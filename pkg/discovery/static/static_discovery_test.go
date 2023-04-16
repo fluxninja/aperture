@@ -110,7 +110,7 @@ var _ = Describe("Static service discovery", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("Writes one entity if it's defined for multiple services", func() {
+		It("Writes one entity if it is defined for multiple services", func() {
 			someIPAddress := "1.2.3.4"
 			someUID := "foo"
 			someName := "some_entity"

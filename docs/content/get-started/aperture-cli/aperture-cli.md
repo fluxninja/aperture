@@ -41,7 +41,7 @@ the binaries can be downloaded from GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
 Page</a>.
 
-Alternatively download it using following script:
+Alternatively, download it using the following script:
 
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
@@ -63,6 +63,8 @@ Skip the following steps if you have obtained the binary file directly using the
 steps mentioned above.
 
 :::
+
+<!-- vale off -->
 
 <Tabs groupId="setup" queryString>
 <TabItem value="macOS" label="macOS">
@@ -87,10 +89,12 @@ With rpm:
 </TabItem>
 </Tabs>
 
+<!-- vale on -->
+
 ## Enable shell autocompletion
 
 To configure your shell to load `aperturectl`
-[bash completions](/reference/aperturectl/completion/completion.md) add to your
+[bash completions](/reference/aperturectl/completion/completion.md), add to your
 profile:
 
 <Tabs>
@@ -118,6 +122,7 @@ aperturectl completion powershell | Out-String | Invoke-Expression
 
 ## Uninstall
 
+<!-- vale off -->
 <Tabs groupId="setup" queryString>
 <TabItem value="macOS" label="macOS">
 With Homebrew:
@@ -141,6 +146,8 @@ With rpm:
 sudo rpm -e aperturectl
 </CodeBlock>
 </TabItem></Tabs>
+
+<!-- vale on -->
 
 ---
 

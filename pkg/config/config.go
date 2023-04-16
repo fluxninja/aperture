@@ -104,7 +104,7 @@ func GroupTag(group string) string {
 type FileUnmarshallerConstructor struct {
 	// Optional Merge Config
 	MergeConfig map[string]interface{}
-	// Config Name -- config file name without the extension -- it's also the annotated name of koanf instance
+	// Config Name -- config file name without the extension -- it is also the annotated name of koanf instance
 	Name string
 	// Command line flag for reading file path
 	PathFlag string

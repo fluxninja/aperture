@@ -48,7 +48,7 @@ extensions: # remote extensions to be bundled
 replaces:
   - old: github.com/org/name
     new: github.com/org/name2
-enable_core_extensions: false # default is true`
+enable_core_extensions: false # default is true
 ```
 
 ### Options
@@ -69,5 +69,4 @@ enable_core_extensions: false # default is true`
 
 ### SEE ALSO
 
-- [aperturectl build](/reference/aperturectl/build/build.md) - Builds the agent
-  and controller binaries
+- [aperturectl build](/reference/aperturectl/build/build.md) - Builds the agent and controller binaries

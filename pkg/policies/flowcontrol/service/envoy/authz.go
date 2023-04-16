@@ -82,10 +82,10 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	start := time.Now()
 
 	createExtAuthzResponse := func(checkResponse *flowcontrolv1.CheckResponse) *authv3.CheckResponse {
-		// We don't care about the particular format we send the CheckResponse,
+		// We do not care about the particular format we send the CheckResponse,
 		// Envoy can treat is as black-box. The only thing we care about is for
 		// it to be deserializable by logs processing pipeline.
-		// Using protobuf wire format as it's faster to serialize/deserialize
+		// Using protobuf wire format as it is faster to serialize/deserialize
 		// than using protojson or roundtripping through structpb.Struct.
 		// Additional base64 encoding step is used, as there's no way to push
 		// binary data through dynamic metadata and envoy's access log

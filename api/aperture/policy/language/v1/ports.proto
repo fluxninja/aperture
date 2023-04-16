@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package aperture.policy.language.v1;
 
-// Components receive input from other components via InPorts
+// Components receive input from other components through InPorts
 message InPort {
   oneof value {
     // Name of the incoming Signal on the InPort.
@@ -12,7 +12,7 @@ message InPort {
   }
 }
 
-// Components produce output for other components via OutPorts
+// Components produce output for other components through OutPorts
 message OutPort {
   // Name of the outgoing Signal on the OutPort.
   string signal_name = 1;

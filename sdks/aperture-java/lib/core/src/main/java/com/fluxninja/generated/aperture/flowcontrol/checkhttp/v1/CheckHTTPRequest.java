@@ -26,95 +26,6 @@ private static final long serialVersionUID = 0L;
     return new CheckHTTPRequest();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
-  private CheckHTTPRequest(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Builder subBuilder = null;
-            if (source_ != null) {
-              subBuilder = source_.toBuilder();
-            }
-            source_ = input.readMessage(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(source_);
-              source_ = subBuilder.buildPartial();
-            }
-
-            break;
-          }
-          case 18: {
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Builder subBuilder = null;
-            if (destination_ != null) {
-              subBuilder = destination_.toBuilder();
-            }
-            destination_ = input.readMessage(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(destination_);
-              destination_ = subBuilder.buildPartial();
-            }
-
-            break;
-          }
-          case 26: {
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.Builder subBuilder = null;
-            if (request_ != null) {
-              subBuilder = request_.toBuilder();
-            }
-            request_ = input.readMessage(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(request_);
-              request_ = subBuilder.buildPartial();
-            }
-
-            break;
-          }
-          case 34: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            controlPoint_ = s;
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (com.google.protobuf.UninitializedMessageException e) {
-      throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckhttpProto.internal_static_aperture_flowcontrol_checkhttp_v1_CheckHTTPRequest_descriptor;
@@ -191,7 +102,6 @@ private static final long serialVersionUID = 0L;
      *
      * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
      */
-
     /* nullable */
 java.lang.String getHeadersOrDefault(
         java.lang.String key,
@@ -204,7 +114,6 @@ java.lang.String defaultValue);
      *
      * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
      */
-
     java.lang.String getHeadersOrThrow(
         java.lang.String key);
 
@@ -353,105 +262,6 @@ java.lang.String defaultValue);
       return new HttpRequest();
     }
 
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private HttpRequest(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              method_ = s;
-              break;
-            }
-            case 18: {
-              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-                headers_ = com.google.protobuf.MapField.newMapField(
-                    HeadersDefaultEntryHolder.defaultEntry);
-                mutable_bitField0_ |= 0x00000001;
-              }
-              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-              headers__ = input.readMessage(
-                  HeadersDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              headers_.getMutableMap().put(
-                  headers__.getKey(), headers__.getValue());
-              break;
-            }
-            case 26: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              path_ = s;
-              break;
-            }
-            case 34: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              host_ = s;
-              break;
-            }
-            case 42: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              scheme_ = s;
-              break;
-            }
-            case 48: {
-
-              size_ = input.readInt64();
-              break;
-            }
-            case 58: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              protocol_ = s;
-              break;
-            }
-            case 66: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              body_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckhttpProto.internal_static_aperture_flowcontrol_checkhttp_v1_CheckHTTPRequest_HttpRequest_descriptor;
@@ -478,7 +288,8 @@ java.lang.String defaultValue);
     }
 
     public static final int METHOD_FIELD_NUMBER = 1;
-    private volatile java.lang.Object method_;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object method_ = "";
     /**
      * <pre>
      * The HTTP request method, such as `GET`, `POST`.
@@ -535,6 +346,7 @@ java.lang.String defaultValue);
                   com.google.protobuf.WireFormat.FieldType.STRING,
                   "");
     }
+    @SuppressWarnings("serial")
     private com.google.protobuf.MapField<
         java.lang.String, java.lang.String> headers_;
     private com.google.protobuf.MapField<java.lang.String, java.lang.String>
@@ -545,7 +357,6 @@ java.lang.String defaultValue);
       }
       return headers_;
     }
-
     public int getHeadersCount() {
       return internalGetHeaders().getMap().size();
     }
@@ -556,7 +367,6 @@ java.lang.String defaultValue);
      *
      * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
      */
-
     @java.lang.Override
     public boolean containsHeaders(
         java.lang.String key) {
@@ -579,7 +389,6 @@ java.lang.String defaultValue);
      * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
      */
     @java.lang.Override
-
     public java.util.Map<java.lang.String, java.lang.String> getHeadersMap() {
       return internalGetHeaders().getMap();
     }
@@ -591,10 +400,11 @@ java.lang.String defaultValue);
      * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
      */
     @java.lang.Override
-
-    public java.lang.String getHeadersOrDefault(
+    public /* nullable */
+java.lang.String getHeadersOrDefault(
         java.lang.String key,
-        java.lang.String defaultValue) {
+        /* nullable */
+java.lang.String defaultValue) {
       if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, java.lang.String> map =
           internalGetHeaders().getMap();
@@ -608,7 +418,6 @@ java.lang.String defaultValue);
      * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
      */
     @java.lang.Override
-
     public java.lang.String getHeadersOrThrow(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
@@ -621,7 +430,8 @@ java.lang.String defaultValue);
     }
 
     public static final int PATH_FIELD_NUMBER = 3;
-    private volatile java.lang.Object path_;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object path_ = "";
     /**
      * <pre>
      * The request target, as it appears in the first line of the HTTP request. This includes
@@ -669,7 +479,8 @@ java.lang.String defaultValue);
     }
 
     public static final int HOST_FIELD_NUMBER = 4;
-    private volatile java.lang.Object host_;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object host_ = "";
     /**
      * <pre>
      * The HTTP request `Host` header value.
@@ -715,7 +526,8 @@ java.lang.String defaultValue);
     }
 
     public static final int SCHEME_FIELD_NUMBER = 5;
-    private volatile java.lang.Object scheme_;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object scheme_ = "";
     /**
      * <pre>
      * The HTTP URL scheme, such as `http` and `https`.
@@ -761,7 +573,7 @@ java.lang.String defaultValue);
     }
 
     public static final int SIZE_FIELD_NUMBER = 6;
-    private long size_;
+    private long size_ = 0L;
     /**
      * <pre>
      * The HTTP request size in bytes. If unknown, it must be -1.
@@ -776,7 +588,8 @@ java.lang.String defaultValue);
     }
 
     public static final int PROTOCOL_FIELD_NUMBER = 7;
-    private volatile java.lang.Object protocol_;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object protocol_ = "";
     /**
      * <pre>
      * The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
@@ -822,7 +635,8 @@ java.lang.String defaultValue);
     }
 
     public static final int BODY_FIELD_NUMBER = 8;
-    private volatile java.lang.Object body_;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object body_ = "";
     /**
      * <pre>
      * The HTTP request body.
@@ -908,7 +722,7 @@ java.lang.String defaultValue);
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(body_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 8, body_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -949,7 +763,7 @@ java.lang.String defaultValue);
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(body_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, body_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -980,7 +794,7 @@ java.lang.String defaultValue);
           .equals(other.getProtocol())) return false;
       if (!getBody()
           .equals(other.getBody())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -1010,7 +824,7 @@ java.lang.String defaultValue);
       hash = (53 * hash) + getProtocol().hashCode();
       hash = (37 * hash) + BODY_FIELD_NUMBER;
       hash = (53 * hash) + getBody().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -1154,37 +968,26 @@ java.lang.String defaultValue);
 
       // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.newBuilder()
       private Builder() {
-        maybeForceBuilderInitialization();
+
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
+
       }
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         method_ = "";
-
         internalGetMutableHeaders().clear();
         path_ = "";
-
         host_ = "";
-
         scheme_ = "";
-
         size_ = 0L;
-
         protocol_ = "";
-
         body_ = "";
-
         return this;
       }
 
@@ -1211,52 +1014,40 @@ java.lang.String defaultValue);
       @java.lang.Override
       public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest buildPartial() {
         com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest result = new com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest(this);
-        int from_bitField0_ = bitField0_;
-        result.method_ = method_;
-        result.headers_ = internalGetHeaders();
-        result.headers_.makeImmutable();
-        result.path_ = path_;
-        result.host_ = host_;
-        result.scheme_ = scheme_;
-        result.size_ = size_;
-        result.protocol_ = protocol_;
-        result.body_ = body_;
+        if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
+      private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.method_ = method_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.headers_ = internalGetHeaders();
+          result.headers_.makeImmutable();
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.path_ = path_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.host_ = host_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.scheme_ = scheme_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.size_ = size_;
+        }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.protocol_ = protocol_;
+        }
+        if (((from_bitField0_ & 0x00000080) != 0)) {
+          result.body_ = body_;
+        }
       }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
+
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest) {
@@ -1271,20 +1062,25 @@ java.lang.String defaultValue);
         if (other == com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.getDefaultInstance()) return this;
         if (!other.getMethod().isEmpty()) {
           method_ = other.method_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
         internalGetMutableHeaders().mergeFrom(
             other.internalGetHeaders());
+        bitField0_ |= 0x00000002;
         if (!other.getPath().isEmpty()) {
           path_ = other.path_;
+          bitField0_ |= 0x00000004;
           onChanged();
         }
         if (!other.getHost().isEmpty()) {
           host_ = other.host_;
+          bitField0_ |= 0x00000008;
           onChanged();
         }
         if (!other.getScheme().isEmpty()) {
           scheme_ = other.scheme_;
+          bitField0_ |= 0x00000010;
           onChanged();
         }
         if (other.getSize() != 0L) {
@@ -1292,13 +1088,15 @@ java.lang.String defaultValue);
         }
         if (!other.getProtocol().isEmpty()) {
           protocol_ = other.protocol_;
+          bitField0_ |= 0x00000040;
           onChanged();
         }
         if (!other.getBody().isEmpty()) {
           body_ = other.body_;
+          bitField0_ |= 0x00000080;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -1313,17 +1111,74 @@ java.lang.String defaultValue);
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                method_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+                headers__ = input.readMessage(
+                    HeadersDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+                internalGetMutableHeaders().getMutableMap().put(
+                    headers__.getKey(), headers__.getValue());
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                path_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 34: {
+                host_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              case 42: {
+                scheme_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              case 48: {
+                size_ = input.readInt64();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
+              case 58: {
+                protocol_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 58
+              case 66: {
+                body_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000080;
+                break;
+              } // case 66
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
       private int bitField0_;
@@ -1381,11 +1236,9 @@ java.lang.String defaultValue);
        */
       public Builder setMethod(
           java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+        if (value == null) { throw new NullPointerException(); }
         method_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -1398,8 +1251,8 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder clearMethod() {
-        
         method_ = getDefaultInstance().getMethod();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
@@ -1414,12 +1267,10 @@ java.lang.String defaultValue);
        */
       public Builder setMethodBytes(
           com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
         method_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -1427,7 +1278,7 @@ java.lang.String defaultValue);
       private com.google.protobuf.MapField<
           java.lang.String, java.lang.String> headers_;
       private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetHeaders() {
+          internalGetHeaders() {
         if (headers_ == null) {
           return com.google.protobuf.MapField.emptyMapField(
               HeadersDefaultEntryHolder.defaultEntry);
@@ -1435,8 +1286,7 @@ java.lang.String defaultValue);
         return headers_;
       }
       private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetMutableHeaders() {
-        onChanged();;
+          internalGetMutableHeaders() {
         if (headers_ == null) {
           headers_ = com.google.protobuf.MapField.newMapField(
               HeadersDefaultEntryHolder.defaultEntry);
@@ -1444,9 +1294,10 @@ java.lang.String defaultValue);
         if (!headers_.isMutable()) {
           headers_ = headers_.copy();
         }
+        bitField0_ |= 0x00000002;
+        onChanged();
         return headers_;
       }
-
       public int getHeadersCount() {
         return internalGetHeaders().getMap().size();
       }
@@ -1457,7 +1308,6 @@ java.lang.String defaultValue);
        *
        * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
        */
-
       @java.lang.Override
       public boolean containsHeaders(
           java.lang.String key) {
@@ -1480,7 +1330,6 @@ java.lang.String defaultValue);
        * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
        */
       @java.lang.Override
-
       public java.util.Map<java.lang.String, java.lang.String> getHeadersMap() {
         return internalGetHeaders().getMap();
       }
@@ -1492,10 +1341,11 @@ java.lang.String defaultValue);
        * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
        */
       @java.lang.Override
-
-      public java.lang.String getHeadersOrDefault(
+      public /* nullable */
+java.lang.String getHeadersOrDefault(
           java.lang.String key,
-          java.lang.String defaultValue) {
+          /* nullable */
+java.lang.String defaultValue) {
         if (key == null) { throw new NullPointerException("map key"); }
         java.util.Map<java.lang.String, java.lang.String> map =
             internalGetHeaders().getMap();
@@ -1509,7 +1359,6 @@ java.lang.String defaultValue);
        * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
        */
       @java.lang.Override
-
       public java.lang.String getHeadersOrThrow(
           java.lang.String key) {
         if (key == null) { throw new NullPointerException("map key"); }
@@ -1520,8 +1369,8 @@ java.lang.String defaultValue);
         }
         return map.get(key);
       }
-
       public Builder clearHeaders() {
+        bitField0_ = (bitField0_ & ~0x00000002);
         internalGetMutableHeaders().getMutableMap()
             .clear();
         return this;
@@ -1533,7 +1382,6 @@ java.lang.String defaultValue);
        *
        * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
        */
-
       public Builder removeHeaders(
           java.lang.String key) {
         if (key == null) { throw new NullPointerException("map key"); }
@@ -1546,7 +1394,8 @@ java.lang.String defaultValue);
        */
       @java.lang.Deprecated
       public java.util.Map<java.lang.String, java.lang.String>
-      getMutableHeaders() {
+          getMutableHeaders() {
+        bitField0_ |= 0x00000002;
         return internalGetMutableHeaders().getMutableMap();
       }
       /**
@@ -1560,12 +1409,10 @@ java.lang.String defaultValue);
           java.lang.String key,
           java.lang.String value) {
         if (key == null) { throw new NullPointerException("map key"); }
-        if (value == null) {
-  throw new NullPointerException("map value");
-}
-
+        if (value == null) { throw new NullPointerException("map value"); }
         internalGetMutableHeaders().getMutableMap()
             .put(key, value);
+        bitField0_ |= 0x00000002;
         return this;
       }
       /**
@@ -1575,11 +1422,11 @@ java.lang.String defaultValue);
        *
        * <code>map&lt;string, string&gt; headers = 2 [json_name = "headers"];</code>
        */
-
       public Builder putAllHeaders(
           java.util.Map<java.lang.String, java.lang.String> values) {
         internalGetMutableHeaders().getMutableMap()
             .putAll(values);
+        bitField0_ |= 0x00000002;
         return this;
       }
 
@@ -1639,11 +1486,9 @@ java.lang.String defaultValue);
        */
       public Builder setPath(
           java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+        if (value == null) { throw new NullPointerException(); }
         path_ = value;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
@@ -1657,8 +1502,8 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder clearPath() {
-        
         path_ = getDefaultInstance().getPath();
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
       }
@@ -1674,12 +1519,10 @@ java.lang.String defaultValue);
        */
       public Builder setPathBytes(
           com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
         path_ = value;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
@@ -1737,11 +1580,9 @@ java.lang.String defaultValue);
        */
       public Builder setHost(
           java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+        if (value == null) { throw new NullPointerException(); }
         host_ = value;
+        bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
@@ -1754,8 +1595,8 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder clearHost() {
-        
         host_ = getDefaultInstance().getHost();
+        bitField0_ = (bitField0_ & ~0x00000008);
         onChanged();
         return this;
       }
@@ -1770,12 +1611,10 @@ java.lang.String defaultValue);
        */
       public Builder setHostBytes(
           com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
         host_ = value;
+        bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
@@ -1833,11 +1672,9 @@ java.lang.String defaultValue);
        */
       public Builder setScheme(
           java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+        if (value == null) { throw new NullPointerException(); }
         scheme_ = value;
+        bitField0_ |= 0x00000010;
         onChanged();
         return this;
       }
@@ -1850,8 +1687,8 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder clearScheme() {
-        
         scheme_ = getDefaultInstance().getScheme();
+        bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
@@ -1866,12 +1703,10 @@ java.lang.String defaultValue);
        */
       public Builder setSchemeBytes(
           com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
         scheme_ = value;
+        bitField0_ |= 0x00000010;
         onChanged();
         return this;
       }
@@ -1899,8 +1734,9 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder setSize(long value) {
-        
+
         size_ = value;
+        bitField0_ |= 0x00000020;
         onChanged();
         return this;
       }
@@ -1913,7 +1749,7 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder clearSize() {
-        
+        bitField0_ = (bitField0_ & ~0x00000020);
         size_ = 0L;
         onChanged();
         return this;
@@ -1972,11 +1808,9 @@ java.lang.String defaultValue);
        */
       public Builder setProtocol(
           java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+        if (value == null) { throw new NullPointerException(); }
         protocol_ = value;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
@@ -1989,8 +1823,8 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder clearProtocol() {
-        
         protocol_ = getDefaultInstance().getProtocol();
+        bitField0_ = (bitField0_ & ~0x00000040);
         onChanged();
         return this;
       }
@@ -2005,12 +1839,10 @@ java.lang.String defaultValue);
        */
       public Builder setProtocolBytes(
           com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
         protocol_ = value;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
@@ -2068,11 +1900,9 @@ java.lang.String defaultValue);
        */
       public Builder setBody(
           java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+        if (value == null) { throw new NullPointerException(); }
         body_ = value;
+        bitField0_ |= 0x00000080;
         onChanged();
         return this;
       }
@@ -2085,8 +1915,8 @@ java.lang.String defaultValue);
        * @return This builder for chaining.
        */
       public Builder clearBody() {
-        
         body_ = getDefaultInstance().getBody();
+        bitField0_ = (bitField0_ & ~0x00000080);
         onChanged();
         return this;
       }
@@ -2101,12 +1931,10 @@ java.lang.String defaultValue);
        */
       public Builder setBodyBytes(
           com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
         body_ = value;
+        bitField0_ |= 0x00000080;
         onChanged();
         return this;
       }
@@ -2143,7 +1971,18 @@ java.lang.String defaultValue);
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new HttpRequest(input, extensionRegistry);
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
       }
     };
 
@@ -2204,7 +2043,7 @@ java.lang.String defaultValue);
    */
   @java.lang.Override
   public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddressOrBuilder getSourceOrBuilder() {
-    return getSource();
+    return source_ == null ? com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.getDefaultInstance() : source_;
   }
 
   public static final int DESTINATION_FIELD_NUMBER = 2;
@@ -2248,7 +2087,7 @@ java.lang.String defaultValue);
    */
   @java.lang.Override
   public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddressOrBuilder getDestinationOrBuilder() {
-    return getDestination();
+    return destination_ == null ? com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.getDefaultInstance() : destination_;
   }
 
   public static final int REQUEST_FIELD_NUMBER = 3;
@@ -2286,11 +2125,12 @@ java.lang.String defaultValue);
    */
   @java.lang.Override
   public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequestOrBuilder getRequestOrBuilder() {
-    return getRequest();
+    return request_ == null ? com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.getDefaultInstance() : request_;
   }
 
   public static final int CONTROL_POINT_FIELD_NUMBER = 4;
-  private volatile java.lang.Object controlPoint_;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object controlPoint_ = "";
   /**
    * <pre>
    * For an SDK based insertion, a Control Point can represent a particular feature or execution block within a Service.
@@ -2363,7 +2203,7 @@ java.lang.String defaultValue);
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 4, controlPoint_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -2387,7 +2227,7 @@ java.lang.String defaultValue);
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, controlPoint_);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -2419,7 +2259,7 @@ java.lang.String defaultValue);
     }
     if (!getControlPoint()
         .equals(other.getControlPoint())) return false;
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -2444,7 +2284,7 @@ java.lang.String defaultValue);
     }
     hash = (37 * hash) + CONTROL_POINT_FIELD_NUMBER;
     hash = (53 * hash) + getControlPoint().hashCode();
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -2561,42 +2401,34 @@ java.lang.String defaultValue);
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (sourceBuilder_ == null) {
-        source_ = null;
-      } else {
-        source_ = null;
+      bitField0_ = 0;
+      source_ = null;
+      if (sourceBuilder_ != null) {
+        sourceBuilder_.dispose();
         sourceBuilder_ = null;
       }
-      if (destinationBuilder_ == null) {
-        destination_ = null;
-      } else {
-        destination_ = null;
+      destination_ = null;
+      if (destinationBuilder_ != null) {
+        destinationBuilder_.dispose();
         destinationBuilder_ = null;
       }
-      if (requestBuilder_ == null) {
-        request_ = null;
-      } else {
-        request_ = null;
+      request_ = null;
+      if (requestBuilder_ != null) {
+        requestBuilder_.dispose();
         requestBuilder_ = null;
       }
       controlPoint_ = "";
-
       return this;
     }
 
@@ -2623,58 +2455,33 @@ java.lang.String defaultValue);
     @java.lang.Override
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest buildPartial() {
       com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest result = new com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest(this);
-      if (sourceBuilder_ == null) {
-        result.source_ = source_;
-      } else {
-        result.source_ = sourceBuilder_.build();
-      }
-      if (destinationBuilder_ == null) {
-        result.destination_ = destination_;
-      } else {
-        result.destination_ = destinationBuilder_.build();
-      }
-      if (requestBuilder_ == null) {
-        result.request_ = request_;
-      } else {
-        result.request_ = requestBuilder_.build();
-      }
-      result.controlPoint_ = controlPoint_;
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
+    private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.source_ = sourceBuilder_ == null
+            ? source_
+            : sourceBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.destination_ = destinationBuilder_ == null
+            ? destination_
+            : destinationBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.request_ = requestBuilder_ == null
+            ? request_
+            : requestBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.controlPoint_ = controlPoint_;
+      }
     }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
-    }
-    @java.lang.Override
-    public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-    @java.lang.Override
-    public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-    @java.lang.Override
-    public Builder setRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-    @java.lang.Override
-    public Builder addRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.addRepeatedField(field, value);
-    }
+
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest) {
@@ -2698,9 +2505,10 @@ java.lang.String defaultValue);
       }
       if (!other.getControlPoint().isEmpty()) {
         controlPoint_ = other.controlPoint_;
+        bitField0_ |= 0x00000008;
         onChanged();
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -2715,19 +2523,59 @@ java.lang.String defaultValue);
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              input.readMessage(
+                  getSourceFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 10
+            case 18: {
+              input.readMessage(
+                  getDestinationFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 18
+            case 26: {
+              input.readMessage(
+                  getRequestFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 26
+            case 34: {
+              controlPoint_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress source_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -2743,7 +2591,7 @@ java.lang.String defaultValue);
      * @return Whether the source field is set.
      */
     public boolean hasSource() {
-      return sourceBuilder_ != null || source_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <pre>
@@ -2777,11 +2625,11 @@ java.lang.String defaultValue);
           throw new NullPointerException();
         }
         source_ = value;
-        onChanged();
       } else {
         sourceBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -2797,11 +2645,11 @@ java.lang.String defaultValue);
         com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Builder builderForValue) {
       if (sourceBuilder_ == null) {
         source_ = builderForValue.build();
-        onChanged();
       } else {
         sourceBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -2815,17 +2663,18 @@ java.lang.String defaultValue);
      */
     public Builder mergeSource(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress value) {
       if (sourceBuilder_ == null) {
-        if (source_ != null) {
-          source_ =
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.newBuilder(source_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          source_ != null &&
+          source_ != com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.getDefaultInstance()) {
+          getSourceBuilder().mergeFrom(value);
         } else {
           source_ = value;
         }
-        onChanged();
       } else {
         sourceBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -2838,14 +2687,13 @@ java.lang.String defaultValue);
      * <code>.aperture.flowcontrol.checkhttp.v1.SocketAddress source = 1 [json_name = "source"];</code>
      */
     public Builder clearSource() {
-      if (sourceBuilder_ == null) {
-        source_ = null;
-        onChanged();
-      } else {
-        source_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      source_ = null;
+      if (sourceBuilder_ != null) {
+        sourceBuilder_.dispose();
         sourceBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
@@ -2858,7 +2706,7 @@ java.lang.String defaultValue);
      * <code>.aperture.flowcontrol.checkhttp.v1.SocketAddress source = 1 [json_name = "source"];</code>
      */
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Builder getSourceBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getSourceFieldBuilder().getBuilder();
     }
@@ -2916,7 +2764,7 @@ java.lang.String defaultValue);
      * @return Whether the destination field is set.
      */
     public boolean hasDestination() {
-      return destinationBuilder_ != null || destination_ != null;
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <pre>
@@ -2950,11 +2798,11 @@ java.lang.String defaultValue);
           throw new NullPointerException();
         }
         destination_ = value;
-        onChanged();
       } else {
         destinationBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -2970,11 +2818,11 @@ java.lang.String defaultValue);
         com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Builder builderForValue) {
       if (destinationBuilder_ == null) {
         destination_ = builderForValue.build();
-        onChanged();
       } else {
         destinationBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -2988,17 +2836,18 @@ java.lang.String defaultValue);
      */
     public Builder mergeDestination(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress value) {
       if (destinationBuilder_ == null) {
-        if (destination_ != null) {
-          destination_ =
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.newBuilder(destination_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000002) != 0) &&
+          destination_ != null &&
+          destination_ != com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.getDefaultInstance()) {
+          getDestinationBuilder().mergeFrom(value);
         } else {
           destination_ = value;
         }
-        onChanged();
       } else {
         destinationBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -3011,14 +2860,13 @@ java.lang.String defaultValue);
      * <code>.aperture.flowcontrol.checkhttp.v1.SocketAddress destination = 2 [json_name = "destination"];</code>
      */
     public Builder clearDestination() {
-      if (destinationBuilder_ == null) {
-        destination_ = null;
-        onChanged();
-      } else {
-        destination_ = null;
+      bitField0_ = (bitField0_ & ~0x00000002);
+      destination_ = null;
+      if (destinationBuilder_ != null) {
+        destinationBuilder_.dispose();
         destinationBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
@@ -3031,7 +2879,7 @@ java.lang.String defaultValue);
      * <code>.aperture.flowcontrol.checkhttp.v1.SocketAddress destination = 2 [json_name = "destination"];</code>
      */
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Builder getDestinationBuilder() {
-      
+      bitField0_ |= 0x00000002;
       onChanged();
       return getDestinationFieldBuilder().getBuilder();
     }
@@ -3087,7 +2935,7 @@ java.lang.String defaultValue);
      * @return Whether the request field is set.
      */
     public boolean hasRequest() {
-      return requestBuilder_ != null || request_ != null;
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
      * <pre>
@@ -3117,11 +2965,11 @@ java.lang.String defaultValue);
           throw new NullPointerException();
         }
         request_ = value;
-        onChanged();
       } else {
         requestBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000004;
+      onChanged();
       return this;
     }
     /**
@@ -3135,11 +2983,11 @@ java.lang.String defaultValue);
         com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.Builder builderForValue) {
       if (requestBuilder_ == null) {
         request_ = builderForValue.build();
-        onChanged();
       } else {
         requestBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000004;
+      onChanged();
       return this;
     }
     /**
@@ -3151,17 +2999,18 @@ java.lang.String defaultValue);
      */
     public Builder mergeRequest(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest value) {
       if (requestBuilder_ == null) {
-        if (request_ != null) {
-          request_ =
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.newBuilder(request_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000004) != 0) &&
+          request_ != null &&
+          request_ != com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.getDefaultInstance()) {
+          getRequestBuilder().mergeFrom(value);
         } else {
           request_ = value;
         }
-        onChanged();
       } else {
         requestBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000004;
+      onChanged();
       return this;
     }
     /**
@@ -3172,14 +3021,13 @@ java.lang.String defaultValue);
      * <code>.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest request = 3 [json_name = "request"];</code>
      */
     public Builder clearRequest() {
-      if (requestBuilder_ == null) {
-        request_ = null;
-        onChanged();
-      } else {
-        request_ = null;
+      bitField0_ = (bitField0_ & ~0x00000004);
+      request_ = null;
+      if (requestBuilder_ != null) {
+        requestBuilder_.dispose();
         requestBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
@@ -3190,7 +3038,7 @@ java.lang.String defaultValue);
      * <code>.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest request = 3 [json_name = "request"];</code>
      */
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.HttpRequest.Builder getRequestBuilder() {
-      
+      bitField0_ |= 0x00000004;
       onChanged();
       return getRequestFieldBuilder().getBuilder();
     }
@@ -3286,11 +3134,9 @@ java.lang.String defaultValue);
      */
     public Builder setControlPoint(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      if (value == null) { throw new NullPointerException(); }
       controlPoint_ = value;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
@@ -3304,8 +3150,8 @@ java.lang.String defaultValue);
      * @return This builder for chaining.
      */
     public Builder clearControlPoint() {
-      
       controlPoint_ = getDefaultInstance().getControlPoint();
+      bitField0_ = (bitField0_ & ~0x00000008);
       onChanged();
       return this;
     }
@@ -3321,12 +3167,10 @@ java.lang.String defaultValue);
      */
     public Builder setControlPointBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       controlPoint_ = value;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
@@ -3363,7 +3207,18 @@ java.lang.String defaultValue);
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new CheckHTTPRequest(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

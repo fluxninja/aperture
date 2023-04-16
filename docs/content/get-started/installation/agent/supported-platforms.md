@@ -22,5 +22,5 @@ Below are the platforms supported for the Aperture Agent:
 | RHEL       | 7 and above         |
 | Fedora     | 35 and above        |
 
-For information regarding other platforms where you would like to see support
-for Aperture, please contact FluxNinja support at support@fluxninja.com
+For information regarding other platforms where you want to see support for
+Aperture, please contact FluxNinja support at support@fluxninja.com

@@ -1,8 +1,8 @@
-label: Javascript
+label: JavaScript
 position: 4
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "Javascript"
-  keywords: ["javascript", "control", "points"]
+  title: "JavaScript"
+  keywords: ["JavaScript", "control", "points"]

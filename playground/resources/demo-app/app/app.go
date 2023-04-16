@@ -41,9 +41,9 @@ type SimpleService struct {
 	port     int
 	// If the ENVOY_EGRESS_PORT environment variable is set then we use
 	// envoy port to configure address to envoy proxy.
-	// If it's not set then value is -1 and we do not configure proxy.
+	// If it is not set then value is -1 and we do not configure proxy.
 	// Istio proxy should handle requests without additional config
-	// if it's injected.
+	// if it is injected.
 	envoyPort         int
 	rabbitMQURL       string
 	concurrency       int           // Maximum number of concurrent clients

@@ -34,7 +34,7 @@ func Merge(originalService, mergedService *heartbeatv1.Service) {
 // - agent group
 // - service name
 //
-// This shouldn't happen in real world, but entities which have multiple values
+// This should not happen in real world, but entities which have multiple values
 // for an agent group is ignored.
 // Entities which have multiple values for service name will create one service
 // for each of them.

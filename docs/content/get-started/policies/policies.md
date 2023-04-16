@@ -20,17 +20,17 @@ import Zoom from 'react-medium-image-zoom';
 ## Introduction
 
 The easiest way to get started with policies in Aperture is to use the built-in
-blueprints system. Advanced users can learn about designing new policies by
+blueprint system. Advanced users can learn about designing new policies by
 following the
 [signal processing](/tutorials/signal-processing/signal-processing.md)
 tutorials.
 
-Aperture repository contains several [blueprints][blueprints] that can be used
-to generate [policies][policies] and [Grafana dashboards][grafana]. Blueprints
-can be used both as a guide for creating new policies, or used as-is by
-providing required parameters or customizations.
+The Aperture repository contains several [blueprints][blueprints] that can be
+used to generate [policies][policies] and [Grafana dashboards][grafana].
+Blueprints can be used both as a guide for creating new policies, or used as-is
+by providing required parameters or customizations.
 
-In order to manage blueprints and generate policies, you can use `aperturectl`
+To manage blueprints and generate policies, you can use the `aperturectl`
 [CLI tool](/reference/aperturectl/aperturectl.md), by following the
 [installation steps](/get-started/aperture-cli/aperture-cli.md#installation)
 first.
@@ -59,12 +59,12 @@ policies/latency-aimd-concurrency-limiting
 policies/static-rate-limiting
 ```
 
-## Customizing Blueprints (values.yaml)
+## Customizing Blueprints
 
-Blueprints use `values.yaml` file to provide required fields and to customize
+Blueprints use a configuration file to provide required fields and to customize
 the generated policy and dashboard files.
 
-For example, to generate `policies/static-rate-limiting` policy, you can first
+For example, to generate a `policies/static-rate-limiting` policy, you can first
 generate a `values.yaml` file using the following command:
 
 ```mdx-code-block
@@ -126,7 +126,7 @@ The generated policies can be applied using `aperturectl` or `kubectl`.
 <TabItem value="aperturectl" label="aperturectl">
 ```
 
-You can pass `--apply` flag with the `aperturectl` to directly apply the
+You can pass the `--apply` flag with the `aperturectl` to directly apply the
 generated policies on a Kubernetes cluster in the namespace where the Aperture
 Controller is installed.
 
@@ -168,7 +168,7 @@ kubectl get policies.fluxninja.com -n aperture-controller
 
 The policy runtime can be visualized in Grafana or any other Prometheus
 compatible analytics tool. Refer to the Prometheus compatible metrics available
-from [controller][controller-metrics] and [agent][agent-metrics]. Some of the
+from the [controller][controller-metrics] and [agent][agent-metrics]. Some
 policy [blueprints][blueprints] come with recommended Grafana dashboards.
 
 ## Deleting Policies
@@ -183,5 +183,4 @@ kubectl delete policies.fluxninja.com static-rate-limiting -n aperture-controlle
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
 [blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
 [policies]: /concepts/policy/policy.md
-[service]: /concepts/flow-control/flow-selector.md#service
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/

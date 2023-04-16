@@ -53,9 +53,22 @@ func main() {
 			return nil
 		}
 		if strings.HasSuffix(path, ".md") {
+			// inside this file, replace instances of "sub-command" with "sub command"
+			content, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			content = []byte(strings.ReplaceAll(string(content), "sub-command", "sub command"))
+			content = []byte(strings.ReplaceAll(string(content), "via your OS's", "using your operating system's"))
+			// write the file back
+			err = os.WriteFile(path, content, 0o600)
+			if err != nil {
+				return err
+			}
+
 			subdir := transform(path)
 			subdir = filepath.Join(docsDir, subdir)
-			// create the subdirectory and move the file to it
+			// create the subdirectory and move the file to it.
 			err = os.MkdirAll(filepath.Dir(subdir), 0o755)
 			if err != nil {
 				return err

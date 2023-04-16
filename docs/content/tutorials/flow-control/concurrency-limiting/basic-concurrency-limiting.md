@@ -13,13 +13,13 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 The most effective technique to protect services from cascading failures is to
-limit the concurrency on the service to match the processing capacity of the
-service. However, figuring out concurrency limit of a service is a hard problem
-in face of continuously changing service infrastructure. Each new version
-deployed, horizontal scaling, or a change in access patterns can change the
-concurrency limit of a service.
+limit the concurrency of the service to match the processing capacity of the
+service. However, figuring out the concurrency limit of a service is a hard
+problem in the face of continuously changing service infrastructure. Each new
+version deployed, horizontal scaling, or a change in access patterns can change
+the concurrency limit of a service.
 
-To accurately model the concurrency limit of a service, it's critical to track
+To accurately model the concurrency limit of a service, it is critical to track
 its
 [golden signals](https://sre.google/sre-book/monitoring-distributed-systems/#xref_monitoring_golden-signals).
 For instance, queue buildup can be detected by tracking deviation of current
@@ -27,36 +27,36 @@ latency from historically normal values.
 
 ## Policy
 
-In this policy we will be using the Latency based AIMD (Additive Increase,
-Multiplicative Decrease) Concurrency Limiting
-[Blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
-to instantiate the policy via Jsonnet. Various building blocks used in the
-policy are described separately in the Signal Processing tutorials.
+This policy uses the latency-based AIMD (Additive Increase, Multiplicative
+Decrease) concurrency limiting
+[Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
+and is instantiated using Jsonnet.
 
 At a high-level, this policy consists of:
 
-- Latency EMA based overload detection: A Flux Meter is used to gather latency
+- Latency EMA-based overload detection: A Flux Meter is used to gather latency
   metrics from a
   [service control point](/concepts/flow-control/flow-selector.md). The latency
-  signal is then fed into EMA component to help establish a long-term trend that
-  we can compare current latency against to detect overloads. See tutorial on
-  [Detecting Overload](/tutorials/signal-processing/detecting-overload.md) to
-  learn more about how this is achieved.
+  signal is then fed into an Exponential Moving Average (EMA) component to
+  establish a long-term trend that can be compared to the current latency to
+  detect overloads. For more information on how this is achieved, see the
+  tutorial on
+  [Detecting Overload](/tutorials/signal-processing/detecting-overload.md).
 - Gradient Controller: Set point latency and current latency signals are fed to
   the gradient controller that calculates the proportional response to adjust
   the Accepted Concurrency (Control Variable).
 - Integral Optimizer: When the service is detected to be in the normal state, an
-  integral optimizer is used to additively increase the concurrency on the
+  integral optimizer is used to additively increase the concurrency of the
   service in each execution cycle of the circuit. This design allows warming-up
-  a service from cold start state. This also protects applications from sudden
-  spikes in traffic as it sets an upper bound to the concurrency allowed on a
-  service in each execution cycle of circuit based on the observed incoming
-  concurrency.
-- Concurrency Limiting Actuator: The concurrency limits are actuated via
+  a service from an initial inactive state. This also protects applications from
+  sudden spikes in traffic, as it sets an upper bound to the concurrency allowed
+  on a service in each execution cycle of the circuit based on the observed
+  incoming concurrency.
+- Concurrency Limiting Actuator: The concurrency limits are actuated using a
   [weighted-fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that is
-  synchronized with Aperture Agents via etcd. The load multiplier adjusts
+  synchronized with Aperture Agents through etcd. The load multiplier adjusts
   (increases or decreases) the token bucket fill rates based on the incoming
   concurrency observed at each agent.
 
@@ -103,12 +103,12 @@ for this policy.
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/get-started/playground/playground.md), we will see that as the
+[Playground](/get-started/playground/playground.md), it demonstrates that when
 traffic spikes above the concurrency limit of
-`service1-demo-app.demoapp.svc.cluster.local`, controller triggers load-shed for
-a proportion of requests matching the Selector. This helps protect the service
-from becoming unresponsive and keeps the latency within the tolerance limit
-(`1.1`) configured in the circuit.
+`service1-demo-app.demoapp.svc.cluster.local`, the controller triggers load
+shedding for a proportion of requests matching the selector. This approach helps
+protect the service from becoming unresponsive and maintains the latency within
+the tolerance limit (`1.1`) configured in the circuit.
 
 <Zoom>
 
@@ -119,8 +119,8 @@ from becoming unresponsive and keeps the latency within the tolerance limit
 ### Dry Run Mode
 
 You can run this policy in the `Dry Run` mode by setting the
-`defaultConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy
-doesn't actuate (i.e. traffic is never dropped) while still evaluating the
+`defaultConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy does
+not actuate (meaning traffic is never dropped) while still evaluating the
 decision it would take in each cycle. This helps understand how the policy would
 behave as the input signals change.
 

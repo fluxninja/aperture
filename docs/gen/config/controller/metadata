@@ -3,14 +3,16 @@ title: Aperture Controller Configuration Reference
 sidebar_position: 10
 sidebar_label: Controller
 ---
+<!-- vale off -->
 
 <head>
   <body className="schema-docs" />
 </head>
 
+<!-- vale on -->
 
 :::info
 See also [Aperture Controller installation](/get-started/installation/controller/controller.md).
 :::
 
-List of all config parameters for Aperture Controller.
+List of all configuration parameters for Aperture Controller.

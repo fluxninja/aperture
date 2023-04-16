@@ -41,5 +41,4 @@ aperturectl flow-control control-points --kube
 
 ### SEE ALSO
 
-- [aperturectl flow-control](/reference/aperturectl/flow-control/flow-control.md) -
-  Flow Control integrations
+- [aperturectl flow-control](/reference/aperturectl/flow-control/flow-control.md) - Flow Control integrations

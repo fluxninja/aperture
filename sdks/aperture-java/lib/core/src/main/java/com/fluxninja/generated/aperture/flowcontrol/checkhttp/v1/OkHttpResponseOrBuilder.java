@@ -46,7 +46,6 @@ public interface OkHttpResponseOrBuilder extends
    *
    * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
    */
-
   /* nullable */
 java.lang.String getHeadersOrDefault(
       java.lang.String key,
@@ -59,7 +58,6 @@ java.lang.String defaultValue);
    *
    * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
    */
-
   java.lang.String getHeadersOrThrow(
       java.lang.String key);
 

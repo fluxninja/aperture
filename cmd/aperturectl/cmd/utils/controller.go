@@ -170,7 +170,7 @@ func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err 
 		return 0, nil, fmt.Errorf("failed to create Kubernetes client: %w", err)
 	}
 
-	// FIXME Forwarding to a service would be nicer solution, but couldn't make
+	// FIXME Forwarding to a service would be nicer solution, but could not make
 	// it work for some reason, thus forwarding to pod directly.
 	pods, err := clientset.CoreV1().Pods(controllerNs).List(context.Background(), metav1.ListOptions{
 		LabelSelector: labels.Set{"app.kubernetes.io/component": "aperture-controller"}.String(),

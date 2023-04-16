@@ -12,10 +12,8 @@ Install example Istio EnvoyFilter
 
 ### Synopsis
 
-Use this command to install example Istio EnvoyFilter on your Kubernetes
-cluster. Refer
-https://artifacthub.io/packages/helm/aperture/istioconfig#parameters for list of
-configurable parameters for preparing values file.
+Use this command to install example Istio EnvoyFilter on your Kubernetes cluster.
+Refer https://artifacthub.io/packages/helm/aperture/istioconfig#parameters for list of configurable parameters for preparing values file.
 
 ```
 aperturectl install istioconfig [flags]
@@ -46,5 +44,4 @@ aperturectl install istioconfig --values-file=values.yaml --namespace=istio-syst
 
 ### SEE ALSO
 
-- [aperturectl install](/reference/aperturectl/install/install.md) - Install
-  Aperture components
+- [aperturectl install](/reference/aperturectl/install/install.md) - Install Aperture components

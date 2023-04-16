@@ -3,9 +3,9 @@ package config
 
 import "github.com/fluxninja/aperture/pkg/config"
 
-// NewDefaultCommonOTELConfig creates CommonOTELConfig with all the default values set.
-func NewDefaultCommonOTELConfig() *CommonOTELConfig {
-	return &CommonOTELConfig{
+// NewDefaultCommonOTelConfig creates CommonOTelConfig with all the default values set.
+func NewDefaultCommonOTelConfig() *CommonOTelConfig {
+	return &CommonOTelConfig{
 		Ports: PortsConfig{
 			DebugPort:       8888,
 			HealthCheckPort: 13133,
@@ -15,31 +15,31 @@ func NewDefaultCommonOTELConfig() *CommonOTELConfig {
 	}
 }
 
-// CommonOTELConfig is the configuration for the OTEL collector.
+// CommonOTelConfig is the configuration for the OTel collector.
 // swagger:model
 // +kubebuilder:object:generate=true
-type CommonOTELConfig struct {
+type CommonOTelConfig struct {
 	// BatchAlerts configures batch alerts processor.
 	BatchAlerts BatchAlertsConfig `json:"batch_alerts"`
 	// Ports configures debug, health and extension ports values.
 	Ports PortsConfig `json:"ports"`
 }
 
-// PortsConfig defines configuration for OTEL debug and extension ports.
+// PortsConfig defines configuration for OTel debug and extension ports.
 // swagger:model
 // +kubebuilder:object:generate=true
 type PortsConfig struct {
-	// Port on which otel collector exposes prometheus metrics on /metrics path.
+	// Port on which OTel collector exposes Prometheus metrics on /metrics path.
 	DebugPort uint32 `json:"debug_port" validate:"gte=0" default:"8888"`
 	// Port on which health check extension in exposed.
 	HealthCheckPort uint32 `json:"health_check_port" validate:"gte=0" default:"13133"`
-	// Port on which pprof extension in exposed.
+	// Port on which `pprof` extension in exposed.
 	PprofPort uint32 `json:"pprof_port" validate:"gte=0" default:"1777"`
-	// Port on which zpages extension in exposed.
+	// Port on which `zpages` extension in exposed.
 	ZpagesPort uint32 `json:"zpages_port" validate:"gte=0" default:"55679"`
 }
 
-// BatchAlertsConfig defines configuration for OTEL batch processor.
+// BatchAlertsConfig defines configuration for OTel batch processor.
 // swagger:model
 // +kubebuilder:object:generate=true
 type BatchAlertsConfig struct {

@@ -52,7 +52,7 @@ type HTTPServerConfig struct {
 	MaxHeaderBytes int `json:"max_header_bytes" validate:"gte=0" default:"1048576"`
 	// Buckets specification in latency histogram
 	LatencyBucketsMS []float64 `json:"latency_buckets_ms" validate:"gte=0" default:"[10.0,25.0,100.0,250.0,1000.0]"`
-	// Disable HTTP Keep Alives
+	// Disable HTTP Keepalive
 	DisableHTTPKeepAlives bool `json:"disable_http_keep_alives" default:"false"`
 }
 
@@ -137,7 +137,7 @@ func (constructor ServerConstructor) provideServer(
 			// Ignore already registered error, as this is not harmful. Metrics may
 			// be registered by other running server.
 			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-				return nil, nil, nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
+				return nil, nil, nil, fmt.Errorf("could not register prometheus metrics: %w", err)
 			}
 		}
 	}

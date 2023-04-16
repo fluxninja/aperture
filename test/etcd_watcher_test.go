@@ -45,7 +45,7 @@ var _ = Describe("Etcd Watcher", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("tracks etcd key even if it doesn't exist at first", func() {
+		It("tracks etcd key even if it does not exist at first", func() {
 			_, err := etcdClient.KV.Get(ctx, notifierPath)
 			Expect(err).ToNot(HaveOccurred())
 

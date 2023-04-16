@@ -291,7 +291,7 @@ type heapPolicy struct {
 func newHeapPolicy(config watchdogconfig.HeapConfig) *heapPolicy {
 	hp := heapPolicy{HeapConfig: config}
 
-	// get the initial effective GoGC; guess it's 100 (default), and restore
+	// get the initial effective GoGC; guess it is 100 (default), and restore
 	// it to whatever it actually was. This works because SetGCPercent
 	// returns the previous value.
 	hp.originalGoGC = debug.SetGCPercent(100)
@@ -335,7 +335,7 @@ func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 		hp.currGoGC = hp.originalGoGC
 	} else if hp.currGoGC < hp.MinGoGC {
 		log.Warn().Msg("heap driven watchdog reached minimum threshold for GoGC value")
-		// cap GoGC to avoid overscheduling.
+		// cap GoGC to avoid over scheduling.
 		hp.currGoGC = hp.MinGoGC
 	}
 

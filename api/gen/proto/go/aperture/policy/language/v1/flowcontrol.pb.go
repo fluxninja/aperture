@@ -126,13 +126,13 @@ type ServiceSelector struct {
 	// :::info
 	//
 	// In the Kubernetes sidecar installation mode, service discovery is switched off by default.
-	// In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
+	// To scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 	//
 	// :::
 	//
 	// :::info
 	//
-	// An entity (e.g. Kubernetes pod) may belong to multiple services.
+	// An entity (for example, Kubernetes pod) might belong to multiple services.
 	//
 	// :::
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty" default:"any"` // @gotags: default:"any"
@@ -219,7 +219,7 @@ type FlowMatcher struct {
 
 	// [Control Point](/concepts/flow-control/flow-selector.md#control-point)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
-	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 	// or filter chains.
 	ControlPoint string `protobuf:"bytes,1,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
@@ -238,7 +238,7 @@ type FlowMatcher struct {
 	// classifier, but only if they were created at some previous control point
 	// (and propagated in baggage).
 	//
-	// This limitation doesn't apply to selectors of other entities, like
+	// This limitation does not apply to selectors of other entities, like
 	// Flux Meters or Actuators. It's valid to create a flow label on a control
 	// point using classifier, and immediately use it for matching on the same
 	// control point.
@@ -301,7 +301,7 @@ type FlowControlResources struct {
 
 	// Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 	//
-	// Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+	// Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive"` // @gotags: validate:"dive"
 	// Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 	//
@@ -561,7 +561,7 @@ type Classifier struct {
 	//
 	// Rego is a policy language used to express complex policies in a concise and declarative way.
 	// It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
-	// For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+	// For simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.
 	Rego *Rego `protobuf:"bytes,3,opt,name=rego,proto3" json:"rego,omitempty"`
 }
 
@@ -738,7 +738,7 @@ func (*Rule_Extractor) isRule_Source() {}
 
 func (*Rule_Rego_) isRule_Source() {}
 
-// Rego define a set of labels that are extracted after evaluating a rego module.
+// Rego define a set of labels that are extracted after evaluating a Rego module.
 //
 // :::info
 //
@@ -748,7 +748,7 @@ func (*Rule_Rego_) isRule_Source() {}
 //
 // :::info
 //
-// Special rego variables:
+// Special Rego variables:
 // - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 //
 // :::
@@ -781,9 +781,9 @@ type Rego struct {
 	// A map of {key, value} pairs mapping from
 	// [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
 	// how to extract and propagate flow labels with that key.
-	// The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+	// The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
 	Labels map[string]*Rego_LabelProperties `protobuf:"bytes,1,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"required,gt=0,dive,keys,required,endkeys,required"` // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
-	// Source code of the rego module.
+	// Source code of the Rego module.
 	//
 	// :::Note
 	//
@@ -839,7 +839,7 @@ func (x *Rego) GetModule() string {
 	return ""
 }
 
-// Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
+// Defines a high-level way to specify how to extract a flow label value given HTTP request metadata, without a need to write Rego code
 //
 // There are multiple variants of extractor, specify exactly one.
 type Extractor struct {
@@ -941,9 +941,9 @@ type Extractor_From struct {
 	// Attribute path is a dot-separated path to attribute.
 	//
 	// Should be either:
-	// * one of the fields of [Attribute Context][attribute-context], or
-	// * a special "request.http.bearer" pseudo-attribute.
-	// Eg. "request.http.method" or "request.http.header.user-agent"
+	// * one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or
+	// * a special `request.http.bearer` pseudo-attribute.
+	// For example, `request.http.method` or `request.http.header.user-agent`
 	//
 	// Note: The same attribute path syntax is shared by other extractor variants,
 	// wherever attribute path is needed in their "from" syntax.
@@ -952,12 +952,11 @@ type Extractor_From struct {
 	// ```yaml
 	// from: request.http.headers.user-agent
 	// ```
-	// [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 	From string `protobuf:"bytes,1,opt,name=from,proto3,oneof"`
 }
 
 type Extractor_Json struct {
-	// Deserialize a json, and extract one of the fields.
+	// Parse JSON, and extract one of the fields.
 	Json *JSONExtractor `protobuf:"bytes,2,opt,name=json,proto3,oneof"`
 }
 
@@ -986,7 +985,7 @@ func (*Extractor_Jwt) isExtractor_Variant() {}
 
 func (*Extractor_PathTemplates) isExtractor_Variant() {}
 
-// Deserialize a json, and extract one of the fields
+// Parse JSON, and extract one of the fields
 //
 // Example:
 // ```yaml
@@ -998,12 +997,12 @@ type JSONExtractor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Attribute path pointing to some strings - eg. "request.http.body".
+	// Attribute path pointing to some strings - for example, `request.http.body`.
 	From string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty" validate:"required"` //@gotags: validate:"required"
-	// Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
+	// JSON pointer represents a parsed JSON pointer which allows to select a specified field from the payload.
 	//
-	// Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-	// eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+	// Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+	// for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
 	Pointer string `protobuf:"bytes,2,opt,name=pointer,proto3" json:"pointer,omitempty"`
 }
 
@@ -1053,12 +1052,16 @@ func (x *JSONExtractor) GetPointer() string {
 	return ""
 }
 
-// Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+// Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`
 //
-// IP addresses in attribute context are defined as objects with separate ip and port fields.
+// IP addresses in attribute context are defined as objects with separate IP and port fields.
 // This is a helper to display an address as a single string.
 //
-// Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
+// :::caution
+//
+// This might introduce high-cardinality flow label values.
+//
+// :::
 //
 // Example:
 // ```yaml
@@ -1071,7 +1074,7 @@ type AddressExtractor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Attribute path pointing to some string - eg. "source.address".
+	// Attribute path pointing to some string - for example, `source.address`.
 	From string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty" validate:"required"` //@gotags: validate:"required"
 }
 
@@ -1116,10 +1119,10 @@ func (x *AddressExtractor) GetFrom() string {
 
 // Parse the attribute as JWT and read the payload
 //
-// Specify a field to be extracted from payload using "json_pointer".
+// Specify a field to be extracted from payload using `json_pointer`.
 //
-// Note: The signature is not verified against the secret (we're assuming there's some
-// other parts of the system that handles such verification).
+// Note: The signature is not verified against the secret (assuming there's some
+// other part of the system that handles such verification).
 //
 // Example:
 // ```yaml
@@ -1131,12 +1134,12 @@ type JWTExtractor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
+	// JWT (JSON Web Token) can be extracted from any input attribute, but most likely you'd want to use `request.http.bearer`.
 	From string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty" validate:"required"` //@gotags: validate:"required"
-	// Json pointer allowing to select a specified field from the json payload.
+	// JSON pointer allowing to select a specified field from the payload.
 	//
-	// Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-	// eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+	// Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+	// for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
 	JsonPointer string `protobuf:"bytes,2,opt,name=json_pointer,json=jsonPointer,proto3" json:"json_pointer,omitempty"`
 }
 
@@ -1200,7 +1203,7 @@ type PathTemplateMatcher struct {
 	//
 	//   - Static path segment `/foo` matches a path segment exactly
 	//   - `/{param}` matches arbitrary path segment.
-	//     (The param name is ignored and can be omitted (`{}`))
+	//     (The parameter name is ignored and can be omitted (`{}`))
 	//   - The parameter must cover whole segment.
 	//   - Additionally, path template can end with `/*` wildcard to match
 	//     arbitrary number of trailing segments (0 or more).
@@ -1367,7 +1370,7 @@ type FlowControl_RateLimiter struct {
 }
 
 type FlowControl_ConcurrencyLimiter struct {
-	// _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+	// Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
 	ConcurrencyLimiter *ConcurrencyLimiter `protobuf:"bytes,2,opt,name=concurrency_limiter,json=concurrencyLimiter,proto3,oneof"`
 }
 
@@ -1411,7 +1414,7 @@ func (*FlowControl_LoadShaperSeries) isFlowControl_Component() {}
 //
 // :::
 //
-// Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+// RateLimiting is done on per-label-value basis. Use `label_key`
 // to select which label should be used as key.
 type RateLimiter struct {
 	state         protoimpl.MessageState
@@ -1420,7 +1423,7 @@ type RateLimiter struct {
 
 	// Input ports for the RateLimiter component
 	InPorts *RateLimiter_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Which control point to apply this ratelimiter to.
+	// Which control point to apply this rate limiter to.
 	FlowSelector *FlowSelector `protobuf:"bytes,2,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Parameters for the RateLimiter component
 	Parameters *RateLimiter_Parameters `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -1497,7 +1500,7 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 	return nil
 }
 
-// _Concurrency Limiter_ is an actuator component that regulates flows in order to provide active service protection
+// Concurrency Limiter is an actuator component that regulates flows to provide active service protection
 //
 // :::info
 //
@@ -1505,11 +1508,11 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 //
 // :::
 //
-// It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
-// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
+// It's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
+// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
 //
 // ConcurrencyLimiter configuration is split into two parts: An actuation
-// strategy and a scheduler. Right now, only `load_actuator` strategy is available.
+// strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 type ConcurrencyLimiter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1735,7 +1738,7 @@ func (x *LoadActuator) GetDefaultConfig() *LoadActuator_DynamicConfig {
 	return nil
 }
 
-// High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+// High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
 type AIMDConcurrencyController struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1755,7 +1758,7 @@ type AIMDConcurrencyController struct {
 	MaxLoadMultiplier float64 `protobuf:"fixed64,6,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,7,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.0025"` // @gotags: default:"0.0025"
-	// Configuration for embedded alerter.
+	// Configuration for embedded Alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,8,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
 	// Dynamic configuration key for load actuation.
 	DynamicConfigKey string `protobuf:"bytes,9,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
@@ -1941,7 +1944,19 @@ func (x *FlowRegulator) GetDefaultConfig() *FlowRegulator_DynamicConfig {
 	return nil
 }
 
-// The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
+// The _Load Shaper_ produces a smooth and continuous traffic load
+// that changes progressively over time, based on the specified steps.
+//
+// Each step is defined by two parameters:
+//   - The `target_accept_percentage`.
+//   - The `duration` for the signal to change from the
+//     previous step's `target_accept_percentage` to the current step's
+//     `target_accept_percentage`.
+//
+// The percentage of requests accepted starts at the `target_accept_percentage`
+// defined in the first step and gradually ramps up or down linearly from
+// the previous step's `target_accept_percentage` to the next
+// `target_accept_percentage`, over the `duration` specified for each step.
 type LoadShaper struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2333,9 +2348,9 @@ func (x *FluxMeter_ExponentialBucketsRange) GetCount() int32 {
 	return 0
 }
 
-// Raw rego rules are compiled 1:1 to rego queries
+// Raw Rego rules are compiled 1:1 to Rego queries
 //
-// High-level extractor-based rules are compiled into a single rego query.
+// High-level extractor-based rules are compiled into a single Rego query.
 //
 // Deprecated: 1.5.0
 type Rule_Rego struct {
@@ -2343,13 +2358,13 @@ type Rule_Rego struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Source code of the rego module.
+	// Source code of the Rego module.
 	//
 	// Note: Must include a "package" declaration.
 	Source string `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty" validate:"deprecated,required"` // @gotags: validate:"deprecated,required"
-	// Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+	// Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
 	//
-	// Note: The module name must match the package name from the "source".
+	// Note: The module name must match the package name from the `source`.
 	Query string `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty" validate:"deprecated,required"` // @gotags: validate:"deprecated,required"
 }
 
@@ -2469,14 +2484,15 @@ type RateLimiter_Parameters struct {
 
 	// Time after which the limit for a given label value will be reset.
 	LimitResetInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=limit_reset_interval,json=limitResetInterval,proto3" json:"limit_reset_interval,omitempty" default:"60s"` // @gotags: default:"60s"
-	// Specifies which label the ratelimiter should be keyed by.
+	// Specifies which label the rate limiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
 	// [label](/concepts/flow-control/flow-label.md) with given key.
-	// Eg., to give each user a separate limit, assuming you have a _user_ flow
+	// For example, to give each user a separate limit, assuming you
+	// have a _user_ flow
 	// label set up, set `label_key: "user"`.
 	LabelKey string `protobuf:"bytes,2,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Configuration of lazy-syncing behaviour of ratelimiter
+	// Configuration of lazy-syncing behaviour of rate limiter
 	LazySync *RateLimiter_Parameters_LazySync `protobuf:"bytes,3,opt,name=lazy_sync,json=lazySync,proto3" json:"lazy_sync,omitempty"`
 }
 
@@ -2540,7 +2556,8 @@ type RateLimiter_Override struct {
 
 	// Value of the label for which the override should be applied.
 	LabelValue string `protobuf:"bytes,1,opt,name=label_value,json=labelValue,proto3" json:"label_value,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Amount by which the _in\_ports.limit_ should be multiplied for this label value.
+	// Amount by which the `in_ports.limit` should be multiplied for
+	// this label value.
 	LimitScaleFactor float64 `protobuf:"fixed64,2,opt,name=limit_scale_factor,json=limitScaleFactor,proto3" json:"limit_scale_factor,omitempty" default:"1.0"` // @gotags: default:"1.0"
 }
 
@@ -2645,12 +2662,12 @@ type RateLimiter_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Number of flows allowed per _limit\_reset\_interval_ per each label.
-	// Negative values disable the ratelimiter.
+	// Number of flows allowed per `limit_reset_interval` per each label.
+	// Negative values disable the rate limiter.
 	//
 	// :::tip
 	//
-	// Negative limit can be useful to _conditionally_ enable the ratelimiter
+	// Negative limit can be useful to _conditionally_ enable the rate limiter
 	// under certain circumstances. [Decider](#decider) might be helpful.
 	//
 	// :::
@@ -2703,7 +2720,7 @@ type RateLimiter_Parameters_LazySync struct {
 
 	// Enables lazy sync
 	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty" default:"false"` // @gotags: default:"false"
-	// Number of times to lazy sync within the _limit\_reset\_interval_.
+	// Number of times to lazy sync within the `limit_reset_interval`.
 	NumSync uint32 `protobuf:"varint,2,opt,name=num_sync,json=numSync,proto3" json:"num_sync,omitempty" default:"5" validate:"gt=0"` // @gotags: default:"5" validate:"gt=0"
 }
 
@@ -2821,15 +2838,14 @@ type Scheduler_Parameters struct {
 	// List of workloads to be used in scheduler.
 	//
 	// Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
-	// requests". There are two aspects of this "smartness":
+	// allows for load-shedding to be "intelligent" compared to random rejections.
+	// There are two aspects of this "intelligence":
 	//   - Scheduler can more precisely calculate concurrency if it understands
-	//     that flows belonging to different classes have different weights (eg.
-	//     inserts vs lookups).
+	//     that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
 	//   - Setting different priorities to different workloads lets the scheduler
 	//     avoid dropping important traffic during overload.
 	//
-	// Each workload in this list specifies also a matcher that's used to
+	// Each workload in this list specifies also a matcher that is used to
 	// determine which flow will be categorized into which workload.
 	// In case of multiple matching workloads, the first matching one will be used.
 	// If none of workloads match, `default_workload` will be used.
@@ -2847,10 +2863,11 @@ type Scheduler_Parameters struct {
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during last few seconds (exact duration
 	// of this average can change).
-	// Make sure to not provide `tokens` in workload definitions or in the flow
-	// if you want to use this feature.
+	// Verify that the `tokens` in workload definitions
+	// or the flow aren't set if you want
+	// to use this feature.
 	AutoTokens bool `protobuf:"varint,3,opt,name=auto_tokens,json=autoTokens,proto3" json:"auto_tokens,omitempty" default:"true"` // @gotags: default:"true"
-	// Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
+	// Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
 	//
 	// If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 	// it will be rejected.
@@ -2858,24 +2875,24 @@ type Scheduler_Parameters struct {
 	// This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
 	TimeoutFactor float64 `protobuf:"fixed64,4,opt,name=timeout_factor,json=timeoutFactor,proto3" json:"timeout_factor,omitempty" validate:"gte=0.0" default:"0.5"` // @gotags: validate:"gte=0.0" default:"0.5"
 	// Max Timeout is the value with which the flow timeout is capped.
-	// When auto_tokens feature is not enabled, this value is used as the
+	// When `auto_tokens` feature is not enabled, this value is used as the
 	// timeout for the flow, otherwise it is used as a cap for the timeout.
 	//
 	// :::caution
 	//
-	// This timeout needs to be strictly less than the timeout set on the
+	// This timeout needs to be less than the timeout set on the
 	// client for the whole GRPC call:
 	// * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-	// * in case of libraries, timeout configured... TODO.
+	// * in case of libraries, is configured during the client initialization.
 	//
-	// We're using fail-open logic in integrations, so if the GRPC timeout
+	// Fail-open logic is use for flow control APIs, so if the GRPC timeout
 	// fires first, the flow will end up being unconditionally allowed while
-	// it're still waiting on the scheduler.
+	// it is still waiting on the scheduler.
 	//
 	// To avoid such cases, the end-to-end GRPC timeout should also contain
-	// some headroom for constant overhead like serialization, etc. Default
-	// value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
-	// tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+	// some headroom for constant overhead like serialization and other processing delays. Default
+	// value for GRPC timeouts is 500ms, giving 10ms of headroom, so when
+	// tweaking this timeout, adjust the GRPC timeout accordingly.
 	//
 	// :::
 	MaxTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=max_timeout,json=maxTimeout,proto3" json:"max_timeout,omitempty" default:"0.49s"` // @gotags: default:"0.49s"
@@ -2959,13 +2976,12 @@ type Scheduler_Outs struct {
 	//
 	// :::info
 	//
-	// Concurrency is a unitless number describing mean number of
+	// Concurrency is a unit less number describing mean number of
 	// [flows](/concepts/flow-control/flow-control.md#flow) being
 	// concurrently processed by the system (system = control point).
 	// Concurrency is calculated as _work_ done per unit of time (so
 	// work-seconds per world-seconds). Work-seconds are computed based on
-	// token-weights of of flows (which are either estimated via `auto_tokens`
-	// or specified by `Workload.tokens`).
+	// token-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).
 	//
 	// :::
 	//
@@ -3042,10 +3058,10 @@ type Scheduler_Workload_Parameters struct {
 	// $$
 	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255" default:"0"` // @gotags: validate:"gte=0,lte=255" default:"0"
 	// Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-	// This override is applicable only if tokens for the request are not specified in the request.
+	// This override is applicable only if tokens for the request aren't specified in the request.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty"`
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -3268,7 +3284,7 @@ type AIMDConcurrencyController_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+	// Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
 	IsOverload *OutPort `protobuf:"bytes,1,opt,name=is_overload,json=isOverload,proto3" json:"is_overload,omitempty"`
 	// Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
 	DesiredLoadMultiplier *OutPort `protobuf:"bytes,2,opt,name=desired_load_multiplier,json=desiredLoadMultiplier,proto3" json:"desired_load_multiplier,omitempty"`
@@ -3404,8 +3420,11 @@ type FlowRegulator_Parameters struct {
 	// _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The flow label key for identifying sessions.
-	// If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-	// If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+	//   - When label key is specified, _Flow Regulator_ acts as a sticky filter.
+	//     The series of flows with the same value of label key get the same
+	//     decision provided that the `accept_percentage` is same or higher.
+	//   - When label key is not specified, _Flow Regulator_ acts as a stateless filter.
+	//     Percentage of flows are selected randomly for rejection.
 	LabelKey string `protobuf:"bytes,2,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty"`
 }
 
@@ -3635,9 +3654,9 @@ type LoadShaper_Outs struct {
 
 	// The percentage of flows being accepted by the _Load Shaper_.
 	AcceptPercentage *OutPort `protobuf:"bytes,1,opt,name=accept_percentage,json=acceptPercentage,proto3" json:"accept_percentage,omitempty"`
-	// A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
+	// A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
 	AtStart *OutPort `protobuf:"bytes,2,opt,name=at_start,json=atStart,proto3" json:"at_start,omitempty"`
-	// A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+	// A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
 	AtEnd *OutPort `protobuf:"bytes,3,opt,name=at_end,json=atEnd,proto3" json:"at_end,omitempty"`
 }
 

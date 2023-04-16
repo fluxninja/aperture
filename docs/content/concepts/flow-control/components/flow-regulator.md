@@ -26,9 +26,9 @@ specific sessions or users.
 
 If a label key is specified, the Flow Regulator acts as a sticky filter. In this
 mode, it ensures that a series of flows with the same value of the label key get
-the same decision as long as the accept-percentage remains the same or higher.
-This is useful when you want to maintain consistent behavior for specific
-sessions or users.
+the same decision, provided the percentage of accepted requests remains the same
+or higher. This is useful when you want to maintain consistent behavior for
+specific sessions or users.
 
 ## Dynamic Configuration {#dynamic-configuration}
 

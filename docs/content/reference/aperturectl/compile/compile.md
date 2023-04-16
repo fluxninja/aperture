@@ -12,9 +12,8 @@ Compile circuit from Aperture Policy file
 
 ### Synopsis
 
-Use this command to compile the Aperture Policy circuit from a file to validate
-the circuit. You can also generate the DOT and Mermaid graphs of the compiled
-Aperture Policy circuit to visualize it.
+Use this command to compile the Aperture Policy circuit from a file to validate the circuit.
+You can also generate the DOT and Mermaid graphs of the compiled Aperture Policy circuit to visualize it.
 
 ```
 aperturectl compile [flags]
@@ -32,7 +31,7 @@ aperturectl compile --policy=policy.yaml --mermaid --dot
 
 ```
       --cr string        Path to Aperture Policy custom resource file
-      --depth int        Maximum depth to expand the graph. Use -1 for maximum possible depth
+      --depth int        Maximum depth to expand the graph. Use -1 for maximum possible depth (default 1)
       --dot string       Path to store the dot file
   -h, --help             help for compile
       --mermaid string   Path to store the mermaid file
@@ -41,5 +40,4 @@ aperturectl compile --policy=policy.yaml --mermaid --dot
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
-  to interact with Aperture
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture

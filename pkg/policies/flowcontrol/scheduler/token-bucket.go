@@ -74,7 +74,7 @@ func (tbb *tokenBucketBase) addTokens(toAdd float64) {
 }
 
 func (tbb *tokenBucketBase) take(now time.Time, tokens float64) (time.Duration, bool) {
-	// if tokens aren't coming don't provide any more tokens
+	// if tokens aren't coming do not provide any more tokens
 	if tbb.fillRate == 0 {
 		return time.Duration(0), false
 	}

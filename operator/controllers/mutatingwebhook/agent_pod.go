@@ -97,22 +97,22 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		},
 		{
 			Name:          controllers.OtelDebugPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.DebugPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.DebugPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          controllers.OtelHealthcheckPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.HealthCheckPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.HealthCheckPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          controllers.OtelPprofPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.PprofPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.PprofPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          controllers.OtelZpagesPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.ZpagesPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.ZpagesPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 	}

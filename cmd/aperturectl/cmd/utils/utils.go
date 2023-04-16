@@ -119,7 +119,7 @@ func CompilePolicy(path string) (*circuitfactory.Circuit, *languagev1.Policy, er
 
 	// FIXME This ValidateAndCompile function validates the policy as a whole –
 	// circuit, but also the other resource classifiers, fluxmeters.  This
-	// command is called "circuit-compiler" though, so it's bit... surprising.
+	// command is called "circuit-compiler" though, so it is bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
 	circuit, policy, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)

@@ -84,8 +84,8 @@ func (counter *WindowedCounter) AddTokens(now time.Time, tokens uint64) bool {
 			counter.counters[counter.currentSlot] = 0
 		}
 
-		// If entire window was invalidated, it's better to go back to the bootstrap mode
-		// Traffic might have restarted after an outage so we shouldn't drop excessive traffic because
+		// If entire window was invalidated, it is better to go back to the bootstrap mode
+		// Traffic might have restarted after an outage so we should not drop excessive traffic because
 		// tokenRate will be calculated with incomplete counts
 		if ticks >= int64(counter.totalSlots) {
 			counter.currentSlot = 0
@@ -101,6 +101,6 @@ func (counter *WindowedCounter) AddTokens(now time.Time, tokens uint64) bool {
 		return true
 	}
 
-	// still bootstrapping or didn't shift slots yet
+	// still bootstrapping or did not shift slots yet
 	return false
 }

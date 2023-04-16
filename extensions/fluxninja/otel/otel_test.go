@@ -24,12 +24,12 @@ import (
 
 type inStruct struct {
 	fx.In
-	Actual []*otelconfig.OTELConfig `group:"extension-config"`
+	Actual []*otelconfig.OTelConfig `group:"extension-config"`
 }
 
-var _ = DescribeTable("FN Extension OTEL", func(
-	baseConfig *otelconfig.OTELConfig,
-	expected *otelconfig.OTELConfig,
+var _ = DescribeTable("FN Extension OTel", func(
+	baseConfig *otelconfig.OTelConfig,
+	expected *otelconfig.OTelConfig,
 ) {
 	cfg := map[string]interface{}{
 		"fluxninja": map[string]interface{}{
@@ -59,7 +59,7 @@ var _ = DescribeTable("FN Extension OTEL", func(
 				}
 			},
 			fx.Annotate(
-				func() *otelconfig.OTELConfig {
+				func() *otelconfig.OTelConfig {
 					return baseConfig
 				},
 				fx.ResultTags(config.NameTag("base")),
@@ -98,50 +98,50 @@ var _ = DescribeTable("FN Extension OTEL", func(
 },
 	Entry(
 		"add FN processors and exporters",
-		otelconfig.NewOTELConfig(),
-		baseExtensionOTELConfig(),
+		otelconfig.NewOTelConfig(),
+		baseExtensionOTelConfig(),
 	),
 	Entry(
 		"add FN exporters to logs pipeline",
-		baseOTELConfigWithPipeline("logs", testPipeline()),
-		baseExtensionOTELConfigWithPipeline("logs", testPipelineWithFN()),
+		baseOTelConfigWithPipeline("logs", testPipeline()),
+		baseExtensionOTelConfigWithPipeline("logs", testPipelineWithFN()),
 	),
 	Entry(
 		"add FN exporters to alerts pipeline",
-		baseOTELConfigWithPipeline("logs/alerts", testPipeline()),
-		baseExtensionOTELConfigWithPipeline("logs/alerts", testPipelineWithFN()),
+		baseOTelConfigWithPipeline("logs/alerts", testPipeline()),
+		baseExtensionOTelConfigWithPipeline("logs/alerts", testPipelineWithFN()),
 	),
 	Entry(
 		"add FN exporters to user custom metrics pipeline",
-		baseOTELConfigWithPipeline("metrics/user-defined-rabbitmq", testPipeline()),
-		baseExtensionOTELConfigWithPipeline("metrics/user-defined-rabbitmq", testPipelineWithFN()),
+		baseOTelConfigWithPipeline("metrics/user-defined-rabbitmq", testPipeline()),
+		baseExtensionOTelConfigWithPipeline("metrics/user-defined-rabbitmq", testPipelineWithFN()),
 	),
 	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
-		baseOTELConfigWithPipeline("metrics/fast", testPipeline()),
-		baseExtensionOTELConfigWithMetrics("metrics/slow"),
+		baseOTelConfigWithPipeline("metrics/fast", testPipeline()),
+		baseExtensionOTelConfigWithMetrics("metrics/slow"),
 	),
 	Entry(
 		"add metrics/controller-slow pipeline if metrics/controller-fast pipeline exists",
-		baseOTELConfigWithPipeline("metrics/controller-fast", testPipeline()),
-		baseExtensionOTELConfigWithMetrics("metrics/controller-slow"),
+		baseOTelConfigWithPipeline("metrics/controller-fast", testPipeline()),
+		baseExtensionOTelConfigWithMetrics("metrics/controller-slow"),
 	),
 )
 
-func baseOTELConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTELConfig {
-	cfg := baseOTELConfig()
+func baseOTelConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTelConfig {
+	cfg := baseOTelConfig()
 	cfg.Service.AddPipeline(name, pipeline)
 	return cfg
 }
 
-func baseExtensionOTELConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTELConfig {
-	cfg := baseExtensionOTELConfig()
+func baseExtensionOTelConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTelConfig {
+	cfg := baseExtensionOTelConfig()
 	cfg.Service.AddPipeline(name, pipeline)
 	return cfg
 }
 
-func baseExtensionOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELConfig {
-	cfg := baseExtensionOTELConfig()
+func baseExtensionOTelConfigWithMetrics(pipelineName string) *otelconfig.OTelConfig {
+	cfg := baseExtensionOTelConfig()
 	cfg.AddReceiver("prometheus/fluxninja", map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
@@ -168,8 +168,8 @@ func baseExtensionOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELCon
 	return cfg
 }
 
-func baseOTELConfig() *otelconfig.OTELConfig {
-	cfg := otelconfig.NewOTELConfig()
+func baseOTelConfig() *otelconfig.OTelConfig {
+	cfg := otelconfig.NewOTelConfig()
 	cfg.AddReceiver("prometheus", map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
@@ -182,9 +182,9 @@ func baseOTELConfig() *otelconfig.OTELConfig {
 	return cfg
 }
 
-// baseExtensionOTELConfig as produced by FN Extension
-func baseExtensionOTELConfig() *otelconfig.OTELConfig {
-	cfg := otelconfig.NewOTELConfig()
+// baseExtensionOTelConfig as produced by FN Extension
+func baseExtensionOTelConfig() *otelconfig.OTelConfig {
+	cfg := otelconfig.NewOTelConfig()
 	cfg.AddProcessor("attributes/fluxninja", map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{

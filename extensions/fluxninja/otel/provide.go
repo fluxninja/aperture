@@ -35,7 +35,7 @@ const (
 	exporterFluxNinja = "otlp/fluxninja"
 )
 
-// Module provides the OTEL configuration for FluxNinja.
+// Module provides the OTel configuration for FluxNinja.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
@@ -51,18 +51,18 @@ func Module() fx.Option {
 }
 
 func provideOtelConfig(
-	baseConfig *otelconfig.OTELConfig,
+	baseConfig *otelconfig.OTelConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	lifecycle fx.Lifecycle,
 	heartbeats *heartbeats.Heartbeats,
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
-) (*otelconfig.OTELConfig, error) {
+) (*otelconfig.OTelConfig, error) {
 	if extensionConfig.APIKey == "" {
 		return nil, nil
 	}
 
-	config := otelconfig.NewOTELConfig()
+	config := otelconfig.NewOTelConfig()
 	addFluxNinjaExporter(config, extensionConfig, grpcClientConfig, httpClientConfig)
 	// This is to prevent overwriting extensions with empty config.
 	config.Extensions = baseConfig.Extensions
@@ -102,7 +102,7 @@ func provideOtelConfig(
 	return config, nil
 }
 
-func addAttributesProcessor(config *otelconfig.OTELConfig, controllerID string) {
+func addAttributesProcessor(config *otelconfig.OTelConfig, controllerID string) {
 	config.AddProcessor(processorAttributes, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
@@ -114,7 +114,7 @@ func addAttributesProcessor(config *otelconfig.OTELConfig, controllerID string) 
 	})
 }
 
-func addResourceAttributesProcessor(config *otelconfig.OTELConfig, controllerID string) {
+func addResourceAttributesProcessor(config *otelconfig.OTelConfig, controllerID string) {
 	config.AddProcessor(processorResourceAttributes, map[string]interface{}{
 		"log_statements": []map[string]interface{}{
 			{
@@ -129,7 +129,7 @@ func addResourceAttributesProcessor(config *otelconfig.OTELConfig, controllerID 
 
 func addFNToPipeline(
 	name string,
-	config *otelconfig.OTELConfig,
+	config *otelconfig.OTelConfig,
 	pipeline otelconfig.Pipeline,
 ) {
 	// TODO this duplication of `controller_id` insertion should be cleaned up
@@ -140,7 +140,7 @@ func addFNToPipeline(
 	config.Service.AddPipeline(name, pipeline)
 }
 
-func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
+func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTelConfig) {
 	addFluxNinjaPrometheusReceiver(baseConfig, config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
 	config.Service.AddPipeline("metrics/slow", otelconfig.Pipeline{
@@ -153,7 +153,7 @@ func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 	})
 }
 
-func addMetricsControllerSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
+func addMetricsControllerSlowPipeline(baseConfig, config *otelconfig.OTelConfig) {
 	addFluxNinjaPrometheusReceiver(baseConfig, config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
 	config.Service.AddPipeline("metrics/controller-slow", otelconfig.Pipeline{
@@ -166,7 +166,7 @@ func addMetricsControllerSlowPipeline(baseConfig, config *otelconfig.OTELConfig)
 	})
 }
 
-func addFluxNinjaPrometheusReceiver(baseConfig, config *otelconfig.OTELConfig) {
+func addFluxNinjaPrometheusReceiver(baseConfig, config *otelconfig.OTelConfig) {
 	rawReceiverConfig, _ := baseConfig.Receivers[otelconsts.ReceiverPrometheus].(map[string]any)
 	duplicatedReceiverConfig, err := duplicateMap(rawReceiverConfig)
 	if err != nil {
@@ -200,7 +200,7 @@ func duplicateMap(in map[string]any) (map[string]any, error) {
 	return duplicatedMap, nil
 }
 
-func addFluxNinjaExporter(config *otelconfig.OTELConfig,
+func addFluxNinjaExporter(config *otelconfig.OTelConfig,
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,

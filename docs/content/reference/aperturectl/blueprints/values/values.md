@@ -12,8 +12,7 @@ Provide values file for a given Aperture Blueprint
 
 ### Synopsis
 
-Provides a values file for a given Aperture Blueprint that can be then used to
-generate policies after customization
+Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization
 
 ```
 aperturectl blueprints values [flags]
@@ -49,5 +48,4 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 
 ### SEE ALSO
 
-- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) -
-  Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints

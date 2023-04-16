@@ -17,6 +17,6 @@ type EtcdConfig struct {
 	Password string `json:"password"`
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
-	// List of Etcd server endpoints
+	// List of etcd server endpoints
 	Endpoints []string `json:"endpoints" validate:"required,gt=0,dive,hostname_port|url|fqdn"`
 }

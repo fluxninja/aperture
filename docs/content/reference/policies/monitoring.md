@@ -14,7 +14,7 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Signals flowing through a policy's circuit are reported as Prometheus'
+Signals flowing through a policy's circuit are reported as Prometheus
 [Summaries](https://prometheus.io/docs/practices/histograms/). Therefore, they
 can be monitored in real-time using tools such as
 [Grafana](https://github.com/grafana/grafana).

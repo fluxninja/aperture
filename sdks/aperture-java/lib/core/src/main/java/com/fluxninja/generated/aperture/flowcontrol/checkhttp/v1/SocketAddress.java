@@ -27,67 +27,6 @@ private static final long serialVersionUID = 0L;
     return new SocketAddress();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
-  private SocketAddress(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 8: {
-            int rawValue = input.readEnum();
-
-            protocol_ = rawValue;
-            break;
-          }
-          case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            address_ = s;
-            break;
-          }
-          case 24: {
-
-            port_ = input.readUInt32();
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (com.google.protobuf.UninitializedMessageException e) {
-      throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckhttpProto.internal_static_aperture_flowcontrol_checkhttp_v1_SocketAddress_descriptor;
@@ -210,7 +149,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int PROTOCOL_FIELD_NUMBER = 1;
-  private int protocol_;
+  private int protocol_ = 0;
   /**
    * <code>.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol protocol = 1 [json_name = "protocol", (.validate.rules) = { ... }</code>
    * @return The enum numeric value on the wire for protocol.
@@ -223,13 +162,13 @@ private static final long serialVersionUID = 0L;
    * @return The protocol.
    */
   @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol getProtocol() {
-    @SuppressWarnings("deprecation")
-    com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol result = com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol.valueOf(protocol_);
+    com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol result = com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol.forNumber(protocol_);
     return result == null ? com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol.UNRECOGNIZED : result;
   }
 
   public static final int ADDRESS_FIELD_NUMBER = 2;
-  private volatile java.lang.Object address_;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object address_ = "";
   /**
    * <pre>
    * The address for this socket.
@@ -275,7 +214,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int PORT_FIELD_NUMBER = 3;
-  private int port_;
+  private int port_ = 0;
   /**
    * <pre>
    * The port for this socket.
@@ -312,7 +251,7 @@ private static final long serialVersionUID = 0L;
     if (port_ != 0) {
       output.writeUInt32(3, port_);
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -332,7 +271,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeUInt32Size(3, port_);
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -352,7 +291,7 @@ private static final long serialVersionUID = 0L;
         .equals(other.getAddress())) return false;
     if (getPort()
         != other.getPort()) return false;
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -369,7 +308,7 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getAddress().hashCode();
     hash = (37 * hash) + PORT_FIELD_NUMBER;
     hash = (53 * hash) + getPort();
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -486,28 +425,21 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       protocol_ = 0;
-
       address_ = "";
-
       port_ = 0;
-
       return this;
     }
 
@@ -534,45 +466,24 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress buildPartial() {
       com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress result = new com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress(this);
-      result.protocol_ = protocol_;
-      result.address_ = address_;
-      result.port_ = port_;
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
+    private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.protocol_ = protocol_;
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.address_ = address_;
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.port_ = port_;
+      }
     }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
-    }
-    @java.lang.Override
-    public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-    @java.lang.Override
-    public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-    @java.lang.Override
-    public Builder setRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-    @java.lang.Override
-    public Builder addRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.addRepeatedField(field, value);
-    }
+
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress) {
@@ -590,12 +501,13 @@ private static final long serialVersionUID = 0L;
       }
       if (!other.getAddress().isEmpty()) {
         address_ = other.address_;
+        bitField0_ |= 0x00000002;
         onChanged();
       }
       if (other.getPort() != 0) {
         setPort(other.getPort());
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -610,19 +522,48 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+              protocol_ = input.readEnum();
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 8
+            case 18: {
+              address_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 18
+            case 24: {
+              port_ = input.readUInt32();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 24
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
+    private int bitField0_;
 
     private int protocol_ = 0;
     /**
@@ -638,8 +579,8 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setProtocolValue(int value) {
-      
       protocol_ = value;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -649,8 +590,7 @@ private static final long serialVersionUID = 0L;
      */
     @java.lang.Override
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol getProtocol() {
-      @SuppressWarnings("deprecation")
-      com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol result = com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol.valueOf(protocol_);
+      com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol result = com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol.forNumber(protocol_);
       return result == null ? com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress.Protocol.UNRECOGNIZED : result;
     }
     /**
@@ -662,7 +602,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-      
+      bitField0_ |= 0x00000001;
       protocol_ = value.getNumber();
       onChanged();
       return this;
@@ -672,7 +612,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearProtocol() {
-      
+      bitField0_ = (bitField0_ & ~0x00000001);
       protocol_ = 0;
       onChanged();
       return this;
@@ -731,11 +671,9 @@ private static final long serialVersionUID = 0L;
      */
     public Builder setAddress(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      if (value == null) { throw new NullPointerException(); }
       address_ = value;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
@@ -748,8 +686,8 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearAddress() {
-      
       address_ = getDefaultInstance().getAddress();
+      bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
       return this;
     }
@@ -764,12 +702,10 @@ private static final long serialVersionUID = 0L;
      */
     public Builder setAddressBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       address_ = value;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
@@ -797,8 +733,9 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setPort(int value) {
-      
+
       port_ = value;
+      bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
@@ -811,7 +748,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearPort() {
-      
+      bitField0_ = (bitField0_ & ~0x00000004);
       port_ = 0;
       onChanged();
       return this;
@@ -849,7 +786,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new SocketAddress(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

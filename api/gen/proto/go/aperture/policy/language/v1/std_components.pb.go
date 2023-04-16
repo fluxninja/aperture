@@ -26,7 +26,7 @@ const (
 // and actual value of the signal
 //
 // The `gradient` describes a corrective factor that should be applied to the
-// control variable to get the signal closer to the setpoint. It is computed as follows:
+// control variable to get the signal closer to the setpoint. It's computed as follows:
 //
 // $$
 // \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
@@ -131,18 +131,18 @@ func (x *GradientController) GetDefaultConfig() *GradientController_DynamicConfi
 // Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
 //
 // At any time EMA component operates in one of the following states:
-//  1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-//     If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
+//  1. Warm up state: The first `warmup_window` samples are used to compute the initial EMA.
+//     If an invalid reading is received during the `warmup_window`, the last good average is emitted and the state gets reset back to beginning of warm up state.
 //  2. Normal state: The EMA is computed using following formula.
 //
 // The EMA for a series $Y$ is calculated recursively as:
-//
+// <!-- vale off -->
 // $$
 // \text{EMA} _t =
 // \begin{cases}
 //
 //	Y_0, &\text{for } t = 0 \\
-//	\alpha Y_t + (1 - \alpha) \text{EMA} _{t-1}, &\text{for }t > 0
+//	\alpha Y_t + (1 - \alpha) \text{EMA}_{t-1}, &\text{for }t > 0
 //
 // \end{cases}
 // $$
@@ -154,6 +154,7 @@ func (x *GradientController) GetDefaultConfig() *GradientController_DynamicConfi
 // $$
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
+// <!-- vale on -->
 type EMA struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -220,7 +221,7 @@ func (x *EMA) GetParameters() *EMA_Parameters {
 	return nil
 }
 
-// Type of combinator that computes the arithmetic operation on the operand signals
+// Type of Combinator that computes the arithmetic operation on the operand signals
 type ArithmeticCombinator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -233,7 +234,7 @@ type ArithmeticCombinator struct {
 	// Operator of the arithmetic operation.
 	//
 	// The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
-	// In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
+	// In case of XOR and bit shifts, value of signals is cast to integers before performing the operation.
 	Operator string `protobuf:"bytes,3,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=add sub mul div xor lshift rshift"` // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
 }
 
@@ -290,13 +291,13 @@ func (x *ArithmeticCombinator) GetOperator() string {
 	return ""
 }
 
-// Type of combinator that computes the comparison operation on lhs and rhs signals
+// Type of Combinator that computes the comparison operation on LHS and RHS signals
 //
 // The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 //
-// This component also supports time-based response, i.e. the output
+// This component also supports time-based response (the output)
 // transitions between 1.0 or 0.0 signal if the decider condition is
-// true or false for at least "true_for" or "false_for" duration. If
+// true or false for at least `true_for` or `false_for` duration. If
 // `true_for` and `false_for` durations are zero then the transitions are
 // instantaneous.
 type Decider struct {
@@ -308,13 +309,13 @@ type Decider struct {
 	InPorts *Decider_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Output ports for the Decider component.
 	OutPorts *Decider_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// Comparison operator that computes operation on lhs and rhs input signals.
+	// Comparison operator that computes operation on LHS and RHS input signals.
 	Operator string `protobuf:"bytes,3,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=gt lt gte lte eq neq"` // @gotags: validate:"oneof=gt lt gte lte eq neq"
-	// Duration of time to wait before a transition to true state.
-	// If the duration is zero, the transition will happen instantaneously.
+	// Duration of time to wait before changing to true state.
+	// If the duration is zero, the change will happen instantaneously.```
 	TrueFor *durationpb.Duration `protobuf:"bytes,4,opt,name=true_for,json=trueFor,proto3" json:"true_for,omitempty" default:"0s"` // @gotags: default:"0s"
-	// Duration of time to wait before a transition to false state.
-	// If the duration is zero, the transition will happen instantaneously.
+	// Duration of time to wait before changing to false state.
+	// If the duration is zero, the change will happen instantaneously.
 	FalseFor *durationpb.Duration `protobuf:"bytes,5,opt,name=false_for,json=falseFor,proto3" json:"false_for,omitempty" default:"0s"` // @gotags: default:"0s"
 }
 
@@ -385,7 +386,7 @@ func (x *Decider) GetFalseFor() *durationpb.Duration {
 	return nil
 }
 
-// Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
+// Type of Combinator that switches between `on_signal` and `off_signal` signals based on switch input
 //
 // `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
 //
@@ -531,43 +532,43 @@ type UnaryOperator struct {
 	// Unary Operator to apply.
 	//
 	// The unary operator can be one of the following:
-	// * abs: Absolute value with the sign removed.
-	// * acos: arccosine, in radians.
-	// * acosh: Inverse hyperbolic cosine.
-	// * asin: arcsine, in radians.
-	// * asinh: Inverse hyperbolic sine.
-	// * atan: arctangent, in radians.
-	// * atanh: Inverse hyperbolic tangent.
-	// * cbrt: Cube root.
-	// * ceil: Least integer value greater than or equal to input signal.
-	// * cos: cosine, in radians.
-	// * cosh: Hyperbolic cosine.
-	// * erf: Error function.
-	// * erfc: Complementary error function.
-	// * erfcinv: Inverse complementary error function.
-	// * erfinv: Inverse error function.
-	// * exp: The base-e exponential of input signal.
-	// * exp2: The base-2 exponential of input signal.
-	// * expm1: The base-e exponential of input signal minus 1.
-	// * floor: Greatest integer value less than or equal to input signal.
-	// * gamma: Gamma function.
-	// * j0: Bessel function of the first kind of order 0.
-	// * j1: Bessel function of the first kind of order 1.
-	// * lgamma: Natural logarithm of the absolute value of the gamma function.
-	// * log: Natural logarithm of input signal.
-	// * log10: Base-10 logarithm of input signal.
-	// * log1p: Natural logarithm of input signal plus 1.
-	// * log2: Base-2 logarithm of input signal.
-	// * round: Round to nearest integer.
-	// * roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
-	// * sin: sine, in radians.
-	// * sinh: Hyperbolic sine.
-	// * sqrt: Square root.
-	// * tan: tangent, in radians.
-	// * tanh: Hyperbolic tangent.
-	// * trunc: Truncate to integer.
-	// * y0: Bessel function of the second kind of order 0.
-	// * y1: Bessel function of the second kind of order 1.
+	// * `abs`: Absolute value with the sign removed.
+	// * `acos`: `arccosine`, in radians.
+	// * `acosh`: Inverse hyperbolic cosine.
+	// * `asin`: `arcsine`, in radians.
+	// * `asinh`: Inverse hyperbolic sine.
+	// * `atan`: `arctangent`, in radians.
+	// * `atanh`: Inverse hyperbolic tangent.
+	// * `cbrt`: Cube root.
+	// * `ceil`: Least integer value greater than or equal to input signal.
+	// * `cos`: `cosine`, in radians.
+	// * `cosh`: Hyperbolic cosine.
+	// * `erf`: Error function.
+	// * `erfc`: Complementary error function.
+	// * `erfcinv`: Inverse complementary error function.
+	// * `erfinv`: Inverse error function.
+	// * `exp`: The base-e exponential of input signal.
+	// * `exp2`: The base-2 exponential of input signal.
+	// * `expm1`: The base-e exponential of input signal minus 1.
+	// * `floor`: Greatest integer value less than or equal to input signal.
+	// * `gamma`: Gamma function.
+	// * `j0`: Bessel function of the first kind of order 0.
+	// * `j1`: Bessel function of the first kind of order 1.
+	// * `lgamma`: Natural logarithm of the absolute value of the gamma function.
+	// * `log`: Natural logarithm of input signal.
+	// * `log10`: Base-10 logarithm of input signal.
+	// * `log1p`: Natural logarithm of input signal plus 1.
+	// * `log2`: Base-2 logarithm of input signal.
+	// * `round`: Round to nearest integer.
+	// * `roundtoeven`: Round to nearest integer, with ties going to the nearest even integer.
+	// * `sin`: `sine`, in radians.
+	// * `sinh`: Hyperbolic sine.
+	// * `sqrt`: Square root.
+	// * `tan`: `tangent`, in radians.
+	// * `tanh`: Hyperbolic tangent.
+	// * `trunc`: Truncate to integer.
+	// * `y0`: Bessel function of the second kind of order 0.
+	// * `y1`: Bessel function of the second kind of order 1.
 	Operator string `protobuf:"bytes,3,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1"` // @gotags: validate:"oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1"
 }
 
@@ -814,7 +815,7 @@ func (x *Min) GetOutPorts() *Min_Outs {
 
 // Logical AND.
 //
-// Signals are mapped to boolean values as follows:
+// Signals are mapped to Boolean values as follows:
 // * Zero is treated as false.
 // * Any non-zero is treated as true.
 // * Invalid inputs are considered unknown.
@@ -822,9 +823,9 @@ func (x *Min) GetOutPorts() *Min_Outs {
 //	:::note
 //
 //	Treating invalid inputs as "unknowns" has a consequence that the result
-//	might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+//	might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
 //	because the result would end up false no matter if
-//	first signal was true or false. On the other hand, `unknown && true == unknown`.
+//	first signal was true or false. Conversely, `unknown && true == unknown`.
 //
 //	:::
 type And struct {
@@ -886,7 +887,7 @@ func (x *And) GetOutPorts() *And_Outs {
 
 // Logical OR.
 //
-// See [And component](#and) on how signals are mapped onto boolean values.
+// See [And component](#and) on how signals are mapped onto Boolean values.
 type Or struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -946,7 +947,7 @@ func (x *Or) GetOutPorts() *Or_Outs {
 
 // Logical NOT.
 //
-// See [And component](#and) on how signals are mapped onto boolean values.
+// See [And component](#and) on how signals are mapped onto Boolean values.
 type Inverter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1253,9 +1254,9 @@ type PulseGenerator struct {
 
 	// Output ports for the PulseGenerator component.
 	OutPorts *PulseGenerator_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// Emitting 1 for the true_for duration.
+	// Emitting 1 for the `true_for` duration.
 	TrueFor *durationpb.Duration `protobuf:"bytes,2,opt,name=true_for,json=trueFor,proto3" json:"true_for,omitempty" default:"5s"` // @gotags: default:"5s"
-	// Emitting 0 for the false_for duration.
+	// Emitting 0 for the `false_for` duration.
 	FalseFor *durationpb.Duration `protobuf:"bytes,3,opt,name=false_for,json=falseFor,proto3" json:"false_for,omitempty" default:"5s"` // @gotags: default:"5s"
 }
 
@@ -1313,7 +1314,7 @@ func (x *PulseGenerator) GetFalseFor() *durationpb.Duration {
 }
 
 // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-// If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+// If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
 type Holder struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1323,7 +1324,7 @@ type Holder struct {
 	InPorts *Holder_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Output ports for the Holder component.
 	OutPorts *Holder_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// Holding the last valid signal value for the hold_for duration.
+	// Holding the last valid signal value for the `hold_for` duration.
 	HoldFor *durationpb.Duration `protobuf:"bytes,3,opt,name=hold_for,json=holdFor,proto3" json:"hold_for,omitempty" default:"5s"` // @gotags: default:"5s"
 }
 
@@ -1496,7 +1497,16 @@ func (x *NestedSignalEgress) GetPortName() string {
 	return ""
 }
 
-// The _Signal Generator_ component generates a signal by following a set of specified steps. The output signal begins at the target output defined in the first step, and subsequently transitions linearly from the previous step's target output to the next target output, over the duration of time specified for each step. Each step is defined by two parameters: the target output and the duration of time it takes for the signal to transition from the previous step's target output to the current step's target output. The _Signal Generator_ thus produces a smooth and continuous signal that changes gradually over time, based on the specified steps.The _Signal Generator_ is controlled to proceed forwards or backwards or reset to the start based on readings of input signals.
+// The _Signal Generator_ component generates a smooth and continuous signal
+// by following a sequence of specified steps. Each step has two parameters:
+//   - `target_output`: The desired output value at the end of the step.
+//   - `duration`: The time it takes for the signal to change linearly from the
+//     previous step's `target_output` to the current step's `target_output`.
+//
+// The output signal starts at the `target_output` of the first step and
+// changes linearly between steps based on their `duration`. The _Signal
+// Generator_ can be controlled to move forwards, backwards, or reset to the
+// beginning based on input signals.
 type SignalGenerator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1571,18 +1581,18 @@ type GradientController_Parameters struct {
 	//
 	// Slope is used as exponent on the signal to setpoint ratio in computation
 	// of the gradient (see the [main description](#gradient-controller) for
-	// exact equation). Good intuition for this parameter is "What should the
-	// Gradient Controller do to the control variable when signal is too high",
-	// eg.:
+	// exact equation). This parameter decides how aggressive the controller
+	// responds to the deviation of signal from the setpoint.
+	// for example:
 	// * $\text{slope} = 1$: when signal is too high, increase control variable,
 	// * $\text{slope} = -1$: when signal is too high, decrease control variable,
-	// * $\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.
+	// * $\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.
 	//
 	// The sign of slope depends on correlation between the signal and control variable:
-	// * Use $\text{slope} < 0$ if signal and control variable are _positively_
-	// correlated (eg. Per-pod CPU usage and total concurrency).
-	// * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-	// correlated (eg. Per-pod CPU usage and number of pods).
+	// * Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
+	// the control variable (for example, Per-pod CPU usage and total concurrency).
+	// * Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
+	// the control variable (for example, Per-pod CPU usage and number of pods).
 	//
 	// :::note
 	//
@@ -1597,11 +1607,11 @@ type GradientController_Parameters struct {
 	// With $|\text{slope}| = 1$, the controller will aim to bring the signal to
 	// the setpoint in one tick (assuming linear correlation with signal and setpoint).
 	// Smaller magnitudes of slope will make the controller adjust the control
-	// variable more slowly.
+	// variable gradually.
 	//
-	// We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+	// Setting $|\text{slope}| < 1$ (for example, $\pm0.8$) is recommended.
 	// If you experience overshooting, consider lowering the magnitude even more.
-	// Values of $|\text{slope}| > 1$ are not recommended.
+	// Values of $|\text{slope}| > 1$ aren't recommended.
 	//
 	// :::note
 	//
@@ -1610,9 +1620,9 @@ type GradientController_Parameters struct {
 	//
 	// :::
 	Slope float64 `protobuf:"fixed64,1,opt,name=slope,proto3" json:"slope,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+	// Minimum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 	MinGradient float64 `protobuf:"fixed64,2,opt,name=min_gradient,json=minGradient,proto3" json:"min_gradient,omitempty" default:"-1.79769313486231570814527423731704356798070e+308"` // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
-	// Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+	// Maximum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 	MaxGradient float64 `protobuf:"fixed64,3,opt,name=max_gradient,json=maxGradient,proto3" json:"max_gradient,omitempty" default:"1.79769313486231570814527423731704356798070e+308"` // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
 }
 
@@ -1675,8 +1685,8 @@ type GradientController_DynamicConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Decides whether the controller runs in "manual_mode".
-	// In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+	// Decides whether the controller runs in `manual_mode`.
+	// In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
 	ManualMode bool `protobuf:"varint,1,opt,name=manual_mode,json=manualMode,proto3" json:"manual_mode,omitempty" default:"false"` // @gotags: default:"false"
 }
 
@@ -1874,7 +1884,7 @@ type EMA_Ins struct {
 	Input *InPort `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// Upper bound of the moving average.
 	//
-	// When the signal exceeds `max_envelope` it's multiplied by
+	// When the signal exceeds `max_envelope` it is multiplied by
 	// `correction_factor_on_max_envelope_violation` **once per tick**.
 	//
 	// :::note
@@ -3344,7 +3354,7 @@ func (x *FirstValid_Outs) GetOutput() *OutPort {
 	return nil
 }
 
-// Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
+// Alerter Parameters configure parameters such as alert name, severity, resolve timeout, alert channels and labels.
 type Alerter_Parameters struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3859,7 +3869,7 @@ type NestedSignalIngress_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The signal to be ingressed.
+	// Ingress signal.
 	Signal *OutPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
 }
 
@@ -3908,7 +3918,7 @@ type NestedSignalEgress_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The signal to be egressed.
+	// Egress signal.
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
 }
 
@@ -4074,9 +4084,9 @@ type SignalGenerator_Outs struct {
 
 	// The generated signal.
 	Output *OutPort `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
-	// A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
+	// A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
 	AtStart *OutPort `protobuf:"bytes,2,opt,name=at_start,json=atStart,proto3" json:"at_start,omitempty"`
-	// A boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+	// A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
 	AtEnd *OutPort `protobuf:"bytes,3,opt,name=at_end,json=atEnd,proto3" json:"at_end,omitempty"`
 }
 

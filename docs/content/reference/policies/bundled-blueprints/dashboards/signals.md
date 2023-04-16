@@ -17,12 +17,22 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
+<!-- vale off -->
+
 Code: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
 
+<!-- vale on -->
+
 ### Parameters
 
+<!-- vale off -->
+
 #### common {#common}
+
+<!-- vale on -->
+
+<!-- vale off -->
 
 <a id="common-policy-name"></a> <ParameterDescription
     name="common.policy_name"
@@ -32,9 +42,17 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
+<!-- vale on -->
+
 ---
 
+<!-- vale off -->
+
 #### dashboard {#dashboard}
+
+<!-- vale on -->
+
+<!-- vale off -->
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
     name="dashboard.refresh_interval"
@@ -44,6 +62,10 @@ string"
     value="'5s'"
     description='Refresh interval for dashboard panels.' />
 
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="dashboard-time-from"></a> <ParameterDescription
     name="dashboard.time_from"
     type="
@@ -51,6 +73,10 @@ string"
     reference=""
     value="'now-15m'"
     description='From time of dashboard.' />
+
+<!-- vale on -->
+
+<!-- vale off -->
 
 <a id="dashboard-time-to"></a> <ParameterDescription
     name="dashboard.time_to"
@@ -60,7 +86,15 @@ string"
     value="'now'"
     description='To time of dashboard.' />
 
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### dashboard.datasource {#dashboard-datasource}
+
+<!-- vale on -->
+
+<!-- vale off -->
 
 <a id="dashboard-datasource-name"></a> <ParameterDescription
     name="dashboard.datasource.name"
@@ -70,6 +104,10 @@ string"
     value="'$datasource'"
     description='Datasource name.' />
 
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="dashboard-datasource-filter-regex"></a> <ParameterDescription
     name="dashboard.datasource.filter_regex"
     type="
@@ -77,5 +115,7 @@ string"
     reference=""
     value="''"
     description='Datasource filter regex.' />
+
+<!-- vale on -->
 
 ---

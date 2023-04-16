@@ -315,7 +315,7 @@ func generateGraphs(content []byte, outputDir string, policyPath string, depth i
 	fileName := strings.TrimSuffix(filepath.Base(policyPath), filepath.Ext(policyPath))
 
 	dir := filepath.Join(filepath.Dir(outputDir), "graphs")
-	// create the directory if it doesn't exist
+	// create the directory if it does not exist
 	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err

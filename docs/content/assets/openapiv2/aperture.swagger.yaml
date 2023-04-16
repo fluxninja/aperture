@@ -2,11 +2,11 @@ consumes:
     - application/json
 definitions:
     AIMDConcurrencyController:
-        description: High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+        description: High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
         properties:
             alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration for embedded alerter.
+                description: Configuration for embedded Alerter.
             default_config:
                 $ref: '#/definitions/LoadActuatorDynamicConfig'
                 description: Default configuration.
@@ -75,17 +75,21 @@ definitions:
                 description: IncomingConcurrency is the number of concurrent requests that are received by the service.
             is_overload:
                 $ref: '#/definitions/OutPort'
-                description: Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+                description: Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
             observed_load_multiplier:
                 $ref: '#/definitions/OutPort'
                 description: Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
         type: object
     AddressExtractor:
         description: |-
-            IP addresses in attribute context are defined as objects with separate ip and port fields.
+            IP addresses in attribute context are defined as objects with separate IP and port fields.
             This is a helper to display an address as a single string.
 
-            Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
+            :::caution
+
+            This might introduce high-cardinality flow label values.
+
+            :::
 
             [ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
 
@@ -96,13 +100,13 @@ definitions:
         properties:
             from:
                 description: |+
-                    Attribute path pointing to some string - eg. "source.address".
+                    Attribute path pointing to some string - for example, `source.address`.
 
                 type: string
                 x-go-tag-validate: required
         required:
             - from
-        title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+        title: Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`
         type: object
     Alerter:
         description: Alerter reacts to a signal and generates alert to send to alert manager.
@@ -123,7 +127,7 @@ definitions:
                 description: Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
         type: object
     AlerterParameters:
-        description: Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
+        description: Alerter Parameters configure parameters such as alert name, severity, resolve timeout, alert channels and labels.
         properties:
             alert_channels:
                 description: A list of alert channel strings.
@@ -168,7 +172,7 @@ definitions:
         description: |-
             Logical AND.
 
-            Signals are mapped to boolean values as follows:
+            Signals are mapped to Boolean values as follows:
             * Zero is treated as false.
             * Any non-zero is treated as true.
             * Invalid inputs are considered unknown.
@@ -176,9 +180,9 @@ definitions:
               :::note
 
               Treating invalid inputs as "unknowns" has a consequence that the result
-              might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+              might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
               because the result would end up false no matter if
-              first signal was true or false. On the other hand, `unknown && true == unknown`.
+              first signal was true or false. Conversely, `unknown && true == unknown`.
 
               :::
         properties:
@@ -222,7 +226,7 @@ definitions:
                     Operator of the arithmetic operation.
 
                     The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
-                    In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
+                    In case of XOR and bit shifts, value of signals is cast to integers before performing the operation.
 
                 enum:
                     - add
@@ -238,7 +242,7 @@ definitions:
             out_ports:
                 $ref: '#/definitions/ArithmeticCombinatorOuts'
                 description: Output ports for the Arithmetic Combinator component.
-        title: Type of combinator that computes the arithmetic operation on the operand signals
+        title: Type of Combinator that computes the arithmetic operation on the operand signals
         type: object
     ArithmeticCombinatorIns:
         description: Inputs for the Arithmetic Combinator component.
@@ -305,7 +309,7 @@ definitions:
             max_scale:
                 default: "9223372036854775807"
                 description: |+
-                    The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+                    The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
                 format: int64
                 minLength: 1
@@ -315,7 +319,7 @@ definitions:
             max_scale_in_percentage:
                 default: 1
                 description: |+
-                    The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+                    The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 
                 format: double
                 type: number
@@ -323,7 +327,7 @@ definitions:
             max_scale_out_percentage:
                 default: 10
                 description: |+
-                    The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+                    The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 
                 format: double
                 type: number
@@ -331,7 +335,7 @@ definitions:
             min_scale:
                 default: "0"
                 description: |+
-                    The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+                    The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 
                 format: int64
                 minLength: 0
@@ -343,7 +347,7 @@ definitions:
                 description: Output ports for the _AutoScaler_.
             scale_in_alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration for scale-in alerter.
+                description: Configuration for scale-in Alerter.
             scale_in_controllers:
                 description: List of _Controllers_ for scaling in.
                 items:
@@ -359,7 +363,7 @@ definitions:
                 x-go-tag-default: 120s
             scale_out_alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration for scale-out alerter.
+                description: Configuration for scale-out Alerter.
             scale_out_controllers:
                 description: List of _Controllers_ for scaling out.
                 items:
@@ -539,30 +543,30 @@ definitions:
         type: string
     Circuit:
         description: |-
+            Circuit is graph of inter-connected signal processing components.
+
             :::info
 
             See also [Circuit overview](/concepts/policy/circuit.md).
 
             :::
 
-            Signals flow between components via ports.
-            As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
-            Circuit is evaluated periodically in order to respond to changes in signal readings.
+            Signals flow between components through ports.
+            As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).
+            Circuit is evaluated periodically to respond to changes in signal readings.
 
-            :::info
+            :::info Signals
 
-            **Signal**
-
-            Signals are floating-point values.
+            Signals are floating point values.
 
             A signal can also have a special **Invalid** value. It's usually used to
-            communicate that signal doesn't have a meaningful value at the moment, eg.
+            communicate that signal does not have a meaningful value at the moment, for example,
             [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
             Components know when their input signals are invalid and can act
-            accordingly. They can either propagate the invalidness, by making their
-            output itself invalid (like eg.
+            accordingly. They can either propagate the invalid signal, by making their
+            output itself invalid (for example,
             [ArithmeticCombinator](#arithmetic-combinator)) or use some different
-            logic, like eg. [Extrapolator](#extrapolator). Refer to a component's
+            logic, for example, [Extrapolator](#extrapolator). Refer to a component's
             docs on how exactly it handles invalid inputs.
 
             :::
@@ -579,12 +583,11 @@ definitions:
             evaluation_interval:
                 default: 0.5s
                 description: |+
-                    Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+                    Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
                 type: string
                 x-go-tag-default: 0.5s
-        title: Circuit is defined as a dataflow graph of inter-connected components
         type: object
     Classifier:
         description: |-
@@ -625,7 +628,7 @@ definitions:
                 description: |-
                     Rego is a policy language used to express complex policies in a concise and declarative way.
                     It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
-                    For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+                    For simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.
                 title: Rego based classification
             rules:
                 additionalProperties:
@@ -691,39 +694,39 @@ definitions:
 
             :::
 
-            Signals flow into the components via input ports and results are emitted on output ports.
+            Signals flow into the components from input ports and results are emitted on output ports.
             Components are wired to each other based on signal names forming an execution graph of the circuit.
 
             :::note
 
             Loops are broken by the runtime at the earliest component index that is part of the loop.
-            The looped signals are saved in the tick they are generated and served in the subsequent tick.
+            The looped signals are saved in the tick they're generated and served in the subsequent tick.
 
             :::
 
             There are three categories of components:
-            * "source" components – they take some sort of input from "the real world" and output
+            * "source" components: they take some sort of input from "the real world" and output
               a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
               they're represented by green color.
-            * signal processor components – "pure" components that don't interact with the "real world".
+            * signal processor components: processing components that do not interact with the external systems.
               Examples: [GradientController](#gradient-controller), [Max](#max).
 
               :::note
 
-              Signal processor components's output can depend on their internal state, in addition to the inputs.
+              Signal processor components' output can depend on their internal state, in addition to the inputs.
               Eg. see the [Exponential Moving Average filter](#e-m-a).
 
               :::
 
-            * "sink" components – they affect the real world.
-              [ConcurrencyLimiter.LoadActuator](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+            * "sink" components: they affect the real world.
+              [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
               In the UI, represented by orange color.  Sink components usually come in pairs with a
               "sources" component which emits a feedback signal, like
-              `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
+              `accepted_concurrency` emitted by ConcurrencyLimiter.
 
             :::tip
 
-            Sometimes you may want to use a constant value as one of component's inputs.
+            Sometimes you might want to use a constant value as one of component's inputs.
             You can create an input port containing the constant value instead of being connected to a signal.
             To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
             You can also use it to provide special math values such as NaN and +- Inf.
@@ -824,11 +827,11 @@ definitions:
 
             :::
 
-            It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
-            Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
+            It's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
+            Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
 
             ConcurrencyLimiter configuration is split into two parts: An actuation
-            strategy and a scheduler. Right now, only `load_actuator` strategy is available.
+            strategy and a scheduler. At this time, only `load_actuator` strategy is available.
         properties:
             flow_selector:
                 $ref: '#/definitions/FlowSelector'
@@ -851,7 +854,7 @@ definitions:
                     output signals.
 
                 x-go-tag-validate: required
-        title: _Concurrency Limiter_ is an actuator component that regulates flows in order to provide active service protection
+        title: Concurrency Limiter is an actuator component that regulates flows to provide active service protection
         type: object
     ConstantSignal:
         description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
@@ -925,17 +928,17 @@ definitions:
         description: |-
             The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
-            This component also supports time-based response, i.e. the output
+            This component also supports time-based response (the output)
             transitions between 1.0 or 0.0 signal if the decider condition is
-            true or false for at least "true_for" or "false_for" duration. If
+            true or false for at least `true_for` or `false_for` duration. If
             `true_for` and `false_for` durations are zero then the transitions are
             instantaneous.
         properties:
             false_for:
                 default: 0s
                 description: |+
-                    Duration of time to wait before a transition to false state.
-                    If the duration is zero, the transition will happen instantaneously.
+                    Duration of time to wait before changing to false state.
+                    If the duration is zero, the change will happen instantaneously.
 
                 type: string
                 x-go-tag-default: 0s
@@ -944,7 +947,7 @@ definitions:
                 description: Input ports for the Decider component.
             operator:
                 description: |+
-                    Comparison operator that computes operation on lhs and rhs input signals.
+                    Comparison operator that computes operation on LHS and RHS input signals.
 
                 enum:
                     - gt
@@ -961,13 +964,12 @@ definitions:
                 description: Output ports for the Decider component.
             true_for:
                 default: 0s
-                description: |+
-                    Duration of time to wait before a transition to true state.
-                    If the duration is zero, the transition will happen instantaneously.
-
+                title: |-
+                    Duration of time to wait before changing to true state.
+                    If the duration is zero, the change will happen instantaneously.```
                 type: string
                 x-go-tag-default: 0s
-        title: Type of combinator that computes the comparison operation on lhs and rhs signals
+        title: Type of Combinator that computes the comparison operation on LHS and RHS signals
         type: object
     DeciderIns:
         description: Inputs for the Decider component.
@@ -996,9 +998,9 @@ definitions:
                 $ref: '#/definitions/DecreasingGradientParameters'
                 title: |-
                     Gradient parameters for the controller. Defaults and constraints:
-                    * slope = 1
-                    * min_gradient = -Inf (must be less than 1)
-                    * max_gradient = 1 (cannot be changed)
+                    * `slope` = 1
+                    * `min_gradient` = -Inf (must be less than 1)
+                    * `max_gradient` = 1 (cannot be changed)
         type: object
     DecreasingGradientIns:
         description: Inputs for Gradient.
@@ -1079,17 +1081,17 @@ definitions:
     EMA:
         description: |-
             At any time EMA component operates in one of the following states:
-            1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-               If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
+            1. Warm up state: The first `warmup_window` samples are used to compute the initial EMA.
+               If an invalid reading is received during the `warmup_window`, the last good average is emitted and the state gets reset back to beginning of warm up state.
             2. Normal state: The EMA is computed using following formula.
 
             The EMA for a series $Y$ is calculated recursively as:
-
+            <!-- vale off -->
             $$
             \text{EMA} _t =
             \begin{cases}
               Y_0, &\text{for } t = 0 \\
-              \alpha Y_t + (1 - \alpha) \text{EMA} _{t-1}, &\text{for }t > 0
+              \alpha Y_t + (1 - \alpha) \text{EMA}_{t-1}, &\text{for }t > 0
             \end{cases}
             $$
 
@@ -1100,6 +1102,7 @@ definitions:
             $$
             \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
             $$
+            <!-- vale on -->
         properties:
             in_ports:
                 $ref: '#/definitions/EMAIns'
@@ -1126,7 +1129,7 @@ definitions:
                 description: |-
                     Upper bound of the moving average.
 
-                    When the signal exceeds `max_envelope` it's multiplied by
+                    When the signal exceeds `max_envelope` it is multiplied by
                     `correction_factor_on_max_envelope_violation` **once per tick**.
 
                     :::note
@@ -1213,7 +1216,7 @@ definitions:
                 type: object
         type: object
     Entity:
-        description: Entity represents a pod, vm, etc.
+        description: Entity represents a pod, VM, and so on.
         properties:
             ip_address:
                 description: |+
@@ -1230,7 +1233,7 @@ definitions:
                 description: Namespace of the entity. For example, pod namespace.
                 type: string
             node_name:
-                description: Node name of the entity. For example, host name.
+                description: Node name of the entity. For example, Hostname.
                 type: string
             services:
                 description: |+
@@ -1252,7 +1255,7 @@ definitions:
             - uid
         type: object
     EqualsMatchExpression:
-        description: Label selector expression of the equal form "label == value".
+        description: Label selector expression of the equal form `label == value`.
         properties:
             label:
                 description: |+
@@ -1277,9 +1280,9 @@ definitions:
                     Attribute path is a dot-separated path to attribute.
 
                     Should be either:
-                    * one of the fields of [Attribute Context][attribute-context], or
-                    * a special "request.http.bearer" pseudo-attribute.
-                    Eg. "request.http.method" or "request.http.header.user-agent"
+                    * one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or
+                    * a special `request.http.bearer` pseudo-attribute.
+                    For example, `request.http.method` or `request.http.header.user-agent`
 
                     Note: The same attribute path syntax is shared by other extractor variants,
                     wherever attribute path is needed in their "from" syntax.
@@ -1288,19 +1291,18 @@ definitions:
                     ```yaml
                     from: request.http.headers.user-agent
                     ```
-                    [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
                 title: Use an attribute with no conversion
                 type: string
             json:
                 $ref: '#/definitions/JSONExtractor'
-                description: Deserialize a json, and extract one of the fields.
+                description: Parse JSON, and extract one of the fields.
             jwt:
                 $ref: '#/definitions/JWTExtractor'
                 description: Parse the attribute as JWT and read the payload.
             path_templates:
                 $ref: '#/definitions/PathTemplateMatcher'
                 description: Match HTTP Path to given path templates.
-        title: Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
+        title: Defines a high-level way to specify how to extract a flow label value given HTTP request metadata, without a need to write Rego code
         type: object
     Extrapolator:
         description: It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
@@ -1383,7 +1385,7 @@ definitions:
                 description: AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
             concurrency_limiter:
                 $ref: '#/definitions/ConcurrencyLimiter'
-                description: _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+                description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
             flow_regulator:
                 $ref: '#/definitions/FlowRegulator'
                 description: Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
@@ -1433,7 +1435,7 @@ definitions:
                 description: |+
                     Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-                    Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+                    Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 
                 type: object
                 x-go-tag-validate: dive
@@ -1468,7 +1470,7 @@ definitions:
                 description: |+
                     [Control Point](/concepts/flow-control/flow-selector.md#control-point)
                     identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
-                    block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+                    block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
                     or filter chains.
 
                 type: string
@@ -1488,7 +1490,7 @@ definitions:
                     classifier, but only if they were created at some previous control point
                     (and propagated in baggage).
 
-                    This limitation doesn't apply to selectors of other entities, like
+                    This limitation does not apply to selectors of other entities, like
                     Flux Meters or Actuators. It's valid to create a flow label on a control
                     point using classifier, and immediately use it for matching on the same
                     control point.
@@ -1547,8 +1549,11 @@ definitions:
             label_key:
                 description: |-
                     The flow label key for identifying sessions.
-                    If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-                    If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+                    - When label key is specified, _Flow Regulator_ acts as a sticky filter.
+                      The series of flows with the same value of label key get the same
+                      decision provided that the `accept_percentage` is same or higher.
+                    - When label key is not specified, _Flow Regulator_ acts as a stateless filter.
+                      Percentage of flows are selected randomly for rejection.
                 type: string
         type: object
     FlowSelector:
@@ -1764,7 +1769,7 @@ definitions:
     GradientController:
         description: |-
             The `gradient` describes a corrective factor that should be applied to the
-            control variable to get the signal closer to the setpoint. It is computed as follows:
+            control variable to get the signal closer to the setpoint. It's computed as follows:
 
             $$
             \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
@@ -1811,8 +1816,8 @@ definitions:
             manual_mode:
                 default: false
                 description: |+
-                    Decides whether the controller runs in "manual_mode".
-                    In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+                    Decides whether the controller runs in `manual_mode`.
+                    In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
 
                 type: boolean
                 x-go-tag-default: "false"
@@ -1856,7 +1861,7 @@ definitions:
             max_gradient:
                 default: 1.7976931348623157e+308
                 description: |+
-                    Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+                    Maximum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 
                 format: double
                 type: number
@@ -1864,7 +1869,7 @@ definitions:
             min_gradient:
                 default: -1.7976931348623157e+308
                 description: |+
-                    Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+                    Minimum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 
                 format: double
                 type: number
@@ -1875,18 +1880,18 @@ definitions:
 
                     Slope is used as exponent on the signal to setpoint ratio in computation
                     of the gradient (see the [main description](#gradient-controller) for
-                    exact equation). Good intuition for this parameter is "What should the
-                    Gradient Controller do to the control variable when signal is too high",
-                    eg.:
+                    exact equation). This parameter decides how aggressive the controller
+                    responds to the deviation of signal from the setpoint.
+                    for example:
                     * $\text{slope} = 1$: when signal is too high, increase control variable,
                     * $\text{slope} = -1$: when signal is too high, decrease control variable,
-                    * $\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.
+                    * $\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.
 
                     The sign of slope depends on correlation between the signal and control variable:
-                    * Use $\text{slope} < 0$ if signal and control variable are _positively_
-                    correlated (eg. Per-pod CPU usage and total concurrency).
-                    * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-                    correlated (eg. Per-pod CPU usage and number of pods).
+                    * Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
+                    the control variable (for example, Per-pod CPU usage and total concurrency).
+                    * Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
+                    the control variable (for example, Per-pod CPU usage and number of pods).
 
                     :::note
 
@@ -1901,11 +1906,11 @@ definitions:
                     With $|\text{slope}| = 1$, the controller will aim to bring the signal to
                     the setpoint in one tick (assuming linear correlation with signal and setpoint).
                     Smaller magnitudes of slope will make the controller adjust the control
-                    variable more slowly.
+                    variable gradually.
 
-                    We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+                    Setting $|\text{slope}| < 1$ (for example, $\pm0.8$) is recommended.
                     If you experience overshooting, consider lowering the magnitude even more.
-                    Values of $|\text{slope}| > 1$ are not recommended.
+                    Values of $|\text{slope}| > 1$ aren't recommended.
 
                     :::note
 
@@ -1935,12 +1940,12 @@ definitions:
     Holder:
         description: |-
             Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-            If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+            If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
         properties:
             hold_for:
                 default: 5s
                 description: |+
-                    Holding the last valid signal value for the hold_for duration.
+                    Holding the last valid signal value for the `hold_for` duration.
 
                 type: string
                 x-go-tag-default: 5s
@@ -1985,7 +1990,7 @@ definitions:
             signal_name:
                 description: Name of the incoming Signal on the InPort.
                 type: string
-        title: Components receive input from other components via InPorts
+        title: Components receive input from other components through InPorts
         type: object
     IncreasingGradient:
         description: Increasing Gradient defines a controller for scaling out based on Gradient Controller.
@@ -1997,9 +2002,9 @@ definitions:
                 $ref: '#/definitions/IncreasingGradientParameters'
                 title: |-
                     Gradient parameters for the controller. Defaults and constraints:
-                    * slope = 1
-                    * min_gradient = 1 (cannot be changed)
-                    * max_gradient = +Inf (must be greater than 1)
+                    * `slope` = 1
+                    * `min_gradient` = 1 (cannot be changed)
+                    * `max_gradient` = +Inf (must be greater than 1)
         type: object
     IncreasingGradientIns:
         description: Inputs for Gradient.
@@ -2062,7 +2067,7 @@ definitions:
         description: |-
             Logical NOT.
 
-            See [And component](#and) on how signals are mapped onto boolean values.
+            See [And component](#and) on how signals are mapped onto Boolean values.
         properties:
             in_ports:
                 $ref: '#/definitions/InverterIns'
@@ -2101,27 +2106,27 @@ definitions:
         properties:
             from:
                 description: |+
-                    Attribute path pointing to some strings - eg. "request.http.body".
+                    Attribute path pointing to some strings - for example, `request.http.body`.
 
                 type: string
                 x-go-tag-validate: required
             pointer:
                 description: |-
-                    Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
+                    JSON pointer represents a parsed JSON pointer which allows to select a specified field from the payload.
 
-                    Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-                    eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+                    Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+                    for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
                 type: string
         required:
             - from
-        title: Deserialize a json, and extract one of the fields
+        title: Parse JSON, and extract one of the fields
         type: object
     JWTExtractor:
         description: |-
-            Specify a field to be extracted from payload using "json_pointer".
+            Specify a field to be extracted from payload using `json_pointer`.
 
-            Note: The signature is not verified against the secret (we're assuming there's some
-            other parts of the system that handles such verification).
+            Note: The signature is not verified against the secret (assuming there's some
+            other part of the system that handles such verification).
 
             Example:
             ```yaml
@@ -2131,16 +2136,16 @@ definitions:
         properties:
             from:
                 description: |+
-                    Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
+                    JWT (JSON Web Token) can be extracted from any input attribute, but most likely you'd want to use `request.http.bearer`.
 
                 type: string
                 x-go-tag-validate: required
             json_pointer:
                 description: |-
-                    Json pointer allowing to select a specified field from the json payload.
+                    JSON pointer allowing to select a specified field from the payload.
 
-                    Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-                    eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+                    Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+                    for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
                 type: string
         required:
             - from
@@ -2239,11 +2244,11 @@ definitions:
     LabelMatcher:
         description: |-
             It provides three ways to define requirements:
-            - matchLabels
-            - matchExpressions
+            - match labels
+            - match expressions
             - arbitrary expression
 
-            If multiple requirements are set, they are all ANDed.
+            If multiple requirements are set, they're all combined using the logical AND operator.
             An empty label matcher always matches.
         properties:
             expression:
@@ -2251,9 +2256,9 @@ definitions:
                 description: An arbitrary expression to be evaluated on the labels.
             match_expressions:
                 description: |-
-                    List of k8s-style label matcher requirements.
+                    List of Kubernetes-style label matcher requirements.
 
-                    Note: The requirements are ANDed.
+                    Note: The requirements are combined using the logical AND operator.
                 items:
                     $ref: '#/definitions/K8sLabelMatcherRequirement'
                     type: object
@@ -2263,9 +2268,9 @@ definitions:
                     type: string
                 description: |-
                     A map of {key,value} pairs representing labels to be matched.
-                    A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+                    A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
 
-                    Note: The requirements are ANDed.
+                    Note: The requirements are combined using the logical AND operator.
                 type: object
         title: |-
             Allows to define rules whether a map of
@@ -2411,7 +2416,20 @@ definitions:
                     concurrency](#scheduler-outs) that needs to be accepted.
         type: object
     LoadShaper:
-        description: 'The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step''s target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step''s target accept percentage to the current step''s target accept percentage. The _Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.'
+        description: |-
+            The _Load Shaper_ produces a smooth and continuous traffic load
+            that changes progressively over time, based on the specified steps.
+
+            Each step is defined by two parameters:
+            - The `target_accept_percentage`.
+            - The `duration` for the signal to change from the
+              previous step's `target_accept_percentage` to the current step's
+              `target_accept_percentage`.
+
+            The percentage of requests accepted starts at the `target_accept_percentage`
+            defined in the first step and gradually ramps up or down linearly from
+            the previous step's `target_accept_percentage` to the next
+            `target_accept_percentage`, over the `duration` specified for each step.
         properties:
             default_config:
                 $ref: '#/definitions/FlowRegulatorDynamicConfig'
@@ -2448,10 +2466,10 @@ definitions:
                 description: The percentage of flows being accepted by the _Load Shaper_.
             at_end:
                 $ref: '#/definitions/OutPort'
-                description: A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+                description: A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
             at_start:
                 $ref: '#/definitions/OutPort'
-                description: A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
+                description: A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
         type: object
     LoadShaperParameters:
         description: Parameters for the _Load Shaper_ component.
@@ -2554,10 +2572,10 @@ definitions:
         properties:
             all:
                 $ref: '#/definitions/MatchExpressionList'
-                description: The expression is true when all subexpressions are true.
+                description: The expression is true when all sub expressions are true.
             any:
                 $ref: '#/definitions/MatchExpressionList'
-                description: The expression is true when any subexpression is true.
+                description: The expression is true when any sub expression is true.
             label_equals:
                 $ref: '#/definitions/EqualsMatchExpression'
                 description: The expression is true when label value equals given value.
@@ -2569,27 +2587,27 @@ definitions:
                 x-go-tag-validate: required
             label_matches:
                 $ref: '#/definitions/MatchesMatchExpression'
-                description: The expression is true when label matches given regex.
+                description: The expression is true when label matches given regular expression.
             not:
                 $ref: '#/definitions/MatchExpression'
-                description: The expression negates the result of subexpression.
+                description: The expression negates the result of sub expression.
         required:
             - label_exists
-        title: Defines a [map<string, string> → bool] expression to be evaluated on labels
+        title: Defines a `[map<string, string> → bool]` expression to be evaluated on labels
         type: object
     MatchExpressionList:
-        description: 'eg. {any: {of: [expr1, expr2]}}.'
+        description: 'for example, `{any: {of: [expr1, expr2]}}`.'
         properties:
             of:
-                description: List of subexpressions of the match expression.
+                description: List of sub expressions of the match expression.
                 items:
                     $ref: '#/definitions/MatchExpression'
                     type: object
                 type: array
-        title: List of MatchExpressions that is used for all/any matching
+        title: List of MatchExpressions that is used for all or any matching
         type: object
     MatchesMatchExpression:
-        description: Label selector expression of the matches form "label matches regex".
+        description: Label selector expression of the form `label matches regex`.
         properties:
             label:
                 description: |+
@@ -2600,7 +2618,7 @@ definitions:
             regex:
                 description: |+
                     Regular expression that should match the label value.
-                    It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+                    It uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 
                 type: string
                 x-go-tag-validate: required
@@ -2726,7 +2744,7 @@ definitions:
         properties:
             signal:
                 $ref: '#/definitions/InPort'
-                description: The signal to be egressed.
+                description: Egress signal.
         type: object
     NestedSignalIngress:
         description: Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
@@ -2743,7 +2761,7 @@ definitions:
         properties:
             signal:
                 $ref: '#/definitions/OutPort'
-                description: The signal to be ingressed.
+                description: Ingress signal.
         type: object
     Network:
         properties:
@@ -2778,7 +2796,7 @@ definitions:
         description: |-
             Logical OR.
 
-            See [And component](#and) on how signals are mapped onto boolean values.
+            See [And component](#and) on how signals are mapped onto Boolean values.
         properties:
             in_ports:
                 $ref: '#/definitions/OrIns'
@@ -2815,7 +2833,7 @@ definitions:
             signal_name:
                 description: Name of the outgoing Signal on the OutPort.
                 type: string
-        title: Components produce output for other components via OutPorts
+        title: Components produce output for other components through OutPorts
         type: object
     OverlappingService:
         description: OverlappingService contains info about a service that overlaps with another one.
@@ -2862,7 +2880,7 @@ definitions:
 
                     * Static path segment `/foo` matches a path segment exactly
                     * `/{param}` matches arbitrary path segment.
-                      (The param name is ignored and can be omitted (`{}`))
+                      (The parameter name is ignored and can be omitted (`{}`))
                     * The parameter must cover whole segment.
                     * Additionally, path template can end with `/*` wildcard to match
                       arbitrary number of trailing segments (0 or more).
@@ -2933,7 +2951,7 @@ definitions:
             max_scale_in_percentage:
                 default: 1
                 description: |+
-                    The maximum decrease of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+                    The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 
                 format: double
                 type: number
@@ -2941,7 +2959,7 @@ definitions:
             max_scale_out_percentage:
                 default: 10
                 description: |+
-                    The maximum increase of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+                    The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 
                 format: double
                 type: number
@@ -2964,7 +2982,7 @@ definitions:
                 x-go-tag-validate: required
             scale_in_alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration for scale-in alerter.
+                description: Configuration for scale-in Alerter.
             scale_in_controllers:
                 description: List of _Controllers_ for scaling in.
                 items:
@@ -2980,7 +2998,7 @@ definitions:
                 x-go-tag-default: 120s
             scale_out_alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration for scale-out alerter.
+                description: Configuration for scale-out Alerter.
             scale_out_controllers:
                 description: List of _Controllers_ for scaling out.
                 items:
@@ -3093,7 +3111,7 @@ definitions:
                 description: Defines the control-loop logic of the policy.
             resources:
                 $ref: '#/definitions/Resources'
-                description: Resources (Flux Meters, Classifiers etc.) to setup.
+                description: Resources (such as Flux Meters, Classifiers) to setup.
         type: object
     PolicyWrapper:
         properties:
@@ -3185,12 +3203,26 @@ definitions:
                 description: Output ports for the PromQL component.
             query_string:
                 description: |-
-                    Describes the Prometheus query to be run.
+                    Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.
 
                     :::note
 
                     The query must return a single value either as a scalar or as a vector with a single element.
-                    Flux Meter metrics can be referred inside this PromQL. Flux Meter defines histogram type of metrics in Prometheus. Thus one can refer to flux_meter_sum, flux_meter_count and flux_meter_bucket. The particular Flux Meter can be identified with the `flux_meter_name` label. There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+
+                    :::
+
+                    :::info Usage with Flux Meter
+
+                    [Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+                    Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+                    The particular Flux Meter can be identified with the `flux_meter_name` label.
+                    There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+
+                    :::
+
+                    :::info Usage with OpenTelemetry Metrics
+
+                    Aperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.
 
                     :::
                 type: string
@@ -3209,7 +3241,7 @@ definitions:
             false_for:
                 default: 5s
                 description: |+
-                    Emitting 0 for the false_for duration.
+                    Emitting 0 for the `false_for` duration.
 
                 type: string
                 x-go-tag-default: 5s
@@ -3219,7 +3251,7 @@ definitions:
             true_for:
                 default: 5s
                 description: |+
-                    Emitting 1 for the true_for duration.
+                    Emitting 1 for the `true_for` duration.
 
                 type: string
                 x-go-tag-default: 5s
@@ -3245,7 +3277,7 @@ definitions:
 
             :::
 
-            Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+            RateLimiting is done on per-label-value basis. Use `label_key`
             to select which label should be used as key.
         properties:
             default_config:
@@ -3257,7 +3289,7 @@ definitions:
             flow_selector:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
-                    Which control point to apply this ratelimiter to.
+                    Which control point to apply this rate limiter to.
 
                 x-go-tag-validate: required
             in_ports:
@@ -3288,12 +3320,12 @@ definitions:
             limit:
                 $ref: '#/definitions/InPort'
                 description: |+
-                    Number of flows allowed per _limit\_reset\_interval_ per each label.
-                    Negative values disable the ratelimiter.
+                    Number of flows allowed per `limit_reset_interval` per each label.
+                    Negative values disable the rate limiter.
 
                     :::tip
 
-                    Negative limit can be useful to _conditionally_ enable the ratelimiter
+                    Negative limit can be useful to _conditionally_ enable the rate limiter
                     under certain circumstances. [Decider](#decider) might be helpful.
 
                     :::
@@ -3312,7 +3344,8 @@ definitions:
             limit_scale_factor:
                 default: 1
                 description: |+
-                    Amount by which the _in\_ports.limit_ should be multiplied for this label value.
+                    Amount by which the `in_ports.limit` should be multiplied for
+                    this label value.
 
                 format: double
                 type: number
@@ -3324,18 +3357,19 @@ definitions:
         properties:
             label_key:
                 description: |+
-                    Specifies which label the ratelimiter should be keyed by.
+                    Specifies which label the rate limiter should be keyed by.
 
                     Rate limiting is done independently for each value of the
                     [label](/concepts/flow-control/flow-label.md) with given key.
-                    Eg., to give each user a separate limit, assuming you have a _user_ flow
+                    For example, to give each user a separate limit, assuming you
+                    have a _user_ flow
                     label set up, set `label_key: "user"`.
 
                 type: string
                 x-go-tag-validate: required
             lazy_sync:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
-                title: Configuration of lazy-syncing behaviour of ratelimiter
+                title: Configuration of lazy-syncing behaviour of rate limiter
             limit_reset_interval:
                 default: 60s
                 description: |+
@@ -3356,7 +3390,7 @@ definitions:
             num_sync:
                 default: 5
                 description: |+
-                    Number of times to lazy sync within the _limit\_reset\_interval_.
+                    Number of times to lazy sync within the `limit_reset_interval`.
 
                 exclusiveMinimum: true
                 format: int64
@@ -3367,7 +3401,7 @@ definitions:
         type: object
     Rego:
         description: |-
-            Rego define a set of labels that are extracted after evaluating a rego module.
+            Rego define a set of labels that are extracted after evaluating a Rego module.
 
             :::info
 
@@ -3377,7 +3411,7 @@ definitions:
 
             :::info
 
-            Special rego variables:
+            Special Rego variables:
             - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 
             :::
@@ -3408,14 +3442,14 @@ definitions:
                     A map of {key, value} pairs mapping from
                     [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
                     how to extract and propagate flow labels with that key.
-                    The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+                    The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
 
                 minProperties: 1
                 type: object
                 x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
             module:
                 description: |+
-                    Source code of the rego module.
+                    Source code of the Rego module.
 
                     :::Note
 
@@ -3510,8 +3544,6 @@ definitions:
             See also [Resources overview](/concepts/policy/resources.md).
 
             :::
-
-            Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
         properties:
             classifiers:
                 description: |+
@@ -3536,7 +3568,7 @@ definitions:
                 description: |+
                     Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-                    Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+                    Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 
                     Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
@@ -3602,22 +3634,22 @@ definitions:
         type: object
     RuleRego:
         description: |-
-            High-level extractor-based rules are compiled into a single rego query.
+            High-level extractor-based rules are compiled into a single Rego query.
 
             Deprecated: 1.5.0
         properties:
             query:
                 description: |+
-                    Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+                    Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
 
-                    Note: The module name must match the package name from the "source".
+                    Note: The module name must match the package name from the `source`.
 
                 type: string
                 x-deprecated: true
                 x-go-tag-validate: deprecated,required
             source:
                 description: |+
-                    Source code of the rego module.
+                    Source code of the Rego module.
 
                     Note: Must include a "package" declaration.
 
@@ -3627,13 +3659,13 @@ definitions:
         required:
             - query
             - source
-        title: Raw rego rules are compiled 1:1 to rego queries
+        title: Raw Rego rules are compiled 1:1 to Rego queries
         type: object
     ScaleInController:
         properties:
             alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration for embedded alerter.
+                description: Configuration for embedded Alerter.
             controller:
                 $ref: '#/definitions/ScaleInControllerController'
                 title: Controller
@@ -3647,7 +3679,7 @@ definitions:
         properties:
             alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration for embedded alerter.
+                description: Configuration for embedded Alerter.
             controller:
                 $ref: '#/definitions/ScaleOutControllerController'
                 title: Controller
@@ -3691,13 +3723,12 @@ definitions:
 
                     :::info
 
-                    Concurrency is a unitless number describing mean number of
+                    Concurrency is a unit less number describing mean number of
                     [flows](/concepts/flow-control/flow-control.md#flow) being
                     concurrently processed by the system (system = control point).
                     Concurrency is calculated as _work_ done per unit of time (so
                     work-seconds per world-seconds). Work-seconds are computed based on
-                    token-weights of of flows (which are either estimated via `auto_tokens`
-                    or specified by `Workload.tokens`).
+                    token-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).
 
                     :::
 
@@ -3721,8 +3752,9 @@ definitions:
                     historical latency. Each workload's `tokens` will be set to average
                     latency of flows in that workload during last few seconds (exact duration
                     of this average can change).
-                    Make sure to not provide `tokens` in workload definitions or in the flow
-                    if you want to use this feature.
+                    Verify that the `tokens` in workload definitions
+                    or the flow aren't set if you want
+                    to use this feature.
 
                 type: boolean
                 x-go-tag-default: "true"
@@ -3733,24 +3765,24 @@ definitions:
                 default: 0.49s
                 description: |+
                     Max Timeout is the value with which the flow timeout is capped.
-                    When auto_tokens feature is not enabled, this value is used as the
+                    When `auto_tokens` feature is not enabled, this value is used as the
                     timeout for the flow, otherwise it is used as a cap for the timeout.
 
                     :::caution
 
-                    This timeout needs to be strictly less than the timeout set on the
+                    This timeout needs to be less than the timeout set on the
                     client for the whole GRPC call:
                     * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-                    * in case of libraries, timeout configured... TODO.
+                    * in case of libraries, is configured during the client initialization.
 
-                    We're using fail-open logic in integrations, so if the GRPC timeout
+                    Fail-open logic is use for flow control APIs, so if the GRPC timeout
                     fires first, the flow will end up being unconditionally allowed while
-                    it're still waiting on the scheduler.
+                    it is still waiting on the scheduler.
 
                     To avoid such cases, the end-to-end GRPC timeout should also contain
-                    some headroom for constant overhead like serialization, etc. Default
-                    value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
-                    tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+                    some headroom for constant overhead like serialization and other processing delays. Default
+                    value for GRPC timeouts is 500ms, giving 10ms of headroom, so when
+                    tweaking this timeout, adjust the GRPC timeout accordingly.
 
                     :::
 
@@ -3759,7 +3791,7 @@ definitions:
             timeout_factor:
                 default: 0.5
                 description: |+
-                    Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
+                    Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
 
                     If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
                     it will be rejected.
@@ -3775,15 +3807,14 @@ definitions:
                     List of workloads to be used in scheduler.
 
                     Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-                    allows for load-shedding to be "smarter" than just "randomly deny 50% of
-                    requests". There are two aspects of this "smartness":
+                    allows for load-shedding to be "intelligent" compared to random rejections.
+                    There are two aspects of this "intelligence":
                     * Scheduler can more precisely calculate concurrency if it understands
-                      that flows belonging to different classes have different weights (eg.
-                      inserts vs lookups).
+                      that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
                     * Setting different priorities to different workloads lets the scheduler
                       avoid dropping important traffic during overload.
 
-                    Each workload in this list specifies also a matcher that's used to
+                    Each workload in this list specifies also a matcher that is used to
                     determine which flow will be categorized into which workload.
                     In case of multiple matching workloads, the first matching one will be used.
                     If none of workloads match, `default_workload` will be used.
@@ -3825,7 +3856,7 @@ definitions:
             fairness_key:
                 description: |-
                     Fairness key is a label key that can be used to provide fairness within a workload.
-                    Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+                    Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
                     you have a classifier that sets `user` flow label, you might want to set
                     `fairness_key = "user"`.
                 type: string
@@ -3850,7 +3881,7 @@ definitions:
             tokens:
                 description: |-
                     Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-                    This override is applicable only if tokens for the request are not specified in the request.
+                    This override is applicable only if tokens for the request aren't specified in the request.
                 format: uint64
                 type: string
         type: object
@@ -3922,13 +3953,13 @@ definitions:
                     :::info
 
                     In the Kubernetes sidecar installation mode, service discovery is switched off by default.
-                    In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
+                    To scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 
                     :::
 
                     :::info
 
-                    An entity (e.g. Kubernetes pod) may belong to multiple services.
+                    An entity (for example, Kubernetes pod) might belong to multiple services.
 
                     :::
 
@@ -3953,7 +3984,17 @@ definitions:
                 type: array
         type: object
     SignalGenerator:
-        description: 'The _Signal Generator_ component generates a signal by following a set of specified steps. The output signal begins at the target output defined in the first step, and subsequently transitions linearly from the previous step''s target output to the next target output, over the duration of time specified for each step. Each step is defined by two parameters: the target output and the duration of time it takes for the signal to transition from the previous step''s target output to the current step''s target output. The _Signal Generator_ thus produces a smooth and continuous signal that changes gradually over time, based on the specified steps.The _Signal Generator_ is controlled to proceed forwards or backwards or reset to the start based on readings of input signals.'
+        description: |-
+            The _Signal Generator_ component generates a smooth and continuous signal
+            by following a sequence of specified steps. Each step has two parameters:
+            - `target_output`: The desired output value at the end of the step.
+            - `duration`: The time it takes for the signal to change linearly from the
+              previous step's `target_output` to the current step's `target_output`.
+
+            The output signal starts at the `target_output` of the first step and
+            changes linearly between steps based on their `duration`. The _Signal
+            Generator_ can be controlled to move forwards, backwards, or reset to the
+            beginning based on input signals.
         properties:
             in_ports:
                 $ref: '#/definitions/SignalGeneratorIns'
@@ -3984,10 +4025,10 @@ definitions:
         properties:
             at_end:
                 $ref: '#/definitions/OutPort'
-                description: A boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+                description: A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
             at_start:
                 $ref: '#/definitions/OutPort'
-                description: A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
+                description: A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
             output:
                 $ref: '#/definitions/OutPort'
                 description: The generated signal.
@@ -4113,7 +4154,7 @@ definitions:
             out_ports:
                 $ref: '#/definitions/SwitcherOuts'
                 description: Output ports for the Switcher component.
-        title: Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
+        title: Type of Combinator that switches between `on_signal` and `off_signal` signals based on switch input
         type: object
     SwitcherIns:
         description: Inputs for the Switcher component.
@@ -4149,43 +4190,43 @@ definitions:
                     Unary Operator to apply.
 
                     The unary operator can be one of the following:
-                    * abs: Absolute value with the sign removed.
-                    * acos: arccosine, in radians.
-                    * acosh: Inverse hyperbolic cosine.
-                    * asin: arcsine, in radians.
-                    * asinh: Inverse hyperbolic sine.
-                    * atan: arctangent, in radians.
-                    * atanh: Inverse hyperbolic tangent.
-                    * cbrt: Cube root.
-                    * ceil: Least integer value greater than or equal to input signal.
-                    * cos: cosine, in radians.
-                    * cosh: Hyperbolic cosine.
-                    * erf: Error function.
-                    * erfc: Complementary error function.
-                    * erfcinv: Inverse complementary error function.
-                    * erfinv: Inverse error function.
-                    * exp: The base-e exponential of input signal.
-                    * exp2: The base-2 exponential of input signal.
-                    * expm1: The base-e exponential of input signal minus 1.
-                    * floor: Greatest integer value less than or equal to input signal.
-                    * gamma: Gamma function.
-                    * j0: Bessel function of the first kind of order 0.
-                    * j1: Bessel function of the first kind of order 1.
-                    * lgamma: Natural logarithm of the absolute value of the gamma function.
-                    * log: Natural logarithm of input signal.
-                    * log10: Base-10 logarithm of input signal.
-                    * log1p: Natural logarithm of input signal plus 1.
-                    * log2: Base-2 logarithm of input signal.
-                    * round: Round to nearest integer.
-                    * roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
-                    * sin: sine, in radians.
-                    * sinh: Hyperbolic sine.
-                    * sqrt: Square root.
-                    * tan: tangent, in radians.
-                    * tanh: Hyperbolic tangent.
-                    * trunc: Truncate to integer.
-                    * y0: Bessel function of the second kind of order 0.
-                    * y1: Bessel function of the second kind of order 1.
+                    * `abs`: Absolute value with the sign removed.
+                    * `acos`: `arccosine`, in radians.
+                    * `acosh`: Inverse hyperbolic cosine.
+                    * `asin`: `arcsine`, in radians.
+                    * `asinh`: Inverse hyperbolic sine.
+                    * `atan`: `arctangent`, in radians.
+                    * `atanh`: Inverse hyperbolic tangent.
+                    * `cbrt`: Cube root.
+                    * `ceil`: Least integer value greater than or equal to input signal.
+                    * `cos`: `cosine`, in radians.
+                    * `cosh`: Hyperbolic cosine.
+                    * `erf`: Error function.
+                    * `erfc`: Complementary error function.
+                    * `erfcinv`: Inverse complementary error function.
+                    * `erfinv`: Inverse error function.
+                    * `exp`: The base-e exponential of input signal.
+                    * `exp2`: The base-2 exponential of input signal.
+                    * `expm1`: The base-e exponential of input signal minus 1.
+                    * `floor`: Greatest integer value less than or equal to input signal.
+                    * `gamma`: Gamma function.
+                    * `j0`: Bessel function of the first kind of order 0.
+                    * `j1`: Bessel function of the first kind of order 1.
+                    * `lgamma`: Natural logarithm of the absolute value of the gamma function.
+                    * `log`: Natural logarithm of input signal.
+                    * `log10`: Base-10 logarithm of input signal.
+                    * `log1p`: Natural logarithm of input signal plus 1.
+                    * `log2`: Base-2 logarithm of input signal.
+                    * `round`: Round to nearest integer.
+                    * `roundtoeven`: Round to nearest integer, with ties going to the nearest even integer.
+                    * `sin`: `sine`, in radians.
+                    * `sinh`: Hyperbolic sine.
+                    * `sqrt`: Square root.
+                    * `tan`: `tangent`, in radians.
+                    * `tanh`: Hyperbolic tangent.
+                    * `trunc`: Truncate to integer.
+                    * `y0`: Bessel function of the second kind of order 0.
+                    * `y1`: Bessel function of the second kind of order 1.
 
                 enum:
                     - abs

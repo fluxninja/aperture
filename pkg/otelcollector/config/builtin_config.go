@@ -12,7 +12,7 @@ import (
 )
 
 // AddAlertsPipeline adds reusable alerts pipeline.
-func AddAlertsPipeline(config *OTELConfig, cfg CommonOTELConfig, extraProcessors ...string) {
+func AddAlertsPipeline(config *OTelConfig, cfg CommonOTelConfig, extraProcessors ...string) {
 	config.AddReceiver(otelconsts.ReceiverAlerts, map[string]any{})
 	config.AddProcessor(otelconsts.ProcessorAlertsNamespace, map[string]interface{}{
 		"actions": []map[string]interface{}{
@@ -43,12 +43,12 @@ func AddAlertsPipeline(config *OTELConfig, cfg CommonOTELConfig, extraProcessors
 	})
 }
 
-// AddPrometheusRemoteWriteExporter adds prometheus remote write exporter which
-// writes to controller prometheus instance.
-func AddPrometheusRemoteWriteExporter(config *OTELConfig, promClient promapi.Client) {
+// AddPrometheusRemoteWriteExporter adds Prometheus remote write exporter which
+// writes to controller Prometheus instance.
+func AddPrometheusRemoteWriteExporter(config *OTelConfig, promClient promapi.Client) {
 	endpoint := promClient.URL("api/v1/write", nil)
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
-	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
+	// tags, so they are not properly read by OTel. Need to use bare maps instead.
 	config.AddExporter(otelconsts.ExporterPrometheusRemoteWrite, map[string]any{
 		"endpoint": endpoint.String(),
 		"resource_to_telemetry_conversion": map[string]any{
@@ -87,9 +87,9 @@ func BuildApertureSelfScrapeConfig(
 	}
 }
 
-// BuildOTELScrapeConfig is a helper to create prometheus sonfiguration which
-// scrapes OTEL instance running on localhost.
-func BuildOTELScrapeConfig(name string, cfg CommonOTELConfig) map[string]any {
+// BuildOTelScrapeConfig is a helper to create prometheus sonfiguration which
+// scrapes OTel instance running on localhost.
+func BuildOTelScrapeConfig(name string, cfg CommonOTelConfig) map[string]any {
 	otelDebugTarget := fmt.Sprintf(":%d", cfg.Ports.DebugPort)
 	return map[string]any{
 		"job_name": name,

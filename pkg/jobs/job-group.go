@@ -20,7 +20,7 @@ const (
 	schedulerConfigKey = "scheduler"
 )
 
-// JobGroupConfig is reexported as it's commonly used when importing jobs package.
+// JobGroupConfig is reexported as it is commonly used when importing jobs package.
 type JobGroupConfig = jobsconfig.JobGroupConfig
 
 // JobGroupConstructor holds fields to create annotated instances of JobGroup.

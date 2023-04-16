@@ -327,7 +327,11 @@ Integer (int64)
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
 {%- if node.parameter.param_type == 'intermediate_node' %}
+<!-- vale off -->
+
 {{ heading_level }} {{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }} {#{{ anchor }}}
+
+<!-- vale on -->
 
 {%- for child_name, child_node in node.children.items() if child_node.parameter.param_type != 'intermediate_node' %}
 {{ render_node(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
@@ -336,6 +340,8 @@ Integer (int64)
 {{ render_node(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- else %}
+<!-- vale off -->
+
 <a id="{{ anchor }}"></a>
 <ParameterDescription
     name="{{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }}"
@@ -343,6 +349,8 @@ Integer (int64)
     reference="{{ node.parameter.docs_link }}"
     value="{{ node.parameter.default | quoteValueDocs }}"
     description='{{ node.parameter.description }}' />
+
+<!-- vale on -->
 {%- endif %}
 {%- endmacro %}
 
@@ -611,9 +619,7 @@ def get_jinja2_environment() -> jinja2.Environment:
     }
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
     env = jinja2.Environment(
-        loader=loader,
-        comment_start_string="<!--",
-        comment_end_string="-->",
+        loader=loader, comment_start_string="<%--", comment_end_string="--%>"
     )
     env.filters["slugify"] = slugify
     env.filters["quoteValueYAML"] = quoteValueYAML
@@ -707,7 +713,9 @@ def update_docs_markdown(
         readme_copied += f"\n:::\n\n"
 
     readme_copied += f"## Configuration\n"
+    readme_copied += f"<!-- vale off -->\n"
     readme_copied += f"\nCode: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
+    readme_copied += f"<!-- vale on -->\n"
 
     env = get_jinja2_environment()
     template = env.get_template("markdown.doc.md.j2")
