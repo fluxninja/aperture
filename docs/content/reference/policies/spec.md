@@ -1130,10 +1130,10 @@ There are three categories of components:
   :::
 
 - "sink" components: they affect the real world.
-  [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+  [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
   In the UI, represented by orange color. Sink components usually come in pairs with a
   "sources" component which emits a feedback signal, like
-  `accepted_concurrency` emitted by ConcurrencyLimiter.
+  `accepted_concurrency` emitted by _Concurrency Limiter_.
 
 :::tip
 
@@ -1472,7 +1472,7 @@ Emits a variable signal which can be set to invalid.
 
 <!-- vale on -->
 
-Concurrency Limiter is an actuator component that regulates flows to provide active service protection
+_Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
 
 :::info
 
@@ -2530,7 +2530,7 @@ AIMD Concurrency control component is based on Additive Increase and Multiplicat
 
 <!-- vale on -->
 
-Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+_Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
 
 </dd>
 <dt>flow_regulator</dt>
@@ -4834,7 +4834,7 @@ An ordered list of load shapers that get applied in order.
 
 <!-- vale on -->
 
-Defines a `[map<string, string> → bool]` expression to be evaluated on labels
+Defines a `[map<string, string> → bool]` expression to be evaluated on labels
 
 MatchExpression has multiple variants, exactly one should be set.
 

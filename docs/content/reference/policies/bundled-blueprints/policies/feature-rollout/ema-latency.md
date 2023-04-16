@@ -1,3 +1,23 @@
+---
+title: Feature Rollout with Exponential Moving Average Latency Feedback
+---
+
+## Introduction
+
+This policy rolls out new features based on exponential moving average of
+latency as the rollout criteria. The current average latency is compared with
+multiples of exponential moving average latency to determine conditions for
+advancing, reversing, or resetting the rollout to its initial state. The rollout
+process consists of a series of steps that progress if the feature is considered
+healthy.
+
+:::info
+
+This blueprint is the same as [`Feature Rollout blueprint`](base.md), with
+relevant fields highlighted in the aperturectl generated values file.
+
+:::
+
 <!-- Configuration Marker -->
 
 ```mdx-code-block
@@ -9,7 +29,7 @@ import {ParameterDescription} from '../../../../../parameterComponents.js'
 
 <!-- vale off -->
 
-Code: <a
+Blueprint name: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/ema-latency`}>policies/feature-rollout/ema-latency</a>
 
 <!-- vale on -->

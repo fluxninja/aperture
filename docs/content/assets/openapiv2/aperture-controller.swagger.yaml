@@ -619,10 +619,10 @@ definitions:
         :::
 
       * "sink" components: they affect the real world.
-        [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+        [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
         In the UI, represented by orange color.  Sink components usually come in pairs with a
         "sources" component which emits a feedback signal, like
-        `accepted_concurrency` emitted by ConcurrencyLimiter.
+        `accepted_concurrency` emitted by _Concurrency Limiter_.
 
       :::tip
 
@@ -744,8 +744,8 @@ definitions:
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. At this time, only `load_actuator` strategy is available.
     type: object
-    title: Concurrency Limiter is an actuator component that regulates flows to provide
-      active service protection
+    title: _Concurrency Limiter_ is an actuator component that regulates flows to
+      provide active service protection
     properties:
       flow_selector:
         description: |+
@@ -1186,9 +1186,9 @@ definitions:
           as a nested circuit.
         $ref: '#/definitions/AIMDConcurrencyController'
       concurrency_limiter:
-        description: Concurrency Limiter provides service protection by applying prioritized
-          load shedding of flows using a network scheduler (for example, Weighted
-          Fair Queuing).
+        description: _Concurrency Limiter_ provides service protection by applying
+          prioritized load shedding of flows using a network scheduler (for example,
+          Weighted Fair Queuing).
         $ref: '#/definitions/ConcurrencyLimiter'
       flow_regulator:
         description: Flow Regulator is a component that regulates the flow of requests

@@ -1,12 +1,12 @@
 ---
-title: Feature Roll-out Policy
+title: Feature Rollout Policy
 ---
 
 ## Introduction
 
-This policy rolls out new features based on closed loop feedback. The roll-out
+This policy rolls out new features based on closed loop feedback. The rollout
 criteria are defined by drivers that determine conditions for advancing,
-reversing, or resetting the roll-out to its initial state. The roll-out process
+reversing, or resetting the rollout to its initial state. The rollout process
 consists of a series of steps that progress if the feature is considered
 healthy.
 
@@ -20,7 +20,9 @@ within this blueprint.
 
 :::info
 
-See tutorials on TODO tgill to see this blueprint in use.
+See the tutorial on
+[Feature Rollout with Average Latency Feedback](/tutorials/flow-control/feature-rollout/with-average-latency-feedback.md)
+to see this blueprint in use.
 
 :::
 
@@ -35,7 +37,7 @@ import {ParameterDescription} from '../../../../../parameterComponents.js'
 
 <!-- vale off -->
 
-Code: <a
+Blueprint name: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/base`}>policies/feature-rollout/base</a>
 
 <!-- vale on -->

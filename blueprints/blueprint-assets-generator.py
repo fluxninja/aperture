@@ -265,7 +265,7 @@ def update_param_defaults(
             if idx == len(parts) - 1:
                 try:
                     return config[part]
-                except:
+                except KeyError:
                     # fatal exit
                     logger.error(f"Unable to find param {name} in rendered config")
                     raise typer.Exit(1)
@@ -714,7 +714,7 @@ def update_docs_markdown(
 
     readme_copied += f"## Configuration\n"
     readme_copied += f"<!-- vale off -->\n"
-    readme_copied += f"\nCode: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
+    readme_copied += f"\nBlueprint name: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
     readme_copied += f"<!-- vale on -->\n"
 
     env = get_jinja2_environment()

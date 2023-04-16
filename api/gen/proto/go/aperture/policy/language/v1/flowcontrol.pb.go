@@ -1370,7 +1370,7 @@ type FlowControl_RateLimiter struct {
 }
 
 type FlowControl_ConcurrencyLimiter struct {
-	// Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+	// _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
 	ConcurrencyLimiter *ConcurrencyLimiter `protobuf:"bytes,2,opt,name=concurrency_limiter,json=concurrencyLimiter,proto3,oneof"`
 }
 
@@ -1500,7 +1500,7 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 	return nil
 }
 
-// Concurrency Limiter is an actuator component that regulates flows to provide active service protection
+// _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
 //
 // :::info
 //

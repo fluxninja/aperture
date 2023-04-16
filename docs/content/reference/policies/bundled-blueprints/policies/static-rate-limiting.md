@@ -19,7 +19,7 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 <!-- vale off -->
 
-Code: <a
+Blueprint name: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/static-rate-limiting`}>policies/static-rate-limiting</a>
 
 <!-- vale on -->

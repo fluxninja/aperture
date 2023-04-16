@@ -1,5 +1,5 @@
 local is_special(val) =
-  if val == 'NaN' || val == '-Inf' || val == '+Inf' then true else false;
+  if std.isString(val) && (val == 'NaN' || val == '-Inf' || val == '+Inf') then true else false;
 
 local patch =
   {

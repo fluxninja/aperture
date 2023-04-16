@@ -385,10 +385,10 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //     :::
 //
 //   - "sink" components: they affect the real world.
-//     [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+//     [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
 //     In the UI, represented by orange color.  Sink components usually come in pairs with a
 //     "sources" component which emits a feedback signal, like
-//     `accepted_concurrency` emitted by ConcurrencyLimiter.
+//     `accepted_concurrency` emitted by _Concurrency Limiter_.
 //
 // :::tip
 //

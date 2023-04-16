@@ -719,10 +719,10 @@ definitions:
               :::
 
             * "sink" components: they affect the real world.
-              [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+              [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
               In the UI, represented by orange color.  Sink components usually come in pairs with a
               "sources" component which emits a feedback signal, like
-              `accepted_concurrency` emitted by ConcurrencyLimiter.
+              `accepted_concurrency` emitted by _Concurrency Limiter_.
 
             :::tip
 
@@ -854,7 +854,7 @@ definitions:
                     output signals.
 
                 x-go-tag-validate: required
-        title: Concurrency Limiter is an actuator component that regulates flows to provide active service protection
+        title: _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
         type: object
     ConstantSignal:
         description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
@@ -1385,7 +1385,7 @@ definitions:
                 description: AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
             concurrency_limiter:
                 $ref: '#/definitions/ConcurrencyLimiter'
-                description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+                description: _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
             flow_regulator:
                 $ref: '#/definitions/FlowRegulator'
                 description: Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.

@@ -57,3 +57,5 @@ Prometheus
 Pub/Sub
 auto-scaler
 Auto-scaler
+[Rr]ollouts?\b
+PromQL
