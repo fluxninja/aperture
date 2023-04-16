@@ -1,0 +1,35 @@
+# Generated values file for policies/feature-rollout/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/base
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+
+# Parameters for the Feature Rollout policy.
+# Type: rollout_policy
+# Required: True
+policy:
+  components: []
+  drivers:
+  evaluation_interval: "1s"
+  load_shaper:
+    flow_regulator_parameters:
+      flow_selector:
+        flow_matcher:
+          control_point: __REQUIRED_FIELD__
+        service_selector:
+          service: __REQUIRED_FIELD__
+      label_key: ""
+    steps:
+      [
+        {
+          "duration": "__REQUIRED_FIELD__",
+          "target_accept_percentage": "__REQUIRED_FIELD__",
+        },
+      ]
+  resources:
+    flow_control:
+      classifiers: []

@@ -567,7 +567,7 @@ definitions:
         description: Namespace of the entity. For example, pod namespace.
         type: string
       node_name:
-        description: Node name of the entity. For example, Hostname.
+        description: Node name of the entity. For example, hostname.
         type: string
       services:
         description: |+

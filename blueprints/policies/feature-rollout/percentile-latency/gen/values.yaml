@@ -1,0 +1,67 @@
+# Generated values file for policies/feature-rollout/percentile-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/percentile-latency
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+
+# Parameters for the Feature Rollout policy.
+# Type: policies/feature-rollout/base:schema:rollout_policy
+# Required: True
+policy:
+  components: []
+  drivers:
+    percentile_latency_drivers:
+      [
+        {
+          "backward": { "threshold": "__REQUIRED_FIELD__" },
+          "flux_meter":
+            {
+              "flow_selector":
+                {
+                  "flow_matcher": { "control_point": "__REQUIRED_FIELD__" },
+                  "service_selector": { "service": "__REQUIRED_FIELD__" },
+                },
+              "static_buckets":
+                {
+                  "buckets":
+                    [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+                },
+            },
+          "forward": { "threshold": "__REQUIRED_FIELD__" },
+          "percentile": 95,
+          "reset": { "threshold": "__REQUIRED_FIELD__" },
+        },
+      ]
+  evaluation_interval: "1s"
+  load_shaper:
+    flow_regulator_parameters:
+      flow_selector:
+        flow_matcher:
+          control_point: __REQUIRED_FIELD__
+        service_selector:
+          service: __REQUIRED_FIELD__
+      label_key: ""
+    steps:
+      [
+        {
+          "duration": "__REQUIRED_FIELD__",
+          "target_accept_percentage": "__REQUIRED_FIELD__",
+        },
+      ]
+  resources:
+    flow_control:
+      classifiers: []
+
+# Configuration for the Grafana dashboard accompanying this policy.
+# Type: policies/feature-rollout/base:param:dashboard
+dashboard:
+  datasource:
+    filter_regex: ""
+    name: "$datasource"
+  refresh_interval: "5s"
+  time_from: "now-15m"
+  time_to: "now"

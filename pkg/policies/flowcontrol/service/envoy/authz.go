@@ -228,6 +228,14 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 					},
 				},
 			}
+		case flowcontrolv1.CheckResponse_REJECT_REASON_FLOW_REGULATED:
+			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
+				DeniedResponse: &authv3.DeniedHttpResponse{
+					Status: &typev3.HttpStatus{
+						Code: typev3.StatusCode_Forbidden,
+					},
+				},
+			}
 		default:
 			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
 		}

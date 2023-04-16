@@ -9,6 +9,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -76,6 +77,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
 	case *policylangv1.Component_Holder:
 		ctor = mkCtor(config.Holder, components.NewHolderAndOptions)
+	case *policylangv1.Component_SignalGenerator:
+		ctor = mkCtor(config.SignalGenerator, components.NewSignalGeneratorAndOptions)
 	case *policylangv1.Component_NestedSignalIngress:
 		ctor = mkCtor(config.NestedSignalIngress, components.NewNestedSignalIngressAndOptions)
 	case *policylangv1.Component_NestedSignalEgress:
@@ -93,6 +96,8 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+		case *policylangv1.FlowControl_FlowRegulator:
+			ctor = mkCtor(flowControlConfig.FlowRegulator, flowregulator.NewFlowRegulatorAndOptions)
 		default:
 			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
 		}

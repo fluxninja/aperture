@@ -66,7 +66,7 @@ Default configuration.
 
 <!-- vale on -->
 
-Configuration key for load actuation.
+Dynamic configuration key for load actuation.
 
 </dd>
 <dt>flow_selector</dt>
@@ -1130,10 +1130,10 @@ There are three categories of components:
   :::
 
 - "sink" components: they affect the real world.
-  [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+  [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
   In the UI, represented by orange color. Sink components usually come in pairs with a
   "sources" component which emits a feedback signal, like
-  `accepted_concurrency` emitted by ConcurrencyLimiter.
+  `accepted_concurrency` emitted by _Concurrency Limiter_.
 
 :::tip
 
@@ -1414,6 +1414,18 @@ Generates 0 and 1 in turns.
 Query components that are query databases such as Prometheus.
 
 </dd>
+<dt>signal_generator</dt>
+<dd>
+
+<!-- vale off -->
+
+([SignalGenerator](#signal-generator))
+
+<!-- vale on -->
+
+Generates the specified signal.
+
+</dd>
 <dt>switcher</dt>
 <dd>
 
@@ -1460,11 +1472,11 @@ Emits a variable signal which can be set to invalid.
 
 <!-- vale on -->
 
-Concurrency Limiter is an actuator component that regulates flows to provide active service protection
+_Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
 
 :::info
 
-See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
+See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).
 
 :::
 
@@ -2518,7 +2530,43 @@ AIMD Concurrency control component is based on Additive Increase and Multiplicat
 
 <!-- vale on -->
 
-Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+_Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+
+</dd>
+<dt>flow_regulator</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowRegulator](#flow-regulator))
+
+<!-- vale on -->
+
+Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+
+</dd>
+<dt>load_shaper</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaper](#load-shaper))
+
+<!-- vale on -->
+
+LoadShaper is a component that shapes the load of the service.
+
+</dd>
+<dt>load_shaper_series</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperSeries](#load-shaper-series))
+
+<!-- vale on -->
+
+LoadShaperSeries is a series of LoadShaper components that shape load one after another in series.
 
 </dd>
 <dt>rate_limiter</dt>
@@ -2530,7 +2578,7 @@ Concurrency Limiter provides service protection by applying prioritized load she
 
 <!-- vale on -->
 
-Rate Limiter provides service protection by applying rate limiter.
+_Rate Limiter_ provides service protection by applying rate limiter.
 
 </dd>
 </dl>
@@ -2659,6 +2707,156 @@ point using classifier, and immediately use it for matching on the same
 control point.
 
 :::
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### FlowRegulator {#flow-regulator}
+
+<!-- vale on -->
+
+_Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowRegulatorDynamicConfig](#flow-regulator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowRegulatorIns](#flow-regulator-ins))
+
+<!-- vale on -->
+
+Input ports for the _Flow Regulator_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowRegulatorParameters](#flow-regulator-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Flow Regulator_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### FlowRegulatorDynamicConfig {#flow-regulator-dynamic-config}
+
+<!-- vale on -->
+
+Dynamic Configuration for _Flow Regulator_
+
+<dl>
+<dt>enable_label_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### FlowRegulatorIns {#flow-regulator-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The percentage of requests to accept.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### FlowRegulatorParameters {#flow-regulator-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>flow_selector</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+_Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The flow label key for identifying sessions.
+
+- When label key is specified, _Flow Regulator_ acts as a sticky filter.
+  The series of flows with the same value of label key get the same
+  decision provided that the `accept_percentage` is same or higher.
+- When label key is not specified, _Flow Regulator_ acts as a stateless filter.
+  Percentage of flows are selected randomly for rejection.
 
 </dd>
 </dl>
@@ -4244,6 +4442,394 @@ concurrency](#scheduler-outs) that needs to be accepted.
 
 <!-- vale off -->
 
+### LoadShaper {#load-shaper}
+
+<!-- vale on -->
+
+The _Load Shaper_ produces a smooth and continuous traffic load
+that changes progressively over time, based on the specified steps.
+
+Each step is defined by two parameters:
+
+- The `target_accept_percentage`.
+- The `duration` for the signal to change from the
+  previous step's `target_accept_percentage` to the current step's
+  `target_accept_percentage`.
+
+The percentage of requests accepted starts at the `target_accept_percentage`
+defined in the first step and gradually ramps up or down linearly from
+the previous step's `target_accept_percentage` to the next
+`target_accept_percentage`, over the `duration` specified for each step.
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowRegulatorDynamicConfig](#flow-regulator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Dynamic configuration key for flow regulator.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperIns](#load-shaper-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperOuts](#load-shaper-outs))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperParameters](#load-shaper-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperIns {#load-shaper-ins}
+
+<!-- vale on -->
+
+Inputs for the _Load Shaper_ component.
+
+<dl>
+<dt>backward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the _Load Shaper_ towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the _Load Shaper_ towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to reset the _Load Shaper_ to the first step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperOuts {#load-shaper-outs}
+
+<!-- vale on -->
+
+Outputs for the _Load Shaper_ component.
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The percentage of flows being accepted by the _Load Shaper_.
+
+</dd>
+<dt>at_end</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+
+</dd>
+<dt>at_start</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperParameters {#load-shaper-parameters}
+
+<!-- vale on -->
+
+Parameters for the _Load Shaper_ component.
+
+<dl>
+<dt>flow_regulator_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowRegulatorParameters](#flow-regulator-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Flow Regulator_.
+
+</dd>
+<dt>steps</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadShaperParametersStep](#load-shaper-parameters-step), **required**)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperParametersStep {#load-shaper-parameters-step}
+
+<!-- vale on -->
+
+<dl>
+<dt>duration</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Duration for which the step is active.
+
+</dd>
+<dt>target_accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, maximum: `100`)
+
+<!-- vale on -->
+
+The value of the step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperSeries {#load-shaper-series}
+
+<!-- vale on -->
+
+_LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperSeriesIns](#load-shaper-series-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperSeriesParameters](#load-shaper-series-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperSeriesIns {#load-shaper-series-ins}
+
+<!-- vale on -->
+
+Inputs for the _LoadShaperSeries_ component.
+
+<dl>
+<dt>backward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the load shaper series towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the load shaper series towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to reset the load shaper series to the first step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperSeriesLoadShaperInstance {#load-shaper-series-load-shaper-instance}
+
+<!-- vale on -->
+
+<dl>
+<dt>load_shaper</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperParameters](#load-shaper-parameters))
+
+<!-- vale on -->
+
+The load shaper.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadShaperOuts](#load-shaper-outs))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadShaperSeriesParameters {#load-shaper-series-parameters}
+
+<!-- vale on -->
+
+Parameters for the _LoadShaperSeries_ component.
+
+<dl>
+<dt>load_shapers</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadShaperSeriesLoadShaperInstance](#load-shaper-series-load-shaper-instance), **required**)
+
+<!-- vale on -->
+
+An ordered list of load shapers that get applied in order.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### MatchExpression {#match-expression}
 
 <!-- vale on -->
@@ -5451,13 +6037,26 @@ Output ports for the PromQL component.
 
 <!-- vale on -->
 
-Describes the Prometheus query to be run.
+Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.
 
-:::info
+:::note
 
-PromQL [reference](https://prometheus.io/docs/prometheus/latest/querying/basics/)
-Flow Metrics [reference](/reference/observability/flow-metrics/flow-metrics.md)
-OpenTelemetry Metrics [reference](/get-started/integrations/metrics/metrics.md)
+The query must return a single value either as a scalar or as a vector with a single element.
+
+:::
+
+:::info Usage with Flux Meter
+
+[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+The particular Flux Meter can be identified with the `flux_meter_name` label.
+There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+
+:::
+
+:::info Usage with OpenTelemetry Metrics
+
+Aperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.
 
 :::
 
@@ -5598,7 +6197,7 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
 
 :::
 
@@ -6661,6 +7260,217 @@ To scope policies to services, the `service` should be set to `any` and instead,
 An entity (for example, Kubernetes pod) might belong to multiple services.
 
 :::
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SignalGenerator {#signal-generator}
+
+<!-- vale on -->
+
+The _Signal Generator_ component generates a smooth and continuous signal
+by following a sequence of specified steps. Each step has two parameters:
+
+- `target_output`: The desired output value at the end of the step.
+- `duration`: The time it takes for the signal to change linearly from the
+  previous step's `target_output` to the current step's `target_output`.
+
+The output signal starts at the `target_output` of the first step and
+changes linearly between steps based on their `duration`. The _Signal
+Generator_ can be controlled to move forwards, backwards, or reset to the
+beginning based on input signals.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([SignalGeneratorIns](#signal-generator-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([SignalGeneratorOuts](#signal-generator-outs))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([SignalGeneratorParameters](#signal-generator-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Signal Generator_ component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SignalGeneratorIns {#signal-generator-ins}
+
+<!-- vale on -->
+
+Inputs for the _Signal Generator_ component.
+
+<dl>
+<dt>backward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the _Signal Generator_ towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the _Signal Generator_ towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to reset the _Signal Generator_ to the first step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SignalGeneratorOuts {#signal-generator-outs}
+
+<!-- vale on -->
+
+Outputs for the _Signal Generator_ component.
+
+<dl>
+<dt>at_end</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+
+</dd>
+<dt>at_start</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
+
+</dd>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The generated signal.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SignalGeneratorParameters {#signal-generator-parameters}
+
+<!-- vale on -->
+
+Parameters for the _Signal Generator_ component.
+
+<dl>
+<dt>steps</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]SignalGeneratorParametersStep](#signal-generator-parameters-step), **required**)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SignalGeneratorParametersStep {#signal-generator-parameters-step}
+
+<!-- vale on -->
+
+<dl>
+<dt>duration</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Duration for which the step is active.
+
+</dd>
+<dt>target_output</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConstantSignal](#constant-signal))
+
+<!-- vale on -->
+
+The value of the step.
 
 </dd>
 </dl>

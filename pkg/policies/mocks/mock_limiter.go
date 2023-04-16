@@ -80,6 +80,20 @@ func (mr *MockLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockLimiter)(nil).GetPolicyName))
 }
 
+// GetRequestCounter mocks base method.
+func (m *MockLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRequestCounter", labels)
+	ret0, _ := ret[0].(prometheus.Counter)
+	return ret0
+}
+
+// GetRequestCounter indicates an expected call of GetRequestCounter.
+func (mr *MockLimiterMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockLimiter)(nil).GetRequestCounter), labels)
+}
+
 // RunLimiter mocks base method.
 func (m *MockLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()

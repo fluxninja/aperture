@@ -534,14 +534,23 @@ message PathTemplateMatcher {
 // FlowControl components are used to regulate requests flow.
 message FlowControl {
   oneof component {
-    // Rate Limiter provides service protection by applying rate limiter.
+    // _Rate Limiter_ provides service protection by applying rate limiter.
     RateLimiter rate_limiter = 1;
 
-    // Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+    // _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
     ConcurrencyLimiter concurrency_limiter = 2;
 
     // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
     AIMDConcurrencyController aimd_concurrency_controller = 3;
+
+    // Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+    FlowRegulator flow_regulator = 4;
+
+    // LoadShaper is a component that shapes the load of the service.
+    LoadShaper load_shaper = 5;
+
+    // LoadShaperSeries is a series of LoadShaper components that shape load one after another in series.
+    LoadShaperSeries load_shaper_series = 6;
   }
 }
 
@@ -549,7 +558,7 @@ message FlowControl {
 //
 // :::info
 //
-// See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
+// See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
 //
 // :::
 //
@@ -626,11 +635,11 @@ message RateLimiter {
   DynamicConfig default_config = 5;
 }
 
-// Concurrency Limiter is an actuator component that regulates flows to provide active service protection
+// _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
 //
 // :::info
 //
-// See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
+// See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).
 //
 // :::
 //
@@ -880,9 +889,136 @@ message AIMDConcurrencyController {
   // Configuration for embedded Alerter.
   Alerter.Parameters alerter_parameters = 8;
 
-  // Configuration key for load actuation.
+  // Dynamic configuration key for load actuation.
   string dynamic_config_key = 9;
 
   // Default configuration.
   LoadActuator.DynamicConfig default_config = 10;
+}
+
+// _Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+message FlowRegulator {
+  // Dynamic Configuration for _Flow Regulator_
+  message DynamicConfig {
+    // Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+    repeated string enable_label_values = 1;
+  }
+
+  message Parameters {
+    // _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
+    FlowSelector flow_selector = 1; // @gotags: validate:"required"
+
+    // The flow label key for identifying sessions.
+    // - When label key is specified, _Flow Regulator_ acts as a sticky filter.
+    //   The series of flows with the same value of label key get the same
+    //   decision provided that the `accept_percentage` is same or higher.
+    // - When label key is not specified, _Flow Regulator_ acts as a stateless filter.
+    //   Percentage of flows are selected randomly for rejection.
+    string label_key = 2;
+  }
+
+  message Ins {
+    // The percentage of requests to accept.
+    InPort accept_percentage = 1;
+  }
+
+  // Input ports for the _Flow Regulator_.
+  Ins in_ports = 1;
+
+  // Parameters for the _Flow Regulator_.
+  Parameters parameters = 2;
+
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 3;
+
+  // Default configuration.
+  DynamicConfig default_config = 4;
+}
+
+// The _Load Shaper_ produces a smooth and continuous traffic load
+// that changes progressively over time, based on the specified steps.
+//
+// Each step is defined by two parameters:
+// - The `target_accept_percentage`.
+// - The `duration` for the signal to change from the
+//   previous step's `target_accept_percentage` to the current step's
+//   `target_accept_percentage`.
+//
+// The percentage of requests accepted starts at the `target_accept_percentage`
+// defined in the first step and gradually ramps up or down linearly from
+// the previous step's `target_accept_percentage` to the next
+// `target_accept_percentage`, over the `duration` specified for each step.
+message LoadShaper {
+  // Parameters for the _Load Shaper_ component.
+  message Parameters {
+    message Step {
+      // The value of the step.
+      double target_accept_percentage = 1; // @gotags: validate:"gte=0,lte=100"
+      // Duration for which the step is active.
+      google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+    }
+
+    // Parameters for the _Flow Regulator_.
+    FlowRegulator.Parameters flow_regulator_parameters = 1; // @gotags: validate:"required"
+
+    repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
+  }
+
+  // Inputs for the _Load Shaper_ component.
+  message Ins {
+    // Whether to progress the _Load Shaper_ towards the next step.
+    InPort forward = 1;
+    // Whether to progress the _Load Shaper_ towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the _Load Shaper_ to the first step.
+    InPort reset = 3;
+  }
+  // Outputs for the _Load Shaper_ component.
+  message Outs {
+    // The percentage of flows being accepted by the _Load Shaper_.
+    OutPort accept_percentage = 1;
+    // A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
+    OutPort at_start = 2;
+    // A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+    OutPort at_end = 3;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Dynamic configuration key for flow regulator.
+  string dynamic_config_key = 9;
+
+  // Default configuration.
+  FlowRegulator.DynamicConfig default_config = 10;
+}
+
+// _LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
+message LoadShaperSeries {
+  message LoadShaperInstance {
+    // The load shaper.
+    LoadShaper.Parameters load_shaper = 1; // @gotags: validate:"required"
+    LoadShaper.Outs out_ports = 2;
+  }
+  // Parameters for the _LoadShaperSeries_ component.
+  message Parameters {
+    // An ordered list of load shapers that get applied in order.
+    repeated LoadShaperInstance load_shapers = 1; // @gotags: validate:"required,dive"
+  }
+
+  // Inputs for the _LoadShaperSeries_ component.
+  message Ins {
+    // Whether to progress the load shaper series towards the next step.
+    InPort forward = 1;
+    // Whether to progress the load shaper series towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the load shaper series to the first step.
+    InPort reset = 3;
+  }
+
+  Ins in_ports = 1;
+
+  Parameters parameters = 2; // @gotags: validate:"required"
 }

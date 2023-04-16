@@ -748,3 +748,52 @@ message NestedSignalEgress {
   // Name of the port.
   string port_name = 2;
 }
+
+// The _Signal Generator_ component generates a smooth and continuous signal
+// by following a sequence of specified steps. Each step has two parameters:
+// - `target_output`: The desired output value at the end of the step.
+// - `duration`: The time it takes for the signal to change linearly from the
+//   previous step's `target_output` to the current step's `target_output`.
+//
+// The output signal starts at the `target_output` of the first step and
+// changes linearly between steps based on their `duration`. The _Signal
+// Generator_ can be controlled to move forwards, backwards, or reset to the
+// beginning based on input signals.
+message SignalGenerator {
+  // Parameters for the _Signal Generator_ component.
+  message Parameters {
+    message Step {
+      // The value of the step.
+      ConstantSignal target_output = 1;
+      // Duration for which the step is active.
+      google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+    }
+    repeated Step steps = 1; // @gotags: validate:"required,gt=0,dive"
+  }
+
+  // Inputs for the _Signal Generator_ component.
+  message Ins {
+    // Whether to progress the _Signal Generator_ towards the next step.
+    InPort forward = 1;
+    // Whether to progress the _Signal Generator_ towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the _Signal Generator_ to the first step.
+    InPort reset = 3;
+  }
+
+  // Outputs for the _Signal Generator_ component.
+  message Outs {
+    // The generated signal.
+    OutPort output = 1;
+    // A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
+    OutPort at_start = 2;
+    // A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+    OutPort at_end = 3;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  // Parameters for the _Signal Generator_ component.
+  Parameters parameters = 3; // @gotags: validate:"required"
+}

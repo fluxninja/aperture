@@ -104,7 +104,7 @@ definitions:
         description: Default configuration.
         $ref: '#/definitions/LoadActuatorDynamicConfig'
       dynamic_config_key:
-        description: Configuration key for load actuation.
+        description: Dynamic configuration key for load actuation.
         type: string
       flow_selector:
         description: |+
@@ -619,10 +619,10 @@ definitions:
         :::
 
       * "sink" components: they affect the real world.
-        [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+        [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
         In the UI, represented by orange color.  Sink components usually come in pairs with a
         "sources" component which emits a feedback signal, like
-        `accepted_concurrency` emitted by ConcurrencyLimiter.
+        `accepted_concurrency` emitted by _Concurrency Limiter_.
 
       :::tip
 
@@ -716,6 +716,9 @@ definitions:
       query:
         description: Query components that are query databases such as Prometheus.
         $ref: '#/definitions/Query'
+      signal_generator:
+        description: Generates the specified signal.
+        $ref: '#/definitions/SignalGenerator'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
@@ -731,7 +734,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
+      See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).
 
       :::
 
@@ -741,8 +744,8 @@ definitions:
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. At this time, only `load_actuator` strategy is available.
     type: object
-    title: Concurrency Limiter is an actuator component that regulates flows to provide
-      active service protection
+    title: _Concurrency Limiter_ is an actuator component that regulates flows to
+      provide active service protection
     properties:
       flow_selector:
         description: |+
@@ -1183,12 +1186,24 @@ definitions:
           as a nested circuit.
         $ref: '#/definitions/AIMDConcurrencyController'
       concurrency_limiter:
-        description: Concurrency Limiter provides service protection by applying prioritized
-          load shedding of flows using a network scheduler (for example, Weighted
-          Fair Queuing).
+        description: _Concurrency Limiter_ provides service protection by applying
+          prioritized load shedding of flows using a network scheduler (for example,
+          Weighted Fair Queuing).
         $ref: '#/definitions/ConcurrencyLimiter'
+      flow_regulator:
+        description: Flow Regulator is a component that regulates the flow of requests
+          to the service by allowing only the specified percentage of requests or
+          sticky sessions.
+        $ref: '#/definitions/FlowRegulator'
+      load_shaper:
+        description: LoadShaper is a component that shapes the load of the service.
+        $ref: '#/definitions/LoadShaper'
+      load_shaper_series:
+        description: LoadShaperSeries is a series of LoadShaper components that shape
+          load one after another in series.
+        $ref: '#/definitions/LoadShaperSeries'
       rate_limiter:
-        description: Rate Limiter provides service protection by applying rate limiter.
+        description: _Rate Limiter_ provides service protection by applying rate limiter.
         $ref: '#/definitions/RateLimiter'
   FlowControlResources:
     type: object
@@ -1281,6 +1296,58 @@ definitions:
           [flow labels](/concepts/flow-control/flow-label.md)
           must also be satisfied (in addition to service+control point matching)
         $ref: '#/definitions/LabelMatcher'
+  FlowRegulator:
+    description: _Flow Regulator_ is a component that regulates the flow of requests
+      to the service by allowing only the specified percentage of requests or sticky
+      sessions.
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+      in_ports:
+        description: Input ports for the _Flow Regulator_.
+        $ref: '#/definitions/FlowRegulatorIns'
+      parameters:
+        description: Parameters for the _Flow Regulator_.
+        $ref: '#/definitions/FlowRegulatorParameters'
+  FlowRegulatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for _Flow Regulator_
+    properties:
+      enable_label_values:
+        description: Specify certain label values to be accepted by this flow filter
+          regardless of accept percentage.
+        type: array
+        items:
+          type: string
+  FlowRegulatorIns:
+    type: object
+    properties:
+      accept_percentage:
+        description: The percentage of requests to accept.
+        $ref: '#/definitions/InPort'
+  FlowRegulatorParameters:
+    type: object
+    properties:
+      flow_selector:
+        description: |+
+          _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/FlowSelector'
+      label_key:
+        description: |-
+          The flow label key for identifying sessions.
+          - When label key is specified, _Flow Regulator_ acts as a sticky filter.
+            The series of flows with the same value of label key get the same
+            decision provided that the `accept_percentage` is same or higher.
+          - When label key is not specified, _Flow Regulator_ acts as a stateless filter.
+            Percentage of flows are selected randomly for rejection.
+        type: string
   FlowSelector:
     description: |-
       :::info
@@ -2010,6 +2077,153 @@ definitions:
           Load multiplier is ratio of [incoming
           concurrency](#scheduler-outs) that needs to be accepted.
         $ref: '#/definitions/InPort'
+  LoadShaper:
+    description: |-
+      The _Load Shaper_ produces a smooth and continuous traffic load
+      that changes progressively over time, based on the specified steps.
+
+      Each step is defined by two parameters:
+      - The `target_accept_percentage`.
+      - The `duration` for the signal to change from the
+        previous step's `target_accept_percentage` to the current step's
+        `target_accept_percentage`.
+
+      The percentage of requests accepted starts at the `target_accept_percentage`
+      defined in the first step and gradually ramps up or down linearly from
+      the previous step's `target_accept_percentage` to the next
+      `target_accept_percentage`, over the `duration` specified for each step.
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Dynamic configuration key for flow regulator.
+        type: string
+      in_ports:
+        $ref: '#/definitions/LoadShaperIns'
+      out_ports:
+        $ref: '#/definitions/LoadShaperOuts'
+      parameters:
+        x-go-tag-validate: required
+        $ref: '#/definitions/LoadShaperParameters'
+  LoadShaperIns:
+    description: Inputs for the _Load Shaper_ component.
+    type: object
+    properties:
+      backward:
+        description: Whether to progress the _Load Shaper_ towards the previous step.
+        $ref: '#/definitions/InPort'
+      forward:
+        description: Whether to progress the _Load Shaper_ towards the next step.
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Whether to reset the _Load Shaper_ to the first step.
+        $ref: '#/definitions/InPort'
+  LoadShaperOuts:
+    description: Outputs for the _Load Shaper_ component.
+    type: object
+    properties:
+      accept_percentage:
+        description: The percentage of flows being accepted by the _Load Shaper_.
+        $ref: '#/definitions/OutPort'
+      at_end:
+        description: A Boolean signal indicating whether the _Load Shaper_ is at the
+          end of signal generation.
+        $ref: '#/definitions/OutPort'
+      at_start:
+        description: A Boolean signal indicating whether the _Load Shaper_ is at the
+          start of signal generation.
+        $ref: '#/definitions/OutPort'
+  LoadShaperParameters:
+    description: Parameters for the _Load Shaper_ component.
+    type: object
+    required:
+    - steps
+    properties:
+      flow_regulator_parameters:
+        description: |+
+          Parameters for the _Flow Regulator_.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/FlowRegulatorParameters'
+      steps:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          $ref: '#/definitions/LoadShaperParametersStep'
+        x-go-tag-validate: required,gt=0,dive
+  LoadShaperParametersStep:
+    type: object
+    required:
+    - duration
+    properties:
+      duration:
+        description: |+
+          Duration for which the step is active.
+
+        type: string
+        x-go-tag-validate: required
+      target_accept_percentage:
+        description: |+
+          The value of the step.
+
+        type: number
+        format: double
+        maximum: 100
+        minimum: 0
+        x-go-tag-validate: gte=0,lte=100
+  LoadShaperSeries:
+    description: _LoadShaperSeries_ is a component that applies a series of _Load
+      Shapers_ in order.
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/LoadShaperSeriesIns'
+      parameters:
+        x-go-tag-validate: required
+        $ref: '#/definitions/LoadShaperSeriesParameters'
+  LoadShaperSeriesIns:
+    description: Inputs for the _LoadShaperSeries_ component.
+    type: object
+    properties:
+      backward:
+        description: Whether to progress the load shaper series towards the previous
+          step.
+        $ref: '#/definitions/InPort'
+      forward:
+        description: Whether to progress the load shaper series towards the next step.
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Whether to reset the load shaper series to the first step.
+        $ref: '#/definitions/InPort'
+  LoadShaperSeriesLoadShaperInstance:
+    type: object
+    properties:
+      load_shaper:
+        description: |+
+          The load shaper.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/LoadShaperParameters'
+      out_ports:
+        $ref: '#/definitions/LoadShaperOuts'
+  LoadShaperSeriesParameters:
+    description: Parameters for the _LoadShaperSeries_ component.
+    type: object
+    required:
+    - load_shapers
+    properties:
+      load_shapers:
+        description: |+
+          An ordered list of load shapers that get applied in order.
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/LoadShaperSeriesLoadShaperInstance'
+        x-go-tag-validate: required,dive
   MatchExpression:
     description: |-
       MatchExpression has multiple variants, exactly one should be set.
@@ -2510,13 +2724,26 @@ definitions:
         $ref: '#/definitions/PromQLOuts'
       query_string:
         description: |-
-          Describes the Prometheus query to be run.
+          Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.
 
-          :::info
+          :::note
 
-          PromQL [reference](https://prometheus.io/docs/prometheus/latest/querying/basics/)
-          Flow Metrics [reference](/reference/observability/flow-metrics/flow-metrics.md)
-          OpenTelemetry Metrics [reference](/get-started/integrations/metrics/metrics.md)
+          The query must return a single value either as a scalar or as a vector with a single element.
+
+          :::
+
+          :::info Usage with Flux Meter
+
+          [Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+          Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+          The particular Flux Meter can be identified with the `flux_meter_name` label.
+          There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+
+          :::
+
+          :::info Usage with OpenTelemetry Metrics
+
+          Aperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.
 
           :::
         type: string
@@ -2566,7 +2793,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
+      See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
 
       :::
 
@@ -3179,6 +3406,86 @@ definitions:
         type: string
         default: any
         x-go-tag-default: any
+  SignalGenerator:
+    description: |-
+      The _Signal Generator_ component generates a smooth and continuous signal
+      by following a sequence of specified steps. Each step has two parameters:
+      - `target_output`: The desired output value at the end of the step.
+      - `duration`: The time it takes for the signal to change linearly from the
+        previous step's `target_output` to the current step's `target_output`.
+
+      The output signal starts at the `target_output` of the first step and
+      changes linearly between steps based on their `duration`. The _Signal
+      Generator_ can be controlled to move forwards, backwards, or reset to the
+      beginning based on input signals.
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/SignalGeneratorIns'
+      out_ports:
+        $ref: '#/definitions/SignalGeneratorOuts'
+      parameters:
+        description: |+
+          Parameters for the _Signal Generator_ component.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/SignalGeneratorParameters'
+  SignalGeneratorIns:
+    description: Inputs for the _Signal Generator_ component.
+    type: object
+    properties:
+      backward:
+        description: Whether to progress the _Signal Generator_ towards the previous
+          step.
+        $ref: '#/definitions/InPort'
+      forward:
+        description: Whether to progress the _Signal Generator_ towards the next step.
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Whether to reset the _Signal Generator_ to the first step.
+        $ref: '#/definitions/InPort'
+  SignalGeneratorOuts:
+    description: Outputs for the _Signal Generator_ component.
+    type: object
+    properties:
+      at_end:
+        description: A Boolean signal indicating whether the _Signal Generator_ is
+          at the end of signal generation.
+        $ref: '#/definitions/OutPort'
+      at_start:
+        description: A Boolean signal indicating whether the _Signal Generator_ is
+          at the start of signal generation.
+        $ref: '#/definitions/OutPort'
+      output:
+        description: The generated signal.
+        $ref: '#/definitions/OutPort'
+  SignalGeneratorParameters:
+    description: Parameters for the _Signal Generator_ component.
+    type: object
+    required:
+    - steps
+    properties:
+      steps:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          $ref: '#/definitions/SignalGeneratorParametersStep'
+        x-go-tag-validate: required,gt=0,dive
+  SignalGeneratorParametersStep:
+    type: object
+    required:
+    - duration
+    properties:
+      duration:
+        description: |+
+          Duration for which the step is active.
+
+        type: string
+        x-go-tag-validate: required
+      target_output:
+        description: The value of the step.
+        $ref: '#/definitions/ConstantSignal'
   Status:
     description: Status holds details about a status that can be reported to the registry.
     type: object

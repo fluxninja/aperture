@@ -30,18 +30,17 @@ type Limiter interface {
 	GetFlowSelector() *policylangv1.FlowSelector
 	RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
+	GetRequestCounter(labels map[string]string) prometheus.Counter
 }
 
 // RateLimiter interface.
 type RateLimiter interface {
 	Limiter
 	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
-	GetRequestCounter(labels map[string]string) prometheus.Counter
 }
 
 // ConcurrencyLimiter interface.
 type ConcurrencyLimiter interface {
 	Limiter
 	GetLatencyObserver(labels map[string]string) prometheus.Observer
-	GetRequestCounter(labels map[string]string) prometheus.Counter
 }

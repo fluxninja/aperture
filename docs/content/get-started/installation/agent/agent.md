@@ -44,7 +44,7 @@ The Aperture Agent can be installed in the following modes:
       whenever a new pod is started with required labels and annotations, the
       Agent container will be attached with the pod.
 
-2. [**Bare Metal/VM**](bare_metal.md)
+2. [**Bare Metal or VM**](bare_metal.md)
 
    The Aperture Agent can be installed as a system service on any Linux system
    that is [supported](supported-platforms.md).

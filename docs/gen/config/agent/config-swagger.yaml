@@ -504,7 +504,7 @@ definitions:
                 x-go-tag-json: namespace,omitempty
                 x-go-tag-protobuf: bytes,4,opt,name=namespace,proto3
             node_name:
-                description: Node name of the entity. For example, Hostname.
+                description: Node name of the entity. For example, hostname.
                 type: string
                 x-go-name: NodeName
                 x-go-tag-json: node_name,omitempty

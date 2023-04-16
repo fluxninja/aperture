@@ -1,3 +1,12 @@
+local flow_selector_defaults = {
+  service_selector: {
+    service: '__REQUIRED_FIELD__',
+  },
+  flow_matcher: {
+    control_point: '__REQUIRED_FIELD__',
+  },
+};
+
 {
   /**
   * @param (common.policy_name: string required) Name of the policy.
@@ -7,19 +16,10 @@
   },
   policy: {
     /**
-    * @param (policy.flux_meter: aperture.spec.v1.FluxMeter) Flux Meter.
-    * @param (policy.flux_meter.flow_selector.service_selector.service: string required)
-    * @param (policy.flux_meter.flow_selector.flow_matcher.control_point: string required)
+    * @param (policy.flux_meter: aperture.spec.v1.FluxMeter required) Flux Meter.
     */
     flux_meter: {
-      flow_selector: {
-        service_selector: {
-          service: '__REQUIRED_FIELD__',
-        },
-        flow_matcher: {
-          control_point: '__REQUIRED_FIELD__',
-        },
-      },
+      flow_selector: flow_selector_defaults,
     },
     /**
     * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
@@ -44,9 +44,7 @@
       latency_ema_limit_multiplier: 2.0,
     },
     /**
-    * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector) Concurrency Limiter flow selector.
-    * @param (policy.concurrency_controller.flow_selector.service_selector.service: string required)
-    * @param (policy.concurrency_controller.flow_selector.flow_matcher.control_point: string required)
+    * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector required) Concurrency Limiter flow selector.
     * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
     * @param (policy.concurrency_controller.scheduler.auto_tokens: bool) Automatically estimate cost (tokens) for workload requests.
     * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
@@ -56,14 +54,7 @@
     * @param (policy.concurrency_controller.default_config: aperture.spec.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
     */
     concurrency_controller: {
-      flow_selector: {
-        service_selector: {
-          service: '__REQUIRED_FIELD__',
-        },
-        flow_matcher: {
-          control_point: '__REQUIRED_FIELD__',
-        },
-      },
+      flow_selector: flow_selector_defaults,
       scheduler: {
         auto_tokens: true,
       },

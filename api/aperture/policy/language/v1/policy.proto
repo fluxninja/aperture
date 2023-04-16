@@ -139,10 +139,10 @@ message Resources {
 //   :::
 //
 // * "sink" components: they affect the real world.
-//   [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+//   [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
 //   In the UI, represented by orange color.  Sink components usually come in pairs with a
 //   "sources" component which emits a feedback signal, like
-//   `accepted_concurrency` emitted by ConcurrencyLimiter.
+//   `accepted_concurrency` emitted by _Concurrency Limiter_.
 //
 // :::tip
 //
@@ -224,6 +224,9 @@ message Component {
 
     // Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
     NestedSignalEgress nested_signal_egress = 26;
+
+    // Generates the specified signal.
+    SignalGenerator signal_generator = 27;
 
     // Query components that are query databases such as Prometheus.
     Query query = 100;

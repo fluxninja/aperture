@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/feature-rollout/promql blueprint",
+  "additionalProperties": false,
+  "required": ["common", "policy"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        }
+      }
+    },
+    "policy": {
+      "description": "Parameters for the Feature Rollout policy.",
+      "default": {
+        "components": [],
+        "drivers": {
+          "promql_drivers": [
+            {
+              "backward": {
+                "operator": "__REQUIRED_FIELD__",
+                "threshold": "__REQUIRED_FIELD__"
+              },
+              "forward": {
+                "operator": "__REQUIRED_FIELD__",
+                "threshold": "__REQUIRED_FIELD__"
+              },
+              "query_string": "__REQUIRED_FIELD__",
+              "reset": {
+                "operator": "__REQUIRED_FIELD__",
+                "threshold": "__REQUIRED_FIELD__"
+              }
+            }
+          ]
+        },
+        "evaluation_interval": "1s",
+        "load_shaper": {
+          "flow_regulator_parameters": {
+            "flow_selector": {
+              "flow_matcher": {
+                "control_point": "__REQUIRED_FIELD__"
+              },
+              "service_selector": {
+                "service": "__REQUIRED_FIELD__"
+              }
+            },
+            "label_key": ""
+          },
+          "steps": [
+            {
+              "duration": "__REQUIRED_FIELD__",
+              "target_accept_percentage": "__REQUIRED_FIELD__"
+            }
+          ]
+        },
+        "resources": {
+          "flow_control": {
+            "classifiers": []
+          }
+        }
+      },
+      "type": "object",
+      "$ref": "../../../../policies/feature-rollout/base/gen/definitions.json#/$defs/rollout_policy"
+    },
+    "dashboard": {
+      "description": "Configuration for the Grafana dashboard accompanying this policy.",
+      "default": {
+        "datasource": {
+          "filter_regex": "",
+          "name": "$datasource"
+        },
+        "refresh_interval": "5s",
+        "time_from": "now-15m",
+        "time_to": "now"
+      },
+      "type": "object",
+      "$ref": "../../../../policies/feature-rollout/base/gen/definitions.json#/properties/dashboard"
+    }
+  },
+  "$defs": null
+}

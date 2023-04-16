@@ -1260,7 +1260,7 @@ Namespace of the entity. For example, pod namespace.
 
 <!-- vale on -->
 
-Node name of the entity. For example, Hostname.
+Node name of the entity. For example, hostname.
 
 </dd>
 <dt>services</dt>

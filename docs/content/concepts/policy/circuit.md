@@ -88,8 +88,8 @@ Examples of built-in components include:
     - [Max](/reference/policies/spec.md#max) and
       [Min](/reference/policies/spec.md#min): These components take multiple
       input or output signals and emit the maximum or minimum of those signals.
-  - **Transformers**: These components statefully transform an input signal into
-    an output signal.
+  - **Transformers**: These components transform an input signal into an output
+    signal based on past state.
     - [EMA](/reference/policies/spec.md#e-m-a): Exponential moving average.
   - [Decider and Switcher](/reference/policies/spec.md#decider): These
     components work in tandem to make the circuit adapt based on conditions.

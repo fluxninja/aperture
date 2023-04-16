@@ -14,7 +14,7 @@
           "x-order": 1
         },
         "dynamic_config_key": {
-          "description": "Configuration key for load actuation.",
+          "description": "Dynamic configuration key for load actuation.",
           "type": "string",
           "x-order": 2
         },
@@ -514,7 +514,7 @@
       "additionalProperties": false
     },
     "Component": {
-      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components from input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nThere are three categories of components:\n* \"source\" components: they take some sort of input from \"the real world\" and output\n  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI\n  they're represented by green color.\n* signal processor components: processing components that do not interact with the external systems.\n  Examples: [GradientController](#gradient-controller), [Max](#max).\n\n  :::note\n\n  Signal processor components' output can depend on their internal state, in addition to the inputs.\n  Eg. see the [Exponential Moving Average filter](#e-m-a).\n\n  :::\n\n* \"sink\" components:\u00a0they affect the real world.\n  [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).\n  In the UI, represented by orange color.  Sink components usually come in pairs with a\n  \"sources\" component which emits a feedback signal, like\n  `accepted_concurrency` emitted by ConcurrencyLimiter.\n\n:::tip\n\nSometimes you might want to use a constant value as one of component's inputs.\nYou can create an input port containing the constant value instead of being connected to a signal.\nTo do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.\nYou can also use it to provide special math values such as NaN and +- Inf.\nIf You need to provide the same constant signal to multiple components,\nYou can use the [Variable](#variable) component.\n\n:::\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
+      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components from input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nThere are three categories of components:\n* \"source\" components: they take some sort of input from \"the real world\" and output\n  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI\n  they're represented by green color.\n* signal processor components: processing components that do not interact with the external systems.\n  Examples: [GradientController](#gradient-controller), [Max](#max).\n\n  :::note\n\n  Signal processor components' output can depend on their internal state, in addition to the inputs.\n  Eg. see the [Exponential Moving Average filter](#e-m-a).\n\n  :::\n\n* \"sink\" components:\u00a0they affect the real world.\n  [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).\n  In the UI, represented by orange color.  Sink components usually come in pairs with a\n  \"sources\" component which emits a feedback signal, like\n  `accepted_concurrency` emitted by _Concurrency Limiter_.\n\n:::tip\n\nSometimes you might want to use a constant value as one of component's inputs.\nYou can create an input port containing the constant value instead of being connected to a signal.\nTo do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.\nYou can also use it to provide special math values such as NaN and +- Inf.\nIf You need to provide the same constant signal to multiple components,\nYou can use the [Variable](#variable) component.\n\n:::\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
       "properties": {
         "alerter": {
           "$ref": "#/definitions/Alerter",
@@ -626,20 +626,25 @@
           "description": "Query components that are query databases such as Prometheus.",
           "x-order": 21
         },
+        "signal_generator": {
+          "$ref": "#/definitions/SignalGenerator",
+          "description": "Generates the specified signal.",
+          "x-order": 22
+        },
         "switcher": {
           "$ref": "#/definitions/Switcher",
           "description": "Switcher acts as a switch that emits one of the two signals based on third signal.",
-          "x-order": 22
+          "x-order": 23
         },
         "unary_operator": {
           "$ref": "#/definitions/UnaryOperator",
           "description": "Takes an input signal and emits the square root of the input signal.",
-          "x-order": 23
+          "x-order": 24
         },
         "variable": {
           "$ref": "#/definitions/Variable",
           "description": "Emits a variable signal which can be set to invalid.",
-          "x-order": 24
+          "x-order": 25
         }
       },
       "title": "Computational block that forms the circuit",
@@ -647,7 +652,7 @@
       "additionalProperties": false
     },
     "ConcurrencyLimiter": {
-      "description": ":::info\n\nSee also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens which translate to (avg. latency \\* in-flight requests) (Little's Law).\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
+      "description": ":::info\n\nSee also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens which translate to (avg. latency \\* in-flight requests) (Little's Law).\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
@@ -667,7 +672,7 @@
           "x-order": 2
         }
       },
-      "title": "Concurrency Limiter is an actuator component that regulates flows to provide active service protection",
+      "title": "_Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection",
       "type": "object",
       "additionalProperties": false
     },
@@ -1138,13 +1143,28 @@
         },
         "concurrency_limiter": {
           "$ref": "#/definitions/ConcurrencyLimiter",
-          "description": "Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
+          "description": "_Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
           "x-order": 1
+        },
+        "flow_regulator": {
+          "$ref": "#/definitions/FlowRegulator",
+          "description": "Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
+          "x-order": 2
+        },
+        "load_shaper": {
+          "$ref": "#/definitions/LoadShaper",
+          "description": "LoadShaper is a component that shapes the load of the service.",
+          "x-order": 3
+        },
+        "load_shaper_series": {
+          "$ref": "#/definitions/LoadShaperSeries",
+          "description": "LoadShaperSeries is a series of LoadShaper components that shape load one after another in series.",
+          "x-order": 4
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
-          "description": "Rate Limiter provides service protection by applying rate limiter.",
-          "x-order": 2
+          "description": "_Rate Limiter_ provides service protection by applying rate limiter.",
+          "x-order": 5
         }
       },
       "type": "object",
@@ -1194,6 +1214,76 @@
       },
       "required": ["control_point"],
       "title": "Describes which flows a [flow control\ncomponent](/concepts/flow-control/flow-control.md#components) should apply\nto",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "FlowRegulator": {
+      "description": "_Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
+      "properties": {
+        "default_config": {
+          "$ref": "#/definitions/FlowRegulatorDynamicConfig",
+          "description": "Default configuration.",
+          "x-order": 0
+        },
+        "dynamic_config_key": {
+          "description": "Configuration key for DynamicConfig.",
+          "type": "string",
+          "x-order": 1
+        },
+        "in_ports": {
+          "$ref": "#/definitions/FlowRegulatorIns",
+          "description": "Input ports for the _Flow Regulator_.",
+          "x-order": 2
+        },
+        "parameters": {
+          "$ref": "#/definitions/FlowRegulatorParameters",
+          "description": "Parameters for the _Flow Regulator_.",
+          "x-order": 3
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "FlowRegulatorDynamicConfig": {
+      "properties": {
+        "enable_label_values": {
+          "description": "Specify certain label values to be accepted by this flow filter regardless of accept percentage.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "x-order": 0
+        }
+      },
+      "title": "Dynamic Configuration for _Flow Regulator_",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "FlowRegulatorIns": {
+      "properties": {
+        "accept_percentage": {
+          "$ref": "#/definitions/InPort",
+          "description": "The percentage of requests to accept.",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "FlowRegulatorParameters": {
+      "properties": {
+        "flow_selector": {
+          "$ref": "#/definitions/FlowSelector",
+          "description": "_Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "label_key": {
+          "description": "The flow label key for identifying sessions.\n- When label key is specified, _Flow Regulator_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Flow Regulator_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
+          "type": "string",
+          "x-order": 1
+        }
+      },
       "type": "object",
       "additionalProperties": false
     },
@@ -1913,6 +2003,198 @@
       "type": "object",
       "additionalProperties": false
     },
+    "LoadShaper": {
+      "description": "The _Load Shaper_ produces a smooth and continuous traffic load\nthat changes progressively over time, based on the specified steps.\n\nEach step is defined by two parameters:\n- The `target_accept_percentage`.\n- The `duration` for the signal to change from the\n  previous step's `target_accept_percentage` to the current step's\n  `target_accept_percentage`.\n\nThe percentage of requests accepted starts at the `target_accept_percentage`\ndefined in the first step and gradually ramps up or down linearly from\nthe previous step's `target_accept_percentage` to the next\n`target_accept_percentage`, over the `duration` specified for each step.",
+      "properties": {
+        "default_config": {
+          "$ref": "#/definitions/FlowRegulatorDynamicConfig",
+          "description": "Default configuration.",
+          "x-order": 0
+        },
+        "dynamic_config_key": {
+          "description": "Dynamic configuration key for flow regulator.",
+          "type": "string",
+          "x-order": 1
+        },
+        "in_ports": {
+          "$ref": "#/definitions/LoadShaperIns",
+          "x-order": 2
+        },
+        "out_ports": {
+          "$ref": "#/definitions/LoadShaperOuts",
+          "x-order": 3
+        },
+        "parameters": {
+          "$ref": "#/definitions/LoadShaperParameters",
+          "x-go-tag-validate": "required",
+          "x-order": 4
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperIns": {
+      "description": "Inputs for the _Load Shaper_ component.",
+      "properties": {
+        "backward": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to progress the _Load Shaper_ towards the previous step.",
+          "x-order": 0
+        },
+        "forward": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to progress the _Load Shaper_ towards the next step.",
+          "x-order": 1
+        },
+        "reset": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to reset the _Load Shaper_ to the first step.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperOuts": {
+      "description": "Outputs for the _Load Shaper_ component.",
+      "properties": {
+        "accept_percentage": {
+          "$ref": "#/definitions/OutPort",
+          "description": "The percentage of flows being accepted by the _Load Shaper_.",
+          "x-order": 0
+        },
+        "at_end": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.",
+          "x-order": 1
+        },
+        "at_start": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperParameters": {
+      "description": "Parameters for the _Load Shaper_ component.",
+      "properties": {
+        "flow_regulator_parameters": {
+          "$ref": "#/definitions/FlowRegulatorParameters",
+          "description": "Parameters for the _Flow Regulator_.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/definitions/LoadShaperParametersStep",
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array",
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 1
+        }
+      },
+      "required": ["steps"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperParametersStep": {
+      "properties": {
+        "duration": {
+          "description": "Duration for which the step is active.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "target_accept_percentage": {
+          "description": "The value of the step.\n\n",
+          "format": "double",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-validate": "gte=0,lte=100",
+          "x-order": 1
+        }
+      },
+      "required": ["duration"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperSeries": {
+      "description": "_LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/LoadShaperSeriesIns",
+          "x-order": 0
+        },
+        "parameters": {
+          "$ref": "#/definitions/LoadShaperSeriesParameters",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperSeriesIns": {
+      "description": "Inputs for the _LoadShaperSeries_ component.",
+      "properties": {
+        "backward": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to progress the load shaper series towards the previous step.",
+          "x-order": 0
+        },
+        "forward": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to progress the load shaper series towards the next step.",
+          "x-order": 1
+        },
+        "reset": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to reset the load shaper series to the first step.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperSeriesLoadShaperInstance": {
+      "properties": {
+        "load_shaper": {
+          "$ref": "#/definitions/LoadShaperParameters",
+          "description": "The load shaper.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "out_ports": {
+          "$ref": "#/definitions/LoadShaperOuts",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LoadShaperSeriesParameters": {
+      "description": "Parameters for the _LoadShaperSeries_ component.",
+      "properties": {
+        "load_shapers": {
+          "description": "An ordered list of load shapers that get applied in order.\n\n",
+          "items": {
+            "$ref": "#/definitions/LoadShaperSeriesLoadShaperInstance",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required,dive",
+          "x-order": 0
+        }
+      },
+      "required": ["load_shapers"],
+      "type": "object",
+      "additionalProperties": false
+    },
     "MatchExpression": {
       "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals: { label = app, value = frobnicator }\n```",
       "properties": {
@@ -2513,7 +2795,7 @@
           "x-order": 1
         },
         "query_string": {
-          "description": "Describes the Prometheus query to be run.\n\n:::info\n\nPromQL [reference](https://prometheus.io/docs/prometheus/latest/querying/basics/)\nFlow Metrics [reference](/reference/observability/flow-metrics/flow-metrics.md)\nOpenTelemetry Metrics [reference](/get-started/integrations/metrics/metrics.md)\n\n:::",
+          "description": "Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.\n\n:::note\n\nThe query must return a single value either as a scalar or as a vector with a single element.\n\n:::\n\n:::info Usage with Flux Meter\n\n[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.\nTherefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.\nThe particular Flux Meter can be identified with the `flux_meter_name` label.\nThere are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.\n\n:::\n\n:::info Usage with OpenTelemetry Metrics\n\nAperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.\n\n:::",
           "type": "string",
           "x-order": 2
         }
@@ -2584,7 +2866,7 @@
       "additionalProperties": false
     },
     "RateLimiter": {
-      "description": ":::info\n\nSee also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value basis. Use `label_key`\nto select which label should be used as key.",
+      "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value basis. Use `label_key`\nto select which label should be used as key.",
       "properties": {
         "default_config": {
           "$ref": "#/definitions/RateLimiterDynamicConfig",
@@ -3041,6 +3323,107 @@
         }
       },
       "title": "Describes which service a [flow control or observability\ncomponent](/concepts/flow-control/flow-control.md#components) should apply\nto",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "SignalGenerator": {
+      "description": "The _Signal Generator_ component generates a smooth and continuous signal\nby following a sequence of specified steps. Each step has two parameters:\n- `target_output`: The desired output value at the end of the step.\n- `duration`: The time it takes for the signal to change linearly from the\n  previous step's `target_output` to the current step's `target_output`.\n\nThe output signal starts at the `target_output` of the first step and\nchanges linearly between steps based on their `duration`. The _Signal\nGenerator_ can be controlled to move forwards, backwards, or reset to the\nbeginning based on input signals.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/SignalGeneratorIns",
+          "x-order": 0
+        },
+        "out_ports": {
+          "$ref": "#/definitions/SignalGeneratorOuts",
+          "x-order": 1
+        },
+        "parameters": {
+          "$ref": "#/definitions/SignalGeneratorParameters",
+          "description": "Parameters for the _Signal Generator_ component.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "SignalGeneratorIns": {
+      "description": "Inputs for the _Signal Generator_ component.",
+      "properties": {
+        "backward": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to progress the _Signal Generator_ towards the previous step.",
+          "x-order": 0
+        },
+        "forward": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to progress the _Signal Generator_ towards the next step.",
+          "x-order": 1
+        },
+        "reset": {
+          "$ref": "#/definitions/InPort",
+          "description": "Whether to reset the _Signal Generator_ to the first step.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "SignalGeneratorOuts": {
+      "description": "Outputs for the _Signal Generator_ component.",
+      "properties": {
+        "at_end": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.",
+          "x-order": 0
+        },
+        "at_start": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.",
+          "x-order": 1
+        },
+        "output": {
+          "$ref": "#/definitions/OutPort",
+          "description": "The generated signal.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "SignalGeneratorParameters": {
+      "description": "Parameters for the _Signal Generator_ component.",
+      "properties": {
+        "steps": {
+          "items": {
+            "$ref": "#/definitions/SignalGeneratorParametersStep",
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array",
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 0
+        }
+      },
+      "required": ["steps"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "SignalGeneratorParametersStep": {
+      "properties": {
+        "duration": {
+          "description": "Duration for which the step is active.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "target_output": {
+          "$ref": "#/definitions/ConstantSignal",
+          "description": "The value of the step.",
+          "x-order": 1
+        }
+      },
+      "required": ["duration"],
       "type": "object",
       "additionalProperties": false
     },

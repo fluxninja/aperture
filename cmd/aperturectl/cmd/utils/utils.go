@@ -257,6 +257,7 @@ func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile st
 		}
 		err := schemaLoader.AddSchemas(gojsonschema.NewReferenceLoader("file://" + schema))
 		if err != nil {
+			log.Error().Err(err).Msgf("Failed to add schema %s", schema)
 			return err
 		}
 	}
@@ -268,15 +269,18 @@ func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile st
 
 	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader("file://" + rootSchema))
 	if err != nil {
+		log.Error().Err(err).Msgf("Failed to compile schema %s", rootSchema)
 		return err
 	}
 	// marshal documentFile to json and load it
 	documentYamlBytes, err := os.ReadFile(documentFile)
 	if err != nil {
+		log.Error().Err(err).Msgf("Failed to read document %s", documentFile)
 		return err
 	}
 	documentJSON, err := yaml.YAMLToJSON(documentYamlBytes)
 	if err != nil {
+		log.Error().Err(err).Msgf("Failed to convert document %s to JSON", documentFile)
 		return err
 	}
 
@@ -285,6 +289,7 @@ func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile st
 	// validate document
 	result, err := schema.Validate(documentLoader)
 	if err != nil {
+		log.Error().Err(err).Msgf("Failed to validate document %s", documentFile)
 		return err
 	}
 	if !result.Valid() {
@@ -292,6 +297,7 @@ func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile st
 		for _, desc := range result.Errors() {
 			errorMessage := fmt.Sprintf("- %s", desc)
 			merr = multierror.Append(merr, errors.New(errorMessage))
+			log.Error().Err(err).Msg(errorMessage)
 		}
 		return merr
 	}

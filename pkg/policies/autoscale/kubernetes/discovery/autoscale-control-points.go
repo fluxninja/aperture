@@ -160,7 +160,7 @@ func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers
 }
 
 func (p *podNotifier) electionResultCallback(e notifiers.Event) {
-	log.Info().Msg("Election result callback")
+	log.Debug().Msg("Election result callback")
 	p.stateMutex.Lock()
 	defer p.stateMutex.Unlock()
 	p.isLeader = true
@@ -192,7 +192,6 @@ func (cpc *autoScaleControlPoints) stop() {
 
 // Add adds a ControlPoint to the cache.
 func (cpc *autoScaleControlPoints) Add(cp AutoScaleControlPoint) {
-	log.Info().Msgf("Add called for %v", cp)
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
 	defer cpc.controlPointsMutex.Unlock()
@@ -213,7 +212,7 @@ func (cpc *autoScaleControlPoints) Add(cp AutoScaleControlPoint) {
 
 // Update updates a ControlPoint in the cache.
 func (cpc *autoScaleControlPoints) Update(cp AutoScaleControlPoint) {
-	log.Info().Msgf("Update called for %v", cp)
+	log.Debug().Msgf("Update called for %v", cp)
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
 	defer cpc.controlPointsMutex.Unlock()
@@ -225,7 +224,7 @@ func (cpc *autoScaleControlPoints) Update(cp AutoScaleControlPoint) {
 		return
 	}
 
-	log.Info().Msgf("Canceling goroutine for %v", cp)
+	log.Debug().Msgf("Canceling goroutine for %v", cp)
 	// cancel current goroutine
 	cpsOld.cancel()
 
@@ -247,7 +246,7 @@ func (cpc *autoScaleControlPoints) Update(cp AutoScaleControlPoint) {
 
 // Delete deletes a ControlPoint from the cache.
 func (cpc *autoScaleControlPoints) Delete(cp AutoScaleControlPoint) {
-	log.Info().Msgf("Delete called for %v", cp)
+	log.Debug().Msgf("Delete called for %v", cp)
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
 	defer cpc.controlPointsMutex.Unlock()
@@ -256,7 +255,7 @@ func (cpc *autoScaleControlPoints) Delete(cp AutoScaleControlPoint) {
 		log.Error().Msgf("Control point %v not found in cache", cp)
 		return
 	}
-	log.Info().Msgf("Canceling goroutine for %v", cp)
+	log.Debug().Msgf("Canceling goroutine for %v", cp)
 	cpsOld.cancel()
 	delete(cpc.controlPoints, cp)
 
@@ -272,7 +271,6 @@ func (cpc *autoScaleControlPoints) Delete(cp AutoScaleControlPoint) {
 }
 
 func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *controlPointState) stream.Callback {
-	log.Info().Msgf("fetchScale called for %v", cp)
 	noOp := func() {}
 
 	targetGK := schema.GroupKind{
@@ -297,7 +295,6 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 			return err
 		}
 
-		log.Info().Msgf("Scale subresource for %s/%s: %v", cp.Kind, cp.Name, scale)
 		return nil
 	}
 
@@ -328,7 +325,6 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 	}
 
 	return func() {
-		log.Info().Msgf("Writing event for %v, event: %v", cp, *scale)
 		cpc.trackers.WriteEvent(notifiers.Key(key), value)
 	}
 }

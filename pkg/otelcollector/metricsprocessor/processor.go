@@ -177,6 +177,16 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 				}
 				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
+
+			// Update flow regulator metrics.
+			if fr := decision.GetFlowRegulatorInfo(); fr != nil {
+				labels := map[string]string{
+					metrics.PolicyNameLabel:  decision.PolicyName,
+					metrics.PolicyHashLabel:  decision.PolicyHash,
+					metrics.ComponentIDLabel: decision.ComponentId,
+				}
+				p.updateMetricsForFlowRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+			}
 		}
 	}
 
@@ -251,6 +261,25 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 	}
 }
 
+func (p *metricsProcessor) updateMetricsForFlowRegulator(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
+	flowRegulator := p.cfg.engine.GetFlowRegulator(limiterID)
+	if flowRegulator == nil {
+		log.Sample(noFlowRegulatorSampler).Warn().
+			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
+			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
+			Msg("FlowRegulator not found")
+		return
+	}
+	// Add decision type label to the request counter metric
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	labels[metrics.RegulatorDroppedLabel] = strconv.FormatBool(dropped)
+	requestCounter := flowRegulator.GetRequestCounter(labels)
+	if requestCounter != nil {
+		requestCounter.Inc()
+	}
+}
+
 func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.ClassifierID) {
 	classifier := p.cfg.classificationEngine.GetClassifier(classifierID)
 	if classifier == nil {
@@ -312,6 +341,7 @@ func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv
 var (
 	noConcurrencyLimiterSampler = log.NewRatelimitingSampler()
 	noRateLimiterSampler        = log.NewRatelimitingSampler()
+	noFlowRegulatorSampler      = log.NewRatelimitingSampler()
 	noClassifierSampler         = log.NewRatelimitingSampler()
 	noFluxMeterSampler          = log.NewRatelimitingSampler()
 )
