@@ -343,12 +343,14 @@ Integer (int64)
 <!-- vale off -->
 
 <a id="{{ anchor }}"></a>
+
 <ParameterDescription
     name="{{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }}"
     type="{{ render_type(node.parameter.param_type, node.parameter.is_complex_type) }}"
     reference="{{ node.parameter.docs_link }}"
     value="{{ node.parameter.default | quoteValueDocs }}"
-    description='{{ node.parameter.description }}' />
+    description='{{ node.parameter.description }}'
+/>
 
 <!-- vale on -->
 {%- endif %}

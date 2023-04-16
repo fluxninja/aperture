@@ -34,13 +34,16 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
 
 <!-- vale off -->
 
-<a id="common-policy-name"></a> <ParameterDescription
+<a id="common-policy-name"></a>
+
+<ParameterDescription
     name="common.policy_name"
     type="
 string"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='Name of the policy.' />
+    description='Name of the policy.'
+/>
 
 <!-- vale on -->
 
@@ -54,37 +57,46 @@ string"
 
 <!-- vale off -->
 
-<a id="dashboard-refresh-interval"></a> <ParameterDescription
+<a id="dashboard-refresh-interval"></a>
+
+<ParameterDescription
     name="dashboard.refresh_interval"
     type="
 string"
     reference=""
     value="'5s'"
-    description='Refresh interval for dashboard panels.' />
+    description='Refresh interval for dashboard panels.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="dashboard-time-from"></a> <ParameterDescription
+<a id="dashboard-time-from"></a>
+
+<ParameterDescription
     name="dashboard.time_from"
     type="
 string"
     reference=""
     value="'now-15m'"
-    description='From time of dashboard.' />
+    description='From time of dashboard.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="dashboard-time-to"></a> <ParameterDescription
+<a id="dashboard-time-to"></a>
+
+<ParameterDescription
     name="dashboard.time_to"
     type="
 string"
     reference=""
     value="'now'"
-    description='To time of dashboard.' />
+    description='To time of dashboard.'
+/>
 
 <!-- vale on -->
 
@@ -96,25 +108,31 @@ string"
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-name"></a> <ParameterDescription
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
     name="dashboard.datasource.name"
     type="
 string"
     reference=""
     value="'$datasource'"
-    description='Datasource name.' />
+    description='Datasource name.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-filter-regex"></a> <ParameterDescription
+<a id="dashboard-datasource-filter-regex"></a>
+
+<ParameterDescription
     name="dashboard.datasource.filter_regex"
     type="
 string"
     reference=""
     value="''"
-    description='Datasource filter regex.' />
+    description='Datasource filter regex.'
+/>
 
 <!-- vale on -->
 

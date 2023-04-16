@@ -52,13 +52,16 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="common-policy-name"></a> <ParameterDescription
+<a id="common-policy-name"></a>
+
+<ParameterDescription
     name="common.policy_name"
     type="
 string"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='Name of the policy.' />
+    description='Name of the policy.'
+/>
 
 <!-- vale on -->
 
@@ -66,13 +69,16 @@ string"
 
 <!-- vale off -->
 
-<a id="policy"></a> <ParameterDescription
+<a id="policy"></a>
+
+<ParameterDescription
     name="policy"
     type="
 Object (rollout_policy)"
     reference="#rollout-policy"
     value="{'components': [], 'drivers': {}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': []}}}"
-    description='Parameters for the Feature Rollout policy.' />
+    description='Parameters for the Feature Rollout policy.'
+/>
 
 <!-- vale on -->
 
@@ -86,37 +92,46 @@ Object (rollout_policy)"
 
 <!-- vale off -->
 
-<a id="dashboard-refresh-interval"></a> <ParameterDescription
+<a id="dashboard-refresh-interval"></a>
+
+<ParameterDescription
     name="dashboard.refresh_interval"
     type="
 string"
     reference=""
     value="'5s'"
-    description='Refresh interval for dashboard panels.' />
+    description='Refresh interval for dashboard panels.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="dashboard-time-from"></a> <ParameterDescription
+<a id="dashboard-time-from"></a>
+
+<ParameterDescription
     name="dashboard.time_from"
     type="
 string"
     reference=""
     value="'now-15m'"
-    description='From time of dashboard.' />
+    description='From time of dashboard.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="dashboard-time-to"></a> <ParameterDescription
+<a id="dashboard-time-to"></a>
+
+<ParameterDescription
     name="dashboard.time_to"
     type="
 string"
     reference=""
     value="'now'"
-    description='To time of dashboard.' />
+    description='To time of dashboard.'
+/>
 
 <!-- vale on -->
 
@@ -128,25 +143,31 @@ string"
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-name"></a> <ParameterDescription
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
     name="dashboard.datasource.name"
     type="
 string"
     reference=""
     value="'$datasource'"
-    description='Datasource name.' />
+    description='Datasource name.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-filter-regex"></a> <ParameterDescription
+<a id="dashboard-datasource-filter-regex"></a>
+
+<ParameterDescription
     name="dashboard.datasource.filter_regex"
     type="
 string"
     reference=""
     value="''"
-    description='Datasource filter regex.' />
+    description='Datasource filter regex.'
+/>
 
 <!-- vale on -->
 
@@ -162,13 +183,16 @@ string"
 
 <!-- vale off -->
 
-<a id="promql-driver-query-string"></a> <ParameterDescription
+<a id="promql-driver-query-string"></a>
+
+<ParameterDescription
     name="query_string"
     type="
 string"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.' />
+    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
+/>
 
 <!-- vale on -->
 
@@ -180,25 +204,31 @@ string"
 
 <!-- vale off -->
 
-<a id="promql-driver-forward-threshold"></a> <ParameterDescription
+<a id="promql-driver-forward-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the forward criteria.' />
+    description='The threshold for the forward criteria.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-forward-operator"></a> <ParameterDescription
+<a id="promql-driver-forward-operator"></a>
+
+<ParameterDescription
     name="operator"
     type="
 string"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`' />
+    description='The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+/>
 
 <!-- vale on -->
 
@@ -210,25 +240,31 @@ string"
 
 <!-- vale off -->
 
-<a id="promql-driver-backward-threshold"></a> <ParameterDescription
+<a id="promql-driver-backward-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the backward criteria.' />
+    description='The threshold for the backward criteria.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-backward-operator"></a> <ParameterDescription
+<a id="promql-driver-backward-operator"></a>
+
+<ParameterDescription
     name="operator"
     type="
 string"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`' />
+    description='The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+/>
 
 <!-- vale on -->
 
@@ -240,25 +276,31 @@ string"
 
 <!-- vale off -->
 
-<a id="promql-driver-reset-threshold"></a> <ParameterDescription
+<a id="promql-driver-reset-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the reset criteria.' />
+    description='The threshold for the reset criteria.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-reset-operator"></a> <ParameterDescription
+<a id="promql-driver-reset-operator"></a>
+
+<ParameterDescription
     name="operator"
     type="
 string"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`' />
+    description='The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+/>
 
 <!-- vale on -->
 
@@ -272,13 +314,16 @@ string"
 
 <!-- vale off -->
 
-<a id="average-latency-driver-flow-selector"></a> <ParameterDescription
+<a id="average-latency-driver-flow-selector"></a>
+
+<ParameterDescription
     name="flow_selector"
     type="
 Object (aperture.spec.v1.FlowSelector)"
     reference="../../../spec#flow-selector"
     value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}"
-    description='Identify the service and flows whose latency needs to be measured.' />
+    description='Identify the service and flows whose latency needs to be measured.'
+/>
 
 <!-- vale on -->
 
@@ -290,13 +335,16 @@ Object (aperture.spec.v1.FlowSelector)"
 
 <!-- vale off -->
 
-<a id="average-latency-driver-forward-threshold"></a> <ParameterDescription
+<a id="average-latency-driver-forward-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the forward criteria.' />
+    description='The threshold for the forward criteria.'
+/>
 
 <!-- vale on -->
 
@@ -308,13 +356,16 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="average-latency-driver-backward-threshold"></a> <ParameterDescription
+<a id="average-latency-driver-backward-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the backward criteria.' />
+    description='The threshold for the backward criteria.'
+/>
 
 <!-- vale on -->
 
@@ -326,13 +377,16 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="average-latency-driver-reset-threshold"></a> <ParameterDescription
+<a id="average-latency-driver-reset-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the reset criteria.' />
+    description='The threshold for the reset criteria.'
+/>
 
 <!-- vale on -->
 
@@ -346,25 +400,31 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-flux-meter"></a> <ParameterDescription
+<a id="percentile-latency-driver-flux-meter"></a>
+
+<ParameterDescription
     name="flux_meter"
     type="
 Object (aperture.spec.v1.FluxMeter)"
     reference="../../../spec#flux-meter"
     value="{'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}"
-    description='FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.' />
+    description='FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-percentile"></a> <ParameterDescription
+<a id="percentile-latency-driver-percentile"></a>
+
+<ParameterDescription
     name="percentile"
     type="
 Number (double)"
     reference=""
     value="95"
-    description='The percentile to be used for latency measurement.' />
+    description='The percentile to be used for latency measurement.'
+/>
 
 <!-- vale on -->
 
@@ -376,13 +436,16 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-forward-threshold"></a> <ParameterDescription
+<a id="percentile-latency-driver-forward-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the forward criteria.' />
+    description='The threshold for the forward criteria.'
+/>
 
 <!-- vale on -->
 
@@ -394,13 +457,16 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-backward-threshold"></a> <ParameterDescription
+<a id="percentile-latency-driver-backward-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the backward criteria.' />
+    description='The threshold for the backward criteria.'
+/>
 
 <!-- vale on -->
 
@@ -412,13 +478,16 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-reset-threshold"></a> <ParameterDescription
+<a id="percentile-latency-driver-reset-threshold"></a>
+
+<ParameterDescription
     name="threshold"
     type="
 Number (double)"
     reference=""
     value="__REQUIRED_FIELD__"
-    description='The threshold for the reset criteria.' />
+    description='The threshold for the reset criteria.'
+/>
 
 <!-- vale on -->
 
@@ -432,25 +501,31 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="ema-latency-driver-flow-selector"></a> <ParameterDescription
+<a id="ema-latency-driver-flow-selector"></a>
+
+<ParameterDescription
     name="flow_selector"
     type="
 Object (aperture.spec.v1.FlowSelector)"
     reference="../../../spec#flow-selector"
     value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}"
-    description='Identify the service and flows whose latency needs to be measured.' />
+    description='Identify the service and flows whose latency needs to be measured.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="ema-latency-driver-ema"></a> <ParameterDescription
+<a id="ema-latency-driver-ema"></a>
+
+<ParameterDescription
     name="ema"
     type="
 Object (aperture.spec.v1.EMAParameters)"
     reference="../../../spec#e-m-a-parameters"
     value="{'ema_window': '1500s', 'warmup_window': '60s'}"
-    description='The parameters for the exponential moving average.' />
+    description='The parameters for the exponential moving average.'
+/>
 
 <!-- vale on -->
 
@@ -463,13 +538,15 @@ Object (aperture.spec.v1.EMAParameters)"
 <!-- vale off -->
 
 <a id="ema-latency-driver-forward-latency-tolerance-multiplier"></a>
+
 <ParameterDescription
     name="latency_tolerance_multiplier"
     type="
 Number (double)"
     reference=""
     value="1.05"
-    description='The threshold for the forward criteria.' />
+    description='The threshold for the forward criteria.'
+/>
 
 <!-- vale on -->
 
@@ -482,13 +559,15 @@ Number (double)"
 <!-- vale off -->
 
 <a id="ema-latency-driver-backward-latency-tolerance-multiplier"></a>
+
 <ParameterDescription
     name="latency_tolerance_multiplier"
     type="
 Number (double)"
     reference=""
     value="1.05"
-    description='The threshold for the backward criteria.' />
+    description='The threshold for the backward criteria.'
+/>
 
 <!-- vale on -->
 
@@ -501,13 +580,15 @@ Number (double)"
 <!-- vale off -->
 
 <a id="ema-latency-driver-reset-latency-tolerance-multiplier"></a>
+
 <ParameterDescription
     name="latency_tolerance_multiplier"
     type="
 Number (double)"
     reference=""
     value="1.25"
-    description='The threshold for the reset criteria.' />
+    description='The threshold for the reset criteria.'
+/>
 
 <!-- vale on -->
 
@@ -521,50 +602,62 @@ Number (double)"
 
 <!-- vale off -->
 
-<a id="rollout-policy-load-shaper"></a> <ParameterDescription
+<a id="rollout-policy-load-shaper"></a>
+
+<ParameterDescription
     name="load_shaper"
     type="
 Object (aperture.spec.v1.LoadShaperParameters)"
     reference="../../../spec#load-shaper-parameters"
     value="{'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}"
-    description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.' />
+    description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="rollout-policy-components"></a> <ParameterDescription
+<a id="rollout-policy-components"></a>
+
+<ParameterDescription
     name="components"
     type="
 Array of
 Object (aperture.spec.v1.Component)"
     reference="../../../spec#component"
     value="[]"
-    description='List of additional circuit components.' />
+    description='List of additional circuit components.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="rollout-policy-resources"></a> <ParameterDescription
+<a id="rollout-policy-resources"></a>
+
+<ParameterDescription
     name="resources"
     type="
 Object (aperture.spec.v1.Resources)"
     reference="../../../spec#resources"
     value="{'flow_control': {'classifiers': []}}"
-    description='List of additional resources.' />
+    description='List of additional resources.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="rollout-policy-evaluation-interval"></a> <ParameterDescription
+<a id="rollout-policy-evaluation-interval"></a>
+
+<ParameterDescription
     name="evaluation_interval"
     type="
 string"
     reference=""
     value="'1s'"
-    description='The interval between successive evaluations of the Circuit.' />
+    description='The interval between successive evaluations of the Circuit.'
+/>
 
 <!-- vale on -->
 
@@ -576,20 +669,24 @@ string"
 
 <!-- vale off -->
 
-<a id="rollout-policy-drivers-promql-drivers"></a> <ParameterDescription
+<a id="rollout-policy-drivers-promql-drivers"></a>
+
+<ParameterDescription
     name="promql_drivers"
     type="
 Array of
 Object (promql_driver)"
     reference="#promql-driver"
     value="[{'backward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'forward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'query_string': '__REQUIRED_FIELD__', 'reset': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}}]"
-    description='List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.' />
+    description='List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
 <a id="rollout-policy-drivers-average-latency-drivers"></a>
+
 <ParameterDescription
     name="average_latency_drivers"
     type="
@@ -597,13 +694,15 @@ Array of
 Object (average_latency_driver)"
     reference="#average-latency-driver"
     value="[{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'reset': {'threshold': '__REQUIRED_FIELD__'}}]"
-    description='List of drivers that compare average latency against forward, backward and reset thresholds.' />
+    description='List of drivers that compare average latency against forward, backward and reset thresholds.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
 <a id="rollout-policy-drivers-percentile-latency-drivers"></a>
+
 <ParameterDescription
     name="percentile_latency_drivers"
     type="
@@ -611,20 +710,24 @@ Array of
 Object (percentile_latency_driver)"
     reference="#percentile-latency-driver"
     value="[{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flux_meter': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'percentile': 95, 'reset': {'threshold': '__REQUIRED_FIELD__'}}]"
-    description='List of drivers that compare percentile latency against forward, backward and reset thresholds.' />
+    description='List of drivers that compare percentile latency against forward, backward and reset thresholds.'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="rollout-policy-drivers-ema-latency-drivers"></a> <ParameterDescription
+<a id="rollout-policy-drivers-ema-latency-drivers"></a>
+
+<ParameterDescription
     name="ema_latency_drivers"
     type="
 Array of
 Object (ema_latency_driver)"
     reference="#ema-latency-driver"
     value="[{'backward': {'latency_tolerance_multiplier': 1.05}, 'ema': {'ema_window': '1500s', 'warmup_window': '60s'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'latency_tolerance_multiplier': 1.05}, 'reset': {'latency_tolerance_multiplier': 1.25}}]"
-    description='List of drivers that compare trend latency against forward, backward and reset thresholds.' />
+    description='List of drivers that compare trend latency against forward, backward and reset thresholds.'
+/>
 
 <!-- vale on -->
 
@@ -644,13 +747,16 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="load-shaper"></a> <ParameterDescription
+<a id="load-shaper"></a>
+
+<ParameterDescription
     name="load_shaper"
     type="
 Object (aperture.spec.v1.FlowRegulatorDynamicConfig)"
     reference="../../../spec#flow-regulator-dynamic-config"
     value="__REQUIRED_FIELD__"
-    description='Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.' />
+    description='Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.'
+/>
 
 <!-- vale on -->
 
