@@ -18,7 +18,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           level: warning
-          filter_mode: files
+          filter_mode: file
           filter_files: changed
           disabled_categories: "TYPOS,TYPOGRAPHY"
           patterns: "**.md"
