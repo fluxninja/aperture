@@ -351,7 +351,7 @@ MARKDOWN_DOC_TPL = """
     description='{{ node.parameter.description }}'
     type='{{- render_type(node.parameter.param_type, node.parameter.is_complex_type) }}'
     reference='{{ node.parameter.docs_link }}'
-    value='{{ node.parameter.default | valueJSON }}'
+    value='{{ node.parameter.default | to_json }}'
 />
 
 <!-- vale on -->
@@ -434,7 +434,7 @@ MARKDOWN_README_TPL = """
 <details>
 <summary>Click to expand</summary>
 ```yaml
-{{ node.parameter.default | valueYAML }}
+{{ node.parameter.default | to_yaml }}
 ```
 </details>
 {%- endif %}
@@ -514,7 +514,7 @@ type: "{{ param_type }}"
 {% else %}
 {{ node.parameter.param_name }}:
   description: "{{ node.parameter.description }}"
-  default: {{ node.parameter.default | quoteValue }}
+  default: {{ node.parameter.default | quote_value }}
   {{ render_type(node.parameter.param_type, node.parameter.json_schema_link,
                  node.parameter.is_complex_type) | indent(2, true) }}
 {% endif %}
@@ -561,7 +561,7 @@ YAML_TPL = """
 {%- endfor %}
 {%- endif %}
 {%- else %}
-{{- value | quoteValue }}
+{{- value | quote_value }}
 {%- endif %}
 {%- endmacro %}
 {%- macro render_node(node, level) %}
@@ -593,18 +593,18 @@ YAML_TPL = """
 """
 
 
-def quoteValue(value: str) -> str:
+def quote_value(value: str) -> str:
     # if value is __REQUIRED_FIELD__ return as unquoted string
     if value == "__REQUIRED_FIELD__":
         return value
     return json.dumps(value)
 
 
-def valueYAML(value: Any) -> str:
+def to_yaml(value: Any) -> str:
     return yaml.dump(value, default_flow_style=False)
 
 
-def valueJSON(value: Any) -> str:
+def to_json(value: Any) -> str:
     return json.dumps(value)
 
 
@@ -620,9 +620,9 @@ def get_jinja2_environment() -> jinja2.Environment:
         loader=loader, comment_start_string="<%--", comment_end_string="--%>"
     )
     env.filters["slugify"] = slugify
-    env.filters["quoteValue"] = quoteValue
-    env.filters["valueYAML"] = valueYAML
-    env.filters["valueJSON"] = valueJSON
+    env.filters["quote_value"] = quote_value
+    env.filters["to_yaml"] = to_yaml
+    env.filters["to_json"] = to_json
     return env
 
 
