@@ -37,7 +37,7 @@ The Aperture Agent can be installed in the following modes:
       The Aperture Agent can be installed using the Kubernetes Operator
       available for it. This method requires access to create cluster level
       resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition
-      etc.
+      and so on.
 
       1. [**DaemonSet**](kubernetes/operator/daemonset.md)
 
