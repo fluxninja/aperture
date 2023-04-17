@@ -49,9 +49,9 @@ type ControllerClient interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
-	PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
-	PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
-	PostDynamicConfigs(ctx context.Context, in *v1.PostDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
+	PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostResponse, error)
+	PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostResponse, error)
+	PostDynamicConfigs(ctx context.Context, in *v1.PostDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostResponse, error)
 }
 
 type controllerClient struct {
@@ -134,8 +134,8 @@ func (c *controllerClient) PreviewHTTPRequests(ctx context.Context, in *PreviewH
 	return out, nil
 }
 
-func (c *controllerClient) PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error) {
-	out := new(v1.PostPoliciesResponse)
+func (c *controllerClient) PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostResponse, error) {
+	out := new(v1.PostResponse)
 	err := c.cc.Invoke(ctx, Controller_PostPolicies_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -143,8 +143,8 @@ func (c *controllerClient) PostPolicies(ctx context.Context, in *v1.PostPolicies
 	return out, nil
 }
 
-func (c *controllerClient) PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error) {
-	out := new(v1.PostPoliciesResponse)
+func (c *controllerClient) PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostResponse, error) {
+	out := new(v1.PostResponse)
 	err := c.cc.Invoke(ctx, Controller_PatchPolicies_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -152,8 +152,8 @@ func (c *controllerClient) PatchPolicies(ctx context.Context, in *v1.PostPolicie
 	return out, nil
 }
 
-func (c *controllerClient) PostDynamicConfigs(ctx context.Context, in *v1.PostDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error) {
-	out := new(v1.PostPoliciesResponse)
+func (c *controllerClient) PostDynamicConfigs(ctx context.Context, in *v1.PostDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostResponse, error) {
+	out := new(v1.PostResponse)
 	err := c.cc.Invoke(ctx, Controller_PostDynamicConfigs_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -174,9 +174,9 @@ type ControllerServer interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
-	PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error)
-	PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error)
-	PostDynamicConfigs(context.Context, *v1.PostDynamicConfigsRequest) (*v1.PostPoliciesResponse, error)
+	PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error)
+	PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error)
+	PostDynamicConfigs(context.Context, *v1.PostDynamicConfigsRequest) (*v1.PostResponse, error)
 }
 
 // UnimplementedControllerServer should be embedded to have forward compatible implementations.
@@ -207,13 +207,13 @@ func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *Preview
 func (UnimplementedControllerServer) PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewHTTPRequests not implemented")
 }
-func (UnimplementedControllerServer) PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error) {
+func (UnimplementedControllerServer) PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostPolicies not implemented")
 }
-func (UnimplementedControllerServer) PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error) {
+func (UnimplementedControllerServer) PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PatchPolicies not implemented")
 }
-func (UnimplementedControllerServer) PostDynamicConfigs(context.Context, *v1.PostDynamicConfigsRequest) (*v1.PostPoliciesResponse, error) {
+func (UnimplementedControllerServer) PostDynamicConfigs(context.Context, *v1.PostDynamicConfigsRequest) (*v1.PostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfigs not implemented")
 }
 

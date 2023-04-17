@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdnotifier "github.com/fluxninja/aperture/pkg/etcd/notifier"
+	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
@@ -19,8 +20,10 @@ import (
 )
 
 const (
-	policiesTrackerFxTag              = "PoliciesTracker"
-	policiesDynamicConfigTrackerFxTag = "PoliciesDynamicConfigTracker"
+	policiesTrackerFxTag                 = "PoliciesTracker"
+	policiesDynamicConfigTrackerFxTag    = "PoliciesDynamicConfigTracker"
+	policiesAPITrackerFxTag              = "PoliciesAPITracker"
+	policiesAPIDynamicConfigTrackerFxTag = "PoliciesAPIDynamicConfigTracker"
 )
 
 // swagger:operation POST /policies common-configuration PoliciesConfig
@@ -49,11 +52,21 @@ func Module() fx.Option {
 				),
 			),
 		),
-		// Syncing policies config to etcd
+		// Create a new watcher for CRs
 		crwatcher.Constructor{
 			Name:              policiesTrackerFxTag,
 			DynamicConfigName: policiesDynamicConfigTrackerFxTag,
-		}.Annotate(), // Create a new watcher
+		}.Annotate(),
+		// Create a new watcher for policies API
+		etcdwatcher.Constructor{
+			Name:     policiesAPITrackerFxTag,
+			EtcdPath: paths.PoliciesAPIConfigPath,
+		}.Annotate(),
+		// Create a new watcher for policies API dynamic config
+		etcdwatcher.Constructor{
+			Name:     policiesAPIDynamicConfigTrackerFxTag,
+			EtcdPath: paths.PoliciesAPIDynamicConfigPath,
+		}.Annotate(),
 		fx.Invoke(
 			fx.Annotate(
 				setupPoliciesNotifier,
@@ -62,10 +75,42 @@ func Module() fx.Option {
 					config.NameTag(policiesDynamicConfigTrackerFxTag),
 				),
 			),
+			fx.Annotate(
+				setupPoliciesAPINotifier,
+				fx.ParamTags(
+					config.NameTag(policiesAPITrackerFxTag),
+					config.NameTag(policiesAPIDynamicConfigTrackerFxTag),
+				),
+			),
 		),
 		// Policy factory
 		policyFactoryModule(),
 	)
+}
+
+func setupPoliciesAPINotifier(
+	policiesWatcher notifiers.Watcher,
+	dynamicConfigWatcher notifiers.Watcher,
+	etcdClient *etcdclient.Client,
+	lifecycle fx.Lifecycle,
+) {
+	policiesNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient, true)
+	dynamicConfigNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient, true)
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			return multierr.Combine(
+				policiesWatcher.AddPrefixNotifier(policiesNotifier),
+				dynamicConfigWatcher.AddPrefixNotifier(dynamicConfigNotifier),
+			)
+		},
+		OnStop: func(ctx context.Context) error {
+			return multierr.Combine(
+				policiesWatcher.RemovePrefixNotifier(policiesNotifier),
+				dynamicConfigWatcher.RemovePrefixNotifier(dynamicConfigNotifier),
+			)
+		},
+	})
 }
 
 func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trackers, error) {
@@ -74,9 +119,10 @@ func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trac
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			policyTrackersErr := policyTrackers.Start()
-			policyDynamicConfigTrackersErr := policyDynamicConfigTrackers.Start()
-			return multierr.Combine(policyTrackersErr, policyDynamicConfigTrackersErr)
+			return multierr.Combine(
+				policyTrackers.Start(),
+				policyDynamicConfigTrackers.Start(),
+			)
 		},
 		OnStop: func(ctx context.Context) error {
 			return multierr.Combine(
@@ -138,7 +184,7 @@ func setupPoliciesNotifier(
 	// content transform callback to wrap policy in config properties wrapper
 	policyEtcdNotifier.SetTransformFunc(wrapPolicy)
 
-	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient, false)
+	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient, true)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -159,6 +205,7 @@ func setupPoliciesNotifier(
 			if err != nil {
 				return err
 			}
+
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
@@ -180,6 +227,7 @@ func setupPoliciesNotifier(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+
 			return merr
 		},
 	})

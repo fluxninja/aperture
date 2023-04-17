@@ -76,17 +76,17 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 }
 
 // PostPolicies posts policies to the system.
-func (s *PolicyService) PostPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostPoliciesResponse, error) {
+func (s *PolicyService) PostPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
 	return s.updatePolicies(ctx, policies, true)
 }
 
 // PatchPolicies patches policies to the system.
-func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostPoliciesResponse, error) {
+func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
 	return s.updatePolicies(ctx, policies, false)
 }
 
-// PostDynamicConfigs updtaes dynamic configs to the system.
-func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostPoliciesResponse, error) {
+// PostDynamicConfigs updates dynamic configs to the system.
+func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
 	var errs []string
 	for idx, request := range dynamicConfigs.DynamicConfigs {
 		if request.Name == "" {
@@ -113,7 +113,7 @@ func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *
 		s.etcdWriter.Write(path.Join(paths.PoliciesAPIDynamicConfigPath, request.Name), jsonDynamicConfig)
 	}
 
-	response := &policylangv1.PostPoliciesResponse{}
+	response := &policylangv1.PostResponse{}
 	var err error
 	if len(errs) > 0 {
 		response.Errors = errs
@@ -133,7 +133,7 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 }
 
 // updatePolicies manages Post/Patch operations on policies.
-func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, isPatch bool) (*policylangv1.PostPoliciesResponse, error) {
+func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, isPatch bool) (*policylangv1.PostResponse, error) {
 	var errs []string
 	for idx, request := range policies.Policies {
 		if request.Name == "" {
@@ -157,7 +157,7 @@ func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylang
 		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.Name), jsonPolicy)
 	}
 
-	response := &policylangv1.PostPoliciesResponse{}
+	response := &policylangv1.PostResponse{}
 	var err error
 	if len(errs) > 0 {
 		response.Errors = errs

@@ -120,7 +120,7 @@ func (msg *DeletePolicyRequest) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PostPoliciesResponse) MarshalJSON() ([]byte, error) {
+func (msg *PostResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -129,7 +129,7 @@ func (msg *PostPoliciesResponse) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PostPoliciesResponse) UnmarshalJSON(b []byte) error {
+func (msg *PostResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

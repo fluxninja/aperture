@@ -3179,7 +3179,7 @@ definitions:
         required:
             - name
         type: object
-    PostPoliciesResponse:
+    PostResponse:
         properties:
             errors:
                 items:
@@ -4689,7 +4689,7 @@ paths:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/PostPoliciesResponse'
+                        $ref: '#/definitions/PostResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -4983,7 +4983,7 @@ paths:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/PostPoliciesResponse'
+                        $ref: '#/definitions/PostResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -5003,7 +5003,7 @@ paths:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/PostPoliciesResponse'
+                        $ref: '#/definitions/PostResponse'
                 default:
                     description: An unexpected error response.
                     schema:

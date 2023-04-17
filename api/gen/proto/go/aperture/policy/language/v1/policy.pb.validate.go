@@ -666,22 +666,22 @@ var _ interface {
 	ErrorName() string
 } = DeletePolicyRequestValidationError{}
 
-// Validate checks the field values on PostPoliciesResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *PostPoliciesResponse) Validate() error {
+// Validate checks the field values on PostResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PostResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PostPoliciesResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// PostPoliciesResponseMultiError, or nil if none found.
-func (m *PostPoliciesResponse) ValidateAll() error {
+// ValidateAll checks the field values on PostResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PostResponseMultiError, or
+// nil if none found.
+func (m *PostResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PostPoliciesResponse) validate(all bool) error {
+func (m *PostResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -691,19 +691,18 @@ func (m *PostPoliciesResponse) validate(all bool) error {
 	// no validation rules for Message
 
 	if len(errors) > 0 {
-		return PostPoliciesResponseMultiError(errors)
+		return PostResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// PostPoliciesResponseMultiError is an error wrapping multiple validation
-// errors returned by PostPoliciesResponse.ValidateAll() if the designated
-// constraints aren't met.
-type PostPoliciesResponseMultiError []error
+// PostResponseMultiError is an error wrapping multiple validation errors
+// returned by PostResponse.ValidateAll() if the designated constraints aren't met.
+type PostResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PostPoliciesResponseMultiError) Error() string {
+func (m PostResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -712,11 +711,11 @@ func (m PostPoliciesResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PostPoliciesResponseMultiError) AllErrors() []error { return m }
+func (m PostResponseMultiError) AllErrors() []error { return m }
 
-// PostPoliciesResponseValidationError is the validation error returned by
-// PostPoliciesResponse.Validate if the designated constraints aren't met.
-type PostPoliciesResponseValidationError struct {
+// PostResponseValidationError is the validation error returned by
+// PostResponse.Validate if the designated constraints aren't met.
+type PostResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -724,24 +723,22 @@ type PostPoliciesResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e PostPoliciesResponseValidationError) Field() string { return e.field }
+func (e PostResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PostPoliciesResponseValidationError) Reason() string { return e.reason }
+func (e PostResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PostPoliciesResponseValidationError) Cause() error { return e.cause }
+func (e PostResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PostPoliciesResponseValidationError) Key() bool { return e.key }
+func (e PostResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PostPoliciesResponseValidationError) ErrorName() string {
-	return "PostPoliciesResponseValidationError"
-}
+func (e PostResponseValidationError) ErrorName() string { return "PostResponseValidationError" }
 
 // Error satisfies the builtin error interface
-func (e PostPoliciesResponseValidationError) Error() string {
+func (e PostResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -753,14 +750,14 @@ func (e PostPoliciesResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPostPoliciesResponse.%s: %s%s",
+		"invalid %sPostResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PostPoliciesResponseValidationError{}
+var _ error = PostResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -768,7 +765,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PostPoliciesResponseValidationError{}
+} = PostResponseValidationError{}
 
 // Validate checks the field values on GetPoliciesResponse with the rules
 // defined in the proto definition for this message. If any rules are

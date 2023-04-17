@@ -351,14 +351,17 @@ agentsLoop:
 	return agents, nil
 }
 
-func (h *Handler) PostPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostPoliciesResponse, error) {
+// PostPolicies posts policies to the system.
+func (h *Handler) PostPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
 	return h.policyService.PostPolicies(ctx, req)
 }
 
-func (h *Handler) PatchPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostPoliciesResponse, error) {
+// PatchPolicies patches policies to the system.
+func (h *Handler) PatchPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
 	return h.policyService.PatchPolicies(ctx, req)
 }
 
-func (h *Handler) PostDynamicConfigs(ctx context.Context, req *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostPoliciesResponse, error) {
+// PostDynamicConfigs updates dynamic-configs to the system.
+func (h *Handler) PostDynamicConfigs(ctx context.Context, req *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
 	return h.policyService.PostDynamicConfigs(ctx, req)
 }

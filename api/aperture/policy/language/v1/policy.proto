@@ -30,7 +30,7 @@ service PolicyService {
   }
 
   // PostPolicies creates or updates policies based on the provided request.
-  rpc PostPolicies(PostPoliciesRequest) returns (PostPoliciesResponse) {
+  rpc PostPolicies(PostPoliciesRequest) returns (PostResponse) {
     option (google.api.http) = {
       post: "/v1/policies"
       body: "*"
@@ -41,7 +41,7 @@ service PolicyService {
   }
 
   // PatchPolicies patches policies based on the provided request.
-  rpc PatchPolicies(PostPoliciesRequest) returns (PostPoliciesResponse) {
+  rpc PatchPolicies(PostPoliciesRequest) returns (PostResponse) {
     option (google.api.http) = {
       patch: "/v1/policies"
       body: "*"
@@ -52,7 +52,7 @@ service PolicyService {
   }
 
   // PostDynamicConfigs patches dynamic configs based on the provided request.
-  rpc PostDynamicConfigs(PostDynamicConfigsRequest) returns (PostPoliciesResponse) {
+  rpc PostDynamicConfigs(PostDynamicConfigsRequest) returns (PostResponse) {
     option (google.api.http) = {
       post: "/v1/dynamic-configs"
       body: "*"
@@ -101,7 +101,7 @@ message DeletePolicyRequest {
   string name = 1;
 }
 
-message PostPoliciesResponse {
+message PostResponse {
   repeated string errors = 1;
   string message = 2;
 }

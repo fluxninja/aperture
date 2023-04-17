@@ -4,10 +4,11 @@ import (
 	"context"
 	"os"
 
+	"go.uber.org/fx"
+
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"go.uber.org/fx"
 )
 
 const (
@@ -38,12 +39,14 @@ func (constructor Constructor) Annotate() fx.Option {
 	}
 	policyTrackersName := config.NameTag(constructor.Name)
 	policyDynamicConfigTrackersName := config.NameTag(constructor.DynamicConfigName)
-	return fx.Options(fx.Invoke(
-		fx.Annotate(
-			constructor.provideWatcher,
-			fx.ParamTags(policyTrackersName, policyDynamicConfigTrackersName),
+	return fx.Options(
+		fx.Invoke(
+			fx.Annotate(
+				constructor.provideWatcher,
+				fx.ParamTags(policyTrackersName, policyDynamicConfigTrackersName),
+			),
 		),
-	))
+	)
 }
 
 // provideWatcher creates a Kubernetes watcher to watch the Policy Custom Resource.
