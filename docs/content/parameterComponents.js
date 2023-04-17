@@ -24,7 +24,6 @@ const renderComplexValue = (yamlValue) => (
 );
 
 const renderValue = (jsonValue) => {
-  const yamlValue = yaml.dump(jsonValue);
   if (
     typeof jsonValue === "string" ||
     typeof jsonValue === "number" ||
@@ -33,6 +32,7 @@ const renderValue = (jsonValue) => {
   ) {
     return renderSimpleValue(jsonValue);
   } else {
+    const yamlValue = yaml.dump(jsonValue);
     return renderComplexValue(yamlValue);
   }
 };

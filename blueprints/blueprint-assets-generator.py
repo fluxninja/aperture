@@ -474,8 +474,7 @@ items:
   {{ render_type(param_type[2:], ref_id, is_complex_type) | indent(2) }}
 {% elif param_type.startswith('map[') %}
 type: object
-additionalProperties: {
-    { render_type(param_type[4:-1], ref_id, is_complex_type) }}
+additionalProperties: {{ render_type(param_type[4:-1], ref_id, is_complex_type) }}
 {% elif is_complex_type %}
 type: object
 $ref: "{{- ref_id }}"
