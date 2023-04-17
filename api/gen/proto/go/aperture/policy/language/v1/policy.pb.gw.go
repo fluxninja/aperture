@@ -370,7 +370,7 @@ func RegisterPolicyServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.policy.language.v1.PolicyService/PostDynamicConfigs", runtime.WithHTTPPathPattern("/v1/policies/dynamic-configs"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.policy.language.v1.PolicyService/PostDynamicConfigs", runtime.WithHTTPPathPattern("/v1/dynamic-configs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -547,7 +547,7 @@ func RegisterPolicyServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.policy.language.v1.PolicyService/PostDynamicConfigs", runtime.WithHTTPPathPattern("/v1/policies/dynamic-configs"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.policy.language.v1.PolicyService/PostDynamicConfigs", runtime.WithHTTPPathPattern("/v1/dynamic-configs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -597,7 +597,7 @@ var (
 
 	pattern_PolicyService_PatchPolicies_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "policies"}, ""))
 
-	pattern_PolicyService_PostDynamicConfigs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "policies", "dynamic-configs"}, ""))
+	pattern_PolicyService_PostDynamicConfigs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "dynamic-configs"}, ""))
 
 	pattern_PolicyService_DeletePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "policies", "name"}, ""))
 )

@@ -3151,9 +3151,9 @@ func (m *PostDynamicConfigsRequest_DynamicConfigRequest) validate(all bool) erro
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetPolicyName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		err := PostDynamicConfigsRequest_DynamicConfigRequestValidationError{
-			field:  "PolicyName",
+			field:  "Name",
 			reason: "value length must be at least 1 runes",
 		}
 		if !all {

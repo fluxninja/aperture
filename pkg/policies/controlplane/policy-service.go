@@ -89,28 +89,28 @@ func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv
 func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostPoliciesResponse, error) {
 	var errs []string
 	for idx, request := range dynamicConfigs.DynamicConfigs {
-		if request.PolicyName == "" {
+		if request.Name == "" {
 			errs = append(errs, fmt.Sprintf("policy name is empty at index '%d'", idx))
 			continue
 		}
 
-		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.PolicyName})
+		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.PolicyName))
+			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
 			continue
 		}
 
 		if request.DynamicConfig == nil {
-			errs = append(errs, fmt.Sprintf("dynamic config is missing for policy name '%s'", request.PolicyName))
+			errs = append(errs, fmt.Sprintf("dynamic config is missing for policy name '%s'", request.Name))
 			continue
 		}
 
 		jsonDynamicConfig, err := request.DynamicConfig.MarshalJSON()
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.PolicyName, err))
+			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.Name, err))
 			continue
 		}
-		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.PolicyName), jsonDynamicConfig)
+		s.etcdWriter.Write(path.Join(paths.PoliciesAPIDynamicConfigPath, request.Name), jsonDynamicConfig)
 	}
 
 	response := &policylangv1.PostPoliciesResponse{}

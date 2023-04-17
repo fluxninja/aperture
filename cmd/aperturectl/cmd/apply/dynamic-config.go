@@ -97,7 +97,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 				request := languagev1.PostDynamicConfigsRequest{
 					DynamicConfigs: []*languagev1.PostDynamicConfigsRequest_DynamicConfigRequest{
 						{
-							PolicyName:    policyName,
+							Name:          policyName,
 							DynamicConfig: dynamicConfigStruct,
 						},
 					},

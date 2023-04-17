@@ -10,6 +10,27 @@ info:
   version: "1.0"
 host: aperture-controller
 paths:
+  /v1/dynamic-configs:
+    post:
+      tags:
+      - aperture-controller
+      summary: PostDynamicConfigs patches dynamic configs based on the provided request.
+      operationId: PolicyService_PostDynamicConfigs
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PostDynamicConfigsRequest'
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/PostPoliciesResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/info/host:
     get:
       tags:
@@ -100,27 +121,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/PostPoliciesRequest'
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PostPoliciesResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/policies/dynamic-configs:
-    post:
-      tags:
-      - aperture-controller
-      summary: PostDynamicConfigs patches dynamic configs based on the provided request.
-      operationId: PolicyService_PostDynamicConfigs
-      parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/PostDynamicConfigsRequest'
       responses:
         "200":
           description: A successful response.
@@ -2814,12 +2814,12 @@ definitions:
     type: object
     required:
     - dynamic_config
-    - policy_name
+    - name
     properties:
       dynamic_config:
         type: object
         x-go-tag-validate: required
-      policy_name:
+      name:
         type: string
         x-go-tag-validate: required
   PostPoliciesRequest:

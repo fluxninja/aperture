@@ -3150,12 +3150,12 @@ definitions:
             dynamic_config:
                 type: object
                 x-go-tag-validate: required
-            policy_name:
+            name:
                 type: string
                 x-go-tag-validate: required
         required:
             - dynamic_config
-            - policy_name
+            - name
         type: object
     PostPoliciesRequest:
         properties:
@@ -4676,6 +4676,27 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-agent
+    /v1/dynamic-configs:
+        post:
+            operationId: PolicyService_PostDynamicConfigs
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PostDynamicConfigsRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostPoliciesResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: PostDynamicConfigs patches dynamic configs based on the provided request.
+            tags:
+                - aperture-controller
     /v1/flowcontrol/checkhttp:
         post:
             operationId: FlowControlServiceHTTP_CheckHTTP
@@ -5027,27 +5048,6 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-controller
-    /v1/policies/dynamic-configs:
-        post:
-            operationId: PolicyService_PostDynamicConfigs
-            parameters:
-                - in: body
-                  name: body
-                  required: true
-                  schema:
-                    $ref: '#/definitions/PostDynamicConfigsRequest'
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/PostPoliciesResponse'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            summary: PostDynamicConfigs patches dynamic configs based on the provided request.
             tags:
                 - aperture-controller
     /v1/status/{path}:
