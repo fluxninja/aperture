@@ -193,14 +193,27 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
+		invalidCount := make(map[string]int)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
-			p.updateMetricsForFluxMeters(
+			valid := p.updateMetricsForFluxMeters(
 				fluxMeter,
 				checkResponse.DecisionType,
 				statusCode, flowStatus,
 				attributes,
 				treatAsMissing)
+			if !valid {
+				invalidCount[fluxMeter.FluxMeterName]++
+			}
 		}
+		for fluxMeterName, count := range invalidCount {
+			fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterName)
+			metric, err := fluxMeter.GetInvalidFluxMeterTotal(nil)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
+			}
+			metric.Set(float64(count))
+		}
+
 	}
 
 	if len(checkResponse.ClassifierInfos) > 0 {
@@ -304,7 +317,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	flowStatus string,
 	attributes pcommon.Map,
 	treatAsMissing []string,
-) {
+) (valid bool) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
 		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
@@ -312,7 +325,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FlowStatusLabel, flowStatus).
 			Msg("FluxMeter not found")
-		return
+		return true
 	}
 
 	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
@@ -321,15 +334,15 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)
 
 	// Add attribute found label to the flux meter metric
-	if found {
-		labels[metrics.ValidLabel] = metrics.ValidTrue
-	} else {
-		labels[metrics.ValidLabel] = metrics.ValidFalse
+	if !found {
+		fluxMeter.DeleteFromHistogram(labels)
+		return false
 	}
 	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {
 		fluxMeterHistogram.Observe(metricValue)
 	}
+	return true
 }
 
 func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse, controlPointType string) {

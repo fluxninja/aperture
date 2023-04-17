@@ -14,9 +14,9 @@ spec:
               output:
                 signal_name: LATENCY
             query_string:
-              sum(increase(flux_meter_sum{valid="true", flow_status="OK",
-              flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
-              flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))
+              sum(increase(flux_meter_sum{flow_status="OK",
+              flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+              flux_meter_name="service1-demo-app"}[5s]))
       - arithmetic_combinator:
           in_ports:
             lhs:
