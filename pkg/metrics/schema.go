@@ -18,6 +18,10 @@ const (
 	SignalReadingMetricName = "signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
+	// InvalidSignalReadingsTotal - counts invalid signal readings.
+	InvalidSignalReadingsTotal = "invalid_signal_readings_total"
+	// InvalidFluxMeterTotal - counts invalid flux meters.
+	InvalidFluxMeterTotal = "invalid_flux_meter_total"
 	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
 	RateLimiterCounterMetricName = "rate_limiter_counter"
 	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
@@ -115,14 +119,6 @@ const (
 	SubCircuitIDLabel = "sub_circuit_id"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
-	// ValidLabel - label for specifying if metric is valid.
-	// In case of FluxMeter a metric may be invalid if attribute is not found in flow telemetry.
-	// In case of Signal metrics, a metric may be invalid if signal reading is invalid.
-	ValidLabel = "valid"
-	// ValidTrue - if attribute was found.
-	ValidTrue = "true"
-	// ValidFalse - if attribute was not found.
-	ValidFalse = "false"
 	// ClassifierIndexLabel - prometheus label specifying clasiffier index.
 	ClassifierIndexLabel = "classifier_index"
 	// StatusCodeLabel - http status code.
