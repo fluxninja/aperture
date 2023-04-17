@@ -3,15 +3,20 @@ package controlplane
 import (
 	"context"
 	"fmt"
+	"path"
 	"strings"
 
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
 // PolicyService is the implementation of policylangv1.PolicyService interface.
@@ -20,6 +25,7 @@ type PolicyService struct {
 	policyFactory               *PolicyFactory
 	policyTrackers              notifiers.Trackers
 	policyDynamicConfigTrackers notifiers.Trackers
+	etcdWriter                  *etcdwriter.Writer
 }
 
 // RegisterPolicyService registers a service for policy.
@@ -27,12 +33,25 @@ func RegisterPolicyService(
 	policyTrackers, policyDynamicConfigTrackers notifiers.Trackers,
 	server *grpc.Server,
 	policyFactory *PolicyFactory,
+	etcdClient *etcdclient.Client,
+	lifecycle fx.Lifecycle,
 ) *PolicyService {
 	svc := &PolicyService{
 		policyFactory:               policyFactory,
 		policyTrackers:              policyTrackers,
 		policyDynamicConfigTrackers: policyDynamicConfigTrackers,
 	}
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			svc.etcdWriter = etcdwriter.NewWriter(etcdClient, false)
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			return svc.etcdWriter.Close()
+		},
+	})
+
 	policylangv1.RegisterPolicyServiceServer(server, svc)
 	return svc
 }
@@ -91,7 +110,7 @@ func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *
 			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.PolicyName, err))
 			continue
 		}
-		s.policyDynamicConfigTrackers.WriteEvent(notifiers.Key(request.PolicyName), jsonDynamicConfig)
+		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.PolicyName), jsonDynamicConfig)
 	}
 
 	response := &policylangv1.PostPoliciesResponse{}
@@ -108,8 +127,8 @@ func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *
 
 // DeletePolicy deletes a policy from the system.
 func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
-	s.policyTrackers.RemoveEvent(notifiers.Key(policy.Name))
-	s.policyDynamicConfigTrackers.RemoveEvent(notifiers.Key(policy.Name))
+	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIConfigPath, policy.Name))
+	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
 	return &emptypb.Empty{}, nil
 }
 
@@ -135,7 +154,7 @@ func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylang
 			errs = append(errs, err.Error())
 			continue
 		}
-		s.policyTrackers.WriteEvent(notifiers.Key(request.Name), jsonPolicy)
+		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.Name), jsonPolicy)
 	}
 
 	response := &policylangv1.PostPoliciesResponse{}
