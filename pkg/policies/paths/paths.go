@@ -15,7 +15,7 @@ var (
 	// PoliciesConfigPath is config path in etcd for policies.
 	PoliciesConfigPath = path.Join(ConfigPrefix, "policies")
 	// PoliciesDynamicConfigPath is config path in etcd for dynamic configuration of policies.
-	PoliciesDynamicConfigPath = path.Join(ConfigPrefix, "policies-dynamic-config")
+	PoliciesDynamicConfigPath = path.Join(ConfigPrefix, "dynamic-config-policies")
 	// ClassifiersPath is config path in etcd for classifiers.
 	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
 	// LoadActuatorDecisionsPath is decision path in etcd for load decisions.
