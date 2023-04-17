@@ -10,9 +10,9 @@ managed:
       - buf.build/grpc-ecosystem/grpc-gateway
       - buf.build/envoyproxy/protoc-gen-validate
 plugins:
-  - remote: buf.build/protocolbuffers/plugins/java:v21.6.0-1
+  - plugin: buf.build/protocolbuffers/java
     out: gen/proto/java
-  - remote: buf.build/grpc/plugins/java:v1.49.1-1
+  - plugin: buf.build/grpc/java
     out: gen/proto/java
   - plugin: buf.build/grpc/python
     out: gen/proto/python
@@ -29,7 +29,7 @@ plugins:
     opt:
       - paths=source_relative
       - require_unimplemented_servers=false
-  - remote: buf.build/mitchellh/plugins/protoc-gen-go-json:v1.1.0
+  - plugin: buf.build/community/mitchellh-go-json
     out: gen/proto/go
     opt:
       - paths=source_relative
@@ -40,19 +40,6 @@ plugins:
     out: gen/proto/go
     opt:
       - paths=source_relative
-  - plugin: buf.build/grpc-ecosystem/gateway
-    out: gen/proto/go
-    opt:
-      - paths=source_relative
-  - plugin: buf.build/grpc-ecosystem/openapiv2
-    out: gen/openapiv2
-    opt:
-      - json_names_for_fields=false
-      - merge_file_name=aperture
-      - allow_merge=true
-      - output_format=yaml
-      - generate_unbound_methods=false
-      - openapi_naming_strategy=fqn
   - plugin: buf.build/bufbuild/validate-go
     out: gen/proto/go
     opt:

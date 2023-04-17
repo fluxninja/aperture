@@ -71,7 +71,7 @@ func createMetricsReceiver(
 	rConf component.Config,
 	consumer consumer.Metrics,
 ) (receiver.Metrics, error) {
-	// At this point we don't have access to Factories, so we cannot do anything with the config
+	// At this point we do not have access to Factories, so we cannot do anything with the config
 	return &leaderOnlyReceiver{
 		config:             *rConf.(*Config),
 		consumer:           consumer,

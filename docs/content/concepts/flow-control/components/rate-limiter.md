@@ -9,7 +9,7 @@ See also [_Rate Limiter_ reference][reference]
 
 :::
 
-The _Rate Limiter_ is a powerful tool that can be used to prevent recurring
+The _Rate Limiter_ is a powerful component that can be used to prevent recurring
 overloads by proactively regulating heavy-hitters. It achieves this by accepting
 or rejecting incoming flows based on per-label limits, which are configured as
 the number of requests per given period of time. The _Rate Limiter_ is a
@@ -20,12 +20,12 @@ application.
 ## Distributed Counters {#distributed-counters}
 
 For each configured [_Rate Limiter Component_][reference], every matching
-Aperture Agent instantiates a copy of the _Rate Limiter_. Although each agent
+Aperture Agent instantiates a copy of the _Rate Limiter_. Although each Agent
 has its own copy of the component, they all share counters through a distributed
 counter system. This means that they work together as a single _Rate Limiter_,
 providing seamless coordination and control across agents. The distributed
-counters are powered by the [Agent-to-Agent peer-to-peer network][agent-group]
-network, which ensures reliable and efficient communication between agents.
+counters are powered by the [Agent-to-Agent peer-to-peer network][agent-group],
+which ensures reliable and efficient communication between agents.
 
 ### Lazy Syncing {#lazy-syncing}
 
@@ -38,7 +38,7 @@ inaccuracy in edge-cases.
 
 The _Rate Limiter_ component accepts or rejects incoming flow based on per-label
 limits, configured as the maximum number of requests per a given period of time.
-The rate limiting label is chosen from the [flow-label][flow-label] with a
+The rate-limiting label is chosen from the [flow-label][flow-label] with a
 specific key, enabling you to configure separate limits for different users or
 flows.
 

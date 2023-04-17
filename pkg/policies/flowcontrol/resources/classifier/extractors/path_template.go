@@ -68,7 +68,7 @@ func (pt PathTemplate) NumSegments() int {
 // (eg. /foo is more specific than /*).
 //
 // Note: This function might have false positives (eg. /foo/bar is treated as
-// more specific than /xyz, even though they're not related), but it shouldn't
+// more specific than /xyz, even though they're not related), but it should not
 // have any false negatives.
 //
 // This function can be used as sorting comparator.

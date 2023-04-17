@@ -46,5 +46,4 @@ aperturectl discovery entities --kube --find-by=“ip=10.244.1.24”
 
 ### SEE ALSO
 
-- [aperturectl discovery](/reference/aperturectl/discovery/discovery.md) -
-  Discovery integrations
+- [aperturectl discovery](/reference/aperturectl/discovery/discovery.md) - Discovery integrations

@@ -28,7 +28,7 @@ All the configuration parameters for Aperture Agent are listed
 
 ## Installation Modes {#agent-installation-modes}
 
-The Aperture Agent can be installed in below listed modes:
+The Aperture Agent can be installed in the following modes:
 
 1. **Kubernetes**
 
@@ -44,7 +44,7 @@ The Aperture Agent can be installed in below listed modes:
       whenever a new pod is started with required labels and annotations, the
       Agent container will be attached with the pod.
 
-2. [**Bare Metal/VM**](bare_metal.md)
+2. [**Bare Metal or VM**](bare_metal.md)
 
    The Aperture Agent can be installed as a system service on any Linux system
-   that's [supported](supported-platforms.md).
+   that is [supported](supported-platforms.md).

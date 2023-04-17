@@ -102,7 +102,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		if !r.resourcesDeleted {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			// Return and don't requeue
+			// Return and do not requeue
 			logger.Info("Agent resource not found. Ignoring since object must be deleted")
 		}
 		return ctrl.Result{}, nil
@@ -143,7 +143,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			}
 			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
 				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
-					"The required resources are already deployed. Skipping resource creation as currently, the Agent doesn't require multiple replicas.")
+					"The required resources are already deployed. Skipping resource creation as currently, the Agent does not require multiple replicas.")
 
 				instance.Status.Resources = "skipped"
 				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
@@ -541,7 +541,7 @@ func (r *AgentReconciler) reconcileClusterRoleBinding(ctx context.Context, insta
 			return r.reconcileClusterRoleBinding(ctx, instance)
 		}
 
-		// Checking invalid as Kubernetes doesn't allow updating RoleRef
+		// Checking invalid as Kubernetes does not allow updating RoleRef
 		if errors.IsInvalid(err) && strings.Contains(err.Error(), "cannot change roleRef") {
 			if err = r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
 				log.Error(err, "failed to delete object of ClusterRoleBinding")

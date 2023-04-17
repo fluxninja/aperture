@@ -20,13 +20,13 @@ const (
 type FluxNinjaExtensionConfig struct {
 	// Interval between each heartbeat.
 	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
-	// Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
+	// Address to GRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
-	// API Key for this agent. If this key is not set, the extension will not be enabled.
+	// API Key for this agent. If this key is not set, the extension won't be enabled.
 	APIKey string `json:"api_key"`
 	// Client configuration.
 	ClientConfig ClientConfig `json:"client"`
-	// Installation mode describes how Agent/Controller is being run.
+	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
 }
 

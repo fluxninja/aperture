@@ -59,7 +59,7 @@ type LogConfig struct {
 	// Use non-blocking log writer (can lose logs at high throughput)
 	NonBlocking bool `json:"non_blocking" default:"true"`
 
-	// Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
+	// Additional log writer: pretty console (`stdout`) logging (not recommended for prod environments)
 	PrettyConsole bool `json:"pretty_console" default:"false"`
 }
 
@@ -67,7 +67,7 @@ type LogConfig struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type LogWriterConfig struct {
-	// Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+	// Output file for logs. Keywords allowed - [`stderr`, `default`]. `default` maps to `/var/log/fluxninja/<service>.log`
 	File string `json:"file" default:"stderr"`
 	// Log file max size in MB
 	MaxSize int `json:"max_size" validate:"gte=0" default:"50"`

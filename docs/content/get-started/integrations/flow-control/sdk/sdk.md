@@ -16,17 +16,20 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 import DocCardList from '@theme/DocCardList';
 ```
 
-For services to communicate with Aperture Agent, [Control Points][flow-control]
-must be set to describe where the Flows are happening.
+For services to control flows with Aperture Agent, [Control
+Points][flow-control] must be set within the service.
 
-One way to achieve that is through [Istio/Envoy integration][istio].
+This can be achieved in the following ways:
 
-A second way, one that allows for more customization, is to use Aperture SDK to
-set feature or traffic Control Points within services.
+- [Istio/Envoy integration][istio] for controlling HTTP or GRPC requests flowing
+  through the service.
+- Aperture SDKs can be used to set feature or traffic (HTTP and GRPC) control
+  points within the service code. This approach allows for fine-grained flow
+  control.
 
-We provide <a
+<a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/sdks/`}>Aperture
-SDKs</a> for popular languages, such as :-
+SDKs</a> available for popular languages, such as :-
 
 - [Golang][golang]
 - [Java][java]
@@ -34,11 +37,11 @@ SDKs</a> for popular languages, such as :-
 - [Python][python]
 
 Aperture SDK allows you to manually wrap any function call or code snippet
-inside the Service code as a Feature Control Point. Every invocation of the
-Feature is a Flow from the perspective of Aperture.
+inside the service code as a feature control point. Every invocation of the
+feature is a flow from the perspective of Aperture.
 
-It also provides middlewares for popular frameworks, allowing you to easily set
-traffic Control Points within your service.
+Middleware for popular frameworks is also provided, enabling simple
+configuration of traffic control points within your service.
 
 <DocCardList />
 

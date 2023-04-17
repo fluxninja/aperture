@@ -3,11 +3,11 @@ package config
 
 import "github.com/fluxninja/aperture/pkg/config"
 
-// JobConfig is config for Job
+// JobConfig is configuration for a periodic job
 // swagger:model
 // +kubebuilder:object:generate=true
 type JobConfig struct {
-	// Time period between job executions. Zero or negative value means that the job will never execute periodically.
+	// Time between job executions. Zero or negative value means that the job will never execute periodically.
 	ExecutionPeriod config.Duration `json:"execution_period" default:"10s"`
 
 	// Execution timeout

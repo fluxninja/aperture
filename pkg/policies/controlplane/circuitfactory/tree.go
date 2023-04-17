@@ -307,7 +307,7 @@ func (tree *Tree) collectComponents(maxDepth int, currentDepth int) []*runtime.C
 			components = append(components, childComponents...)
 		}
 	} else {
-		// If the tree doesn't have children, add its root component to the list.
+		// If the tree does not have children, add its root component to the list.
 		components = append(components, tree.Node)
 	}
 	return components

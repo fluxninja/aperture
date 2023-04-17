@@ -17,7 +17,7 @@ _Pod Scaler_ is a basic building block of an auto-scaling policy for Kubernetes.
 It can scale out or scale in a Kubernetes Resources such as a Deployment. The
 component takes the desired replicas as an input signal and scales the
 underlying resources based on the value of the signal. To complete the feedback
-loop the component emits output signals for the number of configured replicas
+loop, the component emits output signals for the number of configured replicas
 and the actual number of replicas deployed.
 
 A _Pod Scaler_ component is not required if you are using the high-level

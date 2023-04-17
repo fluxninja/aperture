@@ -133,6 +133,12 @@
   withQueryMixin(query):: {
     query+: query,
   },
+  withSignalGenerator(signal_generator):: {
+    signal_generator: signal_generator,
+  },
+  withSignalGeneratorMixin(signal_generator):: {
+    signal_generator+: signal_generator,
+  },
   withSwitcher(switcher):: {
     switcher: switcher,
   },

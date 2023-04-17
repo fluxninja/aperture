@@ -202,7 +202,6 @@ public interface CheckResponseOrBuilder extends
    *
    * <code>map&lt;string, string&gt; telemetry_flow_labels = 7 [json_name = "telemetryFlowLabels"];</code>
    */
-
   /* nullable */
 java.lang.String getTelemetryFlowLabelsOrDefault(
       java.lang.String key,
@@ -215,7 +214,6 @@ java.lang.String defaultValue);
    *
    * <code>map&lt;string, string&gt; telemetry_flow_labels = 7 [json_name = "telemetryFlowLabels"];</code>
    */
-
   java.lang.String getTelemetryFlowLabelsOrThrow(
       java.lang.String key);
 

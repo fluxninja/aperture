@@ -163,7 +163,7 @@ var _ = Describe("Classifier", func() {
 			}))
 		})
 
-		It("doesn't classify if direction doesn't match", func() {
+		It("does not classify if direction does not match", func() {
 			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
@@ -288,7 +288,7 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("configured with same label for different rules in yaml", func() {
-		// Note: we don't support multiple rules for the same label in a single
+		// Note: we do not support multiple rules for the same label in a single
 		// rulesets. But we might add support in the future, eg.:
 		// "foo/1": ...
 		// "foo/2": ...

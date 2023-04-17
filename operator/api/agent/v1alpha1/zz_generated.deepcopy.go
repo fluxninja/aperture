@@ -63,7 +63,7 @@ func (in *AgentConfigSpec) DeepCopyInto(out *AgentConfigSpec) {
 	out.FlowControl = in.FlowControl
 	out.AutoScale = in.AutoScale
 	in.ServiceDiscoverySpec.DeepCopyInto(&out.ServiceDiscoverySpec)
-	in.OTEL.DeepCopyInto(&out.OTEL)
+	in.OTel.DeepCopyInto(&out.OTel)
 	in.AgentFunctions.DeepCopyInto(&out.AgentFunctions)
 }
 

@@ -12,10 +12,8 @@ Install Aperture Controller
 
 ### Synopsis
 
-Use this command to install Aperture Controller and its dependencies on your
-Kubernetes cluster. Refer
-https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters for
-list of configurable parameters for preparing values file.
+Use this command to install Aperture Controller and its dependencies on your Kubernetes cluster.
+Refer https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters for list of configurable parameters for preparing values file.
 
 ```
 aperturectl install controller [flags]
@@ -46,5 +44,4 @@ aperturectl install controller --values-file=values.yaml --namespace=aperture
 
 ### SEE ALSO
 
-- [aperturectl install](/reference/aperturectl/install/install.md) - Install
-  Aperture components
+- [aperturectl install](/reference/aperturectl/install/install.md) - Install Aperture components

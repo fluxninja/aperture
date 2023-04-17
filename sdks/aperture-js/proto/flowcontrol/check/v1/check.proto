@@ -24,6 +24,7 @@ message CheckResponse {
     REJECT_REASON_NONE = 0;
     REJECT_REASON_RATE_LIMITED = 1;
     REJECT_REASON_CONCURRENCY_LIMITED = 2;
+    REJECT_REASON_FLOW_REGULATED = 3;
   }
 
   // DecisionType contains fields that represent decision made by Check call.
@@ -86,6 +87,10 @@ message LimiterDecision {
     string workload_index = 1;
   }
 
+  message FlowRegulatorInfo {
+    string label = 1;
+  }
+
   enum LimiterReason {
     LIMITER_REASON_UNSPECIFIED = 0;
     LIMITER_REASON_KEY_NOT_FOUND = 1;
@@ -99,6 +104,7 @@ message LimiterDecision {
   oneof details {
     RateLimiterInfo rate_limiter_info = 6;
     ConcurrencyLimiterInfo concurrency_limiter_info = 7;
+    FlowRegulatorInfo flow_regulator_info = 8;
   }
 }
 

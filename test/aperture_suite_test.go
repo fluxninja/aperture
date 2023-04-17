@@ -150,7 +150,7 @@ var _ = BeforeSuite(func() {
 		fx.Option(
 			fx.Provide(
 				fx.Annotate(
-					provideOTELConfig,
+					provideOTelConfig,
 					fx.ResultTags(`name:"base"`),
 				),
 			),
@@ -160,7 +160,7 @@ var _ = BeforeSuite(func() {
 		fx.Provide(
 			clockwork.NewRealClock,
 			fx.Annotate(
-				agent.AgentOTELComponents,
+				agent.AgentOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
 					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
@@ -245,8 +245,8 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTELConfig() *otelconfig.OTELConfig {
-	cfg := otelconfig.NewOTELConfig()
+func provideOTelConfig() *otelconfig.OTelConfig {
+	cfg := otelconfig.NewOTelConfig()
 	if phStarted {
 		cfg.AddReceiver("prometheus", map[string]interface{}{
 			"config": map[string]interface{}{

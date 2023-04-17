@@ -118,5 +118,5 @@ public interface CheckHTTPResponseOrBuilder extends
    */
   com.google.protobuf.StructOrBuilder getDynamicMetadataOrBuilder();
 
-  public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.HttpResponseCase getHttpResponseCase();
+  com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.HttpResponseCase getHttpResponseCase();
 }

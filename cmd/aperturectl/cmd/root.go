@@ -55,7 +55,7 @@ aperturectl is a CLI tool which can be used to interact with Aperture seamlessly
 // Execute is the entry point for the CLI. It is called from the main package.
 func Execute() {
 	// Process the verbose and allowDeprecated flags before executing the command.
-	// Fun fact: PersistentPreRunE doesn't allow chaining.
+	// Fun fact: PersistentPreRunE does not allow chaining.
 
 	// set flags manually using pflag and parse them
 	pflag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")

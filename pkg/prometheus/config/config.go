@@ -5,6 +5,6 @@ package config
 // swagger:model
 // +kubebuilder:object:generate=true
 type PrometheusConfig struct {
-	// Address of the prometheus server
+	// Address of the Prometheus server
 	Address string `json:"address" validate:"required,hostname_port|url|fqdn"`
 }

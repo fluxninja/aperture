@@ -6,7 +6,7 @@ package config
 // +kubebuilder:object:generate=true
 type PeerDiscoveryConfig struct {
 	// Network address of aperture server to advertise to peers - this address
-	// should be reachable from other agents. Used for nat traversal when
+	// should be reachable from other agents. Used for NAT traversal when
 	// provided.
 	AdvertisementAddr string `json:"advertisement_addr" validate:"omitempty,hostname_port"`
 }

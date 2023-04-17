@@ -126,13 +126,13 @@ type ServiceSelector struct {
 	// :::info
 	//
 	// In the Kubernetes sidecar installation mode, service discovery is switched off by default.
-	// In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
+	// To scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 	//
 	// :::
 	//
 	// :::info
 	//
-	// An entity (e.g. Kubernetes pod) may belong to multiple services.
+	// An entity (for example, Kubernetes pod) might belong to multiple services.
 	//
 	// :::
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty" default:"any"` // @gotags: default:"any"
@@ -219,7 +219,7 @@ type FlowMatcher struct {
 
 	// [Control Point](/concepts/flow-control/flow-selector.md#control-point)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
-	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 	// or filter chains.
 	ControlPoint string `protobuf:"bytes,1,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
@@ -238,7 +238,7 @@ type FlowMatcher struct {
 	// classifier, but only if they were created at some previous control point
 	// (and propagated in baggage).
 	//
-	// This limitation doesn't apply to selectors of other entities, like
+	// This limitation does not apply to selectors of other entities, like
 	// Flux Meters or Actuators. It's valid to create a flow label on a control
 	// point using classifier, and immediately use it for matching on the same
 	// control point.
@@ -301,7 +301,7 @@ type FlowControlResources struct {
 
 	// Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 	//
-	// Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+	// Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive"` // @gotags: validate:"dive"
 	// Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 	//
@@ -561,7 +561,7 @@ type Classifier struct {
 	//
 	// Rego is a policy language used to express complex policies in a concise and declarative way.
 	// It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
-	// For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+	// For simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.
 	Rego *Rego `protobuf:"bytes,3,opt,name=rego,proto3" json:"rego,omitempty"`
 }
 
@@ -738,7 +738,7 @@ func (*Rule_Extractor) isRule_Source() {}
 
 func (*Rule_Rego_) isRule_Source() {}
 
-// Rego define a set of labels that are extracted after evaluating a rego module.
+// Rego define a set of labels that are extracted after evaluating a Rego module.
 //
 // :::info
 //
@@ -748,7 +748,7 @@ func (*Rule_Rego_) isRule_Source() {}
 //
 // :::info
 //
-// Special rego variables:
+// Special Rego variables:
 // - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 //
 // :::
@@ -781,9 +781,9 @@ type Rego struct {
 	// A map of {key, value} pairs mapping from
 	// [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
 	// how to extract and propagate flow labels with that key.
-	// The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+	// The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
 	Labels map[string]*Rego_LabelProperties `protobuf:"bytes,1,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"required,gt=0,dive,keys,required,endkeys,required"` // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
-	// Source code of the rego module.
+	// Source code of the Rego module.
 	//
 	// :::Note
 	//
@@ -839,7 +839,7 @@ func (x *Rego) GetModule() string {
 	return ""
 }
 
-// Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
+// Defines a high-level way to specify how to extract a flow label value given HTTP request metadata, without a need to write Rego code
 //
 // There are multiple variants of extractor, specify exactly one.
 type Extractor struct {
@@ -941,9 +941,9 @@ type Extractor_From struct {
 	// Attribute path is a dot-separated path to attribute.
 	//
 	// Should be either:
-	// * one of the fields of [Attribute Context][attribute-context], or
-	// * a special "request.http.bearer" pseudo-attribute.
-	// Eg. "request.http.method" or "request.http.header.user-agent"
+	// * one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or
+	// * a special `request.http.bearer` pseudo-attribute.
+	// For example, `request.http.method` or `request.http.header.user-agent`
 	//
 	// Note: The same attribute path syntax is shared by other extractor variants,
 	// wherever attribute path is needed in their "from" syntax.
@@ -952,12 +952,11 @@ type Extractor_From struct {
 	// ```yaml
 	// from: request.http.headers.user-agent
 	// ```
-	// [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 	From string `protobuf:"bytes,1,opt,name=from,proto3,oneof"`
 }
 
 type Extractor_Json struct {
-	// Deserialize a json, and extract one of the fields.
+	// Parse JSON, and extract one of the fields.
 	Json *JSONExtractor `protobuf:"bytes,2,opt,name=json,proto3,oneof"`
 }
 
@@ -986,7 +985,7 @@ func (*Extractor_Jwt) isExtractor_Variant() {}
 
 func (*Extractor_PathTemplates) isExtractor_Variant() {}
 
-// Deserialize a json, and extract one of the fields
+// Parse JSON, and extract one of the fields
 //
 // Example:
 // ```yaml
@@ -998,12 +997,12 @@ type JSONExtractor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Attribute path pointing to some strings - eg. "request.http.body".
+	// Attribute path pointing to some strings - for example, `request.http.body`.
 	From string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty" validate:"required"` //@gotags: validate:"required"
-	// Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
+	// JSON pointer represents a parsed JSON pointer which allows to select a specified field from the payload.
 	//
-	// Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-	// eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+	// Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+	// for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
 	Pointer string `protobuf:"bytes,2,opt,name=pointer,proto3" json:"pointer,omitempty"`
 }
 
@@ -1053,12 +1052,16 @@ func (x *JSONExtractor) GetPointer() string {
 	return ""
 }
 
-// Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+// Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`
 //
-// IP addresses in attribute context are defined as objects with separate ip and port fields.
+// IP addresses in attribute context are defined as objects with separate IP and port fields.
 // This is a helper to display an address as a single string.
 //
-// Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
+// :::caution
+//
+// This might introduce high-cardinality flow label values.
+//
+// :::
 //
 // Example:
 // ```yaml
@@ -1071,7 +1074,7 @@ type AddressExtractor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Attribute path pointing to some string - eg. "source.address".
+	// Attribute path pointing to some string - for example, `source.address`.
 	From string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty" validate:"required"` //@gotags: validate:"required"
 }
 
@@ -1116,10 +1119,10 @@ func (x *AddressExtractor) GetFrom() string {
 
 // Parse the attribute as JWT and read the payload
 //
-// Specify a field to be extracted from payload using "json_pointer".
+// Specify a field to be extracted from payload using `json_pointer`.
 //
-// Note: The signature is not verified against the secret (we're assuming there's some
-// other parts of the system that handles such verification).
+// Note: The signature is not verified against the secret (assuming there's some
+// other part of the system that handles such verification).
 //
 // Example:
 // ```yaml
@@ -1131,12 +1134,12 @@ type JWTExtractor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
+	// JWT (JSON Web Token) can be extracted from any input attribute, but most likely you'd want to use `request.http.bearer`.
 	From string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty" validate:"required"` //@gotags: validate:"required"
-	// Json pointer allowing to select a specified field from the json payload.
+	// JSON pointer allowing to select a specified field from the payload.
 	//
-	// Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-	// eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+	// Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+	// for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
 	JsonPointer string `protobuf:"bytes,2,opt,name=json_pointer,json=jsonPointer,proto3" json:"json_pointer,omitempty"`
 }
 
@@ -1200,7 +1203,7 @@ type PathTemplateMatcher struct {
 	//
 	//   - Static path segment `/foo` matches a path segment exactly
 	//   - `/{param}` matches arbitrary path segment.
-	//     (The param name is ignored and can be omitted (`{}`))
+	//     (The parameter name is ignored and can be omitted (`{}`))
 	//   - The parameter must cover whole segment.
 	//   - Additionally, path template can end with `/*` wildcard to match
 	//     arbitrary number of trailing segments (0 or more).
@@ -1270,6 +1273,9 @@ type FlowControl struct {
 	//	*FlowControl_RateLimiter
 	//	*FlowControl_ConcurrencyLimiter
 	//	*FlowControl_AimdConcurrencyController
+	//	*FlowControl_FlowRegulator
+	//	*FlowControl_LoadShaper
+	//	*FlowControl_LoadShaperSeries
 	Component isFlowControl_Component `protobuf_oneof:"component"`
 }
 
@@ -1333,17 +1339,38 @@ func (x *FlowControl) GetAimdConcurrencyController() *AIMDConcurrencyController 
 	return nil
 }
 
+func (x *FlowControl) GetFlowRegulator() *FlowRegulator {
+	if x, ok := x.GetComponent().(*FlowControl_FlowRegulator); ok {
+		return x.FlowRegulator
+	}
+	return nil
+}
+
+func (x *FlowControl) GetLoadShaper() *LoadShaper {
+	if x, ok := x.GetComponent().(*FlowControl_LoadShaper); ok {
+		return x.LoadShaper
+	}
+	return nil
+}
+
+func (x *FlowControl) GetLoadShaperSeries() *LoadShaperSeries {
+	if x, ok := x.GetComponent().(*FlowControl_LoadShaperSeries); ok {
+		return x.LoadShaperSeries
+	}
+	return nil
+}
+
 type isFlowControl_Component interface {
 	isFlowControl_Component()
 }
 
 type FlowControl_RateLimiter struct {
-	// Rate Limiter provides service protection by applying rate limiter.
+	// _Rate Limiter_ provides service protection by applying rate limiter.
 	RateLimiter *RateLimiter `protobuf:"bytes,1,opt,name=rate_limiter,json=rateLimiter,proto3,oneof"`
 }
 
 type FlowControl_ConcurrencyLimiter struct {
-	// Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+	// _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
 	ConcurrencyLimiter *ConcurrencyLimiter `protobuf:"bytes,2,opt,name=concurrency_limiter,json=concurrencyLimiter,proto3,oneof"`
 }
 
@@ -1352,21 +1379,42 @@ type FlowControl_AimdConcurrencyController struct {
 	AimdConcurrencyController *AIMDConcurrencyController `protobuf:"bytes,3,opt,name=aimd_concurrency_controller,json=aimdConcurrencyController,proto3,oneof"`
 }
 
+type FlowControl_FlowRegulator struct {
+	// Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+	FlowRegulator *FlowRegulator `protobuf:"bytes,4,opt,name=flow_regulator,json=flowRegulator,proto3,oneof"`
+}
+
+type FlowControl_LoadShaper struct {
+	// LoadShaper is a component that shapes the load of the service.
+	LoadShaper *LoadShaper `protobuf:"bytes,5,opt,name=load_shaper,json=loadShaper,proto3,oneof"`
+}
+
+type FlowControl_LoadShaperSeries struct {
+	// LoadShaperSeries is a series of LoadShaper components that shape load one after another in series.
+	LoadShaperSeries *LoadShaperSeries `protobuf:"bytes,6,opt,name=load_shaper_series,json=loadShaperSeries,proto3,oneof"`
+}
+
 func (*FlowControl_RateLimiter) isFlowControl_Component() {}
 
 func (*FlowControl_ConcurrencyLimiter) isFlowControl_Component() {}
 
 func (*FlowControl_AimdConcurrencyController) isFlowControl_Component() {}
 
+func (*FlowControl_FlowRegulator) isFlowControl_Component() {}
+
+func (*FlowControl_LoadShaper) isFlowControl_Component() {}
+
+func (*FlowControl_LoadShaperSeries) isFlowControl_Component() {}
+
 // Limits the traffic on a control point to specified rate
 //
 // :::info
 //
-// See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
+// See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
 //
 // :::
 //
-// Ratelimiting is done separately on per-label-value basis. Use _label\_key_
+// RateLimiting is done on per-label-value basis. Use `label_key`
 // to select which label should be used as key.
 type RateLimiter struct {
 	state         protoimpl.MessageState
@@ -1375,7 +1423,7 @@ type RateLimiter struct {
 
 	// Input ports for the RateLimiter component
 	InPorts *RateLimiter_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Which control point to apply this ratelimiter to.
+	// Which control point to apply this rate limiter to.
 	FlowSelector *FlowSelector `protobuf:"bytes,2,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Parameters for the RateLimiter component
 	Parameters *RateLimiter_Parameters `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -1452,19 +1500,19 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 	return nil
 }
 
-// Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
+// _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
 //
 // :::info
 //
-// See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
+// See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).
 //
 // :::
 //
-// It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
-// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
+// It's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
+// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
 //
 // ConcurrencyLimiter configuration is split into two parts: An actuation
-// strategy and a scheduler. Right now, only `load_actuator` strategy is available.
+// strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 type ConcurrencyLimiter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1690,7 +1738,7 @@ func (x *LoadActuator) GetDefaultConfig() *LoadActuator_DynamicConfig {
 	return nil
 }
 
-// High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+// High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
 type AIMDConcurrencyController struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1710,9 +1758,9 @@ type AIMDConcurrencyController struct {
 	MaxLoadMultiplier float64 `protobuf:"fixed64,6,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,7,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.0025"` // @gotags: default:"0.0025"
-	// Configuration for embedded alerter.
+	// Configuration for embedded Alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,8,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
-	// Configuration key for load actuation.
+	// Dynamic configuration key for load actuation.
 	DynamicConfigKey string `protobuf:"bytes,9,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
 	// Default configuration.
 	DefaultConfig *LoadActuator_DynamicConfig `protobuf:"bytes,10,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
@@ -1820,6 +1868,232 @@ func (x *AIMDConcurrencyController) GetDefaultConfig() *LoadActuator_DynamicConf
 	return nil
 }
 
+// _Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+type FlowRegulator struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Input ports for the _Flow Regulator_.
+	InPorts *FlowRegulator_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	// Parameters for the _Flow Regulator_.
+	Parameters *FlowRegulator_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
+	// Configuration key for DynamicConfig.
+	DynamicConfigKey string `protobuf:"bytes,3,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
+	// Default configuration.
+	DefaultConfig *FlowRegulator_DynamicConfig `protobuf:"bytes,4,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
+}
+
+func (x *FlowRegulator) Reset() {
+	*x = FlowRegulator{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowRegulator) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowRegulator) ProtoMessage() {}
+
+func (x *FlowRegulator) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowRegulator.ProtoReflect.Descriptor instead.
+func (*FlowRegulator) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *FlowRegulator) GetInPorts() *FlowRegulator_Ins {
+	if x != nil {
+		return x.InPorts
+	}
+	return nil
+}
+
+func (x *FlowRegulator) GetParameters() *FlowRegulator_Parameters {
+	if x != nil {
+		return x.Parameters
+	}
+	return nil
+}
+
+func (x *FlowRegulator) GetDynamicConfigKey() string {
+	if x != nil {
+		return x.DynamicConfigKey
+	}
+	return ""
+}
+
+func (x *FlowRegulator) GetDefaultConfig() *FlowRegulator_DynamicConfig {
+	if x != nil {
+		return x.DefaultConfig
+	}
+	return nil
+}
+
+// The _Load Shaper_ produces a smooth and continuous traffic load
+// that changes progressively over time, based on the specified steps.
+//
+// Each step is defined by two parameters:
+//   - The `target_accept_percentage`.
+//   - The `duration` for the signal to change from the
+//     previous step's `target_accept_percentage` to the current step's
+//     `target_accept_percentage`.
+//
+// The percentage of requests accepted starts at the `target_accept_percentage`
+// defined in the first step and gradually ramps up or down linearly from
+// the previous step's `target_accept_percentage` to the next
+// `target_accept_percentage`, over the `duration` specified for each step.
+type LoadShaper struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	InPorts    *LoadShaper_Ins        `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	OutPorts   *LoadShaper_Outs       `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
+	Parameters *LoadShaper_Parameters `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
+	// Dynamic configuration key for flow regulator.
+	DynamicConfigKey string `protobuf:"bytes,9,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
+	// Default configuration.
+	DefaultConfig *FlowRegulator_DynamicConfig `protobuf:"bytes,10,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
+}
+
+func (x *LoadShaper) Reset() {
+	*x = LoadShaper{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaper) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaper) ProtoMessage() {}
+
+func (x *LoadShaper) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaper.ProtoReflect.Descriptor instead.
+func (*LoadShaper) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *LoadShaper) GetInPorts() *LoadShaper_Ins {
+	if x != nil {
+		return x.InPorts
+	}
+	return nil
+}
+
+func (x *LoadShaper) GetOutPorts() *LoadShaper_Outs {
+	if x != nil {
+		return x.OutPorts
+	}
+	return nil
+}
+
+func (x *LoadShaper) GetParameters() *LoadShaper_Parameters {
+	if x != nil {
+		return x.Parameters
+	}
+	return nil
+}
+
+func (x *LoadShaper) GetDynamicConfigKey() string {
+	if x != nil {
+		return x.DynamicConfigKey
+	}
+	return ""
+}
+
+func (x *LoadShaper) GetDefaultConfig() *FlowRegulator_DynamicConfig {
+	if x != nil {
+		return x.DefaultConfig
+	}
+	return nil
+}
+
+// _LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
+type LoadShaperSeries struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	InPorts    *LoadShaperSeries_Ins        `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	Parameters *LoadShaperSeries_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
+}
+
+func (x *LoadShaperSeries) Reset() {
+	*x = LoadShaperSeries{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaperSeries) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaperSeries) ProtoMessage() {}
+
+func (x *LoadShaperSeries) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaperSeries.ProtoReflect.Descriptor instead.
+func (*LoadShaperSeries) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *LoadShaperSeries) GetInPorts() *LoadShaperSeries_Ins {
+	if x != nil {
+		return x.InPorts
+	}
+	return nil
+}
+
+func (x *LoadShaperSeries) GetParameters() *LoadShaperSeries_Parameters {
+	if x != nil {
+		return x.Parameters
+	}
+	return nil
+}
+
 // StaticBuckets holds the static value of the buckets where latency histogram will be stored.
 type FluxMeter_StaticBuckets struct {
 	state         protoimpl.MessageState
@@ -1833,7 +2107,7 @@ type FluxMeter_StaticBuckets struct {
 func (x *FluxMeter_StaticBuckets) Reset() {
 	*x = FluxMeter_StaticBuckets{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[20]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1846,7 +2120,7 @@ func (x *FluxMeter_StaticBuckets) String() string {
 func (*FluxMeter_StaticBuckets) ProtoMessage() {}
 
 func (x *FluxMeter_StaticBuckets) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[20]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1887,7 +2161,7 @@ type FluxMeter_LinearBuckets struct {
 func (x *FluxMeter_LinearBuckets) Reset() {
 	*x = FluxMeter_LinearBuckets{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[21]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1900,7 +2174,7 @@ func (x *FluxMeter_LinearBuckets) String() string {
 func (*FluxMeter_LinearBuckets) ProtoMessage() {}
 
 func (x *FluxMeter_LinearBuckets) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[21]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1956,7 +2230,7 @@ type FluxMeter_ExponentialBuckets struct {
 func (x *FluxMeter_ExponentialBuckets) Reset() {
 	*x = FluxMeter_ExponentialBuckets{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[22]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1969,7 +2243,7 @@ func (x *FluxMeter_ExponentialBuckets) String() string {
 func (*FluxMeter_ExponentialBuckets) ProtoMessage() {}
 
 func (x *FluxMeter_ExponentialBuckets) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[22]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2024,7 +2298,7 @@ type FluxMeter_ExponentialBucketsRange struct {
 func (x *FluxMeter_ExponentialBucketsRange) Reset() {
 	*x = FluxMeter_ExponentialBucketsRange{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[23]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2037,7 +2311,7 @@ func (x *FluxMeter_ExponentialBucketsRange) String() string {
 func (*FluxMeter_ExponentialBucketsRange) ProtoMessage() {}
 
 func (x *FluxMeter_ExponentialBucketsRange) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[23]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2074,9 +2348,9 @@ func (x *FluxMeter_ExponentialBucketsRange) GetCount() int32 {
 	return 0
 }
 
-// Raw rego rules are compiled 1:1 to rego queries
+// Raw Rego rules are compiled 1:1 to Rego queries
 //
-// High-level extractor-based rules are compiled into a single rego query.
+// High-level extractor-based rules are compiled into a single Rego query.
 //
 // Deprecated: 1.5.0
 type Rule_Rego struct {
@@ -2084,20 +2358,20 @@ type Rule_Rego struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Source code of the rego module.
+	// Source code of the Rego module.
 	//
 	// Note: Must include a "package" declaration.
 	Source string `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty" validate:"deprecated,required"` // @gotags: validate:"deprecated,required"
-	// Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+	// Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
 	//
-	// Note: The module name must match the package name from the "source".
+	// Note: The module name must match the package name from the `source`.
 	Query string `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty" validate:"deprecated,required"` // @gotags: validate:"deprecated,required"
 }
 
 func (x *Rule_Rego) Reset() {
 	*x = Rule_Rego{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[25]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2110,7 +2384,7 @@ func (x *Rule_Rego) String() string {
 func (*Rule_Rego) ProtoMessage() {}
 
 func (x *Rule_Rego) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[25]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2167,7 +2441,7 @@ type Rego_LabelProperties struct {
 func (x *Rego_LabelProperties) Reset() {
 	*x = Rego_LabelProperties{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[26]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2180,7 +2454,7 @@ func (x *Rego_LabelProperties) String() string {
 func (*Rego_LabelProperties) ProtoMessage() {}
 
 func (x *Rego_LabelProperties) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[26]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2210,21 +2484,22 @@ type RateLimiter_Parameters struct {
 
 	// Time after which the limit for a given label value will be reset.
 	LimitResetInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=limit_reset_interval,json=limitResetInterval,proto3" json:"limit_reset_interval,omitempty" default:"60s"` // @gotags: default:"60s"
-	// Specifies which label the ratelimiter should be keyed by.
+	// Specifies which label the rate limiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
 	// [label](/concepts/flow-control/flow-label.md) with given key.
-	// Eg., to give each user a separate limit, assuming you have a _user_ flow
+	// For example, to give each user a separate limit, assuming you
+	// have a _user_ flow
 	// label set up, set `label_key: "user"`.
 	LabelKey string `protobuf:"bytes,2,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Configuration of lazy-syncing behaviour of ratelimiter
+	// Configuration of lazy-syncing behaviour of rate limiter
 	LazySync *RateLimiter_Parameters_LazySync `protobuf:"bytes,3,opt,name=lazy_sync,json=lazySync,proto3" json:"lazy_sync,omitempty"`
 }
 
 func (x *RateLimiter_Parameters) Reset() {
 	*x = RateLimiter_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[29]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2237,7 +2512,7 @@ func (x *RateLimiter_Parameters) String() string {
 func (*RateLimiter_Parameters) ProtoMessage() {}
 
 func (x *RateLimiter_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[29]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2281,14 +2556,15 @@ type RateLimiter_Override struct {
 
 	// Value of the label for which the override should be applied.
 	LabelValue string `protobuf:"bytes,1,opt,name=label_value,json=labelValue,proto3" json:"label_value,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Amount by which the _in\_ports.limit_ should be multiplied for this label value.
+	// Amount by which the `in_ports.limit` should be multiplied for
+	// this label value.
 	LimitScaleFactor float64 `protobuf:"fixed64,2,opt,name=limit_scale_factor,json=limitScaleFactor,proto3" json:"limit_scale_factor,omitempty" default:"1.0"` // @gotags: default:"1.0"
 }
 
 func (x *RateLimiter_Override) Reset() {
 	*x = RateLimiter_Override{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[30]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2301,7 +2577,7 @@ func (x *RateLimiter_Override) String() string {
 func (*RateLimiter_Override) ProtoMessage() {}
 
 func (x *RateLimiter_Override) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[30]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2344,7 +2620,7 @@ type RateLimiter_DynamicConfig struct {
 func (x *RateLimiter_DynamicConfig) Reset() {
 	*x = RateLimiter_DynamicConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[31]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2357,7 +2633,7 @@ func (x *RateLimiter_DynamicConfig) String() string {
 func (*RateLimiter_DynamicConfig) ProtoMessage() {}
 
 func (x *RateLimiter_DynamicConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[31]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2386,12 +2662,12 @@ type RateLimiter_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Number of flows allowed per _limit\_reset\_interval_ per each label.
-	// Negative values disable the ratelimiter.
+	// Number of flows allowed per `limit_reset_interval` per each label.
+	// Negative values disable the rate limiter.
 	//
 	// :::tip
 	//
-	// Negative limit can be useful to _conditionally_ enable the ratelimiter
+	// Negative limit can be useful to _conditionally_ enable the rate limiter
 	// under certain circumstances. [Decider](#decider) might be helpful.
 	//
 	// :::
@@ -2401,7 +2677,7 @@ type RateLimiter_Ins struct {
 func (x *RateLimiter_Ins) Reset() {
 	*x = RateLimiter_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[32]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2414,7 +2690,7 @@ func (x *RateLimiter_Ins) String() string {
 func (*RateLimiter_Ins) ProtoMessage() {}
 
 func (x *RateLimiter_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[32]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2444,14 +2720,14 @@ type RateLimiter_Parameters_LazySync struct {
 
 	// Enables lazy sync
 	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty" default:"false"` // @gotags: default:"false"
-	// Number of times to lazy sync within the _limit\_reset\_interval_.
+	// Number of times to lazy sync within the `limit_reset_interval`.
 	NumSync uint32 `protobuf:"varint,2,opt,name=num_sync,json=numSync,proto3" json:"num_sync,omitempty" default:"5" validate:"gt=0"` // @gotags: default:"5" validate:"gt=0"
 }
 
 func (x *RateLimiter_Parameters_LazySync) Reset() {
 	*x = RateLimiter_Parameters_LazySync{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[33]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2464,7 +2740,7 @@ func (x *RateLimiter_Parameters_LazySync) String() string {
 func (*RateLimiter_Parameters_LazySync) ProtoMessage() {}
 
 func (x *RateLimiter_Parameters_LazySync) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[33]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2510,7 +2786,7 @@ type Scheduler_Workload struct {
 func (x *Scheduler_Workload) Reset() {
 	*x = Scheduler_Workload{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[34]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2523,7 +2799,7 @@ func (x *Scheduler_Workload) String() string {
 func (*Scheduler_Workload) ProtoMessage() {}
 
 func (x *Scheduler_Workload) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[34]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2562,15 +2838,14 @@ type Scheduler_Parameters struct {
 	// List of workloads to be used in scheduler.
 	//
 	// Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
-	// requests". There are two aspects of this "smartness":
+	// allows for load-shedding to be "intelligent" compared to random rejections.
+	// There are two aspects of this "intelligence":
 	//   - Scheduler can more precisely calculate concurrency if it understands
-	//     that flows belonging to different classes have different weights (eg.
-	//     inserts vs lookups).
+	//     that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
 	//   - Setting different priorities to different workloads lets the scheduler
 	//     avoid dropping important traffic during overload.
 	//
-	// Each workload in this list specifies also a matcher that's used to
+	// Each workload in this list specifies also a matcher that is used to
 	// determine which flow will be categorized into which workload.
 	// In case of multiple matching workloads, the first matching one will be used.
 	// If none of workloads match, `default_workload` will be used.
@@ -2588,10 +2863,11 @@ type Scheduler_Parameters struct {
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during last few seconds (exact duration
 	// of this average can change).
-	// Make sure to not provide `tokens` in workload definitions or in the flow
-	// if you want to use this feature.
+	// Verify that the `tokens` in workload definitions
+	// or the flow aren't set if you want
+	// to use this feature.
 	AutoTokens bool `protobuf:"varint,3,opt,name=auto_tokens,json=autoTokens,proto3" json:"auto_tokens,omitempty" default:"true"` // @gotags: default:"true"
-	// Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
+	// Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
 	//
 	// If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 	// it will be rejected.
@@ -2599,24 +2875,24 @@ type Scheduler_Parameters struct {
 	// This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
 	TimeoutFactor float64 `protobuf:"fixed64,4,opt,name=timeout_factor,json=timeoutFactor,proto3" json:"timeout_factor,omitempty" validate:"gte=0.0" default:"0.5"` // @gotags: validate:"gte=0.0" default:"0.5"
 	// Max Timeout is the value with which the flow timeout is capped.
-	// When auto_tokens feature is not enabled, this value is used as the
+	// When `auto_tokens` feature is not enabled, this value is used as the
 	// timeout for the flow, otherwise it is used as a cap for the timeout.
 	//
 	// :::caution
 	//
-	// This timeout needs to be strictly less than the timeout set on the
+	// This timeout needs to be less than the timeout set on the
 	// client for the whole GRPC call:
 	// * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-	// * in case of libraries, timeout configured... TODO.
+	// * in case of libraries, is configured during the client initialization.
 	//
-	// We're using fail-open logic in integrations, so if the GRPC timeout
+	// Fail-open logic is use for flow control APIs, so if the GRPC timeout
 	// fires first, the flow will end up being unconditionally allowed while
-	// it're still waiting on the scheduler.
+	// it is still waiting on the scheduler.
 	//
 	// To avoid such cases, the end-to-end GRPC timeout should also contain
-	// some headroom for constant overhead like serialization, etc. Default
-	// value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
-	// tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+	// some headroom for constant overhead like serialization and other processing delays. Default
+	// value for GRPC timeouts is 500ms, giving 10ms of headroom, so when
+	// tweaking this timeout, adjust the GRPC timeout accordingly.
 	//
 	// :::
 	MaxTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=max_timeout,json=maxTimeout,proto3" json:"max_timeout,omitempty" default:"0.49s"` // @gotags: default:"0.49s"
@@ -2625,7 +2901,7 @@ type Scheduler_Parameters struct {
 func (x *Scheduler_Parameters) Reset() {
 	*x = Scheduler_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[35]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2638,7 +2914,7 @@ func (x *Scheduler_Parameters) String() string {
 func (*Scheduler_Parameters) ProtoMessage() {}
 
 func (x *Scheduler_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[35]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2700,13 +2976,12 @@ type Scheduler_Outs struct {
 	//
 	// :::info
 	//
-	// Concurrency is a unitless number describing mean number of
+	// Concurrency is a unit less number describing mean number of
 	// [flows](/concepts/flow-control/flow-control.md#flow) being
 	// concurrently processed by the system (system = control point).
 	// Concurrency is calculated as _work_ done per unit of time (so
 	// work-seconds per world-seconds). Work-seconds are computed based on
-	// token-weights of of flows (which are either estimated via `auto_tokens`
-	// or specified by `Workload.tokens`).
+	// token-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).
 	//
 	// :::
 	//
@@ -2724,7 +2999,7 @@ type Scheduler_Outs struct {
 func (x *Scheduler_Outs) Reset() {
 	*x = Scheduler_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[36]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2737,7 +3012,7 @@ func (x *Scheduler_Outs) String() string {
 func (*Scheduler_Outs) ProtoMessage() {}
 
 func (x *Scheduler_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[36]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2783,10 +3058,10 @@ type Scheduler_Workload_Parameters struct {
 	// $$
 	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255" default:"0"` // @gotags: validate:"gte=0,lte=255" default:"0"
 	// Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-	// This override is applicable only if tokens for the request are not specified in the request.
+	// This override is applicable only if tokens for the request aren't specified in the request.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty"`
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -2795,7 +3070,7 @@ type Scheduler_Workload_Parameters struct {
 func (x *Scheduler_Workload_Parameters) Reset() {
 	*x = Scheduler_Workload_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[37]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2808,7 +3083,7 @@ func (x *Scheduler_Workload_Parameters) String() string {
 func (*Scheduler_Workload_Parameters) ProtoMessage() {}
 
 func (x *Scheduler_Workload_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[37]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2859,7 +3134,7 @@ type LoadActuator_DynamicConfig struct {
 func (x *LoadActuator_DynamicConfig) Reset() {
 	*x = LoadActuator_DynamicConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[38]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2872,7 +3147,7 @@ func (x *LoadActuator_DynamicConfig) String() string {
 func (*LoadActuator_DynamicConfig) ProtoMessage() {}
 
 func (x *LoadActuator_DynamicConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[38]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2909,7 +3184,7 @@ type LoadActuator_Ins struct {
 func (x *LoadActuator_Ins) Reset() {
 	*x = LoadActuator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[39]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2922,7 +3197,7 @@ func (x *LoadActuator_Ins) String() string {
 func (*LoadActuator_Ins) ProtoMessage() {}
 
 func (x *LoadActuator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[39]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2960,7 +3235,7 @@ type AIMDConcurrencyController_Ins struct {
 func (x *AIMDConcurrencyController_Ins) Reset() {
 	*x = AIMDConcurrencyController_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[40]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2973,7 +3248,7 @@ func (x *AIMDConcurrencyController_Ins) String() string {
 func (*AIMDConcurrencyController_Ins) ProtoMessage() {}
 
 func (x *AIMDConcurrencyController_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[40]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3009,7 +3284,7 @@ type AIMDConcurrencyController_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+	// Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
 	IsOverload *OutPort `protobuf:"bytes,1,opt,name=is_overload,json=isOverload,proto3" json:"is_overload,omitempty"`
 	// Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
 	DesiredLoadMultiplier *OutPort `protobuf:"bytes,2,opt,name=desired_load_multiplier,json=desiredLoadMultiplier,proto3" json:"desired_load_multiplier,omitempty"`
@@ -3024,7 +3299,7 @@ type AIMDConcurrencyController_Outs struct {
 func (x *AIMDConcurrencyController_Outs) Reset() {
 	*x = AIMDConcurrencyController_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[41]
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3037,7 +3312,7 @@ func (x *AIMDConcurrencyController_Outs) String() string {
 func (*AIMDConcurrencyController_Outs) ProtoMessage() {}
 
 func (x *AIMDConcurrencyController_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[41]
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3084,6 +3359,585 @@ func (x *AIMDConcurrencyController_Outs) GetAcceptedConcurrency() *OutPort {
 func (x *AIMDConcurrencyController_Outs) GetIncomingConcurrency() *OutPort {
 	if x != nil {
 		return x.IncomingConcurrency
+	}
+	return nil
+}
+
+// Dynamic Configuration for _Flow Regulator_
+type FlowRegulator_DynamicConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+	EnableLabelValues []string `protobuf:"bytes,1,rep,name=enable_label_values,json=enableLabelValues,proto3" json:"enable_label_values,omitempty"`
+}
+
+func (x *FlowRegulator_DynamicConfig) Reset() {
+	*x = FlowRegulator_DynamicConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[45]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowRegulator_DynamicConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowRegulator_DynamicConfig) ProtoMessage() {}
+
+func (x *FlowRegulator_DynamicConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[45]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowRegulator_DynamicConfig.ProtoReflect.Descriptor instead.
+func (*FlowRegulator_DynamicConfig) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{19, 0}
+}
+
+func (x *FlowRegulator_DynamicConfig) GetEnableLabelValues() []string {
+	if x != nil {
+		return x.EnableLabelValues
+	}
+	return nil
+}
+
+type FlowRegulator_Parameters struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
+	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
+	// The flow label key for identifying sessions.
+	//   - When label key is specified, _Flow Regulator_ acts as a sticky filter.
+	//     The series of flows with the same value of label key get the same
+	//     decision provided that the `accept_percentage` is same or higher.
+	//   - When label key is not specified, _Flow Regulator_ acts as a stateless filter.
+	//     Percentage of flows are selected randomly for rejection.
+	LabelKey string `protobuf:"bytes,2,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty"`
+}
+
+func (x *FlowRegulator_Parameters) Reset() {
+	*x = FlowRegulator_Parameters{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[46]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowRegulator_Parameters) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowRegulator_Parameters) ProtoMessage() {}
+
+func (x *FlowRegulator_Parameters) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[46]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowRegulator_Parameters.ProtoReflect.Descriptor instead.
+func (*FlowRegulator_Parameters) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{19, 1}
+}
+
+func (x *FlowRegulator_Parameters) GetFlowSelector() *FlowSelector {
+	if x != nil {
+		return x.FlowSelector
+	}
+	return nil
+}
+
+func (x *FlowRegulator_Parameters) GetLabelKey() string {
+	if x != nil {
+		return x.LabelKey
+	}
+	return ""
+}
+
+type FlowRegulator_Ins struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The percentage of requests to accept.
+	AcceptPercentage *InPort `protobuf:"bytes,1,opt,name=accept_percentage,json=acceptPercentage,proto3" json:"accept_percentage,omitempty"`
+}
+
+func (x *FlowRegulator_Ins) Reset() {
+	*x = FlowRegulator_Ins{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[47]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowRegulator_Ins) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowRegulator_Ins) ProtoMessage() {}
+
+func (x *FlowRegulator_Ins) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[47]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowRegulator_Ins.ProtoReflect.Descriptor instead.
+func (*FlowRegulator_Ins) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{19, 2}
+}
+
+func (x *FlowRegulator_Ins) GetAcceptPercentage() *InPort {
+	if x != nil {
+		return x.AcceptPercentage
+	}
+	return nil
+}
+
+// Parameters for the _Load Shaper_ component.
+type LoadShaper_Parameters struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Parameters for the _Flow Regulator_.
+	FlowRegulatorParameters *FlowRegulator_Parameters     `protobuf:"bytes,1,opt,name=flow_regulator_parameters,json=flowRegulatorParameters,proto3" json:"flow_regulator_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
+	Steps                   []*LoadShaper_Parameters_Step `protobuf:"bytes,2,rep,name=steps,proto3" json:"steps,omitempty" validate:"required,gt=0,dive"`                                                                      // @gotags: validate:"required,gt=0,dive"
+}
+
+func (x *LoadShaper_Parameters) Reset() {
+	*x = LoadShaper_Parameters{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[48]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaper_Parameters) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaper_Parameters) ProtoMessage() {}
+
+func (x *LoadShaper_Parameters) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[48]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaper_Parameters.ProtoReflect.Descriptor instead.
+func (*LoadShaper_Parameters) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{20, 0}
+}
+
+func (x *LoadShaper_Parameters) GetFlowRegulatorParameters() *FlowRegulator_Parameters {
+	if x != nil {
+		return x.FlowRegulatorParameters
+	}
+	return nil
+}
+
+func (x *LoadShaper_Parameters) GetSteps() []*LoadShaper_Parameters_Step {
+	if x != nil {
+		return x.Steps
+	}
+	return nil
+}
+
+// Inputs for the _Load Shaper_ component.
+type LoadShaper_Ins struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Whether to progress the _Load Shaper_ towards the next step.
+	Forward *InPort `protobuf:"bytes,1,opt,name=forward,proto3" json:"forward,omitempty"`
+	// Whether to progress the _Load Shaper_ towards the previous step.
+	Backward *InPort `protobuf:"bytes,2,opt,name=backward,proto3" json:"backward,omitempty"`
+	// Whether to reset the _Load Shaper_ to the first step.
+	Reset_ *InPort `protobuf:"bytes,3,opt,name=reset,proto3" json:"reset,omitempty"`
+}
+
+func (x *LoadShaper_Ins) Reset() {
+	*x = LoadShaper_Ins{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[49]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaper_Ins) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaper_Ins) ProtoMessage() {}
+
+func (x *LoadShaper_Ins) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[49]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaper_Ins.ProtoReflect.Descriptor instead.
+func (*LoadShaper_Ins) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{20, 1}
+}
+
+func (x *LoadShaper_Ins) GetForward() *InPort {
+	if x != nil {
+		return x.Forward
+	}
+	return nil
+}
+
+func (x *LoadShaper_Ins) GetBackward() *InPort {
+	if x != nil {
+		return x.Backward
+	}
+	return nil
+}
+
+func (x *LoadShaper_Ins) GetReset_() *InPort {
+	if x != nil {
+		return x.Reset_
+	}
+	return nil
+}
+
+// Outputs for the _Load Shaper_ component.
+type LoadShaper_Outs struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The percentage of flows being accepted by the _Load Shaper_.
+	AcceptPercentage *OutPort `protobuf:"bytes,1,opt,name=accept_percentage,json=acceptPercentage,proto3" json:"accept_percentage,omitempty"`
+	// A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
+	AtStart *OutPort `protobuf:"bytes,2,opt,name=at_start,json=atStart,proto3" json:"at_start,omitempty"`
+	// A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+	AtEnd *OutPort `protobuf:"bytes,3,opt,name=at_end,json=atEnd,proto3" json:"at_end,omitempty"`
+}
+
+func (x *LoadShaper_Outs) Reset() {
+	*x = LoadShaper_Outs{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[50]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaper_Outs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaper_Outs) ProtoMessage() {}
+
+func (x *LoadShaper_Outs) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[50]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaper_Outs.ProtoReflect.Descriptor instead.
+func (*LoadShaper_Outs) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{20, 2}
+}
+
+func (x *LoadShaper_Outs) GetAcceptPercentage() *OutPort {
+	if x != nil {
+		return x.AcceptPercentage
+	}
+	return nil
+}
+
+func (x *LoadShaper_Outs) GetAtStart() *OutPort {
+	if x != nil {
+		return x.AtStart
+	}
+	return nil
+}
+
+func (x *LoadShaper_Outs) GetAtEnd() *OutPort {
+	if x != nil {
+		return x.AtEnd
+	}
+	return nil
+}
+
+type LoadShaper_Parameters_Step struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The value of the step.
+	TargetAcceptPercentage float64 `protobuf:"fixed64,1,opt,name=target_accept_percentage,json=targetAcceptPercentage,proto3" json:"target_accept_percentage,omitempty" validate:"gte=0,lte=100"` // @gotags: validate:"gte=0,lte=100"
+	// Duration for which the step is active.
+	Duration *durationpb.Duration `protobuf:"bytes,2,opt,name=duration,proto3" json:"duration,omitempty" validate:"required"` // @gotags: validate:"required"
+}
+
+func (x *LoadShaper_Parameters_Step) Reset() {
+	*x = LoadShaper_Parameters_Step{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[51]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaper_Parameters_Step) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaper_Parameters_Step) ProtoMessage() {}
+
+func (x *LoadShaper_Parameters_Step) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[51]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaper_Parameters_Step.ProtoReflect.Descriptor instead.
+func (*LoadShaper_Parameters_Step) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{20, 0, 0}
+}
+
+func (x *LoadShaper_Parameters_Step) GetTargetAcceptPercentage() float64 {
+	if x != nil {
+		return x.TargetAcceptPercentage
+	}
+	return 0
+}
+
+func (x *LoadShaper_Parameters_Step) GetDuration() *durationpb.Duration {
+	if x != nil {
+		return x.Duration
+	}
+	return nil
+}
+
+type LoadShaperSeries_LoadShaperInstance struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The load shaper.
+	LoadShaper *LoadShaper_Parameters `protobuf:"bytes,1,opt,name=load_shaper,json=loadShaper,proto3" json:"load_shaper,omitempty" validate:"required"` // @gotags: validate:"required"
+	OutPorts   *LoadShaper_Outs       `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
+}
+
+func (x *LoadShaperSeries_LoadShaperInstance) Reset() {
+	*x = LoadShaperSeries_LoadShaperInstance{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[52]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaperSeries_LoadShaperInstance) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaperSeries_LoadShaperInstance) ProtoMessage() {}
+
+func (x *LoadShaperSeries_LoadShaperInstance) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[52]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaperSeries_LoadShaperInstance.ProtoReflect.Descriptor instead.
+func (*LoadShaperSeries_LoadShaperInstance) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{21, 0}
+}
+
+func (x *LoadShaperSeries_LoadShaperInstance) GetLoadShaper() *LoadShaper_Parameters {
+	if x != nil {
+		return x.LoadShaper
+	}
+	return nil
+}
+
+func (x *LoadShaperSeries_LoadShaperInstance) GetOutPorts() *LoadShaper_Outs {
+	if x != nil {
+		return x.OutPorts
+	}
+	return nil
+}
+
+// Parameters for the _LoadShaperSeries_ component.
+type LoadShaperSeries_Parameters struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// An ordered list of load shapers that get applied in order.
+	LoadShapers []*LoadShaperSeries_LoadShaperInstance `protobuf:"bytes,1,rep,name=load_shapers,json=loadShapers,proto3" json:"load_shapers,omitempty" validate:"required,dive"` // @gotags: validate:"required,dive"
+}
+
+func (x *LoadShaperSeries_Parameters) Reset() {
+	*x = LoadShaperSeries_Parameters{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[53]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaperSeries_Parameters) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaperSeries_Parameters) ProtoMessage() {}
+
+func (x *LoadShaperSeries_Parameters) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[53]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaperSeries_Parameters.ProtoReflect.Descriptor instead.
+func (*LoadShaperSeries_Parameters) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{21, 1}
+}
+
+func (x *LoadShaperSeries_Parameters) GetLoadShapers() []*LoadShaperSeries_LoadShaperInstance {
+	if x != nil {
+		return x.LoadShapers
+	}
+	return nil
+}
+
+// Inputs for the _LoadShaperSeries_ component.
+type LoadShaperSeries_Ins struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Whether to progress the load shaper series towards the next step.
+	Forward *InPort `protobuf:"bytes,1,opt,name=forward,proto3" json:"forward,omitempty"`
+	// Whether to progress the load shaper series towards the previous step.
+	Backward *InPort `protobuf:"bytes,2,opt,name=backward,proto3" json:"backward,omitempty"`
+	// Whether to reset the load shaper series to the first step.
+	Reset_ *InPort `protobuf:"bytes,3,opt,name=reset,proto3" json:"reset,omitempty"`
+}
+
+func (x *LoadShaperSeries_Ins) Reset() {
+	*x = LoadShaperSeries_Ins{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[54]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoadShaperSeries_Ins) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadShaperSeries_Ins) ProtoMessage() {}
+
+func (x *LoadShaperSeries_Ins) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[54]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadShaperSeries_Ins.ProtoReflect.Descriptor instead.
+func (*LoadShaperSeries_Ins) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP(), []int{21, 2}
+}
+
+func (x *LoadShaperSeries_Ins) GetForward() *InPort {
+	if x != nil {
+		return x.Forward
+	}
+	return nil
+}
+
+func (x *LoadShaperSeries_Ins) GetBackward() *InPort {
+	if x != nil {
+		return x.Backward
+	}
+	return nil
+}
+
+func (x *LoadShaperSeries_Ins) GetReset_() *InPort {
+	if x != nil {
+		return x.Reset_
 	}
 	return nil
 }
@@ -3301,7 +4155,7 @@ var file_aperture_policy_language_v1_flowcontrol_proto_rawDesc = []byte{
 	0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22,
-	0xc7, 0x02, 0x0a, 0x0b, 0x46, 0x6c, 0x6f, 0x77, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x12,
+	0xc7, 0x04, 0x0a, 0x0b, 0x46, 0x6c, 0x6f, 0x77, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x12,
 	0x4d, 0x0a, 0x0c, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x65, 0x72, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x28, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
 	0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
@@ -3320,7 +4174,23 @@ var file_aperture_policy_language_v1_flowcontrol_proto_rawDesc = []byte{
 	0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x49, 0x4d, 0x44, 0x43, 0x6f, 0x6e, 0x63, 0x75, 0x72,
 	0x72, 0x65, 0x6e, 0x63, 0x79, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x48,
 	0x00, 0x52, 0x19, 0x61, 0x69, 0x6d, 0x64, 0x43, 0x6f, 0x6e, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e,
-	0x63, 0x79, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x42, 0x0b, 0x0a, 0x09,
+	0x63, 0x79, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x12, 0x53, 0x0a, 0x0e,
+	0x66, 0x6c, 0x6f, 0x77, 0x5f, 0x72, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x76, 0x31, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72,
+	0x48, 0x00, 0x52, 0x0d, 0x66, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f,
+	0x72, 0x12, 0x4a, 0x0a, 0x0b, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x70, 0x65, 0x72,
+	0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
+	0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
+	0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x48,
+	0x00, 0x52, 0x0a, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x12, 0x5d, 0x0a,
+	0x12, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x70, 0x65, 0x72, 0x5f, 0x73, 0x65, 0x72,
+	0x69, 0x65, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2d, 0x2e, 0x61, 0x70, 0x65, 0x72,
+	0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67,
+	0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70,
+	0x65, 0x72, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x48, 0x00, 0x52, 0x10, 0x6c, 0x6f, 0x61, 0x64,
+	0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x42, 0x0b, 0x0a, 0x09,
 	0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x22, 0x9c, 0x07, 0x0a, 0x0b, 0x52, 0x61,
 	0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x65, 0x72, 0x12, 0x47, 0x0a, 0x08, 0x69, 0x6e, 0x5f,
 	0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x61, 0x70,
@@ -3571,26 +4441,177 @@ var file_aperture_policy_language_v1_flowcontrol_proto_rawDesc = []byte{
 	0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61,
 	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x75, 0x74, 0x50, 0x6f, 0x72,
 	0x74, 0x52, 0x13, 0x69, 0x6e, 0x63, 0x6f, 0x6d, 0x69, 0x6e, 0x67, 0x43, 0x6f, 0x6e, 0x63, 0x75,
-	0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x42, 0xad, 0x02, 0x0a, 0x33, 0x63, 0x6f, 0x6d, 0x2e, 0x66,
-	0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2e, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74,
-	0x65, 0x64, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
-	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x42, 0x10,
-	0x46, 0x6c, 0x6f, 0x77, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x50, 0x01, 0x5a, 0x55, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66,
-	0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
-	0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
-	0x67, 0x6f, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x70, 0x6f, 0x6c, 0x69,
-	0x63, 0x79, 0x2f, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2f, 0x76, 0x31, 0x3b, 0x6c,
-	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x4c, 0xaa,
-	0x02, 0x1b, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63,
-	0x79, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1b,
-	0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5c,
-	0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x27, 0x41, 0x70,
+	0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x22, 0xd5, 0x04, 0x0a, 0x0d, 0x46, 0x6c, 0x6f, 0x77, 0x52,
+	0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x49, 0x0a, 0x08, 0x69, 0x6e, 0x5f, 0x70,
+	0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x61, 0x70, 0x65,
+	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67,
+	0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x2e, 0x49, 0x6e, 0x73, 0x52, 0x07, 0x69, 0x6e, 0x50, 0x6f,
+	0x72, 0x74, 0x73, 0x12, 0x55, 0x0a, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72,
+	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x35, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75,
+	0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61,
+	0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61,
+	0x74, 0x6f, 0x72, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x52, 0x0a,
+	0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x2c, 0x0a, 0x12, 0x64, 0x79,
+	0x6e, 0x61, 0x6d, 0x69, 0x63, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x6b, 0x65, 0x79,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x64, 0x79, 0x6e, 0x61, 0x6d, 0x69, 0x63, 0x43,
+	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x4b, 0x65, 0x79, 0x12, 0x5f, 0x0a, 0x0e, 0x64, 0x65, 0x66, 0x61,
+	0x75, 0x6c, 0x74, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x38, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
+	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x46,
+	0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x2e, 0x44, 0x79, 0x6e,
+	0x61, 0x6d, 0x69, 0x63, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x0d, 0x64, 0x65, 0x66, 0x61,
+	0x75, 0x6c, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x1a, 0x3f, 0x0a, 0x0d, 0x44, 0x79, 0x6e,
+	0x61, 0x6d, 0x69, 0x63, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x2e, 0x0a, 0x13, 0x65, 0x6e,
+	0x61, 0x62, 0x6c, 0x65, 0x5f, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x11, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x4c,
+	0x61, 0x62, 0x65, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x1a, 0x79, 0x0a, 0x0a, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x4e, 0x0a, 0x0d, 0x66, 0x6c, 0x6f, 0x77,
+	0x5f, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x29, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63,
+	0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6c,
+	0x6f, 0x77, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x0c, 0x66, 0x6c, 0x6f, 0x77,
+	0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x1b, 0x0a, 0x09, 0x6c, 0x61, 0x62, 0x65,
+	0x6c, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6c, 0x61, 0x62,
+	0x65, 0x6c, 0x4b, 0x65, 0x79, 0x1a, 0x57, 0x0a, 0x03, 0x49, 0x6e, 0x73, 0x12, 0x50, 0x0a, 0x11,
+	0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x5f, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x61, 0x67,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75,
+	0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61,
+	0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x10, 0x61, 0x63,
+	0x63, 0x65, 0x70, 0x74, 0x50, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x61, 0x67, 0x65, 0x22, 0xe9,
+	0x08, 0x0a, 0x0a, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x12, 0x46, 0x0a,
+	0x08, 0x69, 0x6e, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x2b, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63,
+	0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f,
+	0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x2e, 0x49, 0x6e, 0x73, 0x52, 0x07, 0x69, 0x6e,
+	0x50, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x49, 0x0a, 0x09, 0x6f, 0x75, 0x74, 0x5f, 0x70, 0x6f, 0x72,
+	0x74, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74,
+	0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75,
+	0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65,
+	0x72, 0x2e, 0x4f, 0x75, 0x74, 0x73, 0x52, 0x08, 0x6f, 0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x73,
+	0x12, 0x52, 0x0a, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x32, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x2e, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x52, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65,
+	0x74, 0x65, 0x72, 0x73, 0x12, 0x2c, 0x0a, 0x12, 0x64, 0x79, 0x6e, 0x61, 0x6d, 0x69, 0x63, 0x5f,
+	0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x10, 0x64, 0x79, 0x6e, 0x61, 0x6d, 0x69, 0x63, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x4b,
+	0x65, 0x79, 0x12, 0x5f, 0x0a, 0x0e, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x63, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x38, 0x2e, 0x61, 0x70, 0x65,
+	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67,
+	0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x2e, 0x44, 0x79, 0x6e, 0x61, 0x6d, 0x69, 0x63, 0x43, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x52, 0x0d, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x1a, 0xc7, 0x02, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65,
+	0x72, 0x73, 0x12, 0x71, 0x0a, 0x19, 0x66, 0x6c, 0x6f, 0x77, 0x5f, 0x72, 0x65, 0x67, 0x75, 0x6c,
+	0x61, 0x74, 0x6f, 0x72, 0x5f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x35, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
+	0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
+	0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f,
+	0x72, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x52, 0x17, 0x66, 0x6c,
+	0x6f, 0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x50, 0x61, 0x72, 0x61, 0x6d,
+	0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x4d, 0x0a, 0x05, 0x73, 0x74, 0x65, 0x70, 0x73, 0x18, 0x02,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x37, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x2e, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x53, 0x74, 0x65, 0x70, 0x52, 0x05, 0x73,
+	0x74, 0x65, 0x70, 0x73, 0x1a, 0x77, 0x0a, 0x04, 0x53, 0x74, 0x65, 0x70, 0x12, 0x38, 0x0a, 0x18,
+	0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x5f, 0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x5f, 0x70, 0x65,
+	0x72, 0x63, 0x65, 0x6e, 0x74, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52, 0x16,
+	0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x50, 0x65, 0x72, 0x63,
+	0x65, 0x6e, 0x74, 0x61, 0x67, 0x65, 0x12, 0x35, 0x0a, 0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x52, 0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x1a, 0xc0, 0x01,
+	0x0a, 0x03, 0x49, 0x6e, 0x73, 0x12, 0x3d, 0x0a, 0x07, 0x66, 0x6f, 0x72, 0x77, 0x61, 0x72, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
+	0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
+	0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x07, 0x66, 0x6f, 0x72,
+	0x77, 0x61, 0x72, 0x64, 0x12, 0x3f, 0x0a, 0x08, 0x62, 0x61, 0x63, 0x6b, 0x77, 0x61, 0x72, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
+	0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
+	0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x08, 0x62, 0x61, 0x63,
+	0x6b, 0x77, 0x61, 0x72, 0x64, 0x12, 0x39, 0x0a, 0x05, 0x72, 0x65, 0x73, 0x65, 0x74, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x05, 0x72, 0x65, 0x73, 0x65, 0x74,
+	0x1a, 0xd7, 0x01, 0x0a, 0x04, 0x4f, 0x75, 0x74, 0x73, 0x12, 0x51, 0x0a, 0x11, 0x61, 0x63, 0x63,
+	0x65, 0x70, 0x74, 0x5f, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x61, 0x67, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x76, 0x31, 0x2e, 0x4f, 0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x10, 0x61, 0x63, 0x63, 0x65,
+	0x70, 0x74, 0x50, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x61, 0x67, 0x65, 0x12, 0x3f, 0x0a, 0x08,
+	0x61, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x72, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24,
+	0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
+	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x75, 0x74,
+	0x50, 0x6f, 0x72, 0x74, 0x52, 0x07, 0x61, 0x74, 0x53, 0x74, 0x61, 0x72, 0x74, 0x12, 0x3b, 0x0a,
+	0x06, 0x61, 0x74, 0x5f, 0x65, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e,
+	0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e,
+	0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x75, 0x74, 0x50,
+	0x6f, 0x72, 0x74, 0x52, 0x05, 0x61, 0x74, 0x45, 0x6e, 0x64, 0x22, 0xa7, 0x05, 0x0a, 0x10, 0x4c,
+	0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x12,
+	0x4c, 0x0a, 0x08, 0x69, 0x6e, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x31, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c,
+	0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e,
+	0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73,
+	0x2e, 0x49, 0x6e, 0x73, 0x52, 0x07, 0x69, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x58, 0x0a,
+	0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x38, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c,
+	0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e,
+	0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73,
+	0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x52, 0x0a, 0x70, 0x61, 0x72,
+	0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x1a, 0xb4, 0x01, 0x0a, 0x12, 0x4c, 0x6f, 0x61, 0x64,
+	0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x12, 0x53,
+	0x0a, 0x0b, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x32, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70,
+	0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76,
+	0x31, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x2e, 0x50, 0x61, 0x72,
+	0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x52, 0x0a, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61,
+	0x70, 0x65, 0x72, 0x12, 0x49, 0x0a, 0x09, 0x6f, 0x75, 0x74, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
+	0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
+	0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x2e,
+	0x4f, 0x75, 0x74, 0x73, 0x52, 0x08, 0x6f, 0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x1a, 0x71,
+	0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x63, 0x0a, 0x0c,
+	0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x70, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x40, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f,
+	0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31,
+	0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x53, 0x65, 0x72, 0x69, 0x65,
+	0x73, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72, 0x49, 0x6e, 0x73, 0x74,
+	0x61, 0x6e, 0x63, 0x65, 0x52, 0x0b, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x70, 0x65, 0x72,
+	0x73, 0x1a, 0xc0, 0x01, 0x0a, 0x03, 0x49, 0x6e, 0x73, 0x12, 0x3d, 0x0a, 0x07, 0x66, 0x6f, 0x72,
+	0x77, 0x61, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65,
+	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52,
+	0x07, 0x66, 0x6f, 0x72, 0x77, 0x61, 0x72, 0x64, 0x12, 0x3f, 0x0a, 0x08, 0x62, 0x61, 0x63, 0x6b,
+	0x77, 0x61, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65,
+	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52,
+	0x08, 0x62, 0x61, 0x63, 0x6b, 0x77, 0x61, 0x72, 0x64, 0x12, 0x39, 0x0a, 0x05, 0x72, 0x65, 0x73,
+	0x65, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74,
+	0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75,
+	0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x05, 0x72,
+	0x65, 0x73, 0x65, 0x74, 0x42, 0xad, 0x02, 0x0a, 0x33, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x75,
+	0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2e, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x64,
+	0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
+	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x42, 0x10, 0x46, 0x6c,
+	0x6f, 0x77, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
+	0x5a, 0x55, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x75,
+	0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f,
+	0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
+	0x2f, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2f, 0x76, 0x31, 0x3b, 0x6c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x4c, 0xaa, 0x02, 0x1b,
+	0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e,
+	0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1b, 0x41, 0x70,
 	0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c, 0x61,
-	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74,
-	0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1e, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
-	0x3a, 0x3a, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x3a, 0x3a, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61,
-	0x67, 0x65, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x27, 0x41, 0x70, 0x65, 0x72,
+	0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e, 0x67,
+	0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0xea, 0x02, 0x1e, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x3a, 0x3a,
+	0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x3a, 0x3a, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
+	0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3605,7 +4626,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_rawDescGZIP() []byte {
 	return file_aperture_policy_language_v1_flowcontrol_proto_rawDescData
 }
 
-var file_aperture_policy_language_v1_flowcontrol_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
+var file_aperture_policy_language_v1_flowcontrol_proto_msgTypes = make([]protoimpl.MessageInfo, 55)
 var file_aperture_policy_language_v1_flowcontrol_proto_goTypes = []interface{}{
 	(*FlowSelector)(nil),                      // 0: aperture.policy.language.v1.FlowSelector
 	(*ServiceSelector)(nil),                   // 1: aperture.policy.language.v1.ServiceSelector
@@ -3626,106 +4647,148 @@ var file_aperture_policy_language_v1_flowcontrol_proto_goTypes = []interface{}{
 	(*Scheduler)(nil),                         // 16: aperture.policy.language.v1.Scheduler
 	(*LoadActuator)(nil),                      // 17: aperture.policy.language.v1.LoadActuator
 	(*AIMDConcurrencyController)(nil),         // 18: aperture.policy.language.v1.AIMDConcurrencyController
-	nil,                                       // 19: aperture.policy.language.v1.FlowControlResources.FluxMetersEntry
-	(*FluxMeter_StaticBuckets)(nil),           // 20: aperture.policy.language.v1.FluxMeter.StaticBuckets
-	(*FluxMeter_LinearBuckets)(nil),           // 21: aperture.policy.language.v1.FluxMeter.LinearBuckets
-	(*FluxMeter_ExponentialBuckets)(nil),      // 22: aperture.policy.language.v1.FluxMeter.ExponentialBuckets
-	(*FluxMeter_ExponentialBucketsRange)(nil), // 23: aperture.policy.language.v1.FluxMeter.ExponentialBucketsRange
-	nil,                                     // 24: aperture.policy.language.v1.Classifier.RulesEntry
-	(*Rule_Rego)(nil),                       // 25: aperture.policy.language.v1.Rule.Rego
-	(*Rego_LabelProperties)(nil),            // 26: aperture.policy.language.v1.Rego.LabelProperties
-	nil,                                     // 27: aperture.policy.language.v1.Rego.LabelsEntry
-	nil,                                     // 28: aperture.policy.language.v1.PathTemplateMatcher.TemplateValuesEntry
-	(*RateLimiter_Parameters)(nil),          // 29: aperture.policy.language.v1.RateLimiter.Parameters
-	(*RateLimiter_Override)(nil),            // 30: aperture.policy.language.v1.RateLimiter.Override
-	(*RateLimiter_DynamicConfig)(nil),       // 31: aperture.policy.language.v1.RateLimiter.DynamicConfig
-	(*RateLimiter_Ins)(nil),                 // 32: aperture.policy.language.v1.RateLimiter.Ins
-	(*RateLimiter_Parameters_LazySync)(nil), // 33: aperture.policy.language.v1.RateLimiter.Parameters.LazySync
-	(*Scheduler_Workload)(nil),              // 34: aperture.policy.language.v1.Scheduler.Workload
-	(*Scheduler_Parameters)(nil),            // 35: aperture.policy.language.v1.Scheduler.Parameters
-	(*Scheduler_Outs)(nil),                  // 36: aperture.policy.language.v1.Scheduler.Outs
-	(*Scheduler_Workload_Parameters)(nil),   // 37: aperture.policy.language.v1.Scheduler.Workload.Parameters
-	(*LoadActuator_DynamicConfig)(nil),      // 38: aperture.policy.language.v1.LoadActuator.DynamicConfig
-	(*LoadActuator_Ins)(nil),                // 39: aperture.policy.language.v1.LoadActuator.Ins
-	(*AIMDConcurrencyController_Ins)(nil),   // 40: aperture.policy.language.v1.AIMDConcurrencyController.Ins
-	(*AIMDConcurrencyController_Outs)(nil),  // 41: aperture.policy.language.v1.AIMDConcurrencyController.Outs
-	(*LabelMatcher)(nil),                    // 42: aperture.policy.language.v1.LabelMatcher
-	(*GradientController_Parameters)(nil),   // 43: aperture.policy.language.v1.GradientController.Parameters
-	(*Alerter_Parameters)(nil),              // 44: aperture.policy.language.v1.Alerter.Parameters
-	(*durationpb.Duration)(nil),             // 45: google.protobuf.Duration
-	(*InPort)(nil),                          // 46: aperture.policy.language.v1.InPort
-	(*OutPort)(nil),                         // 47: aperture.policy.language.v1.OutPort
+	(*FlowRegulator)(nil),                     // 19: aperture.policy.language.v1.FlowRegulator
+	(*LoadShaper)(nil),                        // 20: aperture.policy.language.v1.LoadShaper
+	(*LoadShaperSeries)(nil),                  // 21: aperture.policy.language.v1.LoadShaperSeries
+	nil,                                       // 22: aperture.policy.language.v1.FlowControlResources.FluxMetersEntry
+	(*FluxMeter_StaticBuckets)(nil),           // 23: aperture.policy.language.v1.FluxMeter.StaticBuckets
+	(*FluxMeter_LinearBuckets)(nil),           // 24: aperture.policy.language.v1.FluxMeter.LinearBuckets
+	(*FluxMeter_ExponentialBuckets)(nil),      // 25: aperture.policy.language.v1.FluxMeter.ExponentialBuckets
+	(*FluxMeter_ExponentialBucketsRange)(nil), // 26: aperture.policy.language.v1.FluxMeter.ExponentialBucketsRange
+	nil,                                         // 27: aperture.policy.language.v1.Classifier.RulesEntry
+	(*Rule_Rego)(nil),                           // 28: aperture.policy.language.v1.Rule.Rego
+	(*Rego_LabelProperties)(nil),                // 29: aperture.policy.language.v1.Rego.LabelProperties
+	nil,                                         // 30: aperture.policy.language.v1.Rego.LabelsEntry
+	nil,                                         // 31: aperture.policy.language.v1.PathTemplateMatcher.TemplateValuesEntry
+	(*RateLimiter_Parameters)(nil),              // 32: aperture.policy.language.v1.RateLimiter.Parameters
+	(*RateLimiter_Override)(nil),                // 33: aperture.policy.language.v1.RateLimiter.Override
+	(*RateLimiter_DynamicConfig)(nil),           // 34: aperture.policy.language.v1.RateLimiter.DynamicConfig
+	(*RateLimiter_Ins)(nil),                     // 35: aperture.policy.language.v1.RateLimiter.Ins
+	(*RateLimiter_Parameters_LazySync)(nil),     // 36: aperture.policy.language.v1.RateLimiter.Parameters.LazySync
+	(*Scheduler_Workload)(nil),                  // 37: aperture.policy.language.v1.Scheduler.Workload
+	(*Scheduler_Parameters)(nil),                // 38: aperture.policy.language.v1.Scheduler.Parameters
+	(*Scheduler_Outs)(nil),                      // 39: aperture.policy.language.v1.Scheduler.Outs
+	(*Scheduler_Workload_Parameters)(nil),       // 40: aperture.policy.language.v1.Scheduler.Workload.Parameters
+	(*LoadActuator_DynamicConfig)(nil),          // 41: aperture.policy.language.v1.LoadActuator.DynamicConfig
+	(*LoadActuator_Ins)(nil),                    // 42: aperture.policy.language.v1.LoadActuator.Ins
+	(*AIMDConcurrencyController_Ins)(nil),       // 43: aperture.policy.language.v1.AIMDConcurrencyController.Ins
+	(*AIMDConcurrencyController_Outs)(nil),      // 44: aperture.policy.language.v1.AIMDConcurrencyController.Outs
+	(*FlowRegulator_DynamicConfig)(nil),         // 45: aperture.policy.language.v1.FlowRegulator.DynamicConfig
+	(*FlowRegulator_Parameters)(nil),            // 46: aperture.policy.language.v1.FlowRegulator.Parameters
+	(*FlowRegulator_Ins)(nil),                   // 47: aperture.policy.language.v1.FlowRegulator.Ins
+	(*LoadShaper_Parameters)(nil),               // 48: aperture.policy.language.v1.LoadShaper.Parameters
+	(*LoadShaper_Ins)(nil),                      // 49: aperture.policy.language.v1.LoadShaper.Ins
+	(*LoadShaper_Outs)(nil),                     // 50: aperture.policy.language.v1.LoadShaper.Outs
+	(*LoadShaper_Parameters_Step)(nil),          // 51: aperture.policy.language.v1.LoadShaper.Parameters.Step
+	(*LoadShaperSeries_LoadShaperInstance)(nil), // 52: aperture.policy.language.v1.LoadShaperSeries.LoadShaperInstance
+	(*LoadShaperSeries_Parameters)(nil),         // 53: aperture.policy.language.v1.LoadShaperSeries.Parameters
+	(*LoadShaperSeries_Ins)(nil),                // 54: aperture.policy.language.v1.LoadShaperSeries.Ins
+	(*LabelMatcher)(nil),                        // 55: aperture.policy.language.v1.LabelMatcher
+	(*GradientController_Parameters)(nil),       // 56: aperture.policy.language.v1.GradientController.Parameters
+	(*Alerter_Parameters)(nil),                  // 57: aperture.policy.language.v1.Alerter.Parameters
+	(*durationpb.Duration)(nil),                 // 58: google.protobuf.Duration
+	(*InPort)(nil),                              // 59: aperture.policy.language.v1.InPort
+	(*OutPort)(nil),                             // 60: aperture.policy.language.v1.OutPort
 }
 var file_aperture_policy_language_v1_flowcontrol_proto_depIdxs = []int32{
 	1,  // 0: aperture.policy.language.v1.FlowSelector.service_selector:type_name -> aperture.policy.language.v1.ServiceSelector
 	2,  // 1: aperture.policy.language.v1.FlowSelector.flow_matcher:type_name -> aperture.policy.language.v1.FlowMatcher
-	42, // 2: aperture.policy.language.v1.FlowMatcher.label_matcher:type_name -> aperture.policy.language.v1.LabelMatcher
-	19, // 3: aperture.policy.language.v1.FlowControlResources.flux_meters:type_name -> aperture.policy.language.v1.FlowControlResources.FluxMetersEntry
+	55, // 2: aperture.policy.language.v1.FlowMatcher.label_matcher:type_name -> aperture.policy.language.v1.LabelMatcher
+	22, // 3: aperture.policy.language.v1.FlowControlResources.flux_meters:type_name -> aperture.policy.language.v1.FlowControlResources.FluxMetersEntry
 	5,  // 4: aperture.policy.language.v1.FlowControlResources.classifiers:type_name -> aperture.policy.language.v1.Classifier
 	0,  // 5: aperture.policy.language.v1.FluxMeter.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
-	20, // 6: aperture.policy.language.v1.FluxMeter.static_buckets:type_name -> aperture.policy.language.v1.FluxMeter.StaticBuckets
-	21, // 7: aperture.policy.language.v1.FluxMeter.linear_buckets:type_name -> aperture.policy.language.v1.FluxMeter.LinearBuckets
-	22, // 8: aperture.policy.language.v1.FluxMeter.exponential_buckets:type_name -> aperture.policy.language.v1.FluxMeter.ExponentialBuckets
-	23, // 9: aperture.policy.language.v1.FluxMeter.exponential_buckets_range:type_name -> aperture.policy.language.v1.FluxMeter.ExponentialBucketsRange
+	23, // 6: aperture.policy.language.v1.FluxMeter.static_buckets:type_name -> aperture.policy.language.v1.FluxMeter.StaticBuckets
+	24, // 7: aperture.policy.language.v1.FluxMeter.linear_buckets:type_name -> aperture.policy.language.v1.FluxMeter.LinearBuckets
+	25, // 8: aperture.policy.language.v1.FluxMeter.exponential_buckets:type_name -> aperture.policy.language.v1.FluxMeter.ExponentialBuckets
+	26, // 9: aperture.policy.language.v1.FluxMeter.exponential_buckets_range:type_name -> aperture.policy.language.v1.FluxMeter.ExponentialBucketsRange
 	0,  // 10: aperture.policy.language.v1.Classifier.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
-	24, // 11: aperture.policy.language.v1.Classifier.rules:type_name -> aperture.policy.language.v1.Classifier.RulesEntry
+	27, // 11: aperture.policy.language.v1.Classifier.rules:type_name -> aperture.policy.language.v1.Classifier.RulesEntry
 	7,  // 12: aperture.policy.language.v1.Classifier.rego:type_name -> aperture.policy.language.v1.Rego
 	8,  // 13: aperture.policy.language.v1.Rule.extractor:type_name -> aperture.policy.language.v1.Extractor
-	25, // 14: aperture.policy.language.v1.Rule.rego:type_name -> aperture.policy.language.v1.Rule.Rego
-	27, // 15: aperture.policy.language.v1.Rego.labels:type_name -> aperture.policy.language.v1.Rego.LabelsEntry
+	28, // 14: aperture.policy.language.v1.Rule.rego:type_name -> aperture.policy.language.v1.Rule.Rego
+	30, // 15: aperture.policy.language.v1.Rego.labels:type_name -> aperture.policy.language.v1.Rego.LabelsEntry
 	9,  // 16: aperture.policy.language.v1.Extractor.json:type_name -> aperture.policy.language.v1.JSONExtractor
 	10, // 17: aperture.policy.language.v1.Extractor.address:type_name -> aperture.policy.language.v1.AddressExtractor
 	11, // 18: aperture.policy.language.v1.Extractor.jwt:type_name -> aperture.policy.language.v1.JWTExtractor
 	12, // 19: aperture.policy.language.v1.Extractor.path_templates:type_name -> aperture.policy.language.v1.PathTemplateMatcher
-	28, // 20: aperture.policy.language.v1.PathTemplateMatcher.template_values:type_name -> aperture.policy.language.v1.PathTemplateMatcher.TemplateValuesEntry
+	31, // 20: aperture.policy.language.v1.PathTemplateMatcher.template_values:type_name -> aperture.policy.language.v1.PathTemplateMatcher.TemplateValuesEntry
 	14, // 21: aperture.policy.language.v1.FlowControl.rate_limiter:type_name -> aperture.policy.language.v1.RateLimiter
 	15, // 22: aperture.policy.language.v1.FlowControl.concurrency_limiter:type_name -> aperture.policy.language.v1.ConcurrencyLimiter
 	18, // 23: aperture.policy.language.v1.FlowControl.aimd_concurrency_controller:type_name -> aperture.policy.language.v1.AIMDConcurrencyController
-	32, // 24: aperture.policy.language.v1.RateLimiter.in_ports:type_name -> aperture.policy.language.v1.RateLimiter.Ins
-	0,  // 25: aperture.policy.language.v1.RateLimiter.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
-	29, // 26: aperture.policy.language.v1.RateLimiter.parameters:type_name -> aperture.policy.language.v1.RateLimiter.Parameters
-	31, // 27: aperture.policy.language.v1.RateLimiter.default_config:type_name -> aperture.policy.language.v1.RateLimiter.DynamicConfig
-	0,  // 28: aperture.policy.language.v1.ConcurrencyLimiter.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
-	16, // 29: aperture.policy.language.v1.ConcurrencyLimiter.scheduler:type_name -> aperture.policy.language.v1.Scheduler
-	17, // 30: aperture.policy.language.v1.ConcurrencyLimiter.load_actuator:type_name -> aperture.policy.language.v1.LoadActuator
-	36, // 31: aperture.policy.language.v1.Scheduler.out_ports:type_name -> aperture.policy.language.v1.Scheduler.Outs
-	35, // 32: aperture.policy.language.v1.Scheduler.parameters:type_name -> aperture.policy.language.v1.Scheduler.Parameters
-	39, // 33: aperture.policy.language.v1.LoadActuator.in_ports:type_name -> aperture.policy.language.v1.LoadActuator.Ins
-	38, // 34: aperture.policy.language.v1.LoadActuator.default_config:type_name -> aperture.policy.language.v1.LoadActuator.DynamicConfig
-	40, // 35: aperture.policy.language.v1.AIMDConcurrencyController.in_ports:type_name -> aperture.policy.language.v1.AIMDConcurrencyController.Ins
-	41, // 36: aperture.policy.language.v1.AIMDConcurrencyController.out_ports:type_name -> aperture.policy.language.v1.AIMDConcurrencyController.Outs
-	0,  // 37: aperture.policy.language.v1.AIMDConcurrencyController.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
-	35, // 38: aperture.policy.language.v1.AIMDConcurrencyController.scheduler_parameters:type_name -> aperture.policy.language.v1.Scheduler.Parameters
-	43, // 39: aperture.policy.language.v1.AIMDConcurrencyController.gradient_parameters:type_name -> aperture.policy.language.v1.GradientController.Parameters
-	44, // 40: aperture.policy.language.v1.AIMDConcurrencyController.alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
-	38, // 41: aperture.policy.language.v1.AIMDConcurrencyController.default_config:type_name -> aperture.policy.language.v1.LoadActuator.DynamicConfig
-	4,  // 42: aperture.policy.language.v1.FlowControlResources.FluxMetersEntry.value:type_name -> aperture.policy.language.v1.FluxMeter
-	6,  // 43: aperture.policy.language.v1.Classifier.RulesEntry.value:type_name -> aperture.policy.language.v1.Rule
-	26, // 44: aperture.policy.language.v1.Rego.LabelsEntry.value:type_name -> aperture.policy.language.v1.Rego.LabelProperties
-	45, // 45: aperture.policy.language.v1.RateLimiter.Parameters.limit_reset_interval:type_name -> google.protobuf.Duration
-	33, // 46: aperture.policy.language.v1.RateLimiter.Parameters.lazy_sync:type_name -> aperture.policy.language.v1.RateLimiter.Parameters.LazySync
-	30, // 47: aperture.policy.language.v1.RateLimiter.DynamicConfig.overrides:type_name -> aperture.policy.language.v1.RateLimiter.Override
-	46, // 48: aperture.policy.language.v1.RateLimiter.Ins.limit:type_name -> aperture.policy.language.v1.InPort
-	37, // 49: aperture.policy.language.v1.Scheduler.Workload.parameters:type_name -> aperture.policy.language.v1.Scheduler.Workload.Parameters
-	42, // 50: aperture.policy.language.v1.Scheduler.Workload.label_matcher:type_name -> aperture.policy.language.v1.LabelMatcher
-	34, // 51: aperture.policy.language.v1.Scheduler.Parameters.workloads:type_name -> aperture.policy.language.v1.Scheduler.Workload
-	37, // 52: aperture.policy.language.v1.Scheduler.Parameters.default_workload_parameters:type_name -> aperture.policy.language.v1.Scheduler.Workload.Parameters
-	45, // 53: aperture.policy.language.v1.Scheduler.Parameters.max_timeout:type_name -> google.protobuf.Duration
-	47, // 54: aperture.policy.language.v1.Scheduler.Outs.accepted_concurrency:type_name -> aperture.policy.language.v1.OutPort
-	47, // 55: aperture.policy.language.v1.Scheduler.Outs.incoming_concurrency:type_name -> aperture.policy.language.v1.OutPort
-	46, // 56: aperture.policy.language.v1.LoadActuator.Ins.load_multiplier:type_name -> aperture.policy.language.v1.InPort
-	46, // 57: aperture.policy.language.v1.AIMDConcurrencyController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	46, // 58: aperture.policy.language.v1.AIMDConcurrencyController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
-	47, // 59: aperture.policy.language.v1.AIMDConcurrencyController.Outs.is_overload:type_name -> aperture.policy.language.v1.OutPort
-	47, // 60: aperture.policy.language.v1.AIMDConcurrencyController.Outs.desired_load_multiplier:type_name -> aperture.policy.language.v1.OutPort
-	47, // 61: aperture.policy.language.v1.AIMDConcurrencyController.Outs.observed_load_multiplier:type_name -> aperture.policy.language.v1.OutPort
-	47, // 62: aperture.policy.language.v1.AIMDConcurrencyController.Outs.accepted_concurrency:type_name -> aperture.policy.language.v1.OutPort
-	47, // 63: aperture.policy.language.v1.AIMDConcurrencyController.Outs.incoming_concurrency:type_name -> aperture.policy.language.v1.OutPort
-	64, // [64:64] is the sub-list for method output_type
-	64, // [64:64] is the sub-list for method input_type
-	64, // [64:64] is the sub-list for extension type_name
-	64, // [64:64] is the sub-list for extension extendee
-	0,  // [0:64] is the sub-list for field type_name
+	19, // 24: aperture.policy.language.v1.FlowControl.flow_regulator:type_name -> aperture.policy.language.v1.FlowRegulator
+	20, // 25: aperture.policy.language.v1.FlowControl.load_shaper:type_name -> aperture.policy.language.v1.LoadShaper
+	21, // 26: aperture.policy.language.v1.FlowControl.load_shaper_series:type_name -> aperture.policy.language.v1.LoadShaperSeries
+	35, // 27: aperture.policy.language.v1.RateLimiter.in_ports:type_name -> aperture.policy.language.v1.RateLimiter.Ins
+	0,  // 28: aperture.policy.language.v1.RateLimiter.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
+	32, // 29: aperture.policy.language.v1.RateLimiter.parameters:type_name -> aperture.policy.language.v1.RateLimiter.Parameters
+	34, // 30: aperture.policy.language.v1.RateLimiter.default_config:type_name -> aperture.policy.language.v1.RateLimiter.DynamicConfig
+	0,  // 31: aperture.policy.language.v1.ConcurrencyLimiter.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
+	16, // 32: aperture.policy.language.v1.ConcurrencyLimiter.scheduler:type_name -> aperture.policy.language.v1.Scheduler
+	17, // 33: aperture.policy.language.v1.ConcurrencyLimiter.load_actuator:type_name -> aperture.policy.language.v1.LoadActuator
+	39, // 34: aperture.policy.language.v1.Scheduler.out_ports:type_name -> aperture.policy.language.v1.Scheduler.Outs
+	38, // 35: aperture.policy.language.v1.Scheduler.parameters:type_name -> aperture.policy.language.v1.Scheduler.Parameters
+	42, // 36: aperture.policy.language.v1.LoadActuator.in_ports:type_name -> aperture.policy.language.v1.LoadActuator.Ins
+	41, // 37: aperture.policy.language.v1.LoadActuator.default_config:type_name -> aperture.policy.language.v1.LoadActuator.DynamicConfig
+	43, // 38: aperture.policy.language.v1.AIMDConcurrencyController.in_ports:type_name -> aperture.policy.language.v1.AIMDConcurrencyController.Ins
+	44, // 39: aperture.policy.language.v1.AIMDConcurrencyController.out_ports:type_name -> aperture.policy.language.v1.AIMDConcurrencyController.Outs
+	0,  // 40: aperture.policy.language.v1.AIMDConcurrencyController.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
+	38, // 41: aperture.policy.language.v1.AIMDConcurrencyController.scheduler_parameters:type_name -> aperture.policy.language.v1.Scheduler.Parameters
+	56, // 42: aperture.policy.language.v1.AIMDConcurrencyController.gradient_parameters:type_name -> aperture.policy.language.v1.GradientController.Parameters
+	57, // 43: aperture.policy.language.v1.AIMDConcurrencyController.alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
+	41, // 44: aperture.policy.language.v1.AIMDConcurrencyController.default_config:type_name -> aperture.policy.language.v1.LoadActuator.DynamicConfig
+	47, // 45: aperture.policy.language.v1.FlowRegulator.in_ports:type_name -> aperture.policy.language.v1.FlowRegulator.Ins
+	46, // 46: aperture.policy.language.v1.FlowRegulator.parameters:type_name -> aperture.policy.language.v1.FlowRegulator.Parameters
+	45, // 47: aperture.policy.language.v1.FlowRegulator.default_config:type_name -> aperture.policy.language.v1.FlowRegulator.DynamicConfig
+	49, // 48: aperture.policy.language.v1.LoadShaper.in_ports:type_name -> aperture.policy.language.v1.LoadShaper.Ins
+	50, // 49: aperture.policy.language.v1.LoadShaper.out_ports:type_name -> aperture.policy.language.v1.LoadShaper.Outs
+	48, // 50: aperture.policy.language.v1.LoadShaper.parameters:type_name -> aperture.policy.language.v1.LoadShaper.Parameters
+	45, // 51: aperture.policy.language.v1.LoadShaper.default_config:type_name -> aperture.policy.language.v1.FlowRegulator.DynamicConfig
+	54, // 52: aperture.policy.language.v1.LoadShaperSeries.in_ports:type_name -> aperture.policy.language.v1.LoadShaperSeries.Ins
+	53, // 53: aperture.policy.language.v1.LoadShaperSeries.parameters:type_name -> aperture.policy.language.v1.LoadShaperSeries.Parameters
+	4,  // 54: aperture.policy.language.v1.FlowControlResources.FluxMetersEntry.value:type_name -> aperture.policy.language.v1.FluxMeter
+	6,  // 55: aperture.policy.language.v1.Classifier.RulesEntry.value:type_name -> aperture.policy.language.v1.Rule
+	29, // 56: aperture.policy.language.v1.Rego.LabelsEntry.value:type_name -> aperture.policy.language.v1.Rego.LabelProperties
+	58, // 57: aperture.policy.language.v1.RateLimiter.Parameters.limit_reset_interval:type_name -> google.protobuf.Duration
+	36, // 58: aperture.policy.language.v1.RateLimiter.Parameters.lazy_sync:type_name -> aperture.policy.language.v1.RateLimiter.Parameters.LazySync
+	33, // 59: aperture.policy.language.v1.RateLimiter.DynamicConfig.overrides:type_name -> aperture.policy.language.v1.RateLimiter.Override
+	59, // 60: aperture.policy.language.v1.RateLimiter.Ins.limit:type_name -> aperture.policy.language.v1.InPort
+	40, // 61: aperture.policy.language.v1.Scheduler.Workload.parameters:type_name -> aperture.policy.language.v1.Scheduler.Workload.Parameters
+	55, // 62: aperture.policy.language.v1.Scheduler.Workload.label_matcher:type_name -> aperture.policy.language.v1.LabelMatcher
+	37, // 63: aperture.policy.language.v1.Scheduler.Parameters.workloads:type_name -> aperture.policy.language.v1.Scheduler.Workload
+	40, // 64: aperture.policy.language.v1.Scheduler.Parameters.default_workload_parameters:type_name -> aperture.policy.language.v1.Scheduler.Workload.Parameters
+	58, // 65: aperture.policy.language.v1.Scheduler.Parameters.max_timeout:type_name -> google.protobuf.Duration
+	60, // 66: aperture.policy.language.v1.Scheduler.Outs.accepted_concurrency:type_name -> aperture.policy.language.v1.OutPort
+	60, // 67: aperture.policy.language.v1.Scheduler.Outs.incoming_concurrency:type_name -> aperture.policy.language.v1.OutPort
+	59, // 68: aperture.policy.language.v1.LoadActuator.Ins.load_multiplier:type_name -> aperture.policy.language.v1.InPort
+	59, // 69: aperture.policy.language.v1.AIMDConcurrencyController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	59, // 70: aperture.policy.language.v1.AIMDConcurrencyController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
+	60, // 71: aperture.policy.language.v1.AIMDConcurrencyController.Outs.is_overload:type_name -> aperture.policy.language.v1.OutPort
+	60, // 72: aperture.policy.language.v1.AIMDConcurrencyController.Outs.desired_load_multiplier:type_name -> aperture.policy.language.v1.OutPort
+	60, // 73: aperture.policy.language.v1.AIMDConcurrencyController.Outs.observed_load_multiplier:type_name -> aperture.policy.language.v1.OutPort
+	60, // 74: aperture.policy.language.v1.AIMDConcurrencyController.Outs.accepted_concurrency:type_name -> aperture.policy.language.v1.OutPort
+	60, // 75: aperture.policy.language.v1.AIMDConcurrencyController.Outs.incoming_concurrency:type_name -> aperture.policy.language.v1.OutPort
+	0,  // 76: aperture.policy.language.v1.FlowRegulator.Parameters.flow_selector:type_name -> aperture.policy.language.v1.FlowSelector
+	59, // 77: aperture.policy.language.v1.FlowRegulator.Ins.accept_percentage:type_name -> aperture.policy.language.v1.InPort
+	46, // 78: aperture.policy.language.v1.LoadShaper.Parameters.flow_regulator_parameters:type_name -> aperture.policy.language.v1.FlowRegulator.Parameters
+	51, // 79: aperture.policy.language.v1.LoadShaper.Parameters.steps:type_name -> aperture.policy.language.v1.LoadShaper.Parameters.Step
+	59, // 80: aperture.policy.language.v1.LoadShaper.Ins.forward:type_name -> aperture.policy.language.v1.InPort
+	59, // 81: aperture.policy.language.v1.LoadShaper.Ins.backward:type_name -> aperture.policy.language.v1.InPort
+	59, // 82: aperture.policy.language.v1.LoadShaper.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	60, // 83: aperture.policy.language.v1.LoadShaper.Outs.accept_percentage:type_name -> aperture.policy.language.v1.OutPort
+	60, // 84: aperture.policy.language.v1.LoadShaper.Outs.at_start:type_name -> aperture.policy.language.v1.OutPort
+	60, // 85: aperture.policy.language.v1.LoadShaper.Outs.at_end:type_name -> aperture.policy.language.v1.OutPort
+	58, // 86: aperture.policy.language.v1.LoadShaper.Parameters.Step.duration:type_name -> google.protobuf.Duration
+	48, // 87: aperture.policy.language.v1.LoadShaperSeries.LoadShaperInstance.load_shaper:type_name -> aperture.policy.language.v1.LoadShaper.Parameters
+	50, // 88: aperture.policy.language.v1.LoadShaperSeries.LoadShaperInstance.out_ports:type_name -> aperture.policy.language.v1.LoadShaper.Outs
+	52, // 89: aperture.policy.language.v1.LoadShaperSeries.Parameters.load_shapers:type_name -> aperture.policy.language.v1.LoadShaperSeries.LoadShaperInstance
+	59, // 90: aperture.policy.language.v1.LoadShaperSeries.Ins.forward:type_name -> aperture.policy.language.v1.InPort
+	59, // 91: aperture.policy.language.v1.LoadShaperSeries.Ins.backward:type_name -> aperture.policy.language.v1.InPort
+	59, // 92: aperture.policy.language.v1.LoadShaperSeries.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	93, // [93:93] is the sub-list for method output_type
+	93, // [93:93] is the sub-list for method input_type
+	93, // [93:93] is the sub-list for extension type_name
+	93, // [93:93] is the sub-list for extension extendee
+	0,  // [0:93] is the sub-list for field type_name
 }
 
 func init() { file_aperture_policy_language_v1_flowcontrol_proto_init() }
@@ -3965,8 +5028,20 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 				return nil
 			}
 		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FlowRegulator); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FluxMeter_StaticBuckets); i {
+			switch v := v.(*LoadShaper); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3978,19 +5053,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FluxMeter_LinearBuckets); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FluxMeter_ExponentialBuckets); i {
+			switch v := v.(*LoadShaperSeries); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4002,7 +5065,19 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FluxMeter_ExponentialBucketsRange); i {
+			switch v := v.(*FluxMeter_StaticBuckets); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FluxMeter_LinearBuckets); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4014,7 +5089,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Rule_Rego); i {
+			switch v := v.(*FluxMeter_ExponentialBuckets); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4026,7 +5101,19 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Rego_LabelProperties); i {
+			switch v := v.(*FluxMeter_ExponentialBucketsRange); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Rule_Rego); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4038,31 +5125,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RateLimiter_Parameters); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RateLimiter_Override); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RateLimiter_DynamicConfig); i {
+			switch v := v.(*Rego_LabelProperties); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4074,7 +5137,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RateLimiter_Ins); i {
+			switch v := v.(*RateLimiter_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4086,7 +5149,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RateLimiter_Parameters_LazySync); i {
+			switch v := v.(*RateLimiter_Override); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4098,7 +5161,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Scheduler_Workload); i {
+			switch v := v.(*RateLimiter_DynamicConfig); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4110,7 +5173,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Scheduler_Parameters); i {
+			switch v := v.(*RateLimiter_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4122,7 +5185,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Scheduler_Outs); i {
+			switch v := v.(*RateLimiter_Parameters_LazySync); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4134,7 +5197,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Scheduler_Workload_Parameters); i {
+			switch v := v.(*Scheduler_Workload); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4146,7 +5209,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LoadActuator_DynamicConfig); i {
+			switch v := v.(*Scheduler_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4158,7 +5221,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LoadActuator_Ins); i {
+			switch v := v.(*Scheduler_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4170,7 +5233,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AIMDConcurrencyController_Ins); i {
+			switch v := v.(*Scheduler_Workload_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4182,7 +5245,163 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadActuator_DynamicConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadActuator_Ins); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AIMDConcurrencyController_Ins); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AIMDConcurrencyController_Outs); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FlowRegulator_DynamicConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FlowRegulator_Parameters); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FlowRegulator_Ins); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadShaper_Parameters); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadShaper_Ins); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadShaper_Outs); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadShaper_Parameters_Step); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadShaperSeries_LoadShaperInstance); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[53].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadShaperSeries_Parameters); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[54].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoadShaperSeries_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4215,6 +5434,9 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 		(*FlowControl_RateLimiter)(nil),
 		(*FlowControl_ConcurrencyLimiter)(nil),
 		(*FlowControl_AimdConcurrencyController)(nil),
+		(*FlowControl_FlowRegulator)(nil),
+		(*FlowControl_LoadShaper)(nil),
+		(*FlowControl_LoadShaperSeries)(nil),
 	}
 	file_aperture_policy_language_v1_flowcontrol_proto_msgTypes[15].OneofWrappers = []interface{}{
 		(*ConcurrencyLimiter_LoadActuator)(nil),
@@ -4225,7 +5447,7 @@ func file_aperture_policy_language_v1_flowcontrol_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_aperture_policy_language_v1_flowcontrol_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   42,
+			NumMessages:   55,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

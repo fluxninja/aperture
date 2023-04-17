@@ -57,9 +57,9 @@ type ControllerConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Policies PoliciesConfig `json:"policies"`
 
-	// OTEL configuration.
+	// OTel configuration.
 	//+kubebuilder:validation:Optional
-	OTEL controller.ControllerOTELConfig `json:"otel"`
+	OTel controller.ControllerOTelConfig `json:"otel"`
 }
 
 // PoliciesConfig for policy engine.

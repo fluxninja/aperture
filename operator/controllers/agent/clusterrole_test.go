@@ -219,7 +219,7 @@ var _ = Describe("clusterRoleForAgent", func() {
 		})
 	})
 
-	Context("Instance with auto scale and sidecar mode enabled", func() {
+	Context("Instance with auto-scale and sidecar mode enabled", func() {
 		It("returns correct ClusterRole", func() {
 			instance := &agentv1alpha1.Agent{
 				TypeMeta: metav1.TypeMeta{

@@ -104,7 +104,7 @@ const (
 
 	// EnvoyMissingAttributeValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but it
-	// is not available. Eg. In case authz couldn't reach agent, so we know
+	// is not available. Eg. In case authz could not reach agent, so we know
 	// nothing about flowcontrol policies.  Note that this is different case
 	// from "just empty", eg. "", "[]" or "{}".
 	EnvoyMissingAttributeValue = "-"
@@ -130,7 +130,7 @@ const (
 	// InstanceLabel describes agent group to which metrics refer.
 	InstanceLabel = "instance"
 
-	/* Specific to Agent and Controller OTEL collector factories. */
+	/* Specific to Agent and Controller OTel collector factories. */
 
 	// ReceiverOTLP collects logs from libraries and SDKs.
 	ReceiverOTLP = "otlp"

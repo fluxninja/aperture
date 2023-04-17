@@ -81,7 +81,7 @@ func NewZapAdapter(logger *Logger, component string) zapcore.Core {
 	encodercfg.CallerKey = zerolog.CallerFieldName
 	encodercfg.EncodeCaller = zapcore.ShortCallerEncoder
 
-	// duplicate zerolog logger and remove it's context
+	// duplicate zerolog logger and remove it is context
 	childLogger := logger.logger.With().Logger()
 	childLogger.UpdateContext(func(c zerolog.Context) zerolog.Context {
 		// reset context

@@ -147,7 +147,7 @@ func writeJSONFile(name string, d interface{}) error {
 // GetSource returns the source of the dependency.
 func GetSource(dir string) string {
 	source := ""
-	// if it doesn't exist, continue
+	// if it does not exist, continue
 	if _, err := os.Stat(filepath.Join(dir, sourceFilename)); err == nil {
 		sourceBytes, err := os.ReadFile(filepath.Join(dir, sourceFilename))
 		if err == nil {
@@ -160,7 +160,7 @@ func GetSource(dir string) string {
 // GetVersion returns the version of the dependency.
 func GetVersion(dir string) string {
 	version := ""
-	// if it doesn't exist, continue
+	// if it does not exist, continue
 	if _, err := os.Stat(filepath.Join(dir, versionFilename)); err == nil {
 		versionBytes, err := os.ReadFile(filepath.Join(dir, versionFilename))
 		if err == nil {
@@ -173,7 +173,7 @@ func GetVersion(dir string) string {
 // GetRelPath returns the relative path to the dependency.
 func GetRelPath(dir string) string {
 	relPath := ""
-	// if it doesn't exist, continue
+	// if it does not exist, continue
 	if _, err := os.Stat(filepath.Join(dir, relPathFilename)); err == nil {
 		relPathBytes, err := os.ReadFile(filepath.Join(dir, relPathFilename))
 		if err == nil {

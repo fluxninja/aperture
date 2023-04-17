@@ -96,12 +96,13 @@ func setupFluxMeterModule(
 
 // FluxMeter describes single fluxmeter.
 type FluxMeter struct {
-	registry      status.Registry
-	flowSelector  *policylangv1.FlowSelector
-	histMetricVec *prometheus.HistogramVec
-	fluxMeterName string
-	attributeKey  string
-	buckets       []float64
+	registry              status.Registry
+	flowSelector          *policylangv1.FlowSelector
+	histMetricVec         *prometheus.HistogramVec
+	invalidFluxMeterTotal *prometheus.GaugeVec
+	fluxMeterName         string
+	attributeKey          string
+	buckets               []float64
 }
 
 type fluxMeterFactory struct {
@@ -173,21 +174,24 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				Name:        metrics.FluxMeterMetricName,
 				Buckets:     fluxMeter.buckets,
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
-			}, []string{
-				metrics.DecisionTypeLabel,
-				metrics.StatusCodeLabel,
-				metrics.FlowStatusLabel,
-				metrics.ValidLabel,
-			})
+			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})
+			fluxMeter.invalidFluxMeterTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+				Name:        metrics.InvalidFluxMeterTotal,
+				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
+				Help:        "The number of invalid readings from a Flux Meter",
+			}, nil)
 			// Register metric with Prometheus
-			err := prometheusRegistry.Register(fluxMeter.histMetricVec)
-			if err != nil {
-				logger.Error().Err(err).Msgf("Failed to register metric %+v with Prometheus registry", fluxMeter.histMetricVec)
-				return err
+			fmMetrics := []prometheus.Collector{fluxMeter.histMetricVec, fluxMeter.invalidFluxMeterTotal}
+			for _, metric := range fmMetrics {
+				err := prometheusRegistry.Register(metric)
+				if err != nil {
+					logger.Error().Err(err).Msgf("Failed to register metric %+v with Prometheus registry", metric)
+					return err
+				}
 			}
 
 			// Register metric with PCA
-			err = engineAPI.RegisterFluxMeter(fluxMeter)
+			err := engineAPI.RegisterFluxMeter(fluxMeter)
 			if err != nil {
 				logger.Error().Err(err).Msgf("Failed to register FluxMeter %s with EngineAPI", fluxMeter.fluxMeterName)
 				return err
@@ -204,9 +208,12 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 			}
 
 			// Unregister metric with Prometheus
-			unregistered := prometheusRegistry.Unregister(fluxMeter.histMetricVec)
-			if !unregistered {
-				logger.Error().Err(err).Msgf("Failed to unregister metric %+v with Prometheus registry", fluxMeter.histMetricVec)
+			fmMetrics := []prometheus.Collector{fluxMeter.histMetricVec, fluxMeter.invalidFluxMeterTotal}
+			for _, metric := range fmMetrics {
+				unregistered := prometheusRegistry.Unregister(metric)
+				if !unregistered {
+					logger.Error().Err(err).Msgf("Failed to unregister metric %+v with Prometheus registry", metric)
+				}
 			}
 
 			return errMulti
@@ -245,4 +252,14 @@ func (fluxMeter *FluxMeter) GetHistogram(labels map[string]string) prometheus.Ob
 		return nil
 	}
 	return fluxMeterHistogram
+}
+
+// DeleteFromHistogram deletes the histogram.
+func (fluxMeter *FluxMeter) DeleteFromHistogram(labels map[string]string) {
+	fluxMeter.histMetricVec.Delete(labels)
+}
+
+// GetInvalidFluxMeterTotal returns the gauge for invalid flux meters.
+func (fluxMeter *FluxMeter) GetInvalidFluxMeterTotal(labels map[string]string) (prometheus.Gauge, error) {
+	return fluxMeter.invalidFluxMeterTotal.GetMetricWith(labels)
 }

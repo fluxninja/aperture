@@ -1,6 +1,6 @@
 ---
-title: Kubelet Stats
-description: Integrating Kubelet Stats Metrics
+title: kubelet metrics
+description: Integrating kubelet metrics
 keywords:
   - kubeletstats
   - otel
@@ -13,7 +13,7 @@ Before proceeding, ensure that you have [built][build] Aperture Agent with the
 `kubeletstatsreceiver` extension enabled, so that
 [kubeletstatsreceiver][receiver] is available.
 
-You can configure [Custom metrics][custom-metrics] for Kubelet Stats using the
+You can configure [Custom metrics][custom-metrics] for kubelet using the
 following configuration in the [Aperture Agent's config][agent-config]:
 
 ```yaml

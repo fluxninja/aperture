@@ -20,7 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Components receive input from other components via InPorts
+// Components receive input from other components through InPorts
 type InPort struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -104,7 +104,7 @@ func (*InPort_SignalName) isInPort_Value() {}
 
 func (*InPort_ConstantSignal) isInPort_Value() {}
 
-// Components produce output for other components via OutPorts
+// Components produce output for other components through OutPorts
 type OutPort struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

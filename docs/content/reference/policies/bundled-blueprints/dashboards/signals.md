@@ -17,65 +17,117 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
-Code: <a
+<!-- vale off -->
+
+Blueprint name: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+
+<!-- vale on -->
 
 ### Parameters
 
+<!-- vale off -->
+
 #### common {#common}
 
-<a id="common-policy-name"></a> <ParameterDescription
-    name="common.policy_name"
-    type="
-string"
-    reference=""
-    value="__REQUIRED_FIELD__"
-    description='Name of the policy.' />
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="common-policy-name"></a>
+
+<ParameterDescription
+    name='common.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
 
 ---
 
+<!-- vale off -->
+
 #### dashboard {#dashboard}
 
-<a id="dashboard-refresh-interval"></a> <ParameterDescription
-    name="dashboard.refresh_interval"
-    type="
-string"
-    reference=""
-    value="'5s'"
-    description='Refresh interval for dashboard panels.' />
+<!-- vale on -->
 
-<a id="dashboard-time-from"></a> <ParameterDescription
-    name="dashboard.time_from"
-    type="
-string"
-    reference=""
-    value="'now-15m'"
-    description='From time of dashboard.' />
+<!-- vale off -->
 
-<a id="dashboard-time-to"></a> <ParameterDescription
-    name="dashboard.time_to"
-    type="
-string"
-    reference=""
-    value="'now'"
-    description='To time of dashboard.' />
+<a id="dashboard-refresh-interval"></a>
+
+<ParameterDescription
+    name='dashboard.refresh_interval'
+    description='Refresh interval for dashboard panels.'
+    type='string'
+    reference=''
+    value='"5s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-from"></a>
+
+<ParameterDescription
+    name='dashboard.time_from'
+    description='From time of dashboard.'
+    type='string'
+    reference=''
+    value='"now-15m"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-to"></a>
+
+<ParameterDescription
+    name='dashboard.time_to'
+    description='To time of dashboard.'
+    type='string'
+    reference=''
+    value='"now"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
 
 ##### dashboard.datasource {#dashboard-datasource}
 
-<a id="dashboard-datasource-name"></a> <ParameterDescription
-    name="dashboard.datasource.name"
-    type="
-string"
-    reference=""
-    value="'$datasource'"
-    description='Datasource name.' />
+<!-- vale on -->
 
-<a id="dashboard-datasource-filter-regex"></a> <ParameterDescription
-    name="dashboard.datasource.filter_regex"
-    type="
-string"
-    reference=""
-    value="''"
-    description='Datasource filter regex.' />
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-filter-regex"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.filter_regex'
+    description='Datasource filter regex.'
+    type='string'
+    reference=''
+    value='""'
+/>
+
+<!-- vale on -->
 
 ---

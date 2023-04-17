@@ -13,8 +13,10 @@ it.
 
 ## Kubernetes Objects for Operator
 
-Below are the Kubernetes Objects which get created for the Operator considering
+Below are the Kubernetes Objects which are created for the Operator, considering
 `agent` is the release name and `default` is the namespace:
+
+<!-- vale off -->
 
 | API Version                     | Kind                         | Name                          | Namespace |
 | ------------------------------- | ---------------------------- | ----------------------------- | --------- |
@@ -27,12 +29,16 @@ Below are the Kubernetes Objects which get created for the Operator considering
 | apps/v1                         | Deployment                   | agent-aperture-agent-manager  | default   |
 | fluxninja.com/v1alpha1          | Agent                        | agent                         | default   |
 
+<!-- vale on -->
+
 ## Kubernetes Objects by Operator
 
-Below are the Kubernetes Objects which get created by the Operator considering
+Below are the Kubernetes Objects which are created by the Operator, considering
 `agent` is the Custom Resource name and `default` is the namespace:
 
 ### DaemonSet Mode
+
+<!-- vale off -->
 
 | API Version                  | Kind               | Name           | Namespace |
 | ---------------------------- | ------------------ | -------------- | --------- |
@@ -43,7 +49,11 @@ Below are the Kubernetes Objects which get created by the Operator considering
 | v1                           | ServiceAccount     | aperture-agent | default   |
 | apps/v1                      | DaemonSet          | aperture-agent | default   |
 
+<!-- vale on -->
+
 ### Sidecar Mode
+
+<!-- vale off -->
 
 | API Version                     | Kind                         | Name              | Namespace                      |
 | ------------------------------- | ---------------------------- | ----------------- | ------------------------------ |
@@ -51,3 +61,5 @@ Below are the Kubernetes Objects which get created by the Operator considering
 | rbac.authorization.k8s.io/v1    | ClusterRoleBinding           | aperture-agent    | Global                         |
 | admissionregistration.k8s.io/v1 | MutatingWebhookConfiguration | aperture-injector | Global                         |
 | v1                              | ConfigMap                    | aperture-agent    | All Sidecar enabled namespaces |
+
+<!-- vale on -->

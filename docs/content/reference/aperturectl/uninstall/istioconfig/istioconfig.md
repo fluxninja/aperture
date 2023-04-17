@@ -12,8 +12,7 @@ Install example Istio EnvoyFilter
 
 ### Synopsis
 
-Use this command to uninstall example Istio EnvoyFilter from your Kubernetes
-cluster.
+Use this command to uninstall example Istio EnvoyFilter from your Kubernetes cluster.
 
 ```
 aperturectl uninstall istioconfig [flags]
@@ -44,5 +43,4 @@ aperturectl uninstall istioconfig --namespace=istio-system
 
 ### SEE ALSO
 
-- [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) -
-  Uninstall Aperture components
+- [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) - Uninstall Aperture components
