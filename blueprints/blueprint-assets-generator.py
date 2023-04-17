@@ -542,6 +542,14 @@ YAML_TPL = """
 {%- for key, val in value.items() %}
 {{ '  ' * (level) }}{{ key }}: {{ render_value(val, level+1) }}
 {%- endfor %}
+{%- elif value is iterable and value is not string %}
+{%- if value | length == 0 %}
+{{- '[]' }}
+{%- else %}
+{%- for item in value %}
+{{ '  ' * level }}- {{ render_value(item, level+1) }}
+{%- endfor %}
+{%- endif %}
 {%- else %}
 {{- value | quoteValueYAML }}
 {%- endif %}
