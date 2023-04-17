@@ -1,0 +1,13 @@
+name: Create Vale Style Archive
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Vale Style Release
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        type: 'zip'
+        filename: 'vale-aperture.zip'
+        directory: '.github/styles/Vocab/FluxNinja'
