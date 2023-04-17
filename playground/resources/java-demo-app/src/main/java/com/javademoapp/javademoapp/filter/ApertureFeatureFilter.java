@@ -1,4 +1,4 @@
-package com.javademoapp.javademoapp;
+package com.javademoapp.javademoapp.filter;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -37,6 +37,7 @@ public class ApertureFeatureFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
+        System.out.println("INSIDE FILTER!");
         Map<String, String> labels = new HashMap<>();
         labels.put("app", "demoapp");
         labels.put("instance", System.getenv().getOrDefault("HOSTNAME", "instance-1"));
@@ -68,11 +69,15 @@ public class ApertureFeatureFilter implements Filter {
             log.debug("Starting Aperture SDK flow");
             Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
 
+//            System.out.println(flow.checkResponse());
+
             if (flow.accepted()) {
+                System.out.println("Flow accepted");
                 log.debug("Flow accepted by Aperture Agent");
                 chain.doFilter(request, response);
                 flow.end(FlowStatus.OK);
             } else {
+                System.out.println("Flow rejected");
                 log.debug("Flow rejected by Aperture Agent");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Request denied");
                 flow.end(FlowStatus.Error);
@@ -84,6 +89,7 @@ public class ApertureFeatureFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println("Initing Filter");
         String agentHost;
         String agentPort;
         try {
@@ -103,6 +109,7 @@ public class ApertureFeatureFilter implements Filter {
             log.error(message);
             throw new ServletException(message);
         }
+        System.out.println("Inited Filter");
     }
 
     @Override

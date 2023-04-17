@@ -23,7 +23,7 @@ dependencies {
     }
 
 	implementation("org.springframework.boot:spring-boot-starter-web:2.7.9")
-	implementation("com.fluxninja.aperture:aperture-java-core:0.26.0")
+	implementation("com.fluxninja.aperture:aperture-java-core:1.3.0")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools:2.7.9")
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:2.7.9")

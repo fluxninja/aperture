@@ -1,5 +1,8 @@
-package com.javademoapp.javademoapp;
+package com.javademoapp.javademoapp.controller;
 
+import com.javademoapp.javademoapp.Request;
+import com.javademoapp.javademoapp.Subrequest;
+import com.javademoapp.javademoapp.filter.ApertureFeatureFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,6 +49,7 @@ public class RequestController {
     @RequestMapping(value = "/super", method = RequestMethod.GET)
     // /super endpoint is protected by a Filter created using Aperture SDK feature flow
     public String hello() {
+        System.out.println("Request on /super");
         String message = "Hello World";
         log.info(message);
         return message;
@@ -75,10 +79,12 @@ public class RequestController {
 
     @Bean
     public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env){
+        System.out.println("Preparing Filter");
         FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(apertureFilter);
         registrationBean.addUrlPatterns("/request");
+        registrationBean.addUrlPatterns("/super");
         registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
         registrationBean.addInitParameter("agent_port", System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
 
