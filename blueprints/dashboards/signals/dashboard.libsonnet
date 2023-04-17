@@ -15,9 +15,9 @@ function(cfg) {
 
   local SignalAveragePanel =
     local query = |||
-      increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
+      increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval])
       /
-      increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
+      increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval])
     ||| % { policy_name: policyName };
     local target =
       grafana.prometheus.target(query) +
