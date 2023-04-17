@@ -17,7 +17,8 @@ buf-generate:
 	@rm -rfd gen/proto gen/openapiv2
 	@buf format -w
 	@buf lint
-	@buf generate --path aperture --template buf.gen.aperture.yaml
+	@buf generate --path aperture --template buf.gen.aperture-langs.yaml
+	@buf generate --path aperture --template buf.gen.aperture-grpc-ecosystem.yaml
 	@buf generate --path envoy --template buf.gen.envoy.yaml --include-imports
 	@#inject go annotations
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
