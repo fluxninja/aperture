@@ -37,12 +37,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 <a id="common-policy-name"></a>
 
 <ParameterDescription
-    name="common.policy_name"
-    type="
-string"
-    reference=""
-    value="__REQUIRED_FIELD__"
+    name='common.policy_name'
     description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -60,13 +59,11 @@ string"
 <a id="policy-classifiers"></a>
 
 <ParameterDescription
-    name="policy.classifiers"
-    type="
-Array of
-Object (aperture.spec.v1.Classifier)"
-    reference="../../spec#classifier"
-    value="[]"
+    name='policy.classifiers'
     description='List of classification rules.'
+    type='Array of Object (aperture.spec.v1.Classifier)'
+    reference='../../spec#classifier'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -82,12 +79,11 @@ Object (aperture.spec.v1.Classifier)"
 <a id="policy-rate-limiter-rate-limit"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.rate_limit"
-    type="
-Number (double)"
-    reference=""
-    value="__REQUIRED_FIELD__"
+    name='policy.rate_limiter.rate_limit'
     description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -97,12 +93,11 @@ Number (double)"
 <a id="policy-rate-limiter-flow-selector"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.flow_selector"
-    type="
-Object (aperture.spec.v1.FlowSelector)"
-    reference="../../spec#flow-selector"
-    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}"
+    name='policy.rate_limiter.flow_selector'
     description='A flow selector to match requests against'
+    type='Object (aperture.spec.v1.FlowSelector)'
+    reference='../../spec#flow-selector'
+    value='{"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}'
 />
 
 <!-- vale on -->
@@ -112,12 +107,11 @@ Object (aperture.spec.v1.FlowSelector)"
 <a id="policy-rate-limiter-parameters"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.parameters"
-    type="
-Object (aperture.spec.v1.RateLimiterParameters)"
-    reference="../../spec#rate-limiter-parameters"
-    value="{'label_key': '__REQUIRED_FIELD__', 'limit_reset_interval': '__REQUIRED_FIELD__'}"
+    name='policy.rate_limiter.parameters'
     description='Parameters.'
+    type='Object (aperture.spec.v1.RateLimiterParameters)'
+    reference='../../spec#rate-limiter-parameters'
+    value='{"label_key": "__REQUIRED_FIELD__", "limit_reset_interval": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->
@@ -127,12 +121,11 @@ Object (aperture.spec.v1.RateLimiterParameters)"
 <a id="policy-rate-limiter-default-config"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.default_config"
-    type="
-Object (aperture.spec.v1.RateLimiterDynamicConfig)"
-    reference="../../spec#rate-limiter-dynamic-config"
-    value="{'overrides': []}"
+    name='policy.rate_limiter.default_config'
     description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.'
+    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
+    reference='../../spec#rate-limiter-dynamic-config'
+    value='{"overrides": []}'
 />
 
 <!-- vale on -->
@@ -150,12 +143,11 @@ Object (aperture.spec.v1.RateLimiterDynamicConfig)"
 <a id="dashboard-refresh-interval"></a>
 
 <ParameterDescription
-    name="dashboard.refresh_interval"
-    type="
-string"
-    reference=""
-    value="'10s'"
+    name='dashboard.refresh_interval'
     description='Refresh interval for dashboard panels.'
+    type='string'
+    reference=''
+    value='"10s"'
 />
 
 <!-- vale on -->
@@ -171,12 +163,11 @@ string"
 <a id="dashboard-datasource-name"></a>
 
 <ParameterDescription
-    name="dashboard.datasource.name"
-    type="
-string"
-    reference=""
-    value="'$datasource'"
+    name='dashboard.datasource.name'
     description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
 />
 
 <!-- vale on -->
@@ -186,12 +177,11 @@ string"
 <a id="dashboard-datasource-filter-regex"></a>
 
 <ParameterDescription
-    name="dashboard.datasource.filter_regex"
-    type="
-string"
-    reference=""
-    value="''"
+    name='dashboard.datasource.filter_regex'
     description='Datasource filter regex.'
+    type='string'
+    reference=''
+    value='""'
 />
 
 <!-- vale on -->
@@ -215,12 +205,11 @@ at runtime, without reloading the policy.
 <a id="rate-limiter"></a>
 
 <ParameterDescription
-    name="rate_limiter"
-    type="
-Object (aperture.spec.v1.RateLimiterDynamicConfig)"
-    reference="../../spec#rate-limiter-dynamic-config"
-    value="__REQUIRED_FIELD__"
+    name='rate_limiter'
     description='Rate limiter dynamic configuration that is updated at runtime.'
+    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
+    reference='../../spec#rate-limiter-dynamic-config'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
