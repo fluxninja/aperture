@@ -39,4 +39,10 @@ type FluxMeter interface {
 	//  * metrics.StatusCodeLabel,
 	//  * metrics.FeatureStatusLabel.
 	GetHistogram(labels map[string]string) prometheus.Observer
+
+	// DeleteFromHistogram removes the specified labels from the histogram.
+	DeleteFromHistogram(labels map[string]string)
+
+	// GetInvalidFluxMeterTotal returns a gauge metric for the total number of invalid flux meters with the specified labels.
+	GetInvalidFluxMeterTotal(labels map[string]string) (prometheus.Gauge, error)
 }

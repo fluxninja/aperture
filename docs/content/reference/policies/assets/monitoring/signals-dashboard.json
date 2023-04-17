@@ -101,7 +101,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",valid=\"true\"}[$__rate_interval])\n/\nincrease(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",valid=\"true\"}[$__rate_interval])\n",
+          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n/\nincrease(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Avg",
