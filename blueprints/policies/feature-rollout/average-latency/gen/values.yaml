@@ -15,18 +15,17 @@ policy:
   components: []
   drivers:
     average_latency_drivers:
-      [
-        {
-          "backward": { "threshold": "__REQUIRED_FIELD__" },
-          "flow_selector":
-            {
-              "flow_matcher": { "control_point": "__REQUIRED_FIELD__" },
-              "service_selector": { "service": "__REQUIRED_FIELD__" },
-            },
-          "forward": { "threshold": "__REQUIRED_FIELD__" },
-          "reset": { "threshold": "__REQUIRED_FIELD__" },
-        },
-      ]
+      - backward:
+          threshold: __REQUIRED_FIELD__
+        flow_selector:
+          flow_matcher:
+            control_point: __REQUIRED_FIELD__
+          service_selector:
+            service: __REQUIRED_FIELD__
+        forward:
+          threshold: __REQUIRED_FIELD__
+        reset:
+          threshold: __REQUIRED_FIELD__
   evaluation_interval: "1s"
   load_shaper:
     flow_regulator_parameters:
@@ -37,12 +36,8 @@ policy:
           service: __REQUIRED_FIELD__
       label_key: ""
     steps:
-      [
-        {
-          "duration": "__REQUIRED_FIELD__",
-          "target_accept_percentage": "__REQUIRED_FIELD__",
-        },
-      ]
+      - duration: __REQUIRED_FIELD__
+        target_accept_percentage: __REQUIRED_FIELD__
   resources:
     flow_control:
       classifiers: []

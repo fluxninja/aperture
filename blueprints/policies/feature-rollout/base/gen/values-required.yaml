@@ -24,12 +24,8 @@ policy:
           service: __REQUIRED_FIELD__
       label_key: ""
     steps:
-      [
-        {
-          "duration": "__REQUIRED_FIELD__",
-          "target_accept_percentage": "__REQUIRED_FIELD__",
-        },
-      ]
+      - duration: __REQUIRED_FIELD__
+        target_accept_percentage: __REQUIRED_FIELD__
   resources:
     flow_control:
       classifiers: []
