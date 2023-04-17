@@ -110,16 +110,17 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
   /v1/policies/dynamic-configs:
-    patch:
+    post:
       tags:
       - aperture-controller
-      operationId: PolicyService_PatchDynamicConfigs
+      summary: PostDynamicConfigs patches dynamic configs based on the provided request.
+      operationId: PolicyService_PostDynamicConfigs
       parameters:
       - name: body
         in: body
         required: true
         schema:
-          $ref: '#/definitions/PatchDynamicConfigsRequest'
+          $ref: '#/definitions/PostDynamicConfigsRequest'
       responses:
         "200":
           description: A successful response.
@@ -2570,24 +2571,6 @@ definitions:
       signal_name:
         description: Name of the outgoing Signal on the OutPort.
         type: string
-  PatchDynamicConfigsRequest:
-    type: object
-    properties:
-      dynamic_configs:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/PatchDynamicConfigsRequestDynamicConfigRequest'
-  PatchDynamicConfigsRequestDynamicConfigRequest:
-    type: object
-    required:
-    - policy_name
-    properties:
-      dynamic_config:
-        type: object
-      policy_name:
-        type: string
-        x-go-tag-validate: required
   PathTemplateMatcher:
     description: |-
       HTTP path will be matched against given path templates.
@@ -2816,14 +2799,40 @@ definitions:
       resources:
         description: Resources (such as Flux Meters, Classifiers) to setup.
         $ref: '#/definitions/Resources'
+  PostDynamicConfigsRequest:
+    type: object
+    required:
+    - dynamic_configs
+    properties:
+      dynamic_configs:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/PostDynamicConfigsRequestDynamicConfigRequest'
+        x-go-tag-validate: required
+  PostDynamicConfigsRequestDynamicConfigRequest:
+    type: object
+    required:
+    - dynamic_config
+    - policy_name
+    properties:
+      dynamic_config:
+        type: object
+        x-go-tag-validate: required
+      policy_name:
+        type: string
+        x-go-tag-validate: required
   PostPoliciesRequest:
     type: object
+    required:
+    - policies
     properties:
       policies:
         type: array
         items:
           type: object
           $ref: '#/definitions/PostPoliciesRequestPolicyRequest'
+        x-go-tag-validate: required
   PostPoliciesRequestPolicyRequest:
     type: object
     required:
@@ -2833,6 +2842,7 @@ definitions:
         type: string
         x-go-tag-validate: required
       policy:
+        x-go-tag-validate: required
         $ref: '#/definitions/Policy'
   PostPoliciesResponse:
     type: object

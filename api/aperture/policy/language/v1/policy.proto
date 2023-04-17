@@ -12,6 +12,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
 service PolicyService {
   rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse) {
@@ -50,9 +51,10 @@ service PolicyService {
     };
   }
 
-  rpc PatchDynamicConfigs(PatchDynamicConfigsRequest) returns (PostPoliciesResponse) {
+  // PostDynamicConfigs patches dynamic configs based on the provided request.
+  rpc PostDynamicConfigs(PostDynamicConfigsRequest) returns (PostPoliciesResponse) {
     option (google.api.http) = {
-      patch: "/v1/policies/dynamic-configs"
+      post: "/v1/policies/dynamic-configs"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -79,20 +81,20 @@ message GetPolicyResponse {
 
 message PostPoliciesRequest {
   message PolicyRequest {
-    string name = 1; // @gotags: validate:"required"
-    Policy policy = 2;
+    string name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
+    Policy policy = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
   }
 
-  repeated PolicyRequest policies = 1;
+  repeated PolicyRequest policies = 1 [(validate.rules).repeated.min_items = 1]; // @gotags: validate:"required"
 }
 
-message PatchDynamicConfigsRequest {
+message PostDynamicConfigsRequest {
   message DynamicConfigRequest {
-    string policy_name = 1; // @gotags: validate:"required"
-    google.protobuf.Struct dynamic_config = 2;
+    string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
+    google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
   }
 
-  repeated DynamicConfigRequest dynamic_configs = 1;
+  repeated DynamicConfigRequest dynamic_configs = 1 [(validate.rules).repeated.min_items = 1]; // @gotags: validate:"required"
 }
 
 message DeletePolicyRequest {

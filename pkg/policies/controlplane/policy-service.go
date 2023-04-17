@@ -11,7 +11,6 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
@@ -67,12 +66,18 @@ func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv
 	return s.updatePolicies(ctx, policies, false)
 }
 
-// PatchDynamicConfigs patches dynamic configs to the system.
-func (s *PolicyService) PatchDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PatchDynamicConfigsRequest) (*policylangv1.PostPoliciesResponse, error) {
+// PostDynamicConfigs updtaes dynamic configs to the system.
+func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostPoliciesResponse, error) {
 	var errs []string
 	for idx, request := range dynamicConfigs.DynamicConfigs {
 		if request.PolicyName == "" {
 			errs = append(errs, fmt.Sprintf("policy name is empty at index '%d'", idx))
+			continue
+		}
+
+		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.PolicyName})
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.PolicyName))
 			continue
 		}
 
@@ -86,7 +91,6 @@ func (s *PolicyService) PatchDynamicConfigs(ctx context.Context, dynamicConfigs 
 			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.PolicyName, err))
 			continue
 		}
-		log.Info().Str("dynamic config", string(jsonDynamicConfig)).Msg("writing dynamic config")
 		s.policyDynamicConfigTrackers.WriteEvent(notifiers.Key(request.PolicyName), jsonDynamicConfig)
 	}
 
@@ -110,28 +114,19 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 }
 
 // updatePolicies manages Post/Patch operations on policies.
-func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, checkRequired bool) (*policylangv1.PostPoliciesResponse, error) {
+func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, isPatch bool) (*policylangv1.PostPoliciesResponse, error) {
 	var errs []string
 	for idx, request := range policies.Policies {
 		if request.Name == "" {
-			errs = append(errs, fmt.Sprintf("policy name is empty at index '%d'", idx))
+			errs = append(errs, fmt.Sprintf("policy name is not provided at index '%d'", idx))
 			continue
 		}
 
-		if checkRequired {
-			if request.Policy == nil {
-				errs = append(errs, fmt.Sprintf("policy is missing for policy name '%s'", request.Name))
-				continue
-			}
-		} else {
-			policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
+		if isPatch {
+			_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
 			if err != nil {
 				errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
 				continue
-			}
-
-			if request.Policy == nil {
-				request.Policy = policy.Policy
 			}
 		}
 

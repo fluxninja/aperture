@@ -2871,24 +2871,6 @@ definitions:
                     type: object
                 type: array
         type: object
-    PatchDynamicConfigsRequest:
-        properties:
-            dynamic_configs:
-                items:
-                    $ref: '#/definitions/PatchDynamicConfigsRequestDynamicConfigRequest'
-                    type: object
-                type: array
-        type: object
-    PatchDynamicConfigsRequestDynamicConfigRequest:
-        properties:
-            dynamic_config:
-                type: object
-            policy_name:
-                type: string
-                x-go-tag-validate: required
-        required:
-            - policy_name
-        type: object
     PathTemplateMatcher:
         description: |-
             HTTP path will be matched against given path templates.
@@ -3152,6 +3134,29 @@ definitions:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
         type: object
+    PostDynamicConfigsRequest:
+        properties:
+            dynamic_configs:
+                items:
+                    $ref: '#/definitions/PostDynamicConfigsRequestDynamicConfigRequest'
+                    type: object
+                type: array
+                x-go-tag-validate: required
+        required:
+            - dynamic_configs
+        type: object
+    PostDynamicConfigsRequestDynamicConfigRequest:
+        properties:
+            dynamic_config:
+                type: object
+                x-go-tag-validate: required
+            policy_name:
+                type: string
+                x-go-tag-validate: required
+        required:
+            - dynamic_config
+            - policy_name
+        type: object
     PostPoliciesRequest:
         properties:
             policies:
@@ -3159,6 +3164,9 @@ definitions:
                     $ref: '#/definitions/PostPoliciesRequestPolicyRequest'
                     type: object
                 type: array
+                x-go-tag-validate: required
+        required:
+            - policies
         type: object
     PostPoliciesRequestPolicyRequest:
         properties:
@@ -3167,6 +3175,7 @@ definitions:
                 x-go-tag-validate: required
             policy:
                 $ref: '#/definitions/Policy'
+                x-go-tag-validate: required
         required:
             - name
         type: object
@@ -5021,14 +5030,14 @@ paths:
             tags:
                 - aperture-controller
     /v1/policies/dynamic-configs:
-        patch:
-            operationId: PolicyService_PatchDynamicConfigs
+        post:
+            operationId: PolicyService_PostDynamicConfigs
             parameters:
                 - in: body
                   name: body
                   required: true
                   schema:
-                    $ref: '#/definitions/PatchDynamicConfigsRequest'
+                    $ref: '#/definitions/PostDynamicConfigsRequest'
             responses:
                 "200":
                     description: A successful response.
@@ -5038,6 +5047,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
+            summary: PostDynamicConfigs patches dynamic configs based on the provided request.
             tags:
                 - aperture-controller
     /v1/status/{path}:

@@ -72,7 +72,7 @@ func (msg *PostPoliciesRequest_PolicyRequest) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PatchDynamicConfigsRequest) MarshalJSON() ([]byte, error) {
+func (msg *PostDynamicConfigsRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -81,14 +81,14 @@ func (msg *PatchDynamicConfigsRequest) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PatchDynamicConfigsRequest) UnmarshalJSON(b []byte) error {
+func (msg *PostDynamicConfigsRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PatchDynamicConfigsRequest_DynamicConfigRequest) MarshalJSON() ([]byte, error) {
+func (msg *PostDynamicConfigsRequest_DynamicConfigRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -97,7 +97,7 @@ func (msg *PatchDynamicConfigsRequest_DynamicConfigRequest) MarshalJSON() ([]byt
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PatchDynamicConfigsRequest_DynamicConfigRequest) UnmarshalJSON(b []byte) error {
+func (msg *PostDynamicConfigsRequest_DynamicConfigRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
