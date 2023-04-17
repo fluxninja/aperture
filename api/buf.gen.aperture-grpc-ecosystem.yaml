@@ -1,0 +1,25 @@
+version: v1
+managed:
+  enabled: true
+  java_package_prefix:
+    default: com.fluxninja.generated
+  go_package_prefix:
+    default: github.com/fluxninja/aperture/api/gen/proto/go
+    except:
+      - buf.build/googleapis/googleapis
+      - buf.build/grpc-ecosystem/grpc-gateway
+      - buf.build/envoyproxy/protoc-gen-validate
+plugins:
+  - plugin: buf.build/grpc-ecosystem/gateway
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/grpc-ecosystem/openapiv2
+    out: gen/openapiv2
+    opt:
+      - json_names_for_fields=false
+      - merge_file_name=aperture
+      - allow_merge=true
+      - output_format=yaml
+      - generate_unbound_methods=false
+      - openapi_naming_strategy=fqn
