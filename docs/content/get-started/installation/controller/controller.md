@@ -54,7 +54,7 @@ Install the tool of your choice using the following links:
 
 ## Installation
 
-The Aperture Agent can be installed using below options:
+The Aperture Controller can be installed using the below options:
 
 1. [**Install with Operator**](operator/operator.md)
 

@@ -35,7 +35,7 @@ into your cluster.
 
 :::info Refer
 
-Kubernetes Objects which will be created by following steps are listed
+Kubernetes Objects which will be created by the following steps are listed
 [here](/reference/kubernetes-operator/controller.md).
 
 :::
@@ -171,7 +171,7 @@ Kubernetes Objects which will be created by following steps are listed
       </TabItem>
       </Tabs>
 
-   2. Create a YAML file with below specifications:
+   2. Create a YAML file with the below specifications:
 
       ```yaml
       apiVersion: fluxninja.com/v1alpha1
@@ -256,7 +256,7 @@ state and `Controller` Custom Resource in `created` state.
 ## Uninstall
 
 You can uninstall the Aperture Controller and its components installed above by
-following below steps:
+following the below steps:
 
 1. Uninstall the Aperture Controller:
 
@@ -274,7 +274,7 @@ following below steps:
    </Tabs>
 
 2. Alternatively, if you have installed the Aperture Controller Custom Resource
-   separately, follow below steps:
+   separately, follow the below steps:
 
    1. Delete the Aperture Controller Custom Resource:
 
@@ -298,7 +298,7 @@ following below steps:
       </Tabs>
 
 3. If you have installed the chart in some other namespace than `default`,
-   execute below commands:
+   execute the below commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
@@ -324,8 +324,8 @@ following below steps:
 
 5. **Optional**: Delete the CRD installed by the Helm chart:
 
-   > Note: By design, deleting a chart by using Helm doesn’t delete the Custom
-   > Resource Definitions installed by using the Helm chart.
+   > Note: Intentionally, deleting a chart by using Helm does not delete the
+   > Custom Resource Definitions installed by using the Helm chart.
 
    ```bash
    kubectl delete crd controllers.fluxninja.com
