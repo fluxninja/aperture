@@ -60,16 +60,10 @@ The Aperture Agent can be installed using below options:
 
    The Aperture Controller can be installed using the Kubernetes Operator
    available for it. This method requires access to create cluster level
-   resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition etc.
+   resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition and
+   so on.
 
 2. [**Namespace scoped Installation**](namespace-scoped/namespace-scoped.md)
-
-   :::info
-
-   The Aperture Controller will only perform as expected with Aperture SDKs as
-   integration in this mode.
-
-   :::
 
    The Aperture Controller can also be installed with only namespace scoped
    resources.

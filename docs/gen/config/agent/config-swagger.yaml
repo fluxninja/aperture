@@ -36,9 +36,8 @@ definitions:
                 x-go-name: Endpoints
                 x-go-tag-json: endpoints,omitempty
                 x-go-tag-validate: omitempty,dive,omitempty
-        title: Config is configuration for agent functions.
+        title: AgentFunctionsConfig is configuration for agent functions.
         type: object
-        x-go-name: Config
         x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
     AgentInfoConfig:
         properties:

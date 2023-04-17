@@ -16,10 +16,10 @@ import (
 // Key is the key for agentfunctions configuration.
 const Key = "agent_functions"
 
-// Config is configuration for agent functions.
+// AgentFunctionsConfig is configuration for agent functions.
 // swagger:model AgentFunctionsConfig
 // +kubebuilder:object:generate=true
-type Config struct {
+type AgentFunctionsConfig struct {
 	// RPC servers to connect to (which will be able to call agent functions)
 	Endpoints []string `json:"endpoints,omitempty" validate:"omitempty,dive,omitempty"`
 

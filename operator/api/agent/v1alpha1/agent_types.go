@@ -96,7 +96,7 @@ type AgentConfigSpec struct {
 
 	// Agent functions configuration.
 	//+kubebuilder:validation:Optional
-	AgentFunctions agentfunctions.Config `json:"agent_functions"`
+	AgentFunctions agentfunctions.AgentFunctionsConfig `json:"agent_functions"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.

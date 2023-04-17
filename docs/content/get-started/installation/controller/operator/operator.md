@@ -314,7 +314,7 @@ following below steps:
    </TabItem>
    </Tabs>
 
-4. If you have installed the Contour chart for exposing the Etcd and Prometheus
+4. If you have installed the Contour chart for exposing the etcd and Prometheus
    service, execute the below command:
 
    ```bash
@@ -324,8 +324,8 @@ following below steps:
 
 5. **Optional**: Delete the CRD installed by the Helm chart:
 
-   > Note: By design, deleting a chart via Helm doesn’t delete the Custom
-   > Resource Definitions (CRDs) installed via the Helm chart.
+   > Note: By design, deleting a chart by using Helm doesn’t delete the Custom
+   > Resource Definitions installed by using the Helm chart.
 
    ```bash
    kubectl delete crd controllers.fluxninja.com

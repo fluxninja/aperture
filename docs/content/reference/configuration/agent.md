@@ -221,7 +221,7 @@ Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
 <dt></dt>
 <dd>
 
-([Config](#config))
+([AgentFunctionsConfig](#agent-functions-config))
 Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
 
 </dd>
@@ -589,6 +589,41 @@ Flag to enable the policy
 <!-- vale on -->
 
 Factor sets user-configured limit of available memory
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AgentFunctionsConfig {#agent-functions-config}
+
+<!-- vale on -->
+
+AgentFunctionsConfig is configuration for agent functions.
+
+<dl>
+<dt>endpoints</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+RPC servers to connect to (which will be able to call agent functions)
+
+</dd>
+<dt>client</dt>
+<dd>
+
+<!-- vale off -->
+
+([ClientConfig](#client-config))
+
+<!-- vale on -->
 
 </dd>
 </dl>
@@ -1086,41 +1121,6 @@ https://github.com/kubernetes-sigs/controller-tools/issues/636
 https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
 [Components](#components)
-
----
-
-<!-- vale off -->
-
-### Config {#config}
-
-<!-- vale on -->
-
-Config is configuration for agent functions.
-
-<dl>
-<dt>endpoints</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-RPC servers to connect to (which will be able to call agent functions)
-
-</dd>
-<dt>client</dt>
-<dd>
-
-<!-- vale off -->
-
-([ClientConfig](#client-config))
-
-<!-- vale on -->
-
-</dd>
-</dl>
 
 ---
 

@@ -16,6 +16,6 @@ import DocCardList from '@theme/DocCardList';
 
 The Aperture Agent can be installed using the Kubernetes Operator available for
 it. This method requires access to create cluster level resources like
-ClusterRole, ClusterRoleBinding, CustomResourceDefinition etc.
+ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
 
 <DocCardList />
