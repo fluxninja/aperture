@@ -26,9 +26,6 @@ Use this command to query information about active Flow Control integrations
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
-  to interact with Aperture
-- [aperturectl flow-control control-points](/reference/aperturectl/flow-control/control-points/control-points.md) -
-  List Flow Control control points
-- [aperturectl flow-control preview](/reference/aperturectl/flow-control/preview/preview.md) -
-  Preview control points
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl flow-control control-points](/reference/aperturectl/flow-control/control-points/control-points.md) - List Flow Control control points
+- [aperturectl flow-control preview](/reference/aperturectl/flow-control/preview/preview.md) - Preview control points

@@ -29,77 +29,6 @@ private static final long serialVersionUID = 0L;
     return new OkHttpResponse();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
-  private OkHttpResponse(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    int mutable_bitField0_ = 0;
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-              headers_ = com.google.protobuf.MapField.newMapField(
-                  HeadersDefaultEntryHolder.defaultEntry);
-              mutable_bitField0_ |= 0x00000001;
-            }
-            com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-            headers__ = input.readMessage(
-                HeadersDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-            headers_.getMutableMap().put(
-                headers__.getKey(), headers__.getValue());
-            break;
-          }
-          case 18: {
-            com.google.protobuf.Struct.Builder subBuilder = null;
-            if (dynamicMetadata_ != null) {
-              subBuilder = dynamicMetadata_.toBuilder();
-            }
-            dynamicMetadata_ = input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(dynamicMetadata_);
-              dynamicMetadata_ = subBuilder.buildPartial();
-            }
-
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (com.google.protobuf.UninitializedMessageException e) {
-      throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckhttpProto.internal_static_aperture_flowcontrol_checkhttp_v1_OkHttpResponse_descriptor;
@@ -137,6 +66,7 @@ private static final long serialVersionUID = 0L;
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "");
   }
+  @SuppressWarnings("serial")
   private com.google.protobuf.MapField<
       java.lang.String, java.lang.String> headers_;
   private com.google.protobuf.MapField<java.lang.String, java.lang.String>
@@ -147,7 +77,6 @@ private static final long serialVersionUID = 0L;
     }
     return headers_;
   }
-
   public int getHeadersCount() {
     return internalGetHeaders().getMap().size();
   }
@@ -158,7 +87,6 @@ private static final long serialVersionUID = 0L;
    *
    * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
    */
-
   @java.lang.Override
   public boolean containsHeaders(
       java.lang.String key) {
@@ -181,7 +109,6 @@ private static final long serialVersionUID = 0L;
    * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
    */
   @java.lang.Override
-
   public java.util.Map<java.lang.String, java.lang.String> getHeadersMap() {
     return internalGetHeaders().getMap();
   }
@@ -193,10 +120,11 @@ private static final long serialVersionUID = 0L;
    * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
    */
   @java.lang.Override
-
-  public java.lang.String getHeadersOrDefault(
+  public /* nullable */
+java.lang.String getHeadersOrDefault(
       java.lang.String key,
-      java.lang.String defaultValue) {
+      /* nullable */
+java.lang.String defaultValue) {
     if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, java.lang.String> map =
         internalGetHeaders().getMap();
@@ -210,7 +138,6 @@ private static final long serialVersionUID = 0L;
    * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
    */
   @java.lang.Override
-
   public java.lang.String getHeadersOrThrow(
       java.lang.String key) {
     if (key == null) { throw new NullPointerException("map key"); }
@@ -245,7 +172,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.google.protobuf.StructOrBuilder getDynamicMetadataOrBuilder() {
-    return getDynamicMetadata();
+    return dynamicMetadata_ == null ? com.google.protobuf.Struct.getDefaultInstance() : dynamicMetadata_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -271,7 +198,7 @@ private static final long serialVersionUID = 0L;
     if (dynamicMetadata_ != null) {
       output.writeMessage(2, getDynamicMetadata());
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -294,7 +221,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getDynamicMetadata());
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -316,7 +243,7 @@ private static final long serialVersionUID = 0L;
       if (!getDynamicMetadata()
           .equals(other.getDynamicMetadata())) return false;
     }
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -335,7 +262,7 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + DYNAMIC_METADATA_FIELD_NUMBER;
       hash = (53 * hash) + getDynamicMetadata().hashCode();
     }
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -478,27 +405,22 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       internalGetMutableHeaders().clear();
-      if (dynamicMetadataBuilder_ == null) {
-        dynamicMetadata_ = null;
-      } else {
-        dynamicMetadata_ = null;
+      dynamicMetadata_ = null;
+      if (dynamicMetadataBuilder_ != null) {
+        dynamicMetadataBuilder_.dispose();
         dynamicMetadataBuilder_ = null;
       }
       return this;
@@ -527,50 +449,24 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse buildPartial() {
       com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse result = new com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse(this);
-      int from_bitField0_ = bitField0_;
-      result.headers_ = internalGetHeaders();
-      result.headers_.makeImmutable();
-      if (dynamicMetadataBuilder_ == null) {
-        result.dynamicMetadata_ = dynamicMetadata_;
-      } else {
-        result.dynamicMetadata_ = dynamicMetadataBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
+    private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.headers_ = internalGetHeaders();
+        result.headers_.makeImmutable();
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.dynamicMetadata_ = dynamicMetadataBuilder_ == null
+            ? dynamicMetadata_
+            : dynamicMetadataBuilder_.build();
+      }
     }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
-    }
-    @java.lang.Override
-    public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-    @java.lang.Override
-    public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-    @java.lang.Override
-    public Builder setRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-    @java.lang.Override
-    public Builder addRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.addRepeatedField(field, value);
-    }
+
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) {
@@ -585,10 +481,11 @@ private static final long serialVersionUID = 0L;
       if (other == com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.getDefaultInstance()) return this;
       internalGetMutableHeaders().mergeFrom(
           other.internalGetHeaders());
+      bitField0_ |= 0x00000001;
       if (other.hasDynamicMetadata()) {
         mergeDynamicMetadata(other.getDynamicMetadata());
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -603,17 +500,46 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              headers__ = input.readMessage(
+                  HeadersDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              internalGetMutableHeaders().getMutableMap().put(
+                  headers__.getKey(), headers__.getValue());
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 10
+            case 18: {
+              input.readMessage(
+                  getDynamicMetadataFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 18
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
     private int bitField0_;
@@ -621,7 +547,7 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.MapField<
         java.lang.String, java.lang.String> headers_;
     private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-    internalGetHeaders() {
+        internalGetHeaders() {
       if (headers_ == null) {
         return com.google.protobuf.MapField.emptyMapField(
             HeadersDefaultEntryHolder.defaultEntry);
@@ -629,8 +555,7 @@ private static final long serialVersionUID = 0L;
       return headers_;
     }
     private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-    internalGetMutableHeaders() {
-      onChanged();;
+        internalGetMutableHeaders() {
       if (headers_ == null) {
         headers_ = com.google.protobuf.MapField.newMapField(
             HeadersDefaultEntryHolder.defaultEntry);
@@ -638,9 +563,10 @@ private static final long serialVersionUID = 0L;
       if (!headers_.isMutable()) {
         headers_ = headers_.copy();
       }
+      bitField0_ |= 0x00000001;
+      onChanged();
       return headers_;
     }
-
     public int getHeadersCount() {
       return internalGetHeaders().getMap().size();
     }
@@ -651,7 +577,6 @@ private static final long serialVersionUID = 0L;
      *
      * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
      */
-
     @java.lang.Override
     public boolean containsHeaders(
         java.lang.String key) {
@@ -674,7 +599,6 @@ private static final long serialVersionUID = 0L;
      * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
      */
     @java.lang.Override
-
     public java.util.Map<java.lang.String, java.lang.String> getHeadersMap() {
       return internalGetHeaders().getMap();
     }
@@ -686,10 +610,11 @@ private static final long serialVersionUID = 0L;
      * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
      */
     @java.lang.Override
-
-    public java.lang.String getHeadersOrDefault(
+    public /* nullable */
+java.lang.String getHeadersOrDefault(
         java.lang.String key,
-        java.lang.String defaultValue) {
+        /* nullable */
+java.lang.String defaultValue) {
       if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, java.lang.String> map =
           internalGetHeaders().getMap();
@@ -703,7 +628,6 @@ private static final long serialVersionUID = 0L;
      * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
      */
     @java.lang.Override
-
     public java.lang.String getHeadersOrThrow(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
@@ -714,8 +638,8 @@ private static final long serialVersionUID = 0L;
       }
       return map.get(key);
     }
-
     public Builder clearHeaders() {
+      bitField0_ = (bitField0_ & ~0x00000001);
       internalGetMutableHeaders().getMutableMap()
           .clear();
       return this;
@@ -727,7 +651,6 @@ private static final long serialVersionUID = 0L;
      *
      * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
      */
-
     public Builder removeHeaders(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
@@ -740,7 +663,8 @@ private static final long serialVersionUID = 0L;
      */
     @java.lang.Deprecated
     public java.util.Map<java.lang.String, java.lang.String>
-    getMutableHeaders() {
+        getMutableHeaders() {
+      bitField0_ |= 0x00000001;
       return internalGetMutableHeaders().getMutableMap();
     }
     /**
@@ -754,12 +678,10 @@ private static final long serialVersionUID = 0L;
         java.lang.String key,
         java.lang.String value) {
       if (key == null) { throw new NullPointerException("map key"); }
-      if (value == null) {
-  throw new NullPointerException("map value");
-}
-
+      if (value == null) { throw new NullPointerException("map value"); }
       internalGetMutableHeaders().getMutableMap()
           .put(key, value);
+      bitField0_ |= 0x00000001;
       return this;
     }
     /**
@@ -769,11 +691,11 @@ private static final long serialVersionUID = 0L;
      *
      * <code>map&lt;string, string&gt; headers = 1 [json_name = "headers"];</code>
      */
-
     public Builder putAllHeaders(
         java.util.Map<java.lang.String, java.lang.String> values) {
       internalGetMutableHeaders().getMutableMap()
           .putAll(values);
+      bitField0_ |= 0x00000001;
       return this;
     }
 
@@ -785,7 +707,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the dynamicMetadata field is set.
      */
     public boolean hasDynamicMetadata() {
-      return dynamicMetadataBuilder_ != null || dynamicMetadata_ != null;
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <code>.google.protobuf.Struct dynamic_metadata = 2 [json_name = "dynamicMetadata"];</code>
@@ -807,11 +729,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         dynamicMetadata_ = value;
-        onChanged();
       } else {
         dynamicMetadataBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -821,11 +743,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.Struct.Builder builderForValue) {
       if (dynamicMetadataBuilder_ == null) {
         dynamicMetadata_ = builderForValue.build();
-        onChanged();
       } else {
         dynamicMetadataBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -833,38 +755,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeDynamicMetadata(com.google.protobuf.Struct value) {
       if (dynamicMetadataBuilder_ == null) {
-        if (dynamicMetadata_ != null) {
-          dynamicMetadata_ =
-            com.google.protobuf.Struct.newBuilder(dynamicMetadata_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000002) != 0) &&
+          dynamicMetadata_ != null &&
+          dynamicMetadata_ != com.google.protobuf.Struct.getDefaultInstance()) {
+          getDynamicMetadataBuilder().mergeFrom(value);
         } else {
           dynamicMetadata_ = value;
         }
-        onChanged();
       } else {
         dynamicMetadataBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
      * <code>.google.protobuf.Struct dynamic_metadata = 2 [json_name = "dynamicMetadata"];</code>
      */
     public Builder clearDynamicMetadata() {
-      if (dynamicMetadataBuilder_ == null) {
-        dynamicMetadata_ = null;
-        onChanged();
-      } else {
-        dynamicMetadata_ = null;
+      bitField0_ = (bitField0_ & ~0x00000002);
+      dynamicMetadata_ = null;
+      if (dynamicMetadataBuilder_ != null) {
+        dynamicMetadataBuilder_.dispose();
         dynamicMetadataBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.google.protobuf.Struct dynamic_metadata = 2 [json_name = "dynamicMetadata"];</code>
      */
     public com.google.protobuf.Struct.Builder getDynamicMetadataBuilder() {
-      
+      bitField0_ |= 0x00000002;
       onChanged();
       return getDynamicMetadataFieldBuilder().getBuilder();
     }
@@ -928,7 +850,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new OkHttpResponse(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 

@@ -29,7 +29,7 @@ import (
 func main() {
 	app := platform.New(
 		platform.Config{}.Module(),
-		controller.ModuleForControllerOTEL(),
+		controller.ModuleForControllerOTel(),
 		fx.Provide(
 			clockwork.NewRealClock,
 		),

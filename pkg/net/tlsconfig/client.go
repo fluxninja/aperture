@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// ClientTLSConfig is the config for client TLS.
+// ClientTLSConfig is the configuration for client TLS.
 // swagger:model
 // +kubebuilder:object:generate=true
 type ClientTLSConfig struct {

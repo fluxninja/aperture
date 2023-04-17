@@ -55,7 +55,7 @@ var _ = Describe("Service for Agent", func() {
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
-						OTEL: agent.AgentOTELConfig{},
+						OTel: agent.AgentOTelConfig{},
 					},
 				},
 			}
@@ -146,7 +146,7 @@ var _ = Describe("Service for Agent", func() {
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
-						OTEL: agent.AgentOTELConfig{},
+						OTel: agent.AgentOTelConfig{},
 					},
 				},
 			}

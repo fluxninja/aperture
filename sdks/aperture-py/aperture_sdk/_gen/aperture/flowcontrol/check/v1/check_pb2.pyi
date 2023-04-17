@@ -31,9 +31,11 @@ class CheckResponse(_message.Message):
         REJECT_REASON_NONE: _ClassVar[CheckResponse.RejectReason]
         REJECT_REASON_RATE_LIMITED: _ClassVar[CheckResponse.RejectReason]
         REJECT_REASON_CONCURRENCY_LIMITED: _ClassVar[CheckResponse.RejectReason]
+        REJECT_REASON_FLOW_REGULATED: _ClassVar[CheckResponse.RejectReason]
     REJECT_REASON_NONE: CheckResponse.RejectReason
     REJECT_REASON_RATE_LIMITED: CheckResponse.RejectReason
     REJECT_REASON_CONCURRENCY_LIMITED: CheckResponse.RejectReason
+    REJECT_REASON_FLOW_REGULATED: CheckResponse.RejectReason
     class DecisionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DECISION_TYPE_ACCEPTED: _ClassVar[CheckResponse.DecisionType]
@@ -98,7 +100,7 @@ class ClassifierInfo(_message.Message):
     def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., classifier_index: _Optional[int] = ..., error: _Optional[_Union[ClassifierInfo.Error, str]] = ...) -> None: ...
 
 class LimiterDecision(_message.Message):
-    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "rate_limiter_info", "concurrency_limiter_info"]
+    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "rate_limiter_info", "concurrency_limiter_info", "flow_regulator_info"]
     class LimiterReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         LIMITER_REASON_UNSPECIFIED: _ClassVar[LimiterDecision.LimiterReason]
@@ -119,6 +121,11 @@ class LimiterDecision(_message.Message):
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
         workload_index: str
         def __init__(self, workload_index: _Optional[str] = ...) -> None: ...
+    class FlowRegulatorInfo(_message.Message):
+        __slots__ = ["label"]
+        LABEL_FIELD_NUMBER: _ClassVar[int]
+        label: str
+        def __init__(self, label: _Optional[str] = ...) -> None: ...
     POLICY_NAME_FIELD_NUMBER: _ClassVar[int]
     POLICY_HASH_FIELD_NUMBER: _ClassVar[int]
     COMPONENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -126,6 +133,7 @@ class LimiterDecision(_message.Message):
     REASON_FIELD_NUMBER: _ClassVar[int]
     RATE_LIMITER_INFO_FIELD_NUMBER: _ClassVar[int]
     CONCURRENCY_LIMITER_INFO_FIELD_NUMBER: _ClassVar[int]
+    FLOW_REGULATOR_INFO_FIELD_NUMBER: _ClassVar[int]
     policy_name: str
     policy_hash: str
     component_id: str
@@ -133,7 +141,8 @@ class LimiterDecision(_message.Message):
     reason: LimiterDecision.LimiterReason
     rate_limiter_info: LimiterDecision.RateLimiterInfo
     concurrency_limiter_info: LimiterDecision.ConcurrencyLimiterInfo
-    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., concurrency_limiter_info: _Optional[_Union[LimiterDecision.ConcurrencyLimiterInfo, _Mapping]] = ...) -> None: ...
+    flow_regulator_info: LimiterDecision.FlowRegulatorInfo
+    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., concurrency_limiter_info: _Optional[_Union[LimiterDecision.ConcurrencyLimiterInfo, _Mapping]] = ..., flow_regulator_info: _Optional[_Union[LimiterDecision.FlowRegulatorInfo, _Mapping]] = ...) -> None: ...
 
 class FluxMeterInfo(_message.Message):
     __slots__ = ["flux_meter_name"]

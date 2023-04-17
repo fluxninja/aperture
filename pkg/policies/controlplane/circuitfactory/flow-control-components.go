@@ -7,6 +7,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -47,7 +48,7 @@ func newFlowControlCompositeAndOptions(
 				return retErr(err)
 			}
 
-			// Need a unique ID for sub component since it's used for graph generation
+			// Need a unique ID for sub component since it is used for graph generation
 			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
@@ -111,6 +112,14 @@ func newFlowControlCompositeAndOptions(
 		}
 
 		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+	} else if loadShaper := flowControlComponentProto.GetLoadShaper(); loadShaper != nil {
+		nestedCircuit, err := flowregulator.ParseLoadShaper(loadShaper)
+		if err != nil {
+			return retErr(err)
+		}
+
+		tree, configuredComponents, options, err := ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		return tree, configuredComponents, options, err
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }

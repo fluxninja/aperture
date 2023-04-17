@@ -1,0 +1,46 @@
+version: v1
+managed:
+  enabled: true
+  java_package_prefix:
+    default: com.fluxninja.generated
+  go_package_prefix:
+    default: github.com/fluxninja/aperture/api/gen/proto/go
+    except:
+      - buf.build/googleapis/googleapis
+      - buf.build/grpc-ecosystem/grpc-gateway
+      - buf.build/envoyproxy/protoc-gen-validate
+plugins:
+  - plugin: buf.build/protocolbuffers/java
+    out: gen/proto/java
+  - plugin: buf.build/grpc/java
+    out: gen/proto/java
+  - plugin: buf.build/grpc/python
+    out: gen/proto/python
+  - plugin: buf.build/protocolbuffers/python
+    out: gen/proto/python
+  - plugin: buf.build/protocolbuffers/pyi
+    out: gen/proto/python
+  - plugin: buf.build/protocolbuffers/go
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/grpc/go
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false
+  - plugin: buf.build/community/mitchellh-go-json
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
+      - orig_name=true
+      # keep this value false as we marshal the config messages to make wrappers
+      - emit_defaults=false
+  - remote: buf.build/fluxninja/plugins/protoc-gen-go-deepcopy:v0.2.1
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/bufbuild/validate-go
+    out: gen/proto/go
+    opt:
+      - paths=source_relative

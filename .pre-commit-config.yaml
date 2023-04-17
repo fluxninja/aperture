@@ -24,11 +24,11 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$
+        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|\.github/.*
       - id: end-of-file-fixer
-        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|blueprints/gen/jsonschema/.*
+        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|blueprints/gen/jsonschema/.*|\.github/.*
       - id: check-yaml
-        exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*|playground/scenarios/.*/charts/.*)
+        exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*|playground/scenarios/.*/charts/.*|\.github/.*)
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files
@@ -91,7 +91,7 @@ repos:
     rev: "v3.0.0-alpha.6"
     hooks:
       - id: prettier
-        exclude: ^(docs/content/reference/.*|docs/content/reference/aperturectl/.*|manifests/charts/.*/README*|.github/.*/.*.md)
+        exclude: ^(docs/content/reference/.*|docs/content/reference/aperturectl/.*|manifests/charts/.*/README*|.github)
         types_or:
           [
             sh,
@@ -231,5 +231,6 @@ repos:
     hooks:
       - id: codespell
         args:
-          - --ignore-words=./.vscode/ltex.dictionary.en-US.txt
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|playground/resources/nginx/.*)$
+          - "-L inport,atleast,iteraction"
+          - "--ignore-words=./.github/styles/Vocab/FluxNinja/accept.txt"
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|playground/resources/nginx/.*|\.github/.*)$

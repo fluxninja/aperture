@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=file:/home/tgill/Work/fluxninja/aperture/blueprints/policies/feature-rollout/average-latency/gen/definitions.json
+# Generated values file for policies/feature-rollout/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "feature-rollout"
+
+# Parameters for the Feature Rollout policy.
+# Type: policies/feature-rollout/base:schema:rollout_policy
+# Required: True
+policy:
+  components: []
+  drivers:
+    average_latency_drivers:
+      [
+        {
+          "flow_selector":
+            {
+              "flow_matcher": { "control_point": "ingress" },
+              "service_selector":
+                { "service": "service1-demo-app.demoapp.svc.cluster.local" },
+            },
+          "forward": { "threshold": 75 },
+          "reset": { "threshold": 75 },
+        },
+      ]
+  evaluation_interval: "1s"
+  load_shaper:
+    flow_regulator_parameters:
+      flow_selector:
+        flow_matcher:
+          control_point: ingress
+        service_selector:
+          service: service1-demo-app.demoapp.svc.cluster.local
+      label_key: ""
+    steps:
+      [
+        { "duration": "0s", "target_accept_percentage": 1.0 },
+        { "duration": "300s", "target_accept_percentage": 100.0 },
+      ]
+  resources:
+    flow_control:
+      classifiers: []
+
+# Configuration for the Grafana dashboard accompanying this policy.
+# Type: policies/feature-rollout/base:param:dashboard
+dashboard:
+  datasource:
+    filter_regex: ""
+    name: "$datasource"
+  refresh_interval: "5s"
+  time_from: "now-15m"
+  time_to: "now"

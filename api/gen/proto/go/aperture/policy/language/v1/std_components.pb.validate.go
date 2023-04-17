@@ -3556,6 +3556,193 @@ var _ interface {
 	ErrorName() string
 } = NestedSignalEgressValidationError{}
 
+// Validate checks the field values on SignalGenerator with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *SignalGenerator) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalGenerator with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SignalGeneratorMultiError, or nil if none found.
+func (m *SignalGenerator) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalGenerator) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGeneratorValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGeneratorValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGeneratorValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGeneratorValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGeneratorValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGeneratorValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGeneratorValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGeneratorValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGeneratorValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SignalGeneratorMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalGeneratorMultiError is an error wrapping multiple validation errors
+// returned by SignalGenerator.ValidateAll() if the designated constraints
+// aren't met.
+type SignalGeneratorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalGeneratorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalGeneratorMultiError) AllErrors() []error { return m }
+
+// SignalGeneratorValidationError is the validation error returned by
+// SignalGenerator.Validate if the designated constraints aren't met.
+type SignalGeneratorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalGeneratorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalGeneratorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalGeneratorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalGeneratorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalGeneratorValidationError) ErrorName() string { return "SignalGeneratorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SignalGeneratorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalGenerator.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalGeneratorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalGeneratorValidationError{}
+
 // Validate checks the field values on GradientController_Parameters with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -9568,3 +9755,678 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = NestedSignalEgress_InsValidationError{}
+
+// Validate checks the field values on SignalGenerator_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SignalGenerator_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalGenerator_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SignalGenerator_ParametersMultiError, or nil if none found.
+func (m *SignalGenerator_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalGenerator_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetSteps() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SignalGenerator_ParametersValidationError{
+						field:  fmt.Sprintf("Steps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SignalGenerator_ParametersValidationError{
+						field:  fmt.Sprintf("Steps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SignalGenerator_ParametersValidationError{
+					field:  fmt.Sprintf("Steps[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return SignalGenerator_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalGenerator_ParametersMultiError is an error wrapping multiple
+// validation errors returned by SignalGenerator_Parameters.ValidateAll() if
+// the designated constraints aren't met.
+type SignalGenerator_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalGenerator_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalGenerator_ParametersMultiError) AllErrors() []error { return m }
+
+// SignalGenerator_ParametersValidationError is the validation error returned
+// by SignalGenerator_Parameters.Validate if the designated constraints aren't met.
+type SignalGenerator_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalGenerator_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalGenerator_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalGenerator_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalGenerator_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalGenerator_ParametersValidationError) ErrorName() string {
+	return "SignalGenerator_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SignalGenerator_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalGenerator_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalGenerator_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalGenerator_ParametersValidationError{}
+
+// Validate checks the field values on SignalGenerator_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SignalGenerator_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalGenerator_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SignalGenerator_InsMultiError, or nil if none found.
+func (m *SignalGenerator_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalGenerator_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetForward()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_InsValidationError{
+					field:  "Forward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_InsValidationError{
+					field:  "Forward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetForward()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_InsValidationError{
+				field:  "Forward",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetBackward()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_InsValidationError{
+					field:  "Backward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_InsValidationError{
+					field:  "Backward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBackward()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_InsValidationError{
+				field:  "Backward",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetReset_()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_InsValidationError{
+					field:  "Reset_",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_InsValidationError{
+					field:  "Reset_",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetReset_()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_InsValidationError{
+				field:  "Reset_",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SignalGenerator_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalGenerator_InsMultiError is an error wrapping multiple validation
+// errors returned by SignalGenerator_Ins.ValidateAll() if the designated
+// constraints aren't met.
+type SignalGenerator_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalGenerator_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalGenerator_InsMultiError) AllErrors() []error { return m }
+
+// SignalGenerator_InsValidationError is the validation error returned by
+// SignalGenerator_Ins.Validate if the designated constraints aren't met.
+type SignalGenerator_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalGenerator_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalGenerator_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalGenerator_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalGenerator_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalGenerator_InsValidationError) ErrorName() string {
+	return "SignalGenerator_InsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SignalGenerator_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalGenerator_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalGenerator_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalGenerator_InsValidationError{}
+
+// Validate checks the field values on SignalGenerator_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SignalGenerator_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalGenerator_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SignalGenerator_OutsMultiError, or nil if none found.
+func (m *SignalGenerator_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalGenerator_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_OutsValidationError{
+				field:  "Output",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAtStart()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_OutsValidationError{
+					field:  "AtStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_OutsValidationError{
+					field:  "AtStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAtStart()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_OutsValidationError{
+				field:  "AtStart",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAtEnd()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_OutsValidationError{
+					field:  "AtEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_OutsValidationError{
+					field:  "AtEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAtEnd()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_OutsValidationError{
+				field:  "AtEnd",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SignalGenerator_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalGenerator_OutsMultiError is an error wrapping multiple validation
+// errors returned by SignalGenerator_Outs.ValidateAll() if the designated
+// constraints aren't met.
+type SignalGenerator_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalGenerator_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalGenerator_OutsMultiError) AllErrors() []error { return m }
+
+// SignalGenerator_OutsValidationError is the validation error returned by
+// SignalGenerator_Outs.Validate if the designated constraints aren't met.
+type SignalGenerator_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalGenerator_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalGenerator_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalGenerator_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalGenerator_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalGenerator_OutsValidationError) ErrorName() string {
+	return "SignalGenerator_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SignalGenerator_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalGenerator_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalGenerator_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalGenerator_OutsValidationError{}
+
+// Validate checks the field values on SignalGenerator_Parameters_Step with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SignalGenerator_Parameters_Step) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalGenerator_Parameters_Step with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// SignalGenerator_Parameters_StepMultiError, or nil if none found.
+func (m *SignalGenerator_Parameters_Step) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalGenerator_Parameters_Step) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTargetOutput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_Parameters_StepValidationError{
+					field:  "TargetOutput",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_Parameters_StepValidationError{
+					field:  "TargetOutput",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTargetOutput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_Parameters_StepValidationError{
+				field:  "TargetOutput",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDuration()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalGenerator_Parameters_StepValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalGenerator_Parameters_StepValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalGenerator_Parameters_StepValidationError{
+				field:  "Duration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SignalGenerator_Parameters_StepMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalGenerator_Parameters_StepMultiError is an error wrapping multiple
+// validation errors returned by SignalGenerator_Parameters_Step.ValidateAll()
+// if the designated constraints aren't met.
+type SignalGenerator_Parameters_StepMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalGenerator_Parameters_StepMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalGenerator_Parameters_StepMultiError) AllErrors() []error { return m }
+
+// SignalGenerator_Parameters_StepValidationError is the validation error
+// returned by SignalGenerator_Parameters_Step.Validate if the designated
+// constraints aren't met.
+type SignalGenerator_Parameters_StepValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalGenerator_Parameters_StepValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalGenerator_Parameters_StepValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalGenerator_Parameters_StepValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalGenerator_Parameters_StepValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalGenerator_Parameters_StepValidationError) ErrorName() string {
+	return "SignalGenerator_Parameters_StepValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SignalGenerator_Parameters_StepValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalGenerator_Parameters_Step.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalGenerator_Parameters_StepValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalGenerator_Parameters_StepValidationError{}

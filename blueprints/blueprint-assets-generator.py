@@ -95,9 +95,9 @@ class Blueprint:
             json_schema_link = (
                 f"{blueprints_root_relative_path}/{blueprint}/gen/definitions.json#"
             )
-            if annotation_type == "@param":
+            if annotation_type == "param":
                 json_schema_link += f"/properties/{parts[0]}"
-            elif annotation_type == "@schema":
+            elif annotation_type == "schema":
                 json_schema_link += f"/$defs/{parts[0]}"
             else:
                 logger.error(
@@ -263,7 +263,12 @@ def update_param_defaults(
         config = root
         for idx, part in enumerate(parts):
             if idx == len(parts) - 1:
-                return config[part]
+                try:
+                    return config[part]
+                except KeyError:
+                    # fatal exit
+                    logger.error(f"Unable to find param {name} in rendered config")
+                    raise typer.Exit(1)
             else:
                 try:
                     config = config[part]
@@ -297,23 +302,23 @@ def update_param_defaults(
 MARKDOWN_DOC_TPL = """
 {%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
-Array of {{- render_type(param_type[2:], is_complex_type) }}
+{{- 'Array of ' + render_type(param_type[2:], is_complex_type) }}
 {%- elif param_type.startswith('map[') %}
-Object with keys and values of type {{- render_type(param_type[4:-1], is_complex_type) }}
+{{- 'Map of ' + render_type(param_type[4:-1], is_complex_type) }}
 {%- elif is_complex_type %}
-Object ({{ param_type }})
+{{- 'Object (' + param_type + ')' }}
 {%- elif param_type == 'bool' %}
-Boolean
+{{- 'Boolean' }}
 {%- elif param_type == 'float32' %}
-Number (float)
+{{- 'Number (float)' }}
 {%- elif param_type == 'float64' %}
-Number (double)
+{{- 'Number (double)' }}
 {%- elif param_type == 'int32' %}
-Integer (int32)
+{{- 'Integer (int32)' }}
 {%- elif param_type == 'int64' %}
-Integer (int64)
+{{- 'Integer (int64)' }}
 {%- else %}
-{{ param_type }}
+{{- param_type }}
 {%- endif %}
 {%- endmacro %}
 
@@ -322,22 +327,34 @@ Integer (int64)
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
 {%- if node.parameter.param_type == 'intermediate_node' %}
+<!-- vale off -->
+
 {{ heading_level }} {{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
+<!-- vale on -->
+
 {%- for child_name, child_node in node.children.items() if child_node.parameter.param_type != 'intermediate_node' %}
-{{ render_node(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
+{{ render_node(child_node, level + 1, annotation_type,
+               parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- for child_name, child_node in node.children.items() if child_node.parameter.param_type == 'intermediate_node' %}
-{{ render_node(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
+{{ render_node(child_node, level + 1, annotation_type,
+               parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- else %}
+<!-- vale off -->
+
 <a id="{{ anchor }}"></a>
+
 <ParameterDescription
-    name="{{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }}"
-    type="{{ render_type(node.parameter.param_type, node.parameter.is_complex_type) }}"
-    reference="{{ node.parameter.docs_link }}"
-    value="{{ node.parameter.default | quoteValueDocs }}"
-    description='{{ node.parameter.description }}' />
+    name='{{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }}'
+    description='{{ node.parameter.description }}'
+    type='{{- render_type(node.parameter.param_type, node.parameter.is_complex_type) }}'
+    reference='{{ node.parameter.docs_link }}'
+    value='{{ node.parameter.default | to_json }}'
+/>
+
+<!-- vale on -->
 {%- endif %}
 {%- endmacro %}
 
@@ -375,23 +392,23 @@ Integer (int64)
 MARKDOWN_README_TPL = """
 {%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
-Array of {{- render_type(param_type[2:], is_complex_type) }}
+{{- 'Array of ' + render_type(param_type[2:], is_complex_type) }}
 {%- elif param_type.startswith('map[') %}
-Object with keys and values of type {{- render_type(param_type[4:-1], is_complex_type) }}
+{{- 'Map of ' + render_type(param_type[4:-1], is_complex_type) }}
 {%- elif is_complex_type %}
-Object ({{ param_type }})
+{{- 'Object (' + param_type + ')' }}
 {%- elif param_type == 'bool' %}
-Boolean
+{{- 'Boolean' }}
 {%- elif param_type == 'float32' %}
-Number (float)
+{{- 'Number (float)' }}
 {%- elif param_type == 'float64' %}
-Number (double)
+{{- 'Number (double)' }}
 {%- elif param_type == 'int32' %}
-Integer (int32)
+{{- 'Integer (int32)' }}
 {%- elif param_type == 'int64' %}
-Integer (int64)
+{{- 'Integer (int64)' }}
 {%- else %}
-{{ param_type }}
+{{- param_type }}
 {%- endif %}
 {%- endmacro %}
 
@@ -406,13 +423,20 @@ Integer (int64)
 **Description**: {{ node.parameter.description }}
 {%- endif %}
 {%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
+{{ render_properties(child_node, level + 1, annotation_type,
+                     parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- else %}
 {{ heading_level }} {{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }} {#{{ anchor }}}
-**Type**: {{ render_type(node.parameter.param_type, node.parameter.is_complex_type) }}
-**Default Value**: `{{ node.parameter.default | quoteValueDocs }}`
 **Description**: {{ node.parameter.description }}
+**Type**: {{- render_type(node.parameter.param_type, node.parameter.is_complex_type) }}
+**Default Value**:
+<details>
+<summary>Click to expand</summary>
+```yaml
+{{ node.parameter.default | to_yaml }}
+```
+</details>
 {%- endif %}
 {%- endmacro %}
 
@@ -490,8 +514,9 @@ type: "{{ param_type }}"
 {% else %}
 {{ node.parameter.param_name }}:
   description: "{{ node.parameter.description }}"
-  default: {{ node.parameter.default | quoteValueYAML }}
-  {{ render_type(node.parameter.param_type, node.parameter.json_schema_link, node.parameter.is_complex_type) | indent(2, true) }}
+  default: {{ node.parameter.default | quote_value }}
+  {{ render_type(node.parameter.param_type, node.parameter.json_schema_link,
+                 node.parameter.is_complex_type) | indent(2, true) }}
 {% endif %}
 {% endif %}
 {% endmacro %}
@@ -527,8 +552,16 @@ YAML_TPL = """
 {%- for key, val in value.items() %}
 {{ '  ' * (level) }}{{ key }}: {{ render_value(val, level+1) }}
 {%- endfor %}
+{%- elif value is iterable and value is not string %}
+{%- if value | length == 0 %}
+{{- '[]' }}
 {%- else %}
-{{- value | quoteValueYAML }}
+{%- for item in value %}
+{{ '  ' * level }}- {{ render_value(item, level+1) }}
+{%- endfor %}
+{%- endif %}
+{%- else %}
+{{- value | quote_value }}
 {%- endif %}
 {%- endmacro %}
 {%- macro render_node(node, level) %}
@@ -560,41 +593,19 @@ YAML_TPL = """
 """
 
 
-def quoteValueYAML(value: str) -> str:
+def quote_value(value: str) -> str:
     # if value is __REQUIRED_FIELD__ return as unquoted string
     if value == "__REQUIRED_FIELD__":
         return value
-    return quoteValueJSON(value)
-
-
-def quoteValueJSON(value: str) -> str:
     return json.dumps(value)
 
 
-def quoteValueDocs(value: str) -> str:
-    # if value is __REQUIRED_FIELD__ return as unquoted string
-    if value == "__REQUIRED_FIELD__":
-        return value
+def to_yaml(value: Any) -> str:
+    return yaml.dump(value, default_flow_style=False)
 
-    if isinstance(value, bool):
-        return str(value).lower()
 
-    try:
-        int(value)
-        return value
-    except (ValueError, TypeError):
-        pass
-
-    try:
-        float(value)
-        return value
-    except (ValueError, TypeError):
-        pass
-
-    if isinstance(value, list) or isinstance(value, dict):
-        return value
-
-    return f"'{value}'"
+def to_json(value: Any) -> str:
+    return json.dumps(value)
 
 
 def get_jinja2_environment() -> jinja2.Environment:
@@ -606,14 +617,12 @@ def get_jinja2_environment() -> jinja2.Environment:
     }
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
     env = jinja2.Environment(
-        loader=loader,
-        comment_start_string="<!--",
-        comment_end_string="-->",
+        loader=loader, comment_start_string="<%--", comment_end_string="--%>"
     )
     env.filters["slugify"] = slugify
-    env.filters["quoteValueYAML"] = quoteValueYAML
-    env.filters["quoteValueJSON"] = quoteValueJSON
-    env.filters["quoteValueDocs"] = quoteValueDocs
+    env.filters["quote_value"] = quote_value
+    env.filters["to_yaml"] = to_yaml
+    env.filters["to_json"] = to_json
     return env
 
 
@@ -702,7 +711,9 @@ def update_docs_markdown(
         readme_copied += f"\n:::\n\n"
 
     readme_copied += f"## Configuration\n"
-    readme_copied += f"\nCode: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
+    readme_copied += f"<!-- vale off -->\n"
+    readme_copied += f"\nBlueprint name: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
+    readme_copied += f"<!-- vale on -->\n"
 
     env = get_jinja2_environment()
     template = env.get_template("markdown.doc.md.j2")
@@ -834,6 +845,9 @@ def main(
     )
 
     blueprint_gen_path = blueprint_path / "gen"
+
+    # create the gen directory if it doesn't exist
+    blueprint_gen_path.mkdir(parents=True, exist_ok=True)
 
     config_parameters = parse_config_parameters(
         repository_root,

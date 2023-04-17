@@ -1761,6 +1761,47 @@ func (m *Component) validate(all bool) error {
 			}
 		}
 
+	case *Component_SignalGenerator:
+		if v == nil {
+			err := ComponentValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSignalGenerator()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ComponentValidationError{
+						field:  "SignalGenerator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ComponentValidationError{
+						field:  "SignalGenerator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSignalGenerator()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ComponentValidationError{
+					field:  "SignalGenerator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *Component_Query:
 		if v == nil {
 			err := ComponentValidationError{

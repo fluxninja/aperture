@@ -86,9 +86,9 @@ type AgentConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	ServiceDiscoverySpec common.ServiceDiscoverySpec `json:"service_discovery"`
 
-	// OTEL configuration.
+	// OTel configuration.
 	//+kubebuilder:validation:Optional
-	OTEL agent.AgentOTELConfig `json:"otel"`
+	OTel agent.AgentOTelConfig `json:"otel"`
 
 	// Agent functions configuration.
 	//+kubebuilder:validation:Optional
@@ -102,9 +102,9 @@ type FlowControlConfigSpec struct {
 	FlowPreviewConfig preview.FlowPreviewConfig `json:"preview_service"`
 }
 
-// AutoScaleConfigSpec holds auto scale configuration.
+// AutoScaleConfigSpec holds auto-scale configuration.
 type AutoScaleConfigSpec struct {
-	// AutoScaleKubernetesConfig holds auto scale kubernetes configuration.
+	// AutoScaleKubernetesConfig holds auto-scale kubernetes configuration.
 	//+kubebuilder:validation:Optional
 	AutoScaleKubernetesConfig autoscalek8sconfig.AutoScaleKubernetesConfig `json:"kubernetes"`
 }

@@ -116,13 +116,13 @@ func (p PortToSignals) merge(other PortToSignals) error {
 
 // ConstantSignal is a mirror struct to same proto message.
 type ConstantSignal struct {
-	SpecialValue string  `mapstructure:"special_value"`
+	specialValue string  `mapstructure:"special_value"`
 	Value        float64 `mapstructure:"value"`
 }
 
 // Description returns a description of the constant signal.
 func (constantSignal *ConstantSignal) Description() string {
-	specialValue := constantSignal.SpecialValue
+	specialValue := constantSignal.specialValue
 	value := constantSignal.Value
 	var description string
 	if specialValue != "" {
@@ -136,7 +136,7 @@ func (constantSignal *ConstantSignal) Description() string {
 
 // Float returns the float value of the constant signal.
 func (constantSignal *ConstantSignal) Float() float64 {
-	specialValue := constantSignal.SpecialValue
+	specialValue := constantSignal.specialValue
 	value := constantSignal.Value
 	if specialValue == "NaN" {
 		return math.NaN()
@@ -150,10 +150,16 @@ func (constantSignal *ConstantSignal) Float() float64 {
 	return value
 }
 
+// IsSpecial returns true if the constant signal is a special value.
+func (constantSignal *ConstantSignal) IsSpecial() bool {
+	float := constantSignal.Float()
+	return math.IsNaN(float) || math.IsInf(float, 0)
+}
+
 // ConstantSignalFromProto creates a ConstantSignal from a proto message.
 func ConstantSignalFromProto(constantSignalProto *policylangv1.ConstantSignal) *ConstantSignal {
 	return &ConstantSignal{
-		SpecialValue: constantSignalProto.GetSpecialValue(),
+		specialValue: constantSignalProto.GetSpecialValue(),
 		Value:        constantSignalProto.GetValue(),
 	}
 }

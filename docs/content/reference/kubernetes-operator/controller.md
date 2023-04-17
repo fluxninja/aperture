@@ -16,6 +16,8 @@ required for it.
 Below are the Kubernetes Objects which get created for the Operator considering
 `controller` is the release name and `default` is the namespace:
 
+<!-- vale off -->
+
 | API Version                     | Kind                         | Name                                    | Namespace |
 | ------------------------------- | ---------------------------- | --------------------------------------- | --------- |
 | apiextensions.k8s.io/v1         | CustomResourceDefinition     | controllers.fluxninja.com               | Global    |
@@ -43,10 +45,14 @@ Below are the Kubernetes Objects which get created for the Operator considering
 | apps/v1                         | StatefulSet                  | controller-etcd                         | default   |
 | fluxninja.com/v1alpha1          | Controller                   | controller                              | default   |
 
+<!-- vale on -->
+
 ## Kubernetes Objects by Operator
 
-Below are the Kubernetes Objects which get created by the Operator considering
+Below are the Kubernetes Objects which are created by the Operator, considering
 `controller` is the Custom Resource name and `default` is the namespace:
+
+<!-- vale off -->
 
 | API Version                     | Kind                           | Name                       | Namespace |
 | ------------------------------- | ------------------------------ | -------------------------- | --------- |
@@ -58,3 +64,5 @@ Below are the Kubernetes Objects which get created by the Operator considering
 | v1                              | Secret                         | controller-controller-cert | default   |
 | v1                              | ServiceAccount                 | aperture-controller        | default   |
 | apps/v1                         | Deployment                     | aperture-controller        | default   |
+
+<!-- vale on -->

@@ -150,7 +150,7 @@ func (r *registry) Detach() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// We don't have Attach() so parent can't change to other than nil.
+	// We do not have Attach() so parent cannot change to other than nil.
 	if r.parent != nil {
 		// remove child from parent
 		childKV := kv{Key: r.key, Value: r.value}

@@ -12,8 +12,7 @@ List Aperture Blueprints
 
 ### Synopsis
 
-Use this command to list the Aperture Blueprints which are already pulled and
-available in local system.
+Use this command to list the Aperture Blueprints which are already pulled and available in local system.
 
 ```
 aperturectl blueprints list [flags]
@@ -46,5 +45,4 @@ aperturectl blueprints list --all
 
 ### SEE ALSO
 
-- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) -
-  Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints

@@ -50,8 +50,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
-// ModuleForAgentOTEL provides fx options for AgentOTELComponent.
-func ModuleForAgentOTEL() fx.Option {
+// ModuleForAgentOTel provides fx options for AgentOTelComponent.
+func ModuleForAgentOTel() fx.Option {
 	return fx.Options(
 		kubeletstatsreceiver.Module(),
 		k8sattributesprocessor.Module(),
@@ -71,7 +71,7 @@ func ModuleForAgentOTEL() fx.Option {
 				fx.ResultTags(otelconfig.BaseFxTag),
 			),
 			fx.Annotate(
-				AgentOTELComponents,
+				AgentOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
 					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
@@ -82,8 +82,8 @@ func ModuleForAgentOTEL() fx.Option {
 	)
 }
 
-// AgentOTELComponents constructs OTEL Collector Factories for Agent.
-func AgentOTELComponents(
+// AgentOTelComponents constructs OTel Collector Factories for Agent.
+func AgentOTelComponents(
 	alerter alerts.Alerter,
 	receiverFactories []receiver.Factory,
 	processorFactories []processor.Factory,
@@ -104,7 +104,7 @@ func AgentOTELComponents(
 	)
 	errs = multierr.Append(errs, err)
 
-	// We need to create and register empty server wrappers in GRPC server, as OTEL
+	// We need to create and register empty server wrappers in GRPC server, as OTel
 	// receivers are created after our GRPC server is started.
 	// Inside the otlpreceiver the wrappers are filled with proper servers.
 	tsw := &otlpreceiver.TraceServerWrapper{}

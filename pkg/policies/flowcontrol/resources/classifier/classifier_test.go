@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/open-policy-agent/opa/ast"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -153,7 +154,7 @@ var _ = Describe("Classifier", func() {
 				map[string]string{"version": "one", "other": "tag"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -162,7 +163,7 @@ var _ = Describe("Classifier", func() {
 			}))
 		})
 
-		It("doesn't classify if direction doesn't match", func() {
+		It("does not classify if direction does not match", func() {
 			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
@@ -170,7 +171,7 @@ var _ = Describe("Classifier", func() {
 				map[string]string{"version": "one"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(BeEmpty())
@@ -184,7 +185,7 @@ var _ = Describe("Classifier", func() {
 				map[string]string{"version": "two"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -203,7 +204,7 @@ var _ = Describe("Classifier", func() {
 					map[string]string{"version": "one"},
 					attributesWithHeaders(object{
 						"foo": "hello",
-						"bar": 21,
+						"bar": int64(21),
 					}),
 				)
 				Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -276,7 +277,7 @@ var _ = Describe("Classifier", func() {
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -287,7 +288,7 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("configured with same label for different rules in yaml", func() {
-		// Note: we don't support multiple rules for the same label in a single
+		// Note: we do not support multiple rules for the same label in a single
 		// rulesets. But we might add support in the future, eg.:
 		// "foo/1": ...
 		// "foo/2": ...
@@ -320,7 +321,7 @@ var _ = Describe("Classifier", func() {
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"xyz": "cos",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(SatisfyAny(
@@ -375,7 +376,7 @@ var _ = Describe("Classifier", func() {
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(SatisfyAny(
@@ -438,7 +439,7 @@ var _ = Describe("Classifier", func() {
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{}))
@@ -481,16 +482,16 @@ func fl(s string) flowlabel.FlowLabelValue {
 	}
 }
 
-func attributesWithHeaders(headers object) object {
-	return object{
+func attributesWithHeaders(headers object) ast.Value {
+	input := object{
 		"attributes": object{
 			"request": object{
 				"http": object{
 					"headers": headers,
 				},
 			},
-		},
-	}
+		}}
+	return ast.MustInterfaceToValue(input)
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {

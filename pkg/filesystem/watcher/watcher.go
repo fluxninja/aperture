@@ -72,7 +72,7 @@ func (w *watcher) Start() error {
 
 	w.waitGroup.Add(1)
 
-	// bootstrap existing files -- we don't have to add notifiers here as they get added when watch
+	// bootstrap existing files -- we do not have to add notifiers here as they get added when watch
 	// events go routine starts -- this code is for caching the file contents in trackers
 	files, err := os.ReadDir(w.directory)
 	if err != nil {

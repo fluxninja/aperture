@@ -158,7 +158,7 @@ func (h *EtcdHarness) pollEtcdForReadiness() error {
 			time.Sleep(toSleep)
 		}
 	}
-	return fmt.Errorf("etcd didn't come up in 4000ms")
+	return fmt.Errorf("etcd did not come up in 4000ms")
 }
 
 func (h *EtcdHarness) activateAuthentication() context.CancelFunc {

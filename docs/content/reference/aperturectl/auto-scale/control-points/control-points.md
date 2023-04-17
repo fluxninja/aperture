@@ -41,5 +41,4 @@ aperturectl auto-scale control-points --kube
 
 ### SEE ALSO
 
-- [aperturectl auto-scale](/reference/aperturectl/auto-scale/auto-scale.md) -
-  AutoScale integrations
+- [aperturectl auto-scale](/reference/aperturectl/auto-scale/auto-scale.md) - AutoScale integrations

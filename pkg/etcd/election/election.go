@@ -107,7 +107,7 @@ type Election struct {
 	// When closed, leader election has stopped (either due to becoming the
 	// leader or due to cancellation).
 	// Note: chan is used here instead of WaitGroup, so that calls to
-	// WaitUntilLeader done before election is started don't immediately return.
+	// WaitUntilLeader done before election is started do not immediately return.
 	doneChan chan struct{}
 }
 

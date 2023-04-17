@@ -1,0 +1,530 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/feature-rollout/base blueprint",
+  "additionalProperties": false,
+  "required": ["common", "policy"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        }
+      }
+    },
+    "policy": {
+      "description": "Parameters for the Feature Rollout policy.",
+      "default": {
+        "components": [],
+        "drivers": {},
+        "evaluation_interval": "1s",
+        "load_shaper": {
+          "flow_regulator_parameters": {
+            "flow_selector": {
+              "flow_matcher": {
+                "control_point": "__REQUIRED_FIELD__"
+              },
+              "service_selector": {
+                "service": "__REQUIRED_FIELD__"
+              }
+            },
+            "label_key": ""
+          },
+          "steps": [
+            {
+              "duration": "__REQUIRED_FIELD__",
+              "target_accept_percentage": "__REQUIRED_FIELD__"
+            }
+          ]
+        },
+        "resources": {
+          "flow_control": {
+            "classifiers": []
+          }
+        }
+      },
+      "type": "object",
+      "$ref": "#/$defs/rollout_policy"
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "5s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "From time of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "To time of dashboard.",
+          "default": "now",
+          "type": "string"
+        },
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
+              "type": "string"
+            },
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "default": "",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "promql_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["query_string"],
+      "properties": {
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "forward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the forward criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "operator": {
+              "description": "The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            }
+          }
+        },
+        "backward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the backward criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "operator": {
+              "description": "The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            }
+          }
+        },
+        "reset": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the reset criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "operator": {
+              "description": "The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "average_latency_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flow_selector"],
+      "properties": {
+        "flow_selector": {
+          "description": "Identify the service and flows whose latency needs to be measured.",
+          "default": {
+            "flow_matcher": {
+              "control_point": "__REQUIRED_FIELD__"
+            },
+            "service_selector": {
+              "service": "__REQUIRED_FIELD__"
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+        },
+        "forward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the forward criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "backward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the backward criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "reset": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the reset criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        }
+      }
+    },
+    "percentile_latency_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flux_meter"],
+      "properties": {
+        "flux_meter": {
+          "description": "FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.",
+          "default": {
+            "flow_selector": {
+              "flow_matcher": {
+                "control_point": "__REQUIRED_FIELD__"
+              },
+              "service_selector": {
+                "service": "__REQUIRED_FIELD__"
+              }
+            },
+            "static_buckets": {
+              "buckets": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
+        },
+        "forward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the forward criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "backward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the backward criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "reset": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "threshold": {
+              "description": "The threshold for the reset criteria.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "percentile": {
+          "description": "The percentile to be used for latency measurement.",
+          "default": 95,
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ema_latency_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flow_selector", "ema"],
+      "properties": {
+        "flow_selector": {
+          "description": "Identify the service and flows whose latency needs to be measured.",
+          "default": {
+            "flow_matcher": {
+              "control_point": "__REQUIRED_FIELD__"
+            },
+            "service_selector": {
+              "service": "__REQUIRED_FIELD__"
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+        },
+        "forward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "latency_tolerance_multiplier": {
+              "description": "The threshold for the forward criteria.",
+              "default": 1.05,
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "backward": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "latency_tolerance_multiplier": {
+              "description": "The threshold for the backward criteria.",
+              "default": 1.05,
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "reset": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "latency_tolerance_multiplier": {
+              "description": "The threshold for the reset criteria.",
+              "default": 1.25,
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "ema": {
+          "description": "The parameters for the exponential moving average.",
+          "default": {
+            "ema_window": "1500s",
+            "warmup_window": "60s"
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/EMAParameters"
+        }
+      }
+    },
+    "rollout_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["load_shaper"],
+      "properties": {
+        "load_shaper": {
+          "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
+          "default": {
+            "flow_regulator_parameters": {
+              "flow_selector": {
+                "flow_matcher": {
+                  "control_point": "__REQUIRED_FIELD__"
+                },
+                "service_selector": {
+                  "service": "__REQUIRED_FIELD__"
+                }
+              },
+              "label_key": ""
+            },
+            "steps": [
+              {
+                "duration": "__REQUIRED_FIELD__",
+                "target_accept_percentage": "__REQUIRED_FIELD__"
+              }
+            ]
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/LoadShaperParameters"
+        },
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "resources": {
+          "description": "List of additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "1s",
+          "type": "string"
+        },
+        "drivers": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "promql_drivers": {
+              "description": "List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.",
+              "default": [
+                {
+                  "backward": {
+                    "operator": "__REQUIRED_FIELD__",
+                    "threshold": "__REQUIRED_FIELD__"
+                  },
+                  "forward": {
+                    "operator": "__REQUIRED_FIELD__",
+                    "threshold": "__REQUIRED_FIELD__"
+                  },
+                  "query_string": "__REQUIRED_FIELD__",
+                  "reset": {
+                    "operator": "__REQUIRED_FIELD__",
+                    "threshold": "__REQUIRED_FIELD__"
+                  }
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/promql_driver"
+              }
+            },
+            "average_latency_drivers": {
+              "description": "List of drivers that compare average latency against forward, backward and reset thresholds.",
+              "default": [
+                {
+                  "backward": {
+                    "threshold": "__REQUIRED_FIELD__"
+                  },
+                  "flow_selector": {
+                    "flow_matcher": {
+                      "control_point": "__REQUIRED_FIELD__"
+                    },
+                    "service_selector": {
+                      "service": "__REQUIRED_FIELD__"
+                    }
+                  },
+                  "forward": {
+                    "threshold": "__REQUIRED_FIELD__"
+                  },
+                  "reset": {
+                    "threshold": "__REQUIRED_FIELD__"
+                  }
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/average_latency_driver"
+              }
+            },
+            "percentile_latency_drivers": {
+              "description": "List of drivers that compare percentile latency against forward, backward and reset thresholds.",
+              "default": [
+                {
+                  "backward": {
+                    "threshold": "__REQUIRED_FIELD__"
+                  },
+                  "flux_meter": {
+                    "flow_selector": {
+                      "flow_matcher": {
+                        "control_point": "__REQUIRED_FIELD__"
+                      },
+                      "service_selector": {
+                        "service": "__REQUIRED_FIELD__"
+                      }
+                    },
+                    "static_buckets": {
+                      "buckets": [
+                        5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000
+                      ]
+                    }
+                  },
+                  "forward": {
+                    "threshold": "__REQUIRED_FIELD__"
+                  },
+                  "percentile": 95,
+                  "reset": {
+                    "threshold": "__REQUIRED_FIELD__"
+                  }
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/percentile_latency_driver"
+              }
+            },
+            "ema_latency_drivers": {
+              "description": "List of drivers that compare trend latency against forward, backward and reset thresholds.",
+              "default": [
+                {
+                  "backward": {
+                    "latency_tolerance_multiplier": 1.05
+                  },
+                  "ema": {
+                    "ema_window": "1500s",
+                    "warmup_window": "60s"
+                  },
+                  "flow_selector": {
+                    "flow_matcher": {
+                      "control_point": "__REQUIRED_FIELD__"
+                    },
+                    "service_selector": {
+                      "service": "__REQUIRED_FIELD__"
+                    }
+                  },
+                  "forward": {
+                    "latency_tolerance_multiplier": 1.05
+                  },
+                  "reset": {
+                    "latency_tolerance_multiplier": 1.25
+                  }
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/ema_latency_driver"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

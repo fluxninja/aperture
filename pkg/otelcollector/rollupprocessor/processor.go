@@ -77,7 +77,7 @@ func newRollupProcessor(set processor.CreateSettings, cfg *Config) (*rollupProce
 		// Ignore already registered error, as this is not harmful. Metrics may
 		// be registered by other running processor.
 		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-			return nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
+			return nil, fmt.Errorf("could not register prometheus metrics: %w", err)
 		}
 	}
 

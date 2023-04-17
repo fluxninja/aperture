@@ -8,7 +8,7 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  * </pre>
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.49.1)",
+    value = "by gRPC proto compiler (version 1.54.0)",
     comments = "Source: aperture/flowcontrol/check/v1/check.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class FlowControlServiceGrpc {
@@ -98,37 +98,41 @@ public final class FlowControlServiceGrpc {
    * FlowControlService is used to perform Flow Control operations.
    * </pre>
    */
-  public static abstract class FlowControlServiceImplBase implements io.grpc.BindableService {
+  public interface AsyncService {
 
     /**
      * <pre>
      * Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
      * </pre>
      */
-    public void check(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest request,
+    default void check(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest request,
         io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCheckMethod(), responseObserver);
-    }
-
-    @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
-      return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
-          .addMethod(
-            getCheckMethod(),
-            io.grpc.stub.ServerCalls.asyncUnaryCall(
-              new MethodHandlers<
-                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest,
-                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>(
-                  this, METHODID_CHECK)))
-          .build();
     }
   }
 
   /**
+   * Base class for the server implementation of the service FlowControlService.
    * <pre>
    * FlowControlService is used to perform Flow Control operations.
    * </pre>
    */
-  public static final class FlowControlServiceStub extends io.grpc.stub.AbstractAsyncStub<FlowControlServiceStub> {
+  public static abstract class FlowControlServiceImplBase
+      implements io.grpc.BindableService, AsyncService {
+
+    @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
+      return FlowControlServiceGrpc.bindService(this);
+    }
+  }
+
+  /**
+   * A stub to allow clients to do asynchronous rpc calls to service FlowControlService.
+   * <pre>
+   * FlowControlService is used to perform Flow Control operations.
+   * </pre>
+   */
+  public static final class FlowControlServiceStub
+      extends io.grpc.stub.AbstractAsyncStub<FlowControlServiceStub> {
     private FlowControlServiceStub(
         io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
@@ -153,11 +157,13 @@ public final class FlowControlServiceGrpc {
   }
 
   /**
+   * A stub to allow clients to do synchronous rpc calls to service FlowControlService.
    * <pre>
    * FlowControlService is used to perform Flow Control operations.
    * </pre>
    */
-  public static final class FlowControlServiceBlockingStub extends io.grpc.stub.AbstractBlockingStub<FlowControlServiceBlockingStub> {
+  public static final class FlowControlServiceBlockingStub
+      extends io.grpc.stub.AbstractBlockingStub<FlowControlServiceBlockingStub> {
     private FlowControlServiceBlockingStub(
         io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
@@ -181,11 +187,13 @@ public final class FlowControlServiceGrpc {
   }
 
   /**
+   * A stub to allow clients to do ListenableFuture-style rpc calls to service FlowControlService.
    * <pre>
    * FlowControlService is used to perform Flow Control operations.
    * </pre>
    */
-  public static final class FlowControlServiceFutureStub extends io.grpc.stub.AbstractFutureStub<FlowControlServiceFutureStub> {
+  public static final class FlowControlServiceFutureStub
+      extends io.grpc.stub.AbstractFutureStub<FlowControlServiceFutureStub> {
     private FlowControlServiceFutureStub(
         io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
@@ -216,10 +224,10 @@ public final class FlowControlServiceGrpc {
       io.grpc.stub.ServerCalls.ServerStreamingMethod<Req, Resp>,
       io.grpc.stub.ServerCalls.ClientStreamingMethod<Req, Resp>,
       io.grpc.stub.ServerCalls.BidiStreamingMethod<Req, Resp> {
-    private final FlowControlServiceImplBase serviceImpl;
+    private final AsyncService serviceImpl;
     private final int methodId;
 
-    MethodHandlers(FlowControlServiceImplBase serviceImpl, int methodId) {
+    MethodHandlers(AsyncService serviceImpl, int methodId) {
       this.serviceImpl = serviceImpl;
       this.methodId = methodId;
     }
@@ -246,6 +254,18 @@ public final class FlowControlServiceGrpc {
           throw new AssertionError();
       }
     }
+  }
+
+  public static final io.grpc.ServerServiceDefinition bindService(AsyncService service) {
+    return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
+        .addMethod(
+          getCheckMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest,
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>(
+                service, METHODID_CHECK)))
+        .build();
   }
 
   private static abstract class FlowControlServiceBaseDescriptorSupplier

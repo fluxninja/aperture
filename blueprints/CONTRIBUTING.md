@@ -107,7 +107,7 @@ Parser knows about the following docblock tags: `@section`, `@subsection` and
 (See [More on sources][more on sources] from `metadata.yaml` description). This
 field is required.
 
-`@subsection` must be unique within single `@section` and it's used to separate
+`@subsection` must be unique within single `@section` and it is used to separate
 parts of the configuration reference with sub headings.
 
 `@param` can be used to add documentation for specific fields. It's format is as

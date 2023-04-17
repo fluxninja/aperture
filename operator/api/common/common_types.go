@@ -19,13 +19,13 @@ package common
 
 import (
 	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
-	"github.com/fluxninja/aperture/extensions/sentry"
+	sentry "github.com/fluxninja/aperture/extensions/sentry/config"
 	alertmgrconfig "github.com/fluxninja/aperture/pkg/alertmanager/config"
 	"github.com/fluxninja/aperture/pkg/config"
 	kubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
-	"github.com/fluxninja/aperture/pkg/discovery/static"
+	static "github.com/fluxninja/aperture/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
-	"github.com/fluxninja/aperture/pkg/jobs"
+	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
@@ -33,7 +33,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/profilers"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 
 	corev1 "k8s.io/api/core/v1"

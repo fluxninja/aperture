@@ -16,6 +16,8 @@ and behavior. The stream can be stored and visualized in
 
 ### Common
 
+<!-- vale off -->
+
 | Name                                   | Type        | Example Values                                                                                                                                                            | Description                                        | Flow Control Integrations |
 | -------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------- |
 | aperture.source                        | single      | sdk, envoy                                                                                                                                                                | Aperture Flow source                               | SDKs, Envoy               |
@@ -36,7 +38,11 @@ and behavior. The stream can be stored and visualized in
 | aperture.flow.status                   | single      | OK, Error                                                                                                                                                                 | Denotes OK or Error across all protocols           | SDKs, Envoy               |
 | response_received                      | single      | true, false                                                                                                                                                               | Designates whether a response was received         | SDKs, envoy               |
 
+<!-- vale on -->
+
 ### HTTP
+
+<!-- vale off -->
 
 | Name                         | Type   | Example Values                                             | Description                                   | Flow Control Integrations |
 | ---------------------------- | ------ | ---------------------------------------------------------- | --------------------------------------------- | ------------------------- |
@@ -50,13 +56,21 @@ and behavior. The stream can be stored and visualized in
 | http.flavor                  | single | 1.1                                                        | HTTP protocol version                         | Envoy                     |
 | {user-defined-labels}        |        |                                                            | Configured through [_Classifier_][classifier] | Envoy                     |
 
+<!-- vale on -->
+
 ### SDK
+
+<!-- vale off -->
 
 | Name                  | Type | Example Values | Description                                      | Flow Control Integrations |
 | --------------------- | ---- | -------------- | ------------------------------------------------ | ------------------------- |
 | {user-defined-labels} |      |                | Explicitly passed through FlowStart call in SDKs | SDKs                      |
 
+<!-- vale on -->
+
 ## Metric Columns
+
+<!-- vale off -->
 
 | Name                                         | Type                    | Unit  | Description                                           |
 | -------------------------------------------- | ----------------------- | ----- | ----------------------------------------------------- |
@@ -82,6 +96,8 @@ and behavior. The stream can be stored and visualized in
 | http.response_content_length_min             | int                     | bytes | Min of length of the HTTP response content            |
 | http.response_content_length_max             | int                     | bytes | Max of length of the HTTP response content            |
 | http.response_content_length_sumOfSquares    | int                     | bytes | Sum of squares of length of the HTTP response content |
+
+<!-- vale on -->
 
 [quantilesdoublesketch]:
   https://druid.apache.org/docs/latest/development/extensions-core/datasketches-quantiles.html

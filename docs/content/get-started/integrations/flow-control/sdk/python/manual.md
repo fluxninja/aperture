@@ -12,8 +12,8 @@ keywords:
   - manual
 ---
 
-[Aperture Python SDK][pythonsdk] can be used to manually set feature Control
-Points within a Go service.
+[Aperture Python SDK][pythonsdk] can be used to manually set feature control
+points within a Go service.
 
 To do so, first create an instance of ApertureClient:
 
@@ -51,7 +51,7 @@ The created instance can then be used to start a flow:
         flow.end(FlowStatus.Error)
 ```
 
-You can also use the flow as context manager:
+You can also use the flow as a context manager:
 
 ```python
   with aperture_client.start_flow(
@@ -60,7 +60,7 @@ You can also use the flow as context manager:
   ) as flow:
     if flow.accepted:
       # do actual work
-      # if you don't call flow.end() explicitly, it will be called automatically
+      # if you do not call flow.end() explicitly, it will be called automatically
       # when the context manager exits - with the status of the flow
       # depending on whether an error was raised or not
       pass
@@ -77,9 +77,8 @@ helpful to handle specific routes in your service.
     return "Flow was accepted", 202
 ```
 
-For more context on how to use Aperture Python SDK to set feature Control
-Points, you can take a look at the [example app][example] available in our
-repository.
+For more context on using the Aperture Python SDK to set feature control points,
+refer to the [example app][example] available in the repository.
 
 <!--- TODO: Change to pypi package once it is published. --->
 

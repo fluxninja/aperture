@@ -33,7 +33,7 @@ type testGroupConfig struct {
 	expectedScheduling bool // to be used to check if sleeping/stuck jobs are getting stuck or not
 }
 
-// When a job is only scheduled and not run, it's number of run should be 0
+// When a job is only scheduled and not run, it is number of run should be 0
 func (gc *testGroupConfig) OnJobScheduled() {
 	for _, job := range gc.jobs {
 		jobInfo, err := gc.jobGroup.JobInfo(job.Name())

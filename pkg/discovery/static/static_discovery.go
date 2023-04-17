@@ -3,6 +3,7 @@ package static
 import (
 	"encoding/json"
 
+	"github.com/fluxninja/aperture/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
@@ -10,12 +11,12 @@ import (
 // StaticDiscovery reads entities from config and writes them to tracker.
 type StaticDiscovery struct {
 	entityEvents notifiers.EventWriter
-	config       *StaticDiscoveryConfig
+	config       *config.StaticDiscoveryConfig
 }
 
 func newStaticServiceDiscovery(
 	entityEvents notifiers.EventWriter,
-	config *StaticDiscoveryConfig,
+	config *config.StaticDiscoveryConfig,
 ) *StaticDiscovery {
 	return &StaticDiscovery{
 		entityEvents: entityEvents,

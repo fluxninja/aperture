@@ -17,26 +17,26 @@ func provideController(
 	lis *listener.Listener,
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
-) (*otelconfig.OTELConfig, error) {
-	var controllerCfg controllerconfig.ControllerOTELConfig
+) (*otelconfig.OTelConfig, error) {
+	var controllerCfg controllerconfig.ControllerOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
 		return nil, err
 	}
 
-	otelCfg := otelconfig.NewOTELConfig()
-	otelCfg.SetDebugPort(&controllerCfg.CommonOTELConfig)
-	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTELConfig)
+	otelCfg := otelconfig.NewOTelConfig()
+	otelCfg.SetDebugPort(&controllerCfg.CommonOTelConfig)
+	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTelConfig)
 
 	addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
 	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
-	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTELConfig)
+	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTelConfig)
 	return otelCfg, nil
 }
 
-// addMetricsPipeline adds metrics to pipeline for controller OTEL collector.
+// addMetricsPipeline adds metrics to pipeline for controller OTel collector.
 func addMetricsPipeline(
-	config *otelconfig.OTELConfig,
-	controllerConfig *controllerconfig.ControllerOTELConfig,
+	config *otelconfig.OTelConfig,
+	controllerConfig *controllerconfig.ControllerOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 	promClient promapi.Client,
@@ -51,17 +51,17 @@ func addMetricsPipeline(
 }
 
 func addPrometheusReceiver(
-	config *otelconfig.OTELConfig,
-	controllerConfig *controllerconfig.ControllerOTELConfig,
+	config *otelconfig.OTelConfig,
+	controllerConfig *controllerconfig.ControllerOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 ) {
 	scrapeConfigs := []map[string]any{
 		otelconfig.BuildApertureSelfScrapeConfig("aperture-controller-self", tlsConfig, lis),
-		otelconfig.BuildOTELScrapeConfig("aperture-controller-otel", controllerConfig.CommonOTELConfig),
+		otelconfig.BuildOTelScrapeConfig("aperture-controller-otel", controllerConfig.CommonOTelConfig),
 	}
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
-	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
+	// tags, so they are not properly read by OTel. Need to use bare maps instead.
 	config.AddReceiver(otelconsts.ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
