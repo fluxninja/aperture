@@ -161,7 +161,10 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 	}
 	return fx.Options(
 		fx.Supply(
-			fx.Annotate(factory.policiesDynamicConfigEtcdWatcher, fx.As(new(notifiers.Watcher))),
+			fx.Annotate(
+				factory.policiesDynamicConfigEtcdWatcher,
+				fx.As(new(notifiers.Watcher)),
+			),
 			factory.circuitJobGroup,
 			factory.etcdClient,
 			factory.alerterIface,

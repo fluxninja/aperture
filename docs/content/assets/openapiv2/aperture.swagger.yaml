@@ -2871,6 +2871,24 @@ definitions:
                     type: object
                 type: array
         type: object
+    PatchDynamicConfigsRequest:
+        properties:
+            dynamic_configs:
+                items:
+                    $ref: '#/definitions/PatchDynamicConfigsRequestDynamicConfigRequest'
+                    type: object
+                type: array
+        type: object
+    PatchDynamicConfigsRequestDynamicConfigRequest:
+        properties:
+            dynamic_config:
+                type: object
+            policy_name:
+                type: string
+                x-go-tag-validate: required
+        required:
+            - policy_name
+        type: object
     PathTemplateMatcher:
         description: |-
             HTTP path will be matched against given path templates.
@@ -3144,8 +3162,6 @@ definitions:
         type: object
     PostPoliciesRequestPolicyRequest:
         properties:
-            dynamic_config:
-                type: object
             name:
                 type: string
                 x-go-tag-validate: required
@@ -4998,6 +5014,26 @@ paths:
                     description: A successful response.
                     schema:
                         $ref: '#/definitions/GetPolicyResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-controller
+    /v1/policies/dynamic-configs:
+        patch:
+            operationId: PolicyService_PatchDynamicConfigs
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PatchDynamicConfigsRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostPoliciesResponse'
                 default:
                     description: An unexpected error response.
                     schema:

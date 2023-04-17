@@ -33,6 +33,7 @@ const (
 	Controller_PreviewHTTPRequests_FullMethodName        = "/aperture.cmd.v1.Controller/PreviewHTTPRequests"
 	Controller_PostPolicies_FullMethodName               = "/aperture.cmd.v1.Controller/PostPolicies"
 	Controller_PatchPolicies_FullMethodName              = "/aperture.cmd.v1.Controller/PatchPolicies"
+	Controller_PatchDynamicConfigs_FullMethodName        = "/aperture.cmd.v1.Controller/PatchDynamicConfigs"
 )
 
 // ControllerClient is the client API for Controller service.
@@ -50,6 +51,7 @@ type ControllerClient interface {
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
 	PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
 	PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
+	PatchDynamicConfigs(ctx context.Context, in *v1.PatchDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
 }
 
 type controllerClient struct {
@@ -150,6 +152,15 @@ func (c *controllerClient) PatchPolicies(ctx context.Context, in *v1.PostPolicie
 	return out, nil
 }
 
+func (c *controllerClient) PatchDynamicConfigs(ctx context.Context, in *v1.PatchDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error) {
+	out := new(v1.PostPoliciesResponse)
+	err := c.cc.Invoke(ctx, Controller_PatchDynamicConfigs_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 // All implementations should embed UnimplementedControllerServer
 // for forward compatibility
@@ -165,6 +176,7 @@ type ControllerServer interface {
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
 	PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error)
 	PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error)
+	PatchDynamicConfigs(context.Context, *v1.PatchDynamicConfigsRequest) (*v1.PostPoliciesResponse, error)
 }
 
 // UnimplementedControllerServer should be embedded to have forward compatible implementations.
@@ -200,6 +212,9 @@ func (UnimplementedControllerServer) PostPolicies(context.Context, *v1.PostPolic
 }
 func (UnimplementedControllerServer) PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PatchPolicies not implemented")
+}
+func (UnimplementedControllerServer) PatchDynamicConfigs(context.Context, *v1.PatchDynamicConfigsRequest) (*v1.PostPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchDynamicConfigs not implemented")
 }
 
 // UnsafeControllerServer may be embedded to opt out of forward compatibility for this service.
@@ -393,6 +408,24 @@ func _Controller_PatchPolicies_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_PatchDynamicConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.PatchDynamicConfigsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).PatchDynamicConfigs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_PatchDynamicConfigs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).PatchDynamicConfigs(ctx, req.(*v1.PatchDynamicConfigsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Controller_ServiceDesc is the grpc.ServiceDesc for Controller service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -439,6 +472,10 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PatchPolicies",
 			Handler:    _Controller_PatchPolicies_Handler,
+		},
+		{
+			MethodName: "PatchDynamicConfigs",
+			Handler:    _Controller_PatchDynamicConfigs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

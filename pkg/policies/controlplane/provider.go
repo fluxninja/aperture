@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
+	"go.uber.org/fx"
+	"go.uber.org/multierr"
+	"sigs.k8s.io/yaml"
+
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -12,9 +16,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
-	"go.uber.org/fx"
-	"go.uber.org/multierr"
-	"sigs.k8s.io/yaml"
 )
 
 const (
@@ -38,7 +39,8 @@ const (
 // Module - Controller can be initialized by passing options from Module() to fx app.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(providePolicyValidator,
+		fx.Provide(
+			providePolicyValidator,
 			fx.Annotate(
 				provideTrackers,
 				fx.ResultTags(
@@ -72,10 +74,9 @@ func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trac
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			return multierr.Combine(
-				policyTrackers.Start(),
-				policyDynamicConfigTrackers.Start(),
-			)
+			policyTrackersErr := policyTrackers.Start()
+			policyDynamicConfigTrackersErr := policyDynamicConfigTrackers.Start()
+			return multierr.Combine(policyTrackersErr, policyDynamicConfigTrackersErr)
 		},
 		OnStop: func(ctx context.Context) error {
 			return multierr.Combine(
@@ -89,7 +90,12 @@ func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trac
 }
 
 // Sync policies config directory with etcd.
-func setupPoliciesNotifier(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
+func setupPoliciesNotifier(
+	policyTrackers notifiers.Trackers,
+	policyDynamicConfigTrackers notifiers.Trackers,
+	etcdClient *etcdclient.Client,
+	lifecycle fx.Lifecycle,
+) {
 	if policyTrackers == nil || policyDynamicConfigTrackers == nil {
 		log.Debug().Msg("Kubernetes watcher is disabled")
 		return
@@ -107,7 +113,6 @@ func setupPoliciesNotifier(policyTrackers, policyDynamicConfigTrackers notifiers
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
 			}
-
 			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
@@ -129,17 +134,11 @@ func setupPoliciesNotifier(policyTrackers, policyDynamicConfigTrackers notifiers
 		return key, dat, nil
 	}
 
-	policyEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.PoliciesConfigPath,
-		etcdClient,
-		true)
+	policyEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient, true)
 	// content transform callback to wrap policy in config properties wrapper
 	policyEtcdNotifier.SetTransformFunc(wrapPolicy)
 
-	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(
-		paths.PoliciesDynamicConfigPath,
-		etcdClient,
-		true)
+	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient, false)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

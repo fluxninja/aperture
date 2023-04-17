@@ -50,6 +50,16 @@ service PolicyService {
     };
   }
 
+  rpc PatchDynamicConfigs(PatchDynamicConfigsRequest) returns (PostPoliciesResponse) {
+    option (google.api.http) = {
+      patch: "/v1/policies/dynamic-configs"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
   // DeletePolicy removes a policy with the specified name.
   rpc DeletePolicy(DeletePolicyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/v1/policies/{name}"};
@@ -71,10 +81,18 @@ message PostPoliciesRequest {
   message PolicyRequest {
     string name = 1; // @gotags: validate:"required"
     Policy policy = 2;
-    google.protobuf.Struct dynamic_config = 3;
   }
 
   repeated PolicyRequest policies = 1;
+}
+
+message PatchDynamicConfigsRequest {
+  message DynamicConfigRequest {
+    string policy_name = 1; // @gotags: validate:"required"
+    google.protobuf.Struct dynamic_config = 2;
+  }
+
+  repeated DynamicConfigRequest dynamic_configs = 1;
 }
 
 message DeletePolicyRequest {

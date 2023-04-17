@@ -25,6 +25,7 @@ service Controller {
 
   rpc PostPolicies(aperture.policy.language.v1.PostPoliciesRequest) returns (aperture.policy.language.v1.PostPoliciesResponse);
   rpc PatchPolicies(aperture.policy.language.v1.PostPoliciesRequest) returns (aperture.policy.language.v1.PostPoliciesResponse);
+  rpc PatchDynamicConfigs(aperture.policy.language.v1.PatchDynamicConfigsRequest) returns (aperture.policy.language.v1.PostPoliciesResponse);
 }
 
 message ListServicesRequest {}

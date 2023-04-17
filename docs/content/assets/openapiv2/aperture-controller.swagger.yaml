@@ -109,6 +109,26 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+  /v1/policies/dynamic-configs:
+    patch:
+      tags:
+      - aperture-controller
+      operationId: PolicyService_PatchDynamicConfigs
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PatchDynamicConfigsRequest'
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/PostPoliciesResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/policies/{name}:
     get:
       tags:
@@ -2550,6 +2570,24 @@ definitions:
       signal_name:
         description: Name of the outgoing Signal on the OutPort.
         type: string
+  PatchDynamicConfigsRequest:
+    type: object
+    properties:
+      dynamic_configs:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/PatchDynamicConfigsRequestDynamicConfigRequest'
+  PatchDynamicConfigsRequestDynamicConfigRequest:
+    type: object
+    required:
+    - policy_name
+    properties:
+      dynamic_config:
+        type: object
+      policy_name:
+        type: string
+        x-go-tag-validate: required
   PathTemplateMatcher:
     description: |-
       HTTP path will be matched against given path templates.
@@ -2791,8 +2829,6 @@ definitions:
     required:
     - name
     properties:
-      dynamic_config:
-        type: object
       name:
         type: string
         x-go-tag-validate: required

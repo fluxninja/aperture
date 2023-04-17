@@ -94,15 +94,15 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 				if err != nil {
 					return fmt.Errorf("failed to parse DynamicConfig Struct: %w", err)
 				}
-				request := languagev1.PostPoliciesRequest{
-					Policies: []*languagev1.PostPoliciesRequest_PolicyRequest{
+				request := languagev1.PatchDynamicConfigsRequest{
+					DynamicConfigs: []*languagev1.PatchDynamicConfigsRequest_DynamicConfigRequest{
 						{
-							Name:          policyName,
+							PolicyName:    policyName,
 							DynamicConfig: dynamicConfigStruct,
 						},
 					},
 				}
-				_, err = client.PatchPolicies(context.Background(), &request)
+				_, err = client.PatchDynamicConfigs(context.Background(), &request)
 				if err != nil {
 					return fmt.Errorf("failed to update policy: %w", err)
 				}

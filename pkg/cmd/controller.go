@@ -358,3 +358,7 @@ func (h *Handler) PostPolicies(ctx context.Context, req *policylangv1.PostPolici
 func (h *Handler) PatchPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostPoliciesResponse, error) {
 	return h.policyService.PatchPolicies(ctx, req)
 }
+
+func (h *Handler) PatchDynamicConfigs(ctx context.Context, req *policylangv1.PatchDynamicConfigsRequest) (*policylangv1.PostPoliciesResponse, error) {
+	return h.policyService.PatchDynamicConfigs(ctx, req)
+}

@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/notifiers"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
 // PolicyService is the implementation of policylangv1.PolicyService interface.
@@ -22,7 +24,11 @@ type PolicyService struct {
 }
 
 // RegisterPolicyService registers a service for policy.
-func RegisterPolicyService(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers, server *grpc.Server, policyFactory *PolicyFactory) *PolicyService {
+func RegisterPolicyService(
+	policyTrackers, policyDynamicConfigTrackers notifiers.Trackers,
+	server *grpc.Server,
+	policyFactory *PolicyFactory,
+) *PolicyService {
 	svc := &PolicyService{
 		policyFactory:               policyFactory,
 		policyTrackers:              policyTrackers,
@@ -53,12 +59,47 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 
 // PostPolicies posts policies to the system.
 func (s *PolicyService) PostPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostPoliciesResponse, error) {
-	return s.managePolicies(ctx, policies, true)
+	return s.updatePolicies(ctx, policies, true)
 }
 
 // PatchPolicies patches policies to the system.
 func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostPoliciesResponse, error) {
-	return s.managePolicies(ctx, policies, false)
+	return s.updatePolicies(ctx, policies, false)
+}
+
+// PatchDynamicConfigs patches dynamic configs to the system.
+func (s *PolicyService) PatchDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PatchDynamicConfigsRequest) (*policylangv1.PostPoliciesResponse, error) {
+	var errs []string
+	for idx, request := range dynamicConfigs.DynamicConfigs {
+		if request.PolicyName == "" {
+			errs = append(errs, fmt.Sprintf("policy name is empty at index '%d'", idx))
+			continue
+		}
+
+		if request.DynamicConfig == nil {
+			errs = append(errs, fmt.Sprintf("dynamic config is missing for policy name '%s'", request.PolicyName))
+			continue
+		}
+
+		jsonDynamicConfig, err := request.DynamicConfig.MarshalJSON()
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.PolicyName, err))
+			continue
+		}
+		log.Info().Str("dynamic config", string(jsonDynamicConfig)).Msg("writing dynamic config")
+		s.policyDynamicConfigTrackers.WriteEvent(notifiers.Key(request.PolicyName), jsonDynamicConfig)
+	}
+
+	response := &policylangv1.PostPoliciesResponse{}
+	var err error
+	if len(errs) > 0 {
+		response.Errors = errs
+		response.Message = "failed to upload dynamic configs"
+		err = status.Error(codes.InvalidArgument, strings.Join(errs, ","))
+	} else {
+		response.Message = "successfully uploaded dynamic configs"
+	}
+	return response, err
 }
 
 // DeletePolicy deletes a policy from the system.
@@ -68,8 +109,8 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 	return &emptypb.Empty{}, nil
 }
 
-// managePolicies manages Post/Patch operations on policies.
-func (s *PolicyService) managePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, checkRequired bool) (*policylangv1.PostPoliciesResponse, error) {
+// updatePolicies manages Post/Patch operations on policies.
+func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, checkRequired bool) (*policylangv1.PostPoliciesResponse, error) {
 	var errs []string
 	for idx, request := range policies.Policies {
 		if request.Name == "" {
@@ -100,17 +141,6 @@ func (s *PolicyService) managePolicies(ctx context.Context, policies *policylang
 			continue
 		}
 		s.policyTrackers.WriteEvent(notifiers.Key(request.Name), jsonPolicy)
-
-		if request.DynamicConfig == nil {
-			continue
-		}
-
-		jsonDynamicConfig, err := request.DynamicConfig.MarshalJSON()
-		if err != nil {
-			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.Name, err))
-			continue
-		}
-		s.policyDynamicConfigTrackers.WriteEvent(notifiers.Key(request.Name), jsonDynamicConfig)
 	}
 
 	response := &policylangv1.PostPoliciesResponse{}

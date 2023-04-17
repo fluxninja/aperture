@@ -48,10 +48,7 @@ type Policy struct {
 var _ iface.Policy = (*Policy)(nil)
 
 // newPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
-func newPolicyOptions(
-	wrapperMessage *policysyncv1.PolicyWrapper,
-	registry status.Registry,
-) (fx.Option, error) {
+func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (fx.Option, error) {
 	// List of options for the policy.
 	policyOptions := []fx.Option{}
 	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage, registry)
@@ -154,8 +151,10 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 	return policy, compiledCircuit, fx.Options(
 		fx.Options(resourceOptions...),
 		partialCircuitOption,
-		fx.Invoke(policy.setupCircuitJob,
-			policy.setupDynamicConfig),
+		fx.Invoke(
+			policy.setupCircuitJob,
+			policy.setupDynamicConfig,
+		),
 	), nil
 }
 
@@ -164,10 +163,7 @@ func (policy *Policy) GetEvaluationInterval() time.Duration {
 	return policy.evaluationInterval
 }
 
-func (policy *Policy) setupCircuitJob(
-	lifecycle fx.Lifecycle,
-	circuitJobGroup *jobs.JobGroup,
-) error {
+func (policy *Policy) setupCircuitJob(lifecycle fx.Lifecycle, circuitJobGroup *jobs.JobGroup) error {
 	logger := policy.GetStatusRegistry().GetLogger()
 	if policy.evaluationInterval > 0 {
 		// Job name
@@ -205,12 +201,10 @@ func (policy *Policy) setupCircuitJob(
 	return nil
 }
 
-func (policy *Policy) setupDynamicConfig(
-	dynamicConfigWatcher notifiers.Watcher,
-	lifecycle fx.Lifecycle,
-) error {
+func (policy *Policy) setupDynamicConfig(dynamicConfigWatcher notifiers.Watcher, lifecycle fx.Lifecycle) error {
 	unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
-	unmarshalNotifier, err := notifiers.NewUnmarshalKeyNotifier(notifiers.Key(policy.GetPolicyName()),
+	unmarshalNotifier, err := notifiers.NewUnmarshalKeyNotifier(
+		notifiers.Key(policy.GetPolicyName()),
 		unmarshaller,
 		policy.dynamicConfigUpdate,
 	)

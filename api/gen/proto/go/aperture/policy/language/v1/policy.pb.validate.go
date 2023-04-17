@@ -404,6 +404,142 @@ var _ interface {
 	ErrorName() string
 } = PostPoliciesRequestValidationError{}
 
+// Validate checks the field values on PatchDynamicConfigsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PatchDynamicConfigsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PatchDynamicConfigsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PatchDynamicConfigsRequestMultiError, or nil if none found.
+func (m *PatchDynamicConfigsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PatchDynamicConfigsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetDynamicConfigs() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PatchDynamicConfigsRequestValidationError{
+						field:  fmt.Sprintf("DynamicConfigs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PatchDynamicConfigsRequestValidationError{
+						field:  fmt.Sprintf("DynamicConfigs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PatchDynamicConfigsRequestValidationError{
+					field:  fmt.Sprintf("DynamicConfigs[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return PatchDynamicConfigsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// PatchDynamicConfigsRequestMultiError is an error wrapping multiple
+// validation errors returned by PatchDynamicConfigsRequest.ValidateAll() if
+// the designated constraints aren't met.
+type PatchDynamicConfigsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PatchDynamicConfigsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PatchDynamicConfigsRequestMultiError) AllErrors() []error { return m }
+
+// PatchDynamicConfigsRequestValidationError is the validation error returned
+// by PatchDynamicConfigsRequest.Validate if the designated constraints aren't met.
+type PatchDynamicConfigsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PatchDynamicConfigsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PatchDynamicConfigsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PatchDynamicConfigsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PatchDynamicConfigsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PatchDynamicConfigsRequestValidationError) ErrorName() string {
+	return "PatchDynamicConfigsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PatchDynamicConfigsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPatchDynamicConfigsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PatchDynamicConfigsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PatchDynamicConfigsRequestValidationError{}
+
 // Validate checks the field values on DeletePolicyRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -2867,35 +3003,6 @@ func (m *PostPoliciesRequest_PolicyRequest) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetDynamicConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, PostPoliciesRequest_PolicyRequestValidationError{
-					field:  "DynamicConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, PostPoliciesRequest_PolicyRequestValidationError{
-					field:  "DynamicConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDynamicConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return PostPoliciesRequest_PolicyRequestValidationError{
-				field:  "DynamicConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
 		return PostPoliciesRequest_PolicyRequestMultiError(errors)
 	}
@@ -2977,3 +3084,145 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PostPoliciesRequest_PolicyRequestValidationError{}
+
+// Validate checks the field values on
+// PatchDynamicConfigsRequest_DynamicConfigRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PatchDynamicConfigsRequest_DynamicConfigRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// PatchDynamicConfigsRequest_DynamicConfigRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in
+// PatchDynamicConfigsRequest_DynamicConfigRequestMultiError, or nil if none found.
+func (m *PatchDynamicConfigsRequest_DynamicConfigRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PatchDynamicConfigsRequest_DynamicConfigRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PolicyName
+
+	if all {
+		switch v := interface{}(m.GetDynamicConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PatchDynamicConfigsRequest_DynamicConfigRequestValidationError{
+					field:  "DynamicConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PatchDynamicConfigsRequest_DynamicConfigRequestValidationError{
+					field:  "DynamicConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDynamicConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PatchDynamicConfigsRequest_DynamicConfigRequestValidationError{
+				field:  "DynamicConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PatchDynamicConfigsRequest_DynamicConfigRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// PatchDynamicConfigsRequest_DynamicConfigRequestMultiError is an error
+// wrapping multiple validation errors returned by
+// PatchDynamicConfigsRequest_DynamicConfigRequest.ValidateAll() if the
+// designated constraints aren't met.
+type PatchDynamicConfigsRequest_DynamicConfigRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PatchDynamicConfigsRequest_DynamicConfigRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PatchDynamicConfigsRequest_DynamicConfigRequestMultiError) AllErrors() []error { return m }
+
+// PatchDynamicConfigsRequest_DynamicConfigRequestValidationError is the
+// validation error returned by
+// PatchDynamicConfigsRequest_DynamicConfigRequest.Validate if the designated
+// constraints aren't met.
+type PatchDynamicConfigsRequest_DynamicConfigRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PatchDynamicConfigsRequest_DynamicConfigRequestValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e PatchDynamicConfigsRequest_DynamicConfigRequestValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e PatchDynamicConfigsRequest_DynamicConfigRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PatchDynamicConfigsRequest_DynamicConfigRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PatchDynamicConfigsRequest_DynamicConfigRequestValidationError) ErrorName() string {
+	return "PatchDynamicConfigsRequest_DynamicConfigRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PatchDynamicConfigsRequest_DynamicConfigRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPatchDynamicConfigsRequest_DynamicConfigRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PatchDynamicConfigsRequest_DynamicConfigRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PatchDynamicConfigsRequest_DynamicConfigRequestValidationError{}
