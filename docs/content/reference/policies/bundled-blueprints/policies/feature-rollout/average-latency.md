@@ -54,12 +54,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 <a id="common-policy-name"></a>
 
 <ParameterDescription
-    name="common.policy_name"
-    type="
-string"
-    reference=""
-    value="__REQUIRED_FIELD__"
+    name='common.policy_name'
     description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -71,12 +70,11 @@ string"
 <a id="policy"></a>
 
 <ParameterDescription
-    name="policy"
-    type="
-Object (policies/feature-rollout/base:schema:rollout_policy)"
-    reference="../../../bundled-blueprints/policies/feature-rollout/base#rollout-policy"
-    value="{'components': [], 'drivers': {'average_latency_drivers': [{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'reset': {'threshold': '__REQUIRED_FIELD__'}}]}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': []}}}"
+    name='policy'
     description='Parameters for the Feature Rollout policy.'
+    type='Object (policies/feature-rollout/base:schema:rollout_policy)'
+    reference='../../../bundled-blueprints/policies/feature-rollout/base#rollout-policy'
+    value='{"components": [], "drivers": {"average_latency_drivers": [{"backward": {"threshold": "__REQUIRED_FIELD__"}, "flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "forward": {"threshold": "__REQUIRED_FIELD__"}, "reset": {"threshold": "__REQUIRED_FIELD__"}}]}, "evaluation_interval": "1s", "load_shaper": {"flow_regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "resources": {"flow_control": {"classifiers": []}}}'
 />
 
 <!-- vale on -->
@@ -88,12 +86,11 @@ Object (policies/feature-rollout/base:schema:rollout_policy)"
 <a id="dashboard"></a>
 
 <ParameterDescription
-    name="dashboard"
-    type="
-Object (policies/feature-rollout/base:param:dashboard)"
-    reference="../../../bundled-blueprints/policies/feature-rollout/base#dashboard"
-    value="{'datasource': {'filter_regex': '', 'name': '$datasource'}, 'refresh_interval': '5s', 'time_from': 'now-15m', 'time_to': 'now'}"
+    name='dashboard'
     description='Configuration for the Grafana dashboard accompanying this policy.'
+    type='Object (policies/feature-rollout/base:param:dashboard)'
+    reference='../../../bundled-blueprints/policies/feature-rollout/base#dashboard'
+    value='{"datasource": {"filter_regex": "", "name": "$datasource"}, "refresh_interval": "5s", "time_from": "now-15m", "time_to": "now"}'
 />
 
 <!-- vale on -->
@@ -117,12 +114,11 @@ at runtime, without reloading the policy.
 <a id="load-shaper"></a>
 
 <ParameterDescription
-    name="load_shaper"
-    type="
-Object (aperture.spec.v1.FlowRegulatorDynamicConfig)"
-    reference="../../../spec#flow-regulator-dynamic-config"
-    value="__REQUIRED_FIELD__"
+    name='load_shaper'
     description='Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.'
+    type='Object (aperture.spec.v1.FlowRegulatorDynamicConfig)'
+    reference='../../../spec#flow-regulator-dynamic-config'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
