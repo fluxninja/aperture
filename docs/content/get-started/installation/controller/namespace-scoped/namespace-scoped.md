@@ -83,9 +83,10 @@ into your cluster.
    </TabItem>
    </Tabs>
 
-2. By default, Prometheus and Etcd instances are installed. If you don't want to
-   install and use your existing instances of Prometheus or Etcd, configure
-   below values in the `values.yaml` file and pass it with `install` command:
+2. By default, Prometheus and etcd instances are installed. If you do not want
+   to install and use your existing instances of Prometheus or etcd, configure
+   the following values in the `values.yaml` file and pass it with the `install`
+   command:
 
    ```yaml
    controller:
@@ -103,7 +104,7 @@ into your cluster.
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
-   the actual values of Etcd and Prometheus, which will be used by the Aperture
+   the actual values of etcd and Prometheus, which will be used by the Aperture
    Controller.
 
    <Tabs groupId="setup" queryString>
@@ -119,7 +120,7 @@ into your cluster.
    </TabItem>
    </Tabs>
 
-   A list of all the configurable parameters for Etcd are available
+   A list of all the configurable parameters for etcd are available
    [here](/reference/configuration/controller.md#etcd) and Prometheus are
    available [here](/reference/configuration/controller.md#prometheus).
 

@@ -16,16 +16,16 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
 ```
 
-## Controller CRD
+## Controller Custom Resource Definition
 
-The Aperture Controller is a Kubernetes based application and is installed using
+The Aperture Controller is a Kubernetes-based application and is installed using
 the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which is managed by the Aperture Operator.
 
 The configuration for the Aperture Controller process is provided to the
 Controller CRD under the `controller.config` section. All the configuration
-parameters for Aperture Controller are listed
+parameters for the Aperture Controller are listed
 [here](/reference/configuration/controller.md).
 
 ## Installation {#controller-installation}
@@ -55,9 +55,10 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-2. By default, Prometheus and Etcd instances are installed. If you don't want to
-   install and use your existing instances of Prometheus or Etcd, configure
-   below values in the `values.yaml` file and pass it with `install` command:
+2. By default, Prometheus and etcd instances are installed. If you do not want
+   to install and use your existing instances of Prometheus or etcd, configure
+   the following values in the `values.yaml` file and pass it with the `install`
+   command:
 
    ```yaml
    controller:
@@ -74,7 +75,7 @@ Kubernetes Objects which will be created by following steps are listed
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
-   the actual values of Etcd and Prometheus, which will be used by the Aperture
+   the actual values of etcd and Prometheus, which will be used by the Aperture
    Controller.
 
    <Tabs groupId="setup" queryString>
@@ -90,17 +91,17 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-   A list of all the configurable parameters for Etcd are available
-   [here](/reference/configuration/controller.md#etcd) and Prometheus are
+   A list of all the configurable parameters for etcd are available
+   [here](/reference/configuration/controller.md#etcd), and Prometheus are
    available [here](/reference/configuration/controller.md#prometheus).
 
-   **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
-   is enabled on your existing Prometheus instance as it is required by the
+   **Note**: Please ensure that the flag `web.enable-remote-write-receiver` is
+   enabled on your existing Prometheus instance, as it is required by the
    Aperture Controller.
 
 3. If you want to modify the default parameters or the Aperture Controller
-   config, for example `log`, you can create or update the `values.yaml` file
-   and pass it with `install` command:
+   configuration, for example `log`, you can create or update the `values.yaml`
+   file and pass it with `install` command:
 
    ```yaml
    controller:
@@ -124,7 +125,7 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-   All the config parameters for the Aperture Controller are available
+   All the configuration parameters for the Aperture Controller are available
    [here](/reference/configuration/controller.md).
 
    A list of configurable parameters for the installation can be found in the
