@@ -114,27 +114,6 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
-    patch:
-      tags:
-      - aperture-controller
-      summary: PatchPolicies patches policies based on the provided request.
-      operationId: PolicyService_PatchPolicies
-      parameters:
-      - description: PostPoliciesRequest is a request to create or update Policies.
-        name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/PostPoliciesRequest'
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PostResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
   /v1/policies/{name}:
     get:
       tags:

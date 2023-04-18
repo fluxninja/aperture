@@ -42,17 +42,6 @@ service PolicyService {
     };
   }
 
-  // PatchPolicies patches policies based on the provided request.
-  rpc PatchPolicies(PostPoliciesRequest) returns (PostResponse) {
-    option (google.api.http) = {
-      patch: "/v1/policies"
-      body: "*"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["aperture-controller"];
-    };
-  }
-
   // PostDynamicConfigs patches dynamic configs based on the provided request.
   rpc PostDynamicConfigs(PostDynamicConfigsRequest) returns (PostResponse) {
     option (google.api.http) = {

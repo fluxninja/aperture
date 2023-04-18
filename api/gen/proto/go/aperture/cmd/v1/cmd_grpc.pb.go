@@ -32,7 +32,6 @@ const (
 	Controller_PreviewFlowLabels_FullMethodName          = "/aperture.cmd.v1.Controller/PreviewFlowLabels"
 	Controller_PreviewHTTPRequests_FullMethodName        = "/aperture.cmd.v1.Controller/PreviewHTTPRequests"
 	Controller_PostPolicies_FullMethodName               = "/aperture.cmd.v1.Controller/PostPolicies"
-	Controller_PatchPolicies_FullMethodName              = "/aperture.cmd.v1.Controller/PatchPolicies"
 	Controller_PostDynamicConfigs_FullMethodName         = "/aperture.cmd.v1.Controller/PostDynamicConfigs"
 	Controller_DeletePolicy_FullMethodName               = "/aperture.cmd.v1.Controller/DeletePolicy"
 )
@@ -51,7 +50,6 @@ type ControllerClient interface {
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
 	PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostResponse, error)
-	PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostResponse, error)
 	PostDynamicConfigs(ctx context.Context, in *v1.PostDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostResponse, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -145,15 +143,6 @@ func (c *controllerClient) PostPolicies(ctx context.Context, in *v1.PostPolicies
 	return out, nil
 }
 
-func (c *controllerClient) PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostResponse, error) {
-	out := new(v1.PostResponse)
-	err := c.cc.Invoke(ctx, Controller_PatchPolicies_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *controllerClient) PostDynamicConfigs(ctx context.Context, in *v1.PostDynamicConfigsRequest, opts ...grpc.CallOption) (*v1.PostResponse, error) {
 	out := new(v1.PostResponse)
 	err := c.cc.Invoke(ctx, Controller_PostDynamicConfigs_FullMethodName, in, out, opts...)
@@ -186,7 +175,6 @@ type ControllerServer interface {
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
 	PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error)
-	PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error)
 	PostDynamicConfigs(context.Context, *v1.PostDynamicConfigsRequest) (*v1.PostResponse, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 }
@@ -221,9 +209,6 @@ func (UnimplementedControllerServer) PreviewHTTPRequests(context.Context, *Previ
 }
 func (UnimplementedControllerServer) PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostPolicies not implemented")
-}
-func (UnimplementedControllerServer) PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PatchPolicies not implemented")
 }
 func (UnimplementedControllerServer) PostDynamicConfigs(context.Context, *v1.PostDynamicConfigsRequest) (*v1.PostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfigs not implemented")
@@ -405,24 +390,6 @@ func _Controller_PostPolicies_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Controller_PatchPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v1.PostPoliciesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ControllerServer).PatchPolicies(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Controller_PatchPolicies_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ControllerServer).PatchPolicies(ctx, req.(*v1.PostPoliciesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Controller_PostDynamicConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(v1.PostDynamicConfigsRequest)
 	if err := dec(in); err != nil {
@@ -501,10 +468,6 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostPolicies",
 			Handler:    _Controller_PostPolicies_Handler,
-		},
-		{
-			MethodName: "PatchPolicies",
-			Handler:    _Controller_PatchPolicies_Handler,
 		},
 		{
 			MethodName: "PostDynamicConfigs",
