@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 // DeletePolicyCmd is the command to apply a policy to the cluster.
@@ -73,7 +73,7 @@ func deletePolicyUsingAPI() error {
 	}
 	_, err := client.DeletePolicy(context.Background(), &policyRequest)
 	if err != nil {
-		log.Warn().Msgf("failed to delete Policy '%s': %s", policyName, err.Error())
+		log.Warn().Err(err).Str("policy", policyName).Msg("failed to delete Policy")
 	}
 
 	return nil
