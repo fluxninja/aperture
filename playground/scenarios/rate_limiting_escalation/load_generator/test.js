@@ -5,8 +5,8 @@ import http from "k6/http";
 export let vuStages = [
   { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
-  { duration: "1m", target: 30 },
-  { duration: "2m", target: 30 },
+  { duration: "1m", target: 50 },
+  { duration: "2m", target: 50 },
   { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
 ];
@@ -60,13 +60,12 @@ export default function () {
   };
   let res = http.request("POST", url, JSON.stringify(body), {
     headers: headers,
-    timeout: 75,
   });
   const ret = check(res, {
     "http status was 200": res.status === 200,
   });
   if (!ret) {
     // sleep for 10ms to 25ms
-    //sleep(randomIntBetween(0.01, 0.025));
+    sleep(randomIntBetween(0.01, 0.025));
   }
 }

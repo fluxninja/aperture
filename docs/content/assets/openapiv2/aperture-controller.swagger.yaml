@@ -3251,8 +3251,8 @@ definitions:
           it is still waiting on the scheduler.
 
         type: string
-        default: 0.005s
-        x-go-tag-default: 0.005s
+        default: 0.01s
+        x-go-tag-default: 0.01s
       default_workload_parameters:
         description: Parameters to be used if none of workloads specified in `workloads`
           match.

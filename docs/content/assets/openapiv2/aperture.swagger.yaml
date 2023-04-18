@@ -3774,7 +3774,7 @@ definitions:
                 type: boolean
                 x-go-tag-default: "false"
             decision_deadline_margin:
-                default: 0.005s
+                default: 0.01s
                 description: |+
                     Decision deadline margin is the amount of time that the scheduler will
                     subtract from the request deadline to determine the deadline for the
@@ -3790,7 +3790,7 @@ definitions:
                     it is still waiting on the scheduler.
 
                 type: string
-                x-go-tag-default: 0.005s
+                x-go-tag-default: 0.01s
             default_workload_parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters to be used if none of workloads specified in `workloads` match.

@@ -2890,7 +2890,7 @@ type Scheduler_Parameters struct {
 	// Fail-open logic is use for flow control APIs, so if the gRPC deadline
 	// reaches, the flow will end up being unconditionally allowed while
 	// it is still waiting on the scheduler.
-	DecisionDeadlineMargin *durationpb.Duration `protobuf:"bytes,6,opt,name=decision_deadline_margin,json=decisionDeadlineMargin,proto3" json:"decision_deadline_margin,omitempty" default:"0.005s"` // @gotags: default:"0.005s"
+	DecisionDeadlineMargin *durationpb.Duration `protobuf:"bytes,6,opt,name=decision_deadline_margin,json=decisionDeadlineMargin,proto3" json:"decision_deadline_margin,omitempty" default:"0.01s"` // @gotags: default:"0.01s"
 }
 
 func (x *Scheduler_Parameters) Reset() {

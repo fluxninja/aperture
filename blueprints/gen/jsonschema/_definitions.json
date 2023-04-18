@@ -3220,10 +3220,10 @@
           "x-order": 0
         },
         "decision_deadline_margin": {
-          "default": "0.005s",
+          "default": "0.01s",
           "description": "Decision deadline margin is the amount of time that the scheduler will\nsubtract from the request deadline to determine the deadline for the\ndecision. This is to ensure that the scheduler has enough time to\nmake a decision before the request deadline happens, accounting for\nprocessing delays.\nThe request deadline is based on the\n[gRPC deadline](https://grpc.io/blog/deadlines) or the\n[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).\n\nFail-open logic is use for flow control APIs, so if the gRPC deadline\nreaches, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\n",
           "type": "string",
-          "x-go-tag-default": "0.005s",
+          "x-go-tag-default": "0.01s",
           "x-order": 1
         },
         "default_workload_parameters": {

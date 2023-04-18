@@ -7013,7 +7013,7 @@ and `tokens` explicitly specified in the request.
 
 <!-- vale off -->
 
-(string, default: `"0.005s"`)
+(string, default: `"0.01s"`)
 
 <!-- vale on -->
 
