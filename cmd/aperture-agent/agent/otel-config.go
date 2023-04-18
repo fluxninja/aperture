@@ -193,16 +193,12 @@ func addCustomMetricsPipeline(
 
 	if len(metricConfig.Pipeline.Receivers) == 0 && len(metricConfig.Pipeline.Processors) == 0 {
 		if len(metricConfig.Processors) >= 1 {
-			return fmt.Errorf("empty pipeline, inferring pipeline is supported only with 0 or 1 processors")
-		}
-
-		if len(metricConfig.Receivers) == 0 && len(metricConfig.Processors) == 0 {
-			return nil
-		}
-
-		// When pipeline not set explicitly, create pipeline with all defined receivers and processors.
-		metricConfig.Pipeline.Receivers = maps.Keys(metricConfig.Receivers)
-		sort.Strings(metricConfig.Pipeline.Receivers)
+196:  			return fmt.Errorf("empty pipeline, inferring pipeline is supported only with 0 or 1 processors")
+197:  		}
+198:  
+199: 		// When pipeline not set explicitly, create pipeline with all defined receivers and processors.
+200:  		metricConfig.Pipeline.Receivers = maps.Keys(metricConfig.Receivers)
+201:  		sort.Strings(metricConfig.Pipeline.Receivers)
 		metricConfig.Pipeline.Processors = maps.Keys(metricConfig.Processors)
 	}
 
