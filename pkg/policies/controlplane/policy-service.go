@@ -77,52 +77,33 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 
 // PostPolicies posts policies to the system.
 func (s *PolicyService) PostPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
-	return s.updatePolicies(ctx, policies, true)
+	return s.updatePolicies(ctx, policies, false)
 }
 
 // PatchPolicies patches policies to the system.
 func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
-	return s.updatePolicies(ctx, policies, false)
+	return s.updatePolicies(ctx, policies, true)
 }
 
 // PostDynamicConfigs updates dynamic configs to the system.
 func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
 	var errs []string
-	for idx, request := range dynamicConfigs.DynamicConfigs {
-		if request.Name == "" {
-			errs = append(errs, fmt.Sprintf("policy name is empty at index '%d'", idx))
-			continue
-		}
-
-		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
+	for _, request := range dynamicConfigs.DynamicConfigs {
+		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.PolicyName})
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
-			continue
-		}
-
-		if request.DynamicConfig == nil {
-			errs = append(errs, fmt.Sprintf("dynamic config is missing for policy name '%s'", request.Name))
+			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.PolicyName))
 			continue
 		}
 
 		jsonDynamicConfig, err := request.DynamicConfig.MarshalJSON()
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.Name, err))
+			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.PolicyName, err))
 			continue
 		}
-		s.etcdWriter.Write(path.Join(paths.PoliciesAPIDynamicConfigPath, request.Name), jsonDynamicConfig)
+		s.etcdWriter.Write(path.Join(paths.PoliciesAPIDynamicConfigPath, request.PolicyName), jsonDynamicConfig)
 	}
 
-	response := &policylangv1.PostResponse{}
-	var err error
-	if len(errs) > 0 {
-		response.Errors = errs
-		response.Message = "failed to upload dynamic configs"
-		err = status.Error(codes.InvalidArgument, strings.Join(errs, ","))
-	} else {
-		response.Message = "successfully uploaded dynamic configs"
-	}
-	return response, err
+	return prepareResponse(errs, "dynamic configs")
 }
 
 // DeletePolicy deletes a policy from the system.
@@ -135,18 +116,14 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 // updatePolicies manages Post/Patch operations on policies.
 func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, isPatch bool) (*policylangv1.PostResponse, error) {
 	var errs []string
-	for idx, request := range policies.Policies {
-		if request.Name == "" {
-			errs = append(errs, fmt.Sprintf("policy name is not provided at index '%d'", idx))
+	for _, request := range policies.Policies {
+		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
+		if isPatch && err != nil {
+			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
 			continue
-		}
-
-		if isPatch {
-			_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
-			if err != nil {
-				errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
-				continue
-			}
+		} else if err == nil && !isPatch {
+			errs = append(errs, fmt.Sprintf("policy '%s' already exists. Use Patch call to update it.", request.Name))
+			continue
 		}
 
 		jsonPolicy, err := s.getPolicyBytes(request.Name, request.Policy)
@@ -157,16 +134,7 @@ func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylang
 		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.Name), jsonPolicy)
 	}
 
-	response := &policylangv1.PostResponse{}
-	var err error
-	if len(errs) > 0 {
-		response.Errors = errs
-		response.Message = "failed to upload policies"
-		err = status.Error(codes.InvalidArgument, strings.Join(errs, ","))
-	} else {
-		response.Message = "successfully uploaded policies"
-	}
-	return response, err
+	return prepareResponse(errs, "policies")
 }
 
 // getPolicyBytes returns the policy bytes after checking validity of the policy.
@@ -182,4 +150,18 @@ func (s *PolicyService) getPolicyBytes(name string, policy *policylangv1.Policy)
 	}
 
 	return jsonPolicy, nil
+}
+
+// prepareResponse prepares the response for Post/Patch operations.
+func prepareResponse(errs []string, resource string) (*policylangv1.PostResponse, error) {
+	response := &policylangv1.PostResponse{}
+	var err error
+	if len(errs) > 0 {
+		response.Errors = errs
+		response.Message = fmt.Sprintf("failed to upload %s", resource)
+		err = status.Error(codes.InvalidArgument, strings.Join(errs, ","))
+	} else {
+		response.Message = fmt.Sprintf("successfully uploaded %s", resource)
+	}
+	return response, err
 }

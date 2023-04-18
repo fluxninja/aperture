@@ -42,15 +42,15 @@ func (constructor Constructor) Annotate() fx.Option {
 	return fx.Options(
 		fx.Invoke(
 			fx.Annotate(
-				constructor.provideWatcher,
+				constructor.setupWatcher,
 				fx.ParamTags(policyTrackersName, policyDynamicConfigTrackersName),
 			),
 		),
 	)
 }
 
-// provideWatcher creates a Kubernetes watcher to watch the Policy Custom Resource.
-func (constructor Constructor) provideWatcher(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers, unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) error {
+// setupWatcher creates a Kubernetes watcher to watch the Policy Custom Resource.
+func (constructor Constructor) setupWatcher(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers, unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) error {
 	var config CRWatcherConfig
 	err := unmarshaller.UnmarshalKey(ConfigKey, &config)
 	if err != nil {

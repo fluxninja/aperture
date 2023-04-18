@@ -73,11 +73,6 @@ func Module() fx.Option {
 				fx.ParamTags(
 					config.NameTag(policiesTrackerFxTag),
 					config.NameTag(policiesDynamicConfigTrackerFxTag),
-				),
-			),
-			fx.Annotate(
-				setupPoliciesAPINotifier,
-				fx.ParamTags(
 					config.NameTag(policiesAPITrackerFxTag),
 					config.NameTag(policiesAPIDynamicConfigTrackerFxTag),
 				),
@@ -88,31 +83,7 @@ func Module() fx.Option {
 	)
 }
 
-func setupPoliciesAPINotifier(
-	policiesWatcher notifiers.Watcher,
-	dynamicConfigWatcher notifiers.Watcher,
-	etcdClient *etcdclient.Client,
-	lifecycle fx.Lifecycle,
-) {
-	policiesNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient, true)
-	dynamicConfigNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient, true)
-
-	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			return multierr.Combine(
-				policiesWatcher.AddPrefixNotifier(policiesNotifier),
-				dynamicConfigWatcher.AddPrefixNotifier(dynamicConfigNotifier),
-			)
-		},
-		OnStop: func(ctx context.Context) error {
-			return multierr.Combine(
-				policiesWatcher.RemovePrefixNotifier(policiesNotifier),
-				dynamicConfigWatcher.RemovePrefixNotifier(dynamicConfigNotifier),
-			)
-		},
-	})
-}
-
+// provideTrackers provides new trackers for policies and policies dynamic config.
 func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trackers, error) {
 	policyTrackers := notifiers.NewDefaultTrackers()
 	policyDynamicConfigTrackers := notifiers.NewDefaultTrackers()
@@ -139,13 +110,11 @@ func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trac
 func setupPoliciesNotifier(
 	policyTrackers notifiers.Trackers,
 	policyDynamicConfigTrackers notifiers.Trackers,
+	policyAPIWatcher notifiers.Watcher,
+	policyAPIDynamicConfigWatcher notifiers.Watcher,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 ) {
-	if policyTrackers == nil || policyDynamicConfigTrackers == nil {
-		log.Debug().Msg("Kubernetes watcher is disabled")
-		return
-	}
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
 		var dat []byte
 		if bytes == nil {
@@ -188,47 +157,24 @@ func setupPoliciesNotifier(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			err := policyEtcdNotifier.Start()
-			if err != nil {
-				return err
-			}
-			err = policyTrackers.AddPrefixNotifier(policyEtcdNotifier)
-			if err != nil {
-				return err
-			}
-
-			err = policyDynamicConfigEtcdNotifier.Start()
-			if err != nil {
-				return err
-			}
-			err = policyDynamicConfigTrackers.AddPrefixNotifier(policyDynamicConfigEtcdNotifier)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return multierr.Combine(
+				policyEtcdNotifier.Start(),
+				policyTrackers.AddPrefixNotifier(policyEtcdNotifier),
+				policyAPIWatcher.AddPrefixNotifier(policyEtcdNotifier),
+				policyDynamicConfigEtcdNotifier.Start(),
+				policyDynamicConfigTrackers.AddPrefixNotifier(policyDynamicConfigEtcdNotifier),
+				policyAPIDynamicConfigWatcher.AddPrefixNotifier(policyDynamicConfigEtcdNotifier),
+			)
 		},
 		OnStop: func(_ context.Context) error {
-			var merr, err error
-			err = policyTrackers.RemovePrefixNotifier(policyEtcdNotifier)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = policyEtcdNotifier.Stop()
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-
-			err = policyDynamicConfigTrackers.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = policyDynamicConfigEtcdNotifier.Stop()
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-
-			return merr
+			return multierr.Combine(
+				policyTrackers.RemovePrefixNotifier(policyEtcdNotifier),
+				policyAPIWatcher.RemovePrefixNotifier(policyEtcdNotifier),
+				policyEtcdNotifier.Stop(),
+				policyDynamicConfigTrackers.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier),
+				policyAPIDynamicConfigWatcher.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier),
+				policyDynamicConfigEtcdNotifier.Stop(),
+			)
 		},
 	})
 }

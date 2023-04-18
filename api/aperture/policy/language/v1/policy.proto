@@ -15,6 +15,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 service PolicyService {
+  // GetPolicy returns a policy with the specified name.
   rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse) {
     option (google.api.http) = {get: "/v1/policies/{name}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -22,6 +23,7 @@ service PolicyService {
     };
   }
 
+  // GetPolicies returns all policies.
   rpc GetPolicies(google.protobuf.Empty) returns (GetPoliciesResponse) {
     option (google.api.http) = {get: "/v1/policies"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -71,14 +73,17 @@ service PolicyService {
   }
 }
 
+// GetPolicyRequest is a request to get a policy with given name.
 message GetPolicyRequest {
   string name = 1;
 }
 
+// GetPolicyResponse is a response containing the requested Policy.
 message GetPolicyResponse {
   Policy policy = 1;
 }
 
+// PostPoliciesRequest is a request to create or update Policies.
 message PostPoliciesRequest {
   message PolicyRequest {
     string name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
@@ -88,28 +93,33 @@ message PostPoliciesRequest {
   repeated PolicyRequest policies = 1 [(validate.rules).repeated.min_items = 1]; // @gotags: validate:"required"
 }
 
+// PostDynamicConfigsRequest is a request to patch dynamic configs for Policies.
 message PostDynamicConfigsRequest {
   message DynamicConfigRequest {
-    string name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
+    string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
     google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
   }
 
   repeated DynamicConfigRequest dynamic_configs = 1 [(validate.rules).repeated.min_items = 1]; // @gotags: validate:"required"
 }
 
+// DeletePolicyRequest is a request to delete a policy with given name.
 message DeletePolicyRequest {
   string name = 1;
 }
 
+// PostResponse is a response to a PostPoliciesRequest or PostDynamicConfigsRequest.
 message PostResponse {
   repeated string errors = 1;
   string message = 2;
 }
 
+// GetPoliciesResponse is a response containing all Policies.
 message GetPoliciesResponse {
   Policies policies = 1;
 }
 
+// Policies is a collection of Policies.
 message Policies {
   map<string, Policy> policies = 1;
 }

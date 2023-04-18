@@ -1737,11 +1737,13 @@ definitions:
                 x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
         type: object
     GetPoliciesResponse:
+        description: GetPoliciesResponse is a response containing all Policies.
         properties:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
     GetPolicyResponse:
+        description: GetPolicyResponse is a response containing the requested Policy.
         properties:
             policy:
                 $ref: '#/definitions/Policy'
@@ -3093,6 +3095,7 @@ definitions:
                 description: The number of replicas that are desired.
         type: object
     Policies:
+        description: Policies is a collection of Policies.
         properties:
             policies:
                 additionalProperties:
@@ -3135,6 +3138,7 @@ definitions:
                 type: object
         type: object
     PostDynamicConfigsRequest:
+        description: PostDynamicConfigsRequest is a request to patch dynamic configs for Policies.
         properties:
             dynamic_configs:
                 items:
@@ -3150,14 +3154,15 @@ definitions:
             dynamic_config:
                 type: object
                 x-go-tag-validate: required
-            name:
+            policy_name:
                 type: string
                 x-go-tag-validate: required
         required:
             - dynamic_config
-            - name
+            - policy_name
         type: object
     PostPoliciesRequest:
+        description: PostPoliciesRequest is a request to create or update Policies.
         properties:
             policies:
                 items:
@@ -3180,6 +3185,7 @@ definitions:
             - name
         type: object
     PostResponse:
+        description: PostResponse is a response to a PostPoliciesRequest or PostDynamicConfigsRequest.
         properties:
             errors:
                 items:
@@ -4680,7 +4686,8 @@ paths:
         post:
             operationId: PolicyService_PostDynamicConfigs
             parameters:
-                - in: body
+                - description: PostDynamicConfigsRequest is a request to patch dynamic configs for Policies.
+                  in: body
                   name: body
                   required: true
                   schema:
@@ -4969,12 +4976,14 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
+            summary: GetPolicies returns all policies.
             tags:
                 - aperture-controller
         patch:
             operationId: PolicyService_PatchPolicies
             parameters:
-                - in: body
+                - description: PostPoliciesRequest is a request to create or update Policies.
+                  in: body
                   name: body
                   required: true
                   schema:
@@ -4994,7 +5003,8 @@ paths:
         post:
             operationId: PolicyService_PostPolicies
             parameters:
-                - in: body
+                - description: PostPoliciesRequest is a request to create or update Policies.
+                  in: body
                   name: body
                   required: true
                   schema:
@@ -5048,6 +5058,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
+            summary: GetPolicy returns a policy with the specified name.
             tags:
                 - aperture-controller
     /v1/status/{path}:

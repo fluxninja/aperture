@@ -97,14 +97,14 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 				request := languagev1.PostDynamicConfigsRequest{
 					DynamicConfigs: []*languagev1.PostDynamicConfigsRequest_DynamicConfigRequest{
 						{
-							Name:          policyName,
+							PolicyName:    policyName,
 							DynamicConfig: dynamicConfigStruct,
 						},
 					},
 				}
 				_, err = client.PostDynamicConfigs(context.Background(), &request)
 				if err != nil {
-					return fmt.Errorf("failed to update policy: %w", err)
+					return fmt.Errorf("failed to update DynamicConfig: %w", err)
 				}
 			} else {
 				return fmt.Errorf("failed to get Policy '%s': %w", policyName, err)
@@ -113,7 +113,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			policy.DynamicConfig.Raw = dynamicConfigBytes
 			err = c.Update(context.Background(), policy)
 			if err != nil {
-				return fmt.Errorf("failed to update Policy '%s': %w", policyName, err)
+				return fmt.Errorf("failed to update DynamicConfig for policy '%s': %w", policyName, err)
 			}
 		}
 

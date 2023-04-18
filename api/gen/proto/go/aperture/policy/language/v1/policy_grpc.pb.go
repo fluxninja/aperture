@@ -32,7 +32,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PolicyServiceClient interface {
+	// GetPolicy returns a policy with the specified name.
 	GetPolicy(ctx context.Context, in *GetPolicyRequest, opts ...grpc.CallOption) (*GetPolicyResponse, error)
+	// GetPolicies returns all policies.
 	GetPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPoliciesResponse, error)
 	// PostPolicies creates or updates policies based on the provided request.
 	PostPolicies(ctx context.Context, in *PostPoliciesRequest, opts ...grpc.CallOption) (*PostResponse, error)
@@ -110,7 +112,9 @@ func (c *policyServiceClient) DeletePolicy(ctx context.Context, in *DeletePolicy
 // All implementations should embed UnimplementedPolicyServiceServer
 // for forward compatibility
 type PolicyServiceServer interface {
+	// GetPolicy returns a policy with the specified name.
 	GetPolicy(context.Context, *GetPolicyRequest) (*GetPolicyResponse, error)
+	// GetPolicies returns all policies.
 	GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error)
 	// PostPolicies creates or updates policies based on the provided request.
 	PostPolicies(context.Context, *PostPoliciesRequest) (*PostResponse, error)

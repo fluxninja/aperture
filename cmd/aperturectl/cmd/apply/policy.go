@@ -148,23 +148,38 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "no matches for kind") {
-			request := languagev1.PostPoliciesRequest{
-				Policies: []*languagev1.PostPoliciesRequest_PolicyRequest{
-					{
-						Name:   policyCR.GetName(),
-						Policy: policy,
-					},
-				},
-			}
-			_, err = client.PostPolicies(context.Background(), &request)
-			if err != nil {
-				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
-			}
-		} else {
+			err = updatePolicyUsingAPI(name, policy)
+		}
+
+		if err != nil {
 			return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 		}
 	}
 
 	log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Applied Policy successfully")
+	return nil
+}
+
+// updatePolicyUsingAPI updates the policy using the API.
+func updatePolicyUsingAPI(name string, policy *languagev1.Policy) error {
+	request := languagev1.PostPoliciesRequest{
+		Policies: []*languagev1.PostPoliciesRequest_PolicyRequest{
+			{
+				Name:   name,
+				Policy: policy,
+			},
+		},
+	}
+	_, err := client.PostPolicies(context.Background(), &request)
+	if err != nil {
+		if strings.Contains(err.Error(), "Use Patch call to update it") {
+			_, err = client.PatchPolicies(context.Background(), &request)
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
 	return nil
 }
