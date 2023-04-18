@@ -18,10 +18,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-var controller utils.ControllerConn
+var controllerConn utils.ControllerConn
 
 func init() {
-	controller.InitFlags(generateCmd.PersistentFlags())
+	controllerConn.InitFlags(generateCmd.PersistentFlags())
 	generateCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to generate Aperture Policy resources for")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated Policy resources will be stored. If not provided, will use current directory")
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
