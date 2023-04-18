@@ -31,7 +31,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 ```
       --apply                  Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
       --controller string      Address of Aperture controller
-      --controller-ns string   Namespace in which the Aperture Controller is running.
+      --controller-ns string   Namespace in which the Aperture Controller is running
       --graph-depth int        Max depth of the graph when generating DOT and Mermaid files (default 1)
   -h, --help                   help for generate
       --insecure               Allow insecure connection to controller

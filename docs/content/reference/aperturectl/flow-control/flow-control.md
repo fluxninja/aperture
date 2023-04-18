@@ -18,7 +18,7 @@ Use this command to query information about active Flow Control integrations
 
 ```
       --controller string      Address of Aperture controller
-      --controller-ns string   Namespace in which the Aperture Controller is running.
+      --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for flow-control
       --insecure               Allow insecure connection to controller
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly

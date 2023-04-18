@@ -71,7 +71,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&controllerNs,
 		"controller-ns",
 		"",
-		"Namespace in which the Aperture Controller is running.",
+		"Namespace in which the Aperture Controller is running",
 	)
 }
 
