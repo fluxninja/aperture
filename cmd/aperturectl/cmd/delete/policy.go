@@ -73,7 +73,7 @@ func deletePolicyUsingAPI() error {
 	}
 	_, err := client.DeletePolicy(context.Background(), &policyRequest)
 	if err != nil {
-		log.Warn().Msgf("failed to delete Policy '%s': %w", policyName, err)
+		log.Warn().Msgf("failed to delete Policy '%s': %s", policyName, err.Error())
 	}
 
 	return nil
