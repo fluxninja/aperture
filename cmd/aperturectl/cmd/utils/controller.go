@@ -227,7 +227,7 @@ func (c *ControllerConn) startPortForward(namespace string) (localPort uint16, c
 		fwErrChan <- fw.ForwardPorts()
 	}()
 
-	secrets, err := clientset.CoreV1().Secrets(controllerNs).List(
+	secrets, err := clientset.CoreV1().Secrets(namespace).List(
 		context.Background(),
 		metav1.ListOptions{
 			LabelSelector: labels.Set{"app.kubernetes.io/component": "aperture-controller"}.String(),

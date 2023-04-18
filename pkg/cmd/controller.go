@@ -365,3 +365,8 @@ func (h *Handler) PatchPolicies(ctx context.Context, req *policylangv1.PostPolic
 func (h *Handler) PostDynamicConfigs(ctx context.Context, req *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
 	return h.policyService.PostDynamicConfigs(ctx, req)
 }
+
+// PostDynamicConfigs updates dynamic-configs to the system.
+func (h *Handler) DeletePolicy(ctx context.Context, req *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
+	return h.policyService.DeletePolicy(ctx, req)
+}
