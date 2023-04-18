@@ -759,6 +759,11 @@ message Scheduler {
     // and `tokens` explicitly specified in the request.
     bool auto_tokens = 3; // @gotags: default:"false"
 
+    // Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+    double timeout_factor = 4; // @gotags: validate:"gte=0.0" default:"0"
+    // Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+    google.protobuf.Duration max_timeout = 5; // @gotags: default:"0s"
+
     // Decision deadline margin is the amount of time that the scheduler will
     // subtract from the request deadline to determine the deadline for the
     // decision. This is to ensure that the scheduler has enough time to

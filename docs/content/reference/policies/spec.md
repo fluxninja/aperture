@@ -7043,6 +7043,30 @@ it is still waiting on the scheduler.
 Parameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
+<dt>max_timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"0s"`)
+
+<!-- vale on -->
+
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+</dd>
+<dt>timeout_factor</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+</dd>
 <dt>workloads</dt>
 <dd>
 

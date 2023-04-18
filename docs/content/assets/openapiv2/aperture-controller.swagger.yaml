@@ -3257,6 +3257,22 @@ definitions:
         description: Parameters to be used if none of workloads specified in `workloads`
           match.
         $ref: '#/definitions/SchedulerWorkloadParameters'
+      max_timeout:
+        description: |+
+          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+        type: string
+        default: 0s
+        x-go-tag-default: 0s
+      timeout_factor:
+        description: |+
+          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+        type: number
+        format: double
+        default: 0
+        x-go-tag-default: "0"
+        x-go-tag-validate: gte=0.0
       workloads:
         description: |+
           List of workloads to be used in scheduler.

@@ -3231,6 +3231,22 @@
           "description": "Parameters to be used if none of workloads specified in `workloads` match.",
           "x-order": 2
         },
+        "max_timeout": {
+          "default": "0s",
+          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
+          "type": "string",
+          "x-go-tag-default": "0s",
+          "x-order": 3
+        },
+        "timeout_factor": {
+          "default": 0,
+          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "0",
+          "x-go-tag-validate": "gte=0.0",
+          "x-order": 4
+        },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
           "items": {
@@ -3239,7 +3255,7 @@
           },
           "type": "array",
           "x-go-tag-validate": "dive",
-          "x-order": 3
+          "x-order": 5
         }
       },
       "title": "Scheduler parameters",

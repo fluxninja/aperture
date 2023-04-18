@@ -1,5 +1,4 @@
-import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
-import { check, sleep } from "k6";
+import { check } from "k6";
 import { vu } from "k6/execution";
 import http from "k6/http";
 
@@ -61,12 +60,13 @@ export default function () {
   };
   let res = http.request("POST", url, JSON.stringify(body), {
     headers: headers,
+    timeout: 75,
   });
   const ret = check(res, {
     "http status was 200": res.status === 200,
   });
   if (!ret) {
     // sleep for 10ms to 25ms
-    sleep(randomIntBetween(0.01, 0.025));
+    //sleep(randomIntBetween(0.01, 0.025));
   }
 }
