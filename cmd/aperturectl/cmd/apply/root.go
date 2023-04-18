@@ -1,6 +1,8 @@
 package apply
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/rest"
 
@@ -34,40 +36,41 @@ Use this command to apply the Aperture Policies.`,
 		var err error
 		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get kube config: %w", err)
 		}
 
 		controllerNs, err = cmd.Flags().GetString("controller-ns")
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get controller namespace flag: %w", err)
 		}
 
 		controllerAddr, err := cmd.Flags().GetString("controller")
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get controller address flag: %w", err)
 		}
 
 		kube, err := cmd.Flags().GetBool("kube")
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get kube flag: %w", err)
 		}
 
 		if controllerAddr == "" && !kube {
 			err = cmd.Flags().Set("kube", "true")
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to set kube flag: %w", err)
 			}
 		}
 
 		err = controller.PreRunE(cmd, args)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to run controller pre-run: %w", err)
 		}
 
 		client, err = controller.Client()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get controller client: %w", err)
 		}
+
 		return nil
 	},
 	PersistentPostRun: controller.PostRun,
