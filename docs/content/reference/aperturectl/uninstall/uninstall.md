@@ -19,7 +19,7 @@ Use this command to uninstall Aperture Controller and Agent from your Kubernetes
 ```
   -h, --help                 help for uninstall
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
-      --namespace string     Namespace from which the component will be uninstalled. Defaults to 'default' namespace
+      --namespace string     Namespace from which the component will be uninstalled. Defaults to 'default' namespace (default "default")
       --timeout int          Timeout of waiting for uninstallation hooks completion (default 300)
       --values-file string   Values YAML file containing parameters to customize the installation
       --version string       Version of the Aperture (default "latest")
