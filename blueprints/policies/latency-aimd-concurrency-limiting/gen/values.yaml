@@ -49,8 +49,6 @@ policy:
     # Scheduler parameters.
     # Type: aperture.spec.v1.SchedulerParameters
     scheduler:
-      # Automatically estimate cost (tokens) for workload requests.
-      # Type: bool
       auto_tokens: true
     # Gradient Controller parameters.
     # Type: aperture.spec.v1.GradientControllerParameters

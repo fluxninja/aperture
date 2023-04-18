@@ -512,29 +512,21 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		fairnessLabel = fairnessLabel + "," + val
 	}
 
-	timeout := conLimiter.schedulerParameters.MaxTimeout.AsDuration()
 	// Lookup tokens for the workload, if not provided
+
 	if tokens == 0 {
+		// at least set to 1 token
+		tokens = 1
 		if matchedWorkloadProto.Tokens != 0 {
 			tokens = matchedWorkloadProto.Tokens
 		} else if conLimiter.schedulerParameters.AutoTokens {
-			tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex)
-			if !ok {
-				// default to 1 if auto tokens not found
-				tokens = 1
-			} else {
+			if tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex); ok {
 				tokens = tokensAuto
-				// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
-				timeout = time.Duration(float64(tokens)*conLimiter.schedulerParameters.TimeoutFactor) * time.Millisecond
-				if timeout > conLimiter.schedulerParameters.MaxTimeout.AsDuration() {
-					timeout = conLimiter.schedulerParameters.MaxTimeout.AsDuration()
-				}
 			}
-		} else {
-			// default to 1 if auto tokens not enabled
-			tokens = 1
 		}
 	}
+
+	reqCtx := ctx
 
 	if clientDeadline, hasDeadline := ctx.Deadline(); hasDeadline {
 		// The clientDeadline is calculated based on client's timeout, passed
@@ -542,37 +534,32 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		// client before its deadline passes (otherwise we risk fail-open on
 		// timeout). To allow some headroom for transmitting the response to
 		// the client, we set an "internal" deadline to a bit before client's
-		// deadline, subtracting:
-		// * 2 * 1ms to account for deadline inaccuracies (observed
-		//   that Deadline() - Now() delta might end up longer than
-		//   grpc-timeout (!), usually within 1ms),
-		// * 1ms for response overhead,
-		// * 7ms so that we do not always operate on the edge of the time budget.
+		// deadline, subtracting the configured margin.
 		clientTimeout := time.Until(clientDeadline)
-		internalTimeout := clientTimeout - 10*time.Millisecond
-		if internalTimeout < timeout {
-			timeout = internalTimeout
-		}
+		timeout := clientTimeout - conLimiter.schedulerParameters.DecisionDeadlineMargin.AsDuration()
 		if timeout < 0 {
+			// we will still schedule the request and it will get
+			// dropped if it doesn't get the tokens immediately.
 			timeout = 0
 		}
+		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		reqCtx = timeoutCtx
 	}
 
-	reqContext := scheduler.Request{
+	req := scheduler.Request{
 		FairnessLabel: fairnessLabel,
 		Priority:      uint8(matchedWorkloadProto.Priority),
 		Tokens:        tokens,
 	}
-	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
 
-	accepted := conLimiter.scheduler.Schedule(timeoutCtx, reqContext)
+	accepted := conLimiter.scheduler.Schedule(reqCtx, req)
 
 	// update concurrency metrics and decisionType
-	conLimiter.incomingWorkSecondsCounter.Add(float64(reqContext.Tokens) / 1000)
+	conLimiter.incomingWorkSecondsCounter.Add(float64(req.Tokens) / 1000)
 
 	if accepted {
-		conLimiter.acceptedWorkSecondsCounter.Add(float64(reqContext.Tokens) / 1000)
+		conLimiter.acceptedWorkSecondsCounter.Add(float64(req.Tokens) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{

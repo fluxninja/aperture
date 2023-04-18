@@ -1480,8 +1480,10 @@ See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/conc
 
 :::
 
-It's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
-Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
+It's based on the actuation strategy (for example, load actuator) and workload scheduling
+which is based on Weighted Fair Queuing principles.
+Concurrency is calculated in terms of total tokens per second, which can translate
+to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
 strategy and a scheduler. At this time, only `load_actuator` strategy is available.
@@ -6469,7 +6471,11 @@ You can use the [live-preview](/concepts/flow-control/resources/classifier.md#li
 
 Special Rego variables:
 
-- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+- `data.<package>.tokens`: Number of tokens for this request. This value is
+  used by rate limiters and concurrency limiters when making decisions. The value
+  provided here will override any value provided in the policy configuration for
+  the workload. When this label is provided, it is not emitted as part of flow
+  labels or telemetry and is solely used while processing the request.
 
 :::
 
@@ -6879,8 +6885,6 @@ signals for accepted and incoming concurrency are aggregated across all agents.
 
 :::
 
-See [ConcurrencyLimiter](#concurrency-limiter) for more context.
-
 <dl>
 <dt>out_ports</dt>
 <dd>
@@ -6936,9 +6940,17 @@ scheduler is applied on.
 Concurrency is a unit less number describing mean number of
 [flows](/concepts/flow-control/flow-control.md#flow) being
 concurrently processed by the system (system = control point).
-Concurrency is calculated as _work_ done per unit of time (so
-work-seconds per world-seconds). Work-seconds are computed based on
-token-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).
+Concurrency is calculated as tokens per second that is being
+accepted by the scheduler.
+If the tokens map to milliseconds of response latency (_work_),
+then the concurrency is _work_ done per unit
+of time (so work-seconds per world-seconds). Work-seconds are
+computed based on token-weights of flows (which are either
+estimated using the `auto_tokens` feature or specified by
+`Workload.tokens` setting).
+Conversely, if the tokens map to number of requests where
+each request is 1 token, then the concurrency is simply
+the number of requests per second.
 
 :::
 
@@ -6957,9 +6969,9 @@ Value of this signal is aggregated from all the relevant schedulers.
 Incoming concurrency is concurrency that'd be needed to accept all the
 flows entering the scheduler.
 
-This is computed in the same way as `accepted_concurrency`, but summing
-up work-seconds from all the flows entering scheduler, including
-rejected ones.
+This is computed in the same way as `accepted_concurrency`,
+by summing up tokens from all the flows entering scheduler,
+including rejected ones.
 
 </dd>
 </dl>
@@ -6980,7 +6992,7 @@ Scheduler parameters
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool)
 
 <!-- vale on -->
 
@@ -6988,9 +7000,35 @@ Automatically estimate the size of a request in each workload, based on
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
-Verify that the `tokens` in workload definitions
-or the flow aren't set if you want
-to use this feature.
+This setting is useful in concurrent limiting use-case, where the
+concurrency is calculated as (avg. latency \* in-flight requests).
+
+The value of tokens estimated by `auto_tokens` takes lower precedence
+than the value of `tokens` specified in the workload definition
+and `tokens` explicitly specified in the request.
+
+</dd>
+<dt>decision_deadline_margin</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"0.01s"`)
+
+<!-- vale on -->
+
+Decision deadline margin is the amount of time that the scheduler will
+subtract from the request deadline to determine the deadline for the
+decision. This is to ensure that the scheduler has enough time to
+make a decision before the request deadline happens, accounting for
+processing delays.
+The request deadline is based on the
+[gRPC deadline](https://grpc.io/blog/deadlines) or the
+[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+
+Fail-open logic is use for flow control APIs, so if the gRPC deadline
+reaches, the flow will end up being unconditionally allowed while
+it is still waiting on the scheduler.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -7010,32 +7048,11 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 <!-- vale off -->
 
-(string, default: `"0.49s"`)
+(string, default: `"0s"`)
 
 <!-- vale on -->
 
-Max Timeout is the value with which the flow timeout is capped.
-When `auto_tokens` feature is not enabled, this value is used as the
-timeout for the flow, otherwise it is used as a cap for the timeout.
-
-:::caution
-
-This timeout needs to be less than the timeout set on the
-client for the whole GRPC call:
-
-- in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-- in case of libraries, is configured during the client initialization.
-
-Fail-open logic is use for flow control APIs, so if the GRPC timeout
-fires first, the flow will end up being unconditionally allowed while
-it is still waiting on the scheduler.
-
-To avoid such cases, the end-to-end GRPC timeout should also contain
-some headroom for constant overhead like serialization and other processing delays. Default
-value for GRPC timeouts is 500ms, giving 10ms of headroom, so when
-tweaking this timeout, adjust the GRPC timeout accordingly.
-
-:::
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
 
 </dd>
 <dt>timeout_factor</dt>
@@ -7043,16 +7060,11 @@ tweaking this timeout, adjust the GRPC timeout accordingly.
 
 <!-- vale off -->
 
-(float64, default: `0.5`)
+(float64)
 
 <!-- vale on -->
 
-Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
-
-If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
-it will be rejected.
-
-This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
 
 </dd>
 <dt>workloads</dt>
@@ -7136,7 +7148,8 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale on -->
 
-Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
+Parameters defines parameters such as priority, tokens and fairness key that
+are applicable to flows within a workload.
 
 <dl>
 <dt>fairness_key</dt>
@@ -7182,7 +7195,10 @@ $$
 
 <!-- vale on -->
 
-Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+Tokens determines the cost of admitting a single request the workload,
+which is typically defined as milliseconds of response latency or
+simply equal to 1 if the resource being accessed is constrained by the
+number of requests (3rd party rate limiters).
 This override is applicable only if tokens for the request aren't specified in the request.
 
 </dd>

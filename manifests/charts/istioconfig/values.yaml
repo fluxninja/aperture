@@ -4,17 +4,17 @@ name: aperture-envoy-filter
 ## @section Envoy Filter Parameters
 ##
 envoyFilter:
-  ## @param envoyFilter.name Name of service running aperture-agent
+  ## @param envoyFilter.name Name of service running `aperture-agent`
   name: aperture-agent
-  ## @param envoyFilter.namespace Namespace where aperture-agent is running
+  ## @param envoyFilter.namespace Namespace where `aperture-agent` is running
   namespace: aperture-agent
-  ## @param envoyFilter.port Port serving ext authz API and for streaming access logs
+  ## @param envoyFilter.port Port serving external authorization API and for streaming access logs
   port: 8080
-  ## @param envoyFilter.authzGrpcTimeout Timeout in seconds to authz requests made to aperture-agent. Note: aperture-agent scheduler has max_timeout parameter that must tuned to match the setting here.
-  authzGrpcTimeout: 0.5s
-  ## @param envoyFilter.enableAuthzRequestBodyBuffering Enable buffering request body that is sent over ext authz API. Note: This might break some streaming APIs.
+  ## @param envoyFilter.authzGrpcTimeout Timeout in seconds to authorization requests made to `aperture-agent`.
+  authzGrpcTimeout: 0.25s
+  ## @param envoyFilter.enableAuthzRequestBodyBuffering Enable buffering request body that is sent over external authorization API. Note: This might break some streaming APIs.
   enableAuthzRequestBodyBuffering: true
-  ## @param envoyFilter.maxRequestBytes Maximum size of request that is sent over ext authz API
+  ## @param envoyFilter.maxRequestBytes Maximum size of request that is sent over external authorization API
   maxRequestBytes: 8192
   ## @param envoyFilter.sidecarMode Aperture Agent installed using the Sidecar mode
   sidecarMode: false
