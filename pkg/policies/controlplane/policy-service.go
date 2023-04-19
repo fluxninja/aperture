@@ -76,29 +76,21 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 
 // UpsertPolicy creates/updates policy to the system.
 func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
-	if req.UpdateMask == nil && len(req.UpdateMask.GetPaths()) == 0 {
-		return s.upsertPolicy(ctx, req, false)
-	}
+	updateMask := req.UpdateMask != nil && len(req.UpdateMask.GetPaths()) > 0
 
-	return s.upsertPolicy(ctx, req, true)
-}
-
-func (s *PolicyService) upsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest, updateMask bool) (*emptypb.Empty, error) {
 	policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
-	if err != nil {
-		if updateMask {
-			return nil, err
-		}
+	if err != nil && updateMask {
+		return nil, err
 	}
 
 	if policy != nil {
-		if updateMask {
-			if !(len(req.UpdateMask.GetPaths()) == 1 && req.UpdateMask.GetPaths()[0] == "all") {
-				utils.ApplyFieldMask(policy.Policy, req.Policy, req.UpdateMask)
-				req.Policy = policy.Policy
-			}
-		} else {
+		if !updateMask {
 			return nil, status.Errorf(codes.AlreadyExists, "Policy '%s' already exists. Use UpsertPolicy with PATCH call to update it.", req.PolicyName)
+		}
+
+		if !(len(req.UpdateMask.GetPaths()) == 1 && req.UpdateMask.GetPaths()[0] == "all") {
+			utils.ApplyFieldMask(policy.Policy, req.Policy, req.UpdateMask)
+			req.Policy = policy.Policy
 		}
 	}
 
