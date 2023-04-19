@@ -36,7 +36,7 @@ type FluxNinjaExtensionConfig struct {
 type ClientConfig struct {
 	// HTTP client settings.
 	HTTPClient http.HTTPClientConfig `json:"http"`
-	// GRPC client settings.
+	// gRPC client settings.
 	GRPCClient grpc.GRPCClientConfig `json:"grpc"`
 }
 

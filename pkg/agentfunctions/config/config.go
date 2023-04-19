@@ -23,6 +23,6 @@ type Config struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type ClientConfig struct {
-	// GRPC client settings.
+	// gRPC client settings.
 	GRPCClient grpcclient.GRPCClientConfig `json:"grpc"`
 }

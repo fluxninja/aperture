@@ -13,7 +13,7 @@ import (
 // Module provides authz handler
 //
 // Authz handler is one of the APIs to classification and flowcontrol modules.
-// Authz uses envoy's external authorization grpc API.
+// Authz uses envoy's external authorization gRPC API.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(NewHandler),

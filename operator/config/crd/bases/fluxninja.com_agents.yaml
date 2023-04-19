@@ -895,7 +895,7 @@ spec:
                         description: Network client configuration
                         properties:
                           grpc:
-                            description: GRPC client settings.
+                            description: gRPC client settings.
                             properties:
                               backoff:
                                 description: Backoff config
@@ -1161,7 +1161,7 @@ spec:
                         description: Client configuration.
                         properties:
                           grpc:
-                            description: GRPC client settings.
+                            description: gRPC client settings.
                             properties:
                               backoff:
                                 description: Backoff config

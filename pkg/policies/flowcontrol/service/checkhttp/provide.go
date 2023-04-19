@@ -41,7 +41,7 @@ func ProvideHandler(
 	return h, nil
 }
 
-// Register registers flowcontrol service on a grpc server.
+// Register registers flowcontrol service on a gRPC server.
 func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceHTTPServer, healthsrv *health.Server) {
 	flowcontrolv1.RegisterFlowControlServiceHTTPServer(server, handler)
 

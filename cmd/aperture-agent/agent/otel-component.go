@@ -104,8 +104,8 @@ func AgentOTelComponents(
 	)
 	errs = multierr.Append(errs, err)
 
-	// We need to create and register empty server wrappers in GRPC server, as OTel
-	// receivers are created after our GRPC server is started.
+	// We need to create and register empty server wrappers in gRPC server, as OTel
+	// receivers are created after our gRPC server is started.
 	// Inside the otlpreceiver the wrappers are filled with proper servers.
 	tsw := &otlpreceiver.TraceServerWrapper{}
 	msw := &otlpreceiver.MetricServerWrapper{}

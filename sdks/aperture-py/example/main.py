@@ -40,7 +40,7 @@ async def connected_handler():
         nonlocal state
         state = connectivity
 
-    # grpc does not expose a way to get the current state of the channel
+    # gRPC does not expose a way to get the current state of the channel
     # so we subscribe to the channel and unsubscribe immediately,
     # as callback is triggered immediately when subscribing
     grpc_channel = aperture_client.grpc_channel

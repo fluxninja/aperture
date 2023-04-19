@@ -23,7 +23,7 @@ const (
 	defaultGMuxListener = "grpc-gmux-listener"
 )
 
-// ServerModule is an fx module that provides annotated GRPC Server using the default listener and registers its metrics with the prometheus registry.
+// ServerModule is an fx module that provides annotated gRPC Server using the default listener and registers its metrics with the prometheus registry.
 func ServerModule() fx.Option {
 	return fx.Options(
 		ServerConstructor{}.Annotate(),
@@ -31,7 +31,7 @@ func ServerModule() fx.Option {
 	)
 }
 
-// GMuxServerModule is an fx module that provides annotated grpc Server using gmux provided listener and registers its metrics with the prometheus registry.
+// GMuxServerModule is an fx module that provides annotated gRPC Server using gmux provided listener and registers its metrics with the prometheus registry.
 func GMuxServerModule() fx.Option {
 	return fx.Options(
 		listener.GMuxConstructor{ListenerName: defaultGMuxListener}.Annotate(),
@@ -52,7 +52,7 @@ type GRPCServerConfig struct {
 	LatencyBucketsMS []float64 `json:"latency_buckets_ms" validate:"gte=0" default:"[10.0,25.0,100.0,250.0,1000.0]"`
 }
 
-// ServerConstructor holds fields to create an annotated GRPC Server.
+// ServerConstructor holds fields to create an annotated gRPC Server.
 type ServerConstructor struct {
 	// Name of grpc server instance -- empty for main server
 	Name string
@@ -66,7 +66,7 @@ type ServerConstructor struct {
 	ServerOptions []grpc.ServerOption
 }
 
-// Annotate creates an annotated instance of GRPC Server.
+// Annotate creates an annotated instance of gRPC Server.
 func (constructor ServerConstructor) Annotate() fx.Option {
 	if constructor.ConfigKey == "" {
 		constructor.ConfigKey = defaultServerConfigKey
