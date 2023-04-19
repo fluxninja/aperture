@@ -356,6 +356,11 @@ func (h *Handler) PostPolicies(ctx context.Context, req *policylangv1.PostPolici
 	return h.policyService.PostPolicies(ctx, req)
 }
 
+// PatchPolicies patches policies to the system.
+func (h *Handler) PatchPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
+	return h.policyService.PatchPolicies(ctx, req)
+}
+
 // PostDynamicConfigs updates dynamic-configs to the system.
 func (h *Handler) PostDynamicConfigs(ctx context.Context, req *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
 	return h.policyService.PostDynamicConfigs(ctx, req)

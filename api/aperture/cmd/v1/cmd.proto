@@ -24,6 +24,7 @@ service Controller {
   rpc PreviewHTTPRequests(PreviewHTTPRequestsRequest) returns (PreviewHTTPRequestsControllerResponse);
 
   rpc PostPolicies(aperture.policy.language.v1.PostPoliciesRequest) returns (aperture.policy.language.v1.PostResponse);
+  rpc PatchPolicies(aperture.policy.language.v1.PostPoliciesRequest) returns (aperture.policy.language.v1.PostResponse);
   rpc PostDynamicConfigs(aperture.policy.language.v1.PostDynamicConfigsRequest) returns (aperture.policy.language.v1.PostResponse);
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
 }

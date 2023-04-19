@@ -172,7 +172,14 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) error {
 	}
 	_, err := client.PostPolicies(context.Background(), &request)
 	if err != nil {
-		return err
+		if strings.Contains(err.Error(), "Use Patch call to update it") {
+			_, err = client.PatchPolicies(context.Background(), &request)
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
 	}
 	return nil
 }

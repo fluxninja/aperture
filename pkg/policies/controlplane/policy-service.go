@@ -77,24 +77,17 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 
 // PostPolicies posts policies to the system.
 func (s *PolicyService) PostPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
-	var errs []string
+	return s.updatePolicies(ctx, policies, false)
+}
 
-	for _, request := range policies.Policies {
-		jsonPolicy, err := s.getPolicyBytes(request.Name, request.Policy)
-		if err != nil {
-			errs = append(errs, err.Error())
-			continue
-		}
-		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.Name), jsonPolicy)
-	}
-
-	return prepareResponse(errs, "policies")
+// PatchPolicies patches policies to the system.
+func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
+	return s.updatePolicies(ctx, policies, true)
 }
 
 // PostDynamicConfigs updates dynamic configs to the system.
 func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
 	var errs []string
-
 	for _, request := range dynamicConfigs.DynamicConfigs {
 		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.PolicyName})
 		if err != nil {
@@ -104,7 +97,7 @@ func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *
 
 		jsonDynamicConfig, err := request.DynamicConfig.MarshalJSON()
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': %s", request.PolicyName, err.Error()))
+			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.PolicyName, err))
 			continue
 		}
 		s.etcdWriter.Write(path.Join(paths.PoliciesAPIDynamicConfigPath, request.PolicyName), jsonDynamicConfig)
@@ -120,16 +113,40 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 	return &emptypb.Empty{}, nil
 }
 
+// updatePolicies manages Post/Patch operations on policies.
+func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, isPatch bool) (*policylangv1.PostResponse, error) {
+	var errs []string
+	for _, request := range policies.Policies {
+		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
+		if isPatch && err != nil {
+			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
+			continue
+		} else if err == nil && !isPatch {
+			errs = append(errs, fmt.Sprintf("policy '%s' already exists. Use Patch call to update it.", request.Name))
+			continue
+		}
+
+		jsonPolicy, err := s.getPolicyBytes(request.Name, request.Policy)
+		if err != nil {
+			errs = append(errs, err.Error())
+			continue
+		}
+		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.Name), jsonPolicy)
+	}
+
+	return prepareResponse(errs, "policies")
+}
+
 // getPolicyBytes returns the policy bytes after checking validity of the policy.
 func (s *PolicyService) getPolicyBytes(name string, policy *policylangv1.Policy) ([]byte, error) {
 	jsonPolicy, err := policy.MarshalJSON()
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal policy '%s': %w", name, err)
+		return nil, fmt.Errorf("failed to marshal policy '%s': '%s'", name, err)
 	}
 
 	_, _, err = ValidateAndCompile(context.Background(), name, jsonPolicy)
 	if err != nil {
-		return nil, fmt.Errorf("failed to compile policy '%s': %w", name, err)
+		return nil, fmt.Errorf("failed to compile policy '%s': '%s'", name, err)
 	}
 
 	return jsonPolicy, nil
@@ -141,10 +158,10 @@ func prepareResponse(errs []string, resource string) (*policylangv1.PostResponse
 	var err error
 	if len(errs) > 0 {
 		response.Errors = errs
-		response.Message = fmt.Sprintf("failed to upload '%s'", resource)
+		response.Message = fmt.Sprintf("failed to upload %s", resource)
 		err = status.Error(codes.InvalidArgument, strings.Join(errs, ","))
 	} else {
-		response.Message = fmt.Sprintf("successfully uploaded '%s'", resource)
+		response.Message = fmt.Sprintf("successfully uploaded %s", resource)
 	}
 	return response, err
 }

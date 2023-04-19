@@ -4992,6 +4992,27 @@ paths:
             summary: GetPolicies returns all policies.
             tags:
                 - aperture-controller
+        patch:
+            operationId: PolicyService_PatchPolicies
+            parameters:
+                - description: PostPoliciesRequest is a request to create or update Policies.
+                  in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PostPoliciesRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: PatchPolicies patches policies based on the provided request.
+            tags:
+                - aperture-controller
         post:
             operationId: PolicyService_PostPolicies
             parameters:
