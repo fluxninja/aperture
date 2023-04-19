@@ -208,7 +208,7 @@ definitions:
                 x-go-tag-default: "1.6"
                 x-go-tag-json: multiplier
                 x-go-tag-validate: gte=0
-        title: BackoffConfig holds configuration for GRPC client backoff.
+        title: BackoffConfig holds configuration for gRPC client backoff.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
     BatchAlertsConfig:
@@ -613,15 +613,15 @@ definitions:
                 x-go-name: UseProxy
                 x-go-tag-default: "false"
                 x-go-tag-json: use_proxy
-        title: GRPCClientConfig holds configuration for GRPC Client.
+        title: GRPCClientConfig holds configuration for gRPC Client.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
     GRPCGatewayConfig:
-        description: GRPCGatewayConfig holds configuration for grpc-http gateway
+        description: GRPCGatewayConfig holds configuration for gRPC to HTTP gateway
         properties:
             grpc_server_address:
                 default: 0.0.0.0:1
-                description: GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+                description: gRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs gRPC and HTTP servers on the same port
                 pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
                 type: string
                 x-go-name: GRPCAddr
@@ -666,7 +666,7 @@ definitions:
                 x-go-tag-default: '[10.0,25.0,100.0,250.0,1000.0]'
                 x-go-tag-json: latency_buckets_ms
                 x-go-tag-validate: gte=0
-        title: GRPCServerConfig holds configuration for GRPC Server.
+        title: GRPCServerConfig holds configuration for gRPC Server.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
     HTTPClientConfig:

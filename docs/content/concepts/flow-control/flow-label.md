@@ -31,7 +31,7 @@ baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
-For each HTTP [_Control Point_][control-point] (where flows are HTTP or GRPC
+For each HTTP [_Control Point_][control-point] (where flows are HTTP or gRPC
 requests), some basic metadata is available as _request labels_. These are
 `http.method`, `http.target`, `http.host`, `http.scheme`,
 `http.request_content_length` and `http.flavor`. Additionally, all (non-pseudo)

@@ -40,7 +40,7 @@ func GMuxServerModule() fx.Option {
 	)
 }
 
-// GRPCServerConfig holds configuration for GRPC Server.
+// GRPCServerConfig holds configuration for gRPC Server.
 // swagger:model
 // +kubebuilder:object:generate=true
 type GRPCServerConfig struct {

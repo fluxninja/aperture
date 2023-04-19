@@ -81,12 +81,12 @@ graph LR
 
 </Zoom>
 
-In the above diagram, each service has _Traffic_ (HTTP or GRPC) control points.
-Every incoming API request to a service is a flow at its `ingress` control
-point. Likewise, every outgoing request from a service is a flow at its `egress`
+In the above diagram, each service has HTTP or gRPC control points. Every
+incoming API request to a service is a flow at its `ingress` control point.
+Likewise, every outgoing request from a service is a flow at its `egress`
 control point.
 
-In addition, the `Frontend` service has _Feature_ control points identifying
+In addition, the `Frontend` service has feature control points identifying
 _recommendations_ and _live-update_ features inside the `Frontend` service's
 code.
 

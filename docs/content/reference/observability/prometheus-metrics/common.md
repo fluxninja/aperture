@@ -52,8 +52,8 @@ for more information.
 
 <!-- vale on -->
 
-### GRPC Server Metrics
+### gRPC Server Metrics
 
-GRPC server metrics are exposed by default. See
+gRPC server metrics are exposed by default. See
 [grpc-ecosystem/go-grpc-prometheus server_metrics](https://pkg.go.dev/github.com/grpc-ecosystem/go-grpc-prometheus#NewServerMetrics)
 for more information.
