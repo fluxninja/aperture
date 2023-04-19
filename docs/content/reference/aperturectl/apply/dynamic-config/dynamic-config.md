@@ -32,6 +32,16 @@ aperturectl apply dynamic-config --policy=static-rate-limiting --file=dynamic-co
       --policy string   Name of the Policy to apply the DynamicConfig to
 ```
 
+### Options inherited from parent commands
+
+```
+      --controller string      Address of Aperture controller
+      --controller-ns string   Namespace in which the Aperture Controller is running
+      --insecure               Allow insecure connection to controller
+      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
+      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+```
+
 ### SEE ALSO
 
 - [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policies

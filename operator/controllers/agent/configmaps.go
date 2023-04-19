@@ -20,7 +20,6 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"strings"
 
 	"github.com/fluxninja/aperture/operator/controllers"
 
@@ -45,44 +44,6 @@ func configMapForAgentConfig(
 	instance *agentv1alpha1.Agent,
 	scheme *runtime.Scheme,
 ) (*corev1.ConfigMap, error) {
-	// HACK: auto-inject controller's cert to agent if we detect it connects to local controller.
-	// FIXME: Mounting optional configmap with controller CA would be a better
-	// solution, but right now we do not have a configmap with CA, just a secret
-	// that contains also the key.
-	// Also, we should figure out the way so that both CA file from config and
-	// controller's CA can be used simultaneously.
-	// FIXME: Even better solution would be for local controller to be signed
-	// using https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/
-	var localControllerCert []byte
-	for _, endpoint := range instance.Spec.ConfigSpec.AgentFunctions.Endpoints {
-		controllerNS := localControllerNamespaceFromEndpoint(endpoint)
-		if controllerNS == "" {
-			continue
-		}
-
-		caFile := &instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile
-		if *caFile != "" {
-			continue
-		}
-
-		if client_ == nil {
-			continue
-		}
-
-		var secrets corev1.SecretList
-		_ = client_.List(ctx, &secrets, &client.ListOptions{Namespace: controllerNS})
-
-		for _, secret := range secrets.Items {
-			if !strings.HasSuffix(secret.Name, "-controller-cert") {
-				continue
-			}
-			localControllerCert = append(localControllerCert, secret.Data[controllers.ControllerCertName]...)
-			if localControllerCert != nil {
-				*caFile = "/etc/aperture/aperture-agent/config/controller-ca.pem"
-			}
-		}
-	}
-
 	jsonConfig, err := json.Marshal(instance.Spec.ConfigSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Agent config to JSON. Error: '%s'", err.Error())
@@ -105,8 +66,41 @@ func configMapForAgentConfig(
 		},
 	}
 
-	if localControllerCert != nil {
-		cm.Data["controller-ca.pem"] = string(localControllerCert)
+	if scheme != nil {
+		if err := ctrl.SetControllerReference(instance, cm, scheme); err != nil {
+			return nil, err
+		}
+	}
+
+	return cm, nil
+}
+
+// configMapForAgentControllerClientCert prepares the ConfigMap object for the Controller client certificate.
+func configMapForAgentControllerClientCert(
+	ctx context.Context,
+	client_ client.Client,
+	instance *agentv1alpha1.Agent,
+	scheme *runtime.Scheme,
+) (*corev1.ConfigMap, error) {
+	if instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile != "" {
+		return nil, nil
+	}
+
+	localControllerCert := controllers.GetControllerClientCert(instance.Spec.ConfigSpec.AgentFunctions.Endpoints, client_, ctx)
+	if localControllerCert == nil {
+		return nil, nil
+	}
+
+	cm := &corev1.ConfigMap{
+		ObjectMeta: v1.ObjectMeta{
+			Name:        controllers.AgentControllerClientCertCMName,
+			Namespace:   instance.GetNamespace(),
+			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AgentServiceName),
+			Annotations: instance.Spec.Annotations,
+		},
+		Data: map[string]string{
+			controllers.ControllerClientCertKey: string(localControllerCert),
+		},
 	}
 
 	if scheme != nil {
@@ -167,29 +161,20 @@ func CreateAgentConfigMapInNamespace(
 	return configMap
 }
 
-func localControllerNamespaceFromEndpoint(endpoint string) string {
-	addr, port, ok := strings.Cut(endpoint, ":")
-	if !ok {
-		return ""
+// CreateAgentControllerClientCertConfigMapInNamespace creates the Agent ConfigMap for Controller client certificate in the given namespace instead of the default one.
+func CreateAgentControllerClientCertConfigMapInNamespace(
+	ctx context.Context,
+	client client.Client,
+	instance *agentv1alpha1.Agent,
+	namespace string,
+) *corev1.ConfigMap {
+	configMap, _ := configMapForAgentControllerClientCert(ctx, client, instance, nil)
+	if configMap == nil {
+		return nil
 	}
 
-	if port != "8080" {
-		return ""
-	}
+	configMap.Namespace = namespace
+	configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
 
-	subdomains := strings.Split(addr, ".")
-	if len(subdomains) < 2 {
-		return ""
-	}
-
-	if subdomains[0] != "aperture-controller" {
-		return ""
-	}
-
-	tail := strings.Join(subdomains[2:], ".") + "."
-	if !strings.HasPrefix("svc.cluster.local.", tail) { //nolint:gocritic
-		return ""
-	}
-
-	return subdomains[1]
+	return configMap
 }

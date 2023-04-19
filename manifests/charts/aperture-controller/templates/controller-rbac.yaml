@@ -1,0 +1,22 @@
+{{ if and .Values.controller.namespaceScoped .Values.controller.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.controller.serviceAccount.name | default (include "common.names.fullname" .) }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-controller
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.commonAnnotations .Values.controller.serviceAccount.annotations }}
+  annotations:
+    {{- if .Values.controller.serviceAccount.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.controller.serviceAccount.annotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+automountServiceAccountToken: {{ .Values.controller.serviceAccount.automountServiceAccountToken }}
+{{- end }}

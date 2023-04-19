@@ -1,3 +1,4 @@
+{{- if and (not .Values.agent.namespaceScoped) }}
 # Deleting the Aperture Custom Resource creating with the chart in the 'pre-delete' hook.
 # The CR required the operator to gracefully delete all the resources and if the chart is
 # deleted before deleting the CR, it won't get cleaned up properly.
@@ -36,4 +37,5 @@ spec:
           - "/bin/bash"
           - "-xc"
           - "kubectl delete agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}; while (kubectl get agent {{ .Release.Name }} -n {{ template "common.names.namespace" . }}); ret=$?; [ $ret -eq 0 ]; do echo deleting; sleep 2; done"
+{{- end }}
 {{- end }}

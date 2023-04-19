@@ -1,0 +1,248 @@
+{{- if .Values.controller.namespaceScoped }}
+{{- if not .Values.controller.serverCert.secretName -}}
+  {{- fail ".Values.controller.serverCert.secretName must be set when .Values.controller.namespaceScoped is true" -}}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-controller
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" . $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        sidecar.fluxninja.com/injection: "false"
+        {{- if .Values.controller.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.controller.podAnnotations "context" . $ ) | nindent 8 }}
+        {{- end }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: aperture-controller
+        {{- if .Values.controller.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.controller.podLabels "context" . $ ) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "common.images.pullSecrets" (dict "images" (list .Values.controller.image) "global" .Values.global) | nindent 6 }}
+      {{- if .Values.controller.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.controller.hostAliases "context" . $ ) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.controller.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.controller.nodeSelector "context" . $ ) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.controller.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.controller.affinity "context" . $ ) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.controller.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.controller.tolerations "context" . $ ) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ .Values.controller.serviceAccount.name | default (include "common.names.fullname" .) }}
+      {{- if .Values.controller.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.controller.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.controller.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.controller.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- if or .Values.controller.initContainers .Values.etcd.enabled .Values.prometheus.enabled }}
+      initContainers:
+        {{- if and .Values.etcd.enabled .Values.etcd.initContainer.enabled }}
+        - name: wait-for-etcd
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.etcd.initContainer.image "global" .Values.global) }}
+          imagePullPolicy: {{ .Values.etcd.initContainer.image.pullPolicy }}
+          command:
+            - 'sh'
+            - '-c'
+            - >
+              while (etcdctl --endpoints $(yq -r '.etcd.endpoints[]' /etc/aperture/aperture-controller/config/aperture-controller.yaml) endpoint health); res=$?; [ $res != 0 ]; do
+                echo "Waiting for Etcd to be Healthy";
+              done;
+              echo "Etcd is healthy."
+          volumeMounts:
+            - mountPath: /etc/aperture/aperture-controller/config
+              name: aperture-controller-config
+        {{- end }}
+        {{- if and .Values.prometheus.enabled .Values.prometheus.initContainer.enabled }}
+        - name: wait-for-prometheus
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.prometheus.initContainer.image "global" .Values.global) }}
+          imagePullPolicy: {{ .Values.prometheus.initContainer.image.pullPolicy }}
+          command:
+            - 'sh'
+            - '-c'
+            - >
+              while [ "$(curl -s -o /dev/null -w '%{http_code}' $(yq -r '.prometheus.address' /etc/aperture/aperture-controller/config/aperture-controller.yaml)/-/ready)" != "200" ] ; do
+                echo "Waiting for Prometheus to be Ready"; sleep 2;
+              done;
+              echo "Prometheus is ready."
+          volumeMounts:
+            - mountPath: /etc/aperture/aperture-controller/config
+              name: aperture-controller-config
+        {{- end }}
+        {{- if .Values.controller.initContainers }}
+        {{ .Values.controller.initContainers | toYaml | nindent 4 }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: aperture-controller
+          image: {{ include "controller-operator.image" (dict "image" .Values.controller.image "context" $ ) }}
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
+          {{- if .Values.controller.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.controller.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.controller.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.controller.command "context" . $ ) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.controller.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.controller.args "context" . $ ) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.controller.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.controller.lifecycleHooks "context" . $ ) | nindent 12 }}
+          {{- end }}
+          env:
+            - name: APERTURE_CONTROLLER_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: APERTURE_CONTROLLER_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- if or .Values.controller.secrets.fluxNinjaExtension.create .Values.controller.secrets.fluxNinjaExtension.secretKeyRef.name -}}
+            - name: APERTURE_CONTROLLER_FLUXNINJA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "controller.apiSecret.name" (dict "controller" .Values.controller "context" . $ ) }}
+                  key: {{ include "controller.apiSecret.key" (dict "controller" .Values.controller $ ) }}
+                  optional: false
+            {{- end }}
+            {{- if .Values.controller.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.controller.extraEnvVars "context" . $ ) | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.controller.extraEnvVarsCM .Values.controller.extraEnvVarsSecret }}
+          envFrom:
+            {{- if .Values.controller.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.controller.extraEnvVarsCM "context" . $ ) }}
+            {{- end }}
+            {{- if .Values.controller.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.controller.extraEnvVarsSecret "context" . $ ) }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.controller.resources }}
+          resources: {{- toYaml .Values.controller.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: {{ include "controller.server.port" (dict "controller" .Values.controller $ ) }}
+              name: server
+              protocol: TCP
+            - containerPort: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "debug_port" "defaultPort" 8888 $ ) }}
+              name: otel-debug
+              protocol: TCP
+            - containerPort: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "health_check_port" "defaultPort" 13133 $ ) }}
+              name: otel-health
+              protocol: TCP
+            - containerPort: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "pprof_port" "defaultPort" 1777 $ ) }}
+              name: otel-pprof
+              protocol: TCP
+            - containerPort: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "zpages_port" "defaultPort" 55679 $ ) }}
+              name: otel-zpages
+              protocol: TCP
+          {{- if .Values.controller.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /v1/status/system/liveness
+              port: server
+              scheme: HTTPS
+            {{- if  .Values.controller.livenessProbe.initialDelaySeconds }}
+            initialDelaySeconds: {{ .Values.controller.livenessProbe.initialDelaySeconds }}
+            {{- else }}
+            initialDelaySeconds: 15
+            {{- end }}
+            {{- if  .Values.controller.livenessProbe.periodSeconds }}
+            periodSeconds: {{ .Values.controller.livenessProbe.periodSeconds }}
+            {{- else }}
+            periodSeconds: 15
+            {{- end }}
+            {{- if  .Values.controller.livenessProbe.timeoutSeconds }}
+            timeoutSeconds: {{ .Values.controller.livenessProbe.timeoutSeconds }}
+            {{- else }}
+            timeoutSeconds: 5
+            {{- end }}
+            {{- if  .Values.controller.livenessProbe.failureThreshold }}
+            failureThreshold: {{ .Values.controller.livenessProbe.failureThreshold }}
+            {{- else }}
+            failureThreshold: 6
+            {{- end }}
+            {{- if  .Values.controller.livenessProbe.successThreshold }}
+            successThreshold: {{ .Values.controller.livenessProbe.successThreshold }}
+            {{- else }}
+            successThreshold: 1
+            {{- end }}
+          {{- else if .Values.controller.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.controller.customLivenessProbe "context" . $ ) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.controller.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /v1/status/system/readiness
+              port: server
+              scheme: HTTPS
+            {{- if  .Values.controller.readinessProbe.initialDelaySeconds }}
+            initialDelaySeconds: {{ .Values.controller.readinessProbe.initialDelaySeconds }}
+            {{- else }}
+            initialDelaySeconds: 15
+            {{- end }}
+            {{- if  .Values.controller.readinessProbe.periodSeconds }}
+            periodSeconds: {{ .Values.controller.readinessProbe.periodSeconds }}
+            {{- else }}
+            periodSeconds: 15
+            {{- end }}
+            {{- if  .Values.controller.readinessProbe.timeoutSeconds }}
+            timeoutSeconds: {{ .Values.controller.readinessProbe.timeoutSeconds }}
+            {{- else }}
+            timeoutSeconds: 5
+            {{- end }}
+            {{- if  .Values.controller.readinessProbe.failureThreshold }}
+            failureThreshold: {{ .Values.controller.readinessProbe.failureThreshold }}
+            {{- else }}
+            failureThreshold: 6
+            {{- end }}
+            {{- if  .Values.controller.readinessProbe.successThreshold }}
+            successThreshold: {{ .Values.controller.readinessProbe.successThreshold }}
+            {{- else }}
+            successThreshold: 1
+            {{- end }}
+          {{- else if .Values.controller.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.controller.customReadinessProbe "context" . $ ) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /etc/aperture/aperture-controller/config
+              name: aperture-controller-config
+            - mountPath: /etc/aperture/aperture-controller/certs
+              name: server-cert
+            {{- if .Values.controller.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.controller.extraVolumeMounts "context" . $ ) | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: aperture-controller-config
+          configMap:
+            name: {{ template "common.names.fullname" . }}-config
+        - name: server-cert
+          secret:
+            secretName: {{ .Values.controller.serverCert.secretName }}
+        {{- if .Values.controller.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.controller.extraVolumes "context" . $ ) | nindent 8 }}
+        {{- end }}
+{{- end }}

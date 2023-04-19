@@ -330,6 +330,7 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 		Enabled:  true,
 	}
 
+	instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -524,6 +525,14 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 		return err
 	}
 	if _, err = createSecretForController(r.Client, r.Recorder, secret, ctx, instance); err != nil {
+		return err
+	}
+
+	cm, err := configMapForControllerClientCert(instance.DeepCopy(), r.Scheme, controllerClientCert)
+	if err != nil {
+		return err
+	}
+	if _, err = createConfigMapForController(r.Client, r.Recorder, cm, ctx, instance); err != nil {
 		return err
 	}
 

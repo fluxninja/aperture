@@ -1,7 +1,7 @@
+{{- if and (not .Values.controller.namespaceScoped) .Values.controller.createUninstallHook }}
 # Deleting the Aperture Custom Resource creating with the chart in the 'pre-delete' hook.
 # The CR required the operator to gracefully delete all the resources and if the chart is
 # deleted before deleting the CR, it won't get cleaned up properly.
-{{- if .Values.controller.createUninstallHook }}
 apiVersion: batch/v1
 kind: Job
 metadata:

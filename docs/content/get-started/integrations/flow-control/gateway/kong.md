@@ -11,7 +11,7 @@ sidebar_position: 2
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVersion.js';
 ```
 
 Integrating Aperture with Kong using Custom plugins.

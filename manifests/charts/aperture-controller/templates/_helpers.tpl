@@ -20,7 +20,7 @@ Compile all warnings into a single message.
 
 {{/*
 Get image tag for operator.
-{{ include "controller-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $) }}
+{{ include "controller-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
 */}}
 {{- define "controller-operator.image" -}}
 {{- $tag := get .image "tag" -}}
@@ -34,7 +34,7 @@ Get image tag for operator.
 
 {{/*
 Create the endpoint of the etcd for Aperture Controller
-{{ include "controller.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
+{{ include "controller.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $ ) }}
 */}}
 {{- define "controller.etcd.endpoints" -}}
 {{- $endpoints := list -}}
@@ -51,7 +51,7 @@ Create the endpoint of the etcd for Aperture Controller
 
 {{/*
 Create the address of the Prometheus for Aperture Controller
-{{ include "controller.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $) }}
+{{ include "controller.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $ ) }}
 */}}
 {{- define "controller.prometheus.address" -}}
 {{- if .context.Values.prometheus.enabled -}}
@@ -67,9 +67,9 @@ Create the address of the Prometheus for Aperture Controller
 
 {{/*
 Fetch the value of the API Key secret for Aperture Controller
-{{ include "controller.apiSecret.value" ( dict "controller" .Values.path.to.the.controller $) }}
+{{ include "controller.apiSecret.value" ( dict "controller" .Values.path.to.the.controller $ ) }}
 */}}
-{{- define "controller.apisecret.value" -}}
+{{- define "controller.apiSecret.value" -}}
 {{- if .controller.secrets.fluxNinjaExtension.create -}}
     {{- if .controller.secrets.fluxNinjaExtension.value -}}
         {{ print .controller.secrets.fluxNinjaExtension.value }}
@@ -82,8 +82,56 @@ Fetch the value of the API Key secret for Aperture Controller
 {{- end -}}
 
 {{/*
+Fetch the Name of the API Key secret for Aperture Controller
+{{ include "controller.apiSecret.name" ( dict "controller" .Values.path.to.the.controller "context" $.context $ ) }}
+*/}}
+{{- define "controller.apiSecret.name" -}}
+{{- if .controller.secrets.fluxNinjaExtension.secretKeyRef.name -}}
+    {{ print .controller.secrets.fluxNinjaExtension.secretKeyRef.name }}
+{{- else -}}
+    {{ print "%s-controller-apikey" .context.Release.Name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the Key of the API Key secret for Aperture Controller
+{{ include "controller.apiSecret.name" ( dict "controller" .Values.path.to.the.controller $ ) }}
+*/}}
+{{- define "controller.apiSecret.key" -}}
+{{- if .controller.secrets.fluxNinjaExtension.secretKeyRef.key -}}
+    {{ print .controller.secrets.fluxNinjaExtension.secretKeyRef.key }}
+{{- else -}}
+    {{ print "apiKey" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the server port of the Aperture Controller
+{{ include "controller.server.port" ( dict "controller" .Values.path.to.the.controller $ ) }}
+*/}}
+{{- define "controller.server.port" -}}
+{{- if and .controller.config .controller.config.server .controller.config.server.listener .controller.config.server.listener.addr -}}
+    {{ print (split ":" .controller.config.server.listener.addr)._1 }}
+{{- else -}}
+    {{ print "8080" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the OTEL port of the Aperture Controller
+{{ include "controller.otel.port" ( dict "controller" .Values.path.to.the.controller portName string defaultPort string $ ) }}
+*/}}
+{{- define "controller.otel.port" -}}
+{{- if and .controller.config .controller.config.otel .controller.config.otel.ports (hasKey .controller.config.otel.ports .portName) -}}
+    {{ print (get .controller.config.otel.ports .portName) }}
+{{- else -}}
+    {{ print .defaultPort }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Prepare the Host for configuring in the Ingress
-{{ include "controller.ingress-endpoint" ( dict "component" "component_name" "context" $.context $) }}
+{{ include "controller.ingress-endpoint" ( dict "component" "component_name" "context" $.context $ ) }}
 */}}
 {{- define "controller.ingress-endpoint" -}}
 {{- if .context.Values.ingress.domain_name -}}

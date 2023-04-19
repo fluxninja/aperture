@@ -44,6 +44,7 @@ Generated File Starts
 | `dist_cache`        | [DistCache](#dist-cache)               |
 | `etcd`              | [Etcd](#etcd)                          |
 | `flow_control`      | [FlowControl](#flow-control)           |
+| `agent_functions`   | [Functions](#functions)                |
 | `kubernetes_client` | [KubernetesClient](#kubernetes-client) |
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
@@ -228,6 +229,30 @@ Environment variable prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
 
 ([FluxNinjaExtensionConfig](#flux-ninja-extension-config))
 Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
+
+</dd>
+
+<!-- vale off -->
+
+</dl>
+
+---
+
+<!-- vale off -->
+
+### _agent_functions_ {#functions}
+
+<!-- vale on -->
+
+<dl>
+
+<!-- vale off -->
+
+<dt></dt>
+<dd>
+
+([AgentFunctionsConfig](#agent-functions-config))
+Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
 
 </dd>
 
@@ -688,6 +713,41 @@ Factor sets user-configured limit of available memory
 
 <!-- vale off -->
 
+### AgentFunctionsConfig {#agent-functions-config}
+
+<!-- vale on -->
+
+AgentFunctionsConfig is configuration for agent functions.
+
+<dl>
+<dt>endpoints</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+RPC servers to connect to (which will be able to call agent functions)
+
+</dd>
+<dt>client</dt>
+<dd>
+
+<!-- vale off -->
+
+([ClientConfig](#client-config))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### AgentInfoConfig {#agent-info-config}
 
 <!-- vale on -->
@@ -769,6 +829,24 @@ the controller Prometheus.
 Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
 is optional, as all the components and pipeline names would be normalized.
 By default `kubeletstats` custom metrics is added, which can be overwritten.
+
+Below is example to overwrite `kubeletstats` custom metrics:
+
+    otel:
+    	custom_metrics:
+    		kubeletstats: {}
+
+</dd>
+<dt>disable_kubernetes_scraper</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 
 </dd>
 <dt>batch_alerts</dt>

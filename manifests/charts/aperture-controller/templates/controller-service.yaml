@@ -1,0 +1,43 @@
+{{- if .Values.controller.namespaceScoped }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-controller
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" . $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  ports:
+  - port: {{ include "controller.server.port" (dict "controller" .Values.controller $ ) }}
+    targetPort: server
+    name: server
+    protocol: TCP
+  - port: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "debug_port" "defaultPort" 8888 $ ) }}
+    targetPort: otel-debug
+    name: otel-debug
+    protocol: TCP
+  - port: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "health_check_port" "defaultPort" 13133 $ ) }}
+    targetPort: otel-health
+    name: otel-health
+    protocol: TCP
+  - port: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "pprof_port" "defaultPort" 1777 $ ) }}
+    targetPort: otel-pprof
+    name: otel-pprof
+    protocol: TCP
+  - port: {{ include "controller.otel.port" (dict "controller" .Values.controller "portName" "zpages_port" "defaultPort" 55679 $ ) }}
+    targetPort: otel-zpages
+    name: otel-zpages
+    protocol: TCP
+  selector: {{- include "common.labels.standard" . | nindent 4 }}
+  {{- if .Values.controller.podLabels }}
+  {{- include "common.tplvalues.render" (dict "value" .Values.controller.podLabels "context" . $ ) | nindent 4 }}
+  {{- end }}
+{{- end }}

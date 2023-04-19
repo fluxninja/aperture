@@ -253,6 +253,18 @@ Environment variable prefix: `APERTURE_CONTROLLER_OTEL_`
 
 <!-- vale off -->
 
+<dt>cr_watcher</dt>
+<dd>
+
+([CRWatcherConfig](#c-r-watcher-config))
+Environment variable prefix: `APERTURE_CONTROLLER_POLICIES_CR_WATCHER_`
+
+</dd>
+
+<!-- vale off -->
+
+<!-- vale off -->
+
 <dt>promql_jobs_scheduler</dt>
 <dd>
 
@@ -629,6 +641,31 @@ SendBatchSize is the size of a batch which after hit, will trigger it to be sent
 <!-- vale on -->
 
 Timeout sets the time after which a batch will be sent regardless of size.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### CRWatcherConfig {#c-r-watcher-config}
+
+<!-- vale on -->
+
+CRWatcherConfig holds fields to configure the Kubernetes watcher for Aperture Policy custom resource.
+
+<dl>
+<dt>enabled</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Enabled indicates whether the Kubernetes watcher is enabled.
 
 </dd>
 </dl>

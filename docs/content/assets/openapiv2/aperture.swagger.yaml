@@ -1739,9 +1739,16 @@ definitions:
                 x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
         type: object
     GetPoliciesResponse:
+        description: GetPoliciesResponse is a response containing all Policies.
         properties:
             policies:
                 $ref: '#/definitions/Policies'
+        type: object
+    GetPolicyResponse:
+        description: GetPolicyResponse is a response containing the requested Policy.
+        properties:
+            policy:
+                $ref: '#/definitions/Policy'
         type: object
     GlobalAutoScaleControlPoint:
         properties:
@@ -3090,6 +3097,7 @@ definitions:
                 description: The number of replicas that are desired.
         type: object
     Policies:
+        description: Policies is a collection of Policies.
         properties:
             policies:
                 additionalProperties:
@@ -3130,6 +3138,63 @@ definitions:
                 additionalProperties:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
+        type: object
+    PostDynamicConfigsRequest:
+        description: PostDynamicConfigsRequest is a request to patch dynamic configs for Policies.
+        properties:
+            dynamic_configs:
+                items:
+                    $ref: '#/definitions/PostDynamicConfigsRequestDynamicConfigRequest'
+                    type: object
+                type: array
+                x-go-tag-validate: required
+        required:
+            - dynamic_configs
+        type: object
+    PostDynamicConfigsRequestDynamicConfigRequest:
+        properties:
+            dynamic_config:
+                type: object
+                x-go-tag-validate: required
+            policy_name:
+                type: string
+                x-go-tag-validate: required
+        required:
+            - dynamic_config
+            - policy_name
+        type: object
+    PostPoliciesRequest:
+        description: PostPoliciesRequest is a request to create or update Policies.
+        properties:
+            policies:
+                items:
+                    $ref: '#/definitions/PostPoliciesRequestPolicyRequest'
+                    type: object
+                type: array
+                x-go-tag-validate: required
+        required:
+            - policies
+        type: object
+    PostPoliciesRequestPolicyRequest:
+        properties:
+            name:
+                type: string
+                x-go-tag-validate: required
+            policy:
+                $ref: '#/definitions/Policy'
+                x-go-tag-validate: required
+        required:
+            - name
+        type: object
+    PostResponse:
+        description: PostResponse is a response to a PostPoliciesRequest or PostDynamicConfigsRequest.
+        properties:
+            errors:
+                items:
+                    type: string
+                type: array
+            message:
+                type: string
         type: object
     PreviewFlowLabelsControllerResponse:
         properties:
@@ -4630,6 +4695,28 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-agent
+    /v1/dynamic-configs:
+        post:
+            operationId: PolicyService_PostDynamicConfigs
+            parameters:
+                - description: PostDynamicConfigsRequest is a request to patch dynamic configs for Policies.
+                  in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PostDynamicConfigsRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: PostDynamicConfigs patches dynamic configs based on the provided request.
+            tags:
+                - aperture-controller
     /v1/flowcontrol/checkhttp:
         post:
             operationId: FlowControlServiceHTTP_CheckHTTP
@@ -4902,6 +4989,89 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
+            summary: GetPolicies returns all policies.
+            tags:
+                - aperture-controller
+        patch:
+            operationId: PolicyService_PatchPolicies
+            parameters:
+                - description: PostPoliciesRequest is a request to create or update Policies.
+                  in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PostPoliciesRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: PatchPolicies patches policies based on the provided request.
+            tags:
+                - aperture-controller
+        post:
+            operationId: PolicyService_PostPolicies
+            parameters:
+                - description: PostPoliciesRequest is a request to create or update Policies.
+                  in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PostPoliciesRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: PostPolicies creates or updates policies based on the provided request.
+            tags:
+                - aperture-controller
+    /v1/policies/{name}:
+        delete:
+            operationId: PolicyService_DeletePolicy
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: DeletePolicy removes a policy with the specified name.
+            tags:
+                - aperture-controller
+        get:
+            operationId: PolicyService_GetPolicy
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetPolicyResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: GetPolicy returns a policy with the specified name.
             tags:
                 - aperture-controller
     /v1/status/{path}:
@@ -4933,13 +5103,13 @@ tags:
     - name: EntitiesService
     - name: FlowControlPointsService
     - name: FlowPreviewService
+    - name: PolicyService
     - name: Controller
     - name: DistCacheService
     - name: FlowControlService
     - name: FlowControlServiceHTTP
     - name: InfoService
     - name: PeerDiscoveryService
-    - name: PolicyService
     - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService

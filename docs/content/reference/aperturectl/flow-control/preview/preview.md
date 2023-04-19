@@ -30,10 +30,11 @@ aperturectl flow-control preview [--http] SERVICE CONTROL_POINT [flags]
 ### Options inherited from parent commands
 
 ```
-      --controller string    Address of Aperture controller
-      --insecure             Allow insecure connection to controller
-      --kube                 Find controller in Kubernetes cluster, instead of connecting directly
-      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --controller string      Address of Aperture controller
+      --controller-ns string   Namespace in which the Aperture Controller is running
+      --insecure               Allow insecure connection to controller
+      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
+      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
 ```
 
 ### SEE ALSO

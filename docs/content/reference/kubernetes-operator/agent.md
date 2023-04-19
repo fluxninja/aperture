@@ -40,14 +40,15 @@ Below are the Kubernetes Objects which are created by the Operator, considering
 
 <!-- vale off -->
 
-| API Version                  | Kind               | Name           | Namespace |
-| ---------------------------- | ------------------ | -------------- | --------- |
-| rbac.authorization.k8s.io/v1 | ClusterRole        | aperture-agent | Global    |
-| rbac.authorization.k8s.io/v1 | ClusterRoleBinding | aperture-agent | Global    |
-| v1                           | ConfigMap          | aperture-agent | default   |
-| v1                           | Service            | aperture-agent | default   |
-| v1                           | ServiceAccount     | aperture-agent | default   |
-| apps/v1                      | DaemonSet          | aperture-agent | default   |
+| API Version                  | Kind               | Name                       | Namespace |
+| ---------------------------- | ------------------ | -------------------------- | --------- |
+| rbac.authorization.k8s.io/v1 | ClusterRole        | aperture-agent             | Global    |
+| rbac.authorization.k8s.io/v1 | ClusterRoleBinding | aperture-agent             | Global    |
+| v1                           | ConfigMap          | aperture-agent             | default   |
+| v1                           | ConfigMap          | aperture-agent-client-cert | default   |
+| v1                           | Service            | aperture-agent             | default   |
+| v1                           | ServiceAccount     | aperture-agent             | default   |
+| apps/v1                      | DaemonSet          | aperture-agent             | default   |
 
 <!-- vale on -->
 
@@ -55,11 +56,12 @@ Below are the Kubernetes Objects which are created by the Operator, considering
 
 <!-- vale off -->
 
-| API Version                     | Kind                         | Name              | Namespace                      |
-| ------------------------------- | ---------------------------- | ----------------- | ------------------------------ |
-| rbac.authorization.k8s.io/v1    | ClusterRole                  | aperture-agent    | Global                         |
-| rbac.authorization.k8s.io/v1    | ClusterRoleBinding           | aperture-agent    | Global                         |
-| admissionregistration.k8s.io/v1 | MutatingWebhookConfiguration | aperture-injector | Global                         |
-| v1                              | ConfigMap                    | aperture-agent    | All Sidecar enabled namespaces |
+| API Version                     | Kind                         | Name                       | Namespace                      |
+| ------------------------------- | ---------------------------- | -------------------------- | ------------------------------ |
+| rbac.authorization.k8s.io/v1    | ClusterRole                  | aperture-agent             | Global                         |
+| rbac.authorization.k8s.io/v1    | ClusterRoleBinding           | aperture-agent             | Global                         |
+| admissionregistration.k8s.io/v1 | MutatingWebhookConfiguration | aperture-injector          | Global                         |
+| v1                              | ConfigMap                    | aperture-agent-client-cert | All Sidecar enabled namespaces |
+| v1                              | ConfigMap                    | aperture-agent             | All Sidecar enabled namespaces |
 
 <!-- vale on -->

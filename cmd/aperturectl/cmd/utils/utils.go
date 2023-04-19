@@ -15,6 +15,11 @@ import (
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/hashicorp/go-multierror"
 	"github.com/xeipuuv/gojsonschema"
+	appsv1 "k8s.io/api/apps/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -325,4 +330,29 @@ func IsBlueprintDeprecated(policyDir string) (bool, string) {
 		return false, ""
 	}
 	return true, deprecated.(string)
+}
+
+// GetControllerDeployment returns the deployment of the Aperture Controller.
+func GetControllerDeployment(kubeRestConfig *rest.Config, namespace string) (*appsv1.Deployment, error) {
+	clientSet, err := kubernetes.NewForConfig(kubeRestConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new ClientSet: %w", err)
+	}
+
+	deployment, err := clientSet.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{
+		LabelSelector: labels.Set{"app.kubernetes.io/component": "aperture-controller"}.String(),
+	})
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf(
+				"no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
+		}
+		return nil, fmt.Errorf("failed to fetch namespace of Aperture Controller in Kubernetes: %w", err)
+	}
+
+	if len(deployment.Items) != 1 {
+		return nil, errors.New("no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
+	}
+
+	return &deployment.Items[0], nil
 }

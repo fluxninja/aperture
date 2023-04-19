@@ -40,7 +40,7 @@ type RegisterClientIn struct {
 
 // RegisterClient registers a client which will allow calling agent functions from controller.
 func RegisterClient(in RegisterClientIn) error {
-	var config afconfig.Config
+	var config afconfig.AgentFunctionsConfig
 	if err := in.Unmarshaller.UnmarshalKey(afconfig.Key, &config); err != nil {
 		return err
 	}

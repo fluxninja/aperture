@@ -92,6 +92,8 @@ otel:
     pprof_port: 1777
     zpages_port: 55679
 policies:
+  cr_watcher:
+    enabled: false
   promql_jobs_scheduler:
     blocking_execution: false
     worker_limit: 0

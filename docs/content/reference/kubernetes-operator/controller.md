@@ -54,15 +54,16 @@ Below are the Kubernetes Objects which are created by the Operator, considering
 
 <!-- vale off -->
 
-| API Version                     | Kind                           | Name                       | Namespace |
-| ------------------------------- | ------------------------------ | -------------------------- | --------- |
-| rbac.authorization.k8s.io/v1    | ClusterRole                    | aperture-controller        | Global    |
-| rbac.authorization.k8s.io/v1    | ClusterRoleBinding             | aperture-controller        | Global    |
-| admissionregistration.k8s.io/v1 | ValidatingWebhookConfiguration | aperture-controller        | Global    |
-| v1                              | ConfigMap                      | aperture-controller        | default   |
-| v1                              | Service                        | aperture-controller        | default   |
-| v1                              | Secret                         | controller-controller-cert | default   |
-| v1                              | ServiceAccount                 | aperture-controller        | default   |
-| apps/v1                         | Deployment                     | aperture-controller        | default   |
+| API Version                     | Kind                           | Name                              | Namespace |
+| ------------------------------- | ------------------------------ | --------------------------------- | --------- |
+| rbac.authorization.k8s.io/v1    | ClusterRole                    | aperture-controller               | Global    |
+| rbac.authorization.k8s.io/v1    | ClusterRoleBinding             | aperture-controller               | Global    |
+| admissionregistration.k8s.io/v1 | ValidatingWebhookConfiguration | aperture-controller               | Global    |
+| v1                              | ConfigMap                      | aperture-controller               | default   |
+| v1                              | ConfigMap                      | controller-controller-client-cert | default   |
+| v1                              | Service                        | aperture-controller               | default   |
+| v1                              | Secret                         | controller-controller-cert        | default   |
+| v1                              | ServiceAccount                 | aperture-controller               | default   |
+| apps/v1                         | Deployment                     | aperture-controller               | default   |
 
 <!-- vale on -->

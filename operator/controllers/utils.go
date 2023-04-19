@@ -256,6 +256,13 @@ func AgentVolumeMounts(agentSpec agentv1alpha1.AgentSpec) []corev1.VolumeMount {
 		},
 	}
 
+	if agentSpec.ControllerClientCertConfig.ConfigMapName != "" {
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name:      agentSpec.ControllerClientCertConfig.ConfigMapName,
+			MountPath: AgentControllerClientCertPath,
+		})
+	}
+
 	return MergeVolumeMounts(volumeMounts, agentSpec.ExtraVolumeMounts)
 }
 
@@ -273,6 +280,20 @@ func AgentVolumes(agentSpec agentv1alpha1.AgentSpec) []corev1.Volume {
 				},
 			},
 		},
+	}
+
+	if agentSpec.ControllerClientCertConfig.ConfigMapName != "" {
+		volumes = append(volumes, corev1.Volume{
+			Name: agentSpec.ControllerClientCertConfig.ConfigMapName,
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					DefaultMode: pointer.Int32(420),
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: agentSpec.ControllerClientCertConfig.ConfigMapName,
+					},
+				},
+			},
+		})
 	}
 
 	return MergeVolumes(volumes, agentSpec.ExtraVolumes)
@@ -324,16 +345,6 @@ func ControllerVolumeMounts(controllerSpec common.CommonSpec) []corev1.VolumeMou
 			MountPath: "/etc/aperture/aperture-controller/config",
 		},
 		{
-			Name:      "etc-aperture-policies",
-			MountPath: PolicyFilePath,
-			ReadOnly:  true,
-		},
-		{
-			Name:      "etc-aperture-classification",
-			MountPath: "/etc/aperture/aperture-controller/classifiers",
-			ReadOnly:  true,
-		},
-		{
 			Name:      "server-cert",
 			MountPath: "/etc/aperture/aperture-controller/certs",
 			ReadOnly:  true,
@@ -354,24 +365,6 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: ControllerServiceName,
 					},
-				},
-			},
-		},
-		{
-			Name: "etc-aperture-policies",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
-		},
-		{
-			Name: "etc-aperture-classification",
-			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32(420),
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "classification",
-					},
-					Optional: pointer.Bool(true),
 				},
 			},
 		},
@@ -812,4 +805,58 @@ func GetPort(addr string) (int32, error) {
 		return 0, err
 	}
 	return int32(port), nil
+}
+
+// GetControllerClientCert returns the controller client certificate from the controller configmap.
+func GetControllerClientCert(endpoints []string, client_ client.Client, ctx context.Context) []byte {
+	var localControllerCert []byte
+	for _, endpoint := range endpoints {
+		controllerNS := localControllerNamespaceFromEndpoint(endpoint)
+		if controllerNS == "" {
+			continue
+		}
+
+		var configMaps corev1.ConfigMapList
+		err := client_.List(ctx, &configMaps, &client.ListOptions{Namespace: controllerNS})
+		if err != nil {
+			continue
+		}
+
+		for _, cm := range configMaps.Items {
+			if !strings.HasSuffix(cm.Name, "-controller-client-cert") {
+				continue
+			}
+			localControllerCert = append(localControllerCert, cm.Data[ControllerClientCertKey]...)
+		}
+	}
+
+	return localControllerCert
+}
+
+// localControllerNamespaceFromEndpoint returns the namespace of the local controller.
+func localControllerNamespaceFromEndpoint(endpoint string) string {
+	addr, port, ok := strings.Cut(endpoint, ":")
+	if !ok {
+		return ""
+	}
+
+	if port != "8080" {
+		return ""
+	}
+
+	subdomains := strings.Split(addr, ".")
+	if len(subdomains) < 2 {
+		return ""
+	}
+
+	if !strings.Contains(subdomains[0], "aperture-controller") {
+		return ""
+	}
+
+	tail := strings.Join(subdomains[2:], ".") + "."
+	if !strings.HasPrefix("svc.cluster.local.", tail) { //nolint:gocritic
+		return ""
+	}
+
+	return subdomains[1]
 }

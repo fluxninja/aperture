@@ -50,6 +50,10 @@ type AgentSpec struct {
 	// Agent Configuration
 	//+kubebuilder:validation:Optional
 	ConfigSpec AgentConfigSpec `json:"config"`
+
+	// ControllerClientCertConfig configuration.
+	//+kubebuilder:validation:Optional
+	ControllerClientCertConfig common.ControllerClientCertConfig `json:"controller_client_cert"`
 }
 
 // AgentConfigSpec holds agent configuration.
@@ -92,7 +96,7 @@ type AgentConfigSpec struct {
 
 	// Agent functions configuration.
 	//+kubebuilder:validation:Optional
-	AgentFunctions agentfunctions.Config `json:"agent_functions"`
+	AgentFunctions agentfunctions.AgentFunctionsConfig `json:"agent_functions"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.

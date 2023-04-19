@@ -11,7 +11,9 @@ import (
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	previewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/agentfunctions/agents"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
@@ -19,12 +21,13 @@ import (
 // Handler is a gRPC server for the controller service.
 type Handler struct {
 	cmdv1.UnimplementedControllerServer
-	agents agents.Agents
+	agents        agents.Agents
+	policyService *controlplane.PolicyService
 }
 
 // NewHandler creates a new Handler.
-func NewHandler(agents agents.Agents) *Handler {
-	return &Handler{agents: agents}
+func NewHandler(agents agents.Agents, policyService *controlplane.PolicyService) *Handler {
+	return &Handler{agents: agents, policyService: policyService}
 }
 
 // ListAgents lists all agents.
@@ -346,4 +349,24 @@ agentsLoop:
 	}
 
 	return agents, nil
+}
+
+// PostPolicies posts policies to the system.
+func (h *Handler) PostPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
+	return h.policyService.PostPolicies(ctx, req)
+}
+
+// PatchPolicies patches policies to the system.
+func (h *Handler) PatchPolicies(ctx context.Context, req *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
+	return h.policyService.PatchPolicies(ctx, req)
+}
+
+// PostDynamicConfigs updates dynamic-configs to the system.
+func (h *Handler) PostDynamicConfigs(ctx context.Context, req *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
+	return h.policyService.PostDynamicConfigs(ctx, req)
+}
+
+// PostDynamicConfigs updates dynamic-configs to the system.
+func (h *Handler) DeletePolicy(ctx context.Context, req *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
+	return h.policyService.DeletePolicy(ctx, req)
 }

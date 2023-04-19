@@ -1323,6 +1323,16 @@ spec:
                   policies:
                     description: Policies configuration.
                     properties:
+                      cr_watcher:
+                        description: CRWatcher configuration.
+                        properties:
+                          enabled:
+                            description: Enabled indicates whether the Kubernetes
+                              watcher is enabled.
+                            type: boolean
+                        required:
+                        - enabled
+                        type: object
                       promql_jobs_scheduler:
                         description: Scheduler for PromQL jobs.
                         properties:
@@ -1341,6 +1351,7 @@ spec:
                             type: integer
                         type: object
                     required:
+                    - cr_watcher
                     - promql_jobs_scheduler
                     type: object
                   profilers:

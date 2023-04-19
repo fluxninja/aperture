@@ -107,6 +107,12 @@ const (
 	OtelZpagesPort = "otel-zpages"
 	// MinimumKubernetesVersion defines minimum kubernetes version required by Aperture.
 	MinimumKubernetesVersion = "v1.23.0"
+	// ControllerClientCertKey defines controller client cert key.
+	ControllerClientCertKey = "controller-ca.pem"
+	// AgentControllerClientCertPath defines Controller client cert path in Agent container.
+	AgentControllerClientCertPath = "/etc/aperture/aperture-agent/certs"
+	// AgentControllerClientCertCMName defines Controller client cert ConfigMap name.
+	AgentControllerClientCertCMName = AgentServiceName + "-client-cert"
 )
 
 var (

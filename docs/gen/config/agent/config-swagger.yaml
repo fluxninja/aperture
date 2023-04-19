@@ -23,6 +23,22 @@ definitions:
         title: AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+    AgentFunctionsConfig:
+        properties:
+            client:
+                $ref: '#/definitions/ClientConfig'
+                x-go-tag-json: client
+            endpoints:
+                description: RPC servers to connect to (which will be able to call agent functions)
+                items:
+                    type: string
+                type: array
+                x-go-name: Endpoints
+                x-go-tag-json: endpoints,omitempty
+                x-go-tag-validate: omitempty,dive,omitempty
+        title: AgentFunctionsConfig is configuration for agent functions.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
     AgentInfoConfig:
         properties:
             agent_group:
@@ -91,9 +107,22 @@ definitions:
                     Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
                     is optional, as all the components and pipeline names would be normalized.
                     By default `kubeletstats` custom metrics is added, which can be overwritten.
+
+                    Below is example to overwrite `kubeletstats` custom metrics:
+
+                    	otel:
+                    		custom_metrics:
+                    			kubeletstats: {}
                 type: object
                 x-go-name: CustomMetrics
                 x-go-tag-json: custom_metrics,omitempty
+            disable_kubernetes_scraper:
+                default: false
+                description: DisableKubernetesScraper disables metrics collection for Kubernetes resources.
+                type: boolean
+                x-go-name: DisableKubernetesScraper
+                x-go-tag-default: "false"
+                x-go-tag-json: disable_kubernetes_scraper
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports
@@ -373,22 +402,6 @@ definitions:
             https://github.com/kubernetes-sigs/kubebuilder/issues/528
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
-    Config:
-        properties:
-            client:
-                $ref: '#/definitions/ClientConfig'
-                x-go-tag-json: client
-            endpoints:
-                description: RPC servers to connect to (which will be able to call agent functions)
-                items:
-                    type: string
-                type: array
-                x-go-name: Endpoints
-                x-go-tag-json: endpoints,omitempty
-                x-go-tag-validate: omitempty,dive,omitempty
-        title: Config is configuration for agent functions.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
     CustomMetricsConfig:
         description: |-
             :::info
@@ -1511,6 +1524,17 @@ info:
     description: Aperture Agent
     title: Agent
 paths:
+    /agent_functions:
+        post:
+            operationId: Functions
+            parameters:
+                - in: body
+                  schema:
+                    $ref: '#/definitions/AgentFunctionsConfig'
+            tags:
+                - common-configuration
+                - Agent
+            x-fn-config-env: true
     /agent_info:
         post:
             operationId: AgentInfo

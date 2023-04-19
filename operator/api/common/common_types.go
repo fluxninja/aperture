@@ -403,3 +403,12 @@ type ServiceDiscoverySpec struct {
 	// StaticDiscoveryConfig for pre-determined list of services.
 	StaticDiscoveryConfig static.StaticDiscoveryConfig `json:"static"`
 }
+
+// ControllerClientCertConfig defines configuration for client certificate for Controller.
+type ControllerClientCertConfig struct {
+	// ConfigMapName is the name of the ConfigMap containing the client certificate.
+	ConfigMapName string `json:"configMapName"`
+
+	// ClientCertKeyName is the key name of the client certificate in the ConfigMap.
+	ClientCertKeyName string `json:"clientCertKeyName"`
+}

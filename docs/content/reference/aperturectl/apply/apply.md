@@ -17,8 +17,12 @@ Use this command to apply the Aperture Policies.
 ### Options
 
 ```
-  -h, --help                 help for apply
-      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --controller string      Address of Aperture controller
+      --controller-ns string   Namespace in which the Aperture Controller is running
+  -h, --help                   help for apply
+      --insecure               Allow insecure connection to controller
+      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
+      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
 ```
 
 ### SEE ALSO

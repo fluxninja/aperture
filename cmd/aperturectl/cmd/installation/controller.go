@@ -4,6 +4,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	controllerInstallCmd.Flags().BoolVar(&generateCert, "generate-cert", false, "Generate self signed certificates for Aperture Controller")
+}
+
 // controllerInstallCmd is the command to install Aperture Controller on Kubernetes.
 var controllerInstallCmd = &cobra.Command{
 	Use:   "controller",

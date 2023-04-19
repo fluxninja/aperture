@@ -3,20 +3,21 @@ package installation
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/operator/api"
 	_ "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	_ "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/spf13/cobra"
-	"k8s.io/client-go/kubernetes/scheme"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func init() {
 	InstallCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	InstallCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Values YAML file containing parameters to customize the installation")
 	InstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture")
-	InstallCmd.PersistentFlags().StringVar(&namespace, "namespace", "", "Namespace in which the component will be installed. Defaults to component name")
+	InstallCmd.PersistentFlags().StringVar(&namespace, "namespace", defaultNS, "Namespace in which the component will be installed. Defaults to 'default' namespace")
 
 	InstallCmd.AddCommand(controllerInstallCmd)
 	InstallCmd.AddCommand(agentInstallCmd)
@@ -47,10 +48,6 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 		})
 		if err != nil {
 			return fmt.Errorf("failed to create Kubernetes client: %w", err)
-		}
-
-		if namespace == "" {
-			namespace = defaultNS
 		}
 
 		if err = manageNamespace(); err != nil {

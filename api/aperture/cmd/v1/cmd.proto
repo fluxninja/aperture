@@ -7,6 +7,7 @@ import "aperture/autoscale/kubernetes/controlpoints/v1/controlpoints.proto";
 import "aperture/discovery/entities/v1/entities.proto";
 import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/preview/v1/preview.proto";
+import "aperture/policy/language/v1/policy.proto";
 import "google/protobuf/empty.proto";
 
 // Controller describes APIs of the controller from the aperturectl POV
@@ -21,6 +22,11 @@ service Controller {
   // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
   rpc PreviewHTTPRequests(PreviewHTTPRequestsRequest) returns (PreviewHTTPRequestsControllerResponse);
+
+  rpc PostPolicies(aperture.policy.language.v1.PostPoliciesRequest) returns (aperture.policy.language.v1.PostResponse);
+  rpc PatchPolicies(aperture.policy.language.v1.PostPoliciesRequest) returns (aperture.policy.language.v1.PostResponse);
+  rpc PostDynamicConfigs(aperture.policy.language.v1.PostDynamicConfigsRequest) returns (aperture.policy.language.v1.PostResponse);
+  rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
 }
 
 message ListServicesRequest {}
