@@ -351,17 +351,17 @@ agentsLoop:
 	return agents, nil
 }
 
-// UpsertPolicy creates/updates policies to the system.
+// UpsertPolicy creates/updates policies in the system.
 func (h *Handler) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
 	return h.policyService.UpsertPolicy(ctx, req)
 }
 
-// PostDynamicConfigs updates dynamic-configs to the system.
+// PostDynamicConfig updates dynamic-config in the system.
 func (h *Handler) PostDynamicConfig(ctx context.Context, req *policylangv1.PostDynamicConfigRequest) (*emptypb.Empty, error) {
 	return h.policyService.PostDynamicConfig(ctx, req)
 }
 
-// PostDynamicConfigs updates dynamic-configs to the system.
+// DeletePolicy deletes policies from the system.
 func (h *Handler) DeletePolicy(ctx context.Context, req *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	return h.policyService.DeletePolicy(ctx, req)
 }
