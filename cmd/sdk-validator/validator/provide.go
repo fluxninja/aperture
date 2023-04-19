@@ -24,7 +24,7 @@ func ProvideFlowControlHandler(in ConstructorIn) (flowcontrolv1.FlowControlServi
 	return &FlowControlHandler{}, nil
 }
 
-// Register registers flowcontrol service on a grpc server.
+// Register registers flowcontrol service on a gRPC server.
 func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceServer) {
 	flowcontrolv1.RegisterFlowControlServiceServer(server, handler)
 	log.Info().Msg("flowcontrol handler registered")

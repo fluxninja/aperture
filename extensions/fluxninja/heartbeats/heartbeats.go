@@ -158,7 +158,7 @@ func (h *Heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder gr
 	connWrapper := grpcClientConnBuilder.Build()
 	conn, err := connWrapper.Dial(ctx, h.heartbeatsAddr)
 	if err != nil {
-		log.Warn().Err(err).Msg("Could not connect to heartbeat grpc server")
+		log.Warn().Err(err).Msg("Could not connect to heartbeat gRPC server")
 		return nil, err
 	}
 

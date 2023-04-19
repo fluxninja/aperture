@@ -57,7 +57,7 @@ type BackoffConfig struct {
 	Jitter float64 `json:"jitter" validate:"gte=0" default:"0.2"`
 }
 
-// Annotate creates an annotated instance of GRPC ClientConnectionBuilder.
+// Annotate creates an annotated instance of gRPC ClientConnectionBuilder.
 func (c ClientConstructor) Annotate() fx.Option {
 	if c.ConfigKey == "" {
 		log.Panic().Msg("config key not provided")

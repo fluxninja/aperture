@@ -34,7 +34,7 @@ type app struct {
 
 // grpcClient creates a new gRPC client that will be passed in order to initialize the Aperture client.
 func grpcClient(ctx context.Context, address string) (*grpc.ClientConn, error) {
-	// creating a grpc client connection is essential to allow the Aperture client to communicate with the Flow Control Service.
+	// creating a gRPC client connection is essential to allow the Aperture client to communicate with the Flow Control Service.
 	var grpcDialOptions []grpc.DialOption
 	grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
 		Backoff:           backoff.DefaultConfig,

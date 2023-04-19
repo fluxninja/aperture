@@ -45,7 +45,7 @@ func (h *PreviewHandler) PreviewFlowLabels(
 	if !h.isEnabled {
 		return nil, status.Error(codes.FailedPrecondition, "preview disabled")
 	}
-	// GRPC handlers assume non-nillness of argument.
+	// gRPC handlers assume non-nillness of argument.
 	if req.Request == nil {
 		return nil, status.Error(codes.InvalidArgument, "missing request")
 	}
@@ -60,7 +60,7 @@ func (h *PreviewHandler) PreviewHTTPRequests(
 	if !h.isEnabled {
 		return nil, status.Error(codes.FailedPrecondition, "preview disabled")
 	}
-	// GRPC handlers assume non-nillness of argument.
+	// gRPC handlers assume non-nillness of argument.
 	if req.Request == nil {
 		return nil, status.Error(codes.InvalidArgument, "missing request")
 	}
