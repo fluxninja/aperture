@@ -99,7 +99,7 @@ func configMapForAgentControllerClientCert(
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string]string{
-			controllers.ControllerClientCertKey: string(localControllerCert),
+			instance.Spec.ControllerClientCertConfig.ClientCertKeyName: string(localControllerCert),
 		},
 	}
 

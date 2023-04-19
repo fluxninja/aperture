@@ -490,6 +490,7 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
 	if !instance.Spec.Sidecar.Enabled &&
+		len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
 		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
 			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
 		configMap, err := configMapForAgentControllerClientCert(ctx, r.Client, instance.DeepCopy(), r.Scheme)
@@ -501,8 +502,7 @@ func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, 
 			return nil
 		}
 
-		instance.Spec.ControllerClientCertConfig.ConfigMapName = configMap.GetName()
-		instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+		instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
@@ -516,9 +516,10 @@ func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, 
 func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
 	if !instance.Spec.Sidecar.Enabled {
 		copiedInstance := instance.DeepCopy()
-		if copiedInstance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
-			copiedInstance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName {
-			copiedInstance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, controllers.ControllerClientCertKey)
+
+		if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+			copiedInstance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+			copiedInstance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
 		}
 		configMap, err := configMapForAgentConfig(ctx, r.Client, copiedInstance, r.Scheme)
 		if err != nil {
