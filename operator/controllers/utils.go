@@ -256,7 +256,8 @@ func AgentVolumeMounts(agentSpec agentv1alpha1.AgentSpec) []corev1.VolumeMount {
 		},
 	}
 
-	if agentSpec.ControllerClientCertConfig.ConfigMapName != "" {
+	if len(agentSpec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		agentSpec.ControllerClientCertConfig.ConfigMapName != "" {
 		volumeMounts = append(volumeMounts, corev1.VolumeMount{
 			Name:      agentSpec.ControllerClientCertConfig.ConfigMapName,
 			MountPath: AgentControllerClientCertPath,

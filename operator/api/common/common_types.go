@@ -406,9 +406,9 @@ type ServiceDiscoverySpec struct {
 
 // ControllerClientCertConfig defines configuration for client certificate for Controller.
 type ControllerClientCertConfig struct {
-	// ConfigMapName is the name of the ConfigMap containing the client certificate.
+	// ConfigMapName is the name of the ConfigMap containing the client certificate which will be mounted at '/etc/aperture/aperture-agent/certs' path with given key name.
 	ConfigMapName string `json:"configMapName"`
 
 	// ClientCertKeyName is the key name of the client certificate in the ConfigMap.
-	ClientCertKeyName string `json:"clientCertKeyName"`
+	ClientCertKeyName string `json:"clientCertKeyName" default:"controller-ca.pem"`
 }
