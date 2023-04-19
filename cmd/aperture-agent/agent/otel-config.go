@@ -341,14 +341,16 @@ func addPrometheusReceiver(
 		otelconfig.BuildOTelScrapeConfig("aperture-otel", agentConfig.CommonOTelConfig),
 	}
 
-	_, err := rest.InClusterConfig()
-	if err == rest.ErrNotInCluster {
-		log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
-	} else if err != nil {
-		log.Warn().Err(err).Msg("Error when discovering k8s environment")
-	} else if !agentConfig.DisableKubernetesScraper {
-		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
-		scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
+	if !agentConfig.DisableKubernetesScraper {
+		_, err := rest.InClusterConfig()
+		if err == rest.ErrNotInCluster {
+			log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
+		} else if err != nil {
+			log.Warn().Err(err).Msg("Error when discovering k8s environment")
+		} else {
+			log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
+			scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
+		}
 	}
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
