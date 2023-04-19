@@ -12,7 +12,6 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/tui"
@@ -20,6 +19,8 @@ import (
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 var (
@@ -124,6 +125,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 	if err != nil {
 		return err
 	}
+	controllerNs = deployment.GetNamespace()
 
 	err = api.AddToScheme(scheme.Scheme)
 	if err != nil {
@@ -141,14 +143,27 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 	policyCR.Annotations = map[string]string{
 		"fluxninja.com/validate": "true",
 	}
-	spec := policyCR.Spec
-	_, err = controllerutil.CreateOrUpdate(context.Background(), kubeClient, policyCR, func() error {
-		policyCR.Spec = spec
-		return nil
-	})
+	err = kubeClient.Create(context.Background(), policyCR)
 	if err != nil {
 		if strings.Contains(err.Error(), "no matches for kind") {
-			err = updatePolicyUsingAPI(name, policy)
+			var isUpdated bool
+			isUpdated, err = updatePolicyUsingAPI(name, policy)
+			if !isUpdated {
+				return err
+			}
+		} else if apierrors.IsAlreadyExists(err) {
+			var update bool
+			update, err = checkForUpdate(name)
+			if err != nil {
+				return fmt.Errorf("failed to check for update: %w", err)
+			}
+
+			if !update {
+				log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
+				return nil
+			}
+
+			err = updatePolicyCR(name, policyCR, kubeClient)
 		}
 
 		if err != nil {
@@ -161,7 +176,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 }
 
 // updatePolicyUsingAPI updates the policy using the API.
-func updatePolicyUsingAPI(name string, policy *languagev1.Policy) error {
+func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) {
 	request := languagev1.PostPoliciesRequest{
 		Policies: []*languagev1.PostPoliciesRequest_PolicyRequest{
 			{
@@ -173,13 +188,56 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) error {
 	_, err := client.PostPolicies(context.Background(), &request)
 	if err != nil {
 		if strings.Contains(err.Error(), "Use Patch call to update it") {
+			var update bool
+			update, err = checkForUpdate(name)
+			if err != nil {
+				return false, fmt.Errorf("failed to check for update: %w", err)
+			}
+
+			if !update {
+				log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
+				return false, nil
+			}
+
 			_, err = client.PatchPolicies(context.Background(), &request)
 			if err != nil {
-				return err
+				return false, err
 			}
 		} else {
-			return err
+			return false, err
 		}
 	}
-	return nil
+	return true, nil
+}
+
+// updatePolicyCR updates the policy CR.
+func updatePolicyCR(name string, policy *policyv1alpha1.Policy, kubeClient k8sclient.Client) error {
+	existingPolicy := &policyv1alpha1.Policy{}
+	err := kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: controllerNs}, existingPolicy)
+	if err != nil {
+		return err
+	}
+
+	existingPolicy.Spec = policy.Spec
+	if existingPolicy.GetAnnotations() == nil {
+		existingPolicy.Annotations = map[string]string{}
+	}
+	existingPolicy.Annotations["fluxninja.com/validate"] = "true"
+
+	err = kubeClient.Update(context.Background(), existingPolicy)
+	if err != nil && apierrors.IsConflict(err) {
+		return updatePolicyCR(name, policy, kubeClient)
+	}
+	return err
+}
+
+// checkForUpdate checks if the user wants to update the policy.
+func checkForUpdate(name string) (bool, error) {
+	model := tui.InitialRadioButtonModel([]string{"Yes", "No"}, fmt.Sprintf("Policy '%s' already exists. Do you want to update it?", name))
+	p := tea.NewProgram(model)
+	if _, err := p.Run(); err != nil {
+		return false, err
+	}
+
+	return *model.Selected == 0, nil
 }
