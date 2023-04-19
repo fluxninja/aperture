@@ -1285,7 +1285,7 @@ spec:
                             type: object
                         type: object
                       endpoint:
-                        description: Address to GRPC or HTTP(s) server listening in
+                        description: Address to gRPC or HTTP(s) server listening in
                           agent service. To use HTTP protocol, the address must start
                           with `http(s)://`.
                         type: string
@@ -1723,9 +1723,9 @@ spec:
                         description: GRPC Gateway configuration.
                         properties:
                           grpc_server_address:
-                            description: GRPC server address to connect to - By default
+                            description: gRPC server address to connect to - By default
                               it points to HTTP server port because FluxNinja stack
-                              runs GRPC and HTTP servers on the same port
+                              runs gRPC and HTTP servers on the same port
                             type: string
                         type: object
                       http:

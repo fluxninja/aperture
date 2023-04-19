@@ -234,7 +234,7 @@ Generated File Starts
 
 (
     {{- template "fnProperty" . -}}
-    {{ if $env  }}, env-var: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}{{ end }}`{{ end -}}
+    {{ if $env  }}, Environment variable prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}{{ end }}`{{ end -}}
 ){{ with .Description }} {{ . }}{{ end }}
 
 <!-- vale on -->
@@ -247,6 +247,8 @@ Generated File Starts
 {{- range .Params }}
 {{- if .IsBodyParam }}
 
+<!-- vale off -->
+
 <dt>{{ .Name }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
@@ -254,6 +256,9 @@ Generated File Starts
 {{ if $env  }} Environment variable prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
 
 </dd>
+
+<!-- vale off -->
+
 {{ end }}
 {{- end }}
 {{- end }}{{/* end .HasBodyParams */}}

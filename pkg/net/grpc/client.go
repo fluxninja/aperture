@@ -27,7 +27,7 @@ type ClientConstructor struct {
 	DefaultConfig GRPCClientConfig
 }
 
-// GRPCClientConfig holds configuration for GRPC Client.
+// GRPCClientConfig holds configuration for gRPC Client.
 // swagger:model
 // +kubebuilder:object:generate=true
 type GRPCClientConfig struct {
@@ -43,7 +43,7 @@ type GRPCClientConfig struct {
 	UseProxy bool `json:"use_proxy" default:"false"`
 }
 
-// BackoffConfig holds configuration for GRPC client backoff.
+// BackoffConfig holds configuration for gRPC client backoff.
 // swagger:model
 // +kubebuilder:object:generate=true
 type BackoffConfig struct {

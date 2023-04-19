@@ -21,9 +21,9 @@ Points][flow-control] must be set within the service.
 
 This can be achieved in the following ways:
 
-- [Istio/Envoy integration][istio] for controlling HTTP or GRPC requests flowing
+- [Istio/Envoy integration][istio] for controlling HTTP or gRPC requests flowing
   through the service.
-- Aperture SDKs can be used to set feature or traffic (HTTP and GRPC) control
+- Aperture SDKs can be used to set feature or traffic (HTTP and gRPC) control
   points within the service code. This approach allows for fine-grained flow
   control.
 
