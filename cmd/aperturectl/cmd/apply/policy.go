@@ -180,7 +180,7 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) 
 	}
 	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
-		if strings.Contains(err.Error(), "Use Patch call to update it") {
+		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
 			var update bool
 			update, err = checkForUpdate(name)
 			if err != nil {

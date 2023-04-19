@@ -98,7 +98,7 @@ func (s *PolicyService) upsertPolicy(ctx context.Context, req *policylangv1.Upse
 				req.Policy = policy.Policy
 			}
 		} else {
-			return nil, status.Errorf(codes.AlreadyExists, "Policy '%s' already exists. Use Patch call to update it.", req.PolicyName)
+			return nil, status.Errorf(codes.AlreadyExists, "Policy '%s' already exists. Use UpsertPolicy with PATCH call to update it.", req.PolicyName)
 		}
 	}
 
