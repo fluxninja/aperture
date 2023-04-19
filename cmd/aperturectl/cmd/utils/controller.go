@@ -129,7 +129,8 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 		if err != nil {
 			return nil, err
 		}
-		port, cert, err := c.startPortForward(deployment.GetNamespace())
+		controllerNs = deployment.GetNamespace()
+		port, cert, err := c.startPortForward()
 		if err != nil {
 			return nil, fmt.Errorf("failed to start port forward for Aperture Controller: %w", err)
 		}
@@ -172,7 +173,7 @@ func (c *ControllerConn) PostRun(_ *cobra.Command, _ []string) {
 	}
 }
 
-func (c *ControllerConn) startPortForward(namespace string) (localPort uint16, cert []byte, err error) {
+func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err error) {
 	clientset, err := kubernetes.NewForConfig(c.kubeConfig)
 	if err != nil {
 		return 0, nil, fmt.Errorf("failed to create Kubernetes client: %w", err)
@@ -180,7 +181,7 @@ func (c *ControllerConn) startPortForward(namespace string) (localPort uint16, c
 
 	// FIXME Forwarding to a service would be nicer solution, but could not make
 	// it work for some reason, thus forwarding to pod directly.
-	pods, err := clientset.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{
+	pods, err := clientset.CoreV1().Pods(controllerNs).List(context.Background(), metav1.ListOptions{
 		LabelSelector: labels.Set{"app.kubernetes.io/component": "aperture-controller"}.String(),
 		FieldSelector: labels.Set{"status.phase": "Running"}.String(),
 	})
@@ -227,7 +228,7 @@ func (c *ControllerConn) startPortForward(namespace string) (localPort uint16, c
 		fwErrChan <- fw.ForwardPorts()
 	}()
 
-	secrets, err := clientset.CoreV1().Secrets(namespace).List(
+	secrets, err := clientset.CoreV1().Secrets(controllerNs).List(
 		context.Background(),
 		metav1.ListOptions{
 			LabelSelector: labels.Set{"app.kubernetes.io/component": "aperture-controller"}.String(),

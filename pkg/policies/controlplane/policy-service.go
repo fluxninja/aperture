@@ -15,31 +15,25 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
 // PolicyService is the implementation of policylangv1.PolicyService interface.
 type PolicyService struct {
 	policylangv1.UnimplementedPolicyServiceServer
-	policyFactory               *PolicyFactory
-	policyTrackers              notifiers.Trackers
-	policyDynamicConfigTrackers notifiers.Trackers
-	etcdWriter                  *etcdwriter.Writer
+	policyFactory *PolicyFactory
+	etcdWriter    *etcdwriter.Writer
 }
 
 // RegisterPolicyService registers a service for policy.
 func RegisterPolicyService(
-	policyTrackers, policyDynamicConfigTrackers notifiers.Trackers,
 	server *grpc.Server,
 	policyFactory *PolicyFactory,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 ) *PolicyService {
 	svc := &PolicyService{
-		policyFactory:               policyFactory,
-		policyTrackers:              policyTrackers,
-		policyDynamicConfigTrackers: policyDynamicConfigTrackers,
+		policyFactory: policyFactory,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -48,7 +42,10 @@ func RegisterPolicyService(
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			return svc.etcdWriter.Close()
+			if svc.etcdWriter != nil {
+				return svc.etcdWriter.Close()
+			}
+			return nil
 		},
 	})
 

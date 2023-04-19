@@ -25,20 +25,20 @@ import (
 // Fx tag to match etcd watcher name.
 var (
 	policiesEtcdWatcherFxTag              = "policies-driver"
-	policiesDynamicConfigEtcdWarcherFxTag = "policies-dynamic-config-driver"
+	policiesDynamicConfigEtcdWatcherFxTag = "policies-dynamic-config-driver"
 )
 
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
 		etcdwatcher.Constructor{Name: policiesEtcdWatcherFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
-		etcdwatcher.Constructor{Name: policiesDynamicConfigEtcdWarcherFxTag, EtcdPath: paths.PoliciesDynamicConfigPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDynamicConfigEtcdWatcherFxTag, EtcdPath: paths.PoliciesDynamicConfigPath}.Annotate(),
 		fx.Provide(
 			fx.Annotate(
 				providePolicyFactory,
 				fx.ParamTags(
 					config.NameTag(policiesEtcdWatcherFxTag),
-					config.NameTag(policiesDynamicConfigEtcdWarcherFxTag),
+					config.NameTag(policiesDynamicConfigEtcdWatcherFxTag),
 					iface.FxOptionsFuncTag,
 					alerts.AlertsFxTag,
 				),
@@ -48,10 +48,6 @@ func policyFactoryModule() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				RegisterPolicyService,
-				fx.ParamTags(
-					config.NameTag(policiesTrackerFxTag),
-					config.NameTag(policiesDynamicConfigTrackerFxTag),
-				),
 			),
 		),
 		prom.Module(),

@@ -126,7 +126,7 @@ Fetch the Distcache port of the Aperture Agent
 {{ include "agent.dist_cache.port" ( dict "agent" .Values.path.to.the.agent portName string defaultPort string $ ) }}
 */}}
 {{- define "agent.dist_cache.port" -}}
-{{- if and .agent.config .agent.config.dist_cache .agent.config.dist_cache (hasKey .agent.config.dist_cache .portName) -}}
+{{- if and .agent.config .agent.config.dist_cache (hasKey .agent.config.dist_cache .portName) -}}
     {{ print (split ":" .agent.config.dist_cache)._0 }}
 {{- else -}}
     {{ print .defaultPort }}

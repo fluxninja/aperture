@@ -32,36 +32,29 @@ The Aperture Agent can be installed in the following modes:
 
 1. **Kubernetes**
 
-   a. [**Install with Operator**](kubernetes/operator/operator.md)
+   1. [**Install with Operator**](kubernetes/operator/operator.md)
 
-   The Aperture Agent can be installed using the Kubernetes Operator available
-   for it. This method requires access to create cluster level resources like
-   ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
+      The Aperture Agent can be installed using the Kubernetes Operator
+      available for it. This method requires access to create cluster level
+      resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition
+      and so on.
 
-   - [**DaemonSet**](kubernetes/operator/daemonset.md)
+      1. [**DaemonSet**](kubernetes/operator/daemonset.md)
 
-     The Aperture Agent can be installed as a
-     [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
-     where it will get deployed on all the nodes of the cluster.
+      The Aperture Agent can be installed as a
+      [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
+      where it will get deployed on all the nodes of the cluster.
 
-   - [**Sidecar**](kubernetes/operator/sidecar.md)
+      2. [**Sidecar**](kubernetes/operator/sidecar.md)
 
-     The Aperture Agent can also be installed as a Sidecar. In this mode,
-     whenever a new pod is started with required labels and annotations, the
-     Agent container will be attached with the pod.
+      The Aperture Agent can also be installed as a Sidecar. In this mode,
+      whenever a new pod is started with required labels and annotations, the
+      Agent container will be attached with the pod.
 
-   b.
-   [**Namespace-Scoped Installation**](kubernetes/namespace-scoped/namespace-scoped.md)
+   2. [**Namespace-Scoped Installation**](kubernetes/namespace-scoped/namespace-scoped.md)
 
-   The Aperture Agent can also be installed with only namespace scoped
-   resources.
-
-   :::info
-
-   The Aperture Agent will only perform as expected with Aperture SDKs as
-   integration in this mode.
-
-   :::
+      The Aperture Agent can also be installed with only namespace scoped
+      resources.
 
 2. [**Bare Metal or VM**](bare_metal.md)
 

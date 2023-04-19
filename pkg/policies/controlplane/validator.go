@@ -37,7 +37,7 @@ func providePolicyValidator(in FxIn) (FxOut, error) {
 	err := in.Unmarshaller.UnmarshalKey(crwatcher.ConfigKey, &config)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal Kubernetes watcher config")
-		return FxOut{}, err
+		return FxOut{}, nil
 	}
 
 	if !config.Enabled {

@@ -21,7 +21,7 @@ type FxIn struct {
 
 // registerPolicyValidator registers Policy Custom Resource validator as k8s webhook.
 func registerPolicyValidator(in FxIn) {
-	validators := []PolicySpecValidator{}
+	validators := make([]PolicySpecValidator, 0, len(in.Validators))
 	for _, validator := range in.Validators {
 		if validator != nil {
 			validators = append(validators, validator)

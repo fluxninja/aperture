@@ -817,7 +817,10 @@ func GetControllerClientCert(endpoints []string, client_ client.Client, ctx cont
 		}
 
 		var configMaps corev1.ConfigMapList
-		_ = client_.List(ctx, &configMaps, &client.ListOptions{Namespace: controllerNS})
+		err := client_.List(ctx, &configMaps, &client.ListOptions{Namespace: controllerNS})
+		if err != nil {
+			continue
+		}
 
 		for _, cm := range configMaps.Items {
 			if !strings.HasSuffix(cm.Name, "-controller-client-cert") {

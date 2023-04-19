@@ -323,8 +323,8 @@ controller:
   ##
   namespaceScoped: false
   ## @param controller.serverCert.secretName Specifies the name of the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.
-  ## @param controller.serverCert.certFileName Specifies the key for Cert file in the secret containing the server certificate for Controller.
-  ## @param controller.serverCert.keyFileName Specifies the key for Key file in the secret containing the server certificate for Controller.
+  ## @param controller.serverCert.certFileName Specifies the key for Cert file in the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.
+  ## @param controller.serverCert.keyFileName Specifies the key for Key file in the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.
   ##
   serverCert:
     secretName: ~
