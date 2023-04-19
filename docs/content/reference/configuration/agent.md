@@ -78,6 +78,8 @@ Generated File Starts
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -85,6 +87,8 @@ Generated File Starts
 Environment variable prefix: `APERTURE_AGENT_AGENT_INFO_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -98,6 +102,8 @@ Environment variable prefix: `APERTURE_AGENT_AGENT_INFO_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>kubernetes</dt>
 <dd>
 
@@ -105,6 +111,8 @@ Environment variable prefix: `APERTURE_AGENT_AGENT_INFO_`
 Environment variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -118,6 +126,8 @@ Environment variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>proxy</dt>
 <dd>
 
@@ -125,6 +135,8 @@ Environment variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 Environment variable prefix: `APERTURE_AGENT_CLIENT_PROXY_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -138,6 +150,8 @@ Environment variable prefix: `APERTURE_AGENT_CLIENT_PROXY_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -145,6 +159,8 @@ Environment variable prefix: `APERTURE_AGENT_CLIENT_PROXY_`
 Environment variable prefix: `APERTURE_AGENT_DIST_CACHE_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -158,6 +174,8 @@ Environment variable prefix: `APERTURE_AGENT_DIST_CACHE_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -165,6 +183,8 @@ Environment variable prefix: `APERTURE_AGENT_DIST_CACHE_`
 Environment variable prefix: `APERTURE_AGENT_ETCD_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -178,6 +198,8 @@ Environment variable prefix: `APERTURE_AGENT_ETCD_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>preview_service</dt>
 <dd>
 
@@ -185,6 +207,8 @@ Environment variable prefix: `APERTURE_AGENT_ETCD_`
 Environment variable prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -198,6 +222,8 @@ Environment variable prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -205,6 +231,8 @@ Environment variable prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
 Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -218,6 +246,8 @@ Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -225,6 +255,8 @@ Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
 Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -238,6 +270,8 @@ Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>http_client</dt>
 <dd>
 
@@ -245,6 +279,8 @@ Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
 Environment variable prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -258,6 +294,8 @@ Environment variable prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>scheduler</dt>
 <dd>
 
@@ -266,6 +304,10 @@ Environment variable prefix: `APERTURE_AGENT_LIVENESS_SCHEDULER_`
 
 </dd>
 
+<!-- vale off -->
+
+<!-- vale off -->
+
 <dt>service</dt>
 <dd>
 
@@ -273,6 +315,8 @@ Environment variable prefix: `APERTURE_AGENT_LIVENESS_SCHEDULER_`
 Environment variable prefix: `APERTURE_AGENT_LIVENESS_SERVICE_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -286,6 +330,8 @@ Environment variable prefix: `APERTURE_AGENT_LIVENESS_SERVICE_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -293,6 +339,8 @@ Environment variable prefix: `APERTURE_AGENT_LIVENESS_SERVICE_`
 Environment variable prefix: `APERTURE_AGENT_LOG_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -306,6 +354,8 @@ Environment variable prefix: `APERTURE_AGENT_LOG_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -313,6 +363,8 @@ Environment variable prefix: `APERTURE_AGENT_LOG_`
 Environment variable prefix: `APERTURE_AGENT_METRICS_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -326,6 +378,8 @@ Environment variable prefix: `APERTURE_AGENT_METRICS_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -333,6 +387,8 @@ Environment variable prefix: `APERTURE_AGENT_METRICS_`
 Environment variable prefix: `APERTURE_AGENT_OTEL_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -346,6 +402,8 @@ Environment variable prefix: `APERTURE_AGENT_OTEL_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -353,6 +411,8 @@ Environment variable prefix: `APERTURE_AGENT_OTEL_`
 Environment variable prefix: `APERTURE_AGENT_PEER_DISCOVERY_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -366,6 +426,8 @@ Environment variable prefix: `APERTURE_AGENT_PEER_DISCOVERY_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -373,6 +435,8 @@ Environment variable prefix: `APERTURE_AGENT_PEER_DISCOVERY_`
 Environment variable prefix: `APERTURE_AGENT_PROFILERS_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -386,6 +450,8 @@ Environment variable prefix: `APERTURE_AGENT_PROFILERS_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -394,6 +460,10 @@ Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_`
 
 </dd>
 
+<!-- vale off -->
+
+<!-- vale off -->
+
 <dt>http_client</dt>
 <dd>
 
@@ -401,6 +471,8 @@ Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_`
 Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_HTTP_CLIENT_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -414,6 +486,8 @@ Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_HTTP_CLIENT_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>scheduler</dt>
 <dd>
 
@@ -422,6 +496,10 @@ Environment variable prefix: `APERTURE_AGENT_READINESS_SCHEDULER_`
 
 </dd>
 
+<!-- vale off -->
+
+<!-- vale off -->
+
 <dt>service</dt>
 <dd>
 
@@ -429,6 +507,8 @@ Environment variable prefix: `APERTURE_AGENT_READINESS_SCHEDULER_`
 Environment variable prefix: `APERTURE_AGENT_READINESS_SERVICE_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -442,6 +522,8 @@ Environment variable prefix: `APERTURE_AGENT_READINESS_SERVICE_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt></dt>
 <dd>
 
@@ -449,6 +531,8 @@ Environment variable prefix: `APERTURE_AGENT_READINESS_SERVICE_`
 Environment variable prefix: `APERTURE_AGENT_SENTRY_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -462,6 +546,8 @@ Environment variable prefix: `APERTURE_AGENT_SENTRY_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>grpc</dt>
 <dd>
 
@@ -469,6 +555,10 @@ Environment variable prefix: `APERTURE_AGENT_SENTRY_`
 Environment variable prefix: `APERTURE_AGENT_SERVER_GRPC_`
 
 </dd>
+
+<!-- vale off -->
+
+<!-- vale off -->
 
 <dt>grpc_gateway</dt>
 <dd>
@@ -478,6 +568,10 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_GRPC_GATEWAY_`
 
 </dd>
 
+<!-- vale off -->
+
+<!-- vale off -->
+
 <dt>http</dt>
 <dd>
 
@@ -485,6 +579,10 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_GRPC_GATEWAY_`
 Environment variable prefix: `APERTURE_AGENT_SERVER_HTTP_`
 
 </dd>
+
+<!-- vale off -->
+
+<!-- vale off -->
 
 <dt>listener</dt>
 <dd>
@@ -494,6 +592,10 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_LISTENER_`
 
 </dd>
 
+<!-- vale off -->
+
+<!-- vale off -->
+
 <dt>tls</dt>
 <dd>
 
@@ -501,6 +603,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_LISTENER_`
 Environment variable prefix: `APERTURE_AGENT_SERVER_TLS_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -514,6 +618,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_TLS_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>kubernetes</dt>
 <dd>
 
@@ -522,6 +628,10 @@ Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 
 </dd>
 
+<!-- vale off -->
+
+<!-- vale off -->
+
 <dt>static</dt>
 <dd>
 
@@ -529,6 +639,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -542,6 +654,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
 
 <dl>
 
+<!-- vale off -->
+
 <dt>memory</dt>
 <dd>
 
@@ -549,6 +663,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
 Environment variable prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_`
 
 </dd>
+
+<!-- vale off -->
 
 </dl>
 
@@ -808,7 +924,7 @@ Enables the Kubernetes auto-scale capability.
 
 <!-- vale on -->
 
-BackoffConfig holds configuration for GRPC client backoff.
+BackoffConfig holds configuration for gRPC client backoff.
 
 <dl>
 <dt>base_delay</dt>
@@ -1489,7 +1605,7 @@ API Key for this agent. If this key is not set, the extension won't be enabled.
 
 <!-- vale on -->
 
-Address to GRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
+Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
 
 </dd>
 <dt>heartbeat_interval</dt>
@@ -1536,7 +1652,7 @@ Installation mode describes on which underlying platform the Agent or the Contro
 
 <!-- vale on -->
 
-GRPCClientConfig holds configuration for GRPC Client.
+GRPCClientConfig holds configuration for gRPC Client.
 
 <dl>
 <dt>insecure</dt>
@@ -1605,7 +1721,7 @@ Use HTTP CONNECT Proxy
 
 <!-- vale on -->
 
-GRPCGatewayConfig holds configuration for grpc-http gateway
+GRPCGatewayConfig holds configuration for gRPC to HTTP gateway
 
 <dl>
 <dt>grpc_server_address</dt>
@@ -1617,7 +1733,7 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 
 <!-- vale on -->
 
-GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+gRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs gRPC and HTTP servers on the same port
 
 </dd>
 </dl>
@@ -1630,7 +1746,7 @@ GRPC server address to connect to - By default it points to HTTP server port bec
 
 <!-- vale on -->
 
-GRPCServerConfig holds configuration for GRPC Server.
+GRPCServerConfig holds configuration for gRPC Server.
 
 <dl>
 <dt>connection_timeout</dt>

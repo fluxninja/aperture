@@ -54,7 +54,7 @@ func init() {
 func main() {
 	// setup flagset and flags
 	fs := flag.NewFlagSet("sdk-validator", flag.ExitOnError)
-	port := fs.String("port", "8089", "Port to start sdk-validator's grpc server on.")
+	port := fs.String("port", "8089", "Port to start sdk-validator's gRPC server on.")
 	requests := fs.Int("requests", 10, "Number of requests to make to SDK example server.")
 	rejects := fs.Int64("rejects", 5, "Number of requests (out of 'requests') to reject.")
 	sdkDockerImage := fs.String("sdk-docker-image", "", "Docker image of SDK example to run.")
@@ -81,23 +81,23 @@ func main() {
 
 	sdkURL := fmt.Sprintf("http://localhost:%s", *sdkPort)
 
-	// create listener for grpc server
+	// create listener for gRPC server
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", *port))
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to listen")
 	}
 
-	// setup grpc server and register various server instances to it
+	// setup gRPC server and register various server instances to it
 	var grpcServer *grpc.Server
 	if *sslCertFilepath != "" && *sslKeyFilepath != "" {
 		creds, err2 := credentials.NewServerTLSFromFile(*sslCertFilepath, *sslKeyFilepath)
 		if err2 != nil {
 			log.Fatal().Err(err2).Msg("Failed to create TLS creds from provided files")
 		}
-		log.Info().Msg("Starting TLS-secured grpc server")
+		log.Info().Msg("Starting TLS-secured gRPC server")
 		grpcServer = grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor), grpc.Creds(creds))
 	} else {
-		log.Info().Msg("Starting insecure grpc server")
+		log.Info().Msg("Starting insecure gRPC server")
 		grpcServer = grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor))
 	}
 	reflection.Register(grpcServer)
@@ -168,7 +168,7 @@ func main() {
 	if *sdkDockerImage != "" {
 		wg.Add(1)
 		go func() {
-			// give the grpc server some time to initialize
+			// give the gRPC server some time to initialize
 			time.Sleep(2 * time.Second)
 
 			rejected := confirmConnectedAndStartTraffic(sdkURL, *requests)
@@ -198,7 +198,7 @@ func main() {
 		}()
 	}
 
-	// start serving traffic on grpc server
+	// start serving traffic on gRPC server
 	log.Info().Str("add", lis.Addr().String()).Msg("Starting sdk-validator")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal().Err(err).Msg("Failed to serve")
