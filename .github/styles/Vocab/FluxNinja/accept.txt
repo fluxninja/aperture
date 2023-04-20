@@ -54,7 +54,6 @@ LinkedIn
 Nutanix
 Netsil
 SLAs
-end-user
 rpm
 performant
 Zalando
