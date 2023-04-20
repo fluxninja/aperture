@@ -729,7 +729,6 @@ jobs:
              if [[ "<< parameters.dry-run >>" == "true" ]]; then
                args+=( --dry-run )
              fi
-            git config --global advice.addIgnoredFile false
             fn release update-aperture-docs "${args[@]}"
       - asdf_save_cache:
           cache_name: publish-docs
