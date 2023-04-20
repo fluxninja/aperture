@@ -17,7 +17,7 @@ PromQL
 [Ss]tatefully
 aperturectl
 Istio
-Lua
+[Ll]ua
 Dockerfile
 Nginx
 Armeria
@@ -35,7 +35,7 @@ Splunk
 vCenter
 Grafana
 Wavepool
-Jsonnet 
+Jsonnet
 Bundler
 kubectl
 [Qq]uantile
@@ -50,6 +50,23 @@ Prometheus
 Pub/Sub
 [Aa]uto-scalers?\b
 [Rr]ollouts?\b
+LinkedIn
+Nutanix
+Netsil
+Kubernauts
+SLAs
+vs
+end user
+rpm
+performant
+Zalando
+Hotstar
+Linkerd
+multithreaded
+look at
+connect with
 AIMD
+Tanveer
+[Rr]ebalancing
 gRPC
 DaemonSet
