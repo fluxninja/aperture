@@ -148,6 +148,10 @@ func (r *NamespaceReconciler) reconcileControllerCertConfigMap(ctx context.Conte
 		return nil
 	}
 
+	if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+		instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+	}
+
 	configMap := agent.CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, namespace)
 
 	if configMap == nil {
@@ -155,9 +159,6 @@ func (r *NamespaceReconciler) reconcileControllerCertConfigMap(ctx context.Conte
 	}
 
 	instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
-	if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
-		instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
-	}
 	res, err := agent.CreateConfigMapForAgent(r.Client, nil, configMap, ctx, instance)
 	if err != nil {
 		msg := fmt.Sprintf("failed to create/update ConfigMap in namespace '%s' for Instance '%s' in Namespace '%s'. Error='%s'",

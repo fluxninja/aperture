@@ -240,8 +240,7 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *agentv1alp
 // deleteDaemonSetModeResources deletes resources installed for DaemonSet mode of Agent.
 func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
 	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
-		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
-			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+		instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName {
 		configMap, err := configMapForAgentControllerClientCert(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 		if err == nil && configMap != nil {
 			if err = r.Delete(ctx, configMap); err != nil {
@@ -319,8 +318,7 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 			}
 
 			if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
-				(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
-					instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+				instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName {
 				configMap, err = configMapForAgentControllerClientCert(ctx, r.Client, instance, nil)
 				if err != nil {
 					log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
@@ -508,6 +506,10 @@ func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, 
 		len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
 		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
 			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+		if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+			instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+		}
+
 		configMap, err := configMapForAgentControllerClientCert(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
@@ -518,9 +520,6 @@ func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, 
 		}
 
 		instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
-		if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
-			instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
-		}
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
@@ -762,11 +761,11 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 		return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
 	}
 
-	var createControllerCLientCm bool
+	var createControllerClientCm bool
 	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
 		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
 			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
-		createControllerCLientCm = true
+		createControllerClientCm = true
 	}
 
 	for index := range nsList.Items {
@@ -789,15 +788,15 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			continue
 		}
 
-		if createControllerCLientCm {
+		if createControllerClientCm {
+			if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+				instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+			}
 			configMap := CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, ns.GetName())
 			if configMap != nil {
 				configMap.Namespace = ns.GetName()
 				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
 				instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
-				if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
-					instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
-				}
 				if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 					return err
 				}
