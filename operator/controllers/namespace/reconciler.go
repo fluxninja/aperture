@@ -143,16 +143,21 @@ func (r *NamespaceReconciler) manageResources(ctx context.Context, log logr.Logg
 // reconcileControllerCertConfigMap prepares the desired states for Agent configmaps containing Controller cert and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *NamespaceReconciler) reconcileControllerCertConfigMap(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent, namespace string) error {
-	if instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+	if instance.Spec.ControllerClientCertConfig.ConfigMapName != "" &&
+		instance.Spec.ControllerClientCertConfig.ConfigMapName != controllers.AgentControllerClientCertCMName {
 		return nil
 	}
+
 	configMap := agent.CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, namespace)
 
 	if configMap == nil {
 		return nil
 	}
 
-	instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, controllers.ControllerClientCertKey)
+	instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
+	if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+		instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+	}
 	res, err := agent.CreateConfigMapForAgent(r.Client, nil, configMap, ctx, instance)
 	if err != nil {
 		msg := fmt.Sprintf("failed to create/update ConfigMap in namespace '%s' for Instance '%s' in Namespace '%s'. Error='%s'",
@@ -175,6 +180,11 @@ func (r *NamespaceReconciler) reconcileControllerCertConfigMap(ctx context.Conte
 // reconcileConfigMap prepares the desired states for Agent configmap and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *NamespaceReconciler) reconcileConfigMap(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent, namespace string) error {
+	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+		instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
+	}
+
 	configMap := agent.CreateAgentConfigMapInNamespace(ctx, r.Client, instance, namespace)
 
 	res, err := agent.CreateConfigMapForAgent(r.Client, nil, configMap, ctx, instance)

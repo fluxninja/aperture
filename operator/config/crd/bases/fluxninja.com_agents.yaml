@@ -2016,9 +2016,6 @@ spec:
                       the client certificate which will be mounted at '/etc/aperture/aperture-agent/certs'
                       path with given key name.
                     type: string
-                required:
-                - clientCertKeyName
-                - configMapName
                 type: object
               customLivenessProbe:
                 description: Custom livenessProbe that overrides the default one
