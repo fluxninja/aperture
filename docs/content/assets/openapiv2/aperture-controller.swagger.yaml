@@ -3298,7 +3298,7 @@ definitions:
   SMAIns:
     type: object
     properties:
-      signal:
+      input:
         description: Signal to be used for the moving average computation.
         $ref: '#/definitions/InPort'
   SMAOuts:

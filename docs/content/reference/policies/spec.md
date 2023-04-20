@@ -6826,7 +6826,7 @@ Parameters for the SMA component.
 <!-- vale on -->
 
 <dl>
-<dt>signal</dt>
+<dt>input</dt>
 <dd>
 
 <!-- vale off -->

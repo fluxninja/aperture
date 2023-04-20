@@ -3151,7 +3151,7 @@
     },
     "SMAIns": {
       "properties": {
-        "signal": {
+        "input": {
           "$ref": "#/definitions/InPort",
           "description": "Signal to be used for the moving average computation.",
           "x-order": 0

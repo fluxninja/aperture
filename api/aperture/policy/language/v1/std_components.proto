@@ -225,7 +225,7 @@ message EMA {
 message SMA {
   message Ins {
     // Signal to be used for the moving average computation.
-    InPort signal = 1;
+    InPort input = 1;
   }
   message Outs {
     // Computed moving average.

@@ -1,10 +1,10 @@
 {
   new():: {
   },
-  withSignal(signal):: {
-    signal: signal,
+  withInput(input):: {
+    input: input,
   },
-  withSignalMixin(signal):: {
-    signal+: signal,
+  withInputMixin(input):: {
+    input+: input,
   },
 }

@@ -5050,11 +5050,11 @@ func (m *SMA_Ins) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetSignal()).(type) {
+		switch v := interface{}(m.GetInput()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, SMA_InsValidationError{
-					field:  "Signal",
+					field:  "Input",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -5062,16 +5062,16 @@ func (m *SMA_Ins) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, SMA_InsValidationError{
-					field:  "Signal",
+					field:  "Input",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetInput()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SMA_InsValidationError{
-				field:  "Signal",
+				field:  "Input",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
