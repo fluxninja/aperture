@@ -45,6 +45,7 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 )
 
 // ContainerSecurityContext prepares SecurityContext for containers based on the provided parameter.
@@ -628,6 +629,67 @@ func CheckAndGenerateCertForOperator() error {
 	}
 
 	return nil
+}
+
+// GetOrGenerateCertificate returns the TLS/SSL certificates of the Controller.
+func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1.Controller) (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
+	secretName := fmt.Sprintf("%s-controller-cert", instance.GetName())
+
+	generateCert := func() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
+		// generate certificates
+		serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(instance.GetName(), instance.GetNamespace())
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		return serverCertPEM, serverPrivKeyPEM, caPEM, nil
+	}
+
+	secret := &corev1.Secret{}
+	err := client.Get(context.TODO(), types.NamespacedName{Name: secretName, Namespace: instance.GetNamespace()}, secret)
+	if err != nil {
+		return generateCert()
+	}
+
+	existingCert, ok := secret.Data[ControllerCertName]
+	if !ok {
+		return generateCert()
+	}
+
+	existingKey, ok := secret.Data[ControllerCertKeyName]
+	if !ok {
+		return generateCert()
+	}
+
+	block, _ := pem.Decode(existingCert)
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return generateCert()
+	}
+
+	// regenerate certificate if it is expired
+	if time.Now().After(cert.NotAfter) {
+		return generateCert()
+	}
+
+	var existingClientCert []byte
+	cm := &corev1.ConfigMap{}
+	err = client.Get(context.TODO(), types.NamespacedName{Name: fmt.Sprintf("%s-controller-client-cert", instance.GetName()), Namespace: instance.GetNamespace()}, cm)
+	if err != nil {
+		// Checking existing ValidatingWebhookConfiguration for backward compatibility
+		vwc := &admissionregistrationv1.ValidatingWebhookConfiguration{}
+		err := client.Get(context.TODO(), types.NamespacedName{Name: ControllerServiceName}, vwc)
+		if err != nil || len(vwc.Webhooks) == 0 {
+			// No ValidatingWebhookConfiguration found, generate new certificate
+			return generateCert()
+		}
+
+		existingClientCert = vwc.Webhooks[0].ClientConfig.CABundle
+	} else {
+		existingClientCert = []byte(cm.Data[ControllerClientCertKey])
+	}
+
+	return bytes.NewBuffer(existingCert), bytes.NewBuffer(existingKey), bytes.NewBuffer(existingClientCert), nil
 }
 
 // MergeEnvVars merges common and provided extra Environment variables of Kubernetes container.

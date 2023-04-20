@@ -1351,7 +1351,6 @@ spec:
                             type: integer
                         type: object
                     required:
-                    - cr_watcher
                     - promql_jobs_scheduler
                     type: object
                   profilers:

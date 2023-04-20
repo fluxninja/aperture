@@ -69,6 +69,7 @@ type PoliciesConfig struct {
 	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler"`
 
 	// CRWatcher configuration.
+	//+kubebuilder:validation:Optional
 	CRWatcher crwatcher.CRWatcherConfig `json:"cr_watcher"`
 }
 
