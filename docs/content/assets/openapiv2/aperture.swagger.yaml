@@ -1188,7 +1188,7 @@ definitions:
             valid_during_warmup:
                 default: false
                 description: |+
-                    Whether the output is valid during the warm up stage.
+                    Whether the output is valid during the warm-up stage.
 
                 type: boolean
                 x-go-tag-default: "false"
@@ -3717,7 +3717,7 @@ definitions:
             valid_during_warmup:
                 default: false
                 description: |+
-                    Whether output is valid during warm-up stage.
+                    Whether the output is valid during the warm-up stage.
 
                 type: boolean
                 x-go-tag-default: "false"

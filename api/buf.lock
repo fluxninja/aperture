@@ -5,32 +5,39 @@ deps:
     owner: cncf
     repository: xds
     commit: ed1d3f62ca8047d7acf9f1dbaeee323a
+    digest: shake256:299925e9597e00754bde2e0802f4a7db5affd9036458e0394f7f3805f8ea334c8e62775945d24515293f60dae117cac3fa8263700156d3bc036082ed61c90001
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: 4df56f12fa70460eab0a644677a9c05b
-    digest: shake256:b7750408d14c2068b7437e07e53074e49433e71c77886aa5d04c6a7dca6b3b7656ef1fd26a7ca9c4453b04062754fb40d4795701dc1bb7fbf3773d68492bf6ad
+    commit: 1a92d23f25a549358ba9f27d8098fda9
+    digest: shake256:2ddcbfe2b85e424d2b39551251f209be2356bfec70761a02fea3a44853da0b071eb4a353bb3aff791d505e49bb15ad1e048b5268e0666b6a9d38b20086b32b30
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
     commit: 6607b10f00ed4a3d98f906807131c44a
+    digest: shake256:acc7b2ededb2f88d296862943a003b157bdb68ec93ed13dcd8566b2d06e47993ea6daf12013b9655658aaf6bbdb141cf65bfe400ce2870f4654b0a5b45e57c09
   - remote: buf.build
     owner: googleapis
     repository: googleapis
     commit: 5ae7f88519b04fe1965da0f8a375a088
+    digest: shake256:27d9fcdc0e3eb957449dc3d17e2d24c7ce59c3c483ecf128818183c336dfd28595ecd13771fb3172247775caf7707c4076dd8e70c5ac2cbcac170df35e4d0028
   - remote: buf.build
     owner: grpc-ecosystem
     repository: grpc-gateway
     commit: a1ecdc58eccd49aa8bea2a7a9022dc27
+    digest: shake256:efdd86fbdc42e8b7259fe461a49656827a03fb7cba0b3b9eb622ca10654ec6beccb9a051229c1553ccd89ed3e95d69ad4d7c799f1da3f3f1bd447b7947a4893e
   - remote: buf.build
     owner: opencensus
     repository: opencensus
     commit: bc2645b085534e4f8ebae3ef20088165
+    digest: shake256:a267651fc56795fed4cc8b02976332c60eae30e3adfca1a1786ef07ed723df166c3118d59b12f3e71be07a54f9e2201f935849e544789a3899626b9662e69310
   - remote: buf.build
     owner: opentelemetry
     repository: opentelemetry
     commit: e47f1a1dbc0b4105ad048239f0d7aa52
+    digest: shake256:86a8f392c562990227a77b7eb3fe11870f4d488b46dee4e161aff62363363989b718b48f9727b1c86423c34e10b2730c61d1d62cd46e57ae52df4f034c681d5b
   - remote: buf.build
     owner: prometheus
     repository: client-model
     commit: 55bcfe88c9e54edc9048a91656832525
+    digest: shake256:a507d3f983e7b8ca8b9a0527a8273eda8e8db6474c6712e1dacbfedb137c9b6f4c0fbbb8638b515183ac7e5e2281f84ec98840fabcf20fb2a2aa5b264891eb82

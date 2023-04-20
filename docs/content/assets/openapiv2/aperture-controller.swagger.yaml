@@ -1179,7 +1179,7 @@ definitions:
         x-go-tag-validate: required
       valid_during_warmup:
         description: |+
-          Whether the output is valid during the warm up stage.
+          Whether the output is valid during the warm-up stage.
 
         type: boolean
         default: false
@@ -3320,7 +3320,7 @@ definitions:
         x-go-tag-validate: required
       valid_during_warmup:
         description: |+
-          Whether output is valid during warm-up stage.
+          Whether the output is valid during the warm-up stage.
 
         type: boolean
         default: false

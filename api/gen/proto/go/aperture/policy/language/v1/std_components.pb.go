@@ -2085,7 +2085,7 @@ type EMA_Parameters struct {
 	CorrectionFactorOnMinEnvelopeViolation float64 `protobuf:"fixed64,3,opt,name=correction_factor_on_min_envelope_violation,json=correctionFactorOnMinEnvelopeViolation,proto3" json:"correction_factor_on_min_envelope_violation,omitempty" validate:"gte=1.0" default:"1.0"` // @gotags: validate:"gte=1.0" default:"1.0"
 	// Correction factor to apply on the output value if its in violation of the max envelope.
 	CorrectionFactorOnMaxEnvelopeViolation float64 `protobuf:"fixed64,4,opt,name=correction_factor_on_max_envelope_violation,json=correctionFactorOnMaxEnvelopeViolation,proto3" json:"correction_factor_on_max_envelope_violation,omitempty" validate:"gte=0,lte=1.0" default:"1.0"` // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
-	// Whether the output is valid during the warm up stage.
+	// Whether the output is valid during the warm-up stage.
 	ValidDuringWarmup bool `protobuf:"varint,5,opt,name=valid_during_warmup,json=validDuringWarmup,proto3" json:"valid_during_warmup,omitempty" default:"false"` // @gotags: default:"false"
 }
 
@@ -2259,7 +2259,7 @@ type SMA_Parameters struct {
 
 	// Window of time over which the moving average is computed.
 	SmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=sma_window,json=smaWindow,proto3" json:"sma_window,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Whether output is valid during warm-up stage.
+	// Whether the output is valid during the warm-up stage.
 	ValidDuringWarmup bool `protobuf:"varint,2,opt,name=valid_during_warmup,json=validDuringWarmup,proto3" json:"valid_during_warmup,omitempty" default:"false"` // @gotags: default:"false"
 }
 

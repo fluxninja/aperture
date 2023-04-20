@@ -62,12 +62,15 @@ swagger mixin "$policy_dir"/config-swagger.yaml "$policy_dir"/aperture.swagger.y
 yq -i eval-all 'select(fileIndex == 0).info = select(fileIndex == 1).info' \
 	"$policy_dir"/policy.yaml "$policy_dir"/config-swagger.yaml
 swagger flatten --with-flatten=remove-unused "$policy_dir"/policy.yaml --format=yaml --output "$policy_dir"/policy.yaml
-swagger generate markdown --spec "$policy_dir"/policy.yaml --target "$policy_dir" \
+swagger generate markdown \
+	--spec "$policy_dir"/policy.yaml \
+	--target "$policy_dir" \
 	--skip-validation \
 	--quiet \
 	--with-flatten=remove-unused \
 	--tags=policy-configuration \
-	--allow-template-override --template-dir "$docs_root"/tools/swagger/swagger-templates \
+	--allow-template-override \
+	--template-dir "$docs_root"/tools/swagger/swagger-templates \
 	--config-file "$docs_root"/tools/swagger/markdown-config.yaml
 rm "$policy_dir"/aperture.swagger.yaml
 # append gen/policy/metadata on top of gen/policy/policy.md

@@ -513,7 +513,7 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -661,7 +661,7 @@ CRWatcherConfig holds fields to configure the Kubernetes watcher for Aperture Po
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -955,7 +955,7 @@ GRPCClientConfig holds configuration for gRPC Client.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -979,7 +979,7 @@ Minimum connection timeout
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1061,7 +1061,7 @@ Connection timeout
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1098,7 +1098,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1110,7 +1110,7 @@ Disable Compression
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1158,7 +1158,7 @@ SSL/TLS key log file (useful for debugging)
 
 <!-- vale off -->
 
-(int64, minimum: `0`)
+(int64, minimum: `0`, default: `0`)
 
 <!-- vale on -->
 
@@ -1194,7 +1194,7 @@ Max Idle Connections per host. 0 = no limit.
 
 <!-- vale off -->
 
-(int64, minimum: `0`)
+(int64, minimum: `0`, default: `0`)
 
 <!-- vale on -->
 
@@ -1230,7 +1230,7 @@ Timeout for making network connection
 
 <!-- vale off -->
 
-(int64, minimum: `0`)
+(int64, minimum: `0`, default: `0`)
 
 <!-- vale on -->
 
@@ -1278,7 +1278,7 @@ HTTP client timeout - Timeouts include connection time, redirects, reading the r
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1290,7 +1290,7 @@ Use Proxy
 
 <!-- vale off -->
 
-(int64, minimum: `0`)
+(int64, minimum: `0`, default: `0`)
 
 <!-- vale on -->
 
@@ -1335,7 +1335,7 @@ HTTPServerConfig holds configuration for HTTP Server.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1528,7 +1528,7 @@ Execution timeout
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1553,7 +1553,7 @@ JobGroupConfig holds configuration for JobGroup.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1568,7 +1568,7 @@ option effectively serializes all job execution.
 
 <!-- vale off -->
 
-(int64)
+(int64, default: `0`)
 
 <!-- vale on -->
 
@@ -1669,7 +1669,7 @@ Use non-blocking log writer (can lose logs at high throughput)
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1706,7 +1706,7 @@ LogWriterConfig holds configuration for a log writer.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1779,7 +1779,7 @@ MetricsConfig holds configuration for service metrics.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1791,7 +1791,7 @@ EnableGoCollector controls whether the go collector is registered on startup. Se
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1803,7 +1803,7 @@ EnableProcessCollector controls whether the process collector is registered on s
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1889,7 +1889,7 @@ ProfilersConfig holds configuration for profilers.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -2032,7 +2032,7 @@ Debug enables printing of Sentry SDK debug messages
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -2143,7 +2143,7 @@ Client CA file path
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -2266,7 +2266,7 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 

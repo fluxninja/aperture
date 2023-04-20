@@ -961,7 +961,7 @@
         },
         "valid_during_warmup": {
           "default": false,
-          "description": "Whether the output is valid during the warm up stage.\n\n",
+          "description": "Whether the output is valid during the warm-up stage.\n\n",
           "type": "boolean",
           "x-go-tag-default": "false",
           "x-order": 3
@@ -3181,7 +3181,7 @@
         },
         "valid_during_warmup": {
           "default": false,
-          "description": "Whether output is valid during warm-up stage.\n\n",
+          "description": "Whether the output is valid during the warm-up stage.\n\n",
           "type": "boolean",
           "x-go-tag-default": "false",
           "x-order": 1

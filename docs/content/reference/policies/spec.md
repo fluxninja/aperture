@@ -2147,11 +2147,11 @@ Duration of EMA sampling window.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
-Whether the output is valid during the warm up stage.
+Whether the output is valid during the warm-up stage.
 
 </dd>
 <dt>warmup_window</dt>
@@ -3325,7 +3325,7 @@ Dynamic Configuration for a Controller
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -5867,7 +5867,7 @@ Dynamic Configuration for ScaleActuator
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -6442,7 +6442,7 @@ Time after which the limit for a given label value will be reset.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -6889,11 +6889,11 @@ Window of time over which the moving average is computed.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
-Whether output is valid during warm-up stage.
+Whether the output is valid during the warm-up stage.
 
 </dd>
 </dl>
@@ -7134,7 +7134,7 @@ Scheduler parameters
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -7202,7 +7202,7 @@ Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored
 
 <!-- vale off -->
 
-(float64)
+(float64, default: `0`)
 
 <!-- vale on -->
 
@@ -7314,7 +7314,7 @@ you have a classifier that sets `user` flow label, you might want to set
 
 <!-- vale off -->
 
-(int64, minimum: `0`, maximum: `255`)
+(int64, minimum: `0`, maximum: `255`, default: `0`)
 
 <!-- vale on -->
 

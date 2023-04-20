@@ -1093,7 +1093,7 @@ definitions:
         x-order: 2
       valid_during_warmup:
         description: |+
-          Whether the output is valid during the warm up stage.
+          Whether the output is valid during the warm-up stage.
 
         type: boolean
         default: false
@@ -3426,7 +3426,7 @@ definitions:
         x-order: 0
       valid_during_warmup:
         description: |+
-          Whether output is valid during warm-up stage.
+          Whether the output is valid during the warm-up stage.
 
         type: boolean
         default: false
