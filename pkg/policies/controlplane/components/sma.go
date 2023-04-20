@@ -63,7 +63,6 @@ func (*SMA) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.Execute.
 func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	// logger := sma.policyReadAPI.GetStatusRegistry().GetLogger()
 	retErr := func(err error) (runtime.PortToReading, error) {
 		return runtime.PortToReading{
 			"output": []runtime.Reading{runtime.InvalidReading()},
