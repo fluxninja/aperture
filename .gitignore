@@ -230,7 +230,9 @@ playground/tilt_local.json
 
 
 # ignore .github/styles except for .github/styles/Vocab/FluxNinja
-.github/styles
+.github/styles/*
+!.github/styles/Vocab
+.github/styles/Vocab/*
 !.github/styles/Vocab/FluxNinja
 
 # Ignore everything in .vscode except for .vscode/ltex.hiddenFalsePositives.en-US.txt
