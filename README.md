@@ -7,8 +7,8 @@
   <a href="https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g">
     <img alt="Slack Community" src="https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen?style=for-the-badge&logo=slack">
   </a>
-  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture/tree/main.svg?style=svg&circle-token=cf4312657fbc2f4833fee89328a3f27ab5f39c10">
-    <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture/main?token=cf4312657fbc2f4833fee89328a3f27ab5f39c10&style=for-the-badge&logo=circleci">
+  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture/tree/main.svg?style=svg">
+    <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture/main?style=for-the-badge&logo=circleci">
   </a>
   <a href="https://goreportcard.com/report/github.com/fluxninja/aperture">
     <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/fluxninja/aperture?style=for-the-badge">
