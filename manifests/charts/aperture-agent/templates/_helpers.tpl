@@ -61,7 +61,7 @@ Create the address of the Prometheus for Aperture Agent
 Fetch the value of the API Key secret for Aperture Agent
 {{ include "agent.apiSecret.value" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
-{{- define "agent.apisecret.value" -}}
+{{- define "agent.apiSecret.value" -}}
 {{- if .agent.secrets.fluxNinjaExtension.create -}}
     {{- if .agent.secrets.fluxNinjaExtension.value -}}
         {{ print .agent.secrets.fluxNinjaExtension.value }}
@@ -70,5 +70,65 @@ Fetch the value of the API Key secret for Aperture Agent
     {{- end -}}
 {{- else -}}
     {{ print "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the Name of the API Key secret for Aperture Agent
+{{ include "agent.apiSecret.name" ( dict "agent" .Values.path.to.the.agent "context" $.context $ ) }}
+*/}}
+{{- define "agent.apiSecret.name" -}}
+{{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.name -}}
+    {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.name }}
+{{- else -}}
+    {{ print "%s-agent-apikey" .context.Release.Name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the Key of the API Key secret for Aperture Agent
+{{ include "agent.apiSecret.key" ( dict "agent" .Values.path.to.the.agent $ ) }}
+*/}}
+{{- define "agent.apiSecret.key" -}}
+{{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.key -}}
+    {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.key }}
+{{- else -}}
+    {{ print "apiKey" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the server port of the Aperture Agent
+{{ include "agent.server.port" ( dict "agent" .Values.path.to.the.agent $ ) }}
+*/}}
+{{- define "agent.server.port" -}}
+{{- if and .agent.config .agent.config.server .agent.config.server.listener .agent.config.server.listener.addr -}}
+    {{ print (split ":" .agent.config.server.listener.addr)._1 }}
+{{- else -}}
+    {{ print "8080" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the OTEL port of the Aperture Agent
+{{ include "agent.otel.port" ( dict "agent" .Values.path.to.the.agent portName string defaultPort string $ ) }}
+*/}}
+{{- define "agent.otel.port" -}}
+{{- if and .agent.config .agent.config.otel .agent.config.otel.ports (hasKey .agent.config.otel.ports .portName) -}}
+    {{ print (get .agent.config.otel.ports .portName) }}
+{{- else -}}
+    {{ print .defaultPort }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the Distcache port of the Aperture Agent
+{{ include "agent.dist_cache.port" ( dict "agent" .Values.path.to.the.agent portName string defaultPort string $ ) }}
+*/}}
+{{- define "agent.dist_cache.port" -}}
+{{- if and .agent.config .agent.config.dist_cache (hasKey .agent.config.dist_cache .portName) -}}
+    {{ print (split ":" .agent.config.dist_cache)._0 }}
+{{- else -}}
+    {{ print .defaultPort }}
 {{- end -}}
 {{- end -}}

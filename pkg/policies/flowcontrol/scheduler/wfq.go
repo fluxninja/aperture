@@ -269,31 +269,42 @@ func (sched *WFQScheduler) queueRequest(request Request) (admitted bool, qReques
 func (sched *WFQScheduler) scheduleRequest(ctx context.Context,
 	request Request,
 	qRequest *queuedRequest,
-) (ok bool) {
+) (allowed bool) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
 	// This request has been selected to be executed next
 	now := sched.clk.Now()
-	waitTime, ok := sched.manager.Take(now, float64(request.Tokens))
+	waitTime, allowed := sched.manager.Take(now, float64(request.Tokens))
 	// check if we need to wait
-	if ok && waitTime > 0 {
+	if allowed && waitTime > 0 {
 		// unlock the lock before waiting
 		sched.lock.Unlock()
-		timer := time.NewTimer(waitTime)
-		defer timer.Stop()
+		// check whether ctx has deadline
+		// and if deadline is less than waitTime
+		// return tokens immediately
+		if dl, o := ctx.Deadline(); o {
+			if dl.Sub(now) < waitTime {
+				allowed = false
+				sched.manager.Return(float64(request.Tokens))
+			}
+		}
+		if allowed {
+			timer := time.NewTimer(waitTime)
+			defer timer.Stop()
 
-		select {
-		case <-ctx.Done():
-			ok = false
-			// return the tokens
-			sched.manager.Return(float64(request.Tokens))
-		case <-timer.C:
+			select {
+			case <-ctx.Done():
+				allowed = false
+				// return the tokens
+				sched.manager.Return(float64(request.Tokens))
+			case <-timer.C:
+			}
 		}
 		// grab the lock again
 		sched.lock.Lock()
 	}
-	if ok {
+	if allowed {
 		// move the flow's VT forward
 		qRequest.fInfo.vt += qRequest.cost
 		// set new virtual time of scheduler

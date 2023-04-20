@@ -45,7 +45,7 @@ func ProvideHandler(
 	h := NewHandler(in.ServiceGetter, in.Metrics, in.EngineAPI)
 
 	// Note: Returning the same handler twice as different interfaces – once as
-	// a handler to be registered on grpc server and once for consumption by
+	// a handler to be registered on gRPC server and once for consumption by
 	// authz
 	return h, h, nil
 }
@@ -65,7 +65,7 @@ func ProvideMetrics(promRegistry *prometheus.Registry) (Metrics, error) {
 // ProvideNopMetrics provides disabled flowcontrol metrics.
 func ProvideNopMetrics() Metrics { return NopMetrics{} }
 
-// Register registers flowcontrol service on a grpc server.
+// Register registers flowcontrol service on a gRPC server.
 func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceServer, healthsrv *health.Server) {
 	flowcontrolv1.RegisterFlowControlServiceServer(server, handler)
 

@@ -23,6 +23,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
 	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -66,6 +67,9 @@ type ControllerConfigSpec struct {
 type PoliciesConfig struct {
 	// Scheduler for PromQL jobs.
 	PromQLJobsScheduler jobs.JobGroupConfig `json:"promql_jobs_scheduler"`
+
+	// CRWatcher configuration.
+	CRWatcher crwatcher.CRWatcherConfig `json:"cr_watcher"`
 }
 
 // ControllerStatus defines the observed state of Controller.

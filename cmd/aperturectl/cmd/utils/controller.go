@@ -26,9 +26,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-const (
-	controllerNs = "aperture-controller"
-)
+var controllerNs string
 
 // ControllerConn manages flags for connecting to controller – either via
 // address or kubeconfig.
@@ -68,6 +66,12 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"kube-config",
 		"",
 		"Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG",
+	)
+	flags.StringVar(
+		&controllerNs,
+		"controller-ns",
+		"",
+		"Namespace in which the Aperture Controller is running",
 	)
 }
 
@@ -121,9 +125,14 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 			cred = credentials.NewClientTLSFromCert(certPool, "")
 		}
 	} else {
+		deployment, err := GetControllerDeployment(c.kubeConfig, controllerNs)
+		if err != nil {
+			return nil, err
+		}
+		controllerNs = deployment.GetNamespace()
 		port, cert, err := c.startPortForward()
 		if err != nil {
-			return nil, fmt.Errorf("failed to start port forward: %w", err)
+			return nil, fmt.Errorf("failed to start port forward for Aperture Controller: %w", err)
 		}
 
 		addr = fmt.Sprintf("localhost:%d", port)
@@ -138,7 +147,7 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 			if !ok {
 				return nil, fmt.Errorf("cannot apply controller cert")
 			}
-			cred = credentials.NewClientTLSFromCert(certPool, "aperture-controller.aperture-controller")
+			cred = credentials.NewClientTLSFromCert(certPool, fmt.Sprintf("%s.%s", deployment.GetName(), deployment.GetNamespace()))
 		}
 	}
 
@@ -219,13 +228,21 @@ func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err 
 		fwErrChan <- fw.ForwardPorts()
 	}()
 
-	certSecret, err := clientset.CoreV1().Secrets(controllerNs).Get(
+	secrets, err := clientset.CoreV1().Secrets(controllerNs).List(
 		context.Background(),
-		"controller-controller-cert",
-		metav1.GetOptions{},
+		metav1.ListOptions{
+			LabelSelector: labels.Set{"app.kubernetes.io/component": "aperture-controller"}.String(),
+		},
 	)
-	if err == nil {
-		cert = certSecret.Data["crt.pem"]
+	if err != nil || len(secrets.Items) == 0 {
+		return 0, nil, fmt.Errorf("no secrets found for Aperture Controller certificate")
+	}
+
+	for _, secret := range secrets.Items {
+		if !strings.HasSuffix(secret.Name, "controller-cert") {
+			continue
+		}
+		cert = secret.Data["crt.pem"]
 	}
 
 	select {

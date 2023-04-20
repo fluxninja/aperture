@@ -30,4 +30,3 @@ jobs:
           debug: false
           review_comment_lgtm: false
           openai_heavy_model: gpt-4
-          max_files_to_summarize: 40

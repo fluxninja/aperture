@@ -319,6 +319,17 @@ operator:
 ## @skip controller.createUninstallHook
 ##
 controller:
+  ## @param controller.namespaceScoped Specifies whether the Controller installation should be namespace-scoped, avoiding the creation of cluster-level resources. This takes precedence over controller.create.
+  ##
+  namespaceScoped: false
+  ## @param controller.serverCert.secretName Specifies the name of the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.
+  ## @param controller.serverCert.certFileName Specifies the key for Cert file in the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.
+  ## @param controller.serverCert.keyFileName Specifies the key for Key file in the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.
+  ##
+  serverCert:
+    secretName: ~
+    certFileName: "crt.pem"
+    keyFileName: "key.pem"
   ## @param controller.create Specifies whether a CR for Controller should be created
   ##
   create: true
@@ -332,8 +343,8 @@ controller:
   ## @param controller.image.pullSecrets Controller image pull secrets
   ##
   image:
-    registry: ~
-    repository: ~
+    registry: docker.io/fluxninja
+    repository: aperture-controller
     tag: ~
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -548,6 +559,7 @@ ingress:
 ## @param etcd.initContainer.image.repository Init container image repository.
 ## @param etcd.initContainer.image.tag Init container image tag.
 ## @param etcd.initContainer.image.pullPolicy Init container image pull policy.
+## @param etcd.pdb.create Whether to create a Pod Disruption Budget for Etcd
 ##
 ##
 etcd:
@@ -561,6 +573,8 @@ etcd:
       repository: etcd
       tag: 3.5
       pullPolicy: IfNotPresent
+  pdb:
+    create: false
   auth:
     rbac:
       create: false
@@ -579,7 +593,8 @@ etcd:
 ## @skip prometheus.nodeExporter
 ## @skip prometheus.pushgateway
 ## @skip prometheus.serverFiles
-## @skip prometheus.kube-state-metrics
+## @skip prometheus.kubeStateMetrics
+## @skip prometheus.rbac
 ##
 prometheus:
   enabled: true
@@ -594,16 +609,17 @@ prometheus:
     image:
       tag: v2.33.5
     extraFlags:
-      - web.enable-remote-write-receiver
+    - web.enable-remote-write-receiver
   alertmanager:
     enabled: false
   nodeExporter:
     enabled: false
   pushgateway:
     enabled: false
+  kubeStateMetrics:
+    enabled: false
   serverFiles:
     prometheus.yml:
       scrape_configs: []
-  kube-state-metrics:
-    podAnnotations:
-      "prometheus.io/scrape": "true"
+  rbac:
+    create: false

@@ -17,6 +17,7 @@ limitations under the License.
 package controller
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
 	"fmt"
@@ -58,6 +59,27 @@ func configMapForControllerConfig(instance *controllerv1alpha1.Controller, schem
 		},
 		Data: map[string]string{
 			"aperture-controller.yaml": string(config),
+		},
+	}
+
+	if err := ctrl.SetControllerReference(instance, cm, scheme); err != nil {
+		return nil, err
+	}
+
+	return cm, nil
+}
+
+// configMapForControllerClientCert prepares the ConfigMap object for the Aperture Controller client Certificate.
+func configMapForControllerClientCert(instance *controllerv1alpha1.Controller, scheme *runtime.Scheme, clientCert *bytes.Buffer) (*corev1.ConfigMap, error) {
+	cm := &corev1.ConfigMap{
+		ObjectMeta: v1.ObjectMeta{
+			Name:        fmt.Sprintf("%s-controller-client-cert", instance.GetName()),
+			Namespace:   instance.GetNamespace(),
+			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
+			Annotations: instance.Spec.Annotations,
+		},
+		Data: map[string]string{
+			controllers.ControllerClientCertKey: clientCert.String(),
 		},
 	}
 

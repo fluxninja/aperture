@@ -160,11 +160,6 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 						metrics.SubCircuitIDLabel: signal.SubCircuitID,
 						metrics.PolicyNameLabel:   circuit.GetPolicyName(),
 					},
-					prometheus.Labels{
-						metrics.SignalNameLabel:   signal.SignalName,
-						metrics.SubCircuitIDLabel: signal.SubCircuitID,
-						metrics.PolicyNameLabel:   circuit.GetPolicyName(),
-					},
 				)
 			}
 		}

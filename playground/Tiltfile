@@ -190,16 +190,6 @@ DEP_TREE = {
                         "controller-prometheus:grafanadatasource"
                     ]
                 },
-                {
-                    "workload": "controller-kube-state-metrics",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        ("^controller-kube-state-metrics", None),
-                    ],
-                    "ignored_objects": [
-                        ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_CONTROLLER_NS),
-                    ]
-                },
             ]
         }
     },
@@ -235,7 +225,7 @@ DEP_TREE = {
                 {
                     "workload": "agent",
                     "new_name": "agent",
-                    "resource_deps": ["controller-etcd", "agent-aperture-agent-manager", "controller-prometheus"],
+                    "resource_deps": ["controller", "agent-aperture-agent-manager"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
                     ]
@@ -890,7 +880,7 @@ def process_aperture_scenario(scenario_path):
             "child_resources": [
                 {
                     "new_name": "scenario-policies",
-                    "resource_deps": ["controller-service"],
+                    "resource_deps": ["controller-service", "agent"],
                     "extra_objects": [
                         (None, "Policy", APERTURE_CONTROLLER_NS)
                     ]

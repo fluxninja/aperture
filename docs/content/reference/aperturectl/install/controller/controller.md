@@ -30,14 +30,15 @@ aperturectl install controller --values-file=values.yaml --namespace=aperture
 ### Options
 
 ```
-  -h, --help   help for controller
+      --generate-cert   Generate self signed certificates for Aperture Controller
+  -h, --help            help for controller
 ```
 
 ### Options inherited from parent commands
 
 ```
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
-      --namespace string     Namespace in which the component will be installed. Defaults to component name
+      --namespace string     Namespace in which the component will be installed. Defaults to 'default' namespace (default "default")
       --values-file string   Values YAML file containing parameters to customize the installation
       --version string       Version of the Aperture (default "latest")
 ```

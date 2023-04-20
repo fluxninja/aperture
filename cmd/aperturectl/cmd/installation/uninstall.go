@@ -3,19 +3,21 @@ package installation
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/operator/api"
 	_ "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	_ "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/spf13/cobra"
-	"k8s.io/client-go/kubernetes/scheme"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func init() {
 	UnInstallCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	UnInstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture")
-	UnInstallCmd.PersistentFlags().StringVar(&namespace, "namespace", "", "Namespace from which the component will be uninstalled. Defaults to component name")
+	UnInstallCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Values YAML file containing parameters to customize the installation")
+	UnInstallCmd.PersistentFlags().StringVar(&namespace, "namespace", defaultNS, "Namespace from which the component will be uninstalled. Defaults to 'default' namespace")
 	UnInstallCmd.PersistentFlags().IntVar(&timeout, "timeout", 300, "Timeout of waiting for uninstallation hooks completion")
 
 	UnInstallCmd.AddCommand(controllerUnInstallCmd)
@@ -32,10 +34,6 @@ Use this command to uninstall Aperture Controller and Agent from your Kubernetes
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error
-
-		if namespace == "" {
-			namespace = defaultNS
-		}
 
 		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
 		if err != nil {

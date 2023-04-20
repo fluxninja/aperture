@@ -1,3 +1,4 @@
+{{- if and (not .Values.agent.namespaceScoped) .Values.operator.rbac.create }}
 ---
 apiVersion: v1
 kind: Service
@@ -5,7 +6,7 @@ metadata:
   name: {{ template "common.names.fullname" . }}-manager
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-controller-manager
+    app.kubernetes.io/component: aperture-agent-manager
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -24,4 +25,5 @@ spec:
       protocol: TCP
       targetPort: webhook-server
   selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
-    app.kubernetes.io/component: aperture-controller-manager
+    app.kubernetes.io/component: aperture-agent-manager
+{{- end }}

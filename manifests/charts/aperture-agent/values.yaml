@@ -319,6 +319,15 @@ operator:
 ## @skip agent.createUninstallHook
 ##
 agent:
+  ## @param agent.namespaceScoped Specifies whether the Aperture Agent installation should be namespace-scoped, avoiding the creation of cluster-level resources. This takes precedence over agent.create.
+  ##
+  namespaceScoped: false
+  ## @param agent.controllerCert.cmName Specifies the name of the ConfigMap containing the client certificate for Controller. Used when .Values.agent.namespaceScoped is true.
+  ## @param agent.controllerCert.certFileName Specifies the key for Cert file in the ConfigMap containing the client certificate for Controller.
+  ##
+  controllerCert:
+    cmName: ~
+    certFileName: "crt.pem"
   ## @param agent.create Specifies whether a CR for Agent should be created
   ##
   create: true
@@ -332,8 +341,8 @@ agent:
   ## @param agent.image.pullSecrets Agent image pull secrets
   ##
   image:
-    registry: ~
-    repository: ~
+    registry: docker.io/fluxninja
+    repository: aperture-agent
     tag: ~
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'

@@ -29,16 +29,20 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 ### Options
 
 ```
-      --apply                Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
-      --graph-depth int      Max depth of the graph when generating DOT and Mermaid files (default 1)
-  -h, --help                 help for generate
-      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
-      --name string          Name of the Aperture Blueprint to generate Aperture Policy resources for
-      --no-validation        Do not validate values.yaml file
-      --no-yaml-modeline     Do not add YAML language server modeline to generated YAML files
-      --output-dir string    Directory path where the generated Policy resources will be stored. If not provided, will use current directory
-      --overwrite            Overwrite existing output directory
-      --values-file string   Path to the values file for Blueprint's input
+      --apply                  Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
+      --controller string      Address of Aperture controller
+      --controller-ns string   Namespace in which the Aperture Controller is running
+      --graph-depth int        Max depth of the graph when generating DOT and Mermaid files (default 1)
+  -h, --help                   help for generate
+      --insecure               Allow insecure connection to controller
+      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
+      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --name string            Name of the Aperture Blueprint to generate Aperture Policy resources for
+      --no-validation          Do not validate values.yaml file
+      --no-yaml-modeline       Do not add YAML language server modeline to generated YAML files
+      --output-dir string      Directory path where the generated Policy resources will be stored. If not provided, will use current directory
+      --overwrite              Overwrite existing output directory
+      --values-file string     Path to the values file for Blueprint's input
 ```
 
 ### Options inherited from parent commands

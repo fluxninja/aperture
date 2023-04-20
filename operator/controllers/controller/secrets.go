@@ -34,7 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-// secretForControllerAPIKey prepares the Secret object for the ApiKey of Agent.
+// secretForControllerAPIKey prepares the Secret object for the ApiKey of Controller.
 func secretForControllerAPIKey(instance *controllerv1alpha1.Controller, scheme *runtime.Scheme) (*corev1.Secret, error) {
 	spec := &instance.Spec.Secrets.FluxNinjaExtension
 
@@ -57,7 +57,7 @@ func secretForControllerAPIKey(instance *controllerv1alpha1.Controller, scheme *
 	return secret, nil
 }
 
-// secretForControllerApiKey prepares the Secret object for the ApiKey of Agent.
+// secretForControllerCert prepares the Secret object for the Aperture Controller Certificate.
 func secretForControllerCert(instance *controllerv1alpha1.Controller, scheme *runtime.Scheme, serverCert, serverKey *bytes.Buffer) (*corev1.Secret, error) {
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{

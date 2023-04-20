@@ -16,7 +16,7 @@ kustomize 5.0.1
 kind 0.18.0
 jb 0.5.1
 tanka 0.24.0
-tilt 0.32.0
+tilt 0.32.2
 jsonnet 0.19.1
 circleci 0.1.25725
 java corretto-19.0.2.7.1

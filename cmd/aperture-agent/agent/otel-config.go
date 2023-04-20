@@ -196,10 +196,19 @@ func addCustomMetricsPipeline(
 			return fmt.Errorf("empty pipeline, inferring pipeline is supported only with 0 or 1 processors")
 		}
 
+		// Skip adding pipeline if there are no receivers and processors.
+		if len(metricConfig.Receivers) == 0 && len(metricConfig.Processors) == 0 {
+			return nil
+		}
+
 		// When pipeline not set explicitly, create pipeline with all defined receivers and processors.
-		metricConfig.Pipeline.Receivers = maps.Keys(metricConfig.Receivers)
-		sort.Strings(metricConfig.Pipeline.Receivers)
-		metricConfig.Pipeline.Processors = maps.Keys(metricConfig.Processors)
+		if len(metricConfig.Receivers) > 0 {
+			metricConfig.Pipeline.Receivers = maps.Keys(metricConfig.Receivers)
+			sort.Strings(metricConfig.Pipeline.Receivers)
+		}
+		if len(metricConfig.Processors) > 0 {
+			metricConfig.Pipeline.Processors = maps.Keys(metricConfig.Processors)
+		}
 	}
 
 	config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
@@ -332,14 +341,16 @@ func addPrometheusReceiver(
 		otelconfig.BuildOTelScrapeConfig("aperture-otel", agentConfig.CommonOTelConfig),
 	}
 
-	_, err := rest.InClusterConfig()
-	if err == rest.ErrNotInCluster {
-		log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
-	} else if err != nil {
-		log.Warn().Err(err).Msg("Error when discovering k8s environment")
-	} else {
-		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
-		scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
+	if !agentConfig.DisableKubernetesScraper {
+		_, err := rest.InClusterConfig()
+		if err == rest.ErrNotInCluster {
+			log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
+		} else if err != nil {
+			log.Warn().Err(err).Msg("Error when discovering k8s environment")
+		} else {
+			log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
+			scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
+		}
 	}
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`

@@ -18,12 +18,14 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
+var controllerConn utils.ControllerConn
+
 func init() {
+	controllerConn.InitFlags(generateCmd.PersistentFlags())
 	generateCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to generate Aperture Policy resources for")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated Policy resources will be stored. If not provided, will use current directory")
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
 	generateCmd.Flags().BoolVar(&applyPolicy, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
-	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
@@ -148,6 +150,11 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 		if applyPolicy {
 			err = apply.ApplyPolicyCmd.Flag("dir").Value.Set(updatedOutputDir)
+			if err != nil {
+				return err
+			}
+
+			err = apply.ApplyPolicyCmd.Flag("kube").Value.Set("true")
 			if err != nil {
 				return err
 			}

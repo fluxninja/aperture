@@ -895,7 +895,7 @@ spec:
                         description: Network client configuration
                         properties:
                           grpc:
-                            description: GRPC client settings.
+                            description: gRPC client settings.
                             properties:
                               backoff:
                                 description: Backoff config
@@ -1161,7 +1161,7 @@ spec:
                         description: Client configuration.
                         properties:
                           grpc:
-                            description: GRPC client settings.
+                            description: gRPC client settings.
                             properties:
                               backoff:
                                 description: Backoff config
@@ -1285,7 +1285,7 @@ spec:
                             type: object
                         type: object
                       endpoint:
-                        description: Address to GRPC or HTTP(s) server listening in
+                        description: Address to gRPC or HTTP(s) server listening in
                           agent service. To use HTTP protocol, the address must start
                           with `http(s)://`.
                         type: string
@@ -1574,13 +1574,19 @@ spec:
                                 - https://opentelemetry.io/docs/collector/configuration/#receivers.
                               x-kubernetes-preserve-unknown-fields: true
                           type: object
-                        description: CustomMetrics configures custom metrics OTel
+                        description: "CustomMetrics configures custom metrics OTel
                           pipelines, which will send data to the controller Prometheus.
                           Key in this map refers to OTel pipeline name. Prefixing
                           pipeline name with `metrics/` is optional, as all the components
                           and pipeline names would be normalized. By default `kubeletstats`
-                          custom metrics is added, which can be overwritten.
+                          custom metrics is added, which can be overwritten. \n Below
+                          is example to overwrite `kubeletstats` custom metrics: \n
+                          otel: custom_metrics: kubeletstats: {}"
                         type: object
+                      disable_kubernetes_scraper:
+                        description: DisableKubernetesScraper disables metrics collection
+                          for Kubernetes resources.
+                        type: boolean
                       ports:
                         description: Ports configures debug, health and extension
                           ports values.
@@ -1723,9 +1729,9 @@ spec:
                         description: GRPC Gateway configuration.
                         properties:
                           grpc_server_address:
-                            description: GRPC server address to connect to - By default
+                            description: gRPC server address to connect to - By default
                               it points to HTTP server port because FluxNinja stack
-                              runs GRPC and HTTP servers on the same port
+                              runs gRPC and HTTP servers on the same port
                             type: string
                         type: object
                       http:
@@ -1997,6 +2003,22 @@ spec:
                     type: integer
                 required:
                 - enabled
+                type: object
+              controller_client_cert:
+                description: ControllerClientCertConfig configuration.
+                properties:
+                  clientCertKeyName:
+                    description: ClientCertKeyName is the key name of the client certificate
+                      in the ConfigMap.
+                    type: string
+                  configMapName:
+                    description: ConfigMapName is the name of the ConfigMap containing
+                      the client certificate which will be mounted at '/etc/aperture/aperture-agent/certs'
+                      path with given key name.
+                    type: string
+                required:
+                - clientCertKeyName
+                - configMapName
                 type: object
               customLivenessProbe:
                 description: Custom livenessProbe that overrides the default one

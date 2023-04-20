@@ -652,7 +652,7 @@
       "additionalProperties": false
     },
     "ConcurrencyLimiter": {
-      "description": ":::info\n\nSee also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens which translate to (avg. latency \\* in-flight requests) (Little's Law).\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
+      "description": ":::info\n\nSee also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling\nwhich is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
@@ -3001,7 +3001,7 @@
       "additionalProperties": false
     },
     "Rego": {
-      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\n:::info\n\nSpecial Rego variables:\n- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
+      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\n:::info\n\nSpecial Rego variables:\n- `data.<package>.tokens`: Number of tokens for this request. This value is\nused by rate limiters and concurrency limiters when making decisions. The value\nprovided here will override any value provided in the policy configuration for\nthe workload. When this label is provided, it is not emitted as part of flow\nlabels or telemetry and is solely used while processing the request.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
       "properties": {
         "labels": {
           "additionalProperties": {
@@ -3175,7 +3175,7 @@
       "additionalProperties": false
     },
     "Scheduler": {
-      "description": ":::note\n\nEach Agent instantiates an independent copy of the scheduler, but output\nsignals for accepted and incoming concurrency are aggregated across all agents.\n\n:::\n\nSee [ConcurrencyLimiter](#concurrency-limiter) for more context.",
+      "description": ":::note\n\nEach Agent instantiates an independent copy of the scheduler, but output\nsignals for accepted and incoming concurrency are aggregated across all agents.\n\n:::",
       "properties": {
         "out_ports": {
           "$ref": "#/definitions/SchedulerOuts",
@@ -3198,12 +3198,12 @@
       "properties": {
         "accepted_concurrency": {
           "$ref": "#/definitions/OutPort",
-          "description": "Accepted concurrency is actual concurrency on a control point that this\nscheduler is applied on.\n\n:::info\n\nConcurrency is a unit less number describing mean number of\n[flows](/concepts/flow-control/flow-control.md#flow) being\nconcurrently processed by the system (system = control point).\nConcurrency is calculated as _work_ done per unit of time (so\nwork-seconds per world-seconds). Work-seconds are computed based on\ntoken-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).\n\n:::\n\nValue of this signal is aggregated from all the relevant schedulers.",
+          "description": "Accepted concurrency is actual concurrency on a control point that this\nscheduler is applied on.\n\n:::info\n\nConcurrency is a unit less number describing mean number of\n[flows](/concepts/flow-control/flow-control.md#flow) being\nconcurrently processed by the system (system = control point).\nConcurrency is calculated as tokens per second that is being\naccepted by the scheduler.\nIf the tokens map to milliseconds of response latency (_work_),\nthen the concurrency is _work_ done per unit\nof time (so work-seconds per world-seconds). Work-seconds are\ncomputed based on token-weights of flows (which are either\nestimated using the `auto_tokens` feature or specified by\n`Workload.tokens` setting).\nConversely, if the tokens map to number of requests where\neach request is 1 token, then the concurrency is simply\nthe number of requests per second.\n\n:::\n\nValue of this signal is aggregated from all the relevant schedulers.",
           "x-order": 0
         },
         "incoming_concurrency": {
           "$ref": "#/definitions/OutPort",
-          "description": "Incoming concurrency is concurrency that'd be needed to accept all the\nflows entering the scheduler.\n\nThis is computed in the same way as `accepted_concurrency`, but summing\nup work-seconds from all the flows entering scheduler, including\nrejected ones.",
+          "description": "Incoming concurrency is concurrency that'd be needed to accept all the\nflows entering the scheduler.\n\nThis is computed in the same way as `accepted_concurrency`,\nby summing up tokens from all the flows entering scheduler,\nincluding rejected ones.",
           "x-order": 1
         }
       },
@@ -3213,32 +3213,39 @@
     "SchedulerParameters": {
       "properties": {
         "auto_tokens": {
-          "default": true,
-          "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nVerify that the `tokens` in workload definitions\nor the flow aren't set if you want\nto use this feature.\n\n",
+          "default": false,
+          "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrent limiting use-case, where the\nconcurrency is calculated as (avg. latency \\* in-flight requests).\n\nThe value of tokens estimated by `auto_tokens` takes lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the request.\n\n",
           "type": "boolean",
-          "x-go-tag-default": "true",
+          "x-go-tag-default": "false",
           "x-order": 0
+        },
+        "decision_deadline_margin": {
+          "default": "0.01s",
+          "description": "Decision deadline margin is the amount of time that the scheduler will\nsubtract from the request deadline to determine the deadline for the\ndecision. This is to ensure that the scheduler has enough time to\nmake a decision before the request deadline happens, accounting for\nprocessing delays.\nThe request deadline is based on the\n[gRPC deadline](https://grpc.io/blog/deadlines) or the\n[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).\n\nFail-open logic is use for flow control APIs, so if the gRPC deadline\nreaches, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\n",
+          "type": "string",
+          "x-go-tag-default": "0.01s",
+          "x-order": 1
         },
         "default_workload_parameters": {
           "$ref": "#/definitions/SchedulerWorkloadParameters",
           "description": "Parameters to be used if none of workloads specified in `workloads` match.",
-          "x-order": 1
-        },
-        "max_timeout": {
-          "default": "0.49s",
-          "description": "Max Timeout is the value with which the flow timeout is capped.\nWhen `auto_tokens` feature is not enabled, this value is used as the\ntimeout for the flow, otherwise it is used as a cap for the timeout.\n\n:::caution\n\nThis timeout needs to be less than the timeout set on the\nclient for the whole GRPC call:\n* in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,\n* in case of libraries, is configured during the client initialization.\n\nFail-open logic is use for flow control APIs, so if the GRPC timeout\nfires first, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\nTo avoid such cases, the end-to-end GRPC timeout should also contain\nsome headroom for constant overhead like serialization and other processing delays. Default\nvalue for GRPC timeouts is 500ms, giving 10ms of headroom, so when\ntweaking this timeout, adjust the GRPC timeout accordingly.\n\n:::\n\n",
-          "type": "string",
-          "x-go-tag-default": "0.49s",
           "x-order": 2
         },
+        "max_timeout": {
+          "default": "0s",
+          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
+          "type": "string",
+          "x-go-tag-default": "0s",
+          "x-order": 3
+        },
         "timeout_factor": {
-          "default": 0.5,
-          "description": "Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.\n\nIf a flow is not able to get tokens within `timeout_factor * tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n",
+          "default": 0,
+          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "0.5",
+          "x-go-tag-default": "0",
           "x-go-tag-validate": "gte=0.0",
-          "x-order": 3
+          "x-order": 4
         },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
@@ -3248,7 +3255,7 @@
           },
           "type": "array",
           "x-go-tag-validate": "dive",
-          "x-order": 4
+          "x-order": 5
         }
       },
       "title": "Scheduler parameters",
@@ -3275,7 +3282,7 @@
       "additionalProperties": false
     },
     "SchedulerWorkloadParameters": {
-      "description": "Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.",
+      "description": "Parameters defines parameters such as priority, tokens and fairness key that\nare applicable to flows within a workload.",
       "properties": {
         "fairness_key": {
           "description": "Fairness key is a label key that can be used to provide fairness within a workload.\nAny [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if\nyou have a classifier that sets `user` flow label, you might want to set\n`fairness_key = \"user\"`.",
@@ -3295,7 +3302,7 @@
           "x-order": 1
         },
         "tokens": {
-          "description": "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.\nThis override is applicable only if tokens for the request aren't specified in the request.",
+          "description": "Tokens determines the cost of admitting a single request the workload,\nwhich is typically defined as milliseconds of response latency or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of requests (3rd party rate limiters).\nThis override is applicable only if tokens for the request aren't specified in the request.",
           "format": "uint64",
           "type": "string",
           "x-order": 2

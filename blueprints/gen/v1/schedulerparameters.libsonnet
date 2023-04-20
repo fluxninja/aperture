@@ -7,6 +7,12 @@
   withAutoTokensMixin(auto_tokens):: {
     auto_tokens+: auto_tokens,
   },
+  withDecisionDeadlineMargin(decision_deadline_margin):: {
+    decision_deadline_margin: decision_deadline_margin,
+  },
+  withDecisionDeadlineMarginMixin(decision_deadline_margin):: {
+    decision_deadline_margin+: decision_deadline_margin,
+  },
   withDefaultWorkloadParameters(default_workload_parameters):: {
     default_workload_parameters: default_workload_parameters,
   },

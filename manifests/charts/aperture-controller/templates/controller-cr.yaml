@@ -1,4 +1,4 @@
-{{- if .Values.controller.create }}
+{{- if and (not .Values.controller.namespaceScoped) .Values.controller.create }}
 apiVersion: fluxninja.com/v1alpha1
 kind: Controller
 metadata:
@@ -7,11 +7,11 @@ metadata:
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: aperture-controller-manager
     {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" . $ ) | nindent 4 }}
     {{- end }}
   {{- if .Values.commonAnnotations }}
   annotations:
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
   {{- end }}
 spec:
   image: {{ omit .Values.controller.image "tag" | toYaml | nindent 4 }}
@@ -184,7 +184,7 @@ spec:
         key: {{ .Values.controller.secrets.fluxNinjaExtension.secretKeyRef.key }}
         {{- end }}
       {{- end }}
-      value: {{ include "controller.apisecret.value" ( dict "controller" .Values.controller $) }}
+      value: {{ include "controller.apiSecret.value" ( dict "controller" .Values.controller $) }}
   {{- end }}
   config:
     {{- if (omit .Values.controller.config "etcd" "prometheus") }}

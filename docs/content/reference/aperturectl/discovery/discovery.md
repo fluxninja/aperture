@@ -17,11 +17,12 @@ Use this command to query information about active Discovery integrations
 ### Options
 
 ```
-      --controller string    Address of Aperture controller
-  -h, --help                 help for discovery
-      --insecure             Allow insecure connection to controller
-      --kube                 Find controller in Kubernetes cluster, instead of connecting directly
-      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --controller string      Address of Aperture controller
+      --controller-ns string   Namespace in which the Aperture Controller is running
+  -h, --help                   help for discovery
+      --insecure               Allow insecure connection to controller
+      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
+      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
 ```
 
 ### SEE ALSO
