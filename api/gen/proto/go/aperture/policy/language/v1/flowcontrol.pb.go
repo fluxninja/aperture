@@ -2874,7 +2874,7 @@ type Scheduler_Parameters struct {
 	//
 	// The value of tokens estimated by `auto_tokens` takes lower precedence
 	// than the value of `tokens` specified in the workload definition
-	// and `tokens` explicitly specified in the request.
+	// and `tokens` explicitly specified in the request labels.
 	AutoTokens bool `protobuf:"varint,3,opt,name=auto_tokens,json=autoTokens,proto3" json:"auto_tokens,omitempty" default:"false"` // @gotags: default:"false"
 	// Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
 	TimeoutFactor float64 `protobuf:"fixed64,4,opt,name=timeout_factor,json=timeoutFactor,proto3" json:"timeout_factor,omitempty" validate:"gte=0.0" default:"0"` // @gotags: validate:"gte=0.0" default:"0"
@@ -3085,7 +3085,8 @@ type Scheduler_Workload_Parameters struct {
 	// which is typically defined as milliseconds of response latency or
 	// simply equal to 1 if the resource being accessed is constrained by the
 	// number of requests (3rd party rate limiters).
-	// This override is applicable only if tokens for the request aren't specified in the request.
+	// This override is applicable only if tokens for the request aren't specified
+	// in the request labels.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty"`
 	// Fairness key is a label key that can be used to provide fairness within a workload.
 	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if

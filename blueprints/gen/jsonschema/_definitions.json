@@ -3221,7 +3221,7 @@
       "properties": {
         "auto_tokens": {
           "default": false,
-          "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrent limiting use-case, where the\nconcurrency is calculated as (avg. latency \\* in-flight requests).\n\nThe value of tokens estimated by `auto_tokens` takes lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the request.\n\n",
+          "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrent limiting use-case, where the\nconcurrency is calculated as (avg. latency \\* in-flight requests).\n\nThe value of tokens estimated by `auto_tokens` takes lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the request labels.\n\n",
           "type": "boolean",
           "x-go-tag-default": "false",
           "x-order": 0
@@ -3316,7 +3316,7 @@
           "x-order": 1
         },
         "tokens": {
-          "description": "Tokens determines the cost of admitting a single request the workload,\nwhich is typically defined as milliseconds of response latency or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of requests (3rd party rate limiters).\nThis override is applicable only if tokens for the request aren't specified in the request.",
+          "description": "Tokens determines the cost of admitting a single request the workload,\nwhich is typically defined as milliseconds of response latency or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of requests (3rd party rate limiters).\nThis override is applicable only if tokens for the request aren't specified\nin the request labels.",
           "format": "uint64",
           "type": "string",
           "x-order": 2

@@ -697,7 +697,8 @@ message Scheduler {
       // which is typically defined as milliseconds of response latency or
       // simply equal to 1 if the resource being accessed is constrained by the
       // number of requests (3rd party rate limiters).
-      // This override is applicable only if tokens for the request aren't specified in the request.
+      // This override is applicable only if tokens for the request aren't specified
+      // in the request labels.
       uint64 tokens = 2;
 
       // Fairness key is a label key that can be used to provide fairness within a workload.
@@ -752,7 +753,7 @@ message Scheduler {
     //
     // The value of tokens estimated by `auto_tokens` takes lower precedence
     // than the value of `tokens` specified in the workload definition
-    // and `tokens` explicitly specified in the request.
+    // and `tokens` explicitly specified in the request labels.
     bool auto_tokens = 3; // @gotags: default:"false"
 
     // Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.

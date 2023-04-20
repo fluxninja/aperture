@@ -7009,7 +7009,7 @@ concurrency is calculated as (avg. latency \* in-flight requests).
 
 The value of tokens estimated by `auto_tokens` takes lower precedence
 than the value of `tokens` specified in the workload definition
-and `tokens` explicitly specified in the request.
+and `tokens` explicitly specified in the request labels.
 
 </dd>
 <dt>decision_deadline_margin</dt>
@@ -7217,7 +7217,8 @@ Tokens determines the cost of admitting a single request the workload,
 which is typically defined as milliseconds of response latency or
 simply equal to 1 if the resource being accessed is constrained by the
 number of requests (3rd party rate limiters).
-This override is applicable only if tokens for the request aren't specified in the request.
+This override is applicable only if tokens for the request aren't specified
+in the request labels.
 
 </dd>
 </dl>
