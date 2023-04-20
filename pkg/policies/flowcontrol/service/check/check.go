@@ -74,7 +74,6 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 			FlowLabels:   labels,
 			ControlPoint: req.ControlPoint,
 			Services:     services,
-			Tokens:       req.Tokens,
 		},
 	)
 	end := time.Now()

@@ -373,7 +373,8 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.ComponentIDLabel] = conLimiter.GetComponentId()
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.concurrencyLimiterMsg.GetLoadActuator(), conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
+	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.concurrencyLimiterMsg.GetLoadActuator(),
+		conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
 	}
@@ -481,10 +482,12 @@ func (conLimiter *concurrencyLimiter) GetFlowSelector() *policylangv1.FlowSelect
 	return conLimiter.concurrencyLimiterMsg.GetFlowSelector()
 }
 
-// RunLimiter processes a single flow by concurrency limiter in a blocking manner.
+// Decide processes a single flow by concurrency limiter in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision {
+func (conLimiter *concurrencyLimiter) Decide(ctx context.Context,
+	labels map[string]string,
+) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
@@ -512,16 +515,25 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		fairnessLabel = fairnessLabel + "," + val
 	}
 
-	// Lookup tokens for the workload, if not provided
+	tokens := uint64(1)
+	// Precedence order (lowest to highest):
+	// 1. AutoTokens
+	// 2. Workload tokens
+	// 3. Label tokens
+	if conLimiter.schedulerParameters.AutoTokens {
+		if tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex); ok {
+			tokens = tokensAuto
+		}
+	}
 
-	if tokens == 0 {
-		// at least set to 1 token
-		tokens = 1
-		if matchedWorkloadProto.Tokens != 0 {
-			tokens = matchedWorkloadProto.Tokens
-		} else if conLimiter.schedulerParameters.AutoTokens {
-			if tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex); ok {
-				tokens = tokensAuto
+	if matchedWorkloadProto.Tokens != 0 {
+		tokens = matchedWorkloadProto.Tokens
+	}
+
+	if conLimiter.schedulerParameters.TokensLabelKey != "" {
+		if val, ok := labels[conLimiter.schedulerParameters.TokensLabelKey]; ok {
+			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
+				tokens = parsedTokens
 			}
 		}
 	}
@@ -555,6 +567,11 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 
 	accepted := conLimiter.scheduler.Schedule(reqCtx, req)
 
+	tokensConsumed := uint64(0)
+	if accepted {
+		tokensConsumed = req.Tokens
+	}
+
 	// update concurrency metrics and decisionType
 	conLimiter.incomingWorkSecondsCounter.Add(float64(req.Tokens) / 1000)
 
@@ -569,9 +586,20 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		Dropped:     !accepted,
 		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
 			ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
-				WorkloadIndex: matchedWorkloadIndex,
+				WorkloadIndex:  matchedWorkloadIndex,
+				TokensConsumed: tokensConsumed,
 			},
 		},
+	}
+}
+
+// Revert reverts the decision made by the limiter.
+func (conLimiter *concurrencyLimiter) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+	if conLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_); ok {
+		tokens := conLimiterDecision.ConcurrencyLimiterInfo.TokensConsumed
+		if tokens > 0 {
+			conLimiter.scheduler.Revert(tokens)
+		}
 	}
 }
 

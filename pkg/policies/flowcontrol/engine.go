@@ -19,9 +19,9 @@ import (
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	concurrencyLimiters []iface.ConcurrencyLimiter
+	concurrencyLimiters []iface.Limiter
 	fluxMeters          []iface.FluxMeter
-	rateLimiters        []iface.RateLimiter
+	rateLimiters        []iface.Limiter
 	flowRegulators      []iface.Limiter
 	labelPreviews       []iface.LabelPreview
 }
@@ -56,18 +56,13 @@ func NewEngine() iface.Engine {
 // (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
-	fluxMeterMapMutex     sync.RWMutex
-	fluxMetersMap         map[iface.FluxMeterID]iface.FluxMeter
-	conLimiterMapMutex    sync.RWMutex
-	conLimiterMap         map[iface.LimiterID]iface.ConcurrencyLimiter
-	rateLimiterMapMutex   sync.RWMutex
-	rateLimiterMap        map[iface.LimiterID]iface.RateLimiter
-	flowRegulatorMapMutex sync.RWMutex
-	flowRegulatorMap      map[iface.LimiterID]iface.Limiter
-	labelPreviewMapMutex  sync.RWMutex
-	labelPreviewMap       map[iface.PreviewID]iface.LabelPreview
-	multiMatchersMutex    sync.RWMutex
-	multiMatchers         map[selectors.ControlPointID]*multiMatcher
+	mutex            sync.RWMutex
+	fluxMetersMap    map[iface.FluxMeterID]iface.FluxMeter
+	conLimiterMap    map[iface.LimiterID]iface.ConcurrencyLimiter
+	rateLimiterMap   map[iface.LimiterID]iface.RateLimiter
+	flowRegulatorMap map[iface.LimiterID]iface.Limiter
+	labelPreviewMap  map[iface.PreviewID]iface.LabelPreview
+	multiMatchers    map[selectors.ControlPointID]*multiMatcher
 }
 
 // ProcessRequest .
@@ -78,9 +73,6 @@ func (e *Engine) ProcessRequest(
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
-	tokens := requestContext.Tokens
-	// Sorting labels keys, so that they're in predictable order, which is
-	// needed by rollupprocessor.
 	labelKeys := maps.Keys(flowLabels)
 	sort.Strings(labelKeys)
 	response = &flowcontrolv1.CheckResponse{
@@ -109,81 +101,62 @@ func (e *Engine) ProcessRequest(
 	}
 	response.FluxMeterInfos = fluxMeterProtos
 
-	// 1. Execute flow regulators
-	flowRegulators := mmr.flowRegulators
-
-	flowRegulatorDecisions, flowRegulatorsDecisionType := runLimiters(ctx, flowRegulators, flowLabels, tokens)
-	response.LimiterDecisions = flowRegulatorDecisions
-
-	// If any flow regulator dropped, then mark this as a decision reason and return.
-	// Do not execute rate limiters.
-	if flowRegulatorsDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-		response.DecisionType = flowRegulatorsDecisionType
-		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_FLOW_REGULATED
-		return
+	limiterTypes := []struct {
+		limiters     []iface.Limiter
+		rejectReason flowcontrolv1.CheckResponse_RejectReason
+	}{
+		{mmr.flowRegulators, flowcontrolv1.CheckResponse_REJECT_REASON_FLOW_REGULATED},
+		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
+		{mmr.concurrencyLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED},
 	}
 
-	// 2. Execute rate limiters
-	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
-	for i, rl := range mmr.rateLimiters {
-		rateLimiters[i] = rl
-	}
+	for _, limiterType := range limiterTypes {
+		limiterDecisions, decisionType := runLimiters(ctx, limiterType.limiters, flowLabels)
+		response.LimiterDecisions = append(response.LimiterDecisions, limiterDecisions...)
 
-	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, flowLabels, tokens)
-	response.LimiterDecisions = append(response.LimiterDecisions, rateLimiterDecisions...)
+		defer func() {
+			if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+				revertRemaining(limiterType.limiters, flowLabels, limiterDecisions)
+			}
+		}()
 
-	defer func() {
-		if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-			returnExtraTokens(mmr.rateLimiters, rateLimiterDecisions, flowLabels)
+		if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+			response.DecisionType = decisionType
+			response.RejectReason = limiterType.rejectReason
+			return
 		}
-	}()
-
-	// If any rate limiter dropped, then mark this as a decision reason and return.
-	// Do not execute concurrency limiters.
-	if rateLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-		response.DecisionType = rateLimitersDecisionType
-		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
-		return
-	}
-
-	// 3. Execute concurrency limiters
-	concurrencyLimiters := make([]iface.Limiter, len(mmr.concurrencyLimiters))
-	for i, cl := range mmr.concurrencyLimiters {
-		concurrencyLimiters[i] = cl
-	}
-
-	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(ctx, concurrencyLimiters, flowLabels, tokens)
-	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
-
-	if concurrencyLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
-		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED
-		return
 	}
 
 	return
 }
 
-func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string, tokens uint64) (
+func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) (
 	[]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
 	var wg sync.WaitGroup
 	var once sync.Once
+
+	// make a child context with a cancel function
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
 
 	decisionType := flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 
-	setDecisionRejected := func() {
+	setDecisionDropped := func() {
 		decisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
+		// cancel all the limiter calls
+		cancel()
 	}
 
 	execLimiter := func(limiter iface.Limiter, i int) func() {
 		return func() {
 			defer wg.Done()
-			decisions[i] = limiter.RunLimiter(ctx, labels, tokens)
+			decisions[i] = limiter.Decide(ctx, labels)
 			if decisions[i].Dropped {
-				once.Do(setDecisionRejected)
+				once.Do(setDecisionDropped)
 			}
 		}
 	}
@@ -202,26 +175,26 @@ func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[strin
 	return decisions, decisionType
 }
 
-func returnExtraTokens(
-	rateLimiters []iface.RateLimiter,
-	rateLimiterDecisions []*flowcontrolv1.LimiterDecision,
+func revertRemaining(
+	limiters []iface.Limiter,
 	labels map[string]string,
+	limiterDecisions []*flowcontrolv1.LimiterDecision,
 ) {
 	labelsCopy := make(map[string]string, len(labels))
 	for k, v := range labels {
 		labelsCopy[k] = v
 	}
-	for i, l := range rateLimiterDecisions {
+	for i, l := range limiterDecisions {
 		if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
-			go rateLimiters[i].TakeN(labelsCopy, -1)
+			go limiters[i].Revert(labelsCopy, limiterDecisions[i])
 		}
 	}
 }
 
 // RegisterConcurrencyLimiter adds concurrency limiter to multimatcher.
 func (e *Engine) RegisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
-	e.conLimiterMapMutex.Lock()
-	defer e.conLimiterMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	if _, ok := e.conLimiterMap[cl.GetLimiterID()]; !ok {
 		e.conLimiterMap[cl.GetLimiterID()] = cl
 	} else {
@@ -237,8 +210,8 @@ func (e *Engine) RegisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
 
 // UnregisterConcurrencyLimiter removes concurrency limiter from multimatcher.
 func (e *Engine) UnregisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
-	e.conLimiterMapMutex.Lock()
-	defer e.conLimiterMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	delete(e.conLimiterMap, cl.GetLimiterID())
 
 	return e.unregister("ConcurrencyLimiter:"+cl.GetLimiterID().String(), cl.GetFlowSelector())
@@ -247,8 +220,8 @@ func (e *Engine) UnregisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error
 // RegisterFluxMeter adds fluxmeter to histogram map and multimatcher.
 func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	// Save the histogram in fluxMeterHists indexed by metric id
-	e.fluxMeterMapMutex.Lock()
-	defer e.fluxMeterMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	if _, ok := e.fluxMetersMap[fm.GetFluxMeterID()]; !ok {
 		e.fluxMetersMap[fm.GetFluxMeterID()] = fm
 	} else {
@@ -268,8 +241,8 @@ func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 // UnregisterFluxMeter removes fluxmeter from histogram map and multimatcher.
 func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 	// Remove the histogram from fluxMeterHists indexed by metric id
-	e.fluxMeterMapMutex.Lock()
-	defer e.fluxMeterMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	delete(e.fluxMetersMap, fm.GetFluxMeterID())
 
 	// Remove the fluxMeterAPI from multiMatchers
@@ -278,8 +251,8 @@ func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 
 // GetFluxMeter Lookup function for getting flux meter.
 func (e *Engine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
-	e.fluxMeterMapMutex.RLock()
-	defer e.fluxMeterMapMutex.RUnlock()
+	e.mutex.RLock()
+	defer e.mutex.RUnlock()
 	fmID := iface.FluxMeterID{
 		FluxMeterName: fluxMeterName,
 	}
@@ -288,15 +261,15 @@ func (e *Engine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 
 // GetConcurrencyLimiter Lookup function for getting concurrency limiter.
 func (e *Engine) GetConcurrencyLimiter(limiterID iface.LimiterID) iface.ConcurrencyLimiter {
-	e.conLimiterMapMutex.RLock()
-	defer e.conLimiterMapMutex.RUnlock()
+	e.mutex.RLock()
+	defer e.mutex.RUnlock()
 	return e.conLimiterMap[limiterID]
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.
 func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
-	e.rateLimiterMapMutex.Lock()
-	defer e.rateLimiterMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	if _, ok := e.rateLimiterMap[rl.GetLimiterID()]; !ok {
 		e.rateLimiterMap[rl.GetLimiterID()] = rl
 	} else {
@@ -316,8 +289,8 @@ func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 
 // UnregisterRateLimiter removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
-	e.rateLimiterMapMutex.Lock()
-	defer e.rateLimiterMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	delete(e.rateLimiterMap, rl.GetLimiterID())
 
 	return e.unregister("RateLimiter:"+rl.GetLimiterID().String(), rl.GetFlowSelector())
@@ -325,15 +298,15 @@ func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 
 // GetRateLimiter Lookup function for getting rate limiter.
 func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
-	e.rateLimiterMapMutex.RLock()
-	defer e.rateLimiterMapMutex.RUnlock()
+	e.mutex.RLock()
+	defer e.mutex.RUnlock()
 	return e.rateLimiterMap[limiterID]
 }
 
 // RegisterFlowRegulator adds limiter actuator to multimatcher.
 func (e *Engine) RegisterFlowRegulator(l iface.Limiter) error {
-	e.flowRegulatorMapMutex.Lock()
-	defer e.flowRegulatorMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	if _, ok := e.flowRegulatorMap[l.GetLimiterID()]; !ok {
 		e.flowRegulatorMap[l.GetLimiterID()] = l
 	} else {
@@ -353,8 +326,8 @@ func (e *Engine) RegisterFlowRegulator(l iface.Limiter) error {
 
 // UnregisterFlowRegulator removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterFlowRegulator(rl iface.Limiter) error {
-	e.flowRegulatorMapMutex.Lock()
-	defer e.flowRegulatorMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	delete(e.flowRegulatorMap, rl.GetLimiterID())
 
 	return e.unregister("FlowRegulator:"+rl.GetLimiterID().String(), rl.GetFlowSelector())
@@ -362,15 +335,15 @@ func (e *Engine) UnregisterFlowRegulator(rl iface.Limiter) error {
 
 // GetFlowRegulator Lookup function for getting flow filter.
 func (e *Engine) GetFlowRegulator(limiterID iface.LimiterID) iface.Limiter {
-	e.flowRegulatorMapMutex.RLock()
-	defer e.flowRegulatorMapMutex.RUnlock()
+	e.mutex.RLock()
+	defer e.mutex.RUnlock()
 	return e.flowRegulatorMap[limiterID]
 }
 
 // RegisterLabelPreview adds label preview to multimatcher.
 func (e *Engine) RegisterLabelPreview(lp iface.LabelPreview) error {
-	e.labelPreviewMapMutex.Lock()
-	defer e.labelPreviewMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	if _, ok := e.labelPreviewMap[lp.GetPreviewID()]; !ok {
 		e.labelPreviewMap[lp.GetPreviewID()] = lp
 	} else {
@@ -386,8 +359,8 @@ func (e *Engine) RegisterLabelPreview(lp iface.LabelPreview) error {
 
 // UnregisterLabelPreview removes label preview from multimatcher.
 func (e *Engine) UnregisterLabelPreview(lp iface.LabelPreview) error {
-	e.labelPreviewMapMutex.Lock()
-	defer e.labelPreviewMapMutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	delete(e.labelPreviewMap, lp.GetPreviewID())
 
 	return e.unregister("LabelPreview:"+lp.GetPreviewID().String(), lp.GetFlowSelector())
@@ -395,8 +368,8 @@ func (e *Engine) UnregisterLabelPreview(lp iface.LabelPreview) error {
 
 // getMatches returns schedulers and fluxmeters for given labels.
 func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map[string]string) *multiMatchResult {
-	e.multiMatchersMutex.RLock()
-	defer e.multiMatchersMutex.RUnlock()
+	e.mutex.RLock()
+	defer e.mutex.RUnlock()
 
 	mmResult := &multiMatchResult{}
 
@@ -419,12 +392,10 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 	return mmResult
 }
 
+// Lock must be held by caller.
 func (e *Engine) register(key string, flowSelectorProto *policylangv1.FlowSelector,
 	matchedCB multimatcher.MatchCallback[multiMatchResult],
 ) error {
-	e.multiMatchersMutex.Lock()
-	defer e.multiMatchersMutex.Unlock()
-
 	selector, err := selectors.FromProto(flowSelectorProto)
 	if err != nil {
 		return fmt.Errorf("failed to parse selector: %v", err)
@@ -443,10 +414,8 @@ func (e *Engine) register(key string, flowSelectorProto *policylangv1.FlowSelect
 	return nil
 }
 
+// Lock must be held by caller.
 func (e *Engine) unregister(key string, flowSelectorProto *policylangv1.FlowSelector) error {
-	e.multiMatchersMutex.Lock()
-	defer e.multiMatchersMutex.Unlock()
-
 	selector, err := selectors.FromProto(flowSelectorProto)
 	if err != nil {
 		return fmt.Errorf("failed to parse selector: %v", err)

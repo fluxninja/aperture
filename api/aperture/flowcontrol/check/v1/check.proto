@@ -14,7 +14,6 @@ service FlowControlService {
 message CheckRequest {
   string control_point = 1;
   map<string, string> labels = 2;
-  uint64 tokens = 3;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -81,10 +80,12 @@ message LimiterDecision {
     int64 remaining = 1;
     int64 current = 2;
     string label = 3;
+    uint64 tokens_consumed = 4;
   }
 
   message ConcurrencyLimiterInfo {
     string workload_index = 1;
+    uint64 tokens_consumed = 2;
   }
 
   message FlowRegulatorInfo {

@@ -420,6 +420,11 @@ func (sched *WFQScheduler) cleanup(qRequest *queuedRequest) {
 	putHeapRequest(qRequest)
 }
 
+// Revert returns tokens to the token bucket.
+func (sched *WFQScheduler) Revert(tokens uint64) {
+	sched.manager.Return(float64(tokens))
+}
+
 func (sched *WFQScheduler) setFlowsGauge(v float64) {
 	if sched.metrics != nil && sched.metrics.FlowsGauge != nil {
 		sched.metrics.FlowsGauge.Set(v)
