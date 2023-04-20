@@ -19,9 +19,9 @@ import (
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	concurrencyLimiters []iface.ConcurrencyLimiter
+	concurrencyLimiters []iface.Limiter
 	fluxMeters          []iface.FluxMeter
-	rateLimiters        []iface.RateLimiter
+	rateLimiters        []iface.Limiter
 	flowRegulators      []iface.Limiter
 	labelPreviews       []iface.LabelPreview
 }
@@ -78,9 +78,6 @@ func (e *Engine) ProcessRequest(
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
-	tokens := requestContext.Tokens
-	// Sorting labels keys, so that they're in predictable order, which is
-	// needed by rollupprocessor.
 	labelKeys := maps.Keys(flowLabels)
 	sort.Strings(labelKeys)
 	response = &flowcontrolv1.CheckResponse{
@@ -109,81 +106,62 @@ func (e *Engine) ProcessRequest(
 	}
 	response.FluxMeterInfos = fluxMeterProtos
 
-	// 1. Execute flow regulators
-	flowRegulators := mmr.flowRegulators
-
-	flowRegulatorDecisions, flowRegulatorsDecisionType := runLimiters(ctx, flowRegulators, flowLabels, tokens)
-	response.LimiterDecisions = flowRegulatorDecisions
-
-	// If any flow regulator dropped, then mark this as a decision reason and return.
-	// Do not execute rate limiters.
-	if flowRegulatorsDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-		response.DecisionType = flowRegulatorsDecisionType
-		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_FLOW_REGULATED
-		return
+	limiterTypes := []struct {
+		limiters     []iface.Limiter
+		rejectReason flowcontrolv1.CheckResponse_RejectReason
+	}{
+		{mmr.flowRegulators, flowcontrolv1.CheckResponse_REJECT_REASON_FLOW_REGULATED},
+		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
+		{mmr.concurrencyLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED},
 	}
 
-	// 2. Execute rate limiters
-	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
-	for i, rl := range mmr.rateLimiters {
-		rateLimiters[i] = rl
-	}
+	for _, limiterType := range limiterTypes {
+		limiterDecisions, decisionType := runLimiters(ctx, limiterType.limiters, flowLabels)
+		response.LimiterDecisions = append(response.LimiterDecisions, limiterDecisions...)
 
-	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, flowLabels, tokens)
-	response.LimiterDecisions = append(response.LimiterDecisions, rateLimiterDecisions...)
+		defer func() {
+			if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+				revertRemaining(limiterType.limiters, flowLabels, limiterDecisions)
+			}
+		}()
 
-	defer func() {
-		if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-			returnExtraTokens(mmr.rateLimiters, rateLimiterDecisions, flowLabels)
+		if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+			response.DecisionType = decisionType
+			response.RejectReason = limiterType.rejectReason
+			return
 		}
-	}()
-
-	// If any rate limiter dropped, then mark this as a decision reason and return.
-	// Do not execute concurrency limiters.
-	if rateLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-		response.DecisionType = rateLimitersDecisionType
-		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
-		return
-	}
-
-	// 3. Execute concurrency limiters
-	concurrencyLimiters := make([]iface.Limiter, len(mmr.concurrencyLimiters))
-	for i, cl := range mmr.concurrencyLimiters {
-		concurrencyLimiters[i] = cl
-	}
-
-	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(ctx, concurrencyLimiters, flowLabels, tokens)
-	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
-
-	if concurrencyLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
-		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED
-		return
 	}
 
 	return
 }
 
-func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string, tokens uint64) (
+func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) (
 	[]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
 	var wg sync.WaitGroup
 	var once sync.Once
+
+	// make a child context with a cancel function
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
 
 	decisionType := flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 
-	setDecisionRejected := func() {
+	setDecisionDropped := func() {
 		decisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
+		// cancel all the limiter calls
+		cancel()
 	}
 
 	execLimiter := func(limiter iface.Limiter, i int) func() {
 		return func() {
 			defer wg.Done()
-			decisions[i] = limiter.RunLimiter(ctx, labels, tokens)
+			decisions[i] = limiter.Decide(ctx, labels)
 			if decisions[i].Dropped {
-				once.Do(setDecisionRejected)
+				once.Do(setDecisionDropped)
 			}
 		}
 	}
@@ -202,18 +180,18 @@ func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[strin
 	return decisions, decisionType
 }
 
-func returnExtraTokens(
-	rateLimiters []iface.RateLimiter,
-	rateLimiterDecisions []*flowcontrolv1.LimiterDecision,
+func revertRemaining(
+	limiters []iface.Limiter,
 	labels map[string]string,
+	limiterDecisions []*flowcontrolv1.LimiterDecision,
 ) {
 	labelsCopy := make(map[string]string, len(labels))
 	for k, v := range labels {
 		labelsCopy[k] = v
 	}
-	for i, l := range rateLimiterDecisions {
+	for i, l := range limiterDecisions {
 		if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
-			go rateLimiters[i].TakeN(labelsCopy, -1)
+			go limiters[i].Revert(labelsCopy, limiterDecisions[i])
 		}
 	}
 }

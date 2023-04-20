@@ -17,6 +17,11 @@ type Scheduler interface {
 	// Schedule sends RequestContext to the underlying scheduler and returns a boolean value,
 	// where true means accept and false means reject.
 	Schedule(ctx context.Context, request Request) bool
+	// Revert "unschedules" a request.
+	// Useful in case the request was rejected by any
+	// other scheduler and the tokens are returned
+	// back to the scheduler.
+	Revert(tokens uint64)
 }
 
 // TokenManager : Interface for token managers.

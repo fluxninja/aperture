@@ -19,4 +19,10 @@
   withLimitResetIntervalMixin(limit_reset_interval):: {
     limit_reset_interval+: limit_reset_interval,
   },
+  withTokensLabelKey(tokens_label_key):: {
+    tokens_label_key: tokens_label_key,
+  },
+  withTokensLabelKeyMixin(tokens_label_key):: {
+    tokens_label_key+: tokens_label_key,
+  },
 }

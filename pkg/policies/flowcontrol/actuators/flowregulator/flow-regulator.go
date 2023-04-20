@@ -33,7 +33,13 @@ const flowRegulatorStatusRoot = "flow_regulators"
 
 var (
 	fxNameTag       = config.NameTag(flowRegulatorStatusRoot)
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel, metrics.DecisionTypeLabel, metrics.RegulatorDroppedLabel}
+	metricLabelKeys = []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.DecisionTypeLabel,
+		metrics.RegulatorDroppedLabel,
+	}
 )
 
 // Module returns the fx options for flow regulator.
@@ -341,8 +347,10 @@ func (fr *flowRegulator) GetFlowSelector() *policylangv1.FlowSelector {
 	return fr.proto.Parameters.GetFlowSelector()
 }
 
-// RunLimiter runs the limiter.
-func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]string, _ uint64) *flowcontrolv1.LimiterDecision {
+// Decide runs the limiter.
+func (fr *flowRegulator) Decide(ctx context.Context,
+	labels map[string]string,
+) *flowcontrolv1.LimiterDecision {
 	var (
 		labelValue  string
 		hasLabelKey bool
@@ -394,6 +402,11 @@ func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]strin
 	}
 
 	return limiterDecision
+}
+
+// Revert implements the Revert method of the flowcontrolv1.FlowRegulator interface.
+func (fr *flowRegulator) Revert(_ map[string]string, _ *flowcontrolv1.LimiterDecision) {
+	// No-op
 }
 
 func (fr *flowRegulator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {

@@ -2971,6 +2971,13 @@
           "type": "string",
           "x-go-tag-default": "60s",
           "x-order": 2
+        },
+        "tokens_label_key": {
+          "default": "tokens",
+          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
+          "type": "string",
+          "x-go-tag-default": "tokens",
+          "x-order": 3
         }
       },
       "required": ["label_key"],
@@ -3001,7 +3008,7 @@
       "additionalProperties": false
     },
     "Rego": {
-      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\n:::info\n\nSpecial Rego variables:\n- `data.<package>.tokens`: Number of tokens for this request. This value is\nused by rate limiters and concurrency limiters when making decisions. The value\nprovided here will override any value provided in the policy configuration for\nthe workload. When this label is provided, it is not emitted as part of flow\nlabels or telemetry and is solely used while processing the request.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
+      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
       "properties": {
         "labels": {
           "additionalProperties": {
@@ -3247,6 +3254,13 @@
           "x-go-tag-validate": "gte=0.0",
           "x-order": 4
         },
+        "tokens_label_key": {
+          "default": "tokens",
+          "description": "Flow label key that will be used to override the number of tokens for this request.\nThe label value must be a valid uint64 number.\nIf this parameter is not provided then each request is assumed to consume 1 token.\n\n",
+          "type": "string",
+          "x-go-tag-default": "tokens",
+          "x-order": 5
+        },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
           "items": {
@@ -3255,7 +3269,7 @@
           },
           "type": "array",
           "x-go-tag-validate": "dive",
-          "x-order": 5
+          "x-order": 6
         }
       },
       "title": "Scheduler parameters",
