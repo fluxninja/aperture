@@ -420,7 +420,9 @@ func (rateLimiter *rateLimiter) Decide(ctx context.Context,
 func (rateLimiter *rateLimiter) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
 		tokens := rateLimiterDecision.RateLimiterInfo.TokensConsumed
-		rateLimiter.TakeN(labels, -int(tokens))
+		if tokens > 0 {
+			rateLimiter.TakeN(labels, -int(tokens))
+		}
 	}
 }
 

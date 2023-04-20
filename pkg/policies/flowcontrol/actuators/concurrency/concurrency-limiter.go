@@ -597,7 +597,9 @@ func (conLimiter *concurrencyLimiter) Decide(ctx context.Context,
 func (conLimiter *concurrencyLimiter) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	if conLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_); ok {
 		tokens := conLimiterDecision.ConcurrencyLimiterInfo.TokensConsumed
-		conLimiter.scheduler.Revert(tokens)
+		if tokens > 0 {
+			conLimiter.scheduler.Revert(tokens)
+		}
 	}
 }
 

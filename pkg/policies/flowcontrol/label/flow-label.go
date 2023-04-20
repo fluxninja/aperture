@@ -5,7 +5,8 @@ import (
 	"strconv"
 )
 
-var errLabelNotFound = errors.New("label not found")
+// ErrLabelNotFound is returned when a flow label is not found.
+var ErrLabelNotFound = errors.New("label not found")
 
 // FlowLabels is a map from flow labels to their values.
 type FlowLabels map[string]FlowLabelValue
@@ -48,7 +49,7 @@ func Merge(dst, src FlowLabels) {
 func (fl FlowLabels) GetUint64(key string) (uint64, error) {
 	val, ok := fl[key]
 	if !ok {
-		return 0, errLabelNotFound
+		return 0, ErrLabelNotFound
 	}
 	return strconv.ParseUint(val.Value, 10, 64)
 }
@@ -58,7 +59,7 @@ func (fl FlowLabels) GetUint64(key string) (uint64, error) {
 func (fl FlowLabels) GetInt64(key string) (int64, error) {
 	val, ok := fl[key]
 	if !ok {
-		return 0, errLabelNotFound
+		return 0, ErrLabelNotFound
 	}
 	return strconv.ParseInt(val.Value, 10, 64)
 }
@@ -68,7 +69,7 @@ func (fl FlowLabels) GetInt64(key string) (int64, error) {
 func (fl FlowLabels) GetString(key string) (string, error) {
 	val, ok := fl[key]
 	if !ok {
-		return "", errLabelNotFound
+		return "", ErrLabelNotFound
 	}
 	return val.Value, nil
 }
@@ -78,7 +79,7 @@ func (fl FlowLabels) GetString(key string) (string, error) {
 func (fl FlowLabels) GetFloat64(key string) (float64, error) {
 	val, ok := fl[key]
 	if !ok {
-		return 0, errLabelNotFound
+		return 0, ErrLabelNotFound
 	}
 	return strconv.ParseFloat(val.Value, 64)
 }
@@ -88,7 +89,7 @@ func (fl FlowLabels) GetFloat64(key string) (float64, error) {
 func (fl FlowLabels) GetBool(key string) (bool, error) {
 	val, ok := fl[key]
 	if !ok {
-		return false, errLabelNotFound
+		return false, ErrLabelNotFound
 	}
 	return strconv.ParseBool(val.Value)
 }
