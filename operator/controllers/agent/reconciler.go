@@ -239,6 +239,17 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *agentv1alp
 
 // deleteDaemonSetModeResources deletes resources installed for DaemonSet mode of Agent.
 func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
+	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
+			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+		configMap, err := configMapForAgentControllerClientCert(ctx, r.Client, instance.DeepCopy(), r.Scheme)
+		if err == nil && configMap != nil {
+			if err = r.Delete(ctx, configMap); err != nil {
+				log.Error(err, "failed to delete object of ConfigMap for Controller Client Cert")
+			}
+		}
+	}
+
 	cm, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 	if err == nil {
 		if err = r.Delete(ctx, cm); err != nil {
@@ -307,16 +318,20 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
-			configMap, err = configMapForAgentControllerClientCert(ctx, r.Client, instance, nil)
-			if err != nil {
-				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-			}
+			if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+				(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
+					instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+				configMap, err = configMapForAgentControllerClientCert(ctx, r.Client, instance, nil)
+				if err != nil {
+					log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				}
 
-			if configMap != nil {
-				configMap.Namespace = ns.GetName()
-				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
-				if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				if configMap != nil {
+					configMap.Namespace = ns.GetName()
+					configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+					if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+						log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+					}
 				}
 			}
 
@@ -503,6 +518,9 @@ func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, 
 		}
 
 		instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
+		if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+			instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+		}
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
@@ -515,18 +533,16 @@ func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, 
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
 	if !instance.Spec.Sidecar.Enabled {
-		copiedInstance := instance.DeepCopy()
-
 		if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
-			copiedInstance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
-			copiedInstance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
+			instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+			instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
 		}
-		configMap, err := configMapForAgentConfig(ctx, r.Client, copiedInstance, r.Scheme)
+		configMap, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
 		}
 
-		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, copiedInstance); err != nil {
+		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
 	}
@@ -746,6 +762,13 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 		return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
 	}
 
+	var createControllerCLientCm bool
+	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
+			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+		createControllerCLientCm = true
+	}
+
 	for index := range nsList.Items {
 		ns := nsList.Items[index]
 		if ns.GetDeletionTimestamp() != nil {
@@ -766,6 +789,25 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			continue
 		}
 
+		if createControllerCLientCm {
+			configMap := CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, ns.GetName())
+			if configMap != nil {
+				configMap.Namespace = ns.GetName()
+				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+				instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
+				if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+					instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+				}
+				if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
+					return err
+				}
+			}
+		}
+
+		if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+			instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+			instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
+		}
 		configMap := CreateAgentConfigMapInNamespace(ctx, r.Client, instance.DeepCopy(), ns.GetName())
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
