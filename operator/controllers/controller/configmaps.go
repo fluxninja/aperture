@@ -75,7 +75,7 @@ func configMapForControllerClientCert(instance *controllerv1alpha1.Controller, s
 		ObjectMeta: v1.ObjectMeta{
 			Name:        fmt.Sprintf("%s-controller-client-cert", instance.GetName()),
 			Namespace:   instance.GetNamespace(),
-			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
+			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AppName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string]string{
