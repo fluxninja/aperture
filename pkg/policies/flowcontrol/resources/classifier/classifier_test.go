@@ -196,7 +196,7 @@ var _ = Describe("Classifier", func() {
 		Context("when ruleset is dropped", func() {
 			BeforeEach(func() { ars1.Drop() })
 
-			It("removes removes subset of rules", func() {
+			It("removes subset of rules", func() {
 				_, labels := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
