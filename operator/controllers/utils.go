@@ -616,6 +616,7 @@ func CheckAndGenerateCertForOperator(config *rest.Config) error {
 		return err
 	}
 
+	var updateSecret bool
 	secretName := fmt.Sprintf("%s-cert", serviceName)
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
@@ -624,25 +625,39 @@ func CheckAndGenerateCertForOperator(config *rest.Config) error {
 			Labels:    CommonLabels(map[string]string{}, serviceName, AppName),
 		},
 	}
+
 	err = k8sClient.Get(context.Background(), types.NamespacedName{Name: secretName, Namespace: namespace}, secret)
 	if err != nil {
+		updateSecret = true
+	} else {
+		certBytes, ok := secret.Data[OperatorCertName]
+		if !ok {
+			updateSecret = true
+		} else {
+			block, _ := pem.Decode(certBytes)
+			var cert *x509.Certificate
+			cert, err = x509.ParseCertificate(block.Bytes)
+			if err == nil && cert.NotAfter.After(time.Now()) {
+				serverCertPEM = bytes.NewBuffer(secret.Data[OperatorCertName])
+				serverPrivKeyPEM = bytes.NewBuffer(secret.Data[OperatorCertKeyName])
+				caPEM = bytes.NewBuffer(secret.Data[OperatorCAName])
+			} else {
+				updateSecret = true
+			}
+		}
+	}
+
+	if updateSecret {
 		secret.Data = map[string][]byte{
 			OperatorCertName:    serverCertPEM.Bytes(),
 			OperatorCertKeyName: serverPrivKeyPEM.Bytes(),
 			OperatorCAName:      caPEM.Bytes(),
 		}
+
 		_, err = controllerutil.CreateOrUpdate(context.Background(), k8sClient, secret, SecretMutate(secret, secret.Data, secret.OwnerReferences))
 		if err != nil {
 			return err
 		}
-	}
-
-	block, _ := pem.Decode(secret.Data[OperatorCertName])
-	cert, err := x509.ParseCertificate(block.Bytes)
-	if err == nil && cert.NotAfter.After(time.Now()) {
-		serverCertPEM = bytes.NewBuffer(secret.Data[OperatorCertName])
-		serverPrivKeyPEM = bytes.NewBuffer(secret.Data[OperatorCertKeyName])
-		caPEM = bytes.NewBuffer(secret.Data[OperatorCAName])
 	}
 
 	err = os.MkdirAll(os.Getenv("APERTURE_OPERATOR_CERT_DIR"), 0o777)
