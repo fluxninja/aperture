@@ -160,18 +160,9 @@ var _ = Describe("Secret for Controller Cert", func() {
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   AppName,
 						"app.kubernetes.io/managed-by": OperatorName,
-						"app.kubernetes.io/component":  ControllerServiceName,
+						"app.kubernetes.io/component":  AppName,
 					},
 					Annotations: nil,
-					OwnerReferences: []metav1.OwnerReference{
-						{
-							APIVersion:         "fluxninja.com/v1alpha1",
-							Name:               instance.GetName(),
-							Kind:               "Controller",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
-						},
-					},
 				},
 				Data: map[string][]byte{
 					ControllerCertName:    []byte(Test),
@@ -208,18 +199,9 @@ var _ = Describe("Secret for Controller Cert", func() {
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   AppName,
 						"app.kubernetes.io/managed-by": OperatorName,
-						"app.kubernetes.io/component":  ControllerServiceName,
+						"app.kubernetes.io/component":  AppName,
 					},
 					Annotations: TestMap,
-					OwnerReferences: []metav1.OwnerReference{
-						{
-							APIVersion:         "fluxninja.com/v1alpha1",
-							Name:               instance.GetName(),
-							Kind:               "Controller",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
-						},
-					},
 				},
 				Data: map[string][]byte{
 					ControllerCertName:    []byte(Test),

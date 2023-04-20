@@ -37,14 +37,18 @@ import (
 	"github.com/imdario/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/client-go/rest"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 )
 
 // ContainerSecurityContext prepares SecurityContext for containers based on the provided parameter.
@@ -587,9 +591,14 @@ func WriteFile(filepath string, sCert *bytes.Buffer) error {
 }
 
 // CheckAndGenerateCertForOperator checks if existing certificates are present and creates new if not present.
-func CheckAndGenerateCertForOperator() error {
+func CheckAndGenerateCertForOperator(config *rest.Config) error {
 	if CheckCertificate() {
 		return nil
+	}
+
+	k8sClient, err := client.New(config, client.Options{})
+	if err != nil {
+		return err
 	}
 
 	namespace := os.Getenv("APERTURE_OPERATOR_NAMESPACE")
@@ -605,6 +614,54 @@ func CheckAndGenerateCertForOperator() error {
 	serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(serviceName, namespace)
 	if err != nil {
 		return err
+	}
+
+	var updateSecret bool
+	secretName := fmt.Sprintf("%s-cert", serviceName)
+	secret := &corev1.Secret{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      secretName,
+			Namespace: namespace,
+			Labels:    CommonLabels(map[string]string{}, serviceName, AppName),
+		},
+	}
+
+	err = k8sClient.Get(context.Background(), types.NamespacedName{Name: secretName, Namespace: namespace}, secret)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			updateSecret = true
+		} else {
+			return err
+		}
+	} else {
+		certBytes, ok := secret.Data[OperatorCertName]
+		if !ok {
+			updateSecret = true
+		} else {
+			block, _ := pem.Decode(certBytes)
+			var cert *x509.Certificate
+			cert, err = x509.ParseCertificate(block.Bytes)
+			if err == nil && cert.NotAfter.After(time.Now()) {
+				serverCertPEM = bytes.NewBuffer(secret.Data[OperatorCertName])
+				serverPrivKeyPEM = bytes.NewBuffer(secret.Data[OperatorCertKeyName])
+				caPEM = bytes.NewBuffer(secret.Data[OperatorCAName])
+			} else {
+				updateSecret = true
+			}
+		}
+	}
+
+	if updateSecret {
+		secret.Data = map[string][]byte{
+			OperatorCertName:    serverCertPEM.Bytes(),
+			OperatorCertKeyName: serverPrivKeyPEM.Bytes(),
+			OperatorCAName:      caPEM.Bytes(),
+		}
+
+		_, err = controllerutil.CreateOrUpdate(context.Background(), k8sClient, secret, SecretMutate(secret, secret.Data, secret.OwnerReferences))
+		if err != nil {
+			return err
+		}
 	}
 
 	err = os.MkdirAll(os.Getenv("APERTURE_OPERATOR_CERT_DIR"), 0o777)
@@ -628,6 +685,67 @@ func CheckAndGenerateCertForOperator() error {
 	}
 
 	return nil
+}
+
+// GetOrGenerateCertificate returns the TLS/SSL certificates of the Controller.
+func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1.Controller) (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
+	secretName := fmt.Sprintf("%s-controller-cert", instance.GetName())
+
+	generateCert := func() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
+		// generate certificates
+		serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(instance.GetName(), instance.GetNamespace())
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		return serverCertPEM, serverPrivKeyPEM, caPEM, nil
+	}
+
+	secret := &corev1.Secret{}
+	err := client.Get(context.TODO(), types.NamespacedName{Name: secretName, Namespace: instance.GetNamespace()}, secret)
+	if err != nil {
+		return generateCert()
+	}
+
+	existingCert, ok := secret.Data[ControllerCertName]
+	if !ok {
+		return generateCert()
+	}
+
+	existingKey, ok := secret.Data[ControllerCertKeyName]
+	if !ok {
+		return generateCert()
+	}
+
+	block, _ := pem.Decode(existingCert)
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return generateCert()
+	}
+
+	// regenerate certificate if it is expired
+	if time.Now().After(cert.NotAfter) {
+		return generateCert()
+	}
+
+	var existingClientCert []byte
+	cm := &corev1.ConfigMap{}
+	err = client.Get(context.TODO(), types.NamespacedName{Name: fmt.Sprintf("%s-controller-client-cert", instance.GetName()), Namespace: instance.GetNamespace()}, cm)
+	if err != nil {
+		// Checking existing ValidatingWebhookConfiguration for backward compatibility
+		vwc := &admissionregistrationv1.ValidatingWebhookConfiguration{}
+		err := client.Get(context.TODO(), types.NamespacedName{Name: ControllerServiceName}, vwc)
+		if err != nil || len(vwc.Webhooks) == 0 {
+			// No ValidatingWebhookConfiguration found, generate new certificate
+			return generateCert()
+		}
+
+		existingClientCert = vwc.Webhooks[0].ClientConfig.CABundle
+	} else {
+		existingClientCert = []byte(cm.Data[ControllerClientCertKey])
+	}
+
+	return bytes.NewBuffer(existingCert), bytes.NewBuffer(existingKey), bytes.NewBuffer(existingClientCert), nil
 }
 
 // MergeEnvVars merges common and provided extra Environment variables of Kubernetes container.

@@ -1247,7 +1247,7 @@ var _ = Describe("Tests for checkCertificate", func() {
 			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 
-			err := CheckAndGenerateCertForOperator()
+			err := CheckAndGenerateCertForOperator(K8sManager.GetConfig())
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(CheckCertificate()).To(Equal(true))
@@ -1273,7 +1273,7 @@ var _ = Describe("Tests for checkCertificate", func() {
 			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 
-			err := CheckAndGenerateCertForOperator()
+			err := CheckAndGenerateCertForOperator(K8sManager.GetConfig())
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -1314,7 +1314,7 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", "")
 
-			err := CheckAndGenerateCertForOperator()
+			err := CheckAndGenerateCertForOperator(K8sManager.GetConfig())
 
 			Expect(err).To(HaveOccurred())
 		})
@@ -1329,7 +1329,7 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", "")
 
 			Expect(CheckCertificate()).To(Equal(false))
-			Expect(CheckAndGenerateCertForOperator()).To(Succeed())
+			Expect(CheckAndGenerateCertForOperator(K8sManager.GetConfig())).To(Succeed())
 			Expect(CheckCertificate()).To(Equal(true))
 		})
 	})

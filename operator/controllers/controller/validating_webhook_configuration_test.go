@@ -209,9 +209,6 @@ var _ = Describe("Test ValidatingWebhookConfiguration Mutate", func() {
 					ClientConfig: admissionregistrationv1.WebhookClientConfig{
 						URL: &Test,
 					},
-					NamespaceSelector: &v1.LabelSelector{
-						MatchLabels: TestMap,
-					},
 					ObjectSelector: &v1.LabelSelector{
 						MatchLabels: TestMap,
 					},
