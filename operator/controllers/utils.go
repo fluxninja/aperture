@@ -693,7 +693,7 @@ func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1
 
 	generateCert := func() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
 		// generate certificates
-		serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(instance.GetName(), instance.GetNamespace())
+		serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(ControllerServiceName, instance.GetNamespace())
 		if err != nil {
 			return nil, nil, nil, err
 		}
