@@ -55,7 +55,7 @@ Nutanix
 Netsil
 SLAs
 vs
-end user
+end-user
 rpm
 performant
 Zalando
@@ -63,7 +63,6 @@ Hotstar
 Linkerd
 multithreaded
 look at
-connect with
 AIMD
 Tanveer
 [Rr]ebalancing
