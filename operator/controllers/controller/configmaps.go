@@ -83,10 +83,6 @@ func configMapForControllerClientCert(instance *controllerv1alpha1.Controller, s
 		},
 	}
 
-	if err := ctrl.SetControllerReference(instance, cm, scheme); err != nil {
-		return nil, err
-	}
-
 	return cm, nil
 }
 

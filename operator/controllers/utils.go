@@ -40,6 +40,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/client-go/rest"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -590,9 +591,14 @@ func WriteFile(filepath string, sCert *bytes.Buffer) error {
 }
 
 // CheckAndGenerateCertForOperator checks if existing certificates are present and creates new if not present.
-func CheckAndGenerateCertForOperator(k8sClient client.Client) error {
+func CheckAndGenerateCertForOperator(config *rest.Config) error {
 	if CheckCertificate() {
 		return nil
+	}
+
+	k8sClient, err := client.New(config, client.Options{})
+	if err != nil {
+		return err
 	}
 
 	namespace := os.Getenv("APERTURE_OPERATOR_NAMESPACE")
@@ -610,20 +616,22 @@ func CheckAndGenerateCertForOperator(k8sClient client.Client) error {
 		return err
 	}
 
+	secretName := fmt.Sprintf("%s-cert", serviceName)
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
-			Name:      serviceName,
+			Name:      secretName,
 			Namespace: namespace,
+			Labels:    CommonLabels(map[string]string{}, serviceName, AppName),
 		},
 	}
-	err = k8sClient.Get(context.Background(), types.NamespacedName{Name: serviceName, Namespace: namespace}, secret)
+	err = k8sClient.Get(context.Background(), types.NamespacedName{Name: secretName, Namespace: namespace}, secret)
 	if err != nil {
 		secret.Data = map[string][]byte{
 			OperatorCertName:    serverCertPEM.Bytes(),
 			OperatorCertKeyName: serverPrivKeyPEM.Bytes(),
 			OperatorCAName:      caPEM.Bytes(),
 		}
-		_, err = controllerutil.CreateOrUpdate(context.Background(), k8sClient, secret, SecretMutate(secret, secret.Data))
+		_, err = controllerutil.CreateOrUpdate(context.Background(), k8sClient, secret, SecretMutate(secret, secret.Data, secret.OwnerReferences))
 		if err != nil {
 			return err
 		}
