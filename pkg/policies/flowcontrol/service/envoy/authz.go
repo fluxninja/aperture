@@ -159,7 +159,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
 	svcs := h.serviceGetter.ServicesFromContext(ctx)
-	classifierMsgs, newFlowLabels, tokens := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -186,7 +186,6 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			FlowLabels:   flowLabels,
 			ControlPoint: ctrlPt,
 			Services:     svcs,
-			Tokens:       tokens,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs

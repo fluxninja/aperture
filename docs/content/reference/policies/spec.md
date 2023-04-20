@@ -6414,6 +6414,22 @@ Configuration of lazy-syncing behaviour of rate limiter
 Time after which the limit for a given label value will be reset.
 
 </dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"tokens"`)
+
+<!-- vale on -->
+
+Flow label key that will be used to override the number of tokens
+for this request.
+This is an optional parameter and takes highest precedence
+when assigning tokens to a request.
+The label value must be a valid uint64 number.
+
+</dd>
 </dl>
 
 ---
@@ -6464,18 +6480,6 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 :::info
 
 You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
-
-:::
-
-:::info
-
-Special Rego variables:
-
-- `data.<package>.tokens`: Number of tokens for this request. This value is
-  used by rate limiters and concurrency limiters when making decisions. The value
-  provided here will override any value provided in the policy configuration for
-  the workload. When this label is provided, it is not emitted as part of flow
-  labels or telemetry and is solely used while processing the request.
 
 :::
 
@@ -7005,7 +7009,7 @@ concurrency is calculated as (avg. latency \* in-flight requests).
 
 The value of tokens estimated by `auto_tokens` takes lower precedence
 than the value of `tokens` specified in the workload definition
-and `tokens` explicitly specified in the request.
+and `tokens` explicitly specified in the request labels.
 
 </dd>
 <dt>decision_deadline_margin</dt>
@@ -7065,6 +7069,20 @@ Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored
 <!-- vale on -->
 
 Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+</dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"tokens"`)
+
+<!-- vale on -->
+
+Flow label key that will be used to override the number of tokens for this request.
+The label value must be a valid uint64 number.
+If this parameter is not provided then each request is assumed to consume 1 token.
 
 </dd>
 <dt>workloads</dt>
@@ -7199,7 +7217,8 @@ Tokens determines the cost of admitting a single request the workload,
 which is typically defined as milliseconds of response latency or
 simply equal to 1 if the resource being accessed is constrained by the
 number of requests (3rd party rate limiters).
-This override is applicable only if tokens for the request aren't specified in the request.
+This override is applicable only if tokens for the request aren't specified
+in the request labels.
 
 </dd>
 </dl>

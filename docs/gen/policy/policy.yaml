@@ -3136,6 +3136,18 @@ definitions:
         default: 60s
         x-go-tag-default: 60s
         x-order: 2
+      tokens_label_key:
+        description: |+
+          Flow label key that will be used to override the number of tokens
+          for this request.
+          This is an optional parameter and takes highest precedence
+          when assigning tokens to a request.
+          The label value must be a valid uint64 number.
+
+        type: string
+        default: tokens
+        x-go-tag-default: tokens
+        x-order: 3
   RateLimiterParametersLazySync:
     type: object
     properties:
@@ -3164,17 +3176,6 @@ definitions:
       :::info
 
       You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
-
-      :::
-
-      :::info
-
-      Special Rego variables:
-      - `data.<package>.tokens`: Number of tokens for this request. This value is
-      used by rate limiters and concurrency limiters when making decisions. The value
-      provided here will override any value provided in the policy configuration for
-      the workload. When this label is provided, it is not emitted as part of flow
-      labels or telemetry and is solely used while processing the request.
 
       :::
 
@@ -3487,7 +3488,7 @@ definitions:
 
           The value of tokens estimated by `auto_tokens` takes lower precedence
           than the value of `tokens` specified in the workload definition
-          and `tokens` explicitly specified in the request.
+          and `tokens` explicitly specified in the request labels.
 
         type: boolean
         default: false
@@ -3535,6 +3536,16 @@ definitions:
         x-go-tag-default: "0"
         x-go-tag-validate: gte=0.0
         x-order: 4
+      tokens_label_key:
+        description: |+
+          Flow label key that will be used to override the number of tokens for this request.
+          The label value must be a valid uint64 number.
+          If this parameter is not provided then each request is assumed to consume 1 token.
+
+        type: string
+        default: tokens
+        x-go-tag-default: tokens
+        x-order: 5
       workloads:
         description: |+
           List of workloads to be used in scheduler.
@@ -3564,7 +3575,7 @@ definitions:
           type: object
           $ref: '#/definitions/SchedulerWorkload'
         x-go-tag-validate: dive
-        x-order: 5
+        x-order: 6
   SchedulerWorkload:
     description: Workload defines a class of requests that preferably have similar
       properties such as response latency or desired priority.
@@ -3624,7 +3635,8 @@ definitions:
           which is typically defined as milliseconds of response latency or
           simply equal to 1 if the resource being accessed is constrained by the
           number of requests (3rd party rate limiters).
-          This override is applicable only if tokens for the request aren't specified in the request.
+          This override is applicable only if tokens for the request aren't specified
+          in the request labels.
         type: string
         format: uint64
         x-order: 2

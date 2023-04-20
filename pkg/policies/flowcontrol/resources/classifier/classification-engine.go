@@ -3,7 +3,6 @@ package classifier
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 	"sync/atomic"
 
@@ -81,7 +80,6 @@ var (
 	emptyResultsetSampler     = log.NewRatelimitingSampler()
 	ambiguousResultsetSampler = log.NewRatelimitingSampler()
 	not1ExprSampler           = log.NewRatelimitingSampler()
-	tokenNotStringSampler     = log.NewRatelimitingSampler()
 )
 
 func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
@@ -89,8 +87,7 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	mm *multimatcher.MultiMatcher[int, multiMatcherResult],
 	labelsForMatching map[string]string,
 	input ast.Value,
-) (classifierMsgs []*flowcontrolv1.ClassifierInfo, tokens uint64) {
-	tokens = 0
+) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
 	logger := c.registry.GetLogger()
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
@@ -167,21 +164,11 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
 			for key, value := range variables {
-				// if key is tokens, set tokens instead of flowLabels
-				if key == consts.TokensLabel {
-					// parse tokens to uint64
-					tokens, err = strconv.ParseUint(fmt.Sprint(value), 10, 64)
-					if err != nil {
-						logger.Sample(tokenNotStringSampler).Warn().Msg("Rego: tokens is not a string")
-						continue
-					}
-				} else {
-					// copy this variable to labels
-					if l, ok := labeler.Labels[key]; ok {
-						flowLabels[key] = flowlabel.FlowLabelValue{
-							Value:     fmt.Sprint(value),
-							Telemetry: l.Telemetry,
-						}
+				// copy this variable to labels
+				if l, ok := labeler.Labels[key]; ok {
+					flowLabels[key] = flowlabel.FlowLabelValue{
+						Value:     fmt.Sprint(value),
+						Telemetry: l.Telemetry,
 					}
 				}
 			}
@@ -197,7 +184,7 @@ func (valueResolver) Resolve(ref ast.Ref) (interface{}, error) {
 	return make(map[string]interface{}), nil
 }
 
-// Classify takes rego input, performs classification, and returns a map of flow labels and tokens.
+// Classify takes rego input, performs classification, and returns a map of flow labels.
 // LabelsForMatching are additional labels to use for selector matching.
 // Request is passed as ast.Value directly instead of map[string]interface{} to avoid unnecessary json conversion.
 func (c *ClassificationEngine) Classify(
@@ -206,13 +193,12 @@ func (c *ClassificationEngine) Classify(
 	ctrlPt string,
 	labelsForMatching map[string]string,
 	input ast.Value,
-) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels, uint64) {
-	tokens := uint64(0)
+) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {
 	flowLabels := make(flowlabel.FlowLabels)
 
 	r, ok := c.activeRules.Load().(rules)
 	if !ok {
-		return nil, flowLabels, 0
+		return nil, flowLabels
 	}
 
 	var classifierMsgs []*flowcontrolv1.ClassifierInfo
@@ -221,9 +207,8 @@ func (c *ClassificationEngine) Classify(
 	cpID := selectors.NewControlPointID(consts.AnyService, ctrlPt)
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
-		classifierInfos, t := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
+		classifierInfos := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
 		classifierMsgs = append(classifierMsgs, classifierInfos...)
-		tokens = t
 	}
 
 	// TODO (krdln): update prometheus metrics upon classification errors.
@@ -236,15 +221,11 @@ func (c *ClassificationEngine) Classify(
 			c.registry.GetLogger().Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
 			continue
 		}
-		classifierInfos, t := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
+		classifierInfos := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
 		classifierMsgs = append(classifierMsgs, classifierInfos...)
-		// check if t is greater than tokens
-		if t > tokens {
-			tokens = t
-		}
 	}
 
-	return classifierMsgs, flowLabels, tokens
+	return classifierMsgs, flowLabels
 }
 
 // ActiveRules returns a slice of uncompiled Rules which are currently active.

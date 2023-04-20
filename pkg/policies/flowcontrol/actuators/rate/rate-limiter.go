@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -371,15 +372,28 @@ func (rateLimiter *rateLimiter) GetFlowSelector() *policylangv1.FlowSelector {
 	return rateLimiter.rateLimiterProto.GetFlowSelector()
 }
 
-// RunLimiter runs the limiter.
-func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision {
+// Decide runs the limiter.
+func (rateLimiter *rateLimiter) Decide(ctx context.Context,
+	labels map[string]string,
+) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
-	if tokens == 0 {
-		tokens = 1
+	tokens := uint64(1)
+	// get tokens from labels
+	if rateLimiter.rateLimiterProto.Parameters.TokensLabelKey != "" {
+		if val, ok := labels[rateLimiter.rateLimiterProto.Parameters.TokensLabelKey]; ok {
+			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
+				tokens = parsedTokens
+			}
+		}
 	}
 
 	label, ok, remaining, current := rateLimiter.TakeN(labels, int(tokens))
+
+	tokensConsumed := uint64(0)
+	if ok {
+		tokensConsumed = tokens
+	}
 
 	if label == "" {
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
@@ -393,11 +407,22 @@ func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[strin
 		Reason:      reason,
 		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 			RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
-				Label:     label,
-				Remaining: int64(remaining),
-				Current:   int64(current),
+				Label:          label,
+				Remaining:      int64(remaining),
+				Current:        int64(current),
+				TokensConsumed: tokensConsumed,
 			},
 		},
+	}
+}
+
+// Revert returns the tokens to the limiter.
+func (rateLimiter *rateLimiter) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
+		tokens := rateLimiterDecision.RateLimiterInfo.TokensConsumed
+		if tokens > 0 {
+			rateLimiter.TakeN(labels, -int(tokens))
+		}
 	}
 }
 

@@ -28,7 +28,8 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetFlowSelector() *policylangv1.FlowSelector
-	RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision
+	Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
+	Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision)
 	GetLimiterID() LimiterID
 	GetRequestCounter(labels map[string]string) prometheus.Counter
 }

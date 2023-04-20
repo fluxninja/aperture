@@ -61,8 +61,6 @@ func (m *CheckRequest) validate(all bool) error {
 
 	// no validation rules for Labels
 
-	// no validation rules for Tokens
-
 	if len(errors) > 0 {
 		return CheckRequestMultiError(errors)
 	}
@@ -884,6 +882,8 @@ func (m *LimiterDecision_RateLimiterInfo) validate(all bool) error {
 
 	// no validation rules for Label
 
+	// no validation rules for TokensConsumed
+
 	if len(errors) > 0 {
 		return LimiterDecision_RateLimiterInfoMultiError(errors)
 	}
@@ -990,6 +990,8 @@ func (m *LimiterDecision_ConcurrencyLimiterInfo) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for WorkloadIndex
+
+	// no validation rules for TokensConsumed
 
 	if len(errors) > 0 {
 		return LimiterDecision_ConcurrencyLimiterInfoMultiError(errors)
