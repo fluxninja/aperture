@@ -37,10 +37,12 @@ import (
 	"github.com/imdario/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
@@ -588,7 +590,7 @@ func WriteFile(filepath string, sCert *bytes.Buffer) error {
 }
 
 // CheckAndGenerateCertForOperator checks if existing certificates are present and creates new if not present.
-func CheckAndGenerateCertForOperator() error {
+func CheckAndGenerateCertForOperator(k8sClient client.Client) error {
 	if CheckCertificate() {
 		return nil
 	}
@@ -606,6 +608,33 @@ func CheckAndGenerateCertForOperator() error {
 	serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(serviceName, namespace)
 	if err != nil {
 		return err
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      serviceName,
+			Namespace: namespace,
+		},
+	}
+	err = k8sClient.Get(context.Background(), types.NamespacedName{Name: serviceName, Namespace: namespace}, secret)
+	if err != nil {
+		secret.Data = map[string][]byte{
+			OperatorCertName:    serverCertPEM.Bytes(),
+			OperatorCertKeyName: serverPrivKeyPEM.Bytes(),
+			OperatorCAName:      caPEM.Bytes(),
+		}
+		_, err = controllerutil.CreateOrUpdate(context.Background(), k8sClient, secret, SecretMutate(secret, secret.Data))
+		if err != nil {
+			return err
+		}
+	}
+
+	block, _ := pem.Decode(secret.Data[OperatorCertName])
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err == nil && cert.NotAfter.After(time.Now()) {
+		serverCertPEM = bytes.NewBuffer(secret.Data[OperatorCertName])
+		serverPrivKeyPEM = bytes.NewBuffer(secret.Data[OperatorCertKeyName])
+		caPEM = bytes.NewBuffer(secret.Data[OperatorCAName])
 	}
 
 	err = os.MkdirAll(os.Getenv("APERTURE_OPERATOR_CERT_DIR"), 0o777)
