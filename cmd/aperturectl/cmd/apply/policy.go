@@ -10,6 +10,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
+	"google.golang.org/genproto/protobuf/field_mask"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -19,8 +23,6 @@ import (
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 var (
@@ -145,28 +147,27 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 	}
 	err = kubeClient.Create(context.Background(), policyCR)
 	if err != nil {
-		if strings.Contains(err.Error(), "no matches for kind") {
+		if apimeta.IsNoMatchError(err) {
 			var isUpdated bool
-			isUpdated, err = updatePolicyUsingAPI(name, policy)
+			isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
 			if !isUpdated {
-				return err
+				return updatePolicyUsingAPIErr
 			}
 		} else if apierrors.IsAlreadyExists(err) {
 			var update bool
-			update, err = checkForUpdate(name)
-			if err != nil {
-				return fmt.Errorf("failed to check for update: %w", err)
+			update, checkForUpdateErr := checkForUpdate(name)
+			if checkForUpdateErr != nil {
+				return fmt.Errorf("failed to check for update: %w", checkForUpdateErr)
 			}
-
 			if !update {
 				log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
 				return nil
 			}
-
-			err = updatePolicyCR(name, policyCR, kubeClient)
-		}
-
-		if err != nil {
+			updatePolicyCRErr := updatePolicyCR(name, policyCR, kubeClient)
+			if updatePolicyCRErr != nil {
+				return updatePolicyCRErr
+			}
+		} else {
 			return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 		}
 	}
@@ -177,17 +178,13 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 
 // updatePolicyUsingAPI updates the policy using the API.
 func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) {
-	request := languagev1.PostPoliciesRequest{
-		Policies: []*languagev1.PostPoliciesRequest_PolicyRequest{
-			{
-				Name:   name,
-				Policy: policy,
-			},
-		},
+	request := languagev1.UpsertPolicyRequest{
+		PolicyName: name,
+		Policy:     policy,
 	}
-	_, err := client.PostPolicies(context.Background(), &request)
+	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
-		if strings.Contains(err.Error(), "Use Patch call to update it") {
+		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
 			var update bool
 			update, err = checkForUpdate(name)
 			if err != nil {
@@ -199,7 +196,10 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) 
 				return false, nil
 			}
 
-			_, err = client.PatchPolicies(context.Background(), &request)
+			request.UpdateMask = &field_mask.FieldMask{
+				Paths: []string{"all"},
+			}
+			_, err = client.UpsertPolicy(context.Background(), &request)
 			if err != nil {
 				return false, err
 			}

@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/types/known/structpb"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
@@ -88,21 +88,17 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			Name:      policyName,
 		}, policy)
 		if err != nil {
-			if strings.Contains(err.Error(), "no matches for kind") {
+			if apimeta.IsNoMatchError(err) {
 				var dynamicConfigStruct *structpb.Struct
 				dynamicConfigStruct, err = structpb.NewStruct(dynamicConfigYAML)
 				if err != nil {
 					return fmt.Errorf("failed to parse DynamicConfig Struct: %w", err)
 				}
-				request := languagev1.PostDynamicConfigsRequest{
-					DynamicConfigs: []*languagev1.PostDynamicConfigsRequest_DynamicConfigRequest{
-						{
-							PolicyName:    policyName,
-							DynamicConfig: dynamicConfigStruct,
-						},
-					},
+				request := languagev1.PostDynamicConfigRequest{
+					PolicyName:    policyName,
+					DynamicConfig: dynamicConfigStruct,
 				}
-				_, err = client.PostDynamicConfigs(context.Background(), &request)
+				_, err = client.PostDynamicConfig(context.Background(), &request)
 				if err != nil {
 					return fmt.Errorf("failed to update DynamicConfig: %w", err)
 				}

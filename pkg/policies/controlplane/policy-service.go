@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"strings"
 
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -16,6 +15,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // PolicyService is the implementation of policylangv1.PolicyService interface.
@@ -23,6 +23,7 @@ type PolicyService struct {
 	policylangv1.UnimplementedPolicyServiceServer
 	policyFactory *PolicyFactory
 	etcdWriter    *etcdwriter.Writer
+	etcdClient    *etcdclient.Client
 }
 
 // RegisterPolicyService registers a service for policy.
@@ -34,6 +35,7 @@ func RegisterPolicyService(
 ) *PolicyService {
 	svc := &PolicyService{
 		policyFactory: policyFactory,
+		etcdClient:    etcdClient,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -72,35 +74,57 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 	}, nil
 }
 
-// PostPolicies posts policies to the system.
-func (s *PolicyService) PostPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
-	return s.updatePolicies(ctx, policies, false)
-}
+// UpsertPolicy creates/updates policy to the system.
+func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
+	updateMask := req.UpdateMask != nil && len(req.UpdateMask.GetPaths()) > 0
 
-// PatchPolicies patches policies to the system.
-func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest) (*policylangv1.PostResponse, error) {
-	return s.updatePolicies(ctx, policies, true)
-}
-
-// PostDynamicConfigs updates dynamic configs to the system.
-func (s *PolicyService) PostDynamicConfigs(ctx context.Context, dynamicConfigs *policylangv1.PostDynamicConfigsRequest) (*policylangv1.PostResponse, error) {
-	var errs []string
-	for _, request := range dynamicConfigs.DynamicConfigs {
-		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.PolicyName})
-		if err != nil {
-			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.PolicyName))
-			continue
-		}
-
-		jsonDynamicConfig, err := request.DynamicConfig.MarshalJSON()
-		if err != nil {
-			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.PolicyName, err))
-			continue
-		}
-		s.etcdWriter.Write(path.Join(paths.PoliciesAPIDynamicConfigPath, request.PolicyName), jsonDynamicConfig)
+	policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
+	if err != nil && updateMask {
+		return nil, err
 	}
 
-	return prepareResponse(errs, "dynamic configs")
+	if policy != nil {
+		if !updateMask {
+			return nil, status.Errorf(codes.AlreadyExists, "Policy '%s' already exists. Use UpsertPolicy with PATCH call to update it.", req.PolicyName)
+		}
+
+		if !(len(req.UpdateMask.GetPaths()) == 1 && req.UpdateMask.GetPaths()[0] == "all") {
+			utils.ApplyFieldMask(policy.Policy, req.Policy, req.UpdateMask)
+			req.Policy = policy.Policy
+		}
+	}
+
+	jsonPolicy, err := s.getPolicyBytes(req.PolicyName, req.Policy)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.etcdClient.Client.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(jsonPolicy))
+	if err != nil {
+		return nil, fmt.Errorf("failed to write policy '%s' to etcd: '%s'", req.PolicyName, err)
+	}
+
+	return new(emptypb.Empty), nil
+}
+
+// PostDynamicConfig updates dynamic config to the system.
+func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1.PostDynamicConfigRequest) (*emptypb.Empty, error) {
+	_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
+	if err != nil {
+		return nil, err
+	}
+
+	jsonDynamicConfig, err := req.DynamicConfig.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal dynamic config '%s': '%s'", req.PolicyName, err)
+	}
+
+	_, err = s.etcdClient.Client.KV.Put(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName), string(jsonDynamicConfig))
+	if err != nil {
+		return nil, fmt.Errorf("failed to write dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
+	}
+
+	return new(emptypb.Empty), nil
 }
 
 // DeletePolicy deletes a policy from the system.
@@ -108,30 +132,6 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIConfigPath, policy.Name))
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
 	return &emptypb.Empty{}, nil
-}
-
-// updatePolicies manages Post/Patch operations on policies.
-func (s *PolicyService) updatePolicies(ctx context.Context, policies *policylangv1.PostPoliciesRequest, isPatch bool) (*policylangv1.PostResponse, error) {
-	var errs []string
-	for _, request := range policies.Policies {
-		_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
-		if isPatch && err != nil {
-			errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
-			continue
-		} else if err == nil && !isPatch {
-			errs = append(errs, fmt.Sprintf("policy '%s' already exists. Use Patch call to update it.", request.Name))
-			continue
-		}
-
-		jsonPolicy, err := s.getPolicyBytes(request.Name, request.Policy)
-		if err != nil {
-			errs = append(errs, err.Error())
-			continue
-		}
-		s.etcdWriter.Write(path.Join(paths.PoliciesAPIConfigPath, request.Name), jsonPolicy)
-	}
-
-	return prepareResponse(errs, "policies")
 }
 
 // getPolicyBytes returns the policy bytes after checking validity of the policy.
@@ -147,18 +147,4 @@ func (s *PolicyService) getPolicyBytes(name string, policy *policylangv1.Policy)
 	}
 
 	return jsonPolicy, nil
-}
-
-// prepareResponse prepares the response for Post/Patch operations.
-func prepareResponse(errs []string, resource string) (*policylangv1.PostResponse, error) {
-	response := &policylangv1.PostResponse{}
-	var err error
-	if len(errs) > 0 {
-		response.Errors = errs
-		response.Message = fmt.Sprintf("failed to upload %s", resource)
-		err = status.Error(codes.InvalidArgument, strings.Join(errs, ","))
-	} else {
-		response.Message = fmt.Sprintf("successfully uploaded %s", resource)
-	}
-	return response, err
 }

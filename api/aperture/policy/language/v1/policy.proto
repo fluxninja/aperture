@@ -10,6 +10,7 @@ import "aperture/policy/language/v1/std_components.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
@@ -31,32 +32,25 @@ service PolicyService {
     };
   }
 
-  // PostPolicies creates or updates policies based on the provided request.
-  rpc PostPolicies(PostPoliciesRequest) returns (PostResponse) {
+  // UpsertPolicy creates/updates policy based on the provided request.
+  rpc UpsertPolicy(UpsertPolicyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/policies"
-      body: "*"
+      post: "/v1/policies/{policy_name}"
+      body: "*",
+      additional_bindings: {
+        patch: "/v1/policies/{policy_name}"
+        body: "*"
+      }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-controller"];
     };
   }
 
-  // PatchPolicies patches policies based on the provided request.
-  rpc PatchPolicies(PostPoliciesRequest) returns (PostResponse) {
+  // PostDynamicConfig creates/updates dynamic config based on the provided request.
+  rpc PostDynamicConfig(PostDynamicConfigRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/v1/policies"
-      body: "*"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["aperture-controller"];
-    };
-  }
-
-  // PostDynamicConfigs patches dynamic configs based on the provided request.
-  rpc PostDynamicConfigs(PostDynamicConfigsRequest) returns (PostResponse) {
-    option (google.api.http) = {
-      post: "/v1/dynamic-configs"
+      post: "/v1/dynamic-configs/{policy_name}"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -83,35 +77,23 @@ message GetPolicyResponse {
   Policy policy = 1;
 }
 
-// PostPoliciesRequest is a request to create or update Policies.
-message PostPoliciesRequest {
-  message PolicyRequest {
-    string name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
-    Policy policy = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
-  }
-
-  repeated PolicyRequest policies = 1 [(validate.rules).repeated.min_items = 1]; // @gotags: validate:"required"
+// PostPolicyRequest is a request to create or update Policy.
+message UpsertPolicyRequest {
+  string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
+  Policy policy = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
+  // The paths to update.
+  google.protobuf.FieldMask update_mask = 3;
 }
 
-// PostDynamicConfigsRequest is a request to patch dynamic configs for Policies.
-message PostDynamicConfigsRequest {
-  message DynamicConfigRequest {
-    string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
-    google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
-  }
-
-  repeated DynamicConfigRequest dynamic_configs = 1 [(validate.rules).repeated.min_items = 1]; // @gotags: validate:"required"
+// PostDynamicConfigRequest is a request to patch dynamic config for Policy.
+message PostDynamicConfigRequest {
+  string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
+  google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
 }
 
 // DeletePolicyRequest is a request to delete a policy with given name.
 message DeletePolicyRequest {
   string name = 1;
-}
-
-// PostResponse is a response to a PostPoliciesRequest or PostDynamicConfigsRequest.
-message PostResponse {
-  repeated string errors = 1;
-  string message = 2;
 }
 
 // GetPoliciesResponse is a response containing all Policies.

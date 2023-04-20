@@ -10,25 +10,35 @@ info:
   version: "1.0"
 host: aperture-controller
 paths:
-  /v1/dynamic-configs:
+  /v1/dynamic-configs/{policy_name}:
     post:
       tags:
       - aperture-controller
-      summary: PostDynamicConfigs patches dynamic configs based on the provided request.
-      operationId: PolicyService_PostDynamicConfigs
+      summary: PostDynamicConfig creates/updates dynamic config based on the provided
+        request.
+      operationId: PolicyService_PostDynamicConfig
       parameters:
-      - description: PostDynamicConfigsRequest is a request to patch dynamic configs
-          for Policies.
-        name: body
+      - type: string
+        x-go-tag-validate: required
+        name: policy_name
+        in: path
+        required: true
+      - name: body
         in: body
         required: true
         schema:
-          $ref: '#/definitions/PostDynamicConfigsRequest'
+          description: PostDynamicConfigRequest is a request to patch dynamic config
+            for Policy.
+          type: object
+          properties:
+            dynamic_config:
+              type: object
+              x-go-tag-validate: required
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/PostResponse'
+            type: object
         default:
           description: An unexpected error response.
           schema:
@@ -93,48 +103,6 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
-    post:
-      tags:
-      - aperture-controller
-      summary: PostPolicies creates or updates policies based on the provided request.
-      operationId: PolicyService_PostPolicies
-      parameters:
-      - description: PostPoliciesRequest is a request to create or update Policies.
-        name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/PostPoliciesRequest'
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PostResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-    patch:
-      tags:
-      - aperture-controller
-      summary: PatchPolicies patches policies based on the provided request.
-      operationId: PolicyService_PatchPolicies
-      parameters:
-      - description: PostPoliciesRequest is a request to create or update Policies.
-        name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/PostPoliciesRequest'
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PostResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
   /v1/policies/{name}:
     get:
       tags:
@@ -165,6 +133,73 @@ paths:
         name: name
         in: path
         required: true
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            type: object
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/policies/{policy_name}:
+    post:
+      tags:
+      - aperture-controller
+      summary: UpsertPolicy creates/updates policy based on the provided request.
+      operationId: PolicyService_UpsertPolicy
+      parameters:
+      - type: string
+        x-go-tag-validate: required
+        name: policy_name
+        in: path
+        required: true
+      - name: body
+        in: body
+        required: true
+        schema:
+          description: PostPolicyRequest is a request to create or update Policy.
+          type: object
+          properties:
+            policy:
+              x-go-tag-validate: required
+              $ref: '#/definitions/Policy'
+            update_mask:
+              description: The paths to update.
+              type: string
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            type: object
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+    patch:
+      tags:
+      - aperture-controller
+      summary: UpsertPolicy creates/updates policy based on the provided request.
+      operationId: PolicyService_UpsertPolicy2
+      parameters:
+      - type: string
+        x-go-tag-validate: required
+        name: policy_name
+        in: path
+        required: true
+      - name: body
+        in: body
+        required: true
+        schema:
+          description: PostPolicyRequest is a request to create or update Policy.
+          type: object
+          properties:
+            policy:
+              x-go-tag-validate: required
+              $ref: '#/definitions/Policy'
+            update_mask:
+              description: The paths to update.
+              type: string
       responses:
         "200":
           description: A successful response.
@@ -2810,64 +2845,6 @@ definitions:
       resources:
         description: Resources (such as Flux Meters, Classifiers) to setup.
         $ref: '#/definitions/Resources'
-  PostDynamicConfigsRequest:
-    description: PostDynamicConfigsRequest is a request to patch dynamic configs for
-      Policies.
-    type: object
-    required:
-    - dynamic_configs
-    properties:
-      dynamic_configs:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/PostDynamicConfigsRequestDynamicConfigRequest'
-        x-go-tag-validate: required
-  PostDynamicConfigsRequestDynamicConfigRequest:
-    type: object
-    required:
-    - dynamic_config
-    - policy_name
-    properties:
-      dynamic_config:
-        type: object
-        x-go-tag-validate: required
-      policy_name:
-        type: string
-        x-go-tag-validate: required
-  PostPoliciesRequest:
-    description: PostPoliciesRequest is a request to create or update Policies.
-    type: object
-    required:
-    - policies
-    properties:
-      policies:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/PostPoliciesRequestPolicyRequest'
-        x-go-tag-validate: required
-  PostPoliciesRequestPolicyRequest:
-    type: object
-    required:
-    - name
-    properties:
-      name:
-        type: string
-        x-go-tag-validate: required
-      policy:
-        x-go-tag-validate: required
-        $ref: '#/definitions/Policy'
-  PostResponse:
-    description: PostResponse is a response to a PostPoliciesRequest or PostDynamicConfigsRequest.
-    type: object
-    properties:
-      errors:
-        type: array
-        items:
-          type: string
-      message:
-        type: string
   ProcessInfo:
     type: object
     properties:

@@ -20,12 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PolicyService_GetPolicy_FullMethodName          = "/aperture.policy.language.v1.PolicyService/GetPolicy"
-	PolicyService_GetPolicies_FullMethodName        = "/aperture.policy.language.v1.PolicyService/GetPolicies"
-	PolicyService_PostPolicies_FullMethodName       = "/aperture.policy.language.v1.PolicyService/PostPolicies"
-	PolicyService_PatchPolicies_FullMethodName      = "/aperture.policy.language.v1.PolicyService/PatchPolicies"
-	PolicyService_PostDynamicConfigs_FullMethodName = "/aperture.policy.language.v1.PolicyService/PostDynamicConfigs"
-	PolicyService_DeletePolicy_FullMethodName       = "/aperture.policy.language.v1.PolicyService/DeletePolicy"
+	PolicyService_GetPolicy_FullMethodName         = "/aperture.policy.language.v1.PolicyService/GetPolicy"
+	PolicyService_GetPolicies_FullMethodName       = "/aperture.policy.language.v1.PolicyService/GetPolicies"
+	PolicyService_UpsertPolicy_FullMethodName      = "/aperture.policy.language.v1.PolicyService/UpsertPolicy"
+	PolicyService_PostDynamicConfig_FullMethodName = "/aperture.policy.language.v1.PolicyService/PostDynamicConfig"
+	PolicyService_DeletePolicy_FullMethodName      = "/aperture.policy.language.v1.PolicyService/DeletePolicy"
 )
 
 // PolicyServiceClient is the client API for PolicyService service.
@@ -36,12 +35,10 @@ type PolicyServiceClient interface {
 	GetPolicy(ctx context.Context, in *GetPolicyRequest, opts ...grpc.CallOption) (*GetPolicyResponse, error)
 	// GetPolicies returns all policies.
 	GetPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPoliciesResponse, error)
-	// PostPolicies creates or updates policies based on the provided request.
-	PostPolicies(ctx context.Context, in *PostPoliciesRequest, opts ...grpc.CallOption) (*PostResponse, error)
-	// PatchPolicies patches policies based on the provided request.
-	PatchPolicies(ctx context.Context, in *PostPoliciesRequest, opts ...grpc.CallOption) (*PostResponse, error)
-	// PostDynamicConfigs patches dynamic configs based on the provided request.
-	PostDynamicConfigs(ctx context.Context, in *PostDynamicConfigsRequest, opts ...grpc.CallOption) (*PostResponse, error)
+	// UpsertPolicy creates/updates policy based on the provided request.
+	UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// PostDynamicConfig creates/updates dynamic config based on the provided request.
+	PostDynamicConfig(ctx context.Context, in *PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -72,27 +69,18 @@ func (c *policyServiceClient) GetPolicies(ctx context.Context, in *emptypb.Empty
 	return out, nil
 }
 
-func (c *policyServiceClient) PostPolicies(ctx context.Context, in *PostPoliciesRequest, opts ...grpc.CallOption) (*PostResponse, error) {
-	out := new(PostResponse)
-	err := c.cc.Invoke(ctx, PolicyService_PostPolicies_FullMethodName, in, out, opts...)
+func (c *policyServiceClient) UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PolicyService_UpsertPolicy_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *policyServiceClient) PatchPolicies(ctx context.Context, in *PostPoliciesRequest, opts ...grpc.CallOption) (*PostResponse, error) {
-	out := new(PostResponse)
-	err := c.cc.Invoke(ctx, PolicyService_PatchPolicies_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *policyServiceClient) PostDynamicConfigs(ctx context.Context, in *PostDynamicConfigsRequest, opts ...grpc.CallOption) (*PostResponse, error) {
-	out := new(PostResponse)
-	err := c.cc.Invoke(ctx, PolicyService_PostDynamicConfigs_FullMethodName, in, out, opts...)
+func (c *policyServiceClient) PostDynamicConfig(ctx context.Context, in *PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PolicyService_PostDynamicConfig_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,12 +104,10 @@ type PolicyServiceServer interface {
 	GetPolicy(context.Context, *GetPolicyRequest) (*GetPolicyResponse, error)
 	// GetPolicies returns all policies.
 	GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error)
-	// PostPolicies creates or updates policies based on the provided request.
-	PostPolicies(context.Context, *PostPoliciesRequest) (*PostResponse, error)
-	// PatchPolicies patches policies based on the provided request.
-	PatchPolicies(context.Context, *PostPoliciesRequest) (*PostResponse, error)
-	// PostDynamicConfigs patches dynamic configs based on the provided request.
-	PostDynamicConfigs(context.Context, *PostDynamicConfigsRequest) (*PostResponse, error)
+	// UpsertPolicy creates/updates policy based on the provided request.
+	UpsertPolicy(context.Context, *UpsertPolicyRequest) (*emptypb.Empty, error)
+	// PostDynamicConfig creates/updates dynamic config based on the provided request.
+	PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error)
 }
@@ -136,14 +122,11 @@ func (UnimplementedPolicyServiceServer) GetPolicy(context.Context, *GetPolicyReq
 func (UnimplementedPolicyServiceServer) GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPolicies not implemented")
 }
-func (UnimplementedPolicyServiceServer) PostPolicies(context.Context, *PostPoliciesRequest) (*PostResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostPolicies not implemented")
+func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *UpsertPolicyRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertPolicy not implemented")
 }
-func (UnimplementedPolicyServiceServer) PatchPolicies(context.Context, *PostPoliciesRequest) (*PostResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PatchPolicies not implemented")
-}
-func (UnimplementedPolicyServiceServer) PostDynamicConfigs(context.Context, *PostDynamicConfigsRequest) (*PostResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfigs not implemented")
+func (UnimplementedPolicyServiceServer) PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfig not implemented")
 }
 func (UnimplementedPolicyServiceServer) DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
@@ -196,56 +179,38 @@ func _PolicyService_GetPolicies_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PolicyService_PostPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostPoliciesRequest)
+func _PolicyService_UpsertPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertPolicyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PolicyServiceServer).PostPolicies(ctx, in)
+		return srv.(PolicyServiceServer).UpsertPolicy(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PolicyService_PostPolicies_FullMethodName,
+		FullMethod: PolicyService_UpsertPolicy_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PolicyServiceServer).PostPolicies(ctx, req.(*PostPoliciesRequest))
+		return srv.(PolicyServiceServer).UpsertPolicy(ctx, req.(*UpsertPolicyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PolicyService_PatchPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostPoliciesRequest)
+func _PolicyService_PostDynamicConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostDynamicConfigRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PolicyServiceServer).PatchPolicies(ctx, in)
+		return srv.(PolicyServiceServer).PostDynamicConfig(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PolicyService_PatchPolicies_FullMethodName,
+		FullMethod: PolicyService_PostDynamicConfig_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PolicyServiceServer).PatchPolicies(ctx, req.(*PostPoliciesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PolicyService_PostDynamicConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostDynamicConfigsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PolicyServiceServer).PostDynamicConfigs(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PolicyService_PostDynamicConfigs_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PolicyServiceServer).PostDynamicConfigs(ctx, req.(*PostDynamicConfigsRequest))
+		return srv.(PolicyServiceServer).PostDynamicConfig(ctx, req.(*PostDynamicConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -284,16 +249,12 @@ var PolicyService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PolicyService_GetPolicies_Handler,
 		},
 		{
-			MethodName: "PostPolicies",
-			Handler:    _PolicyService_PostPolicies_Handler,
+			MethodName: "UpsertPolicy",
+			Handler:    _PolicyService_UpsertPolicy_Handler,
 		},
 		{
-			MethodName: "PatchPolicies",
-			Handler:    _PolicyService_PatchPolicies_Handler,
-		},
-		{
-			MethodName: "PostDynamicConfigs",
-			Handler:    _PolicyService_PostDynamicConfigs_Handler,
+			MethodName: "PostDynamicConfig",
+			Handler:    _PolicyService_PostDynamicConfig_Handler,
 		},
 		{
 			MethodName: "DeletePolicy",
