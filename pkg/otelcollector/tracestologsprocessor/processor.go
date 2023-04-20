@@ -46,7 +46,7 @@ func (p *tracesToLogsProcessor) Start(ctx context.Context, host component.Host) 
 	for k, exp := range exporters[component.DataTypeLogs] {
 		logsExp, ok := exp.(exporter.Logs)
 		if !ok {
-			return fmt.Errorf("the exporter %q isn't a metrics exporter", k.String())
+			return fmt.Errorf("the exporter %q is not a metrics exporter", k.String())
 		}
 
 		availableLogsExporters = append(availableLogsExporters, k.String())

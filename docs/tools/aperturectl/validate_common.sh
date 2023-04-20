@@ -3,6 +3,12 @@
 set -e
 git_root=$(git rev-parse --show-toplevel)
 
+aperturectl="$git_root"/cmd/aperturectl/aperturectl
+# check if aperturectl exists
+if [ ! -f "$aperturectl" ]; then
+	aperturectl="$("$git_root"/scripts/build_aperturectl.sh)"
+fi
+
 # function takes URI, name, values-file as input
 function generate_compare() {
 	local name=$1
@@ -10,12 +16,14 @@ function generate_compare() {
 	local yaml1=$3
 	local yaml2=$4
 
-	go run "$git_root"/cmd/aperturectl/main.go blueprints generate \
+	"$aperturectl" blueprints generate \
 		--uri "$git_root"/blueprints \
 		--name "$name" \
 		--values-file "$values_file" \
 		--output-dir "tmp" \
-		--skip-pull
+		--no-yaml-modeline \
+		--skip-pull \
+		--overwrite
 
 	# make sure yaml1 and yaml2 exist
 	if [ ! -f "$yaml1" ]; then
@@ -37,4 +45,20 @@ function generate_compare() {
 		exit 1
 	fi
 	rm -rf tmp
+}
+
+# function generate_from_values takes name, values_file and output_dir as input and rendes the blueprint
+function generate_from_values() {
+	local name=$1
+	local values_file=$2
+	local output_dir=$3
+
+	"$aperturectl" blueprints generate \
+		--uri "$git_root"/blueprints \
+		--name "$name" \
+		--values-file "$values_file" \
+		--output-dir "$output_dir" \
+		--no-yaml-modeline \
+		--skip-pull \
+		--overwrite
 }

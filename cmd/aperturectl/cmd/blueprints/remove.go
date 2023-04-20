@@ -26,7 +26,7 @@ aperturectl blueprints remove --all`,
 		if all {
 			pathToRemove = blueprintsCacheRoot
 		} else {
-			pathToRemove = blueprintsDir
+			pathToRemove = blueprintsURIRoot
 		}
 
 		err := os.RemoveAll(pathToRemove)

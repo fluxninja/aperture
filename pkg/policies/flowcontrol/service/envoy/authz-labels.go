@@ -4,7 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 )
 
@@ -17,7 +18,7 @@ const (
 )
 
 // AuthzRequestToFlowLabels converts request attributes to new FlowLabels.
-func AuthzRequestToFlowLabels(request *ext_authz.AttributeContext_Request) flowlabel.FlowLabels {
+func AuthzRequestToFlowLabels(request *authv3.AttributeContext_Request) flowlabel.FlowLabels {
 	capacity := numRequestLabels + len(request.GetHttp().GetHeaders())
 	flowLabels := make(flowlabel.FlowLabels, capacity)
 	if request != nil {
@@ -49,8 +50,8 @@ func AuthzRequestToFlowLabels(request *ext_authz.AttributeContext_Request) flowl
 		}
 		for k, v := range request.GetHttp().GetHeaders() {
 			if strings.HasPrefix(k, ":") {
-				// Headers starting with `:` are pseudoheaders, so we don't add
-				// them.  We don't lose anything, as these values are already
+				// Headers starting with `:` are pseudoheaders, so we do not add
+				// them.  We do not lose anything, as these values are already
 				// available as labels pulled from dedicated fields of
 				// Request.Http.
 				continue

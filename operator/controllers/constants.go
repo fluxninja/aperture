@@ -87,8 +87,6 @@ const (
 	DistCache = "dist-cache"
 	// MemberList string.
 	MemberList = "memberlist"
-	// ApertureFluxNinjaPlugin defines FluxNinja plugin name.
-	ApertureFluxNinjaPlugin = "aperture-plugin-fluxninja"
 	// DefaulterAnnotationKey defines annotation key for set defaults.
 	DefaulterAnnotationKey = "fluxninja.com/set-defaults"
 	// AgentModeChangeAnnotationKey defines annotation key for change in Agent installation mode.
@@ -109,6 +107,18 @@ const (
 	OtelZpagesPort = "otel-zpages"
 	// MinimumKubernetesVersion defines minimum kubernetes version required by Aperture.
 	MinimumKubernetesVersion = "v1.23.0"
+	// ControllerClientCertKey defines controller client cert key.
+	ControllerClientCertKey = "controller-ca.pem"
+	// AgentControllerClientCertPath defines Controller client cert path in Agent container.
+	AgentControllerClientCertPath = "/etc/aperture/aperture-agent/certs"
+	// AgentControllerClientCertCMName defines Controller client cert ConfigMap name.
+	AgentControllerClientCertCMName = AgentServiceName + "-client-cert"
+	// OperatorCertName defines operator cert name.
+	OperatorCertName = "crt.pem"
+	// OperatorCertKeyName defines operator key name.
+	OperatorCertKeyName = "key.pem"
+	// OperatorCAName defines operator CA name.
+	OperatorCAName = "ca.pem"
 )
 
 var (

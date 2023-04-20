@@ -25,14 +25,14 @@ type SMA struct {
 }
 
 // Make sure EMA complies with Component interface.
-var _ runtime.Component = (*EMA)(nil)
+var _ runtime.Component = (*SMA)(nil)
 
 // NewSMAAndOptions returns a new SMA filter and its Fx options.
 func NewSMAAndOptions(smaProto *policylangv1.SMA, _ string, policyReadAPI iface.Policy) (*SMA, fx.Option, error) {
 	evaluationInterval := policyReadAPI.GetEvaluationInterval()
 	params := smaProto.GetParameters()
 
-	runs := math.Ceil(float64(params.Window.AsDuration()) / float64(evaluationInterval))
+	runs := math.Ceil(float64(params.SmaWindow.AsDuration()) / float64(evaluationInterval))
 
 	sma := &SMA{
 		policyReadAPI:     policyReadAPI,
@@ -57,6 +57,9 @@ func (sma *SMA) Type() runtime.ComponentType {
 func (sma *SMA) ShortDescription() string {
 	return fmt.Sprintf("runs: %v", sma.runs)
 }
+
+// IsActuator implements runtime.Component.
+func (*SMA) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.Execute.
 func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {

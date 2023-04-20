@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/fluxninja/lumberjack"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/diode"
 	"go.uber.org/fx"
@@ -18,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/lumberjack"
 )
 
 // defaultLogFilePath is the default path for the log files to be stored.
@@ -59,7 +59,7 @@ type LogConfig struct {
 	// Use non-blocking log writer (can lose logs at high throughput)
 	NonBlocking bool `json:"non_blocking" default:"true"`
 
-	// Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
+	// Additional log writer: pretty console (`stdout`) logging (not recommended for prod environments)
 	PrettyConsole bool `json:"pretty_console" default:"false"`
 }
 
@@ -67,7 +67,7 @@ type LogConfig struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type LogWriterConfig struct {
-	// Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+	// Output file for logs. Keywords allowed - [`stderr`, `default`]. `default` maps to `/var/log/fluxninja/<service>.log`
 	File string `json:"file" default:"stderr"`
 	// Log file max size in MB
 	MaxSize int `json:"max_size" validate:"gte=0" default:"50"`
@@ -157,6 +157,13 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		writers = append(writers, log.GetPrettyConsoleWriter())
 	}
 
+	// append writers provided via Fx if they are not nil
+	for _, w := range w {
+		if w != nil {
+			writers = append(writers, w)
+		}
+	}
+
 	multi := zerolog.MultiLevelWriter(writers...)
 
 	var wr io.Writer
@@ -173,9 +180,6 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 	}
 
 	logger := log.NewLogger(wr, strings.ToLower(config.LogLevel))
-
-	// append writers provided via Fx
-	writers = append(writers, w...)
 
 	if constructor.IsGlobal {
 		// set global logger

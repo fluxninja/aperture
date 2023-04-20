@@ -106,7 +106,7 @@ func setupRateLimiterFactory(
 	reg := statusRegistry.Child("component", rateLimiterStatusRoot)
 	logger := reg.GetLogger()
 
-	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("sync", "lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
+	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("sync", "lazy_sync_jobs"), jobs.JobGroupConfig{}, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err
@@ -128,15 +128,11 @@ func setupRateLimiterFactory(
 		counterVector:        counterVector,
 	}
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{
-			rateLimiterFactory.newRateLimiterOptions,
-		},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry:     reg,
-		PrometheusRegistry: prometheusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{rateLimiterFactory.newRateLimiterOptions})
+	if err != nil {
+		return err
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -242,21 +238,27 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
-	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
+	decisionNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 	// dynamic config notifier
 	dynamicConfigUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err
 	}
-	dynamicConfigNotifier := notifiers.NewUnmarshalKeyNotifier(
+	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		dynamicConfigUnmarshaller,
 		rateLimiter.dynamicConfigUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()
@@ -370,10 +372,14 @@ func (rateLimiter *rateLimiter) GetFlowSelector() *policylangv1.FlowSelector {
 }
 
 // RunLimiter runs the limiter.
-func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
-	label, ok, remaining, current := rateLimiter.TakeN(labels, 1)
+	if tokens == 0 {
+		tokens = 1
+	}
+
+	label, ok, remaining, current := rateLimiter.TakeN(labels, int(tokens))
 
 	if label == "" {
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND

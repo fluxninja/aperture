@@ -1,14 +1,13 @@
 package blueprints
 
 import (
-	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
@@ -18,22 +17,20 @@ import (
 const (
 	defaultBlueprintsRepo    = "github.com/fluxninja/aperture/blueprints"
 	defaultBlueprintsVersion = "latest"
-	sourceFilename           = ".source"
-	versionFilename          = ".version"
-	relPathFilename          = ".relpath"
-	lockFilename             = ".flock"
 )
 
 var (
-	// Location of cache for blueprints.
+	// Location of cache for blueprints. E.g. ~/.aperturectl/blueprints.
 	blueprintsCacheRoot string
-	// Location of blueprints in disk (e.g. within cache or custom location).
+	// Location of blueprints uri within cache. E.g. ~/.aperturectl/blueprints/github.com/fluxninja/aperture/blueprints@latest.
+	blueprintsURIRoot string
+
+	// Location of blueprints directory within URI directory. E.g. ~/.aperturectl/blueprints/github.com_fluxninja_aperture_blueprints@v0.26.1/github.com/fluxninja/aperture/blueprints/.
 	blueprintsDir string
 
 	// Args for `blueprints`.
 	blueprintsURI     string
 	blueprintsVersion string
-	lock              *flock.Flock
 )
 
 func init() {
@@ -54,7 +51,7 @@ var BlueprintsCmd = &cobra.Command{
 	Short: "Aperture Blueprints",
 	Long: `
 Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
 			return err
@@ -79,67 +76,45 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 			}
 			blueprintsURI = fmt.Sprintf("%s@%s", defaultBlueprintsRepo, blueprintsVersion)
 		} else {
-			blueprintsURI, err = filepath.Abs(blueprintsURI)
+			var blueprintsURL *url.URL
+			blueprintsURL, err = url.Parse(blueprintsURI)
 			if err != nil {
-				return err
+				blueprintsURI, err = filepath.Abs(blueprintsURI)
+				if err != nil {
+					return err
+				}
+			} else {
+				blueprintsURI = blueprintsURL.String()
 			}
 		}
 
 		// convert the URI to a local dir name which is disk friendly
 		dirName := strings.ReplaceAll(blueprintsURI, "/", "_")
-		blueprintsDir = filepath.Join(blueprintsCacheRoot, dirName)
-		err = os.MkdirAll(blueprintsDir, os.ModePerm)
+		blueprintsURIRoot = filepath.Join(blueprintsCacheRoot, dirName)
+		err = os.MkdirAll(blueprintsURIRoot, os.ModePerm)
 		if err != nil {
 			return err
 		}
-		// lock blueprintsDir to prevent concurrent access using flock package
-		lock = flock.New(filepath.Join(blueprintsDir, lockFilename))
 
 		// pull the latest blueprints based on skipPull and whether cmd is remove
 		if !skipPull && cmd.Use != "remove" {
-			err = pullFunc(cmd, args)
+			err = utils.PullSource(blueprintsURIRoot, blueprintsURI)
 			if err != nil {
 				return err
 			}
 		} else {
 			log.Debug().Msg("skipping pulling blueprints")
 		}
+
+		blueprintsDir = filepath.Join(blueprintsURIRoot, utils.GetRelPath(blueprintsURIRoot))
+		// resolve symlink
+		blueprintsDir, err = filepath.EvalSymlinks(blueprintsDir)
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 	PersistentPostRun: func(_ *cobra.Command, _ []string) {
-		unlock()
+		utils.Unlock(blueprintsURIRoot)
 	},
-}
-
-func writerLock() error {
-	// Get writer lock
-	locked, err := lock.TryLockContext(context.Background(), 10)
-	if err != nil {
-		return err
-	}
-	if !locked {
-		return errors.New("unable to acquire lock on blueprints directory")
-	}
-	return nil
-}
-
-func readerLock() error {
-	// Get reader lock
-	locked, err := lock.TryRLockContext(context.Background(), 10)
-	if err != nil {
-		return err
-	}
-	if !locked {
-		return errors.New("unable to acquire lock on blueprints directory")
-	}
-	return nil
-}
-
-func unlock() {
-	err := lock.Unlock()
-	if err != nil {
-		log.Error().Err(err).Msg("unable to release lock on blueprints directory")
-		// try resetting lock by removing lockfile
-		os.Remove(filepath.Join(blueprintsDir, lockFilename))
-	}
 }

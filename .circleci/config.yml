@@ -142,15 +142,16 @@ workflows:
             packaging/cli/.* updated-aperturectl-packaging true
             operator/(api|config|controllers|hack)/.*|operator/main.go updated-aperture-operator true
             (go.mod|go.sum) updated-aperture true
-            docs/.* updated-aperture-docs true
+            docs/.*|.github/styles/Vocab/FluxNinja/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
             operator/config/crd/bases/.* updated-aperture-charts true
             playground/demo_app/.* updated-demo-app true
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-js/.* updated-aperture-js true
             sdks/aperture-java/.* updated-aperture-java true
+            sdks/aperture-py/.* updated-aperture-py true
             cmd/sdk-validator/.* updated-sdk-validator true
-            blueprints/.*|playground/tanka/.* updated-blueprints true
+            blueprints/.*|playground/tanka/.*|playground/scenarios/demo-app/manifests/.* updated-blueprints true
 
   filter-paths-pr:
     when:

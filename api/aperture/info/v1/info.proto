@@ -52,6 +52,7 @@ message VersionInfo {
 message ProcessInfo {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Duration uptime = 2;
+  repeated string extensions = 3;
 }
 
 message HostInfo {

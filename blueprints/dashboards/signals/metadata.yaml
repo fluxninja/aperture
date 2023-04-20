@@ -1,0 +1,3 @@
+blueprint: Signals
+sources:
+  dashboard: dashboards/signals/dashboard.libsonnet

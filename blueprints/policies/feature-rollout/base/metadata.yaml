@@ -1,0 +1,4 @@
+blueprint: Feature Rollout Policy
+sources:
+  dashboard: policies/feature-rollout/base/dashboard.libsonnet
+  policy: policies/feature-rollout/base/policy.libsonnet

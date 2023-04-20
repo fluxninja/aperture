@@ -65,14 +65,14 @@ func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
 		case metav1.LabelSelectorOpIn:
 			matchExpr, err := mm.LabelMatchesRegex(req.Key, valuesRegex(req.Values))
 			if err != nil {
-				// shouldn't happen as we're in control of the regex, but who knows
+				// should not happen as we're in control of the regex, but who knows
 				return nil, err
 			}
 			reqExprs = append(reqExprs, matchExpr)
 		case metav1.LabelSelectorOpNotIn:
 			matchExpr, err := mm.LabelMatchesRegex(req.Key, valuesRegex(req.Values))
 			if err != nil {
-				// shouldn't happen as we're in control of the regex, but who knows
+				// should not happen as we're in control of the regex, but who knows
 				return nil, err
 			}
 			reqExprs = append(reqExprs, mm.Not(matchExpr))

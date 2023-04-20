@@ -18,10 +18,16 @@ const (
 	SignalReadingMetricName = "signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
+	// InvalidSignalReadingsTotal - counts invalid signal readings.
+	InvalidSignalReadingsTotal = "invalid_signal_readings_total"
+	// InvalidFluxMeterTotal - counts invalid flux meters.
+	InvalidFluxMeterTotal = "invalid_flux_meter_total"
 	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
 	RateLimiterCounterMetricName = "rate_limiter_counter"
 	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
 	ClassifierCounterMetricName = "classifier_counter"
+	// FlowRegulatorCounterMetricName - name of the counter describing times flow regulator was triggered.
+	FlowRegulatorCounterMetricName = "flow_regulator_counter"
 
 	// DistCache metrics scraped from Olric DMaps statistics.
 
@@ -78,7 +84,7 @@ const (
 	// FlowControlRejectReasonsMetricName - metric for reject reason on FCS Check requests.
 	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
 
-	// OTEL metrics.
+	// OTel metrics.
 
 	// RollupMetricName - logs rollup histogram.
 	RollupMetricName = "rollup"
@@ -105,20 +111,14 @@ const (
 	WorkloadIndexLabel = "workload_index"
 	// LimiterDroppedLabel - label to indicate that the particular limiter has dropped the request.
 	LimiterDroppedLabel = "limiter_dropped"
+	// RegulatorDroppedLabel - label to indicate that the particular regulator has dropped the request.
+	RegulatorDroppedLabel = "regulator_dropped"
 	// SignalNameLabel - label for saving circuit signal metrics.
 	SignalNameLabel = "signal_name"
 	// SubCircuitIDLabel - label for saving circuit id in signal metrics.
 	SubCircuitIDLabel = "sub_circuit_id"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
-	// ValidLabel - label for specifying if metric is valid.
-	// In case of FluxMeter a metric may be invalid if attribute is not found in flow telemetry.
-	// In case of Signal metrics, a metric may be invalid if signal reading is invalid.
-	ValidLabel = "valid"
-	// ValidTrue - if attribute was found.
-	ValidTrue = "true"
-	// ValidFalse - if attribute was not found.
-	ValidFalse = "false"
 	// ClassifierIndexLabel - prometheus label specifying clasiffier index.
 	ClassifierIndexLabel = "classifier_index"
 	// StatusCodeLabel - http status code.
@@ -152,4 +152,21 @@ const (
 	DefaultWorkloadIndex = "default"
 	// DefaultAgentGroup - default agent group.
 	DefaultAgentGroup = "default"
+
+	// K8S METRICS.
+
+	// K8sPodCount - number of pods in the cluster.
+	K8sPodCount = "k8s_pod_count"
+	// K8sNamespaceName - namespace of a resource.
+	K8sNamespaceName = "k8s_namespace_name"
+	// K8sNodeName - name of a node.
+	K8sNodeName = "k8s_node_name"
+	// K8sReplicasetName - name of a replicaset.
+	K8sReplicasetName = "k8s_replicaset_name"
+	// K8sDaemonsetName - name of a daemonset.
+	K8sDaemonsetName = "k8s_daemonset_name"
+	// K8sStatefulsetName - name of a statefulset.
+	K8sStatefulsetName = "k8s_statefulset_name"
+	// K8sDeploymentName - name of a deployment.
+	K8sDeploymentName = "k8s_deployment_name"
 )

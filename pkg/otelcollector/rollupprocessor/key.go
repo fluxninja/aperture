@@ -2,6 +2,7 @@ package rollupprocessor
 
 import (
 	"math"
+	"sort"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"google.golang.org/protobuf/encoding/protowire"
@@ -15,7 +16,7 @@ import (
 // The returned key is not-really a textual string, but using string here bo be
 // able to use it as hashmap keys.
 //
-// This function also Sort()s attributes, but note that this doesn't affect
+// This function also Sort()s attributes, but note that this does not affect
 // values of list type – they need to be in repeatable order for "same"
 // attributes to map into the same key.
 //
@@ -28,8 +29,7 @@ import (
 func key(am pcommon.Map, ignore map[string]struct{}) string {
 	// Provide some initial capacity to avoid too many reallocs.
 	key := make([]byte, 0, am.Len()*20)
-	am.Sort()
-	am.Range(func(k string, v pcommon.Value) bool {
+	sortedRange(am, func(k string, v pcommon.Value) bool {
 		if _, exists := ignore[k]; exists {
 			// Skipping all fields from which we will get rolled up values, as
 			// those are dimensions not to be considered as "key".
@@ -49,7 +49,7 @@ func keyAppendString(key []byte, s string) []byte {
 }
 
 func keyAppendValue(key []byte, value pcommon.Value) []byte {
-	// Note: We don't really expect non-ignored attributes of types other than
+	// Note: We do not really expect non-ignored attributes of types other than
 	// str and list, but handle all types somehow anyway.
 	switch value.Type() {
 	case pcommon.ValueTypeStr:
@@ -74,9 +74,8 @@ func keyAppendValue(key []byte, value pcommon.Value) []byte {
 	case pcommon.ValueTypeMap:
 		key = append(key, 'M')
 		m := value.Map()
-		m.Sort()
 		key = protowire.AppendVarint(key, uint64(m.Len()))
-		m.Range(func(k string, v pcommon.Value) bool {
+		sortedRange(m, func(k string, v pcommon.Value) bool {
 			key = keyAppendString(key, k)
 			key = keyAppendValue(key, v)
 			return true
@@ -91,4 +90,22 @@ func keyAppendValue(key []byte, value pcommon.Value) []byte {
 		key = protowire.AppendFixed64(key, math.Float64bits(value.Double()))
 	}
 	return key
+}
+
+func sortedRange(m pcommon.Map, fn func(k string, v pcommon.Value) bool) {
+	sortedKeys := make([]string, 0, m.Len())
+	m.Range(func(k string, _ pcommon.Value) bool {
+		sortedKeys = append(sortedKeys, k)
+		return true
+	})
+	sort.Strings(sortedKeys)
+	for _, k := range sortedKeys {
+		v, ok := m.Get(k)
+		if !ok {
+			continue
+		}
+		if !fn(k, v) {
+			return
+		}
+	}
 }

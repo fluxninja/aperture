@@ -7,8 +7,8 @@
   <a href="https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g">
     <img alt="Slack Community" src="https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen?style=for-the-badge&logo=slack">
   </a>
-  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture/tree/main.svg?style=svg&circle-token=cf4312657fbc2f4833fee89328a3f27ab5f39c10">
-    <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture/main?token=cf4312657fbc2f4833fee89328a3f27ab5f39c10&style=for-the-badge&logo=circleci">
+  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture/tree/main.svg?style=svg">
+    <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture/main?style=for-the-badge&logo=circleci">
   </a>
   <a href="https://goreportcard.com/report/github.com/fluxninja/aperture">
     <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/fluxninja/aperture?style=for-the-badge">
@@ -23,9 +23,9 @@
 
 ## 🥷 What is FluxNinja Aperture?
 
-Aperture is a reliability automation platform for cloud native applications.
-Aperture adaptively protects and recovers applications from outages by
-techniques such as concurrency limiting, rate limiting and auto-scaling.
+Aperture is an intelligent load management platform for cloud native
+applications. Aperture provides capabilities such as concurrency limiting, rate
+limiting and auto-scaling.
 
 <p align="center">
   <picture>
@@ -52,24 +52,19 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 - 🚦 Aperture Agents live next to your service instances as a sidecar and
   provide powerful
-  [flow control](https://docs.fluxninja.com/concepts/integrations/flow-control/)
-  components such as a
-  [weighted fair queuing scheduler](https://docs.fluxninja.com/concepts/integrations/flow-control/components/concurrency-limiter)
+  [flow control](https://docs.fluxninja.com/concepts/flow-control/) components
+  such as a
+  [weighted fair queuing scheduler](https://docs.fluxninja.com/concepts/flow-control/components/concurrency-limiter)
   for prioritized load-shedding and a
-  [distributed rate-limiter](https://docs.fluxninja.com/concepts/integrations/flow-control/components/rate-limiter).
-  A
-  [flow](https://docs.fluxninja.com/concepts/integrations/flow-control/flow-label)
-  is the fundamental unit of work from the perspective of an Aperture Agent. It
-  could be an API call, a feature, or even a database query.
+  [distributed rate-limiter](https://docs.fluxninja.com/concepts/flow-control/components/rate-limiter).
+  A [flow](https://docs.fluxninja.com/concepts/flow-control/flow-label) is the
+  fundamental unit of work from the perspective of an Aperture Agent. It could
+  be an API call, a feature, or even a database query.
 
 - 🤖 Aperture Controller is the "brain" of system. It is powered by always-on,
   [circuit graph driven policies](https://docs.fluxninja.com/concepts/policy/)
   that continuously track deviations from service-level objectives (SLOs) and
   calculate recovery or escalation actions.
-
-## ▶️ Explainer Video
-
-[![Build Indestructible Applications with Aperture Flow Control](https://img.youtube.com/vi/sEl4SMo3KNo/0.jpg)](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
 ## 🏗️ Architecture
 
@@ -94,9 +89,12 @@ To install Aperture system, please follow the
 To learn how to write Aperture policies, please read the
 [Tutorials](https://docs.fluxninja.com/category/tutorials).
 
-### 🎥 Demo Video
+## 🎥 Videos
 
-[![How Concurrency Limits Help Protect Against Cascading Failures](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://youtu.be/m070bAvrDHM)
+- [Chaos Carnival 2023-Graceful Degradation:Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
+- [Graceful Degradation: When All Goes Wrong | Tanveer Gill | Conf42 Chaos Engineering 2023](https://www.youtube.com/watch?v=nm62d2gYqNk)
+- [How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
+- [Build Indestructible Applications with Aperture Flow Control](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
 ## 👷 Contributing
 

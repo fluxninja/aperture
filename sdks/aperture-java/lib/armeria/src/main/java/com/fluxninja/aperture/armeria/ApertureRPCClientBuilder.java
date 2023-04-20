@@ -6,6 +6,7 @@ import com.linecorp.armeria.client.RpcClient;
 /** A builder for configuring an {@link ApertureRPCClient}. */
 public class ApertureRPCClientBuilder {
     ApertureSDK apertureSDK;
+
     public ApertureRPCClientBuilder setApertureSDK(ApertureSDK apertureSDK) {
         this.apertureSDK = apertureSDK;
         return this;

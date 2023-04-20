@@ -7,7 +7,7 @@ functionality on fine-grained features inside service code.
 
 ### ApertureClient Interface
 
-`ApertureClient` maintains a GRPC connection with Aperture Agent.
+`ApertureClient` maintains a gRPC connection with Aperture Agent.
 
 ```go
  options := aperture.Options{

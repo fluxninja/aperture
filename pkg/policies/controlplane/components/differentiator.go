@@ -36,6 +36,9 @@ func (*Differentiator) Type() runtime.ComponentType { return runtime.ComponentTy
 // ShortDescription implements runtime.Component.
 func (d *Differentiator) ShortDescription() string { return fmt.Sprintf("win: %s", d.window) }
 
+// IsActuator implements runtime.Component.
+func (*Differentiator) IsActuator() bool { return false }
+
 // NewDifferentiator creates a differentiator component.
 func NewDifferentiator(diffProto *policylangv1.Differentiator) runtime.Component {
 	diff := &Differentiator{

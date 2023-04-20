@@ -2,12 +2,6 @@ local smains = import './smains.libsonnet';
 local smaouts = import './smaouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      signal: error 'Port signal is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: smains,
   outPorts:: smaouts,

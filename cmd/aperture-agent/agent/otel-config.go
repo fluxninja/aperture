@@ -3,10 +3,13 @@ package agent
 import (
 	"crypto/tls"
 	"fmt"
+	"sort"
 	"strings"
 
 	promapi "github.com/prometheus/client_golang/api"
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
+	"golang.org/x/exp/maps"
 	"k8s.io/client-go/rest"
 
 	agentconfig "github.com/fluxninja/aperture/cmd/aperture-agent/config"
@@ -16,6 +19,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/pkg/otelcollector/leaderonlyreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
 )
 
@@ -24,27 +28,29 @@ func provideAgent(
 	lis *listener.Listener,
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
-) (*otelconfig.OTELConfig, error) {
-	var agentCfg agentconfig.AgentOTELConfig
+) (*otelconfig.OTelConfig, error) {
+	var agentCfg agentconfig.AgentOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
 		return nil, err
 	}
 
-	otelCfg := otelconfig.NewOTELConfig()
-	otelCfg.SetDebugPort(&agentCfg.CommonOTELConfig)
-	otelCfg.AddDebugExtensions(&agentCfg.CommonOTELConfig)
+	otelCfg := otelconfig.NewOTelConfig()
+	otelCfg.SetDebugPort(&agentCfg.CommonOTelConfig)
+	otelCfg.AddDebugExtensions(&agentCfg.CommonOTelConfig)
 
 	addLogsPipeline(otelCfg, &agentCfg)
 	addTracesPipeline(otelCfg, lis)
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
-	addCustomMetricsPipelines(otelCfg, &agentCfg)
-	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTELConfig, otelconsts.ProcessorAgentResourceLabels)
+	if err := addCustomMetricsPipelines(otelCfg, &agentCfg); err != nil {
+		return nil, err
+	}
+	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 	return otelCfg, nil
 }
 
 func addLogsPipeline(
-	config *otelconfig.OTELConfig,
-	userConfig *agentconfig.AgentOTELConfig,
+	config *otelconfig.OTelConfig,
+	userConfig *agentconfig.AgentOTelConfig,
 ) {
 	// Common dependencies for pipelines
 	config.AddReceiver(otelconsts.ReceiverOTLP, otlpreceiver.Config{})
@@ -81,7 +87,7 @@ func addLogsPipeline(
 	})
 }
 
-func addTracesPipeline(config *otelconfig.OTELConfig, lis *listener.Listener) {
+func addTracesPipeline(config *otelconfig.OTelConfig, lis *listener.Listener) {
 	config.AddExporter(otelconsts.ExporterOTLPLoopback, map[string]any{
 		"endpoint": lis.GetAddr(),
 		"tls": map[string]any{
@@ -114,8 +120,8 @@ func addTracesPipeline(config *otelconfig.OTELConfig, lis *listener.Listener) {
 }
 
 func addMetricsPipeline(
-	config *otelconfig.OTELConfig,
-	agentConfig *agentconfig.AgentOTELConfig,
+	config *otelconfig.OTelConfig,
+	agentConfig *agentconfig.AgentOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 	promClient promapi.Client,
@@ -132,10 +138,10 @@ func addMetricsPipeline(
 }
 
 func addCustomMetricsPipelines(
-	config *otelconfig.OTELConfig,
-	agentConfig *agentconfig.AgentOTELConfig,
-) {
-	config.AddProcessor(otelconsts.ProcessorCustromMetrics, map[string]any{
+	config *otelconfig.OTelConfig,
+	agentConfig *agentconfig.AgentOTelConfig,
+) error {
+	config.AddProcessor(otelconsts.ProcessorCustomMetrics, map[string]any{
 		"attributes": []map[string]interface{}{
 			{
 				"key":    "service.name",
@@ -144,30 +150,78 @@ func addCustomMetricsPipelines(
 			},
 		},
 	})
+	if agentConfig.CustomMetrics == nil {
+		agentConfig.CustomMetrics = map[string]agentconfig.CustomMetricsConfig{}
+	}
 	if _, ok := agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats]; !ok {
-		if agentConfig.CustomMetrics == nil {
-			agentConfig.CustomMetrics = map[string]agentconfig.CustomMetricsConfig{}
-		}
 		agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats] = makeCustomMetricsConfigForKubeletStats()
 	}
 	for pipelineName, metricConfig := range agentConfig.CustomMetrics {
-		pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
-		for receiverName, receiverConfig := range metricConfig.Receivers {
-			config.AddReceiver(normalizeComponentName(pipelineName, receiverName), receiverConfig)
+		if err := addCustomMetricsPipeline(config, pipelineName, metricConfig); err != nil {
+			return fmt.Errorf("failed to add custom metric pipeline %s: %w", pipelineName, err)
 		}
-		for processorName, processorConfig := range metricConfig.Processors {
-			config.AddProcessor(normalizeComponentName(pipelineName, processorName), processorConfig)
-		}
-		config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
-			Receivers: normalizeComponentNames(pipelineName, metricConfig.Pipeline.Receivers),
-			Processors: append(
-				normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
-				otelconsts.ProcessorCustromMetrics,
-				otelconsts.ProcessorAgentGroup,
-			),
-			Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
-		})
 	}
+	return nil
+}
+
+func addCustomMetricsPipeline(
+	config *otelconfig.OTelConfig,
+	pipelineName string,
+	metricConfig agentconfig.CustomMetricsConfig,
+) error {
+	pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
+
+	receiverIDs := map[string]string{}
+	processorIDs := map[string]string{}
+
+	for origName, receiverConfig := range metricConfig.Receivers {
+		var id component.ID
+		if err := id.UnmarshalText([]byte(origName)); err != nil {
+			return fmt.Errorf("invalid id %q: %w", origName, err)
+		}
+		id = component.NewIDWithName(id.Type(), normalizeComponentName(pipelineName, id.Name()))
+		id, receiverConfig = leaderonlyreceiver.WrapConfigIf(metricConfig.PerAgentGroup, id, receiverConfig)
+		receiverIDs[origName] = id.String()
+		config.AddReceiver(id.String(), receiverConfig)
+	}
+
+	for origName, processorConfig := range metricConfig.Processors {
+		id := normalizeComponentName(pipelineName, origName)
+		processorIDs[origName] = id
+		config.AddProcessor(id, processorConfig)
+	}
+
+	if len(metricConfig.Pipeline.Receivers) == 0 && len(metricConfig.Pipeline.Processors) == 0 {
+		if len(metricConfig.Processors) >= 1 {
+			return fmt.Errorf("empty pipeline, inferring pipeline is supported only with 0 or 1 processors")
+		}
+
+		// Skip adding pipeline if there are no receivers and processors.
+		if len(metricConfig.Receivers) == 0 && len(metricConfig.Processors) == 0 {
+			return nil
+		}
+
+		// When pipeline not set explicitly, create pipeline with all defined receivers and processors.
+		if len(metricConfig.Receivers) > 0 {
+			metricConfig.Pipeline.Receivers = maps.Keys(metricConfig.Receivers)
+			sort.Strings(metricConfig.Pipeline.Receivers)
+		}
+		if len(metricConfig.Processors) > 0 {
+			metricConfig.Pipeline.Processors = maps.Keys(metricConfig.Processors)
+		}
+	}
+
+	config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
+		Receivers: mapSlice(receiverIDs, metricConfig.Pipeline.Receivers),
+		Processors: append(
+			mapSlice(processorIDs, metricConfig.Pipeline.Processors),
+			otelconsts.ProcessorCustomMetrics,
+			otelconsts.ProcessorAgentResourceLabels,
+		),
+		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
+	})
+
+	return nil
 }
 
 // normalizePipelineName normalizes user defined pipeline name by adding
@@ -177,21 +231,27 @@ func normalizePipelineName(pipelineName string) string {
 	return fmt.Sprintf("metrics/user-defined-%s", pipelineName)
 }
 
-// normalizeComponentNames calls `normalizeComponentName` for each element of the
-// slice. Returns new slice with modified elements.
-func normalizeComponentNames(pipelineName string, components []string) []string {
-	renamed := make([]string, len(components))
-	for i, c := range components {
-		renamed[i] = normalizeComponentName(pipelineName, c)
+func mapSlice(mapping map[string]string, xs []string) []string {
+	ys := make([]string, 0, len(xs))
+	for _, x := range xs {
+		y, ok := mapping[x]
+		if !ok {
+			y = x
+		}
+		ys = append(ys, y)
 	}
-	return renamed
+	return ys
 }
 
 // normalizeComponentName normalizes user defines component name by adding
 // `user-defined-<pipeline_name>` suffix.
 // This ensures no builtin components are overwritten.
 func normalizeComponentName(pipelineName, componentName string) string {
-	return fmt.Sprintf("%s/user-defined-%s", componentName, pipelineName)
+	suffix := fmt.Sprintf("user-defined-%s", pipelineName)
+	if componentName == "" {
+		return suffix
+	}
+	return fmt.Sprintf("%s/%s", componentName, suffix)
 }
 
 func makeCustomMetricsConfigForKubeletStats() agentconfig.CustomMetricsConfig {
@@ -271,28 +331,30 @@ func makeCustomMetricsConfigForKubeletStats() agentconfig.CustomMetricsConfig {
 }
 
 func addPrometheusReceiver(
-	config *otelconfig.OTELConfig,
-	agentConfig *agentconfig.AgentOTELConfig,
+	config *otelconfig.OTelConfig,
+	agentConfig *agentconfig.AgentOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 ) {
 	scrapeConfigs := []map[string]any{
 		otelconfig.BuildApertureSelfScrapeConfig("aperture-self", tlsConfig, lis),
-		otelconfig.BuildOTELScrapeConfig("aperture-otel", agentConfig.CommonOTELConfig),
+		otelconfig.BuildOTelScrapeConfig("aperture-otel", agentConfig.CommonOTelConfig),
 	}
 
-	_, err := rest.InClusterConfig()
-	if err == rest.ErrNotInCluster {
-		log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
-	} else if err != nil {
-		log.Warn().Err(err).Msg("Error when discovering k8s environment")
-	} else {
-		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
-		scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
+	if !agentConfig.DisableKubernetesScraper {
+		_, err := rest.InClusterConfig()
+		if err == rest.ErrNotInCluster {
+			log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
+		} else if err != nil {
+			log.Warn().Err(err).Msg("Error when discovering k8s environment")
+		} else {
+			log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
+			scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
+		}
 	}
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
-	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
+	// tags, so they are not properly read by OTel. Need to use bare maps instead.
 	config.AddReceiver(otelconsts.ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{

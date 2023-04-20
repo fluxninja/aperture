@@ -24,6 +24,9 @@ func (*Min) Type() runtime.ComponentType { return runtime.ComponentTypeSignalPro
 // ShortDescription implements runtime.Component.
 func (*Min) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*Min) IsActuator() bool { return false }
+
 // Make sure Min complies with Component interface.
 var _ runtime.Component = (*Min)(nil)
 

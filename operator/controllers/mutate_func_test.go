@@ -133,7 +133,7 @@ var _ = Describe("Test Secret Mutate", func() {
 		}
 
 		secret := &corev1.Secret{}
-		err := SecretMutate(secret, expected.Data)()
+		err := SecretMutate(secret, expected.Data, expected.OwnerReferences)()
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(secret).To(Equal(expected))
@@ -188,9 +188,6 @@ var _ = Describe("Test ValidatingWebhookConfiguration Mutate", func() {
 					AdmissionReviewVersions: TestArray,
 					ClientConfig: admissionregistrationv1.WebhookClientConfig{
 						URL: &Test,
-					},
-					NamespaceSelector: &metav1.LabelSelector{
-						MatchLabels: TestMap,
 					},
 					ObjectSelector: &metav1.LabelSelector{
 						MatchLabels: TestMap,

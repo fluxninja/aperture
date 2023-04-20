@@ -6,7 +6,8 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -16,8 +17,8 @@ func newFlowControlCompositeAndOptions(
 	flowControlComponentProto *policylangv1.FlowControl,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
-	retErr := func(err error) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 		return Tree{}, nil, nil, err
 	}
 
@@ -28,7 +29,7 @@ func newFlowControlCompositeAndOptions(
 	// Factory parser to determine what kind of composite component to create
 	if concurrencyLimiterProto := flowControlComponentProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
 		var (
-			configuredComponents []runtime.ConfiguredComponent
+			configuredComponents []*runtime.ConfiguredComponent
 			tree                 Tree
 			options              []fx.Option
 		)
@@ -47,14 +48,14 @@ func newFlowControlCompositeAndOptions(
 				return retErr(err)
 			}
 
-			// Need a unique ID for sub component since it's used for graph generation
-			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID)
+			// Need a unique ID for sub component since it is used for graph generation
+			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
 			}
 
 			configuredComponents = append(configuredComponents, schedulerConfComp)
-			tree.Children = append(tree.Children, Tree{Root: schedulerConfComp})
+			tree.Children = append(tree.Children, Tree{Node: schedulerConfComp})
 
 			options = append(options, schedulerOptions)
 
@@ -72,12 +73,12 @@ func newFlowControlCompositeAndOptions(
 				return retErr(err)
 			}
 
-			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID.ChildID(".LoadActuator"), parentCircuitID)
+			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID.ChildID("LoadActuator"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
 			}
 			configuredComponents = append(configuredComponents, loadActuatorConfComp)
-			tree.Children = append(tree.Children, Tree{Root: loadActuatorConfComp})
+			tree.Children = append(tree.Children, Tree{Node: loadActuatorConfComp})
 
 			options = append(options, loadActuatorOptions)
 
@@ -94,17 +95,31 @@ func newFlowControlCompositeAndOptions(
 				runtime.ComponentTypeSignalProcessor),
 			concurrencyLimiterProto,
 			componentID,
+			false,
 		)
 		if err != nil {
 			return retErr(err)
 		}
 
 		concurrencyLimiterConfComp.PortMapping = portMapping
-		tree.Root = concurrencyLimiterConfComp
+		tree.Node = concurrencyLimiterConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if aimdConcurrencyController := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
-		return ParseAIMDConcurrencyController(componentID, aimdConcurrencyController, policyReadAPI)
+		nestedCircuit, err := concurrency.ParseAIMDConcurrencyController(aimdConcurrencyController)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+	} else if loadShaper := flowControlComponentProto.GetLoadShaper(); loadShaper != nil {
+		nestedCircuit, err := flowregulator.ParseLoadShaper(loadShaper)
+		if err != nil {
+			return retErr(err)
+		}
+
+		tree, configuredComponents, options, err := ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		return tree, configuredComponents, options, err
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }

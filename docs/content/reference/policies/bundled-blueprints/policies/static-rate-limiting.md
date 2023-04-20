@@ -4,164 +4,214 @@ title: Static Rate Limiting Policy
 
 ## Introduction
 
-This blueprint provides a simple static rate limiting policy and a dashboard.
-
-## Configuration
+This blueprint provides a simple static rate-limiting policy and a dashboard.
+This policy uses the [`RateLimiter`](/reference/policies/spec.md#rate-limiter)
+component.
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-
-export const ParameterHeading = ({children}) => (
-  <span style={{fontWeight: "bold"}}>{children}</span>
-);
-
-export const WrappedDescription = ({children}) => (
-  <span style={{wordWrap: "normal"}}>{children}</span>
-);
-
-export const RefType = ({type, reference}) => (
-  <a href={reference}>{type}</a>
-);
-
-export const ParameterDescription = ({name, type, reference, value, description}) => (
-  <table class="blueprints-params">
-  <tr>
-    <td><ParameterHeading>Parameter</ParameterHeading></td>
-    <td><code>{name}</code></td>
-  </tr>
-  <tr>
-    <td><ParameterHeading>Type</ParameterHeading></td>
-    <td><em>{reference == "" ? type : <RefType type={type} reference={reference} />}</em></td>
-  </tr>
-  <tr>
-    <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value}</code></td>
-  </tr>
-  <tr>
-    <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
-    <td class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
-  </tr>
-</table>
-);
-```
-
-```mdx-code-block
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
-Code: <a
+## Configuration
+
+<!-- vale off -->
+
+Blueprint name: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/static-rate-limiting`}>policies/static-rate-limiting</a>
 
-<h3 class="blueprints-h3">Common</h3>
+<!-- vale on -->
+
+### Parameters
+
+<!-- vale off -->
+
+#### common {#common}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="common-policy-name"></a>
 
 <ParameterDescription
-    name="common.policy_name"
-    type="string"
-    reference=""
-    value="__REQUIRED_FIELD__"
-    description='Name of the policy.' />
+    name='common.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
 
-<h3 class="blueprints-h3">Policy</h3>
+<!-- vale on -->
 
-<ParameterDescription
-    name="policy.evaluation_interval"
-    type="string"
-    reference=""
-    value="'300s'"
-    description='How often should the policy be re-evaluated' />
+---
 
-<ParameterDescription
-    name="policy.classifiers"
-    type="[]aperture.spec.v1.Classifier"
-    reference="../../spec#v1-classifier"
-    value="[]"
-    description='List of classification rules.' />
+<!-- vale off -->
 
-<h4 class="blueprints-h4">Rate Limiter</h4>
+#### policy {#policy}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-classifiers"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.rate_limit"
-    type="float64"
-    reference=""
-    value="__REQUIRED_FIELD__"
-    description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept' />
+    name='policy.classifiers'
+    description='List of classification rules.'
+    type='Array of Object (aperture.spec.v1.Classifier)'
+    reference='../../spec#classifier'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.rate_limiter {#policy-rate-limiter}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-rate-limit"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.flow_selector"
-    type="aperture.spec.v1.FlowSelector"
-    reference="../../spec#v1-flow-selector"
-    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
-    description='A flow selector to match requests against' />
+    name='policy.rate_limiter.rate_limit'
+    description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-flow-selector"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.flow_selector.service_selector.service"
-    type="string"
-    reference=""
-    value="__REQUIRED_FIELD__"
-    description='Service Name.' />
+    name='policy.rate_limiter.flow_selector'
+    description='A flow selector to match requests against'
+    type='Object (aperture.spec.v1.FlowSelector)'
+    reference='../../spec#flow-selector'
+    value='{"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-parameters"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.flow_selector.flow_matcher.control_point"
-    type="string"
-    reference=""
-    value="__REQUIRED_FIELD__"
-    description='Control Point Name.' />
+    name='policy.rate_limiter.parameters'
+    description='Parameters.'
+    type='Object (aperture.spec.v1.RateLimiterParameters)'
+    reference='../../spec#rate-limiter-parameters'
+    value='{"label_key": "__REQUIRED_FIELD__", "limit_reset_interval": "__REQUIRED_FIELD__"}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-default-config"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.parameters"
-    type="aperture.spec.v1.RateLimiterParameters"
-    reference="../../spec#v1-rate-limiter-parameters"
-    value="{'label_key': '__REQUIRED_FIELD__', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
-    description='Parameters.' />
+    name='policy.rate_limiter.default_config'
+    description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.'
+    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
+    reference='../../spec#rate-limiter-dynamic-config'
+    value='{"overrides": []}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### dashboard {#dashboard}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-refresh-interval"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.parameters.label_key"
-    type="string"
-    reference=""
-    value="__REQUIRED_FIELD__"
-    description='Flow label to use for rate limiting.' />
+    name='dashboard.refresh_interval'
+    description='Refresh interval for dashboard panels.'
+    type='string'
+    reference=''
+    value='"10s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### dashboard.datasource {#dashboard-datasource}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
 
 <ParameterDescription
-    name="policy.rate_limiter.default_config"
-    type="aperture.spec.v1.RateLimiterDynamicConfig"
-    reference="../../spec#v1-rate-limiter-dynamic-config"
-    value="{'overrides': []}"
-    description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
+/>
 
-<h3 class="blueprints-h3">Dashboard</h3>
+<!-- vale on -->
 
-<ParameterDescription
-    name="dashboard.refresh_interval"
-    type="string"
-    reference=""
-    value="'10s'"
-    description='Refresh interval for dashboard panels.' />
+<!-- vale off -->
 
-<h4 class="blueprints-h4">Datasource</h4>
+<a id="dashboard-datasource-filter-regex"></a>
 
 <ParameterDescription
-    name="dashboard.datasource.name"
-    type="string"
-    reference=""
-    value="'$datasource'"
-    description='Datasource name.' />
+    name='dashboard.datasource.filter_regex'
+    description='Datasource filter regex.'
+    type='string'
+    reference=''
+    value='""'
+/>
 
-<ParameterDescription
-    name="dashboard.datasource.filter_regex"
-    type="string"
-    reference=""
-    value="''"
-    description='Datasource filter regex.' />## Dynamic Configuration The
-following configuration parameters can be
+<!-- vale on -->
+
+---
+
+## Dynamic Configuration
+
+:::note
+
+The following configuration parameters can be
 [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
 at runtime, without reloading the policy.
 
-<h3 class="blueprints-h3">Dynamic Configuration</h3>
+:::
+
+### Parameters
+
+<!-- vale off -->
+
+<a id="rate-limiter"></a>
 
 <ParameterDescription
-    name="rate_limiter"
-    type="aperture.spec.v1.RateLimiterDynamicConfig"
-    reference="../../spec#v1-rate-limiter-dynamic-config"
-    value="__REQUIRED_FIELD__"
-    description='Rate limiter dynamic configuration that is updated at runtime.' />
+    name='rate_limiter'
+    description='Rate limiter dynamic configuration that is updated at runtime.'
+    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
+    reference='../../spec#rate-limiter-dynamic-config'
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---

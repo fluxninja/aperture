@@ -8,9 +8,10 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/promql"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -35,7 +36,7 @@ func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
@@ -52,8 +53,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
 		ctor = mkCtor(config.Switcher, components.NewSwitcherAndOptions)
-	case *policylangv1.Component_Sqrt:
-		ctor = mkCtor(config.Sqrt, components.NewSqrtAndOptions)
+	case *policylangv1.Component_UnaryOperator:
+		ctor = mkCtor(config.UnaryOperator, components.NewUnaryOperatorAndOptions)
 	case *policylangv1.Component_Max:
 		ctor = mkCtor(config.Max, components.NewMaxAndOptions)
 	case *policylangv1.Component_Min:
@@ -78,6 +79,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
 	case *policylangv1.Component_Holder:
 		ctor = mkCtor(config.Holder, components.NewHolderAndOptions)
+	case *policylangv1.Component_SignalGenerator:
+		ctor = mkCtor(config.SignalGenerator, components.NewSignalGeneratorAndOptions)
 	case *policylangv1.Component_NestedSignalIngress:
 		ctor = mkCtor(config.NestedSignalIngress, components.NewNestedSignalIngressAndOptions)
 	case *policylangv1.Component_NestedSignalEgress:
@@ -95,6 +98,8 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+		case *policylangv1.FlowControl_FlowRegulator:
+			ctor = mkCtor(flowControlConfig.FlowRegulator, flowregulator.NewFlowRegulatorAndOptions)
 		default:
 			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
 		}
@@ -110,12 +115,12 @@ func NewComponentAndOptions(
 		return Tree{}, nil, nil, err
 	}
 
-	configuredComponent, err := prepareComponent(component, config, componentID)
+	configuredComponent, err := prepareComponent(component, config, componentID, true)
 	if err != nil {
 		return Tree{}, nil, nil, err
 	}
 
-	return Tree{Root: configuredComponent}, []runtime.ConfiguredComponent{configuredComponent}, option, nil
+	return Tree{Node: configuredComponent}, []*runtime.ConfiguredComponent{configuredComponent}, option, nil
 }
 
 type componentConstructor func(
@@ -137,13 +142,14 @@ func prepareComponent(
 	component runtime.Component,
 	config any,
 	componentID runtime.ComponentID,
-) (runtime.ConfiguredComponent, error) {
+	doParsePortMapping bool,
+) (*runtime.ConfiguredComponent, error) {
 	subCircuitID, ok := componentID.ParentID()
 	if !ok {
-		return runtime.ConfiguredComponent{}, fmt.Errorf("component %s is not in a circuit", componentID.String())
+		return nil, fmt.Errorf("component %s is not in a circuit", componentID.String())
 	}
 
-	return prepareComponentInCircuit(component, config, componentID, subCircuitID)
+	return prepareComponentInCircuit(component, config, componentID, subCircuitID, doParsePortMapping)
 }
 
 func prepareComponentInCircuit(
@@ -151,18 +157,22 @@ func prepareComponentInCircuit(
 	config any,
 	componentID runtime.ComponentID,
 	subCircuitID runtime.ComponentID,
-) (runtime.ConfiguredComponent, error) {
+	doParsePortMapping bool,
+) (*runtime.ConfiguredComponent, error) {
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, err
+		return nil, err
 	}
 
-	ports, err := runtime.PortsFromComponentConfig(mapStruct, subCircuitID.String())
-	if err != nil {
-		return runtime.ConfiguredComponent{}, err
+	ports := runtime.NewPortMapping()
+	if doParsePortMapping {
+		ports, err = runtime.PortsFromComponentConfig(mapStruct, subCircuitID.String())
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return runtime.ConfiguredComponent{
+	return &runtime.ConfiguredComponent{
 		Component:   component,
 		PortMapping: ports,
 		Config:      mapStruct,

@@ -12,6 +12,8 @@ public class NettyServer {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_INSECURE_GRPC = "true";
+    public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) throws Exception {
         String agentHost = System.getenv("FN_AGENT_HOST");
@@ -26,6 +28,16 @@ public class NettyServer {
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }
+        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        if (insecureGrpcString == null) {
+            insecureGrpcString = DEFAULT_INSECURE_GRPC;
+        }
+        boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
+
+        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        if (rootCertFile == null) {
+            rootCertFile = DEFAULT_ROOT_CERT;
+        }
 
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -34,9 +46,11 @@ public class NettyServer {
 
             ServerBootstrap httpBootstrap = new ServerBootstrap();
 
-            httpBootstrap.group(bossGroup, workerGroup)
+            httpBootstrap
+                    .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ServerInitializer(agentHost, agentPort))
+                    .childHandler(
+                            new ServerInitializer(agentHost, agentPort, insecureGrpc, rootCertFile))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
@@ -45,8 +59,7 @@ public class NettyServer {
 
             // Wait until the server socket is closed
             httpChannel.channel().closeFuture().sync();
-        }
-        finally {
+        } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }

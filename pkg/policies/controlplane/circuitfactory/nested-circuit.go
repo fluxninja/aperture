@@ -2,6 +2,10 @@ package circuitfactory
 
 import (
 	"encoding/json"
+	"fmt"
+
+	"github.com/mitchellh/mapstructure"
+	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -9,9 +13,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
-	"go.uber.org/fx"
 )
 
 // ParseNestedCircuit parses a nested circuit and returns the parent, leaf components, and options.
@@ -19,8 +20,8 @@ func ParseNestedCircuit(
 	nestedCircuitID runtime.ComponentID,
 	nestedCircuit *policylangv1.NestedCircuit,
 	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
-	retErr := func(err error) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 		return Tree{}, nil, nil, err
 	}
 
@@ -39,7 +40,7 @@ func ParseNestedCircuit(
 	portMapping := runtime.NewPortMapping()
 	parentCircuitID, ok := nestedCircuitID.ParentID()
 	if !ok {
-		return retErr(errors.Errorf("nested circuit %s does not have a parent circuit", nestedCircuitID))
+		return retErr(fmt.Errorf("nested circuit %s does not have a parent circuit", nestedCircuitID))
 	}
 
 	inPortsMap := nestedCircuitProto.GetInPortsMap()
@@ -57,7 +58,9 @@ func ParseNestedCircuit(
 	portMapping.Ins = ins
 	portMapping.Outs = outs
 
-	tree, leafComponents, options, err := CreateComponents(
+	tree := Tree{}
+
+	leafComponents, options, err := tree.CreateComponents(
 		nestedCircuitProto.GetComponents(),
 		nestedCircuitID,
 		policyReadAPI,
@@ -78,7 +81,7 @@ func ParseNestedCircuit(
 			portName := nestedSignalIngress.PortName()
 			// tracking the port names in the nested circuit
 			if _, ok := ingressPorts[portName]; ok {
-				return retErr(errors.Errorf("duplicate ingress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
+				return retErr(fmt.Errorf("duplicate ingress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
 			}
 			ingressPorts[portName] = nil
 			signals, ok := portMapping.GetInPort(portName)
@@ -90,7 +93,7 @@ func ParseNestedCircuit(
 			portName := nestedSignalEgress.PortName()
 			// tracking the port names in the nested circuit
 			if _, ok := egressPorts[portName]; ok {
-				return retErr(errors.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
+				return retErr(fmt.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
 			}
 			egressPorts[portName] = nil
 			signals, ok := portMapping.GetOutPort(portName)
@@ -104,13 +107,13 @@ func ParseNestedCircuit(
 
 	for portName := range portMapping.Ins {
 		if _, ok := ingressPorts[portName]; !ok {
-			return retErr(errors.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
+			return retErr(fmt.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
 		}
 	}
 
 	for portName := range portMapping.Outs {
 		if _, ok := egressPorts[portName]; !ok {
-			return retErr(errors.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
+			return retErr(fmt.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
 		}
 	}
 
@@ -120,12 +123,13 @@ func ParseNestedCircuit(
 			runtime.ComponentTypeSignalProcessor),
 		nestedCircuitProto,
 		nestedCircuitID,
+		false,
 	)
 	if err != nil {
 		return retErr(err)
 	}
 	nestedCircConfComp.PortMapping = portMapping
-	tree.Root = nestedCircConfComp
+	tree.Node = nestedCircConfComp
 
 	return tree, leafComponents, options, err
 }
@@ -133,10 +137,16 @@ func ParseNestedCircuit(
 // DecodePortMap decodes a proto port map into a PortToSignals map.
 func DecodePortMap(config any, circuitID string) (runtime.PortToSignals, error) {
 	ports := make(runtime.PortToSignals)
+	if config == nil {
+		return ports, nil
+	}
 
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
 		return nil, err
+	}
+	if len(mapStruct) == 0 {
+		return ports, nil
 	}
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		WeaklyTypedInput: true, // So that singular ports will transparently be converted to lists.

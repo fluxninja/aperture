@@ -4,35 +4,38 @@ import (
 	"context"
 	"net"
 
+	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
 // ServiceGetter can be used to query services based on client context.
 type ServiceGetter interface {
 	ServicesFromContext(ctx context.Context) []string
+	ServicesFromSocketAddress(addr *corev3.SocketAddress) []string
+	ServicesFromAddress(addr string) []string
 }
 
-// FromEntityCache creates a new EntityCache-powered ServiceGetter.
-func FromEntityCache(ec *entitycache.EntityCache) ServiceGetter {
-	return &ecServiceGetter{entityCache: ec}
+// FromEntities creates a new Entities-powered ServiceGetter.
+func FromEntities(ec *entities.Entities) ServiceGetter {
+	return &ecServiceGetter{entities: ec}
 }
 
 // NewEmpty creates a new ServiceGetter that always returns nil.
 func NewEmpty() ServiceGetter { return emptyServiceGetter{} }
 
 type ecServiceGetter struct {
-	entityCache    *entitycache.EntityCache
+	entities       *entities.Entities
 	ecHasDiscovery bool
 	metrics        *Metrics
 }
 
 // ServicesFromContext returns list of services associated with IP extracted from context
 //
-// The returned list of services depends only on state of entityCache.
+// The returned list of services depends only on state of entities.
 // However, emitted warnings will depend on whether service discovery is enabled or not.
 func (sg *ecServiceGetter) ServicesFromContext(ctx context.Context) []string {
 	svcs, ok := sg.servicesFromContext(ctx)
@@ -55,15 +58,13 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 			log.Bug().Msg("client addr is not TCP")
 		}
 		return nil, false
-
 	}
 
 	clientIP := tcpAddr.IP.String()
-	entity, err := sg.entityCache.GetByIP(clientIP)
+	entity, err := sg.entities.GetByIP(clientIP)
 	if err != nil {
 		if sg.ecHasDiscovery {
-			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", clientIP).
-				Msg("cannot get services")
+			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", clientIP).Msg("cannot get services")
 		}
 		return nil, false
 	}
@@ -71,22 +72,44 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 	return entity.Services, true
 }
 
+// ServicesFromSocketAddress returns list of services associated with IP extracted from SocketAddress.
+func (sg *ecServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddress) []string {
+	svcs := sg.ServicesFromAddress(addr.GetAddress())
+	sg.metrics.inc(svcs != nil)
+	if svcs == nil {
+		svcs = []string{"UNKNOWN"}
+	}
+	return svcs
+}
+
+// ServicesFromAddress returns list of services associated with given IP.
+func (sg *ecServiceGetter) ServicesFromAddress(addr string) []string {
+	entity, err := sg.entities.GetByIP(addr)
+	if err != nil {
+		if sg.ecHasDiscovery {
+			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", addr).Msg("cannot get services")
+		}
+		return nil
+	}
+	return entity.Services
+}
+
 var noEntitySampler = log.NewRatelimitingSampler()
 
-// FxIn are FX arguments to ProvideFromEntityCache.
+// FxIn are FX arguments to ProvideFromEntities.
 type FxIn struct {
 	fx.In
 	Lifecycle      fx.Lifecycle
-	EntityCache    *entitycache.EntityCache
-	EntityTrackers *entitycache.EntityTrackers
+	Entities       *entities.Entities
+	EntityTrackers *entities.EntityTrackers
 	Metrics        *Metrics `optional:"true"`
 }
 
-// ProvideFromEntityCache provides an EntityCache-powered ServiceGetter.
-func ProvideFromEntityCache(in FxIn) ServiceGetter {
+// ProvideFromEntities provides an Entities-powered ServiceGetter.
+func ProvideFromEntities(in FxIn) ServiceGetter {
 	sg := &ecServiceGetter{
-		entityCache: in.EntityCache,
-		metrics:     in.Metrics,
+		entities: in.Entities,
+		metrics:  in.Metrics,
 	}
 
 	in.Lifecycle.Append(fx.Hook{
@@ -104,5 +127,15 @@ func ProvideFromEntityCache(in FxIn) ServiceGetter {
 
 type emptyServiceGetter struct{}
 
-// ServicesFromContext implements ServiceGetter interface.
+// ServicesFromContext implements ServiceGetter interface for emptyServiceGetter.
 func (sg emptyServiceGetter) ServicesFromContext(ctx context.Context) []string { return nil }
+
+// ServicesFromSocketAddress implements ServiceGetter interface for emptyServiceGetter.
+func (sg emptyServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddress) []string {
+	return nil
+}
+
+// ServicesFromAddress implements ServiceGetter interface for emptyServiceGetter.
+func (sg emptyServiceGetter) ServicesFromAddress(addr string) []string {
+	return nil
+}

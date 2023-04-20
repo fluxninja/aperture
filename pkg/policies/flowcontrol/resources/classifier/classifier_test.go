@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/open-policy-agent/opa/ast"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -146,14 +147,14 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies input by returning flow labels", func() {
-			_, labels := classifier.Classify(
+			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
 				map[string]string{"version": "one", "other": "tag"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -162,29 +163,29 @@ var _ = Describe("Classifier", func() {
 			}))
 		})
 
-		It("doesn't classify if direction doesn't match", func() {
-			_, labels := classifier.Classify(
+		It("does not classify if direction does not match", func() {
+			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"egress",
 				map[string]string{"version": "one"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(BeEmpty())
 		})
 
 		It("skips rules with non-matching labels", func() {
-			_, labels := classifier.Classify(
+			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
 				map[string]string{"version": "two"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -196,14 +197,14 @@ var _ = Describe("Classifier", func() {
 			BeforeEach(func() { ars1.Drop() })
 
 			It("removes removes subset of rules", func() {
-				_, labels := classifier.Classify(
+				_, labels, _ := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
 					"ingress",
 					map[string]string{"version": "one"},
 					attributesWithHeaders(object{
 						"foo": "hello",
-						"bar": 21,
+						"bar": int64(21),
 					}),
 				)
 				Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -269,14 +270,14 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("marks the returned flow labels with those flags", func() {
-			_, labels := classifier.Classify(
+			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -287,7 +288,7 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("configured with same label for different rules in yaml", func() {
-		// Note: we don't support multiple rules for the same label in a single
+		// Note: we do not support multiple rules for the same label in a single
 		// rulesets. But we might add support in the future, eg.:
 		// "foo/1": ...
 		// "foo/2": ...
@@ -312,7 +313,7 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			_, labels := classifier.Classify(
+			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
@@ -320,7 +321,7 @@ var _ = Describe("Classifier", func() {
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"xyz": "cos",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(SatisfyAny(
@@ -368,14 +369,14 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			_, labels := classifier.Classify(
+			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(SatisfyAny(
@@ -431,14 +432,14 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies and returns empty flow labels - could not decide which rego to use", func() {
-			_, labels := classifier.Classify(
+			_, labels, _ := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{}))
@@ -481,16 +482,16 @@ func fl(s string) flowlabel.FlowLabelValue {
 	}
 }
 
-func attributesWithHeaders(headers object) object {
-	return object{
+func attributesWithHeaders(headers object) ast.Value {
+	input := object{
 		"attributes": object{
 			"request": object{
 				"http": object{
 					"headers": headers,
 				},
 			},
-		},
-	}
+		}}
+	return ast.MustInterfaceToValue(input)
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {

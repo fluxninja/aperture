@@ -334,7 +334,7 @@ var _ = Describe("Tests for containerProbes", func() {
 			expectedLiveness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
-						Path:   "/v1/status/subsystem/liveness",
+						Path:   "/v1/status/system/liveness",
 						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
@@ -359,7 +359,7 @@ var _ = Describe("Tests for containerProbes", func() {
 			probe := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
-						Path: "/v1/status/subsystem/liveness",
+						Path: "/v1/status/system/liveness",
 						Port: intstr.FromString(Server),
 					},
 				},
@@ -416,7 +416,7 @@ var _ = Describe("Tests for containerProbes", func() {
 			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
-						Path:   "/v1/status/subsystem/readiness",
+						Path:   "/v1/status/system/readiness",
 						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
@@ -441,7 +441,7 @@ var _ = Describe("Tests for containerProbes", func() {
 			probe := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
-						Path: "/v1/status/subsystem/readiness",
+						Path: "/v1/status/system/readiness",
 						Port: intstr.FromString(Server),
 					},
 				},
@@ -506,7 +506,7 @@ var _ = Describe("Tests for containerProbes", func() {
 			expectedReadiness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
-						Path:   "/v1/status/subsystem/readiness",
+						Path:   "/v1/status/system/readiness",
 						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
@@ -521,7 +521,7 @@ var _ = Describe("Tests for containerProbes", func() {
 			expectedLiveness := &corev1.Probe{
 				ProbeHandler: corev1.ProbeHandler{
 					HTTPGet: &corev1.HTTPGetAction{
-						Path:   "/v1/status/subsystem/liveness",
+						Path:   "/v1/status/system/liveness",
 						Port:   intstr.FromString(Server),
 						Scheme: corev1.URISchemeHTTP,
 					},
@@ -551,7 +551,7 @@ var _ = Describe("Tests for agentEnv", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								Create: true,
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
@@ -583,11 +583,11 @@ var _ = Describe("Tests for agentEnv", func() {
 					},
 				},
 				{
-					Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+					Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 					Value: "true",
 				},
 				{
-					Name: "APERTURE_AGENT_FLUXNINJA_PLUGIN_API_KEY",
+					Name: "APERTURE_AGENT_FLUXNINJA_API_KEY",
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{
@@ -648,7 +648,7 @@ var _ = Describe("Tests for agentEnv", func() {
 					},
 				},
 				{
-					Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+					Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 					Value: "true",
 				},
 			}
@@ -806,7 +806,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 				Spec: controllerv1alpha1.ControllerSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								Create: true,
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
@@ -833,7 +833,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 					Value: AppName,
 				},
 				{
-					Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
+					Name: "APERTURE_CONTROLLER_FLUXNINJA_API_KEY",
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{
@@ -913,16 +913,6 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					MountPath: "/etc/aperture/aperture-controller/config",
 				},
 				{
-					Name:      "etc-aperture-policies",
-					MountPath: PolicyFilePath,
-					ReadOnly:  true,
-				},
-				{
-					Name:      "etc-aperture-classification",
-					MountPath: "/etc/aperture/aperture-controller/classifiers",
-					ReadOnly:  true,
-				},
-				{
 					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
@@ -963,16 +953,6 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					MountPath: "/etc/aperture/aperture-controller/config",
 				},
 				{
-					Name:      "etc-aperture-policies",
-					MountPath: PolicyFilePath,
-					ReadOnly:  true,
-				},
-				{
-					Name:      "etc-aperture-classification",
-					MountPath: "/etc/aperture/aperture-controller/classifiers",
-					ReadOnly:  true,
-				},
-				{
 					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
@@ -1005,24 +985,6 @@ var _ = Describe("Tests for controllerVolumes", func() {
 							LocalObjectReference: corev1.LocalObjectReference{
 								Name: ControllerServiceName,
 							},
-						},
-					},
-				},
-				{
-					Name: "etc-aperture-policies",
-					VolumeSource: corev1.VolumeSource{
-						EmptyDir: &corev1.EmptyDirVolumeSource{},
-					},
-				},
-				{
-					Name: "etc-aperture-classification",
-					VolumeSource: corev1.VolumeSource{
-						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32(420),
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "classification",
-							},
-							Optional: pointer.Bool(true),
 						},
 					},
 				},
@@ -1078,24 +1040,6 @@ var _ = Describe("Tests for controllerVolumes", func() {
 							LocalObjectReference: corev1.LocalObjectReference{
 								Name: ControllerServiceName,
 							},
-						},
-					},
-				},
-				{
-					Name: "etc-aperture-policies",
-					VolumeSource: corev1.VolumeSource{
-						EmptyDir: &corev1.EmptyDirVolumeSource{},
-					},
-				},
-				{
-					Name: "etc-aperture-classification",
-					VolumeSource: corev1.VolumeSource{
-						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32(420),
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "classification",
-							},
-							Optional: pointer.Bool(true),
 						},
 					},
 				},
@@ -1178,7 +1122,7 @@ var _ = Describe("Tests for secretName", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
 								},
@@ -1188,7 +1132,7 @@ var _ = Describe("Tests for secretName", func() {
 				},
 			}
 
-			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(Test))
 		})
 	})
@@ -1203,7 +1147,7 @@ var _ = Describe("Tests for secretName", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
@@ -1213,7 +1157,7 @@ var _ = Describe("Tests for secretName", func() {
 
 			expected := fmt.Sprintf("%s-agent-apikey", AppName)
 
-			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1228,7 +1172,7 @@ var _ = Describe("Tests for secretName", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
@@ -1238,7 +1182,7 @@ var _ = Describe("Tests for secretName", func() {
 
 			expected := fmt.Sprintf("%s-controller-apikey", AppName)
 
-			result := SecretName(AppName, "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "controller", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1255,7 +1199,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{
 									Key: Test,
 								},
@@ -1265,7 +1209,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 			}
 
-			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
+			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef)
 			Expect(result).To(Equal(Test))
 		})
 	})
@@ -1280,7 +1224,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
@@ -1288,7 +1232,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 			}
 
-			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
+			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef)
 			Expect(result).To(Equal(SecretKey))
 		})
 	})
@@ -1303,7 +1247,7 @@ var _ = Describe("Tests for checkCertificate", func() {
 			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 
-			err := CheckAndGenerateCertForOperator()
+			err := CheckAndGenerateCertForOperator(K8sManager.GetConfig())
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(CheckCertificate()).To(Equal(true))
@@ -1329,7 +1273,7 @@ var _ = Describe("Tests for checkCertificate", func() {
 			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 
-			err := CheckAndGenerateCertForOperator()
+			err := CheckAndGenerateCertForOperator(K8sManager.GetConfig())
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -1370,7 +1314,7 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
 			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", "")
 
-			err := CheckAndGenerateCertForOperator()
+			err := CheckAndGenerateCertForOperator(K8sManager.GetConfig())
 
 			Expect(err).To(HaveOccurred())
 		})
@@ -1385,7 +1329,7 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", "")
 
 			Expect(CheckCertificate()).To(Equal(false))
-			Expect(CheckAndGenerateCertForOperator()).To(Succeed())
+			Expect(CheckAndGenerateCertForOperator(K8sManager.GetConfig())).To(Succeed())
 			Expect(CheckCertificate()).To(Equal(true))
 		})
 	})

@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,14 +13,18 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/prometheusreceiver"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -55,6 +60,7 @@ var (
 	ph          *harness.PrometheusHarness
 	phStarted   bool
 	jgIn        *JobGroupIn
+	registry    status.Registry
 )
 
 type JobGroupIn struct {
@@ -100,16 +106,15 @@ var _ = BeforeSuite(func() {
 	jgIn = &JobGroupIn{}
 
 	apertureConfig := map[string]interface{}{
-		"plugins": map[string]interface{}{
-			"disabled_plugins": []string{"aperture-plugin-fluxninja"},
-		},
 		"log": map[string]interface{}{
 			// for cleaner logs and for testing config
 			"level":          "debug",
 			"pretty_console": true,
 		},
 		"server": map[string]interface{}{
-			"addr": addr,
+			"listener": map[string]interface{}{
+				"addr": addr,
+			},
 			"grpc": map[string]interface{}{
 				"enable_reflection": true,
 			},
@@ -137,12 +142,15 @@ var _ = BeforeSuite(func() {
 		}
 	}
 
+	info.Service = utils.ApertureAgent
+
 	apertureOpts := fx.Options(
 		platform.Config{MergeConfig: apertureConfig}.Module(),
+		prometheusreceiver.Module(),
 		fx.Option(
 			fx.Provide(
 				fx.Annotate(
-					provideOTELConfig,
+					provideOTelConfig,
 					fx.ResultTags(`name:"base"`),
 				),
 			),
@@ -152,19 +160,24 @@ var _ = BeforeSuite(func() {
 		fx.Provide(
 			clockwork.NewRealClock,
 			fx.Annotate(
-				agent.AgentOTELComponents,
-				fx.ParamTags(alerts.AlertsFxTag),
+				agent.AgentOTelComponents,
+				fx.ParamTags(
+					alerts.AlertsFxTag,
+					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
+					config.GroupTag(otelcollector.ProcessorFactoriesFxTag),
+				),
 			),
-			entitycache.NewEntityCache,
+			entities.NewEntities,
 			servicegetter.NewEmpty,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,
-			cache.NewCache[selectors.ControlPointID],
+			cache.NewCache[selectors.TypedControlPointID],
 		),
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),
 		fx.Populate(jgIn),
+		fx.Populate(&registry),
 	)
 
 	if ehStarted {
@@ -183,7 +196,6 @@ var _ = BeforeSuite(func() {
 		visualize, _ := fx.VisualizeError(err)
 		log.Error().Err(err).Msg("fx.New failed: " + visualize)
 	}
-
 	Expect(err).NotTo(HaveOccurred())
 
 	startCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
@@ -195,6 +207,8 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	etcdWatcher.Start()
 
+	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
+
 	project = "staging"
 	Eventually(func() bool {
 		_, err := http.Get(fmt.Sprintf("http://%v/version", addr))
@@ -203,6 +217,8 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = AfterSuite(func() {
+	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
+
 	stopCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
@@ -229,8 +245,8 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTELConfig() *otelconfig.OTELConfig {
-	cfg := otelconfig.NewOTELConfig()
+func provideOTelConfig() *otelconfig.OTelConfig {
+	cfg := otelconfig.NewOTelConfig()
 	if phStarted {
 		cfg.AddReceiver("prometheus", map[string]interface{}{
 			"config": map[string]interface{}{

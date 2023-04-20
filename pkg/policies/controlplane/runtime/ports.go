@@ -1,11 +1,14 @@
 package runtime
 
 import (
+	"errors"
+	"fmt"
 	"math"
 
-	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
+
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/mapstruct"
 )
 
 // PortMapping is description of a component's ports mapping.
@@ -97,7 +100,7 @@ func (p *PortMapping) Merge(other PortMapping) error {
 	return err
 }
 
-// PortToSignals is a map from port name to a list of ports.
+// PortToSignals is a map from port name to a list of signals.
 type PortToSignals map[string][]Signal
 
 func (p PortToSignals) merge(other PortToSignals) error {
@@ -113,8 +116,52 @@ func (p PortToSignals) merge(other PortToSignals) error {
 
 // ConstantSignal is a mirror struct to same proto message.
 type ConstantSignal struct {
-	SpecialValue string  `mapstructure:"special_value"`
+	specialValue string  `mapstructure:"special_value"`
 	Value        float64 `mapstructure:"value"`
+}
+
+// Description returns a description of the constant signal.
+func (constantSignal *ConstantSignal) Description() string {
+	specialValue := constantSignal.specialValue
+	value := constantSignal.Value
+	var description string
+	if specialValue != "" {
+		description = specialValue
+	} else {
+		description = fmt.Sprintf("%0.2f", value)
+	}
+
+	return description
+}
+
+// Float returns the float value of the constant signal.
+func (constantSignal *ConstantSignal) Float() float64 {
+	specialValue := constantSignal.specialValue
+	value := constantSignal.Value
+	if specialValue == "NaN" {
+		return math.NaN()
+	}
+	if specialValue == "+Inf" {
+		return math.Inf(1)
+	}
+	if specialValue == "-Inf" {
+		return math.Inf(-1)
+	}
+	return value
+}
+
+// IsSpecial returns true if the constant signal is a special value.
+func (constantSignal *ConstantSignal) IsSpecial() bool {
+	float := constantSignal.Float()
+	return math.IsNaN(float) || math.IsInf(float, 0)
+}
+
+// ConstantSignalFromProto creates a ConstantSignal from a proto message.
+func ConstantSignalFromProto(constantSignalProto *policylangv1.ConstantSignal) *ConstantSignal {
+	return &ConstantSignal{
+		specialValue: constantSignalProto.GetSpecialValue(),
+		Value:        constantSignalProto.GetValue(),
+	}
 }
 
 // PortsFromComponentConfig extracts Ports from component's config.
@@ -197,20 +244,7 @@ func (s *Signal) SignalType() SignalType {
 // ConstantSignalValue returns the value of the constant signal.
 func (s *Signal) ConstantSignalValue() float64 {
 	constantSignal := s.ConstantSignal
-	value := 0.0
-	specialValue := constantSignal.SpecialValue
-	if specialValue != "" {
-		switch specialValue {
-		case "NaN":
-			value = math.NaN()
-		case "+Inf":
-			value = math.Inf(1)
-		case "-Inf":
-			value = math.Inf(-1)
-		}
-	} else {
-		value = constantSignal.Value
-	}
+	value := constantSignal.Float()
 
 	return value
 }

@@ -25,11 +25,11 @@ public class HelloWorldHandler extends SimpleChannelInboundHandler<FullHttpReque
                 break;
         }
         ByteBuf content = Unpooled.copiedBuffer(respBody, CharsetUtil.UTF_8);
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+        FullHttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
         ctx.write(response);
         ctx.flush();
     }
-
 }

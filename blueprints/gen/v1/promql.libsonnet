@@ -1,9 +1,6 @@
 local promqlouts = import './promqlouts.libsonnet';
 {
   new():: {
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   outPorts:: promqlouts,
   withEvaluationInterval(evaluation_interval):: {

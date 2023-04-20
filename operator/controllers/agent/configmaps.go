@@ -38,7 +38,12 @@ import (
 )
 
 // configMapForAgentConfig prepares the ConfigMap object for the Agent.
-func configMapForAgentConfig(instance *agentv1alpha1.Agent, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
+func configMapForAgentConfig(
+	ctx context.Context,
+	client_ client.Client,
+	instance *agentv1alpha1.Agent,
+	scheme *runtime.Scheme,
+) (*corev1.ConfigMap, error) {
 	jsonConfig, err := json.Marshal(instance.Spec.ConfigSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Agent config to JSON. Error: '%s'", err.Error())
@@ -58,6 +63,43 @@ func configMapForAgentConfig(instance *agentv1alpha1.Agent, scheme *runtime.Sche
 		},
 		Data: map[string]string{
 			"aperture-agent.yaml": string(config),
+		},
+	}
+
+	if scheme != nil {
+		if err := ctrl.SetControllerReference(instance, cm, scheme); err != nil {
+			return nil, err
+		}
+	}
+
+	return cm, nil
+}
+
+// configMapForAgentControllerClientCert prepares the ConfigMap object for the Controller client certificate.
+func configMapForAgentControllerClientCert(
+	ctx context.Context,
+	client_ client.Client,
+	instance *agentv1alpha1.Agent,
+	scheme *runtime.Scheme,
+) (*corev1.ConfigMap, error) {
+	if instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile != "" {
+		return nil, nil
+	}
+
+	localControllerCert := controllers.GetControllerClientCert(instance.Spec.ConfigSpec.AgentFunctions.Endpoints, client_, ctx)
+	if localControllerCert == nil {
+		return nil, nil
+	}
+
+	cm := &corev1.ConfigMap{
+		ObjectMeta: v1.ObjectMeta{
+			Name:        controllers.AgentControllerClientCertCMName,
+			Namespace:   instance.GetNamespace(),
+			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AgentServiceName),
+			Annotations: instance.Spec.Annotations,
+		},
+		Data: map[string]string{
+			instance.Spec.ControllerClientCertConfig.ClientCertKeyName: string(localControllerCert),
 		},
 	}
 
@@ -106,8 +148,31 @@ func CreateConfigMapForAgent(
 }
 
 // CreateAgentConfigMapInNamespace creates the Agent ConfigMap in the given namespace instead of the default one.
-func CreateAgentConfigMapInNamespace(instance *agentv1alpha1.Agent, namespace string) *corev1.ConfigMap {
-	configMap, _ := configMapForAgentConfig(instance, nil)
+func CreateAgentConfigMapInNamespace(
+	ctx context.Context,
+	client client.Client,
+	instance *agentv1alpha1.Agent,
+	namespace string,
+) *corev1.ConfigMap {
+	configMap, _ := configMapForAgentConfig(ctx, client, instance, nil)
+	configMap.Namespace = namespace
+	configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+
+	return configMap
+}
+
+// CreateAgentControllerClientCertConfigMapInNamespace creates the Agent ConfigMap for Controller client certificate in the given namespace instead of the default one.
+func CreateAgentControllerClientCertConfigMapInNamespace(
+	ctx context.Context,
+	client client.Client,
+	instance *agentv1alpha1.Agent,
+	namespace string,
+) *corev1.ConfigMap {
+	configMap, _ := configMapForAgentControllerClientCert(ctx, client, instance, nil)
+	if configMap == nil {
+		return nil
+	}
+
 	configMap.Namespace = namespace
 	configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
 

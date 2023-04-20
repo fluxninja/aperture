@@ -10,6 +10,8 @@ java {
     setTargetCompatibility("1.8")
 }
 
+tasks.assemble.get().dependsOn(tasks.shadowJar.get())
+
 tasks.jar {
     manifest {
         attributes["Premain-Class"] = "com.fluxninja.aperture.instrumentation.ApertureInstrumentationAgent"
@@ -37,6 +39,7 @@ publishing {
             groupId = "com.fluxninja.aperture"
             artifactId = "aperture-javaagent"
 
+            artifact(tasks["shadowJar"])
             from(components["java"])
 
             versionMapping {

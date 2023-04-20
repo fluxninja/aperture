@@ -13,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
 )
 
 // Alerter is a component that monitors signal value and creates alert on true value.
@@ -35,6 +36,9 @@ func (*Alerter) Type() runtime.ComponentType { return runtime.ComponentTypeSink 
 
 // ShortDescription implements runtime.Component.
 func (a *Alerter) ShortDescription() string { return fmt.Sprintf("%s/%s", a.name, a.severity) }
+
+// IsActuator implements runtime.Component.
+func (*Alerter) IsActuator() bool { return false }
 
 // Make sure Alerter complies with Component interface.
 var _ runtime.Component = (*Alerter)(nil)
@@ -69,11 +73,8 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 // Execute implements runtime.Component.Execute.
 func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	signalValue := inPortReadings.ReadSingleReadingPort("signal")
-	if !signalValue.Valid() {
-		return nil, nil
-	}
 
-	if signalValue.Value() > 0 {
+	if tristate.FromReading(signalValue).IsTrue() {
 		a.alerterIface.AddAlert(a.createAlert())
 	}
 

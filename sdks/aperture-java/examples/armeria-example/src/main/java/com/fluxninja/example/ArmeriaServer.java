@@ -6,7 +6,6 @@ import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.server.*;
-
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,6 +14,8 @@ public class ArmeriaServer {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_INSECURE_GRPC = "true";
+    public static final String DEFAULT_ROOT_CERT = "";
 
     public static HttpService createHelloHTTPService() {
         return new AbstractHttpService() {
@@ -24,6 +25,7 @@ public class ArmeriaServer {
             }
         };
     }
+
     public static HttpService createHealthService() {
         return new AbstractHttpService() {
             @Override
@@ -32,6 +34,7 @@ public class ArmeriaServer {
             }
         };
     }
+
     public static HttpService createConnectedHTTPService() {
         return new AbstractHttpService() {
             @Override
@@ -54,14 +57,27 @@ public class ArmeriaServer {
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }
+        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        if (insecureGrpcString == null) {
+            insecureGrpcString = DEFAULT_INSECURE_GRPC;
+        }
+        boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
+
+        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        if (rootCertFile == null) {
+            rootCertFile = DEFAULT_ROOT_CERT;
+        }
 
         ApertureSDK apertureSDK;
         try {
-            apertureSDK = ApertureSDK.builder()
-                    .setHost(agentHost)
-                    .setPort(Integer.parseInt(agentPort))
-                    .setDuration(Duration.ofMillis(1000))
-                    .build();
+            apertureSDK =
+                    ApertureSDK.builder()
+                            .setHost(agentHost)
+                            .setPort(Integer.parseInt(agentPort))
+                            .setDuration(Duration.ofMillis(1000))
+                            .useInsecureGrpc(insecureGrpc)
+                            .setRootCertificateFile(rootCertFile)
+                            .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();
             return;
@@ -72,8 +88,8 @@ public class ArmeriaServer {
         serverBuilder.service("/health", createHealthService());
         serverBuilder.service("/connected", createConnectedHTTPService());
 
-        ApertureHTTPService decoratedService = createHelloHTTPService()
-            .decorate(ApertureHTTPService.newDecorator(apertureSDK));
+        ApertureHTTPService decoratedService =
+                createHelloHTTPService().decorate(ApertureHTTPService.newDecorator(apertureSDK));
         serverBuilder.service("/super", decoratedService);
 
         Server server = serverBuilder.build();

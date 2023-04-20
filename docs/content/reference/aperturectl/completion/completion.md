@@ -13,7 +13,7 @@ Generate the autocompletion script for the specified shell
 ### Synopsis
 
 Generate the autocompletion script for aperturectl for the specified shell.
-See each sub-command's help for details on how to use the generated script.
+See each sub command's help for details on how to use the generated script.
 
 ### Options
 

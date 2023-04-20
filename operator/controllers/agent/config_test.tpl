@@ -1,3 +1,20 @@
+agent_functions:
+  client:
+    grpc:
+      backoff:
+        jitter: 0.2
+        base_delay: 1s
+        max_delay: 120s
+        multiplier: 1.6
+      insecure: false
+      min_connection_timeout: 20s
+      tls:
+        ca_file: ""
+        cert_file: ""
+        insecure_skip_verify: false
+        key_file: ""
+        key_log_file: ""
+      use_proxy: false
 agent_info:
   agent_group: default
 client:
@@ -5,8 +22,8 @@ client:
     http: ""
     https: ""
 dist_cache:
-  bind_addr: :3320
   memberlist_advertise_addr: ""
+  bind_addr: :3320
   memberlist_bind_addr: :3322
   replica_count: 1
 etcd:
@@ -24,13 +41,16 @@ etcd:
 flow_control:
   preview_service:
     enabled: true
-fluxninja_plugin:
+auto_scale:
+  kubernetes:
+    enabled: true
+fluxninja:
   api_key: ""
   client:
     grpc:
       backoff:
-        base_delay: 1s
         jitter: 0.2
+        base_delay: 1s
         max_delay: 120s
         multiplier: 1.6
       insecure: false
@@ -66,8 +86,9 @@ fluxninja_plugin:
       tls_handshake_timeout: 10s
       use_proxy: false
       write_buffer_size: 0
-  fluxninja_endpoint: ""
+  endpoint: ""
   heartbeat_interval: 5s
+  installation_mode: LINUX_BARE_METAL
 kubernetes_client:
   disable_compression: false
   disable_keep_alives: false
@@ -94,11 +115,11 @@ kubernetes_client:
   write_buffer_size: 0
 liveness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 log:
   level: info
@@ -127,6 +148,7 @@ otel:
     send_batch_max_size: 20000
     send_batch_size: 10000
     timeout: 1s
+  disable_kubernetes_scraper: false
   ports:
     debug_port: 8888
     health_check_port: 13133
@@ -134,11 +156,6 @@ otel:
     zpages_port: 55679
 peer_discovery:
   advertisement_addr: ""
-plugins:
-  disable_plugins: false
-  disabled_plugins:
-  - aperture-plugin-fluxninja
-  plugins_path: default
 profilers:
   cpu_profiler: false
   profiles_path: default
@@ -147,13 +164,13 @@ prometheus:
   address: http://aperture-prometheus-server:80
 readiness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
-sentry_plugin:
+sentry:
   attach_stack_trace: true
   debug: true
   disabled: false
@@ -162,7 +179,6 @@ sentry_plugin:
   sample_rate: 1
   traces_sample_rate: 0.2
 server:
-  addr: :80
   grpc:
     connection_timeout: 120s
     enable_reflection: false
@@ -187,8 +203,10 @@ server:
     read_header_timeout: 10s
     read_timeout: 10s
     write_timeout: 45s
-  keep_alive: 180s
-  network: tcp
+  listener:
+    addr: :80
+    keep_alive: 180s
+    network: tcp
   tls:
     allowed_cn: ""
     cert_file: ""
@@ -197,10 +215,7 @@ server:
     key_file: ""
 service_discovery:
   kubernetes:
-    autoscale_enabled: true
-    discovery_enabled: true
-    node_name: ""
-    pod_name: ""
+    enabled: true
   static: {}
 watchdog:
   cgroup:
@@ -236,7 +251,6 @@ watchdog:
   job:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
   system:
     adaptive_policy:

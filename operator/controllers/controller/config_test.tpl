@@ -14,7 +14,7 @@ etcd:
     key_file: ""
     key_log_file: ""
   username: ""
-fluxninja_plugin:
+fluxninja:
   api_key: ""
   client:
     grpc:
@@ -56,15 +56,16 @@ fluxninja_plugin:
       tls_handshake_timeout: 10s
       use_proxy: false
       write_buffer_size: 0
-  fluxninja_endpoint: ""
+  endpoint: ""
   heartbeat_interval: 5s
+  installation_mode: LINUX_BARE_METAL
 liveness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 log:
   level: info
@@ -90,14 +91,12 @@ otel:
     health_check_port: 13133
     pprof_port: 1777
     zpages_port: 55679
-plugins:
-  disable_plugins: false
-  disabled_plugins:
-  - aperture-plugin-fluxninja
-  plugins_path: default
 policies:
+  cr_watcher:
+    enabled: false
   promql_jobs_scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
 profilers:
   cpu_profiler: false
   profiles_path: default
@@ -106,13 +105,13 @@ prometheus:
   address: http://aperture-prometheus-server:80
 readiness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
-sentry_plugin:
+sentry:
   attach_stack_trace: true
   debug: true
   disabled: false
@@ -121,7 +120,6 @@ sentry_plugin:
   sample_rate: 1
   traces_sample_rate: 0.2
 server:
-  addr: :80
   grpc:
     connection_timeout: 120s
     enable_reflection: false
@@ -146,8 +144,10 @@ server:
     read_header_timeout: 10s
     read_timeout: 10s
     write_timeout: 45s
-  keep_alive: 180s
-  network: tcp
+  listener:
+    addr: :80
+    keep_alive: 180s
+    network: tcp
   tls:
     allowed_cn: ""
     cert_file: /etc/aperture/aperture-controller/certs/crt.pem
@@ -188,7 +188,6 @@ watchdog:
   job:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
   system:
     adaptive_policy:

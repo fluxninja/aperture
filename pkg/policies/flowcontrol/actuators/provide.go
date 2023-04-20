@@ -2,6 +2,7 @@ package actuators
 
 import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/flowregulator"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/rate"
 	"go.uber.org/fx"
 )
@@ -11,5 +12,6 @@ func Module() fx.Option {
 	return fx.Options(
 		concurrency.Module(),
 		rate.Module(),
+		flowregulator.Module(),
 	)
 }

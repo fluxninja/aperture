@@ -9,6 +9,8 @@ const (
 	ApertureSourceSDK = "sdk"
 	// ApertureSourceEnvoy const for Envoy source.
 	ApertureSourceEnvoy = "envoy"
+	// ApertureSourceLua const for Lua source.
+	ApertureSourceLua = "lua"
 	// FeatureControlPoint const for feature control point.
 	FeatureControlPoint = "feature"
 	// HTTPControlPoint for envoy control point.
@@ -38,6 +40,10 @@ const (
 	FlowDurationLabel = "flow_duration_ms"
 	// ApertureProcessingDurationLabel describes Aperture's processing duration in milliseconds.
 	ApertureProcessingDurationLabel = "aperture_processing_duration_ms"
+	// ApertureSourceServiceLabel describes the source service of the flow.
+	ApertureSourceServiceLabel = "aperture.source_service"
+	// ApertureDestinationServiceLabel describes the destination service of the flow.
+	ApertureDestinationServiceLabel = "aperture.destination_service"
 
 	/* The following are derived labels that are applied based on contents of check response. */
 
@@ -85,19 +91,28 @@ const (
 
 	// EnvoyAuthzDurationLabel describes duration of the Authz call in milliseconds.
 	EnvoyAuthzDurationLabel = "authz_duration"
-	// EnvoyResponseDurationLabel from envoy access logs.
-	EnvoyResponseDurationLabel = "RESPONSE_DURATION"
-	// EnvoyBytesReceivedLabel from envoy access logs.
-	EnvoyBytesReceivedLabel = "BYTES_RECEIVED"
-	// EnvoyBytesSentLabel from envoy access logs.
-	EnvoyBytesSentLabel = "BYTES_SENT"
+
+	// CheckHTTPDurationLabel describes duration of the CheckHTTP call in milliseconds.
+	CheckHTTPDurationLabel = "checkhttp_duration"
+
+	// ResponseDurationLabel from access logs.
+	ResponseDurationLabel = "RESPONSE_DURATION"
+	// BytesReceivedLabel from access logs.
+	BytesReceivedLabel = "BYTES_RECEIVED"
+	// BytesSentLabel from access logs.
+	BytesSentLabel = "BYTES_SENT"
 
 	// EnvoyMissingAttributeValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but it
-	// is not available. Eg. In case authz couldn't reach agent, so we know
+	// is not available. Eg. In case authz could not reach agent, so we know
 	// nothing about flowcontrol policies.  Note that this is different case
 	// from "just empty", eg. "", "[]" or "{}".
 	EnvoyMissingAttributeValue = "-"
+
+	// LuaMissingAttributeValue is a special attribute value, which can
+	// happen when (eg. Lua's) logger tries to send attribute value, but it
+	// is not available.
+	LuaMissingAttributeValue = "-"
 
 	/* SDK specific labels. */
 
@@ -115,7 +130,7 @@ const (
 	// InstanceLabel describes agent group to which metrics refer.
 	InstanceLabel = "instance"
 
-	/* Specific to Agent and Controller OTEL collector factories. */
+	/* Specific to Agent and Controller OTel collector factories. */
 
 	// ReceiverOTLP collects logs from libraries and SDKs.
 	ReceiverOTLP = "otlp"
@@ -142,8 +157,8 @@ const (
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
-	// ProcessorCustromMetrics adds `service.name` resource attribute.
-	ProcessorCustromMetrics = "resource/custom_metrics"
+	// ProcessorCustomMetrics adds `service.name` resource attribute.
+	ProcessorCustomMetrics = "resource/custom_metrics"
 	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
 	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
 	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured

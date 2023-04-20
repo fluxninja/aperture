@@ -2,6 +2,7 @@ package concurrency
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"path"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -25,8 +25,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -177,14 +177,12 @@ func setupConcurrencyLimiterFactory(
 		metrics.WorkloadIndexLabel,
 		metrics.LimiterDroppedLabel,
 	})
-
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{conLimiterFactory.newConcurrencyLimiterOptions},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry:     reg,
-		PrometheusRegistry: prometheusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{conLimiterFactory.newConcurrencyLimiterOptions},
+	)
+	if err != nil {
+		return err
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -315,8 +313,13 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		registry:                     reg,
 		concurrencyLimiterFactory:    conLimiterFactory,
 		workloadMultiMatcher:         mm,
-		defaultWorkloadParametersMsg: schedulerParams.DefaultWorkloadParameters,
+		defaultWorkloadParametersMsg: schedulerParams.GetDefaultWorkloadParameters(),
 		schedulerParameters:          schedulerParams,
+	}
+	// default workload params is not a required param so it can be nil
+	if conLimiter.defaultWorkloadParametersMsg == nil {
+		conLimiter.defaultWorkloadParametersMsg = &policylangv1.Scheduler_Workload_Parameters{}
+		config.SetDefaults(conLimiter.defaultWorkloadParametersMsg)
 	}
 
 	return fx.Options(
@@ -399,12 +402,12 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 
 			wfqFlowsGauge, err := wfqFlowsGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return errors.Wrap(err, "failed to get wfq flows gauge")
+				return fmt.Errorf("%w: failed to get wfq flows gauge", err)
 			}
 
 			wfqRequestsGauge, err := wfqRequestsGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return errors.Wrap(err, "failed to get wfq requests gauge")
+				return fmt.Errorf("%w: failed to get wfq requests gauge", err)
 			}
 
 			wfqMetrics := &scheduler.WFQMetrics{
@@ -481,7 +484,7 @@ func (conLimiter *concurrencyLimiter) GetFlowSelector() *policylangv1.FlowSelect
 // RunLimiter processes a single flow by concurrency limiter in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
@@ -508,26 +511,22 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 	if val, ok := labels[matchedWorkloadProto.FairnessKey]; ok {
 		fairnessLabel = fairnessLabel + "," + val
 	}
-	// Lookup tokens for the workload
-	var tokens uint64
-	if conLimiter.schedulerParameters.AutoTokens {
-		tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex)
-		if !ok {
-			// default to 1 if auto tokens not found
-			tokens = 1
-		} else {
-			tokens = tokensAuto
+
+	// Lookup tokens for the workload, if not provided
+
+	if tokens == 0 {
+		// at least set to 1 token
+		tokens = 1
+		if matchedWorkloadProto.Tokens != 0 {
+			tokens = matchedWorkloadProto.Tokens
+		} else if conLimiter.schedulerParameters.AutoTokens {
+			if tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex); ok {
+				tokens = tokensAuto
+			}
 		}
-	} else {
-		tokens = matchedWorkloadProto.Tokens
 	}
 
-	// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
-	timeout := time.Duration(float64(tokens)*conLimiter.schedulerParameters.TimeoutFactor) * time.Millisecond
-
-	if timeout > conLimiter.schedulerParameters.MaxTimeout.AsDuration() {
-		timeout = conLimiter.schedulerParameters.MaxTimeout.AsDuration()
-	}
+	reqCtx := ctx
 
 	if clientDeadline, hasDeadline := ctx.Deadline(); hasDeadline {
 		// The clientDeadline is calculated based on client's timeout, passed
@@ -535,36 +534,32 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		// client before its deadline passes (otherwise we risk fail-open on
 		// timeout). To allow some headroom for transmitting the response to
 		// the client, we set an "internal" deadline to a bit before client's
-		// deadline, subtracting:
-		// * 2 * 1ms to account for deadline inaccuracies (observed
-		//   that Deadline() - Now() delta might end up longer than
-		//   grpc-timeout (!), usually within 1ms),
-		// * 1ms for response overhead,
-		// * 7ms so that we don't always operate on the edge of the time budget.
+		// deadline, subtracting the configured margin.
 		clientTimeout := time.Until(clientDeadline)
-		internalTimeout := clientTimeout - 10*time.Millisecond
-		if internalTimeout < timeout {
-			timeout = internalTimeout
-		}
+		timeout := clientTimeout - conLimiter.schedulerParameters.DecisionDeadlineMargin.AsDuration()
 		if timeout < 0 {
+			// we will still schedule the request and it will get
+			// dropped if it doesn't get the tokens immediately.
 			timeout = 0
 		}
+		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		reqCtx = timeoutCtx
 	}
 
-	reqContext := scheduler.RequestContext{
+	req := scheduler.Request{
 		FairnessLabel: fairnessLabel,
 		Priority:      uint8(matchedWorkloadProto.Priority),
-		Timeout:       timeout,
-		WorkMillis:    tokens,
+		Tokens:        tokens,
 	}
 
-	accepted := conLimiter.scheduler.Schedule(reqContext)
+	accepted := conLimiter.scheduler.Schedule(reqCtx, req)
 
 	// update concurrency metrics and decisionType
-	conLimiter.incomingWorkSecondsCounter.Add(float64(reqContext.WorkMillis) / 1000)
+	conLimiter.incomingWorkSecondsCounter.Add(float64(req.Tokens) / 1000)
 
 	if accepted {
-		conLimiter.acceptedWorkSecondsCounter.Add(float64(reqContext.WorkMillis) / 1000)
+		conLimiter.acceptedWorkSecondsCounter.Add(float64(req.Tokens) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{

@@ -48,10 +48,7 @@ type Policy struct {
 var _ iface.Policy = (*Policy)(nil)
 
 // newPolicyOptions creates a new Policy object and returns its Fx options for the per Policy App.
-func newPolicyOptions(
-	wrapperMessage *policysyncv1.PolicyWrapper,
-	registry status.Registry,
-) (fx.Option, error) {
+func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (fx.Option, error) {
 	// List of options for the policy.
 	policyOptions := []fx.Option{}
 	policy, compiledCircuit, partialPolicyOption, err := compilePolicyWrapper(wrapperMessage, registry)
@@ -108,7 +105,12 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 	var resourceOptions []fx.Option
 	if policyProto.GetResources() != nil {
 		// Initialize flux meters
-		for name, fluxMeterProto := range policyProto.GetResources().FluxMeters {
+		fluxMeters := policyProto.GetResources().GetFlowControl().GetFluxMeters()
+		// Deprecated: v1.5.0
+		if fluxMeters == nil {
+			fluxMeters = policyProto.GetResources().GetFluxMeters()
+		}
+		for name, fluxMeterProto := range fluxMeters {
 			fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy)
 			if err != nil {
 				return nil, nil, nil, err
@@ -116,7 +118,12 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 			resourceOptions = append(resourceOptions, fluxMeterOption)
 		}
 		// Initialize classifiers
-		for index, classifierProto := range policyProto.GetResources().Classifiers {
+		classifiers := policyProto.GetResources().GetFlowControl().GetClassifiers()
+		// Deprecated: v1.5.0
+		if classifiers == nil {
+			classifiers = policyProto.GetResources().GetClassifiers()
+		}
+		for index, classifierProto := range classifiers {
 			classifierOption, err := classifier.NewClassifierOptions(int64(index), classifierProto, policy)
 			if err != nil {
 				return nil, nil, nil, err
@@ -133,7 +140,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
 		compiledCircuit, partialCircuitOption, err = circuitfactory.CompileFromProto(
-			policyProto.GetCircuit().Components,
+			policyProto,
 			policy,
 		)
 		if err != nil {
@@ -144,8 +151,10 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 	return policy, compiledCircuit, fx.Options(
 		fx.Options(resourceOptions...),
 		partialCircuitOption,
-		fx.Invoke(policy.setupCircuitJob,
-			policy.setupDynamicConfig),
+		fx.Invoke(
+			policy.setupCircuitJob,
+			policy.setupDynamicConfig,
+		),
 	), nil
 }
 
@@ -154,10 +163,7 @@ func (policy *Policy) GetEvaluationInterval() time.Duration {
 	return policy.evaluationInterval
 }
 
-func (policy *Policy) setupCircuitJob(
-	lifecycle fx.Lifecycle,
-	circuitJobGroup *jobs.JobGroup,
-) error {
+func (policy *Policy) setupCircuitJob(lifecycle fx.Lifecycle, circuitJobGroup *jobs.JobGroup) error {
 	logger := policy.GetStatusRegistry().GetLogger()
 	if policy.evaluationInterval > 0 {
 		// Job name
@@ -169,12 +175,10 @@ func (policy *Policy) setupCircuitJob(
 			OnStart: func(_ context.Context) error {
 				// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
 				job := jobs.NewBasicJob(policy.jobName, policy.executeTick)
-				initialDelay := config.MakeDuration(0)
 				executionPeriod := config.MakeDuration(policy.evaluationInterval)
 				executionTimeout := config.MakeDuration(time.Millisecond * 100)
 				jobConfig := jobs.JobConfig{
 					InitiallyHealthy: true,
-					InitialDelay:     initialDelay,
 					ExecutionPeriod:  executionPeriod,
 					ExecutionTimeout: executionTimeout,
 				}
@@ -197,15 +201,16 @@ func (policy *Policy) setupCircuitJob(
 	return nil
 }
 
-func (policy *Policy) setupDynamicConfig(
-	dynamicConfigWatcher notifiers.Watcher,
-	lifecycle fx.Lifecycle,
-) error {
+func (policy *Policy) setupDynamicConfig(dynamicConfigWatcher notifiers.Watcher, lifecycle fx.Lifecycle) error {
 	unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
-	unmarshalNotifier := notifiers.NewUnmarshalKeyNotifier(notifiers.Key(policy.GetPolicyName()),
+	unmarshalNotifier, err := notifiers.NewUnmarshalKeyNotifier(
+		notifiers.Key(policy.GetPolicyName()),
 		unmarshaller,
 		policy.dynamicConfigUpdate,
 	)
+	if err != nil {
+		return err
+	}
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -225,13 +230,16 @@ func (policy *Policy) dynamicConfigUpdate(event notifiers.Event, unmarshaller co
 
 func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error) {
 	// Get JobInfo
-	jobInfo := policy.circuitJobGroup.JobInfo(policy.jobName)
-	if jobInfo == nil {
-		return nil, fmt.Errorf("job info not found for job %s", policy.jobName)
+	jobInfo, err := policy.circuitJobGroup.JobInfo(policy.jobName)
+	if err != nil {
+		return nil, err
 	}
-	tickInfo := runtime.NewTickInfo(jobInfo.LastRunTime, jobInfo.NextRunTime, jobInfo.RunCount, policy.evaluationInterval)
+
+	tickInfo := runtime.NewTickInfo(jobInfo.LastExecuteTime,
+		jobInfo.ExecuteCount,
+		policy.evaluationInterval)
 	// Execute Circuit
-	err := policy.circuit.Execute(tickInfo)
+	err = policy.circuit.Execute(tickInfo)
 	// TODO: return tick info (publish to health framework) instead of returning nil proto.Message
 	return nil, err
 }

@@ -38,7 +38,7 @@ import (
 
 // secretForAgentAPIKey prepares the Secret object for the ApiKey of Agent.
 func secretForAgentAPIKey(instance *agentv1alpha1.Agent, scheme *runtime.Scheme) (*corev1.Secret, error) {
-	spec := &instance.Spec.Secrets.FluxNinjaPlugin
+	spec := &instance.Spec.Secrets.FluxNinjaExtension
 
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{
@@ -66,7 +66,7 @@ func CreateSecretForAgent(
 	client client.Client, recorder record.EventRecorder, secret *corev1.Secret, ctx context.Context, instance *agentv1alpha1.Agent) (
 	controllerutil.OperationResult, error,
 ) {
-	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, controllers.SecretMutate(secret, secret.Data))
+	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, controllers.SecretMutate(secret, secret.Data, secret.OwnerReferences))
 	if err != nil {
 		if errors.IsConflict(err) {
 			return CreateSecretForAgent(client, recorder, secret, ctx, instance)
@@ -99,14 +99,14 @@ func CreateSecretForAgent(
 // CreateAgentSecretInNamespace creates the Agent Secret for ApiKey in the given namespace instead of the default one.
 func CreateAgentSecretInNamespace(instance *agentv1alpha1.Agent, namespace string) (*corev1.Secret, error) {
 	copiedInstance := instance.DeepCopy()
-	value := copiedInstance.Spec.Secrets.FluxNinjaPlugin.Value
+	value := copiedInstance.Spec.Secrets.FluxNinjaExtension.Value
 	value = strings.TrimPrefix(value, "enc::")
 	value = strings.TrimSuffix(value, "::enc")
 	decodedValue, err := base64.StdEncoding.DecodeString(value)
 	if err != nil {
 		return nil, err
 	}
-	copiedInstance.Spec.Secrets.FluxNinjaPlugin.Value = string(decodedValue)
+	copiedInstance.Spec.Secrets.FluxNinjaExtension.Value = string(decodedValue)
 	secret, err := secretForAgentAPIKey(copiedInstance, nil)
 	if err != nil {
 		return nil, err

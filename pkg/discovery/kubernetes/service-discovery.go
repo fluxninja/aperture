@@ -3,339 +3,135 @@ package kubernetes
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
-	"sort"
 	"strings"
-	"sync"
-	"time"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/sourcegraph/conc/stream"
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiWatch "k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/tools/watch"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 const podTrackerPrefix = "kubernetes_pod"
 
-type serviceCacheOperation int
-
-const (
-	add serviceCacheOperation = iota
-	remove
-)
-
-type podInfo struct {
-	Name      string
-	Namespace string
-	Node      string
-	UID       string
-	IPAddress string
-}
-
-func podInfoOrder(a, b podInfo) bool {
-	if a.Namespace == b.Namespace {
-		return a.Name < b.Name
-	}
-	return a.Namespace < b.Namespace
-}
-
-type serviceData struct {
-	fqdn string
-	pods []podInfo
-}
-
-// serviceDataCache maps service UID to its data - the name of the service and pods handled by the service.
-type serviceDataCache struct {
-	cache map[string][]podInfo
-	kd    *serviceDiscovery
-}
-
-func newServiceDataCache(kd *serviceDiscovery) *serviceDataCache {
-	return &serviceDataCache{
-		cache: make(map[string][]podInfo),
-		kd:    kd,
-	}
-}
-
-func createServiceData(kd *serviceDiscovery, endpoints *v1.Endpoints, nodeName string) *serviceData {
-	fqdn := kd.getFQDN(endpoints)
-	pods := getServicePods(endpoints, nodeName)
-	sort.Slice(pods, func(i, j int) bool {
-		return podInfoOrder(pods[i], pods[j])
-	})
-
-	return &serviceData{
-		fqdn: fqdn,
-		pods: pods,
-	}
-}
-
-func (sc *serviceDataCache) updateServiceData(endpoints *v1.Endpoints, nodeName string) {
-	serviceData := createServiceData(sc.kd, endpoints, nodeName)
-	sc.cache[serviceData.fqdn] = serviceData.pods
-}
-
-func (sc *serviceDataCache) removeService(endpoints *v1.Endpoints) {
-	fqdn := sc.kd.getFQDN(endpoints)
-	delete(sc.cache, fqdn)
-}
-
-// servicePodMapping maps pod (designated by namespace and pod name) to the list of its services.
-type servicePodMapping struct {
-	mapping map[string]map[string][]string
-}
-
-func newServicePodMapping() *servicePodMapping {
-	return &servicePodMapping{
-		mapping: make(map[string]map[string][]string),
-	}
-}
-
-func (m *servicePodMapping) getFQDNs(namespace, podName string) []string {
-	return m.mapping[namespace][podName]
-}
-
-func (m *servicePodMapping) addService(namespace, podName, fqdn string) {
-	if _, ok := m.mapping[namespace]; !ok {
-		m.mapping[namespace] = make(map[string][]string)
-	}
-	if _, ok := m.mapping[namespace][podName]; !ok {
-		m.mapping[namespace][podName] = nil
-	}
-	// add to the list of services if it doesn't exist
-	if !utils.SliceContains(m.mapping[namespace][podName], fqdn) {
-		m.mapping[namespace][podName] = append(m.mapping[namespace][podName], fqdn)
-	}
-}
-
-func (m *servicePodMapping) removeService(namespace, podName, fqdn string) {
-	if _, ok := m.mapping[namespace]; !ok {
-		return
-	}
-	if _, ok := m.mapping[namespace][podName]; !ok {
-		return
-	}
-	// remove from the list of services if it exists
-	for i, s := range m.mapping[namespace][podName] {
-		if s == fqdn {
-			m.mapping[namespace][podName] = append(m.mapping[namespace][podName][:i], m.mapping[namespace][podName][i+1:]...)
-			break
-		}
-	}
-	// if service list is empty, remove the pod
-	if len(m.mapping[namespace][podName]) == 0 {
-		delete(m.mapping[namespace], podName)
-	}
-	// if namespace is empty, remove the namespace
-	if len(m.mapping[namespace]) == 0 {
-		delete(m.mapping, namespace)
-	}
-}
-
 // serviceDiscovery is a collector that collects Kubernetes information periodically.
 type serviceDiscovery struct {
-	waitGroup              sync.WaitGroup
-	cli                    kubernetes.Interface
-	ctx                    context.Context
-	cancel                 context.CancelFunc
-	entityEvents           notifiers.EventWriter
-	mapping                *servicePodMapping
-	serviceCache           *serviceDataCache
-	nodeName               string
-	revisionEndpointsWatch string
-	clusterDomain          string
+	ctx             context.Context
+	cli             kubernetes.Interface
+	informerFactory informers.SharedInformerFactory
+	entityEvents    notifiers.EventWriter
+	cancel          context.CancelFunc
+	serviceStream   *stream.Stream
+	clusterDomain   string
 }
 
 func newServiceDiscovery(
 	entityEvents notifiers.EventWriter,
-	nodeName string,
 	k8sClient k8s.K8sClient,
 ) (*serviceDiscovery, error) {
-	if nodeName == "" {
-		log.Error().Msg("Node name not set, could not create Kubernetes service discovery")
-		return nil, fmt.Errorf("node name not set")
-	}
-
 	kd := &serviceDiscovery{
-		cli:          k8sClient.GetClientSet(),
-		nodeName:     nodeName,
-		mapping:      newServicePodMapping(),
-		entityEvents: entityEvents,
+		cli:           k8sClient.GetClientSet(),
+		entityEvents:  entityEvents,
+		serviceStream: stream.New(),
 	}
-	kd.serviceCache = newServiceDataCache(kd)
+	kd.informerFactory = informers.NewSharedInformerFactory(kd.cli, 0)
+	kd.ctx, kd.cancel = context.WithCancel(context.Background())
 	return kd, nil
 }
 
-func (kd *serviceDiscovery) start() {
-	kd.ctx, kd.cancel = context.WithCancel(context.Background())
-
-	kd.waitGroup.Add(1)
-
-	panichandler.Go(func() {
-		defer kd.waitGroup.Done()
-
-		operation := func() error {
-			// get cluster domain
-			clusterDomain, err := getClusterDomain()
-			if err != nil {
-				log.Error().Err(err).Msg("Could not get cluster domain, will retry")
-				return err
-			}
-			kd.clusterDomain = clusterDomain
-
-			// purge notifiers
-			kd.entityEvents.Purge("")
-
-			// bootstrap mapping
-			endpoints, err := kd.cli.CoreV1().Endpoints(metav1.NamespaceAll).List(kd.ctx, metav1.ListOptions{})
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to list endpoints")
-				return err
-			}
-			kd.revisionEndpointsWatch = endpoints.ResourceVersion
-			if len(kd.mapping.mapping) > 0 {
-				kd.mapping = newServicePodMapping()
-			}
-			for _, item := range endpoints.Items {
-				e := item
-				kd.serviceCache.updateServiceData(&e, kd.nodeName)
-				kd.updateMappingFromEndpoints(&e, add)
-			}
-
-			// setup watchers
-			endpointsWatchFunc := func(options metav1.ListOptions) (apiWatch.Interface, error) {
-				return kd.cli.CoreV1().Endpoints(metav1.NamespaceAll).Watch(kd.ctx, options)
-			}
-			endpointsWatcher, err := watch.NewRetryWatcher(kd.revisionEndpointsWatch, &cache.ListWatch{
-				WatchFunc: endpointsWatchFunc,
-			})
-			if err != nil {
-				log.Error().Err(err).Msg("Unable to watch endpoints")
-				return err
-			}
-			defer endpointsWatcher.Stop()
-
-			for {
-				// watchers added, start watching events
-				select {
-				case endpointEvent, ok := <-endpointsWatcher.ResultChan():
-					if !ok {
-						log.Error().Msg("Endpoints watcher closed")
-						return fmt.Errorf("endpoints watcher closed")
-					}
-					switch endpointEvent.Type {
-					case apiWatch.Added:
-						endpoints := endpointEvent.Object.(*v1.Endpoints)
-						kd.serviceCache.updateServiceData(endpoints, kd.nodeName)
-						kd.updateMappingFromEndpoints(endpoints, add)
-					case apiWatch.Modified:
-						endpoints := endpointEvent.Object.(*v1.Endpoints)
-						fqdn := kd.getFQDN(endpoints)
-						cachedPods, ok := kd.serviceCache.cache[fqdn]
-						if ok {
-							for _, cachedPod := range cachedPods {
-								kd.mapping.removeService(cachedPod.Namespace, cachedPod.Name, fqdn)
-								kd.removeEntityFromTracker(cachedPod)
-							}
-							kd.serviceCache.removeService(endpoints)
-						}
-						kd.serviceCache.updateServiceData(endpoints, kd.nodeName)
-						kd.updateMappingFromEndpoints(endpoints, add)
-					case apiWatch.Deleted:
-						endpoints := endpointEvent.Object.(*v1.Endpoints)
-						kd.updateMappingFromEndpoints(endpoints, remove)
-						kd.serviceCache.removeService(endpoints)
-					case apiWatch.Error:
-						log.Error().Msg("Endpoints watcher error")
-						return fmt.Errorf("endpoints watcher error")
-					}
-				case <-kd.ctx.Done():
-					log.Info().Msg("KubeClient stopped")
-					return backoff.Permanent(nil)
-				}
-			}
-		}
-		boff := backoff.NewConstantBackOff(5 * time.Second)
-		_ = backoff.Retry(operation, backoff.WithContext(boff, kd.ctx))
-
-		log.Info().Msg("Stopping kubernetes service watcher")
-	})
-}
-
-func (kd *serviceDiscovery) stop() {
-	kd.cancel()
-	kd.waitGroup.Wait()
-	kd.entityEvents.Purge("")
-}
-
-// updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kd *serviceDiscovery) writeEntityInTracker(podInfo podInfo) error {
-	services := kd.mapping.getFQDNs(podInfo.Namespace, podInfo.Name)
-	entity := &entitycachev1.Entity{
-		Services:  services,
-		IpAddress: podInfo.IPAddress,
-		Uid:       podInfo.UID,
-		Prefix:    podTrackerPrefix,
-		Name:      podInfo.Name,
-	}
-
-	value, err := json.Marshal(entity)
+func (kd *serviceDiscovery) start(startCtx context.Context) error {
+	// get cluster domain
+	clusterDomain, err := getClusterDomain()
 	if err != nil {
-		log.Error().Msgf("Error marshaling entity: %v", err)
+		log.Error().Err(err).Msg("Could not get cluster domain, will retry")
+		return err
+	}
+	kd.clusterDomain = clusterDomain
+
+	endpointsInformer := kd.informerFactory.Core().V1().Endpoints().Informer()
+	_, err = endpointsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    kd.handleEndpointsAdd,
+		UpdateFunc: kd.handleEndpointsUpdate,
+		DeleteFunc: kd.handleEndpointsDelete,
+	})
+	if err != nil {
 		return err
 	}
 
-	kd.entityEvents.WriteEvent(notifiers.Key(podInfo.UID), value)
+	serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
+	_, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    kd.handleServiceAdd,
+		DeleteFunc: kd.handleServiceDelete,
+	})
+	if err != nil {
+		return err
+	}
+
+	kd.informerFactory.Start(kd.ctx.Done())
+
+	if !cache.WaitForCacheSync(startCtx.Done(), endpointsInformer.HasSynced, serviceInformer.HasSynced) {
+		return errors.New("timed out waiting for caches to sync")
+	}
+
+	log.Info().Msg("Service discovery started")
 	return nil
 }
 
-// updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kd *serviceDiscovery) removeEntityFromTracker(podInfo podInfo) {
-	kd.entityEvents.RemoveEvent(notifiers.Key(podInfo.UID))
+func (kd *serviceDiscovery) stop(stopCtx context.Context) error {
+	kd.cancel()
+	kd.serviceStream.Wait()
+	kd.entityEvents.Purge("")
+	return nil
 }
 
-func (kd *serviceDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoints, operation serviceCacheOperation) {
-	fqdn := kd.getFQDN(endpoints)
-	pods := getServicePods(endpoints, kd.nodeName)
+// Endpoints informer handlers
 
-	for _, pod := range pods {
-		if operation == add {
-			kd.mapping.addService(pod.Namespace, pod.Name, fqdn)
-			err := kd.writeEntityInTracker(pod)
-			if err != nil {
-				log.Error().Msgf("Tracker could not be updated: %v", err)
+func (kd *serviceDiscovery) handleEndpointsAdd(obj interface{}) {
+	endpoints := obj.(*v1.Endpoints)
+	kd.updateEndpoints(endpoints)
+}
+
+func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
+	oldEndpoints := oldObj.(*v1.Endpoints)
+	newEndpoints := newObj.(*v1.Endpoints)
+
+	// remove addresses that are no longer in the newEndpoints
+	for _, oldSubset := range oldEndpoints.Subsets {
+		for _, oldAddress := range oldSubset.Addresses {
+			found := false
+			for _, newSubset := range newEndpoints.Subsets {
+				for _, newAddress := range newSubset.Addresses {
+					if newAddress.TargetRef.UID == oldAddress.TargetRef.UID {
+						found = true
+						break
+					}
+				}
 			}
-		} else {
-			kd.mapping.removeService(pod.Namespace, pod.Name, fqdn)
-			kd.removeEntityFromTracker(pod)
+			if !found {
+				// address is no longer in the newEndpoints, remove it
+				kd.removeEndpointAddress(oldAddress, oldEndpoints.Namespace, oldEndpoints.Name)
+			}
 		}
 	}
+
+	kd.updateEndpoints(newEndpoints)
 }
 
-// getFQDN return the full qualified domain name of a given service.
-func (kd *serviceDiscovery) getFQDN(endpoints *v1.Endpoints) string {
-	name := endpoints.Name
-	namespace := endpoints.Namespace
-
-	serviceFQDN := fmt.Sprintf("%s.%s.svc.%s", name, namespace, kd.clusterDomain)
-	return serviceFQDN
+func (kd *serviceDiscovery) handleEndpointsDelete(obj interface{}) {
+	endpoints := obj.(*v1.Endpoints)
+	kd.removeEndpoints(endpoints)
 }
 
-// getServicePods retrieves a list of pods handled by a given service that are located on a given node.
-func getServicePods(endpoints *v1.Endpoints, nodeName string) []podInfo {
-	var pods []podInfo
-
+func (kd *serviceDiscovery) updateEndpoints(endpoints *v1.Endpoints) {
 	for _, subset := range endpoints.Subsets {
 		for _, address := range subset.Addresses {
 			if address.TargetRef == nil {
@@ -344,35 +140,159 @@ func getServicePods(endpoints *v1.Endpoints, nodeName string) []podInfo {
 			if address.TargetRef.Kind != "Pod" {
 				continue
 			}
-			if *(address.NodeName) != nodeName {
-				continue
-			}
-			p := podInfo{
+			p := &entitiesv1.Entity{
 				Name:      address.TargetRef.Name,
 				Namespace: address.TargetRef.Namespace,
-				Node:      *address.NodeName,
-				UID:       string(address.TargetRef.UID),
-				IPAddress: address.IP,
+				Uid:       string(address.TargetRef.UID),
+				IpAddress: address.IP,
+				Services:  []string{kd.getService(endpoints.Namespace, endpoints.Name)},
 			}
-			pods = append(pods, p)
+			if address.NodeName != nil {
+				p.NodeName = *address.NodeName
+			}
+			err := kd.updateEntity(p)
+			if err != nil {
+				log.Error().Err(err).Msg("Tracker could not be updated")
+			}
 		}
 	}
-
-	return pods
 }
 
-// Retrieve cluster domain of Kubernetes cluster we are installed on. It can be retrieved by looking up CNAME of
-// kubernetes.default.svc and extracting its suffix.
+// Service informer handlers
+
+func (kd *serviceDiscovery) handleServiceAdd(obj interface{}) {
+	service := obj.(*v1.Service)
+	kd.addClusterIPs(service)
+}
+
+func (kd *serviceDiscovery) handleServiceDelete(obj interface{}) {
+	service := obj.(*v1.Service)
+	kd.removeClusterIPs(service)
+}
+
+func (kd *serviceDiscovery) addClusterIPs(service *v1.Service) {
+	clusterIPs := getClusterIPsFromService(service)
+	for _, clusterIP := range clusterIPs {
+		p := &entitiesv1.Entity{
+			Name:      strings.Join([]string{"ClusterIP", service.Namespace, service.Name, clusterIP}, "-"),
+			Namespace: service.Namespace,
+			Uid:       clusterIP,
+			IpAddress: clusterIP,
+			Services:  []string{kd.getService(service.Namespace, service.Name)},
+		}
+		err := kd.updateEntity(p)
+		if err != nil {
+			log.Error().Err(err).Msg("Tracker could not be updated")
+		}
+	}
+}
+
+func (kd *serviceDiscovery) removeClusterIPs(service *v1.Service) {
+	clusterIPs := getClusterIPsFromService(service)
+	for _, clusterIP := range clusterIPs {
+		kd.entityEvents.RemoveEvent(notifiers.Key(clusterIP))
+	}
+}
+
+// getService return the full qualified domain name of a given service.
+func (kd *serviceDiscovery) getService(namespace, name string) string {
+	service := fmt.Sprintf("%s.%s.svc.%s", name, namespace, kd.clusterDomain)
+	return service
+}
+
+func (kd *serviceDiscovery) removeEndpointAddress(address v1.EndpointAddress, namespace, name string) {
+	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
+		if oldValue == nil {
+			return notifiers.Remove, nil
+		}
+		entity := &entitiesv1.Entity{}
+		err := json.Unmarshal(oldValue, entity)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not unmarshal entity")
+			return notifiers.Remove, nil
+		}
+		entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(namespace, name))
+		if shouldRemove(entity) {
+			return notifiers.Remove, nil
+		}
+		bytes, err := json.Marshal(entity)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not marshal entity")
+			return notifiers.Remove, nil
+		}
+		return notifiers.Write, bytes
+	}
+
+	kd.entityEvents.UpdateValue(notifiers.Key(address.TargetRef.UID), updateFunc)
+}
+
+func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
+	for _, subset := range endpoints.Subsets {
+		for _, address := range subset.Addresses {
+			kd.removeEndpointAddress(address, endpoints.Namespace, endpoints.Name)
+		}
+	}
+}
+
+// updateEntity updates the entity in the tracker.
+func (kd *serviceDiscovery) updateEntity(pod *entitiesv1.Entity) error {
+	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
+		var entity *entitiesv1.Entity
+		if oldValue == nil {
+			// create new entity
+			entity = pod
+		} else {
+			err := json.Unmarshal(oldValue, &entity)
+			if err != nil {
+				log.Error().Msgf("Error unmarshaling entity: %v", err)
+				return notifiers.Write, oldValue
+			}
+			for _, service := range pod.Services {
+				if !utils.SliceContains(entity.Services, service) {
+					entity.Services = append(entity.Services, service)
+				}
+			}
+		}
+		value, err := json.Marshal(entity)
+		if err != nil {
+			log.Error().Msgf("Error marshaling entity: %v", err)
+			return notifiers.Write, oldValue
+		}
+		return notifiers.Write, value
+	}
+
+	kd.entityEvents.UpdateValue(notifiers.Key(pod.Uid), updateFunc)
+
+	return nil
+}
+
+/* Helper functions */
+
+func getClusterIPsFromService(svc *v1.Service) []string {
+	if svc.Spec.Type != v1.ServiceTypeClusterIP {
+		return nil
+	}
+	clusterIPs := svc.Spec.ClusterIPs
+	// remove None, "" from the list
+	clusterIPs = utils.RemoveFromSlice(clusterIPs, "None")
+	clusterIPs = utils.RemoveFromSlice(clusterIPs, "")
+	return clusterIPs
+}
+
+func shouldRemove(entity *entitiesv1.Entity) bool {
+	// once we have more informers then add additional checks here
+	return len(entity.Services) == 0
+}
+
+// getClusterDomain retrieves cluster domain of Kubernetes cluster we are installed on.
+// It can be retrieved by looking up CNAME of kubernetes.default.svc and extracting its suffix.
 func getClusterDomain() (string, error) {
 	apiSvc := "kubernetes.default.svc"
-
 	cname, err := net.LookupCNAME(apiSvc)
 	if err != nil {
 		return "", err
 	}
-
 	clusterDomain := strings.TrimPrefix(cname, apiSvc+".")
 	clusterDomain = strings.TrimSuffix(clusterDomain, ".")
-
 	return clusterDomain, nil
 }

@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+// Messages for aperturectl → controller and controller → agent communication.
+package aperture.rpc.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/rpc/status.proto";
+
+message Request {
+  // Id of the request, this should be unique per client connection. First
+  // request id on the connection should be equal to nextID from the Hello
+  // message.
+  uint64 id = 1;
+
+  // Mandatory timeout for processing request. Timeout is handled on
+  // caller-side. After it passes, caller is no longer interested in a response,
+  // and callee can forget about the request.
+  google.protobuf.Duration timeout = 2;
+
+  // Request payload. The method on the callee will be dispatched by request's type.
+  google.protobuf.Any payload = 3;
+}
+
+message Response {
+  uint64 id = 1;
+  oneof result {
+    // Payload is a message of a type implied by request kind.
+    bytes payload = 2;
+    google.rpc.Status error = 3;
+  }
+}
+
+message ServerToClient {
+  oneof command {
+    // Make a request to client. Expect AgentToController message in the
+    // future containing Response with the same id.
+    Request request = 1;
+
+    // Cancels in-flight request.
+    //
+    // After cancellation, the response is not expected to be received, but
+    // might happen that it will be received. If so, it should be ignored.
+    uint64 cancel_id = 2;
+  }
+}
+
+message ClientToServer {
+  message Hello {
+    string name = 1;
+    uint64 next_id = 2;
+  }
+
+  oneof msg {
+    Hello hello = 1;
+    Response response = 2;
+  }
+}
+
+service Coordinator {
+  rpc Connect(stream ClientToServer) returns (stream ServerToClient);
+}

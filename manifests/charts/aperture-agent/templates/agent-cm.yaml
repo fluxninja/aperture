@@ -1,0 +1,67 @@
+{{- if .Values.agent.namespaceScoped }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "common.names.fullname" . }}-config
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-agent
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" . $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
+  {{- end }}
+data:
+  aperture-agent.yaml: |-
+    {{- if (omit .Values.agent.config "etcd" "prometheus" "auto_scale" "service_discovery" "agent_functions" "otel") }}
+    {{- omit .Values.agent.config "etcd" "prometheus" "auto_scale" "service_discovery" "agent_functions" "otel" | toYaml | nindent 4 }}
+    {{- end }}
+    otel:
+      {{- if and .Values.agent.config.otel (omit .Values.agent.config.otel "disable_kubernetes_scraper" "custom_metrics")}}
+      {{- omit .Values.agent.config.otel "disable_kubernetes_scraper" "custom_metrics" | toYaml | nindent 6 }}
+      {{- end }}
+      disable_kubernetes_scraper: true
+      custom_metrics:
+        {{- if (omit .Values.agent.config.otel.custom_metrics "kubeletstats")}}
+        {{- omit .Values.agent.config.otel.custom_metrics "kubeletstats" | toYaml | nindent 8 }}
+        {{- end }}
+        kubeletstats: {}
+    auto_scale:
+      kubernetes:
+        enabled: false
+    service_discovery:
+      {{- if and .Values.agent.config.service_discovery (omit .Values.agent.config.service_discovery "kubernetes")}}
+      {{- omit .Values.agent.config.service_discovery "kubernetes" | toYaml | nindent 6 }}
+      {{- end }}
+      kubernetes:
+        enabled: false
+    etcd:
+      {{- if (omit .Values.agent.config.etcd "endpoints")}}
+      {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}
+      {{- end }}
+      endpoints: {{ include "agent.etcd.endpoints" (dict "etcd" .Values.agent.config.etcd "context" . $) }}
+    prometheus:
+      address: {{ include "agent.prometheus.address" (dict "prometheus" .Values.agent.config.prometheus "context" . $) }}
+    {{- if and .Values.agent.config.agent_functions .Values.agent.controllerCert .Values.agent.controllerCert.cmName }}
+    agent_functions:
+      {{- if (omit .Values.agent.config.agent_functions "client")}}
+      {{- omit .Values.agent.config.agent_functions "client" | toYaml | nindent 6 }}
+      {{- end }}
+      client:
+        {{- if and .Values.agent.config.agent_functions.client (omit .Values.agent.config.agent_functions.client "grpc")}}
+        {{- omit .Values.agent.config.agent_functions.client "grpc" | toYaml | nindent 8 }}
+        {{- end }}
+        grpc:
+          {{- if and .Values.agent.config.agent_functions.client .Values.agent.config.agent_functions.client.grpc (omit .Values.agent.config.agent_functions.client.grpc "tls")}}
+          {{- omit .Values.agent.config.agent_functions.client.grpc "tls" | toYaml | nindent 10 }}
+          {{- end }}
+          tls:
+            {{- if and .Values.agent.config.agent_functions.client .Values.agent.config.agent_functions.client.grpc .Values.agent.config.agent_functions.client.grpc.tls (omit .Values.agent.config.agent_functions.client.grpc.tls "ca_file")}}
+            {{- omit .Values.agent.config.agent_functions.client.grpc.tls "ca_file" | toYaml | nindent 10 }}
+            {{- end }}
+            ca_file: /etc/aperture/aperture-agent/certs/{{ .Values.agent.controllerCert.certFileName }}
+    {{- end }}
+{{- end }}

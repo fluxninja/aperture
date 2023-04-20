@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+// Messages for aperturectl → controller and controller → agent communication.
+package aperture.cmd.v1;
+
+import "aperture/autoscale/kubernetes/controlpoints/v1/controlpoints.proto";
+import "aperture/discovery/entities/v1/entities.proto";
+import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
+import "aperture/flowcontrol/preview/v1/preview.proto";
+import "aperture/policy/language/v1/policy.proto";
+import "google/protobuf/empty.proto";
+
+// Controller describes APIs of the controller from the aperturectl POV
+service Controller {
+  rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
+  rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
+  rpc ListFlowControlPoints(ListFlowControlPointsRequest) returns (ListFlowControlPointsControllerResponse);
+  rpc ListAutoScaleControlPoints(ListAutoScaleControlPointsRequest) returns (ListAutoScaleControlPointsControllerResponse);
+  rpc ListDiscoveryEntities(ListDiscoveryEntitiesRequest) returns (ListDiscoveryEntitiesControllerResponse);
+  rpc ListDiscoveryEntity(ListDiscoveryEntityRequest) returns (ListDiscoveryEntityAgentResponse);
+
+  // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
+  rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
+  rpc PreviewHTTPRequests(PreviewHTTPRequestsRequest) returns (PreviewHTTPRequestsControllerResponse);
+
+  rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (google.protobuf.Empty);
+  rpc PostDynamicConfig(aperture.policy.language.v1.PostDynamicConfigRequest) returns (google.protobuf.Empty);
+  rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
+}
+
+message ListServicesRequest {}
+
+message ListServicesAgentResponse {
+  repeated string services = 1;
+  // FIXME: Remove. Controller should be aware which agent group agent belongs to.
+  string agent_group = 2;
+}
+
+message ListServicesControllerResponse {
+  repeated GlobalService services = 1;
+  uint32 errors_count = 2;
+}
+
+message ListFlowControlPointsRequest {}
+
+message ListFlowControlPointsAgentResponse {
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 1;
+  // FIXME: Remove. Controller should be aware which agent group agent belongs to.
+  string agent_group = 2;
+}
+
+message ListFlowControlPointsControllerResponse {
+  repeated GlobalFlowControlPoint global_flow_control_points = 1;
+  uint32 errors_count = 2;
+}
+
+message ListAutoScaleControlPointsRequest {}
+
+message ListAutoScaleControlPointsAgentResponse {
+  aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoints auto_scale_control_points = 1;
+  string agent_group = 2;
+}
+
+message ListAutoScaleControlPointsControllerResponse {
+  repeated GlobalAutoScaleControlPoint global_auto_scale_control_points = 1;
+  uint32 errors_count = 2;
+}
+
+message ListDiscoveryEntitiesRequest {}
+
+message ListDiscoveryEntitiesAgentResponse {
+  map<string, aperture.discovery.entities.v1.Entity> entities = 1;
+}
+
+message ListDiscoveryEntitiesControllerResponse {
+  ListDiscoveryEntitiesAgentResponse entities = 1;
+  uint32 errors_count = 2;
+}
+
+message ListDiscoveryEntityRequest {
+  oneof by {
+    string ip_address = 1;
+    string name = 2;
+  }
+}
+
+message ListDiscoveryEntityAgentResponse {
+  aperture.discovery.entities.v1.Entity entity = 1;
+}
+
+message ListAgentsResponse {
+  repeated string agents = 1;
+}
+
+// GlobalFlowControlPoint contains info about a control point on a given
+// service with explicit Agent Group.
+message GlobalFlowControlPoint {
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoint flow_control_point = 1;
+  string agent_group = 2;
+}
+
+message GlobalAutoScaleControlPoint {
+  aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoint auto_scale_control_point = 1;
+  string agent_group = 2;
+}
+
+// GlobalService is a service with explicit agent group.
+message GlobalService {
+  string name = 1;
+  string agent_group = 2;
+}
+
+// Duplicating preview.PreviewRequest because rpc framework needs separate types.
+
+message PreviewFlowLabelsRequest {
+  string agent_group = 1; // Used only in ctl→controller communication.
+  aperture.flowcontrol.preview.v1.PreviewRequest request = 2;
+}
+
+message PreviewHTTPRequestsRequest {
+  string agent_group = 1; // Used only in ctl→controller communication.
+  aperture.flowcontrol.preview.v1.PreviewRequest request = 2;
+}
+
+// Wrapping response types, as we probably will want to add more
+// controller-specific fields in the future.
+
+message PreviewFlowLabelsControllerResponse {
+  aperture.flowcontrol.preview.v1.PreviewFlowLabelsResponse response = 1;
+}
+
+message PreviewHTTPRequestsControllerResponse {
+  aperture.flowcontrol.preview.v1.PreviewHTTPRequestsResponse response = 1;
+}

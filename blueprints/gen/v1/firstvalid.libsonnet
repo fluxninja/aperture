@@ -2,12 +2,6 @@ local firstvalidins = import './firstvalidins.libsonnet';
 local firstvalidouts = import './firstvalidouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      inputs: error 'Port inputs is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: firstvalidins,
   outPorts:: firstvalidouts,

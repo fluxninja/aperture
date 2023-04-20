@@ -2,11 +2,11 @@ package classifier
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -75,12 +75,11 @@ func ProvideClassificationEngine(in ClassificationEngineIn) (iface.Classificatio
 
 	classificationEngine := NewClassificationEngine(reg)
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{classificationEngine.provideClassifierFxOptions},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry: reg,
+	fxDriver, err := notifiers.NewFxDriver(reg, in.PromRegistry,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{classificationEngine.provideClassifierFxOptions})
+	if err != nil {
+		reg.GetLogger().Fatal().Err(err).Msg("Failed to create fx driver")
 	}
 
 	in.Lifecycle.Append(fx.Hook{
@@ -155,7 +154,7 @@ func (c *ClassificationEngine) invokeMiniApp(
 			OnStart: func(startCtx context.Context) error {
 				counter, err := c.counterVec.GetMetricWith(metricLabels)
 				if err != nil {
-					return errors.Wrap(err, "failed to get classifier counter from vector")
+					return fmt.Errorf("%w: failed to get classifier counter from vector", err)
 				}
 				classifier.counter = counter
 

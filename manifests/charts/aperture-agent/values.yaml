@@ -319,6 +319,15 @@ operator:
 ## @skip agent.createUninstallHook
 ##
 agent:
+  ## @param agent.namespaceScoped Specifies whether the Aperture Agent installation should be namespace-scoped, avoiding the creation of cluster-level resources. This takes precedence over agent.create.
+  ##
+  namespaceScoped: false
+  ## @param agent.controllerCert.cmName Specifies the name of the ConfigMap containing the client certificate for Controller. Used when .Values.agent.namespaceScoped is true.
+  ## @param agent.controllerCert.certFileName Specifies the key for Cert file in the ConfigMap containing the client certificate for Controller.
+  ##
+  controllerCert:
+    cmName: ~
+    certFileName: "crt.pem"
   ## @param agent.create Specifies whether a CR for Agent should be created
   ##
   create: true
@@ -332,8 +341,8 @@ agent:
   ## @param agent.image.pullSecrets Agent image pull secrets
   ##
   image:
-    registry: ~
-    repository: ~
+    registry: docker.io/fluxninja
+    repository: aperture-agent
     tag: ~
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -497,13 +506,13 @@ agent:
   ##
   initContainers: []
   ## Agent API secret for FluxNinja ARC connection
-  ## @param agent.secrets.fluxNinjaPlugin.create Whether to create Kubernetes Secret with provided Agent API Key.
-  ## @param agent.secrets.fluxNinjaPlugin.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
-  ## @param agent.secrets.fluxNinjaPlugin.secretKeyRef.key specifies which key from the Secret for Agent API Key to use
-  ## @param agent.secrets.fluxNinjaPlugin.value API Key to use when creating a new Agent API Key Secret
+  ## @param agent.secrets.fluxNinjaExtension.create Whether to create Kubernetes Secret with provided Agent API Key.
+  ## @param agent.secrets.fluxNinjaExtension.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
+  ## @param agent.secrets.fluxNinjaExtension.secretKeyRef.key specifies which key from the Secret for Agent API Key to use
+  ## @param agent.secrets.fluxNinjaExtension.value API Key to use when creating a new Agent API Key Secret
   ##
   secrets:
-    fluxNinjaPlugin:
+    fluxNinjaExtension:
       create: false
       secretKeyRef:
         name: ~

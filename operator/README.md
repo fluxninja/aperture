@@ -76,9 +76,6 @@ below steps.
   ```yaml
   agent:
     config:
-      plugins:
-        disabled_plugins:
-          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["http://controller-etcd:2379"]
       prometheus:
@@ -116,16 +113,13 @@ below steps.
   [Controller](./manifests/charts/aperture-controller/README.md)
 
 - The Controller chart installs Prometheus and Etcd instances by default. If you
-  don't want to install and use your existing instances of Prometheus or Etcd,
+  do not want to install and use your existing instances of Prometheus or Etcd,
   configure below values in the `values.yaml` file and pass it with
   `helm upgrade`:
 
   ```yaml
   controller:
     config:
-      plugins:
-        disabled_plugins:
-          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["ETCD_ENDPOINT"]
       prometheus:
@@ -141,9 +135,6 @@ below steps.
   ```yaml
   agent:
     config:
-      plugins:
-        disabled_plugins:
-          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["ETCD_ENDPOINT"]
       prometheus:

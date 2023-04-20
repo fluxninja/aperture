@@ -37,22 +37,18 @@ func NewHandler(
 
 // HandlerWithValues implements the flowcontrol.v1 service using collected inferred values.
 type HandlerWithValues interface {
-	CheckWithValues(
+	CheckRequest(
 		context.Context,
-		[]string,
-		string,
-		map[string]string,
+		iface.RequestContext,
 	) *flowcontrolv1.CheckResponse
 }
 
-// CheckWithValues makes decision using collected inferred fields from authz or Handler.
-func (h *Handler) CheckWithValues(
+// CheckRequest makes decision using collected inferred fields from authz or Handler.
+func (h *Handler) CheckRequest(
 	ctx context.Context,
-	serviceIDs []string,
-	controlPoint string,
-	labels map[string]string,
+	requestContext iface.RequestContext,
 ) *flowcontrolv1.CheckResponse {
-	checkResponse := h.engine.ProcessRequest(ctx, controlPoint, serviceIDs, labels)
+	checkResponse := h.engine.ProcessRequest(ctx, requestContext)
 	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason())
 	return checkResponse
 }
@@ -69,12 +65,17 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 		labels = make(map[string]string)
 	}
 
-	// CheckWithValues already pushes result to metrics
-	resp := h.CheckWithValues(
+	services := h.serviceGetter.ServicesFromContext(ctx)
+
+	// CheckRequest already pushes result to metrics
+	resp := h.CheckRequest(
 		ctx,
-		h.serviceGetter.ServicesFromContext(ctx),
-		req.ControlPoint,
-		labels,
+		iface.RequestContext{
+			FlowLabels:   labels,
+			ControlPoint: req.ControlPoint,
+			Services:     services,
+			Tokens:       req.Tokens,
+		},
 	)
 	end := time.Now()
 	resp.Start = timestamppb.New(start)

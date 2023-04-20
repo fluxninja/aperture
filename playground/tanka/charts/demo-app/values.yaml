@@ -5,14 +5,44 @@
 replicaCount: 1
 
 simplesrv:
+  cpuLoadPercentage: 0
+  rejectRatio: 0.05
+  hostname: ~
   image:
-    repository: gcr.io/devel-309501/cf-fn/demo-app
+    repository: fluxninja/demo-app
     pullPolicy: IfNotPresent
     tag: "latest"
 
+rabbitmq:
+  enabled: false
+  host: ~
+  port: 5672
+  username: ~
+  password: ~
+
+nginx:
+  enabled: false
+  resources: {}
+  replicaCount: 1
+  image:
+    repository: fluxninja/demo-app-nginx
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
+
+kong:
+  enabled: false
+  resources: {}
+  replicaCount: 1
+  image:
+    repository: fluxninja/demo-app-kong
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
+
 proxy:
   image:
-    repository: gcr.io/devel-309501/cf-fn/fluxninja-proxy-envoy
+    repository: fluxninja/fluxninja-proxy-envoy
     pullPolicy: IfNotPresent
     tag: "latest"
 
@@ -31,10 +61,12 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -46,8 +78,8 @@ service:
   type: ClusterIP
   port: 80
 
-
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following

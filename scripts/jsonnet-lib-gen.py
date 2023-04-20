@@ -1,27 +1,27 @@
 from __future__ import annotations
 
-import os
 import enum
-import textwrap
-
+import json
+import os
+import subprocess
+import tempfile
 from pathlib import Path
-from typing import Mapping, Dict, Optional, List, Tuple, Iterable
+from typing import Dict, Iterable, List, Mapping, Optional, Tuple
 
 import jinja2
-from jinja2.utils import import_string
 import prance
 import typer
-
+import yaml
 from loguru import logger
 
-
 JINJA2_TEMPLATES = {}
-JINJA2_TEMPLATES["definition.libsonnet"] = """
+JINJA2_TEMPLATES[
+    "definition.libsonnet"
+] = """
 {{- definition | portsImports -}}
 
 {
   new():: {
-    {{- definition | defaultPorts | indent(4) }}
   },
 {%- if definition.has_ports() %}
   {{ definition | portsBlock | indent(2) }}
@@ -50,7 +50,9 @@ JINJA2_TEMPLATES["definition.libsonnet"] = """
 }
 
 """
-JINJA2_TEMPLATES["gen.libsonnet"] = """{
+JINJA2_TEMPLATES[
+    "gen.libsonnet"
+] = """{
   {%- for name, import in imports %}
   {{ name }}: import '{{ import }}',
   {%- endfor %}
@@ -58,7 +60,9 @@ JINJA2_TEMPLATES["gen.libsonnet"] = """{
 
 """
 
-JINJA2_TEMPLATES["in_out_ports_block.libsonnet"] = """
+JINJA2_TEMPLATES[
+    "in_out_ports_block.libsonnet"
+] = """
 {%- if in_ports %}
 in_ports: {
   {%- for port in in_ports.definition.properties.keys() %}
@@ -75,9 +79,7 @@ out_ports: {
 {%- endif %}
 """
 
-JSONNET_KEYWORDS = [
-    "error"
-]
+JSONNET_KEYWORDS = ["error"]
 
 
 class JsonnetType(enum.Enum):
@@ -149,14 +151,14 @@ class JsonnetDefinition:
 
     @property
     def jsonnet_name(self):
-        if self.swagger_name.startswith("v1"):
-            return self.swagger_name[2:]
         return self.swagger_name
 
     def _parse_properties(self, properties: Mapping):
         for prop_name, prop in properties.items():
             logger.trace(f"{prop_name}")
-            self.properties[prop_name] = JsonnetObjectProperty.from_swagger(prop_name, prop)
+            self.properties[prop_name] = JsonnetObjectProperty.from_swagger(
+                prop_name, prop
+            )
 
     @classmethod
     def from_swagger(cls, name: str, definition: Mapping):
@@ -198,9 +200,6 @@ def withNameMixinFilter(name: str) -> str:
 
 
 def defaultPorts(definition: JsonnetDefinition) -> str:
-    TPL = textwrap.dedent("""\
-
-    """)
     if definition.type_ != JsonnetType.OBJECT:
         return ""
     in_ports = definition.properties.get("in_ports")
@@ -220,15 +219,13 @@ def portsImports(definition: JsonnetDefinition) -> str:
     in_ports = definition.properties.get("in_ports")
     if in_ports:
         ports_name = f"{definition.jsonnet_name.lower()}ins"
-        ports_v1name = ports_name.split("v1")[1] if 'v1' in ports_name else ports_name
-        ports_fname = f"{ports_v1name}.libsonnet"
+        ports_fname = f"{ports_name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
     out_ports = definition.properties.get("out_ports")
     if out_ports:
         ports_name = f"{definition.jsonnet_name.lower()}outs"
-        ports_v1name = ports_name.split("v1")[1] if 'v1' in ports_name else ports_name
-        ports_fname = f"{ports_v1name}.libsonnet"
+        ports_fname = f"{ports_name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
     return imports
@@ -252,7 +249,6 @@ def portsBlock(definition: JsonnetDefinition) -> str:
     return block.removesuffix("\n")
 
 
-
 def get_jinja2_environment() -> jinja2.Environment:
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
     env = jinja2.Environment(loader=loader)
@@ -264,7 +260,6 @@ def get_jinja2_environment() -> jinja2.Environment:
     env.filters["portsBlock"] = portsBlock
 
     return env
-
 
 
 PROTOBUF_IGNORED_DEFS = [
@@ -283,17 +278,20 @@ class ApertureJsonnetGenerator:
 
     def _first_pass(self):
         RESOLVE_NONE = 0
-        parser = prance.ResolvingParser(str(self.swagger_path), resolve_types=RESOLVE_NONE)
+        parser = prance.ResolvingParser(
+            str(self.swagger_path), resolve_types=RESOLVE_NONE
+        )
         assert parser.specification
 
-        for swagger_name, swagger_def in parser.specification['definitions'].items():
+        for swagger_name, swagger_def in parser.specification["definitions"].items():
             if swagger_name in PROTOBUF_IGNORED_DEFS:
                 continue
-            self.definitions[swagger_name] = JsonnetDefinition.from_swagger(swagger_name, swagger_def)
+            self.definitions[swagger_name] = JsonnetDefinition.from_swagger(
+                swagger_name, swagger_def
+            )
 
     def _second_pass(self):
         for definition in self.definitions.values():
-
             if definition.type_ != JsonnetType.OBJECT:
                 continue
 
@@ -336,8 +334,12 @@ def render_gen_libsonnet(path: Path, imports: List[Tuple[str, Path]]):
     path.write_text(template.render(imports=imports))
 
 
-def main(output_dir: Path = typer.Option(..., help="Output path for the generated library"),
-         aperture_swagger_path: Path = typer.Argument(..., help="Location of the aperture.swagger.yaml")):
+def main(
+    output_dir: Path = typer.Option(..., help="Output path for the generated library"),
+    aperture_swagger_path: Path = typer.Argument(
+        ..., help="Location of the aperture.swagger.yaml"
+    ),
+):
     if not aperture_swagger_path.exists():
         logger.error(f"No such file or directory: {aperture_swagger_path}")
         raise typer.Exit(1)
@@ -361,7 +363,10 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
         libsonnet_path.write_text(rendered_jsonnet)
 
     custom_patches_basedir = output_dir / "custom"
-    custom_patches = [path.relative_to(output_dir) for path in custom_patches_basedir.glob("*.libsonnet")]
+    custom_patches = [
+        path.relative_to(output_dir)
+        for path in custom_patches_basedir.glob("*.libsonnet")
+    ]
 
     spec_libsonnet_path = output_dir / "spec.libsonnet"
     spec_libsonnet_data = render_spec_libsonnet(custom_patches)
@@ -377,6 +382,116 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
         for definition in definitions
     ]
     render_gen_libsonnet(gen_libsonnet_path, imports)
+
+    # rewrite exclusiveMinimum, exclusiveMaximum to use numbers based on minimum and maximum
+    # instead of booleans in aperture_swagger_path, save to temp file
+    with open(aperture_swagger_path, "r") as f:
+        aperture_swagger_data = f.read()
+        # read aperture_swagger_data as yaml
+        aperture_swagger_yaml = yaml.safe_load(aperture_swagger_data)
+        # iterate over all definitions
+        for _, definition in aperture_swagger_yaml["definitions"].items():
+            # iterate over all properties in definition
+            for _, property in definition["properties"].items():
+                # if the property has exclusiveMinimum or exclusiveMaximum, set it to the value of minimum or maximum
+                if (
+                    "exclusiveMinimum" in property
+                    and property["exclusiveMinimum"] == True
+                ):
+                    property["exclusiveMinimum"] = property["minimum"]
+                    # remove minimum
+                    del property["minimum"]
+                if (
+                    "exclusiveMaximum" in property
+                    and property["exclusiveMaximum"] == True
+                ):
+                    property["exclusiveMaximum"] = property["maximum"]
+                    # remove maximum
+                    del property["maximum"]
+        # write aperture_swagger_yaml as yaml to temp file
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
+            yaml.dump(aperture_swagger_yaml, f)
+
+            # next, generate json schema using openapi2jsonschema
+            # execute openapi2jsonschema with arguments -
+            # 1. path in aperture_swagger_path variable
+            # 2. --strict flag
+            # 3. --output flag with value as output_dir/jsonschema
+            jsonschema_dir = output_dir / "jsonschema"
+            exit_code = subprocess.call(
+                [
+                    "openapi2jsonschema",
+                    f.name,
+                    "--strict",
+                    "--output",
+                    str(jsonschema_dir),
+                ]
+            )
+            # remove temp file
+            os.remove(f.name)
+            if exit_code != 0:
+                logger.error(
+                    f"openapi2jsonschema exited with non-zero exit code: {exit_code}"
+                )
+                raise typer.Exit(1)
+            # remove all files in output_dir/jsonschema except for the _definitions.json file
+            for path in jsonschema_dir.rglob("*"):
+                if path.is_file() and path.name != "_definitions.json":
+                    os.remove(path)
+
+            # inject k8s custom resource definition into _definitions.json
+            jsonschema_definitions_path = jsonschema_dir / "_definitions.json"
+            with open(jsonschema_definitions_path, "r") as f:
+                jsonschema_definitions = json.load(f)
+                jsonschema_definitions["definitions"][
+                    "PolicyCustomResource"
+                ] = json.loads(CUSTOM_RESOURCE_DEFINITION)
+            with open(jsonschema_definitions_path, "w") as f:
+                json.dump(jsonschema_definitions, f, indent=2)
+
+
+CUSTOM_RESOURCE_DEFINITION = """
+{
+  "description": "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.",
+  "type": "object",
+  "title": "Policy CustomResourceDefinition",
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+      "x-order": 0,
+      "type": ["string", "null"],
+      "enum": ["fluxninja.com/v1alpha1"]
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+      "x-order": 1,
+      "type": ["string", "null"],
+      "enum": ["Policy"]
+    },
+    "metadata": {
+      "x-order": 2,
+      "$ref": "https://kubernetesjsonschema.dev/v1.18.1/_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Aperture Policy Object",
+      "x-order": 3,
+      "$ref": "#/definitions/Policy"
+    },
+    "dynamicConfig": {
+        "description": "DynamicConfig provides dynamic configuration for the policy.",
+      "x-order": 4,
+        "type": ["object", "null"]
+    },
+    "status": {
+      "description": "Status indicates the actual state of the CustomResourceDefinition",
+      "x-order": 5,
+      "$ref": "https://kubernetesjsonschema.dev/v1.18.1/_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionStatus"
+    }
+  }
+}
+"""
+
 
 if __name__ == "__main__":
     typer.run(main)

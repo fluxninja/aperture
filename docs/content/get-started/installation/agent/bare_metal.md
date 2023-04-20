@@ -15,22 +15,22 @@ sidebar_position: 3
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
-import {apertureVersion,apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
 
 ```
 
-The Aperture Agent can be installed as a system service on any Linux system
-that's [supported](supported-platforms.md).
+The Aperture Agent can be installed as a system service on any Linux system that
+is [supported](supported-platforms.md).
 
 ## Download {#agent-download}
 
 The Aperture Agent can be installed using packages made for your system's
-package manager like `dpkg` or `rpm`.
+package manager, like `dpkg` or `rpm`.
 
-To install Aperture Agent, first download package for your manager from
+To install Aperture Agent, first download the package for your manager from the
 [Releases Page](https://github.com/fluxninja/aperture/releases/latest).
 
-Alternatively download it using following script:
+Alternatively, download it using the following script:
 
 ```mdx-code-block
 export const DownloadScript = ({children, packager, arch, archSeparator, versionSeparator, component}) => (
@@ -65,22 +65,22 @@ curl --fail --location --remote-name "\${url}"
   </TabItem>
 </Tabs>
 
-You should then point Aperture Agent at etcd and prometheus deployed by the
-Aperture Controller, by editing
+To point the Aperture Agent at etcd and Prometheus deployed by the Aperture
+Controller, edit the configuration file located at
 `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 
-All the config parameters for the Aperture Agent are available
+All the configuration parameters for the Aperture Agent are available
 [here](/reference/configuration/agent.md).
 
 :::info
 
-The default config disables the FluxNinja ARC Plugin for the Aperture Agent. If
-you want to keep it enabled, add parameters provided
-[here](/arc/plugin.md#configuration).
+The default configuration disables the FluxNinja ARC Extension for the Aperture
+Agent. If you want to keep it enabled, add parameters provided
+[here](/arc/extension.md#configuration).
 
 :::
 
-After installing, you should enable the `aperture-agent` systemd service, and
+After installing, you should enable the `aperture-agent` `systemd` service, and
 make it start after system boot:
 
 ```bash
@@ -89,8 +89,8 @@ sudo systemctl enable --now aperture-agent
 
 :::caution
 
-Currently configuration watcher and automatic reload aren't supported. If you
-modify the configuration file, make sure to restart the service:
+Currently, configuration watcher and automatic reload aren't supported. If you
+modify the configuration file, do restart the service:
 
 ```bash
 sudo systemctl restart aperture-agent
@@ -104,7 +104,7 @@ You can then view service status:
 sudo systemctl status aperture-agent
 ```
 
-To view the logs, when default log configuration is used, you can use
+To view the logs, when the default log configuration is used, you can use
 `journalctl`:
 
 ```bash
@@ -113,41 +113,41 @@ journalctl -u aperture-agent --since "15 minutes ago"
 
 ## Upgrade
 
-[Download](#agent-download) updated package and follow
+[Download](#agent-download) the updated package and follow
 [installation](#agent-installation) steps. Remember to restart the service after
 installation is complete.
 
 ## Uninstall
 
-1. Stop the Aperture Agent service:
+Stop the Aperture Agent service:
 
 ```bash
 sudo systemctl stop aperture-agent
 ```
 
-2. **Optional**: Remove the agent configuration:
+**Optional**: Remove the agent configuration:
 
 ```bash
 sudo rm /etc/aperture/aperture-agent/config/aperture-agent.yaml
 ```
 
-3. Uninstall the package:
+Uninstall the package:
 
-  <Tabs groupId="packageManager" queryString>
-    <TabItem value="dpkg" label="dpkg">
+<Tabs groupId="packageManager" queryString>
+  <TabItem value="dpkg" label="dpkg">
 
-    ```bash
-    sudo dpkg -r aperture-agent
-    ```
+```bash
+sudo dpkg -r aperture-agent
+```
 
-    </TabItem>
+  </TabItem>
 
-    <TabItem value="rpm" label="rpm">
+  <TabItem value="rpm" label="rpm">
 
-    ```bash
-    sudo rpm -e aperture-agent
-    ```
+```bash
+sudo rpm -e aperture-agent
+```
 
-    </TabItem>
+  </TabItem>
 
-  </Tabs>
+</Tabs>

@@ -22,11 +22,13 @@ import (
 	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
+	agentfunctions "github.com/fluxninja/aperture/pkg/agentfunctions/config"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/distcache"
+	distcache "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/peers"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
+	peers "github.com/fluxninja/aperture/pkg/peers/config"
+	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
+	preview "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -48,6 +50,10 @@ type AgentSpec struct {
 	// Agent Configuration
 	//+kubebuilder:validation:Optional
 	ConfigSpec AgentConfigSpec `json:"config"`
+
+	// ControllerClientCertConfig configuration.
+	//+kubebuilder:validation:Optional
+	ControllerClientCertConfig common.ControllerClientCertConfig `json:"controller_client_cert"`
 }
 
 // AgentConfigSpec holds agent configuration.
@@ -76,13 +82,21 @@ type AgentConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	FlowControl FlowControlConfigSpec `json:"flow_control"`
 
+	// AutoScale configuration.
+	//+kubebuilder:validation:Optional
+	AutoScale AutoScaleConfigSpec `json:"auto_scale"`
+
 	// Service Discovery configuration.
 	//+kubebuilder:validation:Optional
 	ServiceDiscoverySpec common.ServiceDiscoverySpec `json:"service_discovery"`
 
-	// OTEL configuration.
+	// OTel configuration.
 	//+kubebuilder:validation:Optional
-	OTEL agent.AgentOTELConfig `json:"otel"`
+	OTel agent.AgentOTelConfig `json:"otel"`
+
+	// Agent functions configuration.
+	//+kubebuilder:validation:Optional
+	AgentFunctions agentfunctions.AgentFunctionsConfig `json:"agent_functions"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.
@@ -90,6 +104,13 @@ type FlowControlConfigSpec struct {
 	// FlowPreviewConfig holds flow preview configuration.
 	//+kubebuilder:validation:Optional
 	FlowPreviewConfig preview.FlowPreviewConfig `json:"preview_service"`
+}
+
+// AutoScaleConfigSpec holds auto-scale configuration.
+type AutoScaleConfigSpec struct {
+	// AutoScaleKubernetesConfig holds auto-scale kubernetes configuration.
+	//+kubebuilder:validation:Optional
+	AutoScaleKubernetesConfig autoscalek8sconfig.AutoScaleKubernetesConfig `json:"kubernetes"`
 }
 
 // AgentStatus defines the observed state of Agent.

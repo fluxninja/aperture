@@ -2,7 +2,6 @@ package components
 
 import (
 	"errors"
-	"fmt"
 
 	"go.uber.org/fx"
 
@@ -45,6 +44,9 @@ func (*ArithmeticCombinator) Type() runtime.ComponentType {
 // ShortDescription implements runtime.Component.
 func (arith *ArithmeticCombinator) ShortDescription() string { return arith.operator.String() }
 
+// IsActuator implements runtime.Component.
+func (*ArithmeticCombinator) IsActuator() bool { return false }
+
 // Make sure ArithmeticCombinator complies with Component interface.
 var _ runtime.Component = (*ArithmeticCombinator)(nil)
 
@@ -82,7 +84,7 @@ func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToReading,
 			output = runtime.NewReading(lhsVal * rhsVal)
 		case Div:
 			if rhsVal == 0 {
-				err = fmt.Errorf("divide by zero")
+				output = runtime.InvalidReading()
 			} else {
 				output = runtime.NewReading(lhsVal / rhsVal)
 			}

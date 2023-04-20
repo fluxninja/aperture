@@ -1,6 +1,8 @@
 package alerts
 
 import (
+	"strings"
+
 	"github.com/fluxninja/aperture/pkg/config"
 )
 
@@ -40,7 +42,7 @@ func (a *SimpleAlerter) AlertsChan() <-chan *Alert {
 
 // WithLabels returns the alerter wrapper with specified labels.
 func (a *SimpleAlerter) WithLabels(labels map[string]string) Alerter {
-	return newAlerterWrapper(a, labels)
+	return newAlerterWrapper(a, sanitizeKeysInLabels(labels))
 }
 
 type alerterWrapper struct {
@@ -78,5 +80,15 @@ func (aw *alerterWrapper) WithLabels(labels map[string]string) Alerter {
 	for k, v := range labels {
 		mergedLabels[k] = v
 	}
-	return newAlerterWrapper(aw, mergedLabels)
+	return newAlerterWrapper(aw, sanitizeKeysInLabels(mergedLabels))
+}
+
+func sanitizeKeysInLabels(labels map[string]string) map[string]string {
+	// change '-' to '_' in key because alertmanager does not accept it
+	fixedLabels := make(map[string]string)
+	for key, val := range labels {
+		fixedKey := strings.ReplaceAll(key, "-", "_")
+		fixedLabels[fixedKey] = val
+	}
+	return fixedLabels
 }

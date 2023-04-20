@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+import "aperture/policy/language/v1/ports.proto";
+import "google/protobuf/duration.proto";
+
+// Query components that are query databases such as Prometheus.
+message Query {
+  oneof component {
+    // Periodically runs a Prometheus query in the background and emits the result.
+    PromQL promql = 1;
+  }
+}
+
+// Component that runs a Prometheus query periodically and returns the result as an output signal
+message PromQL {
+  // Output for the PromQL component.
+  message Outs {
+    // The result of the Prometheus query as an output signal.
+    OutPort output = 1;
+  }
+
+  // Output ports for the PromQL component.
+  Outs out_ports = 1;
+
+  // Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.
+  //
+  // :::note
+  //
+  // The query must return a single value either as a scalar or as a vector with a single element.
+  //
+  // :::
+  //
+  // :::info Usage with Flux Meter
+  //
+  // [Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+  // Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+  // The particular Flux Meter can be identified with the `flux_meter_name` label.
+  // There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+  //
+  // :::
+  //
+  // :::info Usage with OpenTelemetry Metrics
+  //
+  // Aperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.
+  //
+  // :::
+  string query_string = 2;
+
+  // Describes the interval between successive evaluations of the Prometheus query.
+  google.protobuf.Duration evaluation_interval = 3; // @gotags: default:"10s"
+}

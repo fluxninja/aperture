@@ -10,7 +10,7 @@ import (
 
 // Module .
 var Module = fx.Options(
-	fx.Provide(ProvideFlowcontrolHandler),
+	fx.Provide(ProvideFlowControlHandler),
 	fx.Invoke(Register),
 )
 
@@ -19,12 +19,12 @@ type ConstructorIn struct {
 	fx.In
 }
 
-// ProvideFlowcontrolHandler .
-func ProvideFlowcontrolHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, error) {
+// ProvideFlowControlHandler .
+func ProvideFlowControlHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, error) {
 	return &FlowControlHandler{}, nil
 }
 
-// Register registers flowcontrol service on a grpc server.
+// Register registers flowcontrol service on a gRPC server.
 func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceServer) {
 	flowcontrolv1.RegisterFlowControlServiceServer(server, handler)
 	log.Info().Msg("flowcontrol handler registered")

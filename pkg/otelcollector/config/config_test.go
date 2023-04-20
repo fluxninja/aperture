@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("Config", func() {
 	It("Adds extensions properly", func() {
-		otelConfig := otelconfig.NewOTELConfig()
+		otelConfig := otelconfig.NewOTelConfig()
 		otelConfig.AddExtension("foo", map[string]interface{}{"bar": "baz"})
 		otelConfig.AddExtension("empty", map[string]interface{}{})
 		marshalledConfig, err := json.Marshal(otelConfig)

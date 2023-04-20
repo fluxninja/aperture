@@ -1,7 +1,7 @@
 package envoy
 
 import (
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -13,7 +13,7 @@ import (
 // Module provides authz handler
 //
 // Authz handler is one of the APIs to classification and flowcontrol modules.
-// Authz uses envoy's external authorization grpc API.
+// Authz uses envoy's external authorization gRPC API.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(NewHandler),
@@ -26,7 +26,7 @@ func Module() fx.Option {
 // To be used in fx.Invoke.
 func Register(handler *Handler, server *grpc.Server, healthsrv *health.Server) {
 	// If changing params to this function, keep RegisterAnnotated in sync.
-	ext_authz.RegisterAuthorizationServer(server, handler)
+	authv3.RegisterAuthorizationServer(server, handler)
 
 	healthsrv.SetServingStatus("envoy.service.auth.v3.Authorization", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("Authz handler registered")

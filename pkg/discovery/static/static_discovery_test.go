@@ -7,7 +7,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
+	"github.com/fluxninja/aperture/pkg/config"
+	sdconfig "github.com/fluxninja/aperture/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/pkg/mocks"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
@@ -25,11 +27,11 @@ var _ = BeforeEach(func() {
 var _ = Describe("Static service discovery", func() {
 	Context("Discovery from config", func() {
 		It("Writes no entities with nil service list", func() {
-			config := StaticDiscoveryConfig{
-				Services: nil,
+			cfg := &sdconfig.StaticDiscoveryConfig{
+				Entities: nil,
 			}
 
-			sd, trackers := CreateStaticDiscoveryWithFakeTracker(config)
+			sd, trackers := CreateStaticDiscoveryWithFakeTracker(cfg)
 
 			trackers.EXPECT().WriteEvent(gomock.Any(), gomock.Any()).MaxTimes(0)
 
@@ -43,24 +45,19 @@ var _ = Describe("Static service discovery", func() {
 			someName := "some_entity"
 			someService := "svc1"
 
-			config := StaticDiscoveryConfig{
-				Services: []*ServiceConfig{
+			cfg := &sdconfig.StaticDiscoveryConfig{
+				Entities: []entitiesv1.Entity{
 					{
-						Name: someService,
-						Entities: []*EntityConfig{
-							{
-								IPAddress: someIPAddress,
-								UID:       someUID,
-								Name:      someName,
-							},
-						},
+						IpAddress: someIPAddress,
+						Uid:       someUID,
+						Services:  []string{someService},
+						Name:      someName,
 					},
 				},
 			}
 
-			expectedEntity := &entitycachev1.Entity{
+			expectedEntity := &entitiesv1.Entity{
 				IpAddress: someIPAddress,
-				Prefix:    staticEntityTrackerPrefix,
 				Uid:       someUID,
 				Services:  []string{someService},
 				Name:      someName,
@@ -70,7 +67,7 @@ var _ = Describe("Static service discovery", func() {
 			serializedExpectedEntity, err := json.Marshal(expectedEntity)
 			Expect(err).NotTo(HaveOccurred())
 
-			sd, trackers := CreateStaticDiscoveryWithFakeTracker(config)
+			sd, trackers := CreateStaticDiscoveryWithFakeTracker(cfg)
 
 			trackers.EXPECT().WriteEvent(expectedEntityKey, serializedExpectedEntity).Times(1)
 
@@ -79,69 +76,60 @@ var _ = Describe("Static service discovery", func() {
 		})
 
 		It("Writes all entities defined in config", func() {
-			config := StaticDiscoveryConfig{
-				Services: []*ServiceConfig{
-					{
-						Name: "svc1",
-						Entities: []*EntityConfig{
-							{
-								IPAddress: "1.2.3.4",
-								UID:       "foo",
-								Name:      "someName",
-							},
-							{
-								IPAddress: "1.2.3.5",
-								UID:       "bar",
-								Name:      "someName",
-							},
-						},
-					},
-				},
-			}
+			bytes := []byte(`
+      {
+        "entities": [
+          {
+            "ip_address": "1.2.3.4",
+            "uid": "foo",
+            "name": "someName",
+            "services": ["svc1"]
+          },
+          {
+            "ip_address": "1.2.3.5",
+            "uid": "bar",
+            "name": "someName",
+            "services": ["svc1"]
+          }
+        ]
+      }
+      `)
 
-			sd, trackers := CreateStaticDiscoveryWithFakeTracker(config)
+			// use unmarshaller
+			unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
+			Expect(err).NotTo(HaveOccurred())
+			var cfg sdconfig.StaticDiscoveryConfig
+			err = unmarshaller.Unmarshal(&cfg)
+			Expect(err).NotTo(HaveOccurred())
+
+			sd, trackers := CreateStaticDiscoveryWithFakeTracker(&cfg)
 
 			trackers.EXPECT().WriteEvent(gomock.Any(), gomock.Any()).Times(2)
 
-			err := sd.start()
+			err = sd.start()
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("Writes one entity if it's defined for multiple services", func() {
+		It("Writes one entity if it is defined for multiple services", func() {
 			someIPAddress := "1.2.3.4"
 			someUID := "foo"
 			someName := "some_entity"
 			someService := "svc1"
 			someOtherService := "svc2"
 
-			config := StaticDiscoveryConfig{
-				Services: []*ServiceConfig{
+			cfg := &sdconfig.StaticDiscoveryConfig{
+				Entities: []entitiesv1.Entity{
 					{
-						Name: someService,
-						Entities: []*EntityConfig{
-							{
-								IPAddress: someIPAddress,
-								UID:       someUID,
-								Name:      someName,
-							},
-						},
-					},
-					{
-						Name: someOtherService,
-						Entities: []*EntityConfig{
-							{
-								IPAddress: someIPAddress,
-								UID:       someUID,
-								Name:      someName,
-							},
-						},
+						IpAddress: someIPAddress,
+						Uid:       someUID,
+						Services:  []string{someService, someOtherService},
+						Name:      someName,
 					},
 				},
 			}
 
-			expectedEntity := &entitycachev1.Entity{
+			expectedEntity := &entitiesv1.Entity{
 				IpAddress: someIPAddress,
-				Prefix:    staticEntityTrackerPrefix,
 				Uid:       someUID,
 				Services:  []string{someService, someOtherService},
 				Name:      someName,
@@ -151,7 +139,7 @@ var _ = Describe("Static service discovery", func() {
 			serializedExpectedEntity, err := json.Marshal(expectedEntity)
 			Expect(err).NotTo(HaveOccurred())
 
-			sd, trackers := CreateStaticDiscoveryWithFakeTracker(config)
+			sd, trackers := CreateStaticDiscoveryWithFakeTracker(cfg)
 
 			trackers.EXPECT().WriteEvent(expectedEntityKey, serializedExpectedEntity).Times(1)
 
@@ -161,6 +149,8 @@ var _ = Describe("Static service discovery", func() {
 	})
 })
 
-func CreateStaticDiscoveryWithFakeTracker(config StaticDiscoveryConfig) (*StaticDiscovery, *mocks.MockEventWriter) {
+func CreateStaticDiscoveryWithFakeTracker(
+	config *sdconfig.StaticDiscoveryConfig,
+) (*StaticDiscovery, *mocks.MockEventWriter) {
 	return newStaticServiceDiscovery(mockEventWriter, config), mockEventWriter
 }

@@ -133,23 +133,29 @@
   withQueryMixin(query):: {
     query+: query,
   },
+  withSignalGenerator(signal_generator):: {
+    signal_generator: signal_generator,
+  },
+  withSignalGeneratorMixin(signal_generator):: {
+    signal_generator+: signal_generator,
+  },
   withSma(sma):: {
     sma: sma,
   },
   withSmaMixin(sma):: {
     sma+: sma,
   },
-  withSqrt(sqrt):: {
-    sqrt: sqrt,
-  },
-  withSqrtMixin(sqrt):: {
-    sqrt+: sqrt,
-  },
   withSwitcher(switcher):: {
     switcher: switcher,
   },
   withSwitcherMixin(switcher):: {
     switcher+: switcher,
+  },
+  withUnaryOperator(unary_operator):: {
+    unary_operator: unary_operator,
+  },
+  withUnaryOperatorMixin(unary_operator):: {
+    unary_operator+: unary_operator,
   },
   withVariable(variable):: {
     variable: variable,

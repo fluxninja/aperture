@@ -3,13 +3,15 @@ package jobs
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
-	"github.com/go-co-op/gocron"
+	"github.com/reugn/go-quartz/quartz"
 	"go.uber.org/fx"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	jobsconfig "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -18,39 +20,8 @@ const (
 	schedulerConfigKey = "scheduler"
 )
 
-// SchedulerMode configures the scheduler's behavior when concurrency limit is applied.
-type SchedulerMode int8
-
-const (
-	// RescheduleMode - the default is that if a limit on maximum
-	// concurrent jobs is set and the limit is reached, a job will
-	// skip it's run and try again on the next occurrence in the schedule.
-	RescheduleMode SchedulerMode = iota
-	// WaitMode - if a limit on maximum concurrent jobs is set
-	// and the limit is reached, a job will wait to try and run
-	// until a spot in the limit is freed up.
-	//
-	// Note: this mode can produce unpredictable results as
-	// job execution order isn't guaranteed. For example, a job that
-	// executes frequently may pile up in the wait queue and be executed
-	// many times back to back when the queue opens.
-	WaitMode
-)
-
-// JobGroupConfig holds configuration for JobGroup.
-// swagger:model
-// +kubebuilder:object:generate=true
-type JobGroupConfig struct {
-	SchedulerConfig `json:",inline"`
-}
-
-// SchedulerConfig holds configuration for job Scheduler.
-// swagger:model
-// +kubebuilder:object:generate=true
-type SchedulerConfig struct {
-	// Limits how many jobs can be running at the same time. This is useful when running resource intensive jobs and a precise start time is not critical. 0 = no limit.
-	MaxConcurrentJobs int `json:"max_concurrent_jobs" validate:"gte=0" default:"0"`
-}
+// JobGroupConfig is reexported as it is commonly used when importing jobs package.
+type JobGroupConfig = jobsconfig.JobGroupConfig
 
 // JobGroupConstructor holds fields to create annotated instances of JobGroup.
 type JobGroupConstructor struct {
@@ -59,8 +30,7 @@ type JobGroupConstructor struct {
 	// Config key --  if it is empty then it is <name>.scheduler
 	Key           string
 	GW            GroupWatchers
-	DefaultConfig JobGroupConfig
-	SchedulerMode SchedulerMode
+	DefaultConfig jobsconfig.JobGroupConfig
 }
 
 // Annotate provides annotated instances of JobGroup.
@@ -84,14 +54,14 @@ func (jgc JobGroupConstructor) provideJobGroup(
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (*JobGroup, error) {
-	config := jgc.DefaultConfig
+	schedulerConfig := jgc.DefaultConfig
 
 	key := jgc.Key
 	if key == "" {
 		key = jgc.Name + "." + schedulerConfigKey
 	}
 
-	if err := unmarshaller.UnmarshalKey(key, &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(key, &schedulerConfig); err != nil {
 		log.Panic().Err(err).Msg("Unable to deserialize JobGroup configuration!")
 	}
 
@@ -100,9 +70,9 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		gwAll = append(gwAll, jgc.GW...)
 		gwAll = append(gwAll, gw...)
 	}
-	reg := registry.Child("jg", jgc.Name)
+	reg := registry.Child("job-group", jgc.Name)
 
-	jg, err := NewJobGroup(reg, config.MaxConcurrentJobs, jgc.SchedulerMode, gwAll)
+	jg, err := NewJobGroup(reg, schedulerConfig, gwAll)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +95,7 @@ var errInitialResult = errors.New("job hasn't been scheduled yet")
 // JobGroup tracks a group of jobs.
 // It is responsible for scheduling jobs and keeping track of their statuses.
 type JobGroup struct {
-	scheduler        *gocron.Scheduler
+	scheduler        *quartz.StdScheduler
 	gt               *groupTracker
 	livenessRegistry status.Registry
 }
@@ -133,22 +103,13 @@ type JobGroup struct {
 // NewJobGroup creates a new JobGroup.
 func NewJobGroup(
 	statusRegistry status.Registry,
-	maxConcurrentJobs int,
-	schedulerMode SchedulerMode,
+	config jobsconfig.JobGroupConfig,
 	gws GroupWatchers,
 ) (*JobGroup, error) {
-	scheduler := gocron.NewScheduler(time.UTC)
-	scheduler.TagsUnique()
-	if maxConcurrentJobs > 0 {
-		switch schedulerMode {
-		case RescheduleMode:
-			scheduler.SetMaxConcurrentJobs(maxConcurrentJobs, gocron.RescheduleMode)
-		case WaitMode:
-			scheduler.SetMaxConcurrentJobs(maxConcurrentJobs, gocron.WaitMode)
-		}
-	}
-	// always singleton
-	scheduler.SingletonModeAll()
+	scheduler := quartz.NewStdSchedulerWithOptions(quartz.StdSchedulerOptions{
+		BlockingExecution: config.BlockingExecution,
+		WorkerLimit:       config.WorkerLimit,
+	})
 
 	jg := &JobGroup{
 		scheduler: scheduler,
@@ -161,10 +122,10 @@ func NewJobGroup(
 // Start starts the JobGroup.
 func (jg *JobGroup) Start() error {
 	jg.livenessRegistry = jg.gt.statusRegistry.Root().
-		Child("subsystem", "liveness").
-		Child("jg", "job_groups").
+		Child("system", "liveness").
+		Child("job-group", "job_groups").
 		Child(jg.gt.statusRegistry.Key(), jg.gt.statusRegistry.Value())
-	jg.scheduler.StartAsync()
+	jg.scheduler.Start(context.Background())
 	return nil
 }
 
@@ -172,6 +133,7 @@ func (jg *JobGroup) Start() error {
 func (jg *JobGroup) Stop() error {
 	jg.DeregisterAll()
 	jg.scheduler.Stop()
+	jg.scheduler.Wait(context.Background())
 	jg.livenessRegistry.Detach()
 	return nil
 }
@@ -179,7 +141,7 @@ func (jg *JobGroup) Stop() error {
 // RegisterJob registers a new Job in a JobGroup.
 // It returns an error if the job is already registered.
 // It also starts the job's executor.
-func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
+func (jg *JobGroup) RegisterJob(job Job, config jobsconfig.JobConfig) error {
 	var initialErr error
 	if !config.InitiallyHealthy {
 		initialErr = errInitialResult
@@ -230,30 +192,28 @@ func (jg *JobGroup) DeregisterAll() {
 }
 
 // TriggerJob triggers a Job in the JobGroup.
-func (jg *JobGroup) TriggerJob(name string) {
+func (jg *JobGroup) TriggerJob(name string, delay time.Duration) {
 	jg.gt.mu.Lock()
 	defer jg.gt.mu.Unlock()
 
 	tracker, ok := jg.gt.trackers[name]
 	if ok {
 		if executor, ok := tracker.job.(*jobExecutor); ok {
-			executor.trigger()
+			executor.trigger(delay)
 		}
 	}
 }
 
 // JobInfo returns the information related to a job with given name.
-func (jg *JobGroup) JobInfo(name string) *JobInfo {
+func (jg *JobGroup) JobInfo(name string) (JobInfo, error) {
 	jg.gt.mu.Lock()
 	defer jg.gt.mu.Unlock()
 
 	tracker, ok := jg.gt.trackers[name]
 	if ok {
-		if executor, ok := tracker.job.(*jobExecutor); ok {
-			return executor.jobInfo()
-		}
+		return tracker.jobInfo, nil
 	}
-	return nil
+	return JobInfo{}, fmt.Errorf("job %s not found", name)
 }
 
 // IsHealthy returns true if the job is healthy.

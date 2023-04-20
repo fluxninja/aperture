@@ -12,7 +12,7 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion,apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
 ```
 
 ## Overview
@@ -24,260 +24,73 @@ set policies. Once determined, these decisions are then exported to all Aperture
 Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
-reflecting stability conditions (i.e. process variables) and compares them
-against set points. The difference in the variable values against these points
-is referred to as the error signal. The feedback loop then works to minimize
-these error signals by determining and distributing control actions, that adjust
-these process variables and maintain their values within the optimal range.
-
-## Controller CRD
-
-The Aperture Controller is a Kubernetes based application and is installed using
-the
-[Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
-which is managed by the Aperture Operator.
-
-The configuration for the Aperture Controller process is provided to the
-Controller CRD under the `controller.config` section. All the configuration
-parameters for Aperture Controller are listed
-[here](/reference/configuration/controller.md).
+reflecting stability conditions (process variables) and compares them against
+setpoints. The difference in the variable values against these points is
+referred to as the error signal. The feedback loop then works to minimize these
+error signals by determining and distributing control actions, that adjust these
+process variables and maintain their values within the optimal range.
 
 ## Prerequisites
 
-You can do the installation using `aperturectl` CLI tool or using `Helm`.
-Install the tool of your choice using below links:
+You can do the installation using the `aperturectl` CLI tool or using `Helm`.
+Install the tool of your choice using the following links:
 
-1.  [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
-    :::info Refer
-    [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
-    to see all the available command line arguments. :::
+   :::info Refer
+   [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
+   to see all the available command line arguments.
 
-2.  [Helm](https://helm.sh/docs/intro/install/)
+2. [Helm](https://helm.sh/docs/intro/install/)
 
-    1. Once the Helm CLI is installed, add the
-       [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller)
-       repo in your environment for install/upgrade:
-
-       ```bash
-       helm repo add aperture https://fluxninja.github.io/aperture/
-       helm repo update
-       ```
-
-## Installation {#controller-installation}
-
-By following these instructions, you will have deployed the Aperture Controller
-into your cluster.
-
-:::info Refer Kubernetes Objects which will be created by following steps are
-listed [here](/reference/kubernetes-operator/controller.md). :::
-
-1. Configure the below parameters for the Controller Custom Resource by creating
-   a `values.yaml` and pass it with the `install` command:
-
-   :::info
-
-   The below parameters disable the FluxNinja ARC Plugin for the Aperture
-   Controller. If you want to keep it enabled, add parameters provided
-   [here](/arc/plugin.md#configuration) under the `controller.config` section.
-
-   :::
-
-   ```yaml
-   controller:
-     config:
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
-   ```
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm install controller aperture/aperture-controller -f values.yaml`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-2. By default, Prometheus and Etcd instances are installed. If you don't want to
-   install and use your existing instances of Prometheus or Etcd, configure
-   below values in the `values.yaml` file and pass it with `install` command:
-
-   ```yaml
-   controller:
-     config:
-       etcd:
-         endpoints: ["ETCD_ENDPOINT_HERE"]
-       prometheus:
-         address: "PROMETHEUS_ADDRESS_HERE"
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
-
-   etcd:
-     enabled: false
-
-   prometheus:
-     enabled: false
-   ```
-
-   Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
-   the actual values of Etcd and Prometheus, which will be used by the Aperture
-   Controller.
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm install controller aperture/aperture-controller -f values.yaml`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-   A list of all the configurable parameters for Etcd are available
-   [here](/reference/configuration/controller.md#etcd) and Prometheus are
-   available [here](/reference/configuration/controller.md#prometheus).
-
-   **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
-   is enabled on your existing Prometheus instance as it is required by the
-   Aperture Controller.
-
-3. If you want to modify the default parameters or the Aperture Controller
-   config, for example `log`, you can create or update the `values.yaml` file
-   and pass it with `install` command:
-
-   ```yaml
-   controller:
-     config:
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
-       log:
-         level: debug
-         pretty_console: true
-         non_blocking: false
-   ```
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm install controller aperture/aperture-controller -f values.yaml`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-   All the config parameters for the Aperture Controller are available
-   [here](/reference/configuration/controller.md).
-
-   A list of configurable parameters for the installation can be found in the
-   [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters).
-
-4. If you want to deploy the Aperture Controller into a namespace other than
-   `default`, use the `--namespace` flag:
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml --namespace aperture-controller`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm install controller aperture/aperture-controller -f values.yaml --namespace aperture-controller --create-namespace`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-5. Alternatively, you can create the Controller Custom Resource directly on the
-   Kubernetes cluster using the below steps:
-
-   1. Create a `values.yaml` for starting the operator and disabling the
-      creation of Controller Custom Resource and pass it with `install` command:
-
-      ```yaml
-      controller:
-        create: false
-      ```
-
-      <Tabs groupId="setup" queryString>
-      <TabItem value="aperturectl" label="aperturectl">
-      <CodeBlock language="bash">
-      {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-      </CodeBlock>
-      </TabItem>
-      <TabItem value="Helm" label="Helm">
-      <CodeBlock language="bash">
-      {`helm install controller aperture/aperture-controller -f values.yaml`}
-      </CodeBlock>
-      </TabItem>
-      </Tabs>
-
-   2. Create a YAML file with below specifications:
-
-      ```yaml
-      apiVersion: fluxninja.com/v1alpha1
-      kind: Controller
-      metadata:
-        name: controller
-      spec:
-        image:
-          registry: docker.io/fluxninja
-          repository: aperture-controller
-          tag: latest
-        config:
-          etcd:
-            endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
-          prometheus:
-            address: "http://controller-prometheus-server.default.svc.cluster.local:80"
-          plugins:
-            disabled_plugins:
-              - aperture-plugin-fluxninja
-      ```
-
-      All the configuration parameters for the Controller Custom Resource are
-      listed on the
-      [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#controller-custom-resource-parameters)
-      file of the Helm chart.
-
-   3. Apply the YAML file to the Kubernetes cluster using `kubectl`
+   1. Once the Helm CLI is installed, add the
+      [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller)
+      repository in your environment for install or upgrade:
 
       ```bash
-      kubectl apply -f controller.yaml
+      helm repo add aperture https://fluxninja.github.io/aperture/
+      helm repo update
       ```
 
-## Exposing Etcd and Prometheus services {#expose-etcd-prometheus}
+## Installation
 
-If the Aperture Controller is installed with the packaged Etcd and Prometheus,
-follow below steps to expose them outside of the Kubernetes cluster so that the
-Aperture Agent running on Linux can access them.
+The Aperture Controller can be installed using the below options:
+
+1. [**Install with Operator**](operator/operator.md)
+
+   The Aperture Controller can be installed using the Kubernetes Operator
+   available for it. This method requires access to create cluster level
+   resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition and
+   so on.
+
+2. [**Namespace scoped Installation**](namespace-scoped/namespace-scoped.md)
+
+   The Aperture Controller can also be installed with only namespace scoped
+   resources.
+
+<!-- vale off -->
+
+## Exposing etcd and Prometheus services {#expose-etcd-prometheus}
+
+<!-- vale on -->
+
+If the Aperture Controller is installed with the packaged etcd and Prometheus,
+follow the following steps to expose them outside the Kubernetes cluster so that
+the Aperture Agent running on Linux can access them.
 
 :::info
 
 [Contour](https://projectcontour.io/) is used as a
 [Kubernetes Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
-in below steps to expose the Etcd and Prometheus services out of Kubernetes
-cluster using Load Balancer.
+in the following steps to expose the etcd and Prometheus services out of
+Kubernetes cluster using Load Balancer.
 
-Any other tools can also be used to expose the Etcd and Prometheus services out
+Any other tools can also be used to expose the etcd and Prometheus services out
 of the Kubernetes cluster based on your infrastructure.
 
 :::
 
-1. Add the Helm chart repo for Contour in your environment:
+1. Add the Helm chart repository for Contour in your environment:
 
    ```bash
    helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -289,21 +102,21 @@ of the Kubernetes cluster based on your infrastructure.
    helm install aperture bitnami/contour --namespace projectcontour --create-namespace
    ```
 
-3. It may take a few minutes for the Contour Load Balancer's IP to become
+3. It might take a few minutes for the Contour Load Balancer IP to become
    available. You can watch the status by running:
 
    ```bash
    kubectl get svc aperture-contour-envoy --namespace projectcontour -w
    ```
 
-4. Once `EXTERNAL-IP` is no longer `<pending>`, run below command to get the
-   External IP for the Load Balancer:
+4. Once `EXTERNAL-IP` is no longer `<pending>`, run the following command to get
+   the External IP for the Load Balancer:
 
    ```bash
    kubectl describe svc aperture-contour-envoy --namespace projectcontour | grep Ingress | awk '{print $3}'
    ```
 
-5. Add an entry for the above IP in the Cloud provider's DNS configuration. For
+5. Add an entry for the above IP in the cloud provider's DNS configuration. For
    example, follow steps on
    [Cloud DNS on GKE](https://cloud.google.com/dns/docs/records) for Google
    Kubernetes Engine.
@@ -311,7 +124,7 @@ of the Kubernetes cluster based on your infrastructure.
 6. Configure the below parameters to install the
    [Kubernetes Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
    with the Aperture Controller by updating the `values.yaml` created during
-   installation and pass it with `install` command:
+   installation and passing it with `install` command:
 
    ```yaml
    ingress:
@@ -340,68 +153,16 @@ of the Kubernetes cluster based on your infrastructure.
    </TabItem>
    </Tabs>
 
-7. It may take a few minutes for the Ingress resource to get the `ADDRESS`. You
-   can watch the status by running:
+7. It might take a few minutes for the Ingress resource to get the `ADDRESS`.
+   You can watch the status by running:
 
    ```bash
    kubectl get ingress controller-ingress -w
    ```
 
-8. Once the `ADDRESS` matches the External IP, the Etcd will be accessible on
+8. Once the `ADDRESS` matches the External IP, the etcd will be accessible on
    `http://etcd.YOUR_DOMAIN_HERE:80` and the Prometheus will be accessible on
    `http://prometheus.YOUR_DOMAIN_HERE:80`.
-
-## Upgrade Procedure {#controller-upgrade-procedure}
-
-By following these instructions, you will have deployed the upgraded version of
-Aperture Controller into your cluster.
-
-1. Use the same `values.yaml` file created as part of
-   [Installation Steps](#controller-installation) and pass it with below
-   command:
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml | kubectl apply -f -`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-2. If you have deployed the Aperture Controller into a namespace other than
-   `default`, use the `--namespace` flag:
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml --namespace aperture-controller`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml --namespace aperture-controller | kubectl apply -f -`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-## Verifying the Installation
-
-Once you have successfully deployed the resources, confirm that the Aperture
-Controller is up and running:
-
-```bash
-kubectl get pod -A
-
-kubectl get controller -A
-```
-
-You should see pods for Aperture Controller and Controller Manager in `RUNNING`
-state and `Controller` Custom Resource in `created` state.
 
 ## Applying Policies
 
@@ -412,82 +173,3 @@ on your preference.
 includes step-by-step instructions on how to create policies for Aperture in a
 Kubernetes cluster, which you can follow to create policies according to your
 needs.
-
-## Uninstall
-
-You can uninstall the Aperture Controller and it's components installed above by
-following below steps:
-
-1. Uninstall the Aperture Controller:
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall controller`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm uninstall controller`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-2. Alternatively, if you have installed the Aperture Controller Custom Resource
-   separately, follow below steps:
-
-   1. Delete the Aperture Controller Custom Resource:
-
-      ```bash
-      kubectl delete -f controller.yaml
-      ```
-
-   2. Delete the Aperture Controller to uninstall the Aperture Operator:
-
-      <Tabs groupId="setup" queryString>
-      <TabItem value="aperturectl" label="aperturectl">
-      <CodeBlock language="bash">
-      {`aperturectl uninstall controller`}
-      </CodeBlock>
-      </TabItem>
-      <TabItem value="Helm" label="Helm">
-      <CodeBlock language="bash">
-      {`helm uninstall controller`}
-      </CodeBlock>
-      </TabItem>
-      </Tabs>
-
-3. If you have installed the chart in some other namespace than `default`,
-   execute below commands:
-
-   <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall controller --namespace aperture-controller`}
-   </CodeBlock>
-   </TabItem>
-   <TabItem value="Helm" label="Helm">
-   <CodeBlock language="bash">
-   {`helm uninstall controller --namespace aperture-controller
-   kubectl delete namespace aperture-controller`}
-   </CodeBlock>
-   </TabItem>
-   </Tabs>
-
-4. If you have installed the Contour chart for exposing the Etcd and Prometheus
-   service, execute the below command:
-
-   ```bash
-   helm uninstall aperture -n projectcontour
-   kubectl delete namespace projectcontour
-   ```
-
-5. **Optional**: Delete the CRD installed by the Helm chart:
-
-   > Note: By design, deleting a chart via Helm doesn’t delete the Custom
-   > Resource Definitions (CRDs) installed via the Helm chart.
-
-   ```bash
-   kubectl delete crd controllers.fluxninja.com
-   kubectl delete crd policies.fluxninja.com
-   ```

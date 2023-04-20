@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
@@ -22,13 +23,31 @@ type FxOut struct {
 	Validator policyvalidator.PolicySpecValidator `group:"policy-validators"`
 }
 
+// FxIn is the input for the AddAgentInfoAttribute function.
+type FxIn struct {
+	fx.In
+	Unmarshaller config.Unmarshaller
+}
+
 // providePolicyValidator provides classification Policy Custom Resource validator
 //
 // Note: This validator must be registered to be accessible.
-func providePolicyValidator() FxOut {
+func providePolicyValidator(in FxIn) (FxOut, error) {
+	var config crwatcher.CRWatcherConfig
+	err := in.Unmarshaller.UnmarshalKey(crwatcher.ConfigKey, &config)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal Kubernetes watcher config")
+		return FxOut{}, nil
+	}
+
+	if !config.Enabled {
+		log.Info().Msg("Kubernetes watcher is disabled")
+		return FxOut{}, nil
+	}
+
 	return FxOut{
 		Validator: &PolicySpecValidator{},
-	}
+	}, nil
 }
 
 // PolicySpecValidator Policy implementation of PolicySpecValidator interface.
@@ -49,31 +68,40 @@ func (v *PolicySpecValidator) ValidateSpec(
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
-	_, valid, msg, err := ValidateAndCompile(ctx, name, yamlSrc)
-	return valid, msg, err
+	_, _, err := ValidateAndCompile(ctx, name, yamlSrc)
+	if err != nil {
+		// there is no need to handle validator errors. just return validation result.
+		return false, err.Error(), nil
+	}
+	return true, "", nil
 }
 
 // ValidateAndCompile checks the validity of a single Policy and compiles it.
-func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, bool, string, error) {
+func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, *policiesv1.Policy, error) {
 	if len(yamlSrc) == 0 {
-		return nil, false, "Empty yaml", nil
+		return nil, nil, errors.New("empty policy")
 	}
 	policy := &policiesv1.Policy{}
 
 	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return nil, false, err.Error(), nil
+		return nil, nil, err
 	}
 
 	alerter := alerts.NewSimpleAlerter(100)
 	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
-		return nil, false, err.Error(), err
+		return nil, nil, err
 	}
 
 	if policy.GetResources() != nil {
-		for _, c := range policy.GetResources().Classifiers {
+		classifiers := policy.GetResources().GetFlowControl().GetClassifiers()
+		// Deprecated: v1.5.0
+		if classifiers == nil {
+			classifiers = policy.GetResources().GetClassifiers()
+		}
+		for _, c := range classifiers {
 			_, err = compiler.CompileRuleset(ctx, name, &policysyncv1.ClassifierWrapper{
 				Classifier: c,
 				ClassifierAttributes: &policysyncv1.ClassifierAttributes{
@@ -83,14 +111,9 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 				},
 			})
 			if err != nil {
-				if errors.Is(err, compiler.BadExtractor) || errors.Is(err, compiler.BadSelector) ||
-					errors.Is(err, compiler.BadRego) || errors.Is(err, compiler.BadLabelName) {
-					return nil, false, err.Error(), nil
-				} else {
-					return nil, false, err.Error(), err
-				}
+				return nil, nil, err
 			}
 		}
 	}
-	return circuit, true, "", nil
+	return circuit, policy, nil
 }

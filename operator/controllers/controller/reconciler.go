@@ -100,7 +100,7 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		if !r.resourcesDeleted {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			// Return and don't requeue
+			// Return and do not requeue
 			logger.Info("Controller resource not found. Ignoring since object must be deleted")
 		}
 		return ctrl.Result{}, nil
@@ -141,7 +141,7 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
 				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
-					"The required resources are already deployed. Skipping resource creation as currently, the Controller doesn't support multiple replicas.")
+					"The required resources are already deployed. Skipping resource creation as currently, the Controller does not support multiple replicas.")
 
 				instance.Status.Resources = "skipped"
 				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
@@ -305,9 +305,9 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *cont
 		return nil
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
 		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate
@@ -330,6 +330,7 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 		Enabled:  true,
 	}
 
+	instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -433,7 +434,7 @@ func (r *ControllerReconciler) reconcileClusterRoleBinding(ctx context.Context, 
 			return r.reconcileClusterRoleBinding(ctx, instance)
 		}
 
-		// Checking invalid as Kubernetes doesn't allow updating RoleRef
+		// Checking invalid as Kubernetes does not allow updating RoleRef
 		if errors.IsInvalid(err) && strings.Contains(err.Error(), "cannot change roleRef") {
 			if err = r.Delete(ctx, clusterRoleBindingForController(instance)); err != nil {
 				log.Error(err, "failed to delete object of ClusterRoleBinding")
@@ -513,7 +514,7 @@ func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr
 func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSecret(ctx context.Context, instance *controllerv1alpha1.Controller) error {
 	var err error
 	if controllerCert == nil || controllerKey == nil || controllerClientCert == nil {
-		controllerCert, controllerKey, controllerClientCert, err = controllers.GenerateCertificate(controllers.ControllerServiceName, instance.GetNamespace())
+		controllerCert, controllerKey, controllerClientCert, err = controllers.GetOrGenerateCertificate(r.Client, instance.DeepCopy())
 		if err != nil {
 			return err
 		}
@@ -524,6 +525,14 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 		return err
 	}
 	if _, err = createSecretForController(r.Client, r.Recorder, secret, ctx, instance); err != nil {
+		return err
+	}
+
+	cm, err := configMapForControllerClientCert(instance.DeepCopy(), r.Scheme, controllerClientCert)
+	if err != nil {
+		return err
+	}
+	if _, err = createConfigMapForController(r.Client, r.Recorder, cm, ctx, instance); err != nil {
 		return err
 	}
 
@@ -557,7 +566,7 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 // reconcileSecret prepares the desired states for Controller ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *controllerv1alpha1.Controller) error {
-	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if !instance.Spec.Secrets.FluxNinjaExtension.Create {
 		return nil
 	}
 	secret, err := secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)
@@ -568,10 +577,10 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *co
 		return err
 	}
 
-	instance.Spec.Secrets.FluxNinjaPlugin.Create = false
-	instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
-	instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = controllers.SecretName(
-		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
+	instance.Spec.Secrets.FluxNinjaExtension.Create = false
+	instance.Spec.Secrets.FluxNinjaExtension.Value = ""
+	instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name = controllers.SecretName(
+		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaExtension)
 
 	return nil
 }
@@ -596,8 +605,8 @@ func eventFiltersForController() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
-				new.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+			if diffObjects && old.Spec.Secrets.FluxNinjaExtension.Value != "" &&
+				new.Spec.Secrets.FluxNinjaExtension.Value == "" {
 				return false
 			}
 

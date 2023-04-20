@@ -34,7 +34,7 @@ spec:
               signal_name: LATENCY_EMA
             rhs:
               constant_signal:
-                value: 1.1000000000000001
+                value: 1.1
           operator: mul
           out_ports:
             output:
@@ -58,11 +58,12 @@ spec:
             severity: crit
     evaluation_interval: 0.5s
   resources:
-    flux_meters:
-      test:
-        flow_selector:
-          flow_matcher:
-            control_point: ingress
-          service_selector:
-            agent_group: default
-            service: service1-demo-app.demoapp.svc.cluster.local
+    flow_control:
+      flux_meters:
+        test:
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local

@@ -12,6 +12,11 @@ import (
 	"syscall"
 	"time"
 
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
+
+	"google.golang.org/grpc/credentials"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -38,18 +43,25 @@ var (
 )
 
 func init() {
-	logger = log.NewLogger(log.GetPrettyConsoleWriter(), log.DebugLevel.String())
+	logLevel, logLevelSet := os.LookupEnv("LOG_LEVEL")
+	if !logLevelSet {
+		logLevel = log.DebugLevel.String()
+	}
+	logger = log.NewLogger(log.GetPrettyConsoleWriter(), logLevel)
 	log.SetGlobalLogger(logger)
 }
 
 func main() {
 	// setup flagset and flags
 	fs := flag.NewFlagSet("sdk-validator", flag.ExitOnError)
-	port := fs.String("port", "8089", "Port to start sdk-validator's grpc server on.")
+	port := fs.String("port", "8089", "Port to start sdk-validator's gRPC server on.")
 	requests := fs.Int("requests", 10, "Number of requests to make to SDK example server.")
 	rejects := fs.Int64("rejects", 5, "Number of requests (out of 'requests') to reject.")
 	sdkDockerImage := fs.String("sdk-docker-image", "", "Docker image of SDK example to run.")
 	sdkPort := fs.String("sdk-port", "8080", "Port to expose on SDK's example container.")
+	sslCertFilepath := fs.String("ssl-certificate", "", "Filepath of SSL certificate to configure server TLS.")
+	sslKeyFilepath := fs.String("ssl-key", "", "Filepath of SSL key to configure server TLS.")
+
 	// parse flags
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
@@ -69,14 +81,25 @@ func main() {
 
 	sdkURL := fmt.Sprintf("http://localhost:%s", *sdkPort)
 
-	// create listener for grpc server
+	// create listener for gRPC server
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", *port))
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to listen")
 	}
 
-	// setup grpc server and register various server instances to it
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor))
+	// setup gRPC server and register various server instances to it
+	var grpcServer *grpc.Server
+	if *sslCertFilepath != "" && *sslKeyFilepath != "" {
+		creds, err2 := credentials.NewServerTLSFromFile(*sslCertFilepath, *sslKeyFilepath)
+		if err2 != nil {
+			log.Fatal().Err(err2).Msg("Failed to create TLS creds from provided files")
+		}
+		log.Info().Msg("Starting TLS-secured gRPC server")
+		grpcServer = grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor), grpc.Creds(creds))
+	} else {
+		log.Info().Msg("Starting insecure gRPC server")
+		grpcServer = grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor))
+	}
 	reflection.Register(grpcServer)
 
 	commonHandler := &validator.CommonHandler{
@@ -92,6 +115,15 @@ func main() {
 
 	alerter := alerts.NewSimpleAlerter(100)
 	reg := status.NewRegistry(log.GetGlobalLogger(), alerter)
+
+	// instantiate and register flowcontrolhttp handler
+	flowcontrolHTTPHandler := checkhttp.NewHandler(
+		classifier.NewClassificationEngine(reg),
+		servicegetter.NewEmpty(),
+		commonHandler,
+	)
+	flowcontrolhttpv1.RegisterFlowControlServiceHTTPServer(grpcServer, flowcontrolHTTPHandler)
+
 	authzHandler := envoy.NewHandler(
 		classifier.NewClassificationEngine(reg),
 		servicegetter.NewEmpty(),
@@ -136,7 +168,7 @@ func main() {
 	if *sdkDockerImage != "" {
 		wg.Add(1)
 		go func() {
-			// give the grpc server some time to initialize
+			// give the gRPC server some time to initialize
 			time.Sleep(2 * time.Second)
 
 			rejected := confirmConnectedAndStartTraffic(sdkURL, *requests)
@@ -166,7 +198,7 @@ func main() {
 		}()
 	}
 
-	// start serving traffic on grpc server
+	// start serving traffic on gRPC server
 	log.Info().Str("add", lis.Addr().String()).Msg("Starting sdk-validator")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal().Err(err).Msg("Failed to serve")
@@ -235,6 +267,9 @@ func runDockerContainer(image string, port string) (string, error) {
 			return "", err
 		}
 		if containerJSON.State != nil {
+			if containerJSON.State.Status == "exited" {
+				log.Fatal().Msg("Container exited")
+			}
 			if containerJSON.State.Health != nil {
 				if containerJSON.State.Health.Status == "healthy" {
 					return resp.ID, nil
@@ -251,7 +286,7 @@ func stopDockerContainer(id string) error {
 		return err
 	}
 
-	err = cli.ContainerStop(ctx, id, nil)
+	err = cli.ContainerStop(ctx, id, container.StopOptions{})
 	if err != nil {
 		return err
 	}

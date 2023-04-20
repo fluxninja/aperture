@@ -64,9 +64,9 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		container.Resources.Requests = spec.Resources.Requests
 	}
 
-	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Addr)
+	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Listener.Addr)
 	if err != nil {
-		return fmt.Errorf("invalid value '%v' provided for 'server.addr' config", spec.ConfigSpec.Server.Addr)
+		return fmt.Errorf("invalid value '%v' provided for 'server.addr' config", spec.ConfigSpec.Server.Listener.Addr)
 	}
 
 	distCachePort, err := controllers.GetPort(spec.ConfigSpec.DistCache.BindAddr)
@@ -97,22 +97,22 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		},
 		{
 			Name:          controllers.OtelDebugPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.DebugPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.DebugPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          controllers.OtelHealthcheckPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.HealthCheckPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.HealthCheckPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          controllers.OtelPprofPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.PprofPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.PprofPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          controllers.OtelZpagesPort,
-			ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.ZpagesPort),
+			ContainerPort: int32(spec.ConfigSpec.OTel.Ports.ZpagesPort),
 			Protocol:      corev1.ProtocolTCP,
 		},
 	}

@@ -10,16 +10,38 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion,apertureVersionWithOutV} from '../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 import {DownloadScript} from '../installation/agent/bare_metal.md';
 ```
 
+```mdx-code-block
+export const BinaryDownload = ({}) => (
+<CodeBlock language="bash">
+{`# Substitute BIN for your bin directory.
+VERSION="${apertureVersionWithOutV}"
+BIN="/usr/local/bin"
+OS="$(uname | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m)"
+case "$ARCH" in
+  x86_64) ARCH="amd64";;
+  aarch64) ARCH="arm64";;
+  *) echo "Unsupported architecture: $ARCH"; exit 1;;
+esac
+echo "Will download $OS package version $VERSION compiled for $ARCH machine"
+url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperturectl-$\{VERSION}-$\{OS}-$\{ARCH}"
+curl --fail --location --remote-name "\${url}"
+mv aperturectl* "\${BIN}/aperturectl"
+chmod +x "\${BIN}/aperturectl"
+`}</CodeBlock>
+);
+```
+
 The Aperture CLI is available as a binary executable for all major platforms,
-the binaries can be downloaded form GitHub <a
+the binaries can be downloaded from GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
 Page</a>.
 
-Alternatively download it using following script:
+Alternatively, download it using the following script:
 
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
@@ -28,9 +50,21 @@ Alternatively download it using following script:
   <TabItem value="rpm" label="rpm">
     <DownloadScript packager="rpm" arch="x86_64" archSeparator="." versionSeparator="-" component="aperturectl" />
   </TabItem>
+  <TabItem value="binary" label="binary">
+    <BinaryDownload  />
+  </TabItem>
 </Tabs>
 
 ## Installation
+
+:::info
+
+Skip the following steps if you have obtained the binary file directly using the
+steps mentioned above.
+
+:::
+
+<!-- vale off -->
 
 <Tabs groupId="setup" queryString>
 <TabItem value="macOS" label="macOS">
@@ -42,7 +76,7 @@ brew install fluxninja/aperture/aperturectl
 <TabItem value="Linux" label="Linux">
 With Homebrew:
 <CodeBlock language="bash">
-brew install aperturectl
+brew install fluxninja/aperture/aperturectl
 </CodeBlock>
 With dpkg:
 <CodeBlock language="bash">
@@ -55,10 +89,12 @@ With rpm:
 </TabItem>
 </Tabs>
 
+<!-- vale on -->
+
 ## Enable shell autocompletion
 
 To configure your shell to load `aperturectl`
-[bash completions](/reference/aperturectl/completion/completion.md) add to your
+[bash completions](/reference/aperturectl/completion/completion.md), add to your
 profile:
 
 <Tabs>
@@ -86,6 +122,7 @@ aperturectl completion powershell | Out-String | Invoke-Expression
 
 ## Uninstall
 
+<!-- vale off -->
 <Tabs groupId="setup" queryString>
 <TabItem value="macOS" label="macOS">
 With Homebrew:
@@ -109,6 +146,8 @@ With rpm:
 sudo rpm -e aperturectl
 </CodeBlock>
 </TabItem></Tabs>
+
+<!-- vale on -->
 
 ---
 

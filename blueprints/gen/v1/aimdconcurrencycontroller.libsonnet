@@ -2,14 +2,6 @@ local aimdconcurrencycontrollerins = import './aimdconcurrencycontrollerins.libs
 local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      setpoint: error 'Port setpoint is missing',
-      signal: error 'Port signal is missing',
-    },
-    out_ports: {
-      is_overload: error 'Port is_overload is missing',
-      load_multiplier: error 'Port load_multiplier is missing',
-    },
   },
   inPorts:: aimdconcurrencycontrollerins,
   outPorts:: aimdconcurrencycontrollerouts,
@@ -18,24 +10,6 @@ local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.li
   },
   withAlerterParametersMixin(alerter_parameters):: {
     alerter_parameters+: alerter_parameters,
-  },
-  withConcurrencyLimitMultiplier(concurrency_limit_multiplier):: {
-    concurrency_limit_multiplier: concurrency_limit_multiplier,
-  },
-  withConcurrencyLimitMultiplierMixin(concurrency_limit_multiplier):: {
-    concurrency_limit_multiplier+: concurrency_limit_multiplier,
-  },
-  withConcurrencyLinearIncrement(concurrency_linear_increment):: {
-    concurrency_linear_increment: concurrency_linear_increment,
-  },
-  withConcurrencyLinearIncrementMixin(concurrency_linear_increment):: {
-    concurrency_linear_increment+: concurrency_linear_increment,
-  },
-  withConcurrencySqrtIncrementMultiplier(concurrency_sqrt_increment_multiplier):: {
-    concurrency_sqrt_increment_multiplier: concurrency_sqrt_increment_multiplier,
-  },
-  withConcurrencySqrtIncrementMultiplierMixin(concurrency_sqrt_increment_multiplier):: {
-    concurrency_sqrt_increment_multiplier+: concurrency_sqrt_increment_multiplier,
   },
   withDefaultConfig(default_config):: {
     default_config: default_config,
@@ -66,6 +40,18 @@ local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.li
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
+  },
+  withLoadMultiplierLinearIncrement(load_multiplier_linear_increment):: {
+    load_multiplier_linear_increment: load_multiplier_linear_increment,
+  },
+  withLoadMultiplierLinearIncrementMixin(load_multiplier_linear_increment):: {
+    load_multiplier_linear_increment+: load_multiplier_linear_increment,
+  },
+  withMaxLoadMultiplier(max_load_multiplier):: {
+    max_load_multiplier: max_load_multiplier,
+  },
+  withMaxLoadMultiplierMixin(max_load_multiplier):: {
+    max_load_multiplier+: max_load_multiplier,
   },
   withOutPorts(out_ports):: {
     out_ports: out_ports,

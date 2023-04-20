@@ -9,6 +9,7 @@ local flowSelector = spec.v1.FlowSelector;
 local query = spec.v1.Query;
 local component = spec.v1.Component;
 local flowControl = spec.v1.FlowControl;
+local flowControlResources = spec.v1.FlowControlResources;
 local promQL = spec.v1.PromQL;
 local port = spec.v1.Port;
 local combinator = spec.v1.ArithmeticCombinator;
@@ -35,8 +36,11 @@ function(cfg) {
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withFluxMetersMixin({ [params.policy_name]: params.flux_meter })
-                           + resources.withClassifiers(params.classifiers))
+                           + resources.withFlowControl(
+                             flowControlResources.new()
+                             + flowControlResources.withFluxMetersMixin({ [params.policy_name]: params.flux_meter })
+                             + flowControlResources.withClassifiers(params.classifiers)
+                           ))
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval(evaluation_interval='0.5s')
@@ -45,7 +49,7 @@ function(cfg) {
           component.withQuery(
             query.new()
             + query.withPromql(
-              local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: params.policy_name };
+              local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: params.policy_name };
               promQL.new()
               + promQL.withQueryString(q)
               + promQL.withEvaluationInterval('1s')
@@ -74,9 +78,8 @@ function(cfg) {
               + aimdConcurrencyController.withFlowSelector(cc.flow_selector)
               + aimdConcurrencyController.withSchedulerParameters(cc.scheduler)
               + aimdConcurrencyController.withGradientParameters(cc.gradient)
-              + aimdConcurrencyController.withConcurrencyLimitMultiplier(cc.concurrency_limit_multiplier)
-              + aimdConcurrencyController.withConcurrencyLinearIncrement(cc.concurrency_linear_increment)
-              + aimdConcurrencyController.withConcurrencySqrtIncrementMultiplier(cc.concurrency_sqrt_increment_multiplier)
+              + aimdConcurrencyController.withMaxLoadMultiplier(cc.max_load_multiplier)
+              + aimdConcurrencyController.withLoadMultiplierLinearIncrement(cc.load_multiplier_linear_increment)
               + aimdConcurrencyController.withAlerterParameters(cc.alerter)
               + aimdConcurrencyController.withDynamicConfigKey('concurrency_controller')
               + aimdConcurrencyController.withDefaultConfig(params.concurrency_controller.default_config)
@@ -86,7 +89,10 @@ function(cfg) {
               })
               + aimdConcurrencyController.withOutPorts({
                 is_overload: port.withSignalName('IS_OVERLOAD'),
-                load_multiplier: port.withSignalName('LOAD_MULTIPLIER'),
+                desired_load_multiplier: port.withSignalName('DESIRED_LOAD_MULTIPLIER'),
+                observed_load_multiplier: port.withSignalName('OBSERVED_LOAD_MULTIPLIER'),
+                accepted_concurrency: port.withSignalName('ACCEPTED_CONCURRENCY'),
+                incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),
               }),
             ),
           ),

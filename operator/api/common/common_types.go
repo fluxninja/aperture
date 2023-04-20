@@ -18,24 +18,23 @@ limitations under the License.
 package common
 
 import (
-	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
+	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
+	sentry "github.com/fluxninja/aperture/extensions/sentry/config"
+	alertmgrconfig "github.com/fluxninja/aperture/pkg/alertmanager/config"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
-	"github.com/fluxninja/aperture/pkg/discovery/static"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/jobs"
+	kubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
+	static "github.com/fluxninja/aperture/pkg/discovery/static/config"
+	"github.com/fluxninja/aperture/pkg/etcd"
+	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
-	"github.com/fluxninja/aperture/pkg/prometheus"
-	"github.com/fluxninja/aperture/pkg/watchdog"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
+	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -253,9 +252,9 @@ type CommonSpec struct {
 
 // Secrets for Agent or Controller.
 type Secrets struct {
-	// FluxNinja plugin.
+	// FluxNinja extension.
 	//+kubebuilder:validation:Optional
-	FluxNinjaPlugin APIKeySecret `json:"fluxNinjaPlugin"`
+	FluxNinjaExtension APIKeySecret `json:"fluxNinjaExtension"`
 }
 
 // APIKeySecret defines fields required for creation/usage of secret for the ApiKey of Agent and Controller.
@@ -319,10 +318,6 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Metrics metrics.MetricsConfig `json:"metrics"`
 
-	// Plugins configuration.
-	//+kubebuilder:validation:Optional
-	Plugins plugins.PluginsConfig `json:"plugins"`
-
 	// Profilers configuration.
 	//+kubebuilder:validation:Optional
 	Profilers profilers.ProfilersConfig `json:"profilers"`
@@ -337,22 +332,22 @@ type CommonConfigSpec struct {
 
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
-	Watchdog watchdog.WatchdogConfig `json:"watchdog"`
+	Watchdog watchdogconfig.WatchdogConfig `json:"watchdog"`
 
 	// Alert Managers configuration.
 	//+kubebuilder:validation:Optional
-	Alertmanagers amclient.AlertManagerConfig `json:"alertmanagers,omitempty"`
+	Alertmanagers alertmgrconfig.AlertManagerConfig `json:"alertmanagers,omitempty"`
 
-	// BundledPluginsSpec defines configuration for bundled plugins.
+	// BundledExtensionsSpec defines configuration for bundled extensions.
 	//+kubebuilder:validation:Optional
-	BundledPluginsSpec `json:",inline"`
+	BundledExtensionsSpec `json:",inline"`
 }
 
 // ServerConfigSpec configures main server.
 type ServerConfigSpec struct {
 	// Listener configuration.
 	//+kubebuilder:validation:Optional
-	listener.ListenerConfig `json:",inline"`
+	Listener listener.ListenerConfig `json:"listener"`
 
 	// GRPC server configuration.
 	//+kubebuilder:validation:Optional
@@ -389,15 +384,15 @@ type ClientConfigSpec struct {
 	Proxy http.ProxyConfig `json:"proxy"`
 }
 
-// BundledPluginsSpec defines configuration for bundled plugins.
-type BundledPluginsSpec struct {
-	// FluxNinja ARC plugin configuration.
+// BundledExtensionsSpec defines configuration for bundled extensions.
+type BundledExtensionsSpec struct {
+	// FluxNinja ARC extension configuration.
 	//+kubebuilder:validation:Optional
-	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin"`
+	FluxNinja extconfig.FluxNinjaExtensionConfig `json:"fluxninja"`
 
-	// Sentry plugin configuration.
+	// Sentry extension configuration.
 	//+kubebuilder:validation:Optional
-	SentryPlugin sentry.SentryConfig `json:"sentry_plugin"`
+	Sentry sentry.SentryConfig `json:"sentry"`
 }
 
 // ServiceDiscoverySpec defines configuration for Service discoveru.
@@ -407,4 +402,15 @@ type ServiceDiscoverySpec struct {
 
 	// StaticDiscoveryConfig for pre-determined list of services.
 	StaticDiscoveryConfig static.StaticDiscoveryConfig `json:"static"`
+}
+
+// ControllerClientCertConfig defines configuration for client certificate for Controller.
+type ControllerClientCertConfig struct {
+	// ConfigMapName is the name of the ConfigMap containing the client certificate which will be mounted at '/etc/aperture/aperture-agent/certs' path with given key name.
+	//+kubebuilder:validation:Optional
+	ConfigMapName string `json:"configMapName"`
+
+	// ClientCertKeyName is the key name of the client certificate in the ConfigMap.
+	//+kubebuilder:validation:Optional
+	ClientCertKeyName string `json:"clientCertKeyName" default:"controller-ca.pem"`
 }

@@ -35,9 +35,8 @@ var _ = Describe("Validator", Ordered, func() {
 			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
 		}
 
-		ok, msg, err := policyValidator.ValidateObject(context.TODO(), request)
+		ok, _, err := policyValidator.ValidateObject(context.TODO(), request)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(msg).To(BeEmpty())
 		Expect(ok).To(BeTrue())
 	}
 
@@ -209,9 +208,6 @@ spec:
                 control_point: "ingress"
             scheduler:
               parameters:
-                auto_tokens: true
-                default_workload_parameters:
-                  priority: 20
                 workloads:
                   - parameters:
                       priority: 50
@@ -271,8 +267,8 @@ spec:
           out_ports:
             output:
               signal_name: "MAX_CONCURRENCY"
-      - sqrt:
-          scale: "0.5"
+      - unary_operator:
+          operator: "sqrt"
           in_ports:
             input:
               signal_name: "ACCEPTED_CONCURRENCY"
@@ -325,9 +321,9 @@ spec:
               signal_name: "CONCURRENCY_INCREMENT_DECISION"
       - switcher:
           in_ports:
-            on_true:
+            on_signal:
               signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
-            on_false:
+            off_signal:
               signal_name: "CONCURRENCY_INCREMENT_NORMAL"
             switch:
               signal_name: "CONCURRENCY_INCREMENT_DECISION"

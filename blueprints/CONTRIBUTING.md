@@ -107,7 +107,7 @@ Parser knows about the following docblock tags: `@section`, `@subsection` and
 (See [More on sources][more on sources] from `metadata.yaml` description). This
 field is required.
 
-`@subsection` must be unique within single `@section` and it's used to separate
+`@subsection` must be unique within single `@section` and it is used to separate
 parts of the configuration reference with sub headings.
 
 `@param` can be used to add documentation for specific fields. It's format is as
@@ -135,17 +135,17 @@ of the generated README.md.
 # Updating README.md
 
 README.md generator depends on Python 3.8+ and some extra libraries that can be
-installed from `dev-requirements.txt`:
+installed from `requirements.txt`:
 
 ```sh
-pip install -r dev-requirements.txt
+pip install -r requirements.txt
 ```
 
 To update README.md from blueprint configuration, use
-`scripts/blueprint-readme-generator.py`:
+`scripts/blueprint-assets-generator.py`:
 
 ```sh
-$ ./scripts/blueprint-readme-generator.py policies/latency-aimd-concurrency-limiting
+$ ./scripts/blueprint-assets-generator.py policies/latency-aimd-concurrency-limiting
 $
 ```
 
@@ -160,7 +160,7 @@ Blueprints can be visualized. A blueprint is saved as a
 into an image with GraphViz:
 
 ```sh
-go run -mod=mod cmd/aperturectl/main.go compile --cr blueprints/examples/latency-aimd-concurrency-limiting/gen/policies/example.yaml --dot blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot
+aperturectl compile --cr blueprints/examples/latency-aimd-concurrency-limiting/gen/policies/example.yaml --dot blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot
 dot -Tsvg  blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot > blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.svg
 ```
 

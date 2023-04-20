@@ -3,20 +3,21 @@ package envoy_test
 import (
 	"context"
 
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
@@ -42,11 +43,9 @@ var _ = AfterEach(func() {
 
 type AcceptingHandler struct{}
 
-func (s *AcceptingHandler) CheckWithValues(
+func (s *AcceptingHandler) CheckRequest(
 	context.Context,
-	[]string,
-	string,
-	map[string]string,
+  iface.RequestContext,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
@@ -65,14 +64,14 @@ var _ = Describe("Authorization handler", func() {
 			)
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
-			entities := entitycache.NewEntityCache()
-			entities.Put(&entitycachev1.Entity{
+			entities := entities.NewEntities()
+			entities.Put(&entitiesv1.Entity{
 				IpAddress: "1.2.3.4",
 				Services:  []string{service1FlowSelector.ServiceSelector.Service},
 			})
 			handler = envoy.NewHandler(
 				classifier,
-				servicegetter.FromEntityCache(entities),
+				servicegetter.FromEntities(entities),
 				&AcceptingHandler{},
 			)
 		})
@@ -83,7 +82,7 @@ var _ = Describe("Authorization handler", func() {
 				ctxWithIp,
 				metadata.Pairs("control-point", "ingress"),
 			)
-			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
+			resp, err := handler.Check(ctxWithIp, &authv3.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
 		})
@@ -93,7 +92,7 @@ var _ = Describe("Authorization handler", func() {
 				ctxWithIp,
 				metadata.Pairs("control-point", "ingress"),
 			)
-			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
+			resp, err := handler.Check(ctxWithIp, &authv3.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp.GetDynamicMetadata()).NotTo(BeNil())
 		})

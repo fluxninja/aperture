@@ -36,12 +36,15 @@ var oldAgentSampleYAML string
 //go:embed hook_test.tpl
 var agentSampleYAML string
 
+//go:embed hook_sidecar_test.tpl
+var agentSidecarSampleYAML string
+
 //go:embed hook_invalid_test.tpl
 var agentInvalidSampleYAML string
 
 var _ = Describe("Agent Hook Tests", Ordered, func() {
 	Context("testing Handle", func() {
-		It("should add defaults in spec when valid instance is provided", func() {
+		It("should add defaults in spec when valid instance is provided. Sidecar disabled", func() {
 			agentHook := AgentHooks{}
 
 			res := agentHook.Handle(context.Background(), admission.Request{
@@ -52,6 +55,37 @@ var _ = Describe("Agent Hook Tests", Ordered, func() {
 
 			Expect(res.Allowed).To(Equal(true))
 			Expect(len(res.Patches) > 0).To(Equal(true))
+			By("overriding installation mode to KUBERNETES_DAEMONSET")
+			patchFound := false
+			for _, patch := range res.Patches {
+				if patch.Operation == "add" && patch.Path == "/spec/config/fluxninja" {
+					changes := patch.Value.(map[string]interface{})
+					patchFound = changes["installation_mode"] == "KUBERNETES_DAEMONSET"
+				}
+			}
+			Expect(patchFound).To(Equal(true))
+		})
+
+		It("should add defaults in spec when valid instance is provided. Sidecar enabled", func() {
+			agentHook := AgentHooks{}
+
+			res := agentHook.Handle(context.Background(), admission.Request{
+				AdmissionRequest: v1.AdmissionRequest{
+					Object: runtime.RawExtension{Raw: []byte(agentSidecarSampleYAML)},
+				},
+			})
+
+			Expect(res.Allowed).To(Equal(true))
+			Expect(len(res.Patches) > 0).To(Equal(true))
+			By("overriding installation mode to KUBERNETES_SIDECAR")
+			patchFound := false
+			for _, patch := range res.Patches {
+				if patch.Operation == "add" && patch.Path == "/spec/config/fluxninja" {
+					changes := patch.Value.(map[string]interface{})
+					patchFound = changes["installation_mode"] == "KUBERNETES_SIDECAR"
+				}
+			}
+			Expect(patchFound).To(Equal(true))
 		})
 
 		It("should add annotation when valid instance is provided and installation mode is changed", func() {

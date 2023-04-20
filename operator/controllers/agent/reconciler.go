@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"path"
 	"reflect"
 	"strings"
 
@@ -102,7 +103,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		if !r.resourcesDeleted {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			// Return and don't requeue
+			// Return and do not requeue
 			logger.Info("Agent resource not found. Ignoring since object must be deleted")
 		}
 		return ctrl.Result{}, nil
@@ -143,7 +144,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			}
 			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
 				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
-					"The required resources are already deployed. Skipping resource creation as currently, the Agent doesn't require multiple replicas.")
+					"The required resources are already deployed. Skipping resource creation as currently, the Agent does not require multiple replicas.")
 
 				instance.Status.Resources = "skipped"
 				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
@@ -238,7 +239,17 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *agentv1alp
 
 // deleteDaemonSetModeResources deletes resources installed for DaemonSet mode of Agent.
 func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
-	cm, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
+	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName {
+		configMap, err := configMapForAgentControllerClientCert(ctx, r.Client, instance.DeepCopy(), r.Scheme)
+		if err == nil && configMap != nil {
+			if err = r.Delete(ctx, configMap); err != nil {
+				log.Error(err, "failed to delete object of ConfigMap for Controller Client Cert")
+			}
+		}
+	}
+
+	cm, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 	if err == nil {
 		if err = r.Delete(ctx, cm); err != nil {
 			log.Error(err, "failed to delete object of ConfigMap")
@@ -295,7 +306,7 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 				continue
 			}
 
-			configMap, err := configMapForAgentConfig(instance, nil)
+			configMap, err := configMapForAgentConfig(ctx, r.Client, instance, nil)
 			if err != nil {
 				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
@@ -304,6 +315,22 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 			configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
 			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
 				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			}
+
+			if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+				instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName {
+				configMap, err = configMapForAgentControllerClientCert(ctx, r.Client, instance, nil)
+				if err != nil {
+					log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				}
+
+				if configMap != nil {
+					configMap.Namespace = ns.GetName()
+					configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+					if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+						log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+					}
+				}
 			}
 
 			secret, err := secretForAgentAPIKey(instance, nil)
@@ -406,9 +433,15 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 		return nil
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+	if instance.Spec.Sidecar.Enabled {
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_SIDECAR"
+	} else {
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
+	}
+
+	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
 		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate
@@ -424,6 +457,10 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 
 // manageResources creates/updates required resources.
 func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) error {
+	if err := r.reconcileControllerCertConfigMap(ctx, instance); err != nil {
+		return err
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -462,11 +499,44 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 	return nil
 }
 
+// reconcileControllerCertConfigMap prepares the desired states for Agent configmaps containing Controller cert and
+// sends an request to Kubernetes API to move the actual state to the prepared desired state.
+func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
+	if !instance.Spec.Sidecar.Enabled &&
+		len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
+			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+		if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+			instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+		}
+
+		configMap, err := configMapForAgentControllerClientCert(ctx, r.Client, instance.DeepCopy(), r.Scheme)
+		if err != nil {
+			return err
+		}
+
+		if configMap == nil {
+			return nil
+		}
+
+		instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
+		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // reconcileConfigMap prepares the desired states for Agent configmaps and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
 	if !instance.Spec.Sidecar.Enabled {
-		configMap, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
+		if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+			instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+			instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
+		}
+		configMap, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
 		}
@@ -474,7 +544,6 @@ func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *agen
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
-
 	}
 
 	return nil
@@ -535,7 +604,7 @@ func (r *AgentReconciler) reconcileClusterRoleBinding(ctx context.Context, insta
 			return r.reconcileClusterRoleBinding(ctx, instance)
 		}
 
-		// Checking invalid as Kubernetes doesn't allow updating RoleRef
+		// Checking invalid as Kubernetes does not allow updating RoleRef
 		if errors.IsInvalid(err) && strings.Contains(err.Error(), "cannot change roleRef") {
 			if err = r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
 				log.Error(err, "failed to delete object of ClusterRoleBinding")
@@ -654,7 +723,7 @@ func (r *AgentReconciler) reconcileMutatingWebhookConfiguration(ctx context.Cont
 // reconcileSecret prepares the desired states for Agent ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *agentv1alpha1.Agent) error {
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if instance.Spec.Secrets.FluxNinjaExtension.Create {
 		if !instance.Spec.Sidecar.Enabled {
 			secret, err := secretForAgentAPIKey(instance.DeepCopy(), r.Scheme)
 			if err != nil {
@@ -663,15 +732,15 @@ func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *agentv1
 			if _, err = CreateSecretForAgent(r.Client, r.Recorder, secret, ctx, instance); err != nil {
 				return err
 			}
-			instance.Spec.Secrets.FluxNinjaPlugin.Create = false
-			instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
-			instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = controllers.SecretName(
-				instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			instance.Spec.Secrets.FluxNinjaExtension.Create = false
+			instance.Spec.Secrets.FluxNinjaExtension.Value = ""
+			instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name = controllers.SecretName(
+				instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 		} else {
-			value := instance.Spec.Secrets.FluxNinjaPlugin.Value
+			value := instance.Spec.Secrets.FluxNinjaExtension.Value
 			if !strings.HasPrefix(value, "enc::") && !strings.HasSuffix(value, "::enc") {
-				instance.Spec.Secrets.FluxNinjaPlugin.Value = fmt.Sprintf(
-					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.Secrets.FluxNinjaPlugin.Value)))
+				instance.Spec.Secrets.FluxNinjaExtension.Value = fmt.Sprintf(
+					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.Secrets.FluxNinjaExtension.Value)))
 			}
 		}
 	}
@@ -690,6 +759,13 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 	err := r.List(ctx, nsList)
 	if err != nil {
 		return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
+	}
+
+	var createControllerClientCm bool
+	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
+			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+		createControllerClientCm = true
 	}
 
 	for index := range nsList.Items {
@@ -712,12 +788,31 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			continue
 		}
 
-		configMap := CreateAgentConfigMapInNamespace(instance.DeepCopy(), ns.GetName())
+		if createControllerClientCm {
+			if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+				instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+			}
+			configMap := CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, ns.GetName())
+			if configMap != nil {
+				configMap.Namespace = ns.GetName()
+				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+				instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
+				if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
+					return err
+				}
+			}
+		}
+
+		if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+			instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+			instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
+		}
+		configMap := CreateAgentConfigMapInNamespace(ctx, r.Client, instance.DeepCopy(), ns.GetName())
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
 
-		if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+		if instance.Spec.Secrets.FluxNinjaExtension.Create {
 			secret, err := CreateAgentSecretInNamespace(instance.DeepCopy(), ns.GetName())
 			if err != nil {
 				return err
@@ -757,8 +852,8 @@ func eventFiltersForAgent() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
-				(new.Spec.Secrets.FluxNinjaPlugin.Value == "" || strings.HasPrefix(new.Spec.Secrets.FluxNinjaPlugin.Value, "enc::")) {
+			if diffObjects && old.Spec.Secrets.FluxNinjaExtension.Value != "" &&
+				(new.Spec.Secrets.FluxNinjaExtension.Value == "" || strings.HasPrefix(new.Spec.Secrets.FluxNinjaExtension.Value, "enc::")) {
 				return false
 			}
 

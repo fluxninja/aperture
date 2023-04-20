@@ -58,15 +58,15 @@ Create the address of the Prometheus for Aperture Agent
 {{- end -}}
 
 {{/*
-Fetch the endpoint of the FluxNinja ARC instance
-{{ include "agent.fluxNinjaPlugin.endpoint" ( dict "agent" .Values.path.to.the.agent $) }}
+Fetch the value of the API Key secret for Aperture Agent
+{{ include "agent.apiSecret.value" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
-{{- define "agent.fluxNinjaPlugin.endpoint" -}}
-{{- if .agent.config.fluxninja_plugin.enabled -}}
-    {{- if .agent.config.fluxninja_plugin.fluxninja_endpoint -}}
-        {{ print .agent.config.fluxninja_plugin.fluxninja_endpoint }}
+{{- define "agent.apiSecret.value" -}}
+{{- if .agent.secrets.fluxNinjaExtension.create -}}
+    {{- if .agent.secrets.fluxNinjaExtension.value -}}
+        {{ print .agent.secrets.fluxNinjaExtension.value }}
     {{- else -}}
-        {{- fail "Value of fluxninja_endpoint for FluxNinja plugin cannot be empty when .Values.agent.config.fluxninja_plugin.enabled is set to true." -}}
+        {{- fail "Value of API Key for Agent cannot be empty when .Values.agent.secrets.fluxNinjaExtension.create is set to true." -}}
     {{- end -}}
 {{- else -}}
     {{ print "" }}
@@ -74,17 +74,61 @@ Fetch the endpoint of the FluxNinja ARC instance
 {{- end -}}
 
 {{/*
-Fetch the value of the API Key secret for Aperture Agent
-{{ include "agent.apiSecret.value" ( dict "agent" .Values.path.to.the.agent $) }}
+Fetch the Name of the API Key secret for Aperture Agent
+{{ include "agent.apiSecret.name" ( dict "agent" .Values.path.to.the.agent "context" $.context $ ) }}
 */}}
-{{- define "agent.apisecret.value" -}}
-{{- if .agent.secrets.fluxNinjaPlugin.create -}}
-    {{- if .agent.secrets.fluxNinjaPlugin.value -}}
-        {{ print .agent.secrets.fluxNinjaPlugin.value }}
-    {{- else -}}
-        {{- fail "Value of API Key for Agent cannot be empty when .Values.agent.secrets.fluxNinjaPlugin.create is set to true." -}}
-    {{- end -}}
+{{- define "agent.apiSecret.name" -}}
+{{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.name -}}
+    {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.name }}
 {{- else -}}
-    {{ print "" }}
+    {{ print "%s-agent-apikey" .context.Release.Name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the Key of the API Key secret for Aperture Agent
+{{ include "agent.apiSecret.key" ( dict "agent" .Values.path.to.the.agent $ ) }}
+*/}}
+{{- define "agent.apiSecret.key" -}}
+{{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.key -}}
+    {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.key }}
+{{- else -}}
+    {{ print "apiKey" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the server port of the Aperture Agent
+{{ include "agent.server.port" ( dict "agent" .Values.path.to.the.agent $ ) }}
+*/}}
+{{- define "agent.server.port" -}}
+{{- if and .agent.config .agent.config.server .agent.config.server.listener .agent.config.server.listener.addr -}}
+    {{ print (split ":" .agent.config.server.listener.addr)._1 }}
+{{- else -}}
+    {{ print "8080" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the OTEL port of the Aperture Agent
+{{ include "agent.otel.port" ( dict "agent" .Values.path.to.the.agent portName string defaultPort string $ ) }}
+*/}}
+{{- define "agent.otel.port" -}}
+{{- if and .agent.config .agent.config.otel .agent.config.otel.ports (hasKey .agent.config.otel.ports .portName) -}}
+    {{ print (get .agent.config.otel.ports .portName) }}
+{{- else -}}
+    {{ print .defaultPort }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fetch the Distcache port of the Aperture Agent
+{{ include "agent.dist_cache.port" ( dict "agent" .Values.path.to.the.agent portName string defaultPort string $ ) }}
+*/}}
+{{- define "agent.dist_cache.port" -}}
+{{- if and .agent.config .agent.config.dist_cache (hasKey .agent.config.dist_cache .portName) -}}
+    {{ print (split ":" .agent.config.dist_cache)._0 }}
+{{- else -}}
+    {{ print .defaultPort }}
 {{- end -}}
 {{- end -}}

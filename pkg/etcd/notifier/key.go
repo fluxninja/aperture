@@ -10,7 +10,7 @@ import (
 
 // KeyToEtcdNotifier holds the state of a notifier that writes raw/transformed contents of a watched key to another key in etcd.
 type KeyToEtcdNotifier struct {
-	notifiers.KeyNotifierBase
+	notifiers.KeyBase
 	etcdWriter *etcdwriter.Writer
 	etcdPath   string
 }
@@ -24,14 +24,21 @@ func NewKeyToEtcdNotifier(
 	etcdPath string,
 	etcdClient *etcdclient.Client,
 	withLease bool,
-) *KeyToEtcdNotifier {
-	ken := &KeyToEtcdNotifier{
-		etcdPath:   etcdPath,
-		etcdWriter: etcdwriter.NewWriter(etcdClient, withLease),
-	}
-	ken.SetKey(key)
+) (*KeyToEtcdNotifier, error) {
+	return newKeyToEtcdNotifier(key, etcdPath, etcdwriter.NewWriter(etcdClient, withLease))
+}
 
-	return ken
+func newKeyToEtcdNotifier(
+	key notifiers.Key,
+	etcdPath string,
+	etcdWriter *etcdwriter.Writer,
+) (*KeyToEtcdNotifier, error) {
+	ken := &KeyToEtcdNotifier{
+		KeyBase:    notifiers.NewKeyBase(key),
+		etcdPath:   etcdPath,
+		etcdWriter: etcdWriter,
+	}
+	return ken, nil
 }
 
 // Start starts the key notifier.

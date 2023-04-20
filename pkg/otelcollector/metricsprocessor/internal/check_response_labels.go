@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"

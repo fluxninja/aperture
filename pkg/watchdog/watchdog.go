@@ -4,9 +4,9 @@ package watchdog
 import (
 	"context"
 	"fmt"
-	"math"
 	"runtime"
 	"runtime/debug"
+	"time"
 
 	"github.com/elastic/gosigar"
 	"go.uber.org/fx"
@@ -20,6 +20,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
+	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 )
 
 // swagger:operation POST /watchdog common-configuration Watchdog
@@ -34,10 +35,6 @@ import (
 const (
 	watchdogConfigKey = "watchdog.memory"
 	watchdogJobName   = "watchdog"
-	// PolicyTempDisabled is a marker value for policies to signal that the policy
-	// is temporarily disabled. Use it when all hope is lost to turn around from
-	// significant memory pressure (such as when above an "extreme" watermark).
-	policyTempDisabled uint64 = math.MaxUint64
 )
 
 // Module is a fx module that provides annotated Watchdog jobs and triggers Watchdog checks.
@@ -52,7 +49,7 @@ type Constructor struct {
 	// ConfigKey for config
 	ConfigKey string
 	// Default config
-	DefaultConfig WatchdogConfig
+	DefaultConfig watchdogconfig.WatchdogConfig
 }
 
 // WatchdogIn holds parameters for setupWatchdog.
@@ -70,7 +67,7 @@ type watchdog struct {
 	heapStatusRegistry status.Registry
 	jobGroup           *jobs.JobGroup
 	watchdogJob        *jobs.MultiJob
-	config             WatchdogConfig
+	config             watchdogconfig.WatchdogConfig
 }
 
 func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
@@ -81,7 +78,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	watchdogRegistry := in.StatusRegistry.Child("subsystem", "liveness").Child(watchdogJobName, watchdogJobName)
+	watchdogRegistry := in.StatusRegistry.Child("system", "liveness").Child(watchdogJobName, watchdogJobName)
 
 	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 
@@ -97,7 +94,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 	return nil
 }
 
-func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
+func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config watchdogconfig.WatchdogConfig) *watchdog {
 	heapStatusRegistry := registry.Child("heap", "heap")
 
 	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName, watchdogJobName), nil, nil)
@@ -172,7 +169,7 @@ func (w *watchdog) start() error {
 			select {
 			case <-w.sentinel.gcTriggered:
 				log.Trace().Msg("GC detected, triggering watchdog checks")
-				w.jobGroup.TriggerJob(watchdogJobName)
+				w.jobGroup.TriggerJob(watchdogJobName, time.Duration(0))
 				if hp != nil {
 					details, e := hp.checkHeap()
 					if e != nil {
@@ -257,7 +254,7 @@ func systemUsage() (uint64, uint64, error) {
 }
 
 type systemWatermarks struct {
-	WatermarksPolicy
+	watchdogconfig.WatermarksPolicy
 }
 
 // Check evaluates the system memory usage and runs GC at configured watermarks of memory utilization.
@@ -271,7 +268,7 @@ func (policy *systemWatermarks) Check(ctx context.Context) (proto.Message, error
 }
 
 type systemAdaptive struct {
-	AdaptivePolicy
+	watchdogconfig.AdaptivePolicy
 }
 
 // Check evaluates the system memory usage and runs GC at configured adaptive thresholds of memory utilization.
@@ -286,15 +283,15 @@ func (policy *systemAdaptive) Check(ctx context.Context) (proto.Message, error) 
 
 // Heap Policy.
 type heapPolicy struct {
-	HeapConfig
+	watchdogconfig.HeapConfig
 	originalGoGC int
 	currGoGC     int
 }
 
-func newHeapPolicy(config HeapConfig) *heapPolicy {
+func newHeapPolicy(config watchdogconfig.HeapConfig) *heapPolicy {
 	hp := heapPolicy{HeapConfig: config}
 
-	// get the initial effective GoGC; guess it's 100 (default), and restore
+	// get the initial effective GoGC; guess it is 100 (default), and restore
 	// it to whatever it actually was. This works because SetGCPercent
 	// returns the previous value.
 	hp.originalGoGC = debug.SetGCPercent(100)
@@ -323,9 +320,9 @@ func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 	usage := memstats.HeapAlloc
 	switch {
 	case hp.WatermarksPolicy.Enabled:
-		threshold = hp.WatermarksPolicy.nextThreshold(hp.Limit, usage)
+		threshold = hp.WatermarksPolicy.NextThreshold(hp.Limit, usage)
 	case hp.AdaptivePolicy.Enabled:
-		threshold = hp.AdaptivePolicy.nextThreshold(hp.Limit, usage)
+		threshold = hp.AdaptivePolicy.NextThreshold(hp.Limit, usage)
 	default:
 		log.Panic().Msg("checkHeap called on disabled policy")
 	}
@@ -338,14 +335,14 @@ func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 		hp.currGoGC = hp.originalGoGC
 	} else if hp.currGoGC < hp.MinGoGC {
 		log.Warn().Msg("heap driven watchdog reached minimum threshold for GoGC value")
-		// cap GoGC to avoid overscheduling.
+		// cap GoGC to avoid over scheduling.
 		hp.currGoGC = hp.MinGoGC
 	}
 
 	debug.SetGCPercent(hp.currGoGC)
 	runtime.ReadMemStats(&memstats)
 
-	if threshold == policyTempDisabled {
+	if threshold == watchdogconfig.PolicyTempDisabled {
 		threshold = memstats.NextGC
 	}
 	log.Info().

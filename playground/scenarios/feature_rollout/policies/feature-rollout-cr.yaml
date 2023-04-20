@@ -1,0 +1,143 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: feature-rollout
+spec:
+  circuit:
+    components:
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: AVERAGE_LATENCY_0
+          query_string: sum(increase(flux_meter_sum{valid="true", flow_status="OK",
+            flux_meter_name="feature-rollout/average_latency/0"}[5s]))/sum(increase(flux_meter_count{valid="true",
+            flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[5s]))
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: AVERAGE_LATENCY_0
+          rhs:
+            constant_signal:
+              value: 75
+        operator: lt
+        out_ports:
+          output:
+            signal_name: FORWARD_0
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: AVERAGE_LATENCY_0
+          rhs:
+            constant_signal:
+              value: 75
+        operator: gt
+        out_ports:
+          output:
+            signal_name: RESET_0
+    - or:
+        in_ports:
+          inputs:
+          - signal_name: FORWARD_0
+        out_ports:
+          output:
+            signal_name: FORWARD_INTENT
+    - or:
+        in_ports:
+          inputs: []
+        out_ports:
+          output:
+            signal_name: BACKWARD_INTENT
+    - or:
+        in_ports:
+          inputs:
+          - signal_name: RESET_0
+        out_ports:
+          output:
+            signal_name: RESET
+    - inverter:
+        in_ports:
+          input:
+            signal_name: BACKWARD_INTENT
+        out_ports:
+          output:
+            signal_name: INVERTED_BACKWARD_INTENT
+    - first_valid:
+        in_ports:
+          inputs:
+          - signal_name: INVERTED_BACKWARD_INTENT
+          - constant_signal:
+              value: 1
+        out_ports:
+          output:
+            signal_name: NOT_BACKWARD
+    - inverter:
+        in_ports:
+          input:
+            signal_name: RESET
+        out_ports:
+          output:
+            signal_name: INVERTED_RESET
+    - first_valid:
+        in_ports:
+          inputs:
+          - signal_name: INVERTED_RESET
+          - constant_signal:
+              value: 1
+        out_ports:
+          output:
+            signal_name: NOT_RESET
+    - and:
+        in_ports:
+          inputs:
+          - signal_name: FORWARD_INTENT
+          - signal_name: NOT_BACKWARD
+          - signal_name: NOT_RESET
+        out_ports:
+          output:
+            signal_name: FORWARD
+    - and:
+        in_ports:
+          inputs:
+          - signal_name: BACKWARD_INTENT
+          - signal_name: NOT_RESET
+        out_ports:
+          output:
+            signal_name: BACKWARD
+    - flow_control:
+        load_shaper:
+          dynamic_config_key: load_shaper
+          in_ports:
+            backward:
+              signal_name: BACKWARD
+            forward:
+              signal_name: FORWARD
+            reset:
+              signal_name: RESET
+          parameters:
+            flow_regulator_parameters:
+              flow_selector:
+                flow_matcher:
+                  control_point: ingress
+                service_selector:
+                  service: service1-demo-app.demoapp.svc.cluster.local
+              label_key: ""
+            steps:
+            - duration: 0s
+              target_accept_percentage: 1
+            - duration: 300s
+              target_accept_percentage: 100
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []
+      flux_meters:
+        feature-rollout/average_latency/0:
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              service: service1-demo-app.demoapp.svc.cluster.local

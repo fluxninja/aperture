@@ -63,6 +63,9 @@ func (dec *Decider) ShortDescription() string {
 	return fmt.Sprintf("%s for %s", dec.operator.String(), dec.trueForDuration.String())
 }
 
+// IsActuator implements runtime.Component.
+func (*Decider) IsActuator() bool { return false }
+
 // Make sure Decider complies with Component interface.
 var _ runtime.Component = (*Decider)(nil)
 

@@ -24,31 +24,31 @@ import (
 	"text/template"
 	"time"
 
-	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	. "github.com/fluxninja/aperture/operator/controllers"
-
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/plugins"
-	"github.com/fluxninja/aperture/pkg/prometheus"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
+
+	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
+	"github.com/fluxninja/aperture/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/operator/controllers/testutils"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/etcd"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 )
 
 //go:embed config_test.tpl
 var controllerConfigYAML string
 
 var _ = Describe("ConfigMap for Controller", func() {
-	Context("Instance without FluxNinja plugin enabled", func() {
+	Context("Instance", func() {
 		It("returns correct ConfigMap", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
@@ -59,7 +59,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 								TLS: tlsconfig.ServerTLSConfig{
@@ -78,10 +78,6 @@ var _ = Describe("ConfigMap for Controller", func() {
 									},
 								},
 							},
-							Plugins: plugins.PluginsConfig{
-								DisablePlugins:  false,
-								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
-							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
 								LeaseTTL:  config.MakeDuration(60 * time.Second),
@@ -90,8 +86,8 @@ var _ = Describe("ConfigMap for Controller", func() {
 								Address: "http://aperture-prometheus-server:80",
 							},
 						},
-						OTEL: controller.ControllerOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: controller.ControllerOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -141,9 +137,9 @@ var _ = Describe("ConfigMap for Controller", func() {
 			}
 
 			result, err := configMapForControllerConfig(instance.DeepCopy(), scheme.Scheme)
-
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+
+			testutils.CompareConfigMap(result, expected)
 		})
 	})
 })

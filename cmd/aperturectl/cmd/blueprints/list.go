@@ -9,6 +9,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/facebookgo/symwalk"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,11 +28,11 @@ aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		err := readerLock()
+		err := utils.ReaderLock(blueprintsURIRoot)
 		if err != nil {
 			return err
 		}
-		defer unlock()
+		defer utils.Unlock(blueprintsURIRoot)
 		if all {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
@@ -40,11 +41,11 @@ aperturectl blueprints list --all`,
 				return err
 			}
 
-			for version, policies := range blueprintsList {
+			for version, blueprints := range blueprintsList {
 				fmt.Printf("%s\n", version)
-				for i, policy := range policies {
-					fmt.Fprintf(w, "%s\n", policy)
-					if i == len(policies)-1 {
+				for i, blueprint := range blueprints {
+					fmt.Fprintf(w, "%s\n", blueprint)
+					if i == len(blueprints)-1 {
 						fmt.Fprintf(w, "\n")
 					}
 				}
@@ -55,13 +56,13 @@ aperturectl blueprints list --all`,
 		} else {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 
-			policies, err := getBlueprints(blueprintsDir)
+			blueprints, err := getBlueprints(blueprintsURIRoot, utils.AllowDeprecated)
 			if err != nil {
 				return err
 			}
 
-			for _, policy := range policies {
-				fmt.Fprintf(w, "%s\n", policy)
+			for _, blueprint := range blueprints {
+				fmt.Fprintf(w, "%s\n", blueprint)
 			}
 
 			w.Flush()
@@ -71,20 +72,27 @@ aperturectl blueprints list --all`,
 	},
 }
 
-func getBlueprints(blueprintsDir string) ([]string, error) {
-	relPath := getRelPath(blueprintsDir)
-
+func getBlueprints(blURIRoot string, listDeprecated bool) ([]string, error) {
+	relPath := utils.GetRelPath(blURIRoot)
 	policies := []string{}
 
-	blueprintsPath := filepath.Join(blueprintsDir, relPath)
-	err := symwalk.Walk(blueprintsPath, func(path string, fi fs.FileInfo, err error) error {
+	blDir := filepath.Join(blURIRoot, relPath)
+	err := symwalk.Walk(blDir, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if !fi.IsDir() && fi.Name() == "config.libsonnet" {
-			strippedPath := strings.TrimPrefix(path, blueprintsPath)
-			strippedPath = strings.TrimSuffix(strippedPath, "/config.libsonnet")
+		if !fi.IsDir() && fi.Name() == "bundle.libsonnet" {
+			strippedPath := strings.TrimPrefix(path, blDir)
+			strippedPath = strings.TrimSuffix(strippedPath, "/bundle.libsonnet")
 			strippedPath = strings.TrimPrefix(strippedPath, "/")
+			if !listDeprecated {
+				// extract blueprint dir from path
+				blueprintDir := strings.TrimSuffix(path, "/bundle.libsonnet")
+				ok, _ := utils.IsBlueprintDeprecated(blueprintDir)
+				if ok {
+					return nil
+				}
+			}
 			policies = append(policies, strippedPath)
 		}
 		return nil
@@ -98,20 +106,20 @@ func getBlueprints(blueprintsDir string) ([]string, error) {
 
 func getCachedBlueprints() (map[string][]string, error) {
 	blueprintsList := map[string][]string{}
-	blueprintsDirs, err := os.ReadDir(blueprintsCacheRoot)
+	blueprintsURIDirs, err := os.ReadDir(blueprintsCacheRoot)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, blueprintsDir := range blueprintsDirs {
-		if blueprintsDir.IsDir() {
-			dir := filepath.Join(blueprintsCacheRoot, blueprintsDir.Name())
-			policies, err := getBlueprints(dir)
+	for _, blueprintsURIDir := range blueprintsURIDirs {
+		if blueprintsURIDir.IsDir() {
+			dir := filepath.Join(blueprintsCacheRoot, blueprintsURIDir.Name())
+			policies, err := getBlueprints(dir, utils.AllowDeprecated)
 			if err != nil {
 				return nil, err
 			}
-			source := getSource(dir)
-			version := getVersion(dir)
+			source := utils.GetSource(dir)
+			version := utils.GetVersion(dir)
 			if version != "" {
 				source = fmt.Sprintf("%s@%s", source, version)
 			}

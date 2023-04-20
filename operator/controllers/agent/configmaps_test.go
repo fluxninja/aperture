@@ -18,6 +18,7 @@ package agent
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
 	"text/template"
@@ -34,20 +35,20 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/operator/controllers/testutils"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/distcache"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	distcacheconfig "github.com/fluxninja/aperture/pkg/distcache/config"
+	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/plugins"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 )
 
 //go:embed config_test.tpl
 var agentConfigYAML string
 
 var _ = Describe("ConfigMap for Agent", func() {
-	Context("Instance without FluxNinja plugin enabled", func() {
+	Context("Instance", func() {
 		It("returns correct ConfigMap", func() {
 			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
@@ -58,7 +59,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
@@ -72,10 +73,6 @@ var _ = Describe("ConfigMap for Agent", func() {
 									},
 								},
 							},
-							Plugins: plugins.PluginsConfig{
-								DisablePlugins:  false,
-								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
-							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
 								LeaseTTL:  config.MakeDuration(60 * time.Second),
@@ -84,12 +81,12 @@ var _ = Describe("ConfigMap for Agent", func() {
 								Address: "http://aperture-prometheus-server:80",
 							},
 						},
-						DistCache: distcache.DistCacheConfig{
+						DistCache: distcacheconfig.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -148,10 +145,10 @@ var _ = Describe("ConfigMap for Agent", func() {
 				},
 			}
 
-			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
-
+			result, err := configMapForAgentConfig(context.Background(), K8sClient, instance.DeepCopy(), scheme.Scheme)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+
+			testutils.CompareConfigMap(result, expected)
 		})
 	})
 })

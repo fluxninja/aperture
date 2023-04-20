@@ -107,7 +107,7 @@ func (p *PrometheusHarness) pollPrometheusForReadiness() error {
 			time.Sleep(toSleep)
 		}
 	}
-	return fmt.Errorf("prometheus didn't come up in 4000ms")
+	return fmt.Errorf("prometheus did not come up in 4000ms")
 }
 
 // Stop kills the harnessed prometheus server and cleans up the prometheus directory.

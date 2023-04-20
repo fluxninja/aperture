@@ -30,7 +30,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/distcache"
+	distcache "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
@@ -76,7 +76,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
@@ -85,8 +85,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -177,7 +177,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						},
 					},
 					{
-						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 						Value: "false",
 					},
 				},
@@ -211,7 +211,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
@@ -220,8 +220,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -350,7 +350,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						},
 					},
 					{
-						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 						Value: "false",
 					},
 				},
@@ -391,7 +391,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						},
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":8000",
 								},
 							},
@@ -400,8 +400,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -522,7 +522,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				LivenessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/v1/status/subsystem/liveness",
+							Path:   "/v1/status/system/liveness",
 							Port:   intstr.FromString(Server),
 							Scheme: corev1.URISchemeHTTP,
 						},
@@ -536,7 +536,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				ReadinessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/v1/status/subsystem/readiness",
+							Path:   "/v1/status/system/readiness",
 							Port:   intstr.FromString(Server),
 							Scheme: corev1.URISchemeHTTP,
 						},
@@ -576,7 +576,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						},
 					},
 					{
-						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 						Value: "false",
 					},
 				},
@@ -645,7 +645,7 @@ var _ = Describe("Pod modification for Agent", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
@@ -654,8 +654,8 @@ var _ = Describe("Pod modification for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -750,7 +750,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									},
 								},
 								{
-									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 									Value: "false",
 								},
 							},
@@ -800,7 +800,7 @@ var _ = Describe("Pod modification for Agent", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
@@ -809,8 +809,8 @@ var _ = Describe("Pod modification for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -965,7 +965,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									},
 								},
 								{
-									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 									Value: "false",
 								},
 							},

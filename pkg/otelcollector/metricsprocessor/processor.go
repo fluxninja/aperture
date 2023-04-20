@@ -84,6 +84,15 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			}
 
 			internal.AddEnvoySpecificLabels(attributes)
+		} else if sourceStr == otelconsts.ApertureSourceLua {
+			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{""})
+			if !success {
+				log.Sample(noEnvoyCheckResponseSampler).Warn().
+					Msg("aperture check response label not found in Lua access logs")
+				return otelcollector.Discard
+			}
+
+			internal.AddLuaSpecificLabels(attributes)
 		} else {
 			log.Sample(unrecognizedSourceLabelSampler).Warn().
 				Msg("aperture source label not recognized")
@@ -93,7 +102,17 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 		attributes.PutStr(otelconsts.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
 		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
-		p.populateControlPointCache(checkResponse)
+		controlPointType := ""
+		telemetryFlowLabels := checkResponse.GetTelemetryFlowLabels()
+		if telemetryFlowLabels == nil {
+			log.Sample(noTelemetryFlowLabelsSampler).Debug().Msg("aperture telemetry flow labels not found")
+		} else {
+			controlPointType, exists = telemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel]
+			if !exists {
+				log.Sample(noControlPointTypeSampler).Debug().Msg("aperture control point type label not found")
+			}
+		}
+		p.populateControlPointCache(checkResponse, controlPointType)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
 		if sourceStr == otelconsts.ApertureSourceSDK {
@@ -101,6 +120,9 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			internal.EnforceIncludeListSDK(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
 			p.updateMetrics(attributes, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
+			internal.EnforceIncludeListHTTP(attributes)
+		} else if sourceStr == otelconsts.ApertureSourceLua {
+			p.updateMetrics(attributes, checkResponse, []string{otelconsts.LuaMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		}
 
@@ -116,6 +138,8 @@ var (
 	noSDKCheckResponseSampler      = log.NewRatelimitingSampler()
 	noEnvoyCheckResponseSampler    = log.NewRatelimitingSampler()
 	unrecognizedSourceLabelSampler = log.NewRatelimitingSampler()
+	noTelemetryFlowLabelsSampler   = log.NewRatelimitingSampler()
+	noControlPointTypeSampler      = log.NewRatelimitingSampler()
 )
 
 func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, treatAsMissing []string) {
@@ -153,20 +177,43 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 				}
 				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
+
+			// Update flow regulator metrics.
+			if fr := decision.GetFlowRegulatorInfo(); fr != nil {
+				labels := map[string]string{
+					metrics.PolicyNameLabel:  decision.PolicyName,
+					metrics.PolicyHashLabel:  decision.PolicyHash,
+					metrics.ComponentIDLabel: decision.ComponentId,
+				}
+				p.updateMetricsForFlowRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+			}
 		}
 	}
 
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
+		invalidCount := make(map[string]int)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
-			p.updateMetricsForFluxMeters(
+			valid := p.updateMetricsForFluxMeters(
 				fluxMeter,
 				checkResponse.DecisionType,
 				statusCode, flowStatus,
 				attributes,
 				treatAsMissing)
+			if !valid {
+				invalidCount[fluxMeter.FluxMeterName]++
+			}
 		}
+		for fluxMeterName, count := range invalidCount {
+			fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterName)
+			metric, err := fluxMeter.GetInvalidFluxMeterTotal(nil)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
+			}
+			metric.Set(float64(count))
+		}
+
 	}
 
 	if len(checkResponse.ClassifierInfos) > 0 {
@@ -227,6 +274,25 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 	}
 }
 
+func (p *metricsProcessor) updateMetricsForFlowRegulator(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
+	flowRegulator := p.cfg.engine.GetFlowRegulator(limiterID)
+	if flowRegulator == nil {
+		log.Sample(noFlowRegulatorSampler).Warn().
+			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
+			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
+			Msg("FlowRegulator not found")
+		return
+	}
+	// Add decision type label to the request counter metric
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	labels[metrics.RegulatorDroppedLabel] = strconv.FormatBool(dropped)
+	requestCounter := flowRegulator.GetRequestCounter(labels)
+	if requestCounter != nil {
+		requestCounter.Inc()
+	}
+}
+
 func (p *metricsProcessor) updateMetricsForClassifier(classifierID iface.ClassifierID) {
 	classifier := p.cfg.classificationEngine.GetClassifier(classifierID)
 	if classifier == nil {
@@ -251,7 +317,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	flowStatus string,
 	attributes pcommon.Map,
 	treatAsMissing []string,
-) {
+) (valid bool) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
 		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
@@ -259,7 +325,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FlowStatusLabel, flowStatus).
 			Msg("FluxMeter not found")
-		return
+		return true
 	}
 
 	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
@@ -268,26 +334,27 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)
 
 	// Add attribute found label to the flux meter metric
-	if found {
-		labels[metrics.ValidLabel] = metrics.ValidTrue
-	} else {
-		labels[metrics.ValidLabel] = metrics.ValidFalse
+	if !found {
+		fluxMeter.DeleteFromHistogram(labels)
+		return false
 	}
 	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
 	if fluxMeterHistogram != nil {
 		fluxMeterHistogram.Observe(metricValue)
 	}
+	return true
 }
 
-func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse) {
+func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse, controlPointType string) {
 	for _, service := range checkResponse.GetServices() {
-		p.cfg.controlPointCache.Put(selectors.NewControlPointID(service, checkResponse.GetControlPoint()))
+		p.cfg.controlPointCache.Put(selectors.NewTypedControlPointID(service, checkResponse.GetControlPoint(), controlPointType))
 	}
 }
 
 var (
 	noConcurrencyLimiterSampler = log.NewRatelimitingSampler()
 	noRateLimiterSampler        = log.NewRatelimitingSampler()
+	noFlowRegulatorSampler      = log.NewRatelimitingSampler()
 	noClassifierSampler         = log.NewRatelimitingSampler()
 	noFluxMeterSampler          = log.NewRatelimitingSampler()
 )

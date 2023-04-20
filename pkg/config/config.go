@@ -19,8 +19,6 @@ import (
 var (
 	// DefaultAssetsDirectory is path to default assets directory.
 	DefaultAssetsDirectory = path.Join("/", "etc", info.Prefix, info.Service)
-	// DefaultArtifactsDirectory is path to default artifacts directory.
-	DefaultArtifactsDirectory = path.Join("/", "opt", info.Prefix, info.Service)
 	// DefaultLogDirectory is path to default log directory.
 	DefaultLogDirectory = path.Join("/", "var", "log", info.Prefix, info.Service)
 	// DefaultTempBase is path to default temporary base.
@@ -106,7 +104,7 @@ func GroupTag(group string) string {
 type FileUnmarshallerConstructor struct {
 	// Optional Merge Config
 	MergeConfig map[string]interface{}
-	// Config Name -- config file name without the extension -- it's also the annotated name of koanf instance
+	// Config Name -- config file name without the extension -- it is also the annotated name of koanf instance
 	Name string
 	// Command line flag for reading file path
 	PathFlag string

@@ -23,7 +23,7 @@ const (
 	defaultGMuxListener = "grpc-gmux-listener"
 )
 
-// ServerModule is an fx module that provides annotated GRPC Server using the default listener and registers its metrics with the prometheus registry.
+// ServerModule is an fx module that provides annotated gRPC Server using the default listener and registers its metrics with the prometheus registry.
 func ServerModule() fx.Option {
 	return fx.Options(
 		ServerConstructor{}.Annotate(),
@@ -31,7 +31,7 @@ func ServerModule() fx.Option {
 	)
 }
 
-// GMuxServerModule is an fx module that provides annotated grpc Server using gmux provided listener and registers its metrics with the prometheus registry.
+// GMuxServerModule is an fx module that provides annotated gRPC Server using gmux provided listener and registers its metrics with the prometheus registry.
 func GMuxServerModule() fx.Option {
 	return fx.Options(
 		listener.GMuxConstructor{ListenerName: defaultGMuxListener}.Annotate(),
@@ -40,7 +40,7 @@ func GMuxServerModule() fx.Option {
 	)
 }
 
-// GRPCServerConfig holds configuration for GRPC Server.
+// GRPCServerConfig holds configuration for gRPC Server.
 // swagger:model
 // +kubebuilder:object:generate=true
 type GRPCServerConfig struct {
@@ -52,7 +52,7 @@ type GRPCServerConfig struct {
 	LatencyBucketsMS []float64 `json:"latency_buckets_ms" validate:"gte=0" default:"[10.0,25.0,100.0,250.0,1000.0]"`
 }
 
-// ServerConstructor holds fields to create an annotated GRPC Server.
+// ServerConstructor holds fields to create an annotated gRPC Server.
 type ServerConstructor struct {
 	// Name of grpc server instance -- empty for main server
 	Name string
@@ -66,7 +66,7 @@ type ServerConstructor struct {
 	ServerOptions []grpc.ServerOption
 }
 
-// Annotate creates an annotated instance of GRPC Server.
+// Annotate creates an annotated instance of gRPC Server.
 func (constructor ServerConstructor) Annotate() fx.Option {
 	if constructor.ConfigKey == "" {
 		constructor.ConfigKey = defaultServerConfigKey
@@ -76,8 +76,14 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				constructor.provideServer,
-				fx.ParamTags(config.NameTag(constructor.ListenerName)),
-				fx.ResultTags(config.NameTag(constructor.Name), config.NameTag(constructor.Name)),
+				fx.ParamTags(
+					config.NameTag(constructor.ListenerName),
+					config.GroupTag(constructor.Name)+` optional:"true"`,
+				),
+				fx.ResultTags(
+					config.NameTag(constructor.Name),
+					config.NameTag(constructor.Name),
+				),
 			),
 		),
 	)
@@ -85,6 +91,7 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 
 func (constructor ServerConstructor) provideServer(
 	listener *listener.Listener,
+	additionalOptions []grpc.ServerOption,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 	shutdowner fx.Shutdowner,
@@ -100,22 +107,28 @@ func (constructor ServerConstructor) provideServer(
 		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
 	)
 
-	// Connection timeout from config
-	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
+	serverOptions := []grpc.ServerOption{}
+	serverOptions = append(serverOptions, constructor.ServerOptions...)
+
+	serverOptions = append(serverOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
 
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),
 		otelgrpc.UnaryServerInterceptor(),
+		validatorUnaryInterceptor(),
 	}
-	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
+	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
 		grpcServerMetrics.StreamServerInterceptor(),
 		otelgrpc.StreamServerInterceptor(),
 	}
-	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
+	serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
 
-	server := grpc.NewServer(constructor.ServerOptions...)
+	// add additionalOptions
+	serverOptions = append(serverOptions, additionalOptions...)
+
+	server := grpc.NewServer(serverOptions...)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {

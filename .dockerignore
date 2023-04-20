@@ -2,7 +2,13 @@
 !go.???
 !cmd
 !pkg
-!plugins
+!extensions
 !api
 !operator
 !tools
+!cmd/*/build-config.yaml
+!scripts/build_aperturectl.sh
+!.git
+!playground/resources/nginx/*
+!playground/resources/kong/*
+!gateways

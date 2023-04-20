@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"reflect"
 	"regexp"
@@ -12,9 +13,8 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/knadh/koanf"
 	koanfjson "github.com/knadh/koanf/parsers/json"
-	"github.com/knadh/koanf/parsers/yaml"
+	koanfyaml "github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
-	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/posflag"
 	"github.com/knadh/koanf/providers/rawbytes"
 	"github.com/mitchellh/mapstructure"
@@ -91,7 +91,6 @@ type KoanfUnmarshaller struct {
 	flagSet      *pflag.FlagSet
 	mergeConfig  map[string]interface{}
 	configFormat ConfigFormat
-	bytes        []byte
 	enableEnv    bool
 }
 
@@ -162,13 +161,28 @@ func (u *KoanfUnmarshaller) UnmarshalKey(keyPath string, i interface{}) error {
 	return ValidateStruct(i)
 }
 
+// Marshal returns the underlying koanf as bytes.
+func (u *KoanfUnmarshaller) Marshal() ([]byte, error) {
+	u.Lock()
+	defer u.Unlock()
+
+	switch u.configFormat {
+	case YAML:
+		return u.koanf.Marshal(koanfyaml.Parser())
+	case JSON:
+		return u.koanf.Marshal(koanfjson.Parser())
+	default:
+		return nil, fmt.Errorf("unknown config format: %s", u.configFormat)
+	}
+}
+
 // Reload reloads the config using the underlying koanf.
 func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
 	k := koanf.New(DefaultKoanfDelim)
 
 	// Precedence:
-	// 1. MergeConfig
-	// 2. Env
+	// 1. Env (resolved during unmarshal stage)
+	// 2. MergeConfig
 	// 3. Bytes
 	// 4. Flags
 
@@ -193,15 +207,6 @@ func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
 		return err
 	}
 
-	if u.enableEnv {
-		err = k.Load(env.Provider(EnvPrefix, k.Delim(), func(s string) string {
-			return strings.TrimPrefix(s, EnvPrefix)
-		}), nil)
-		if err != nil {
-			return err
-		}
-	}
-
 	if u.mergeConfig != nil {
 		err = k.Load(confmap.Provider(u.mergeConfig, k.Delim()), nil)
 		if err != nil {
@@ -211,7 +216,6 @@ func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
 
 	log.Trace().Strs("keys", k.Keys()).Msg("All merged config")
 	u.koanf = k
-	u.bytes = bytes
 
 	return nil
 }
@@ -221,7 +225,7 @@ func loadBytesProvider(k *koanf.Koanf, bytes []byte, configFormat ConfigFormat) 
 	if bytes != nil {
 		// TODO: allow parser config
 		if configFormat == YAML {
-			err = k.Load(rawbytes.Provider(bytes), yaml.Parser())
+			err = k.Load(rawbytes.Provider(bytes), koanfyaml.Parser())
 		} else {
 			err = k.Load(rawbytes.Provider(bytes), koanfjson.Parser())
 		}
@@ -259,7 +263,7 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 
 		tv, ok := t.Tag.Lookup("json")
 		if ok && tv != "" {
-			// scrub omitmepty and string options
+			// scrub omitempty and string options
 			vals := strings.Split(tv, ",")
 			tv = vals[0]
 			if tv == "-" {
@@ -316,7 +320,7 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 				reg := regexp.MustCompile(`^\[(.*)\]$`)
 				matches := reg.FindStringSubmatch(val)
 				if len(matches) != 2 {
-					return
+					break
 				}
 				if matches[1] == "" {
 					v, err = nil, errors.New("empty slice provided in env var")
@@ -331,6 +335,8 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 						v, err = sliceconv.Atoi(sliceValues)
 					case reflect.Float32, reflect.Float64:
 						v, err = sliceconv.Atof(sliceValues)
+					case reflect.String:
+						v, err = sliceValues, nil
 					case reflect.Struct:
 						switch fv.Type().String() {
 						case "config.Duration", "*durationpb.Duration", "config.Timestamp", "*timestamp.Timestamp":
@@ -365,9 +371,7 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 				continue
 			}
 			if v != nil {
-				if tv, ok := t.Tag.Lookup("public"); ok && tv == "true" {
-					log.Info().Str("env", env).Str("key", key).Interface("v", v).Msg("reading env var")
-				}
+				log.Debug().Str("env", env).Str("key", key).Msg("reading env var")
 				keyVals[key] = v
 			}
 		}
@@ -503,6 +507,5 @@ var json = jsoniter.Config{
 	CaseSensitive: true,
 
 	// Error on typos.
-	// (Currently disabled, as we sometimes marshal the same config into two structs)
-	// DisallowUnknownFields: true,
+	DisallowUnknownFields: true,
 }.Froze()

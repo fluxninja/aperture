@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/feature-rollout/promql blueprint",
+  "additionalProperties": false,
+  "required": ["load_shaper"],
+  "properties": {
+    "load_shaper": {
+      "description": "Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "object",
+      "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowRegulatorDynamicConfig"
+    }
+  },
+  "$defs": null
+}

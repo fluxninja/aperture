@@ -1,0 +1,6 @@
+blueprint:
+  Feature Rollout Policy based on deviation of current average latency from it's
+  exponential moving average
+sources:
+  dashboard: policies/feature-rollout/base/dashboard.libsonnet
+  policy: policies/feature-rollout/base/policy.libsonnet

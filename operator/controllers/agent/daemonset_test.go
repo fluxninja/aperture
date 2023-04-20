@@ -32,7 +32,7 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/pkg/distcache"
+	distcacheconfig "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
@@ -103,17 +103,17 @@ var _ = Describe("Agent DaemonSet", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
 						},
-						DistCache: distcache.DistCacheConfig{
+						DistCache: distcacheconfig.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -204,7 +204,7 @@ var _ = Describe("Agent DaemonSet", func() {
 											},
 										},
 										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 											Value: "true",
 										},
 									},
@@ -303,17 +303,17 @@ var _ = Describe("Agent DaemonSet", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
 						},
-						DistCache: distcache.DistCacheConfig{
+						DistCache: distcacheconfig.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -489,7 +489,7 @@ var _ = Describe("Agent DaemonSet", func() {
 											},
 										},
 										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 											Value: "true",
 										},
 									},
@@ -552,7 +552,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									LivenessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/subsystem/liveness",
+												Path:   "/v1/status/system/liveness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},
@@ -566,7 +566,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									ReadinessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/subsystem/readiness",
+												Path:   "/v1/status/system/readiness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},

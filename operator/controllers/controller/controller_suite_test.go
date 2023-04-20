@@ -43,8 +43,8 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	"github.com/fluxninja/aperture/pkg/etcd"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 	//+kubebuilder:scaffold:imports
 )
 

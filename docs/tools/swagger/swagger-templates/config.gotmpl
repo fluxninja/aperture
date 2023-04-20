@@ -31,8 +31,16 @@
 {{- end }}
 
 {{- define "fnConstraints" }}
-  {{- if .Pattern -}}
- Pattern: `{{ .Pattern }}`
+  {{- with .Extensions -}}
+    {{- with (index . "x-deprecated") -}}
+    **DEPRECATED**
+    {{- end -}}
+    {{- with (index . "x-pattern-rules") -}}
+ Format: `{{ . }}`
+    {{- end -}}
+    {{- with (index . "x-oneof") -}}
+ One Of: `{{ . }}`
+    {{- end -}}
   {{- end -}}
   {{- if .Minimum -}}
  Minimum: `{{ json .Minimum }}`
@@ -43,17 +51,22 @@
   {{- if .Required -}}
  Required: `✓`
   {{- end -}}
-  {{- if (index .Extensions "x-go-validate")  -}}
- `{{ index .Extensions "x-go-validate" }}`
-  {{- end -}}
 {{- end -}}
 
 {{/* Like fnConstraints, but appropriate to rendering within body of text */ -}}
 {{- define "fnConstraintsInline" }}
-  {{- with .Pattern -}}
-    , pattern: `{{ . }}`
+  {{- with .Extensions -}}
+    {{- with (index . "x-deprecated") -}}
+    , **DEPRECATED**
+    {{- end -}}
+    {{- with (index . "x-pattern-rules") -}}
+    , format: `{{ . }}`
+    {{- end -}}
+    {{- with (index . "x-oneof") -}}
+    , one of: `{{ . }}`
+    {{- end -}}
   {{- end -}}
-  {{- if .Minimum -}}
+  {{- with .Minimum -}}
     , minimum: `{{ json . }}`
   {{- end -}}
   {{- with .Maximum -}}
@@ -62,19 +75,11 @@
   {{- if .Required -}}
     , **required**
   {{- end -}}
-  {{- with .Extensions }}
-    {{- with (index . "x-go-validate")  -}}
-      , `{{ . }}`
-    {{- end -}}
-  {{- end -}}
 {{- end -}}
 
 {{- define "fnDefault" }}
   {{- if .Default -}}
  Default: `{{ json .Default }}`
-  {{- end -}}
-  {{- if (index .Extensions "x-go-default") -}}
- `{{ index .Extensions "x-go-default" }}`
   {{- end -}}
 {{- end -}}
 
@@ -82,11 +87,6 @@
 {{- define "fnDefaultInline" }}
   {{- with .Default -}}
     , default: `{{ json . }}`
-  {{- end -}}
-  {{- with .Extensions }}
-    {{- with (index . "x-go-default") -}}
-      , default: `{{ . }}`
-    {{- end -}}
   {{- end -}}
 {{- end -}}
 
@@ -157,15 +157,19 @@ any
       {{- end }}
     {{- end }}
     {{- if .Properties }}
-#### {{ if .IsTuple }}Tuple members{{ else }}Properties{{ end }}
 
 <dl>
       {{- range .Properties }}
 <dt>{{ .OriginalName }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
+<!-- vale off -->
+
 ({{- template "fnProperty" . -}})
-{{- if or .Title .Description}} {{ end -}}
+
+<!-- vale on -->
+
+{{ if or .Title .Description}} {{ end -}}
 {{- .Title -}}
 {{- if and .Title .Description }}{{ printf "\n\n" }}{{ end -}}
 {{- .Description }}
@@ -180,16 +184,18 @@ any
 <!---
 Generated File Starts
 -->
-
 {{/* Metadata, title and description are handled by `metadata` files in `/docs/gen` */}}
 
-{{- if or .OperationGroups .Operations }}
+{{/* Skip TOC & Operations reference for policy docs, as they're only dummy stubs */}}
+{{- if and (ne .Info.Title "Policy") (or .OperationGroups .Operations) }}
 ## Table of contents
 
 {{- $alltags := .Tags }}
 {{- range .OperationGroups }}
 
 ### {{ upper (humanize .PackageAlias) }}
+
+<!-- vale off -->
 
 | Key | Reference |
 |-----|-----------|
@@ -199,21 +205,21 @@ Generated File Starts
   {{- printf "\n" }}
 {{- end }}
 
+<!-- vale on -->
+
 {{- if .Operations }}
 ## Reference{{/* all config sections */}}
 
 {{- range .Operations }}
  {{- $opname := .Name }}
 
-### *{{ .Name }}* {# {{- dasherize .Name -}} }
+<!-- vale off -->
+
+### *{{ if slice .Path 1 }}{{ slice .Path 1 }}{{ end }}* {# {{- dasherize .Name -}} }
+
+<!-- vale on -->
+
 {{ if .Summary }}{{ printf "\n" }}{{ trimSpace .Summary }}{{ end }}
-
-
-{{ if slice .Path 1 }}Key: ```{{ slice .Path 1 }}```{{ end }}
-
-{{ if index .Extensions "x-fn-config-env" }}Env-Var Prefix: ```{{ upper (snakize (slice .BasePath 1)) }}_{{ if .Path }}{{ (upper (snakize (slice .Path 1))) }}_{{ end }}```{{ end }}
-
-#### Members
 
 {{- $base := .BasePath }}
 {{- $path := .Path }}
@@ -224,10 +230,14 @@ Generated File Starts
 <dt>{{ .Name }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
+<!-- vale off -->
+
 (
     {{- template "fnProperty" . -}}
-    {{ if $env  }}, env-var: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}{{ end }}`{{ end -}}
+    {{ if $env  }}, Environment variable prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}{{ end }}`{{ end -}}
 ){{ with .Description }} {{ . }}{{ end }}
+
+<!-- vale on -->
 
 </dd>
 {{- end }}
@@ -237,26 +247,45 @@ Generated File Starts
 {{- range .Params }}
 {{- if .IsBodyParam }}
 
+<!-- vale off -->
+
 <dt>{{ .Name }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
-{{ if $env  }} Env-Var Prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
-Type: {{ template "fnSchemaSimple" . }}
+({{ template "fnSchemaSimple" . }})
+{{ if $env  }} Environment variable prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
 
 </dd>
+
+<!-- vale off -->
+
 {{ end }}
 {{- end }}
 {{- end }}{{/* end .HasBodyParams */}}
 </dl>
+
+---
+
 {{- end }}{{/* end range .Operations */}}
 {{- end }}{{/* end if .Operations */}}
 {{- end }}{{/* end if or .OperationGroups .Operations */}}
 
 ## Objects
+
+---
+
 {{- range .Models }}
 
+<!-- vale off -->
+
 ### {{ .Name }} {# {{- dasherize .Name -}} }
+
+<!-- vale on -->
+
 {{ template "fnModel" . }}
+
+---
+
 {{- end }}
 
 <!---

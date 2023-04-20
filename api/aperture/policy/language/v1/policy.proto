@@ -2,33 +2,111 @@ syntax = "proto3";
 
 package aperture.policy.language.v1;
 
-import "aperture/policy/language/v1/classifier.proto";
-import "aperture/policy/language/v1/fluxmeter.proto";
-import "aperture/policy/language/v1/label_matcher.proto";
-import "aperture/policy/language/v1/selector.proto";
+import "aperture/policy/language/v1/autoscale.proto";
+import "aperture/policy/language/v1/flowcontrol.proto";
+import "aperture/policy/language/v1/ports.proto";
+import "aperture/policy/language/v1/query.proto";
+import "aperture/policy/language/v1/std_components.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
 service PolicyService {
+  // GetPolicy returns a policy with the specified name.
+  rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse) {
+    option (google.api.http) = {get: "/v1/policies/{name}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
+  // GetPolicies returns all policies.
   rpc GetPolicies(google.protobuf.Empty) returns (GetPoliciesResponse) {
     option (google.api.http) = {get: "/v1/policies"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-controller"];
     };
   }
+
+  // UpsertPolicy creates/updates policy based on the provided request.
+  rpc UpsertPolicy(UpsertPolicyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/policies/{policy_name}"
+      body: "*",
+      additional_bindings: {
+        patch: "/v1/policies/{policy_name}"
+        body: "*"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
+  // PostDynamicConfig creates/updates dynamic config based on the provided request.
+  rpc PostDynamicConfig(PostDynamicConfigRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/dynamic-configs/{policy_name}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
+  // DeletePolicy removes a policy with the specified name.
+  rpc DeletePolicy(DeletePolicyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/v1/policies/{name}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
 }
 
+// GetPolicyRequest is a request to get a policy with given name.
+message GetPolicyRequest {
+  string name = 1;
+}
+
+// GetPolicyResponse is a response containing the requested Policy.
+message GetPolicyResponse {
+  Policy policy = 1;
+}
+
+// PostPolicyRequest is a request to create or update Policy.
+message UpsertPolicyRequest {
+  string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
+  Policy policy = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
+  // The paths to update.
+  google.protobuf.FieldMask update_mask = 3;
+}
+
+// PostDynamicConfigRequest is a request to patch dynamic config for Policy.
+message PostDynamicConfigRequest {
+  string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
+  google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
+}
+
+// DeletePolicyRequest is a request to delete a policy with given name.
+message DeletePolicyRequest {
+  string name = 1;
+}
+
+// GetPoliciesResponse is a response containing all Policies.
 message GetPoliciesResponse {
   Policies policies = 1;
 }
 
+// Policies is a collection of Policies.
 message Policies {
   map<string, Policy> policies = 1;
 }
 
-// Policy expresses reliability automation workflow that automatically protects services
+// Policy expresses observability-driven control logic.
 //
 // :::info
 //
@@ -40,11 +118,11 @@ message Policies {
 message Policy {
   // Defines the control-loop logic of the policy.
   Circuit circuit = 1;
-  // Resources (Flux Meters, Classifiers etc.) to setup.
+  // Resources (such as Flux Meters, Classifiers) to setup.
   Resources resources = 2;
 }
 
-// Circuit is defined as a dataflow graph of inter-connected components
+// Circuit is graph of inter-connected signal processing components.
 //
 // :::info
 //
@@ -52,36 +130,29 @@ message Policy {
 //
 // :::
 //
-// Signals flow between components via ports.
-// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
-// Circuit is evaluated periodically in order to respond to changes in signal readings.
+// Signals flow between components through ports.
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).
+// Circuit is evaluated periodically to respond to changes in signal readings.
 //
-// :::info
+// :::info Signals
 //
-// **Signal**
-//
-// Signals are floating-point values.
+// Signals are floating point values.
 //
 // A signal can also have a special **Invalid** value. It's usually used to
-// communicate that signal doesn't have a meaningful value at the moment, eg.
-// [PromQL](#v1-prom-q-l) emits such a value if it cannot execute a query.
+// communicate that signal does not have a meaningful value at the moment, for example,
+// [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
 // Components know when their input signals are invalid and can act
-// accordingly. They can either propagate the invalidness, by making their
-// output itself invalid (like eg.
-// [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
-// logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
+// accordingly. They can either propagate the invalid signal, by making their
+// output itself invalid (for example,
+// [ArithmeticCombinator](#arithmetic-combinator)) or use some different
+// logic, for example, [Extrapolator](#extrapolator). Refer to a component's
 // docs on how exactly it handles invalid inputs.
 //
 // :::
 message Circuit {
-  // Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+  // Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
   // This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-  google.protobuf.Duration evaluation_interval = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "0.5s"}
-    }
-  }]; // @gotags: default:"0.5s"
+  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"0.5s"
 
   // Defines a signal processing graph as a list of components.
   repeated Component components = 2; // @gotags: validate:"dive"
@@ -94,20 +165,25 @@ message Circuit {
 // See also [Resources overview](/concepts/policy/resources.md).
 //
 // :::
-//
-// Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 message Resources {
   // Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
   //
-  // Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
-  map<string, FluxMeter> flux_meters = 1; // @gotags: validate:"dive"
+  // Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
+  //
+  // Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
+  map<string, FluxMeter> flux_meters = 1; // @gotags: validate:"deprecated,dive"
   // Classifiers are installed in the data-plane and are used to label the requests based on payload content.
   //
   // The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
-  repeated Classifier classifiers = 2; // @gotags: validate:"dive"
+  //
+  // Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
+  repeated Classifier classifiers = 2; // @gotags: validate:"deprecated,dive"
+
+  // FlowControlResources are resources that are provided by flow control integration.
+  FlowControlResources flow_control = 101;
 }
 
-// Computational block that form the circuit
+// Computational block that forms the circuit
 //
 // :::info
 //
@@ -115,51 +191,51 @@ message Resources {
 //
 // :::
 //
-// Signals flow into the components via input ports and results are emitted on output ports.
+// Signals flow into the components from input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.
 //
 // :::note
 //
 // Loops are broken by the runtime at the earliest component index that is part of the loop.
-// The looped signals are saved in the tick they are generated and served in the subsequent tick.
+// The looped signals are saved in the tick they're generated and served in the subsequent tick.
 //
 // :::
 //
 // There are three categories of components:
-// * "source" components – they take some sort of input from "the real world" and output
-//   a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
+// * "source" components: they take some sort of input from "the real world" and output
+//   a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
 //   they're represented by green color.
-// * signal processor components – "pure" components that don't interact with the "real world".
-//   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
+// * signal processor components: processing components that do not interact with the external systems.
+//   Examples: [GradientController](#gradient-controller), [Max](#max).
 //
 //   :::note
 //
-//   Signal processor components's output can depend on their internal state, in addition to the inputs.
-//   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
+//   Signal processor components' output can depend on their internal state, in addition to the inputs.
+//   Eg. see the [Exponential Moving Average filter](#e-m-a).
 //
 //   :::
 //
-// * "sink" components – they affect the real world.
-//   [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
+// * "sink" components: they affect the real world.
+//   [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
 //   In the UI, represented by orange color.  Sink components usually come in pairs with a
 //   "sources" component which emits a feedback signal, like
-//   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
+//   `accepted_concurrency` emitted by _Concurrency Limiter_.
 //
 // :::tip
 //
-// Sometimes you may want to use a constant value as one of component's inputs.
+// Sometimes you might want to use a constant value as one of component's inputs.
 // You can create an input port containing the constant value instead of being connected to a signal.
-// To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+// To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
 // You can also use it to provide special math values such as NaN and +- Inf.
 // If You need to provide the same constant signal to multiple components,
-// You can use the [Variable](#v1-variable) component.
+// You can use the [Variable](#variable) component.
 //
 // :::
 //
-// See also [Policy](#v1-policy) for a higher-level explanation of circuits.
+// See also [Policy](#policy) for a higher-level explanation of circuits.
 message Component {
   oneof component {
-    // Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+    // Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
     // This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
     GradientController gradient_controller = 1;
 
@@ -182,7 +258,7 @@ message Component {
     Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
-    Sqrt sqrt = 10;
+    UnaryOperator unary_operator = 10;
 
     // Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
     Extrapolator extrapolator = 11;
@@ -229,6 +305,9 @@ message Component {
     // Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
     NestedSignalEgress nested_signal_egress = 26;
 
+    // Generates the specified signal.
+    SignalGenerator signal_generator = 27;
+
     // Query components that are query databases such as Prometheus.
     Query query = 100;
 
@@ -240,1508 +319,17 @@ message Component {
   }
 }
 
-// Query components that are query databases such as Prometheus.
-message Query {
-  oneof component {
-    // Periodically runs a Prometheus query in the background and emits the result.
-    PromQL promql = 1;
-  }
-}
-
-// FlowControl components are used to regulate requests flow.
-message FlowControl {
-  oneof component {
-    // Rate Limiter provides service protection by applying rate limiter.
-    RateLimiter rate_limiter = 1;
-
-    // Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-    ConcurrencyLimiter concurrency_limiter = 2;
-
-    // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-    AIMDConcurrencyController aimd_concurrency_controller = 3;
-  }
-}
-
-// AutoScale components are used to scale a service.
-message AutoScale {
-  oneof component {
-    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 1;
-  }
-}
-
-// Components receive input from other components via InPorts
-message InPort {
-  oneof value {
-    // Name of the incoming Signal on the InPort.
-    string signal_name = 1;
-    // Constant value to be used for this InPort instead of a signal.
-    ConstantSignal constant_signal = 2;
-  }
-}
-
-// Components produce output for other components via OutPorts
-message OutPort {
-  // Name of the outgoing Signal on the OutPort.
-  string signal_name = 1;
-}
-
-// Gradient controller is a type of controller which tries to adjust the
-// control variable proportionally to the relative difference between setpoint
-// and actual value of the signal
-//
-// The `gradient` describes a corrective factor that should be applied to the
-// control variable to get the signal closer to the setpoint. It is computed as follows:
-//
-// $$
-// \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
-// $$
-//
-// `gradient` is then clamped to [min_gradient, max_gradient] range.
-//
-// The output of gradient controller is computed as follows:
-// $$
-// \text{output} = \text{gradient}_{\text{clamped}} \cdot \text{control\_variable} + \text{optimize}.
-// $$
-//
-// Note the additional `optimize` signal, that can be used to "nudge" the
-// controller into desired idle state.
-//
-// The output can be _optionally_ clamped to desired range using `max` and
-// `min` input.
-message GradientController {
-  // Gradient Parameters.
-  message Parameters {
-    // Slope controls the aggressiveness and direction of the Gradient Controller.
-    //
-    // Slope is used as exponent on the signal to setpoint ratio in computation
-    // of the gradient (see the [main description](#v1-gradient-controller) for
-    // exact equation). Good intuition for this parameter is "What should the
-    // Gradient Controller do to the control variable when signal is too high",
-    // eg.:
-    // * $\text{slope} = 1$: when signal is too high, increase control variable,
-    // * $\text{slope} = -1$: when signal is too high, decrease control variable,
-    // * $\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.
-    //
-    // The sign of slope depends on correlation between the signal and control variable:
-    // * Use $\text{slope} < 0$ if signal and control variable are _positively_
-    // correlated (eg. Per-pod CPU usage and total concurrency).
-    // * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-    // correlated (eg. Per-pod CPU usage and number of pods).
-    //
-    // :::note
-    //
-    // You need to set _negative_ slope for a _positive_ correlation, as you're
-    // describing the _action_ which controller should make when the signal
-    // increases.
-    //
-    // :::
-    //
-    // The magnitude of slope describes how aggressively should the controller
-    // react to a deviation of signal.
-    // With $|\text{slope}| = 1$, the controller will aim to bring the signal to
-    // the setpoint in one tick (assuming linear correlation with signal and setpoint).
-    // Smaller magnitudes of slope will make the controller adjust the control
-    // variable more slowly.
-    //
-    // We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
-    // If you experience overshooting, consider lowering the magnitude even more.
-    // Values of $|\text{slope}| > 1$ are not recommended.
-    //
-    // :::note
-    //
-    // Remember that the gradient and output signal can be (optionally) clamped,
-    // so the _slope_ might not fully describe aggressiveness of the controller.
-    //
-    // :::
-    double slope = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-
-    // Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-    double min_gradient = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: -1.7976931348623157e+308}
-      }
-    }]; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
-
-    // Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-    double max_gradient = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1.7976931348623157e+308}
-      }
-    }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
-  }
-
-  // Dynamic Configuration for a Controller
-  message DynamicConfig {
-    // Decides whether the controller runs in "manual_mode".
-    // In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
-    bool manual_mode = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {bool_value: false}
-      }
-    }]; // @gotags: default:"false"
-  }
-
-  // Inputs for the Gradient Controller component.
-  message Ins {
-    // Signal to be used for the gradient computation.
-    InPort signal = 1;
-
-    // Setpoint to be used for the gradient computation.
-    InPort setpoint = 2;
-
-    // Optimize signal is added to the output of the gradient calculation.
-    InPort optimize = 3;
-
-    // Maximum value to limit the output signal.
-    InPort max = 4;
-
-    // Minimum value to limit the output signal.
-    InPort min = 5;
-
-    // Actual current value of the control variable.
-    //
-    // This signal is multiplied by the gradient to produce the output.
-    InPort control_variable = 6;
-  }
-
-  // Outputs for the Gradient Controller component.
-  message Outs {
-    // Computed desired value of the control variable.
-    OutPort output = 1;
-  }
-
-  // Input ports of the Gradient Controller.
-  Ins in_ports = 1;
-
-  // Output ports of the Gradient Controller.
-  Outs out_ports = 2;
-
-  // Gradient Parameters.
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  // Configuration key for DynamicConfig
-  string dynamic_config_key = 4;
-
-  // Default configuration.
-  DynamicConfig default_config = 5;
-}
-
-// Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
-message SMA {
-  message Ins {
-    // Signal to be used for the moving average computation.
-    InPort signal = 1;
-  }
-  message Outs {
-    // Computed moving average.
-    OutPort output = 1;
-  }
-  message Parameters {
-    // Window of time over which the moving average is computed.
-    google.protobuf.Duration window = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "5s"}
-      }
-    }]; // @gotags: default:"5s"
-    // Whether output is valid during warm-up stage.
-    bool valid_during_warmup = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {bool_value: false}
-      }
-    }]; // @gotags: default:"false"
-  }
-
-  // Input ports for the EMA component.
-  Ins in_ports = 1;
-
-  // Output ports for the EMA component.
-  Outs out_ports = 2;
-
-  // Parameters for the EMA component.
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-}
-
-// Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
-//
-// At any time EMA component operates in one of the following states:
-// 1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
-// 2. Normal state: The EMA is computed using following formula.
-//
-// The EMA for a series $Y$ is calculated recursively as:
-//
-// $$
-// \text{EMA} _t =
-// \begin{cases}
-//   Y_0, &\text{for } t = 0 \\
-//   \alpha Y_t + (1 - \alpha) \text{EMA} _{t-1}, &\text{for }t > 0
-// \end{cases}
-// $$
-//
-// The coefficient $\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
-// A higher $\alpha$ discounts older observations faster.
-// The $\alpha$ is computed using ema\_window:
-//
-// $$
-// \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
-// $$
-//
-// The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#v1-e-m-a-ins).
-message EMA {
-  // Inputs for the EMA component.
-  message Ins {
-    // Input signal to be used for the EMA computation.
-    InPort input = 1;
-
-    // Upper bound of the moving average.
-    //
-    // Used during the warm-up stage: if the signal would exceed `max_envelope`
-    // it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
-    //
-    // :::note
-    //
-    // If the signal deviates from `max_envelope` faster than the correction
-    // faster, it might end up exceeding the envelope.
-    //
-    // :::
-    //
-    // :::note
-    //
-    // The envelope logic is **not** used outside the warm-up stage!
-    //
-    // :::
-    InPort max_envelope = 2;
-
-    // Lower bound of the moving average.
-    //
-    // Used during the warm-up stage analogously to `max_envelope`.
-    InPort min_envelope = 3;
-  }
-
-  // Outputs for the EMA component.
-  message Outs {
-    // Exponential moving average of the series of reading as an output signal.
-    OutPort output = 1;
-  }
-
-  // Parameters for the EMA component.
-  message Parameters {
-    // Duration of EMA sampling window.
-    google.protobuf.Duration ema_window = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "5s"}
-      }
-    }]; // @gotags: default:"5s"
-
-    // Duration of EMA warming up window.
-    //
-    // The initial value of the EMA is the average of signal readings received during the warm-up window.
-    google.protobuf.Duration warmup_window = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "0s"}
-      }
-    }]; // @gotags: default:"0s"
-
-    // Correction factor to apply on the output value if its in violation of the min envelope.
-    double correction_factor_on_min_envelope_violation = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1}
-      }
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "gte=1.0"}
-      }
-    }]; // @gotags: validate:"gte=1.0" default:"1.0"
-
-    // Correction factor to apply on the output value if its in violation of the max envelope.
-    double correction_factor_on_max_envelope_violation = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1}
-      }
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "gte=0,lte=1.0"}
-      }
-    }]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
-
-    // Whether the output is valid during the warm-up stage.
-    bool valid_during_warmup = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {bool_value: false}
-      }
-    }]; // @gotags: default:"false"
-  }
-
-  // Input ports for the EMA component.
-  Ins in_ports = 1;
-
-  // Output ports for the EMA component.
-  Outs out_ports = 2;
-
-  // Parameters for the EMA component.
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-}
-
-// Type of combinator that computes the arithmetic operation on the operand signals
-message ArithmeticCombinator {
-  // Inputs for the Arithmetic Combinator component.
-  message Ins {
-    // Left hand side of the arithmetic operation.
-    InPort lhs = 1;
-
-    // Right hand side of the arithmetic operation.
-    InPort rhs = 2;
-  }
-
-  // Outputs for the Arithmetic Combinator component.
-  message Outs {
-    // Result of arithmetic operation.
-    OutPort output = 1;
-  }
-
-  // Input ports for the Arithmetic Combinator component.
-  Ins in_ports = 1;
-
-  // Output ports for the Arithmetic Combinator component.
-  Outs out_ports = 2;
-
-  // Operator of the arithmetic operation.
-  //
-  // The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
-  // In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
-  string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "oneof=add sub mul div xor lshift rshift"}
-    }
-  }]; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
-}
-
-// Type of combinator that computes the comparison operation on lhs and rhs signals
-//
-// The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
-//
-// This component also supports time-based response, i.e. the output
-// transitions between 1.0 or 0.0 signal if the decider condition is
-// true or false for at least "true_for" or "false_for" duration. If
-// `true_for` and `false_for` durations are zero then the transitions are
-// instantaneous.
-message Decider {
-  // Inputs for the Decider component.
-  message Ins {
-    // Left hand side input signal for the comparison operation.
-    InPort lhs = 1;
-
-    // Right hand side input signal for the comparison operation.
-    InPort rhs = 2;
-  }
-
-  // Outputs for the Decider component.
-  message Outs {
-    // Selected signal (1.0 or 0.0).
-    OutPort output = 1;
-  }
-
-  // Input ports for the Decider component.
-  Ins in_ports = 1;
-
-  // Output ports for the Decider component.
-  Outs out_ports = 2;
-
-  // Comparison operator that computes operation on lhs and rhs input signals.
-  string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "oneof=gt lt gte lte eq neq"}
-    }
-  }]; // @gotags: validate:"oneof=gt lt gte lte eq neq"
-
-  // Duration of time to wait before a transition to true state.
-  // If the duration is zero, the transition will happen instantaneously.
-  google.protobuf.Duration true_for = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "0s"}
-    }
-  }]; // @gotags: default:"0s"
-
-  // Duration of time to wait before a transition to false state.
-  // If the duration is zero, the transition will happen instantaneously.
-  google.protobuf.Duration false_for = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "0s"}
-    }
-  }]; // @gotags: default:"0s"
-}
-
-// Type of combinator that switches between `on_true` and `on_false` signals based on switch input
-//
-// `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-//  otherwise `on_false` will be returned.
-message Switcher {
-  // Inputs for the Switcher component.
-  message Ins {
-    // Output signal when switch is valid and not 0.0.
-    InPort on_true = 1;
-
-    // Output signal when switch is invalid or 0.0.
-    InPort on_false = 2;
-
-    // Decides whether to return on_true or on_false.
-    InPort switch = 3;
-  }
-
-  // Outputs for the Switcher component.
-  message Outs {
-    // Selected signal (on_true or on_false).
-    OutPort output = 1;
-  }
-
-  // Input ports for the Switcher component.
-  Ins in_ports = 1;
-
-  // Output ports for the Switcher component.
-  Outs out_ports = 2;
-}
-
-// Limits the traffic on a control point to specified rate
-//
-// :::info
-//
-// See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
-//
-// :::
-//
-// Ratelimiting is done separately on per-label-value basis. Use _label\_key_
-// to select which label should be used as key.
-message RateLimiter {
-  message Parameters {
-    message LazySync {
-      // Enables lazy sync
-      bool enabled = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {bool_value: false}
-        }
-      }]; // @gotags: default:"false"
-
-      // Number of times to lazy sync within the _limit\_reset\_interval_.
-      uint32 num_sync = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {number_value: 5}
-        }
-        extensions: {
-          key: "x-go-validate"
-          value: {string_value: "gt=0"}
-        }
-      }]; // @gotags: default:"5" validate:"gt=0"
-    }
-
-    // Time after which the limit for a given label value will be reset.
-    google.protobuf.Duration limit_reset_interval = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "60s"}
-      }
-    }]; // @gotags: default:"60s"
-
-    // Specifies which label the ratelimiter should be keyed by.
-    //
-    // Rate limiting is done independently for each value of the
-    // [label](/concepts/integrations/flow-control/flow-label.md) with given key.
-    // Eg., to give each user a separate limit, assuming you have a _user_ flow
-    // label set up, set `label_key: "user"`.
-    string label_key = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-
-    // Configuration of lazy-syncing behaviour of ratelimiter
-    LazySync lazy_sync = 3;
-  }
-
-  message Override {
-    // Value of the label for which the override should be applied.
-    string label_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-
-    // Amount by which the _in\_ports.limit_ should be multiplied for this label value.
-    double limit_scale_factor = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1}
-      }
-    }]; // @gotags: default:"1.0"
-  }
-
-  // Dynamic Configuration for the rate limiter
-  message DynamicConfig {
-    // Allows to specify different limits for particular label values.
-    repeated Override overrides = 1; // @gotags: validate:"dive"
-  }
-
-  // Inputs for the RateLimiter component
-  message Ins {
-    // Number of flows allowed per _limit\_reset\_interval_ per each label.
-    // Negative values disable the ratelimiter.
-    //
-    // :::tip
-    //
-    // Negative limit can be useful to _conditionally_ enable the ratelimiter
-    // under certain circumstances. [Decider](#v1-decider) might be helpful.
-    //
-    // :::
-    InPort limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-  }
-
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  // Which control point to apply this ratelimiter to.
-  FlowSelector flow_selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  // Parameters for the RateLimiter component
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  // Configuration key for DynamicConfig
-  string dynamic_config_key = 4;
-
-  // Default configuration
-  DynamicConfig default_config = 5;
-}
-
-// Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-//
-// :::info
-//
-// See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
-//
-// :::
-//
-// It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
-// Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
-//
-// ConcurrencyLimiter configuration is split into two parts: An actuation
-// strategy and a scheduler. Right now, only `load_actuator` strategy is available.
-message ConcurrencyLimiter {
-  // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  FlowSelector flow_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  // Configuration of Weighted Fair Queuing-based workload scheduler.
-  //
-  // Contains configuration of per-agent scheduler, and also defines some
-  // output signals.
-  Scheduler scheduler = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  oneof actuation_strategy {
-    // Actuator based on limiting the accepted concurrency under incoming concurrency * load multiplier.
-    //
-    // Actuation strategy defines the input signal that will drive the scheduler.
-    LoadActuator load_actuator = 3;
-  }
-}
-
-// Weighted Fair Queuing-based workload scheduler
-//
-// :::note
-//
-// Each Agent instantiates an independent copy of the scheduler, but output
-// signals for accepted and incoming concurrency are aggregated across all agents.
-//
-// :::
-//
-// See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
-message Scheduler {
-  // Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
-  message Workload {
-    // Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
-    message Parameters {
-      // Describes priority level of the requests within the workload.
-      // Priority level ranges from 0 to 255.
-      // Higher numbers means higher priority level.
-      uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-validate"
-          value: {string_value: "gte=0,lte=255"}
-        }
-      }]; // @gotags: validate:"gte=0,lte=255"
-
-      // Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-      // This override is applicable only if `auto_tokens` is set to false.
-      uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {number_value: 1}
-        }
-      }]; // @gotags: default:"1"
-
-      // Fairness key is a label key that can be used to provide fairness within a workload.
-      // Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
-      // you have a classifier that sets `user` flow label, you might want to set
-      // `fairness_key = "user"`.
-      string fairness_key = 3;
-    }
-
-    // Parameters associated with flows matching the label matcher.
-    Parameters parameters = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-
-    // Label Matcher to select a Workload based on
-    // [flow labels](/concepts/integrations/flow-control/flow-label.md).
-    LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-  }
-
-  // Scheduler parameters
-  message Parameters {
-    // List of workloads to be used in scheduler.
-    //
-    // Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
-    // allows for load-shedding to be "smarter" than just "randomly deny 50% of
-    // requests". There are two aspects of this "smartness":
-    // * Scheduler can more precisely calculate concurrency if it understands
-    //   that flows belonging to different classes have different weights (eg.
-    //   inserts vs lookups).
-    // * Setting different priorities to different workloads lets the scheduler
-    //   avoid dropping important traffic during overload.
-    //
-    // Each workload in this list specifies also a matcher that's used to
-    // determine which flow will be categorized into which workload.
-    // In case of multiple matching workloads, the first matching one will be used.
-    // If none of workloads match, `default_workload` will be used.
-    //
-    // :::info
-    //
-    // See also [workload definition in the concepts
-    // section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
-    //
-    // :::
-    repeated Workload workloads = 1; // @gotags: validate:"dive"
-
-    // Parameters to be used if none of workloads specified in `workloads` match.
-    Workload.Parameters default_workload_parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-
-    // Automatically estimate the size of a request in each workload, based on
-    // historical latency. Each workload's `tokens` will be set to average
-    // latency of flows in that workload during last few seconds (exact duration
-    // of this average can change).
-    bool auto_tokens = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "true"}
-      }
-    }]; // @gotags: default:"true"
-
-    // Timeout as a factor of tokens for a flow in a workload
-    //
-    // If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
-    // it will be rejected.
-    //
-    // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
-    double timeout_factor = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 0.5}
-      }
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "gte=0.0"}
-      }
-    }]; // @gotags: validate:"gte=0.0" default:"0.5"
-
-    // Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
-    //
-    // :::caution
-    //
-    // This timeout needs to be strictly less than the timeout set on the
-    // client for the whole GRPC call:
-    // * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-    // * in case of libraries, timeout configured... TODO.
-    //
-    // We're using fail-open logic in integrations, so if the GRPC timeout
-    // fires first, the flow will end up being unconditionally allowed while
-    // it're still waiting on the scheduler.
-    //
-    // To avoid such cases, the end-to-end GRPC timeout should also contain
-    // some headroom for constant overhead like serialization, etc. Default
-    // value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
-    // tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
-    //
-    // :::
-    google.protobuf.Duration max_timeout = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "0.49s"}
-      }
-    }]; // @gotags: default:"0.49s"
-  }
-
-  // Output for the Scheduler component.
-  message Outs {
-    // Accepted concurrency is actual concurrency on a control point that this
-    // scheduler is applied on.
-    //
-    // :::info
-    //
-    // Concurrency is a unitless number describing mean number of
-    // [flows](/concepts/integrations/flow-control/flow-control.md#flow) being
-    // concurrently processed by the system (system = control point).
-    // Concurrency is calculated as _work_ done per unit of time (so
-    // work-seconds per world-seconds). Work-seconds are computed based on
-    // token-weights of of flows (which are either estimated via `auto_tokens`
-    // or specified by `Workload.tokens`).
-    //
-    // :::
-    //
-    // Value of this signal is aggregated from all the relevant schedulers.
-    OutPort accepted_concurrency = 1;
-
-    // Incoming concurrency is concurrency that'd be needed to accept all the
-    // flows entering the scheduler.
-    //
-    // This is computed in the same way as `accepted_concurrency`, but summing
-    // up work-seconds from all the flows entering scheduler, including
-    // rejected ones.
-    OutPort incoming_concurrency = 2;
-  }
-
-  // Output ports for the Scheduler component.
-  Outs out_ports = 1;
-
-  // Scheduler parameters.
-  Parameters parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-}
-
-// Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
-message LoadActuator {
-  // Dynamic Configuration for LoadActuator
-  message DynamicConfig {
-    // Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
-    // Useful for observing the behavior of Load Actuator without disrupting any real traffic.
-    bool dry_run = 1;
-  }
-
-  // Input for the Load Actuator component.
-  message Ins {
-    // Load multiplier is ratio of [incoming
-    // concurrency](#v1-scheduler-outs) that needs to be accepted.
-    InPort load_multiplier = 1;
-  }
-
-  // Input ports for the Load Actuator component.
-  Ins in_ports = 1;
-
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 2;
-
-  // Default configuration.
-  DynamicConfig default_config = 3;
-}
-
-// Component that runs a Prometheus query periodically and returns the result as an output signal
-message PromQL {
-  // Output for the PromQL component.
-  message Outs {
-    // The result of the Prometheus query as an output signal.
-    OutPort output = 1;
-  }
-
-  // Output ports for the PromQL component.
-  Outs out_ports = 1;
-
-  // Describes the Prometheus query to be run.
-  //
-  // :::caution
-  //
-  // TODO we should describe how to construct the query, eg. how to employ the
-  // fluxmeters here or link to appropriate place in docs.
-  //
-  // :::
-  string query_string = 2;
-
-  // Describes the interval between successive evaluations of the Prometheus query.
-  google.protobuf.Duration evaluation_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "10s"}
-    }
-  }]; // @gotags: default:"10s"
-}
-
-// Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
-message ConstantSignal {
-  oneof const {
-    string special_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "oneof=NaN +Inf -Inf"}
-      }
-    }]; // @gotags: validate:"oneof=NaN +Inf -Inf"
-    double value = 2;
-  }
-}
-
-// Component that emits a variable value as an output signal, can be defined in dynamic configuration.
-message Variable {
-  message DynamicConfig {
-    ConstantSignal constant_signal = 1;
-  }
-  // Outputs for the Variable component.
-  message Outs {
-    // The value is emitted to the output port.
-    OutPort output = 1;
-  }
-
-  // Output ports for the Variable component.
-  Outs out_ports = 1;
-
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 2;
-
-  // Default configuration.
-  DynamicConfig default_config = 3;
-}
-
-// Takes an input signal and emits the square root of it multiplied by scale as an output
-//
-// $$
-// \text{output} = \text{scale} \sqrt{\text{input}}
-// $$
-message Sqrt {
-  // Inputs for the Sqrt component.
-  message Ins {
-    // Input signal.
-    InPort input = 1;
-  }
-
-  // Outputs for the Sqrt component.
-  message Outs {
-    // Output signal.
-    OutPort output = 1;
-  }
-
-  // Input ports for the Sqrt component.
-  Ins in_ports = 1;
-
-  // Output ports for the Sqrt component.
-  Outs out_ports = 2;
-
-  // Scaling factor to be multiplied with the square root of the input signal.
-  double scale = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 1}
-    }
-  }]; // @gotags default:"1.0"
-}
-
-// Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
-//
-// It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
-message Extrapolator {
-  // Parameters for the Extrapolator component.
-  message Parameters {
-    // Maximum time interval to repeat the last valid value of input signal.
-    google.protobuf.Duration max_extrapolation_interval = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "10s"}
-      }
-    }]; // @gotags: default:"10s"
-  }
-
-  // Inputs for the Extrapolator component.
-  message Ins {
-    // Input signal for the Extrapolator component.
-    InPort input = 1;
-  }
-
-  // Outputs for the Extrapolator component.
-  message Outs {
-    // Extrapolated signal.
-    OutPort output = 1;
-  }
-
-  // Input ports for the Extrapolator component.
-  Ins in_ports = 1;
-
-  // Output ports for the Extrapolator component.
-  Outs out_ports = 2;
-
-  // Parameters for the Extrapolator component.
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-}
-
-// Takes a list of input signals and emits the signal with the maximum value
-//
-// Max: output = max([]inputs).
-message Max {
-  // Inputs for the Max component.
-  message Ins {
-    // Array of input signals.
-    repeated InPort inputs = 1; // @gotags: validate:"dive"
-  }
-
-  // Output for the Max component.
-  message Outs {
-    // Signal with maximum value as an output signal.
-    OutPort output = 1;
-  }
-
-  // Input ports for the Max component.
-  Ins in_ports = 1;
-
-  // Output ports for the Max component.
-  Outs out_ports = 2;
-}
-
-// Takes an array of input signals and emits the signal with the minimum value
-// Min: output = min([]inputs).
-message Min {
-  // Inputs for the Min component.
-  message Ins {
-    // Array of input signals.
-    repeated InPort inputs = 1; // @gotags: validate:"dive"
-  }
-
-  // Output ports for the Min component.
-  message Outs {
-    // Signal with minimum value as an output signal.
-    OutPort output = 1;
-  }
-
-  // Input ports for the Min component.
-  Ins in_ports = 1;
-
-  // Output ports for the Min component.
-  Outs out_ports = 2;
-}
-
-// Logical AND.
-//
-// Signals are mapped to boolean values as follows:
-// * Zero is treated as false.
-// * Any non-zero is treated as true.
-// * Invalid inputs are considered unknown.
-//
-//   :::note
-//
-//   Treating invalid inputs as "unknowns" has a consequence that the result
-//   might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
-//   because the result would end up false no matter if
-//   first signal was true or false. On the other hand, `unknown && true == unknown`.
-//
-//   :::
-message And {
-  // Inputs for the And component.
-  message Ins {
-    // Array of input signals.
-    repeated InPort inputs = 1; // @gotags: validate:"dive"
-  }
-
-  // Output ports for the And component.
-  message Outs {
-    // Result of logical AND of all the input signals.
-    //
-    // Will always be 0 (false), 1 (true) or invalid (unknown).
-    OutPort output = 1;
-  }
-
-  // Input ports for the And component.
-  Ins in_ports = 1;
-
-  // Output ports for the And component.
-  Outs out_ports = 2;
-}
-
-// Logical OR.
-//
-// See [And component](#v1-and) on how signals are mapped onto boolean values.
-message Or {
-  // Inputs for the Or component.
-  message Ins {
-    // Array of input signals.
-    repeated InPort inputs = 1; // @gotags: validate:"dive"
-  }
-
-  // Output ports for the Or component.
-  message Outs {
-    // Result of logical OR of all the input signals.
-    //
-    // Will always be 0 (false), 1 (true) or invalid (unknown).
-    OutPort output = 1;
-  }
-
-  // Input ports for the Or component.
-  Ins in_ports = 1;
-
-  // Output ports for the Or component.
-  Outs out_ports = 2;
-}
-
-// Logical NOT.
-//
-// See [And component](#v1-and) on how signals are mapped onto boolean values.
-message Inverter {
-  // Inputs for the Inverter component.
-  message Ins {
-    // Signal to be negated.
-    InPort input = 1; // @gotags: validate:"dive"
-  }
-
-  // Output ports for the Inverter component.
-  message Outs {
-    // Logical negation of the input signal.
-    //
-    // Will always be 0 (false), 1 (true) or invalid (unknown).
-    OutPort output = 1;
-  }
-
-  // Input ports for the Inverter component.
-  Ins in_ports = 1;
-
-  // Output ports for the Inverter component.
-  Outs out_ports = 2;
-}
-
-// Picks the first valid input signal from the array of input signals and emits it as an output signal
-message FirstValid {
-  // Inputs for the FirstValid component.
-  message Ins {
-    // Array of input signals.
-    repeated InPort inputs = 1; // @gotags: validate:"dive"
-  }
-
-  // Outputs for the FirstValid component.
-  message Outs {
-    // First valid input signal as an output signal.
-    OutPort output = 1;
-  }
-
-  // Input ports for the FirstValid component.
-  Ins in_ports = 1;
-
-  // Output ports for the FirstValid component.
-  Outs out_ports = 2;
-}
-
-// Alerter reacts to a signal and generates alert to send to alert manager.
-message Alerter {
-  // Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
-  message Parameters {
-    // Name of the alert.
-    string alert_name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
-
-    // Severity of the alert, one of 'info', 'warn' or 'crit'.
-    string severity = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "oneof=info warn crit"}
-      }
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "info"}
-      }
-    }]; // @gotags: default:"info" validate:"oneof=info warn crit"
-
-    // Duration of alert resolver.
-    google.protobuf.Duration resolve_timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "300s"}
-      }
-    }]; // @gotags: default:"300s"
-
-    // A list of alert channel strings.
-    repeated string alert_channels = 4;
-
-    // Additional labels to add to alert.
-    map<string, string> labels = 5;
-  }
-
-  // Inputs for the Alerter component.
-  message Ins {
-    // Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
-    InPort signal = 1;
-  }
-
-  // Input ports for the Alerter component.
-  Ins in_ports = 1;
-
-  // Alerter configuration
-  Parameters parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-}
-
-// Accumulates sum of signal every tick.
-message Integrator {
-  // Inputs for the Integrator component.
-  message Ins {
-    // The input signal.
-    InPort input = 1;
-    // Resets the integrator output to zero when reset signal is valid and non-zero.
-    InPort reset = 2;
-    // The minimum output when reset is not set.
-    InPort min = 3;
-    //The maximum output when reset is not set.
-    InPort max = 4;
-  }
-
-  // Outputs for the Integrator component.
-  message Outs {
-    OutPort output = 1;
-  }
-
-  // Input ports for the Integrator component.
-  Ins in_ports = 1;
-
-  // Output ports for the Integrator component.
-  Outs out_ports = 2;
-}
-
-// Differentiator calculates rate of change per tick.
-message Differentiator {
-  // Inputs for the Differentiator component.
-  message Ins {
-    InPort input = 1;
-  }
-
-  // Outputs for the Differentiator component.
-  message Outs {
-    OutPort output = 1;
-  }
-
-  // Input ports for the Differentiator component.
-  Ins in_ports = 1;
-
-  // Output ports for the Differentiator component.
-  Outs out_ports = 2;
-
-  // The window of time over which differentiator operates.
-  google.protobuf.Duration window = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
-}
-
-message HorizontalPodScaler {
-  message ScaleReporter {
-    // Outputs for the HorizontalPodScaler component.
-    message Outs {
-      OutPort actual_replicas = 1;
-      OutPort configured_replicas = 2;
-    }
-
-    Outs out_ports = 1;
-  }
-
-  message ScaleActuator {
-    // Dynamic Configuration for ScaleActuator
-    message DynamicConfig {
-      // Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-      // Useful for observing the behavior of Scaler without disrupting any real traffic.
-      bool dry_run = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {bool_value: false}
-        }
-      }]; // @gotags: default:"false"
-    }
-
-    // Inputs for the HorizontalPodScaler component.
-    message Ins {
-      InPort desired_replicas = 1;
-    }
-
-    Ins in_ports = 1;
-
-    // Configuration key for DynamicConfig
-    string dynamic_config_key = 2;
-
-    // Default configuration.
-    DynamicConfig default_config = 3;
-  }
-
-  // The Kubernetes object on which horizontal scaling is applied.
-  KubernetesObjectSelector kubernetes_object_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  ScaleReporter scale_reporter = 2;
-
-  ScaleActuator scale_actuator = 3;
-}
-
-// Generates 0 and 1 in turns.
-message PulseGenerator {
-  // Outputs for the PulseGenerator component.
-  message Outs {
-    OutPort output = 1;
-  }
-
-  Outs out_ports = 1;
-
-  // Emitting 1 for the true_for duration.
-  google.protobuf.Duration true_for = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
-
-  // Emitting 0 for the false_for duration.
-  google.protobuf.Duration false_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
-}
-
-// Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-// If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
-message Holder {
-  // Inputs for the Holder component.
-  message Ins {
-    InPort input = 1;
-  }
-
-  // Outputs for the Holder component.
-  message Outs {
-    OutPort output = 1;
-  }
-
-  Ins in_ports = 1;
-  Outs out_ports = 2;
-
-  // Holding the last valid signal value for the hold_for duration.
-  google.protobuf.Duration hold_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
-}
-
 // Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
 message NestedCircuit {
+  // Maps input port names to input ports.
   map<string, InPort> in_ports_map = 1;
+  // Maps output port names to output ports.
   map<string, OutPort> out_ports_map = 2;
 
+  // List of components in the nested circuit.
   repeated Component components = 3; // @gotags: validate:"dive"
   // Name of the nested circuit component. This name is displayed by graph visualization tools.
   string name = 4;
   // Short description of the nested circuit component. This description is displayed by graph visualization tools.
   string short_description = 5;
-}
-
-// Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
-message NestedSignalIngress {
-  // Outputs for the NestedSignalIngress component.
-  message Outs {
-    // The signal to be ingressed.
-    OutPort signal = 1;
-  }
-
-  // Output ports for the NestedSignalIngress component.
-  Outs out_ports = 1;
-  string port_name = 2;
-}
-
-// Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
-message NestedSignalEgress {
-  // Inputs for the NestedSignalEgress component.
-  message Ins {
-    // The signal to be egressed.
-    InPort signal = 1;
-  }
-
-  // Input ports for the NestedSignalEgress component.
-  Ins in_ports = 1;
-  string port_name = 2;
-}
-
-// High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
-message AIMDConcurrencyController {
-  // Inputs for the AIMDConcurrencyController component.
-  message Ins {
-    // The signal to the controller.
-    InPort signal = 1;
-    // The setpoint to the controller.
-    InPort setpoint = 2;
-  }
-
-  // Outputs for the AIMDConcurrencyController component.
-  message Outs {
-    // Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
-    OutPort is_overload = 1;
-    // Load multiplier is the ratio of desired concurrency to the incoming concurrency.
-    OutPort load_multiplier = 2;
-  }
-
-  // Input ports for the AIMDConcurrencyController component.
-  Ins in_ports = 1;
-
-  // Output ports for the AIMDConcurrencyController component.
-  Outs out_ports = 2;
-
-  // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  FlowSelector flow_selector = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  // Scheduler parameters.
-  Scheduler.Parameters scheduler_parameters = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-
-  // Gradient parameters for the controller. Defaults to:
-  // * slope = -1
-  // * min_gradient = 0.1
-  // * max_gradient = 1
-  GradientController.Parameters gradient_parameters = 5;
-
-  // Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-  double concurrency_limit_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 2}
-    }
-  }]; // @gotags: default:"2.0"
-
-  // Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-  double concurrency_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 5}
-    }
-  }]; // @gotags: default:"5.0"
-
-  // Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-  double concurrency_sqrt_increment_multiplier = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 1}
-    }
-  }]; // @gotags: default:"1.0"
-
-  // Configuration for embedded alerter.
-  Alerter.Parameters alerter_parameters = 9;
-
-  // Configuration key for load actuation.
-  string dynamic_config_key = 10;
-
-  // Default configuration.
-  LoadActuator.DynamicConfig default_config = 11;
 }

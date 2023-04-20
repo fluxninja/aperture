@@ -8,35 +8,33 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cenkalti/backoff"
-	"github.com/fluxninja/aperture/operator/api"
-	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/hashicorp/go-multierror"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	ctrl "sigs.k8s.io/controller-runtime"
-
+	"github.com/cenkalti/backoff/v4"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/record"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
+	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 // watcher holds the state of the watcher.
 type watcher struct {
 	waitGroup sync.WaitGroup
 	notifiers.Trackers
-	dynamicConfigTrackers notifiers.Trackers
-	ctx                   context.Context
-	cancel                context.CancelFunc
+	policyDynamicConfigTrackers notifiers.Trackers
+	ctx                         context.Context
+	cancel                      context.CancelFunc
 	client.Client
 	scheme           *runtime.Scheme
 	recorder         record.EventRecorder
@@ -47,14 +45,14 @@ type watcher struct {
 var _ notifiers.Watcher = &watcher{}
 
 // NewWatcher prepares watcher instance for the Kuberneter Policy.
-func NewWatcher() (*watcher, error) {
+func NewWatcher(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers) (*watcher, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	watcher := &watcher{
-		Trackers:              notifiers.NewDefaultTrackers(),
-		dynamicConfigTrackers: notifiers.NewDefaultTrackers(),
-		ctx:                   ctx,
-		cancel:                cancel,
+		Trackers:                    policyTrackers,
+		policyDynamicConfigTrackers: policyDynamicConfigTrackers,
+		ctx:                         ctx,
+		cancel:                      cancel,
 	}
 
 	return watcher, nil
@@ -62,15 +60,6 @@ func NewWatcher() (*watcher, error) {
 
 // Start starts the watcher go routines and handles Policy Custom resource events from Kubernetes.
 func (w *watcher) Start() error {
-	err := w.Trackers.Start()
-	if err != nil {
-		return err
-	}
-	err = w.dynamicConfigTrackers.Start()
-	if err != nil {
-		return err
-	}
-
 	w.waitGroup.Add(1)
 
 	panichandler.Go(func() {
@@ -116,21 +105,12 @@ func (w *watcher) Start() error {
 func (w *watcher) Stop() error {
 	w.cancel()
 	w.waitGroup.Wait()
-	var err, merr error
-	err = w.Trackers.Stop()
-	if err != nil {
-		merr = multierror.Append(merr, err)
-	}
-	err = w.dynamicConfigTrackers.Stop()
-	if err != nil {
-		merr = multierror.Append(merr, err)
-	}
-	return merr
+	return nil
 }
 
 // GetDynamicConfigWatcher returns the config watcher.
-func (w *watcher) GetDynamicConfigWatcher() notifiers.Watcher {
-	return w.dynamicConfigTrackers
+func (w *watcher) GetDynamicConfigWatcher() notifiers.Trackers {
+	return w.policyDynamicConfigTrackers
 }
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -153,7 +133,7 @@ func (w *watcher) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result,
 		if !w.resourcesDeleted[req.NamespacedName] {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			// Return and don't requeue
+			// Return and do not requeue
 			log.Debug().Msg(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", req.Name, req.Namespace))
 			instance.Name = req.Name
 			instance.Namespace = req.Namespace
@@ -196,7 +176,7 @@ func (w *watcher) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result,
 
 func (w *watcher) deleteResources(ctx context.Context, instance *policyv1alpha1.Policy) {
 	w.RemoveEvent(notifiers.Key(instance.GetName()))
-	w.dynamicConfigTrackers.RemoveEvent(notifiers.Key(instance.GetName()))
+	w.policyDynamicConfigTrackers.RemoveEvent(notifiers.Key(instance.GetName()))
 }
 
 // updateResource updates the Aperture resource in Kubernetes.
@@ -226,7 +206,7 @@ func (w *watcher) updateStatus(ctx context.Context, instance *policyv1alpha1.Pol
 // reconcilePolicy sends a write event to notifier to get it uploaded on the Etcd.
 func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
 	w.WriteEvent(notifiers.Key(instance.GetName()), instance.Spec.Raw)
-	w.dynamicConfigTrackers.WriteEvent(notifiers.Key(instance.GetName()), instance.DynamicConfig.Raw)
+	w.policyDynamicConfigTrackers.WriteEvent(notifiers.Key(instance.GetName()), instance.DynamicConfig.Raw)
 
 	w.recorder.Eventf(instance, corev1.EventTypeWarning, "UploadSuccessful", "Uploaded policy to trackers.")
 	return nil

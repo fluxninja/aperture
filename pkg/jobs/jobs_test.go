@@ -4,17 +4,18 @@ import (
 	"context"
 	"time"
 
-	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/status"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
+
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var _ JobWatcher = (*testGroupConfig)(nil)
@@ -32,19 +33,21 @@ type testGroupConfig struct {
 	expectedScheduling bool // to be used to check if sleeping/stuck jobs are getting stuck or not
 }
 
-// When a job is only scheduled and not run, it's number of run should be 0
+// When a job is only scheduled and not run, it is number of run should be 0
 func (gc *testGroupConfig) OnJobScheduled() {
 	for _, job := range gc.jobs {
-		jobInfo := gc.jobGroup.JobInfo(job.Name())
-		Expect(jobInfo.RunCount).To(Equal(0))
+		jobInfo, err := gc.jobGroup.JobInfo(job.Name())
+		Expect(err).NotTo(HaveOccurred())
+		Expect(jobInfo.ExecuteCount).To(Equal(0))
 	}
 }
 
 // Estimate the number of runs for the job based on the provided configuration and compare with the actual result
 func (gc *testGroupConfig) OnJobCompleted(_ *statusv1.Status, _ JobStats) {
 	for _, job := range gc.jobs {
-		jobInfo := gc.jobGroup.JobInfo(job.Name())
-		Expect(jobInfo.RunCount).To(Equal(gc.jobRunConfig.expectedNoOfRuns))
+		jobInfo, err := gc.jobGroup.JobInfo(job.Name())
+		Expect(err).NotTo(HaveOccurred())
+		Expect(jobInfo.ExecuteCount).To(Equal(gc.jobRunConfig.expectedNoOfRuns))
 	}
 }
 
@@ -67,12 +70,11 @@ var _ = Describe("Jobs", func() {
 		alerter := alerts.NewSimpleAlerter(100)
 		rootRegistry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 		jobConfig = JobConfig{
-			InitialDelay:     config.MakeDuration(0),
 			ExecutionPeriod:  config.MakeDuration(time.Millisecond * 200),
 			ExecutionTimeout: config.MakeDuration(time.Millisecond * 200),
 			InitiallyHealthy: false,
 		}
-		jobGroup, err = NewJobGroup(rootRegistry, 10, RescheduleMode, groupWatchers)
+		jobGroup, err = NewJobGroup(rootRegistry, JobGroupConfig{}, groupWatchers)
 		Expect(err).NotTo(HaveOccurred())
 
 		addOne = func(ctx context.Context) (proto.Message, error) {
@@ -127,19 +129,18 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 1000,
 				expectedStatusMsg: "OK",
-				expectedNoOfRuns:  2,
+				expectedNoOfRuns:  5,
 			},
 			expectedScheduling: true,
 			jobGroup:           jobGroup,
 		}
 		runJobGroup(jobGroup, groupConfig, jobConfig)
-		Expect(counter).To(Equal(2))
+		Expect(counter).To(Equal(5))
 	})
 
 	It("checks for timed out job", func() {
-		jobConfig.InitialDelay = config.MakeDuration(time.Millisecond * 100)
 		job := NewBasicJob("timeout-job",
 			func(ctx context.Context) (proto.Message, error) {
 				time.Sleep(time.Millisecond * 4000)
@@ -157,7 +158,7 @@ var _ = Describe("Jobs", func() {
 			jobRunConfig: testJobRunConfig{
 				sleepTime:         time.Millisecond * 2000,
 				expectedStatusMsg: "Timeout",
-				expectedNoOfRuns:  11, // Job gets scheduled 10 times within 2 seconds + 1 scheduling caused by manual trigger if job is stuck
+				expectedNoOfRuns:  1,
 			},
 			expectedScheduling: false,
 			jobGroup:           jobGroup,
@@ -173,7 +174,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job, job2},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -193,7 +194,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -220,7 +221,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob, multiJob2},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -265,7 +266,8 @@ var _ = Describe("Jobs", func() {
 		// error when registering job multiple times, written here to achieve more coverage
 		err = jobGroup.DeregisterJob(job.Name())
 		Expect(err).To(HaveOccurred())
-		Expect(jobGroup.JobInfo(job.Name())).To(BeNil())
+		_, err = jobGroup.JobInfo(job.Name())
+		Expect(err).To(HaveOccurred())
 	})
 })
 
@@ -283,14 +285,14 @@ func runJobGroup(jobGroup *JobGroup, groupConfig *testGroupConfig, jobConfig Job
 	for _, job := range groupConfig.jobs {
 		registry := jobGroup.livenessRegistry
 		livenessReg := registry.Root().
-			Child("subsystem", "liveness").
-			Child("jg", "job_groups").
+			Child("system", "liveness").
+			Child("job-group", "job_groups").
 			Child(registry.Key(), registry.Value()).
 			Child("executor", job.Name())
 
 		if groupConfig.jobRunConfig.expectedStatusMsg == "Timeout" {
 			checkStatusMessage(livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, true)
-			jobGroup.TriggerJob(job.Name())
+			jobGroup.TriggerJob(job.Name(), time.Duration(0))
 		} else {
 			checkStatusMessage(livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, false)
 		}

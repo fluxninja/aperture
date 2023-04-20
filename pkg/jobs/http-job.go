@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -47,18 +46,18 @@ func NewHTTPJob(config HTTPJobConfig) *HTTPJob {
 		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != config.ExpectedStatus {
-			return nil, errors.Errorf("unexpected status code: %v, expected: %v", resp.StatusCode,
+			return nil, fmt.Errorf("unexpected status code: %v, expected: %v", resp.StatusCode,
 				config.ExpectedStatus)
 		}
 
 		if config.ExpectedBody != "" {
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return nil, errors.Errorf("failed to read response body: %v", err)
+				return nil, fmt.Errorf("failed to read response body: %v", err)
 			}
 
 			if !strings.Contains(string(body), config.ExpectedBody) {
-				return nil, errors.Errorf("body does not contain expected content '%v'", config.ExpectedBody)
+				return nil, fmt.Errorf("body does not contain expected content '%v'", config.ExpectedBody)
 			}
 		}
 
@@ -88,12 +87,12 @@ func (job *HTTPJob) Execute(ctx context.Context) (proto.Message, error) {
 func fetchURL(ctx context.Context, method string, url string, client *http.Client, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
-		return nil, errors.Errorf("unable to create job http request: %v", err)
+		return nil, fmt.Errorf("unable to create job http request: %v", err)
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.Errorf("fail to execute %v request: %v", method, err)
+		return nil, fmt.Errorf("fail to execute %v request: %w", method, err)
 	}
 	return resp, nil
 }

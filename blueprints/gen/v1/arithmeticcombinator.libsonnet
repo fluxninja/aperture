@@ -2,13 +2,6 @@ local arithmeticcombinatorins = import './arithmeticcombinatorins.libsonnet';
 local arithmeticcombinatorouts = import './arithmeticcombinatorouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      lhs: error 'Port lhs is missing',
-      rhs: error 'Port rhs is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: arithmeticcombinatorins,
   outPorts:: arithmeticcombinatorouts,

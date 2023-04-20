@@ -85,11 +85,15 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 		return nil, err
 	}
 
-	tokensNotifier := notifiers.NewUnmarshalKeyNotifier(
+	tokensNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(paths.AgentComponentKey(atFactory.agentGroup, at.policyName, at.componentID)),
 		unmarshaller,
 		at.tokenUpdateCallback,
 	)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create tokens notifier")
+		return nil, err
+	}
 
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {

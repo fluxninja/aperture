@@ -10,17 +10,16 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
-	appsv1 "k8s.io/api/apps/v1"
+	"google.golang.org/genproto/protobuf/field_mask"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/yaml"
+	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/tui"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -47,9 +46,9 @@ var ApplyPolicyCmd = &cobra.Command{
 aperturectl apply policy --dir=policies`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if file != "" {
-			return ApplyPolicy(file)
+			return applyPolicy(file)
 		} else if dir != "" {
-			policies, err := GetPolicies(dir)
+			policies, err := getPolicies(dir)
 			if err != nil {
 				return err
 			}
@@ -62,8 +61,8 @@ aperturectl apply policy --dir=policies`,
 
 			for policyIndex := range model.Selected {
 				fileName := policies[policyIndex]
-				if err := ApplyPolicy(fileName); err != nil {
-					log.Error().Msgf("failed to apply policy '%s' on Kubernetes.", fileName)
+				if err := applyPolicy(fileName); err != nil {
+					log.Error().Err(err).Msgf("failed to apply policy '%s' on Kubernetes.", fileName)
 				}
 			}
 			return nil
@@ -73,8 +72,8 @@ aperturectl apply policy --dir=policies`,
 	},
 }
 
-// GetPolicies applies all policies in a directory to the cluster.
-func GetPolicies(policyDir string) ([]string, error) {
+// getPolicies applies all policies in a directory to the cluster.
+func getPolicies(policyDir string) ([]string, error) {
 	policies := []string{}
 	// walk the directory and apply all policies
 	return policies, filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
@@ -83,38 +82,38 @@ func GetPolicies(policyDir string) ([]string, error) {
 		}
 		fileBase := info.Name()[:len(info.Name())-len(filepath.Ext(info.Name()))]
 		if filepath.Ext(info.Name()) == ".yaml" && !strings.HasSuffix(fileBase, "-cr") {
-			if policy := GetPolicy(path); policy != nil {
-				policies = append(policies, path)
+			_, err := getPolicy(path)
+			if err != nil {
+				return err
 			}
+			policies = append(policies, path)
 		}
 		return nil
 	})
 }
 
-func GetPolicy(policyFile string) *languagev1.Policy {
-	content, err := os.ReadFile(policyFile)
+func getPolicy(policyFile string) (*languagev1.Policy, error) {
+	_, policy, err := utils.CompilePolicy(policyFile)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	policy := &languagev1.Policy{}
-	err = yaml.Unmarshal(content, policy)
-	if err != nil {
-		log.Warn().Msgf("Skipping apply for policy '%s' due to invalid spec.", policyFile)
-		return nil
-	}
-	return policy
+	return policy, nil
 }
 
-// ApplyPolicy applies a policy to the cluster.
-func ApplyPolicy(policyFile string) error {
+// applyPolicy applies a policy to the cluster.
+func applyPolicy(policyFile string) error {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
-	policy := GetPolicy(policyFile)
-	if policy == nil {
-		return nil
+	policy, err := getPolicy(policyFile)
+	if err != nil {
+		return err
 	}
 
+	return createAndApplyPolicy(policy, policyName)
+}
+
+func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return err
@@ -122,65 +121,123 @@ func ApplyPolicy(policyFile string) error {
 
 	policyCR := &policyv1alpha1.Policy{}
 	policyCR.Spec.Raw = policyBytes
-	policyCR.Name = policyName
-	return createAndApplyPolicy(policyCR)
-}
+	policyCR.Name = name
 
-func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
-	deployment, err := getControllerDeployment()
+	deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
 	if err != nil {
 		return err
 	}
+	controllerNs = deployment.GetNamespace()
 
 	err = api.AddToScheme(scheme.Scheme)
 	if err != nil {
 		return fmt.Errorf("failed to connect to Kubernetes: %w", err)
 	}
 
-	client, err := client.New(kubeRestConfig, client.Options{
+	kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
 		Scheme: scheme.Scheme,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create Kubernetes client: %w", err)
 	}
 
-	policy.Namespace = deployment.GetNamespace()
-	policy.Annotations = map[string]string{
+	policyCR.Namespace = deployment.GetNamespace()
+	policyCR.Annotations = map[string]string{
 		"fluxninja.com/validate": "true",
 	}
-	spec := policy.Spec
-	_, err = controllerutil.CreateOrUpdate(context.Background(), client, policy, func() error {
-		policy.Spec = spec
-		return nil
-	})
+	err = kubeClient.Create(context.Background(), policyCR)
 	if err != nil {
-		return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
+		if apimeta.IsNoMatchError(err) {
+			var isUpdated bool
+			isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
+			if !isUpdated {
+				return updatePolicyUsingAPIErr
+			}
+		} else if apierrors.IsAlreadyExists(err) {
+			var update bool
+			update, checkForUpdateErr := checkForUpdate(name)
+			if checkForUpdateErr != nil {
+				return fmt.Errorf("failed to check for update: %w", checkForUpdateErr)
+			}
+			if !update {
+				log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
+				return nil
+			}
+			updatePolicyCRErr := updatePolicyCR(name, policyCR, kubeClient)
+			if updatePolicyCRErr != nil {
+				return updatePolicyCRErr
+			}
+		} else {
+			return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
+		}
 	}
 
-	log.Info().Str("policy", policy.GetName()).Str("namespace", policy.GetNamespace()).Msg("Applied Policy successfully")
+	log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Applied Policy successfully")
 	return nil
 }
 
-func getControllerDeployment() (*appsv1.Deployment, error) {
-	clientSet, err := kubernetes.NewForConfig(kubeRestConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create new ClientSet: %w", err)
+// updatePolicyUsingAPI updates the policy using the API.
+func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) {
+	request := languagev1.UpsertPolicyRequest{
+		PolicyName: name,
+		Policy:     policy,
 	}
-
-	deployment, err := clientSet.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{
-		FieldSelector: "metadata.name=aperture-controller",
-	})
+	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
-		if apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf(
-				"no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
+		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
+			var update bool
+			update, err = checkForUpdate(name)
+			if err != nil {
+				return false, fmt.Errorf("failed to check for update: %w", err)
+			}
+
+			if !update {
+				log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
+				return false, nil
+			}
+
+			request.UpdateMask = &field_mask.FieldMask{
+				Paths: []string{"all"},
+			}
+			_, err = client.UpsertPolicy(context.Background(), &request)
+			if err != nil {
+				return false, err
+			}
+		} else {
+			return false, err
 		}
-		return nil, fmt.Errorf("failed to fetch aperture-controller namespace in Kubernetes: %w", err)
+	}
+	return true, nil
+}
+
+// updatePolicyCR updates the policy CR.
+func updatePolicyCR(name string, policy *policyv1alpha1.Policy, kubeClient k8sclient.Client) error {
+	existingPolicy := &policyv1alpha1.Policy{}
+	err := kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: controllerNs}, existingPolicy)
+	if err != nil {
+		return err
 	}
 
-	if len(deployment.Items) != 1 {
-		return nil, errors.New("no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
+	existingPolicy.Spec = policy.Spec
+	if existingPolicy.GetAnnotations() == nil {
+		existingPolicy.Annotations = map[string]string{}
+	}
+	existingPolicy.Annotations["fluxninja.com/validate"] = "true"
+
+	err = kubeClient.Update(context.Background(), existingPolicy)
+	if err != nil && apierrors.IsConflict(err) {
+		return updatePolicyCR(name, policy, kubeClient)
+	}
+	return err
+}
+
+// checkForUpdate checks if the user wants to update the policy.
+func checkForUpdate(name string) (bool, error) {
+	model := tui.InitialRadioButtonModel([]string{"Yes", "No"}, fmt.Sprintf("Policy '%s' already exists. Do you want to update it?", name))
+	p := tea.NewProgram(model)
+	if _, err := p.Run(); err != nil {
+		return false, err
 	}
 
-	return &deployment.Items[0], nil
+	return *model.Selected == 0, nil
 }

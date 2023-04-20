@@ -7,7 +7,7 @@ supported flags that can be passed to the binary.
 $ go run main.go --help
 Usage of sdk-validator:
   -port string
-     Port to start sdk-validator's grpc server on. (default "8089")
+     Port to start sdk-validator's gRPC server on. (default "8089")
   -rejects int
      Number of requests (out of 'requests') to reject. (default 5)
   -requests int

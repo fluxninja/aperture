@@ -1,4 +1,5 @@
 //go:generate swagger generate spec --scan-models --include="github.com/fluxninja*" --include-tag=common-configuration --include-tag=agent-configuration -o ../../docs/gen/config/agent/config-swagger.yaml
+//go:generate go run ../../docs/tools/swagger/process-go-tags.go ../../docs/gen/config/agent/config-swagger.yaml
 
 // Package main Agent
 //
@@ -14,19 +15,20 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
+	"github.com/fluxninja/aperture/pkg/agentfunctions"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/discovery"
 	"github.com/fluxninja/aperture/pkg/distcache"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
+	"github.com/fluxninja/aperture/pkg/policies/autoscale"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/policies/infra"
 	"github.com/fluxninja/aperture/pkg/prometheus"
+	"github.com/fluxninja/aperture/pkg/rpc"
 )
 
 func main() {
@@ -43,14 +45,16 @@ func main() {
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,
 		),
-		entitycache.Module(),
 		distcache.Module(),
 		flowcontrol.Module(),
-		infra.Module(),
+		autoscale.Module(),
 		otelcollector.Module(),
-		agent.ModuleForAgentOTEL(),
+		agent.ModuleForAgentOTel(),
 		discovery.Module(),
 		election.Module(),
+		rpc.ClientModule,
+		agentfunctions.Module,
+		Module(),
 	)
 
 	if err := app.Err(); err != nil {

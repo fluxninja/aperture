@@ -1,0 +1,37 @@
+{{- if .Values.controller.namespaceScoped }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "common.names.fullname" . }}-config
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-controller
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" . $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
+  {{- end }}
+data:
+  aperture-controller.yaml: |-
+    {{- if (omit .Values.controller.config "etcd" "prometheus" "server") }}
+    {{- omit .Values.controller.config "etcd" "prometheus" "server" | toYaml | nindent 4 }}
+    {{- end }}
+    server:
+      {{- if and .Values.controller.config.server (omit .Values.controller.config.server "tls")}}
+      {{- omit .Values.controller.config.server "tls" | toYaml | nindent 6 }}
+      {{- end }}
+      tls:
+        enabled: true
+        cert_file: /etc/aperture/aperture-controller/certs/{{ .Values.controller.serverCert.certFileName }}
+        key_file: /etc/aperture/aperture-controller/certs/{{ .Values.controller.serverCert.keyFileName }}
+    etcd:
+      {{- if (omit .Values.controller.config.etcd "endpoints")}}
+      {{- omit .Values.controller.config.etcd "endpoints" | toYaml | nindent 6 }}
+      {{- end }}
+      endpoints: {{ include "controller.etcd.endpoints" (dict "etcd" .Values.controller.config.etcd "context" . $) }}
+    prometheus:
+      address: {{ include "controller.prometheus.address" (dict "prometheus" .Values.controller.config.prometheus "context" . $) }}
+{{- end }}

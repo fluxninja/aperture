@@ -19,6 +19,7 @@ package controllers
 import (
 	"bytes"
 	"context"
+	cryptorand "crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
@@ -33,18 +34,21 @@ import (
 	"strings"
 	"time"
 
-	cryptorand "crypto/rand"
+	"github.com/imdario/mergo"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/client-go/rest"
+	"k8s.io/utils/pointer"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/imdario/mergo"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/utils/pointer"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 )
 
 // ContainerSecurityContext prepares SecurityContext for containers based on the provided parameter.
@@ -135,7 +139,7 @@ func ContainerProbes(spec common.CommonSpec, scheme corev1.URIScheme) (*corev1.P
 		livenessProbe = &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
-					Path:   "/v1/status/subsystem/liveness",
+					Path:   "/v1/status/system/liveness",
 					Port:   intstr.FromString(Server),
 					Scheme: scheme,
 				},
@@ -154,7 +158,7 @@ func ContainerProbes(spec common.CommonSpec, scheme corev1.URIScheme) (*corev1.P
 		readinessProbe = &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
-					Path:   "/v1/status/subsystem/readiness",
+					Path:   "/v1/status/system/readiness",
 					Port:   intstr.FromString(Server),
 					Scheme: scheme,
 				},
@@ -210,7 +214,7 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 			},
 		})
 		envs = append(envs, corev1.EnvVar{
-			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 			Value: "false",
 		})
 	} else {
@@ -224,20 +228,20 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 			},
 		})
 		envs = append(envs, corev1.EnvVar{
-			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 			Value: "true",
 		})
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create || instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name != "" {
+	if instance.Spec.Secrets.FluxNinjaExtension.Create || instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name != "" {
 		envs = append(envs, corev1.EnvVar{
-			Name: "APERTURE_AGENT_FLUXNINJA_PLUGIN_API_KEY",
+			Name: "APERTURE_AGENT_FLUXNINJA_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: SecretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin),
+						Name: SecretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaExtension),
 					},
-					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
+					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef),
 					Optional: pointer.Bool(false),
 				},
 			},
@@ -254,6 +258,14 @@ func AgentVolumeMounts(agentSpec agentv1alpha1.AgentSpec) []corev1.VolumeMount {
 			Name:      "aperture-agent-config",
 			MountPath: "/etc/aperture/aperture-agent/config",
 		},
+	}
+
+	if len(agentSpec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		agentSpec.ControllerClientCertConfig.ConfigMapName != "" {
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name:      agentSpec.ControllerClientCertConfig.ConfigMapName,
+			MountPath: AgentControllerClientCertPath,
+		})
 	}
 
 	return MergeVolumeMounts(volumeMounts, agentSpec.ExtraVolumeMounts)
@@ -273,6 +285,20 @@ func AgentVolumes(agentSpec agentv1alpha1.AgentSpec) []corev1.Volume {
 				},
 			},
 		},
+	}
+
+	if agentSpec.ControllerClientCertConfig.ConfigMapName != "" {
+		volumes = append(volumes, corev1.Volume{
+			Name: agentSpec.ControllerClientCertConfig.ConfigMapName,
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					DefaultMode: pointer.Int32(420),
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: agentSpec.ControllerClientCertConfig.ConfigMapName,
+					},
+				},
+			},
+		})
 	}
 
 	return MergeVolumes(volumes, agentSpec.ExtraVolumes)
@@ -298,15 +324,15 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 		},
 	}
 
-	if spec.Secrets.FluxNinjaPlugin.Create || instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name != "" {
+	if spec.Secrets.FluxNinjaExtension.Create || instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name != "" {
 		envs = append(envs, corev1.EnvVar{
-			Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
+			Name: "APERTURE_CONTROLLER_FLUXNINJA_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: SecretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin),
+						Name: SecretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaExtension),
 					},
-					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
+					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef),
 					Optional: pointer.Bool(false),
 				},
 			},
@@ -322,16 +348,6 @@ func ControllerVolumeMounts(controllerSpec common.CommonSpec) []corev1.VolumeMou
 		{
 			Name:      "aperture-controller-config",
 			MountPath: "/etc/aperture/aperture-controller/config",
-		},
-		{
-			Name:      "etc-aperture-policies",
-			MountPath: PolicyFilePath,
-			ReadOnly:  true,
-		},
-		{
-			Name:      "etc-aperture-classification",
-			MountPath: "/etc/aperture/aperture-controller/classifiers",
-			ReadOnly:  true,
 		},
 		{
 			Name:      "server-cert",
@@ -354,24 +370,6 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: ControllerServiceName,
 					},
-				},
-			},
-		},
-		{
-			Name: "etc-aperture-policies",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
-		},
-		{
-			Name: "etc-aperture-classification",
-			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32(420),
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "classification",
-					},
-					Optional: pointer.Bool(true),
 				},
 			},
 		},
@@ -593,9 +591,14 @@ func WriteFile(filepath string, sCert *bytes.Buffer) error {
 }
 
 // CheckAndGenerateCertForOperator checks if existing certificates are present and creates new if not present.
-func CheckAndGenerateCertForOperator() error {
+func CheckAndGenerateCertForOperator(config *rest.Config) error {
 	if CheckCertificate() {
 		return nil
+	}
+
+	k8sClient, err := client.New(config, client.Options{})
+	if err != nil {
+		return err
 	}
 
 	namespace := os.Getenv("APERTURE_OPERATOR_NAMESPACE")
@@ -611,6 +614,54 @@ func CheckAndGenerateCertForOperator() error {
 	serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(serviceName, namespace)
 	if err != nil {
 		return err
+	}
+
+	var updateSecret bool
+	secretName := fmt.Sprintf("%s-cert", serviceName)
+	secret := &corev1.Secret{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      secretName,
+			Namespace: namespace,
+			Labels:    CommonLabels(map[string]string{}, serviceName, AppName),
+		},
+	}
+
+	err = k8sClient.Get(context.Background(), types.NamespacedName{Name: secretName, Namespace: namespace}, secret)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			updateSecret = true
+		} else {
+			return err
+		}
+	} else {
+		certBytes, ok := secret.Data[OperatorCertName]
+		if !ok {
+			updateSecret = true
+		} else {
+			block, _ := pem.Decode(certBytes)
+			var cert *x509.Certificate
+			cert, err = x509.ParseCertificate(block.Bytes)
+			if err == nil && cert.NotAfter.After(time.Now()) {
+				serverCertPEM = bytes.NewBuffer(secret.Data[OperatorCertName])
+				serverPrivKeyPEM = bytes.NewBuffer(secret.Data[OperatorCertKeyName])
+				caPEM = bytes.NewBuffer(secret.Data[OperatorCAName])
+			} else {
+				updateSecret = true
+			}
+		}
+	}
+
+	if updateSecret {
+		secret.Data = map[string][]byte{
+			OperatorCertName:    serverCertPEM.Bytes(),
+			OperatorCertKeyName: serverPrivKeyPEM.Bytes(),
+			OperatorCAName:      caPEM.Bytes(),
+		}
+
+		_, err = controllerutil.CreateOrUpdate(context.Background(), k8sClient, secret, SecretMutate(secret, secret.Data, secret.OwnerReferences))
+		if err != nil {
+			return err
+		}
 	}
 
 	err = os.MkdirAll(os.Getenv("APERTURE_OPERATOR_CERT_DIR"), 0o777)
@@ -634,6 +685,67 @@ func CheckAndGenerateCertForOperator() error {
 	}
 
 	return nil
+}
+
+// GetOrGenerateCertificate returns the TLS/SSL certificates of the Controller.
+func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1.Controller) (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
+	secretName := fmt.Sprintf("%s-controller-cert", instance.GetName())
+
+	generateCert := func() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
+		// generate certificates
+		serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(ControllerServiceName, instance.GetNamespace())
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		return serverCertPEM, serverPrivKeyPEM, caPEM, nil
+	}
+
+	secret := &corev1.Secret{}
+	err := client.Get(context.TODO(), types.NamespacedName{Name: secretName, Namespace: instance.GetNamespace()}, secret)
+	if err != nil {
+		return generateCert()
+	}
+
+	existingCert, ok := secret.Data[ControllerCertName]
+	if !ok {
+		return generateCert()
+	}
+
+	existingKey, ok := secret.Data[ControllerCertKeyName]
+	if !ok {
+		return generateCert()
+	}
+
+	block, _ := pem.Decode(existingCert)
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return generateCert()
+	}
+
+	// regenerate certificate if it is expired
+	if time.Now().After(cert.NotAfter) {
+		return generateCert()
+	}
+
+	var existingClientCert []byte
+	cm := &corev1.ConfigMap{}
+	err = client.Get(context.TODO(), types.NamespacedName{Name: fmt.Sprintf("%s-controller-client-cert", instance.GetName()), Namespace: instance.GetNamespace()}, cm)
+	if err != nil {
+		// Checking existing ValidatingWebhookConfiguration for backward compatibility
+		vwc := &admissionregistrationv1.ValidatingWebhookConfiguration{}
+		err := client.Get(context.TODO(), types.NamespacedName{Name: ControllerServiceName}, vwc)
+		if err != nil || len(vwc.Webhooks) == 0 {
+			// No ValidatingWebhookConfiguration found, generate new certificate
+			return generateCert()
+		}
+
+		existingClientCert = vwc.Webhooks[0].ClientConfig.CABundle
+	} else {
+		existingClientCert = []byte(cm.Data[ControllerClientCertKey])
+	}
+
+	return bytes.NewBuffer(existingCert), bytes.NewBuffer(existingKey), bytes.NewBuffer(existingClientCert), nil
 }
 
 // MergeEnvVars merges common and provided extra Environment variables of Kubernetes container.
@@ -812,4 +924,58 @@ func GetPort(addr string) (int32, error) {
 		return 0, err
 	}
 	return int32(port), nil
+}
+
+// GetControllerClientCert returns the controller client certificate from the controller configmap.
+func GetControllerClientCert(endpoints []string, client_ client.Client, ctx context.Context) []byte {
+	var localControllerCert []byte
+	for _, endpoint := range endpoints {
+		controllerNS := localControllerNamespaceFromEndpoint(endpoint)
+		if controllerNS == "" {
+			continue
+		}
+
+		var configMaps corev1.ConfigMapList
+		err := client_.List(ctx, &configMaps, &client.ListOptions{Namespace: controllerNS})
+		if err != nil {
+			continue
+		}
+
+		for _, cm := range configMaps.Items {
+			if !strings.HasSuffix(cm.Name, "-controller-client-cert") {
+				continue
+			}
+			localControllerCert = append(localControllerCert, cm.Data[ControllerClientCertKey]...)
+		}
+	}
+
+	return localControllerCert
+}
+
+// localControllerNamespaceFromEndpoint returns the namespace of the local controller.
+func localControllerNamespaceFromEndpoint(endpoint string) string {
+	addr, port, ok := strings.Cut(endpoint, ":")
+	if !ok {
+		return ""
+	}
+
+	if port != "8080" {
+		return ""
+	}
+
+	subdomains := strings.Split(addr, ".")
+	if len(subdomains) < 2 {
+		return ""
+	}
+
+	if !strings.Contains(subdomains[0], "aperture-controller") {
+		return ""
+	}
+
+	tail := strings.Join(subdomains[2:], ".") + "."
+	if !strings.HasPrefix("svc.cluster.local.", tail) { //nolint:gocritic
+		return ""
+	}
+
+	return subdomains[1]
 }
