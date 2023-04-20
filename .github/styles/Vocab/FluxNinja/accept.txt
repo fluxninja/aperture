@@ -54,7 +54,6 @@ LinkedIn
 Nutanix
 Netsil
 SLAs
-vs
 end-user
 rpm
 performant
