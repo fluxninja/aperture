@@ -628,7 +628,11 @@ func CheckAndGenerateCertForOperator(config *rest.Config) error {
 
 	err = k8sClient.Get(context.Background(), types.NamespacedName{Name: secretName, Namespace: namespace}, secret)
 	if err != nil {
-		updateSecret = true
+		if errors.IsNotFound(err) {
+			updateSecret = true
+		} else {
+			return err
+		}
 	} else {
 		certBytes, ok := secret.Data[OperatorCertName]
 		if !ok {

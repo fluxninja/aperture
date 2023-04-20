@@ -354,7 +354,7 @@ following these steps:
 
    :::note
 
-   Deleting a Helm chart using Helm doesn’t delete the Custom Resource
+   Deleting a Helm chart using Helm does not delete the Custom Resource
    Definitions (CRD) installed from the chart.
 
    :::
