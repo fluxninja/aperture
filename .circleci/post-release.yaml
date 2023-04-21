@@ -12,7 +12,7 @@ executors:
       - image: cimg/base:2022.12-18.04
   python-cimg-executor:
     docker:
-      - image: cimg/python:3.10.6
+      - image: cimg/python:3.11
 
 jobs:
   publish-protobuf-files:
@@ -20,7 +20,7 @@ jobs:
       tag:
         type: string
         description: What git tag to use when tagging remote repository
-    executor: base-cimg-executor
+    executor: python-cimg-executor
     steps:
       - checkout
       - asdf_install:

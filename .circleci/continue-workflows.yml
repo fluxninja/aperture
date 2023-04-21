@@ -302,6 +302,10 @@ jobs:
             shellcheck
             tanka
             yq
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - aperture-v5-go-cache-{{ checksum "~/day" }}
       - run:
           name: Install Go tools
           command: scripts/manage_go_tools.sh
@@ -326,10 +330,6 @@ jobs:
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
-      - restore_cache:
-          name: Restore go cache
-          keys:
-            - aperture-v5-go-cache-{{ checksum "~/day" }}
       - run:
           name: Cache golangci-lint run
           command: |
@@ -399,7 +399,7 @@ jobs:
           when: always
 
   validate-publish-java-sdk:
-    executor: base-machine-executor
+    executor: python-cimg-executor
     environment:
       DOCKER_BUILDKIT: 1
     parameters:
@@ -601,7 +601,7 @@ jobs:
                   fn release publish-sdk "${args[@]}"
 
   validate-publish-sdk:
-    executor: base-machine-executor
+    executor: python-cimg-executor
     environment:
       DOCKER_BUILDKIT: 1
     parameters:
