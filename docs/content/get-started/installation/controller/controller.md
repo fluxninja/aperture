@@ -56,6 +56,13 @@ Install the tool of your choice using the following links:
 
 The Aperture Controller can be installed using the below options:
 
+:::caution warning
+
+Upgrading from one of the installation modes below to the other is discouraged
+and can result in unpredictable behavior.
+
+:::
+
 1. [**Install with Operator**](operator/operator.md)
 
    The Aperture Controller can be installed using the Kubernetes Operator

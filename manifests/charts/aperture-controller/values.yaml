@@ -606,6 +606,8 @@ prometheus:
       tag: 3.1.0
       pullPolicy: IfNotPresent
   server:
+    statefulSet:
+      enabled: true
     image:
       tag: v2.33.5
     extraFlags:
