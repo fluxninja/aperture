@@ -399,7 +399,7 @@ jobs:
           when: always
 
   validate-publish-java-sdk:
-    executor: base-machine-executor
+    executor: python-cimg-executor
     environment:
       DOCKER_BUILDKIT: 1
     parameters:
@@ -601,7 +601,7 @@ jobs:
                   fn release publish-sdk "${args[@]}"
 
   validate-publish-sdk:
-    executor: base-machine-executor
+    executor: python-cimg-executor
     environment:
       DOCKER_BUILDKIT: 1
     parameters:

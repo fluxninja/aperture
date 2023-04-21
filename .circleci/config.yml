@@ -4,6 +4,9 @@ version: 2.1
 setup: true
 
 executors:
+  python-cimg-executor:
+    docker:
+      - image: cimg/python:3.11
   base-cimg-executor:
     docker:
       - image: cimg/base:2022.07
@@ -85,7 +88,7 @@ commands:
 
 jobs:
   release-components:
-    executor: base-cimg-executor
+    executor: python-cimg-executor
     steps:
       - checkout
       - asdf_install:
