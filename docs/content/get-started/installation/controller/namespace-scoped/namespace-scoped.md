@@ -19,13 +19,6 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVers
 Aperture Controller can be installed in a single namespace without any cluster
 level resources.
 
-:::info
-
-The Aperture Controller will only perform as expected with Aperture SDKs as
-integration in this mode.
-
-:::
-
 ## Prerequisites
 
 1. Prepare a `values.yaml` file which switches the Aperture Controller to
