@@ -448,6 +448,7 @@ var _ = Describe("ProtobufUnmarshaller", func() {
 				AgentGroup: "ag",
 				Service:    "s.n.svc.cluster.local",
 			},
+			AgentGroup: "ag",
 			FlowMatcher: &policylangv1.FlowMatcher{
 				ControlPoint: "egress",
 			},
