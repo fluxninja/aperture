@@ -56,10 +56,6 @@ func (h *Handler) PreviewFlowLabels(ctx context.Context, req *flowpreviewv1.Prev
 	}
 
 	flowSelector := &policylangv1.FlowSelector{
-		ServiceSelector: &policylangv1.ServiceSelector{
-			AgentGroup: h.agentGroup,
-			Service:    req.Service,
-		},
 		AgentGroup: h.agentGroup,
 		FlowMatcher: &policylangv1.FlowMatcher{
 			ControlPoint: req.ControlPoint,

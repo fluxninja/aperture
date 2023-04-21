@@ -73,7 +73,6 @@ func ParseAIMDConcurrencyController(
 	}
 	alerterLabels["type"] = "concurrency_limiter"
 	alerterLabels["agent_group"] = aimdConcurrencyController.FlowSelector.GetAgentGroup()
-	alerterLabels["service"] = aimdConcurrencyController.FlowSelector.ServiceSelector.GetService()
 	aimdConcurrencyController.AlerterParameters.Labels = alerterLabels
 
 	nestedCircuit := &policylangv1.NestedCircuit{

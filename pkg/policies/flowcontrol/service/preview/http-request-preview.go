@@ -76,10 +76,6 @@ func (h *Handler) PreviewHTTPRequests(ctx context.Context, req *flowpreviewv1.Pr
 	}
 
 	flowSelector := &policylangv1.FlowSelector{
-		ServiceSelector: &policylangv1.ServiceSelector{
-			AgentGroup: h.agentGroup,
-			Service:    req.Service,
-		},
 		AgentGroup: h.agentGroup,
 		FlowMatcher: &policylangv1.FlowMatcher{
 			ControlPoint: req.ControlPoint,

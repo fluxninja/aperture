@@ -4790,50 +4790,8 @@ paths:
                 - aperture-agent
     /v1/flowcontrol/preview/http_requests/{control_point}:
         post:
-            operationId: FlowPreviewService_PreviewHTTPRequests2
-            parameters:
-                - description: Control point to preview.
-                  in: path
-                  name: control_point
-                  required: true
-                  type: string
-                - description: Flow labels to match. Optional parameter for advanced filtering.
-                  in: body
-                  name: label_matcher
-                  required: true
-                  schema:
-                    $ref: '#/definitions/LabelMatcher'
-                - description: Number of samples to collect.
-                  format: int64
-                  in: query
-                  name: samples
-                  required: false
-                  type: string
-                - description: Service to preview.
-                  in: query
-                  name: service
-                  required: false
-                  type: string
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/PreviewHTTPRequestsResponse'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
-        post:
             operationId: FlowPreviewService_PreviewHTTPRequests
             parameters:
-                - description: Service to preview.
-                  in: path
-                  name: service
-                  required: true
-                  type: string
                 - description: Control point to preview.
                   in: path
                   name: control_point
@@ -4849,6 +4807,11 @@ paths:
                   format: int64
                   in: query
                   name: samples
+                  required: false
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
                   required: false
                   type: string
             responses:
@@ -4864,50 +4827,8 @@ paths:
                 - aperture-agent
     /v1/flowcontrol/preview/labels/{control_point}:
         post:
-            operationId: FlowPreviewService_PreviewFlowLabels2
-            parameters:
-                - description: Control point to preview.
-                  in: path
-                  name: control_point
-                  required: true
-                  type: string
-                - description: Flow labels to match. Optional parameter for advanced filtering.
-                  in: body
-                  name: label_matcher
-                  required: true
-                  schema:
-                    $ref: '#/definitions/LabelMatcher'
-                - description: Number of samples to collect.
-                  format: int64
-                  in: query
-                  name: samples
-                  required: false
-                  type: string
-                - description: Service to preview.
-                  in: query
-                  name: service
-                  required: false
-                  type: string
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/PreviewFlowLabelsResponse'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/preview/labels/{service}/{control_point}:
-        post:
             operationId: FlowPreviewService_PreviewFlowLabels
             parameters:
-                - description: Service to preview.
-                  in: path
-                  name: service
-                  required: true
-                  type: string
                 - description: Control point to preview.
                   in: path
                   name: control_point
@@ -4923,6 +4844,11 @@ paths:
                   format: int64
                   in: query
                   name: samples
+                  required: false
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
                   required: false
                   type: string
             responses:

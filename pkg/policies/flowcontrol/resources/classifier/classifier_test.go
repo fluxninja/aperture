@@ -44,9 +44,6 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a simple extractor-based rule
 		rs1 := &policylangv1.Classifier{
 			FlowSelector: &policylangv1.FlowSelector{
-				ServiceSelector: &policylangv1.ServiceSelector{
-					Service: "my-service.default.svc.cluster.local",
-				},
 				FlowMatcher: &policylangv1.FlowMatcher{
 					ControlPoint: "ingress",
 				},
@@ -62,9 +59,6 @@ var _ = Describe("Classifier", func() {
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
 		rs2 := &policylangv1.Classifier{
 			FlowSelector: &policylangv1.FlowSelector{
-				ServiceSelector: &policylangv1.ServiceSelector{
-					Service: "my-service.default.svc.cluster.local",
-				},
 				FlowMatcher: &policylangv1.FlowMatcher{
 					LabelMatcher: &policylangv1.LabelMatcher{
 						MatchLabels: map[string]string{"version": "one"},
@@ -231,9 +225,6 @@ var _ = Describe("Classifier", func() {
 		_, err := classifier.AddRules(context.TODO(), "test", &policysyncv1.ClassifierWrapper{
 			Classifier: &policylangv1.Classifier{
 				FlowSelector: &policylangv1.FlowSelector{
-					ServiceSelector: &policylangv1.ServiceSelector{
-						Service: "my-service.default.svc.cluster.local",
-					},
 					FlowMatcher: &policylangv1.FlowMatcher{
 						ControlPoint: "ingress",
 					},
@@ -450,9 +441,6 @@ var _ = Describe("Classifier", func() {
 		// Classifier with a simple extractor-based rule
 		rs := &policylangv1.Classifier{
 			FlowSelector: &policylangv1.FlowSelector{
-				ServiceSelector: &policylangv1.ServiceSelector{
-					Service: "my-service.default.svc.cluster.local",
-				},
 				FlowMatcher: &policylangv1.FlowMatcher{
 					ControlPoint: "ingress",
 				},

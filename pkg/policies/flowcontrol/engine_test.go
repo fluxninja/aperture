@@ -36,10 +36,6 @@ var _ = Describe("Dataplane Engine", func() {
 
 		engine = NewEngine()
 		flowSelector = &policylangv1.FlowSelector{
-			ServiceSelector: &policylangv1.ServiceSelector{
-				AgentGroup: metrics.DefaultAgentGroup,
-				Service:    "testService.testNamespace.svc.cluster.local",
-			},
 			AgentGroup: metrics.DefaultAgentGroup,
 			FlowMatcher: &policylangv1.FlowMatcher{
 				ControlPoint: "ingress",

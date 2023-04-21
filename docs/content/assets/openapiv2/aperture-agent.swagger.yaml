@@ -128,49 +128,9 @@ paths:
     post:
       tags:
       - aperture-agent
-      operationId: FlowPreviewService_PreviewHTTPRequests2
-      parameters:
-      - type: string
-        description: Control point to preview.
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/LabelMatcher'
-      - type: string
-        format: int64
-        description: Number of samples to collect.
-        name: samples
-        in: query
-      - type: string
-        description: Service to preview.
-        name: service
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PreviewHTTPRequestsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
-    post:
-      tags:
-      - aperture-agent
       operationId: FlowPreviewService_PreviewHTTPRequests
       parameters:
       - type: string
-        description: Service to preview.
-        name: service
-        in: path
-        required: true
-      - type: string
         description: Control point to preview.
         name: control_point
         in: path
@@ -185,6 +145,10 @@ paths:
         format: int64
         description: Number of samples to collect.
         name: samples
+        in: query
+      - type: string
+        description: Service to preview.
+        name: service
         in: query
       responses:
         "200":
@@ -199,49 +163,9 @@ paths:
     post:
       tags:
       - aperture-agent
-      operationId: FlowPreviewService_PreviewFlowLabels2
-      parameters:
-      - type: string
-        description: Control point to preview.
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/LabelMatcher'
-      - type: string
-        format: int64
-        description: Number of samples to collect.
-        name: samples
-        in: query
-      - type: string
-        description: Service to preview.
-        name: service
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PreviewFlowLabelsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/labels/{service}/{control_point}:
-    post:
-      tags:
-      - aperture-agent
       operationId: FlowPreviewService_PreviewFlowLabels
       parameters:
       - type: string
-        description: Service to preview.
-        name: service
-        in: path
-        required: true
-      - type: string
         description: Control point to preview.
         name: control_point
         in: path
@@ -256,6 +180,10 @@ paths:
         format: int64
         description: Number of samples to collect.
         name: samples
+        in: query
+      - type: string
+        description: Service to preview.
+        name: service
         in: query
       responses:
         "200":
