@@ -186,7 +186,7 @@ First,
 all the required tools.
 
 ```bash
-./scripts/install_tools.sh
+./scripts/manage_tools.sh
 ```
 
 ### Tools required for Kubernetes deployment
