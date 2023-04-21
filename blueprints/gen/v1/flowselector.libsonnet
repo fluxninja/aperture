@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withAgentGroup(agent_group):: {
+    agent_group: agent_group,
+  },
+  withAgentGroupMixin(agent_group):: {
+    agent_group+: agent_group,
+  },
   withFlowMatcher(flow_matcher):: {
     flow_matcher: flow_matcher,
   },

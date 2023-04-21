@@ -32,22 +32,13 @@ type Policy interface {
 }
 
 // GetServiceShortDescription returns a short description of the service selector.
-func GetServiceShortDescription(serviceSelector *policylangv1.ServiceSelector) string {
-	var service string
+func GetServiceShortDescription(flowSelector *policylangv1.FlowSelector) string {
+	agentGroup := flowSelector.GetAgentGroup()
 	var prefix string
-	if serviceSelector.AgentGroup == "default" {
+	if agentGroup == "default" {
 		prefix = ""
 	} else {
-		prefix = fmt.Sprintf("%s/", serviceSelector.AgentGroup)
+		prefix = fmt.Sprintf("%s/", agentGroup)
 	}
-
-	if serviceSelector == nil {
-		return ""
-	}
-	if serviceSelector.Service == "" {
-		service = "*"
-	} else {
-		service = serviceSelector.Service
-	}
-	return fmt.Sprintf("%s%s", prefix, service)
+	return prefix
 }

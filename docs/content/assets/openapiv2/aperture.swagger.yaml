@@ -1569,13 +1569,31 @@ definitions:
 
             :::
         properties:
+            agent_group:
+                default: default
+                description: |+
+                    Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+                    selector applies to.
+
+                    :::info
+
+                    Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+                    This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+                    The agents within an agent group form a peer to peer cluster and constantly share state.
+
+                    :::
+
+                type: string
+                x-go-tag-default: default
             flow_matcher:
                 $ref: '#/definitions/FlowMatcher'
                 title: Match control points and labels
                 x-go-tag-validate: required
             service_selector:
                 $ref: '#/definitions/ServiceSelector'
-                title: Match agent group and service
+                title: |-
+                    Match agent group and service
+                    Deprecated: 1.5.0
                 x-go-tag-validate: required
         title: |-
             Describes which flow in which service a [flow control
@@ -4005,6 +4023,7 @@ definitions:
             See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
             :::
+            Deprecated: 1.5.0
         properties:
             agent_group:
                 default: default

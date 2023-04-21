@@ -1457,15 +1457,34 @@ definitions:
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
+      agent_group:
+        description: |+
+          Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+          selector applies to.
+
+          :::info
+
+          Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+          This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+          The agents within an agent group form a peer to peer cluster and constantly share state.
+
+          :::
+
+        type: string
+        default: default
+        x-go-tag-default: default
+        x-order: 0
       flow_matcher:
         title: Match control points and labels
         x-go-tag-validate: required
-        x-order: 0
+        x-order: 1
         $ref: '#/definitions/FlowMatcher'
       service_selector:
-        title: Match agent group and service
+        title: |-
+          Match agent group and service
+          Deprecated: 1.5.0
         x-go-tag-validate: required
-        x-order: 1
+        x-order: 2
         $ref: '#/definitions/ServiceSelector'
   FluxMeter:
     description: |-
@@ -3705,6 +3724,7 @@ definitions:
       See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
       :::
+      Deprecated: 1.5.0
     type: object
     title: |-
       Describes which service a [flow control or observability

@@ -3,9 +3,10 @@ package concurrency
 import (
 	"time"
 
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 const (
@@ -71,13 +72,13 @@ func ParseAIMDConcurrencyController(
 		alerterLabels = make(map[string]string)
 	}
 	alerterLabels["type"] = "concurrency_limiter"
-	alerterLabels["agent_group"] = aimdConcurrencyController.FlowSelector.ServiceSelector.GetAgentGroup()
+	alerterLabels["agent_group"] = aimdConcurrencyController.FlowSelector.GetAgentGroup()
 	alerterLabels["service"] = aimdConcurrencyController.FlowSelector.ServiceSelector.GetService()
 	aimdConcurrencyController.AlerterParameters.Labels = alerterLabels
 
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "AIMDConcurrencyController",
-		ShortDescription: iface.GetServiceShortDescription(aimdConcurrencyController.FlowSelector.ServiceSelector),
+		ShortDescription: iface.GetServiceShortDescription(aimdConcurrencyController.FlowSelector),
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{

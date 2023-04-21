@@ -91,7 +91,7 @@ func newFlowControlCompositeAndOptions(
 
 		concurrencyLimiterConfComp, err := prepareComponent(
 			runtime.NewDummyComponent("ConcurrencyLimiter",
-				iface.GetServiceShortDescription(concurrencyLimiterProto.FlowSelector.ServiceSelector),
+				iface.GetServiceShortDescription(concurrencyLimiterProto.FlowSelector),
 				runtime.ComponentTypeSignalProcessor),
 			concurrencyLimiterProto,
 			componentID,

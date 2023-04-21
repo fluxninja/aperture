@@ -66,7 +66,7 @@ func ParseLoadShaper(loadShaper *policylangv1.LoadShaper) (*policylangv1.NestedC
 
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "LoadShaper",
-		ShortDescription: iface.GetServiceShortDescription(loadShaper.Parameters.FlowRegulatorParameters.FlowSelector.ServiceSelector),
+		ShortDescription: iface.GetServiceShortDescription(loadShaper.Parameters.FlowRegulatorParameters.FlowSelector),
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{

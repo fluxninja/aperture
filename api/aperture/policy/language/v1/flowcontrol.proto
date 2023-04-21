@@ -18,9 +18,21 @@ import "google/protobuf/duration.proto";
 // :::
 message FlowSelector {
   // Match agent group and service
+  // Deprecated: 1.5.0
   ServiceSelector service_selector = 1; // @gotags: validate:"required"
   // Match control points and labels
   FlowMatcher flow_matcher = 2; // @gotags: validate:"required"
+  // Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+  // selector applies to.
+  //
+  // :::info
+  //
+  // Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+  // This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+  // The agents within an agent group form a peer to peer cluster and constantly share state.
+  //
+  // :::
+  string agent_group = 3; // @gotags: default:"default"
 }
 
 // Describes which service a [flow control or observability
@@ -32,6 +44,7 @@ message FlowSelector {
 // See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 //
 // :::
+// Deprecated: 1.5.0
 message ServiceSelector {
   // Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
   // selector applies to.

@@ -2894,6 +2894,27 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 :::
 
 <dl>
+<dt>agent_group</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+selector applies to.
+
+:::info
+
+Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+The agents within an agent group form a peer to peer cluster and constantly share state.
+
+:::
+
+</dd>
 <dt>flow_matcher</dt>
 <dd>
 
@@ -2916,6 +2937,7 @@ Match control points and labels
 <!-- vale on -->
 
 Match agent group and service
+Deprecated: 1.5.0
 
 </dd>
 </dl>
@@ -7382,6 +7404,7 @@ to
 See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
 :::
+Deprecated: 1.5.0
 
 <dl>
 <dt>agent_group</dt>

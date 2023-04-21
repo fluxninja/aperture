@@ -115,6 +115,8 @@ func (m *FlowSelector) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for AgentGroup
+
 	if len(errors) > 0 {
 		return FlowSelectorMultiError(errors)
 	}

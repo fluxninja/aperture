@@ -5,6 +5,7 @@ import (
 	"errors"
 	"path"
 
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
@@ -13,7 +14,6 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
-	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 type concurrencyLimiterConfigSync struct {
@@ -29,14 +29,15 @@ func NewConcurrencyLimiterOptions(
 	componentStackID string,
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
-	// Get Agent Group Name from ConcurrencyLimiter.FlowSelector.ServiceSelector.AgentGroup
 	flowSelectorProto := concurrencyLimiterProto.GetFlowSelector()
 	if flowSelectorProto == nil {
 		return fx.Options(), "", errors.New("concurrencyLimiter.Selector is nil")
 	}
-	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
-	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath,
-		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
+	agentGroup := flowSelectorProto.GetAgentGroup()
+	etcdPath := path.Join(
+		paths.ConcurrencyLimiterConfigPath,
+		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID),
+	)
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,
 		policyBaseAPI:           policyReadAPI,

@@ -40,7 +40,7 @@ func (*flowRegulatorSync) Type() runtime.ComponentType { return runtime.Componen
 
 // ShortDescription implements runtime.Component.
 func (regulatorSync *flowRegulatorSync) ShortDescription() string {
-	return iface.GetServiceShortDescription(regulatorSync.flowRegulatorProto.Parameters.FlowSelector.ServiceSelector)
+	return iface.GetServiceShortDescription(regulatorSync.flowRegulatorProto.Parameters.FlowSelector)
 }
 
 // IsActuator implements runtime.Component.
@@ -52,7 +52,7 @@ func NewFlowRegulatorAndOptions(
 	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	agentGroup := flowRegulatorProto.Parameters.FlowSelector.ServiceSelector.AgentGroup
+	agentGroup := flowRegulatorProto.Parameters.FlowSelector.GetAgentGroup()
 	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
 	configEtcdPath := path.Join(paths.FlowRegulatorConfigPath, etcdKey)
 	decisionsEtcdPath := path.Join(paths.FlowRegulatorDecisionsPath, etcdKey)

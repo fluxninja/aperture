@@ -43,7 +43,7 @@ func (*rateLimiterSync) Type() runtime.ComponentType { return runtime.ComponentT
 
 // ShortDescription implements runtime.Component.
 func (limiterSync *rateLimiterSync) ShortDescription() string {
-	return iface.GetServiceShortDescription(limiterSync.flowSelectorProto.ServiceSelector)
+	return iface.GetServiceShortDescription(limiterSync.flowSelectorProto)
 }
 
 // IsActuator implements runtime.Component.
@@ -60,7 +60,7 @@ func NewRateLimiterAndOptions(
 	if flowSelectorProto == nil {
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
-	agentGroupName := flowSelectorProto.ServiceSelector.AgentGroup
+	agentGroupName := flowSelectorProto.GetAgentGroup()
 	etcdKey := paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), componentID)
 	configEtcdPath := path.Join(paths.RateLimiterConfigPath, etcdKey)
 	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, etcdKey)
@@ -77,11 +77,8 @@ func NewRateLimiterAndOptions(
 		agentGroupName:        agentGroupName,
 		flowSelectorProto:     flowSelectorProto,
 	}
-	return limiterSync, fx.Options(
-		fx.Invoke(
-			limiterSync.setupSync,
-		),
-	), nil
+
+	return limiterSync, fx.Options(fx.Invoke(limiterSync.setupSync)), nil
 }
 
 func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
