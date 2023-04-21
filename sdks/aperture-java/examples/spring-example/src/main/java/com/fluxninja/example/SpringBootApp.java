@@ -10,6 +10,7 @@ public class SpringBootApp {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_GRPC_TIMEOUT_MS = "1000";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
@@ -29,6 +30,11 @@ public class SpringBootApp {
             appPort = DEFAULT_APP_PORT;
         }
         System.setProperty("FN_APP_PORT", appPort);
+        String grpcTimeoutMs = System.getenv("FN_GRPC_TIMEOUT_MS");
+        if (grpcTimeoutMs == null) {
+            grpcTimeoutMs = DEFAULT_GRPC_TIMEOUT_MS;
+        }
+        System.setProperty("FN_GRPC_TIMEOUT_MS", grpcTimeoutMs);
         String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
