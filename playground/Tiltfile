@@ -186,7 +186,7 @@ DEP_TREE = {
                         ("^controller-prometheus", None),
                     ],
                     "ignored_objects": [
-                        ("^controller-prometheus", "Service|Deployment"),
+                        ("^controller-prometheus", "Service|StatefulSet"),
                         "controller-prometheus:grafanadatasource"
                     ]
                 },

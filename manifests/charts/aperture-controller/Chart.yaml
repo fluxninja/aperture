@@ -9,7 +9,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     version: "=1.17.1"
   - name: etcd
-    version: "=8.8.1"
+    version: "=8.9.0"
     repository: https://charts.bitnami.com/bitnami
     condition: etcd.enabled
   - name: prometheus

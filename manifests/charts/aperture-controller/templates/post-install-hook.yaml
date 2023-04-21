@@ -1,0 +1,48 @@
+{{- if not .Values.controller.namespaceScoped }}
+# We have updated the default parameters for built-in Etcd and Prometheus,
+# which may leave some resources behind. This job will clean up the old
+# resources. If you have customized the Etcd or Prometheus parameters, you
+# should manually clean up the old resources.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "common.names.fullname" . }}-post-install-hook
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-controller-manager
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+  {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  ttlSecondsAfterFinished: 10
+  backoffLimit: 0
+  template:
+    metadata:
+      annotations:
+        sidecar.fluxninja.com/injection: "false"
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: aperture-controller-manager
+    spec:
+      serviceAccountName: {{ include "controller-operator.serviceAccountName" . }}
+      restartPolicy: Never
+      containers:
+      - name: post-install-job
+        image: "bitnami/kubectl"
+        command:
+          - "/bin/bash"
+          - "-xc"
+          - |
+            kubectl delete service,deployment --selector=app.kubernetes.io/name=kube-state-metrics,app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/managed-by=Helm -n {{ template "common.names.namespace" . }}
+            kubectl delete clusterrole,clusterrolebinding,serviceaccount --selector=app.kubernetes.io/name=kube-state-metrics,app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/managed-by=Helm
+            kubectl wait statefulset {{ .Release.Name }}-prometheus-server -n {{ template "common.names.namespace" . }} --for=jsonpath='{.status.readyReplicas}'={{ .Values.prometheus.server.replicaCount | default 1}} --timeout=600s
+            kubectl label --overwrite=true --selector=app=prometheus,release={{ .Release.Name }},heritage=Helm pod,service,statefulset -n {{ template "common.names.namespace" . }} app.kubernetes.io/managed-by=Helm
+            kubectl annotate --overwrite=true --selector=app=prometheus,release={{ .Release.Name }},heritage=Helm pod,service,statefulset -n {{ template "common.names.namespace" . }} meta.helm.sh/release-name={{ .Release.Name }}
+            kubectl annotate --overwrite=true --selector=app=prometheus,release={{ .Release.Name }},heritage=Helm pod,service,statefulset -n {{ template "common.names.namespace" . }} meta.helm.sh/release-namespace={{ .Release.Namespace }}
+            kubectl delete deployment --selector=app=prometheus,release={{ .Release.Name }},heritage=Helm -n {{ template "common.names.namespace" . }}
+            kubectl delete clusterrole,clusterrolebinding --selector=app=prometheus,release={{ .Release.Name }},heritage=Helm
+            kubectl delete pdb --selector=app.kubernetes.io/name=etcd,app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/managed-by=Helm -n {{ template "common.names.namespace" . }}
+{{- end }}
