@@ -2,7 +2,6 @@ package components
 
 import (
 	"fmt"
-	"math"
 
 	"go.uber.org/fx"
 
@@ -15,31 +14,29 @@ import (
 
 // SMA is a Simple Moving Average filter.
 type SMA struct {
-	lastGoodOutput    runtime.Reading
 	policyReadAPI     iface.Policy
 	sum               float64
-	count             uint32
-	runs              uint32
-	invalidCount      uint32
+	window            int
+	buffer            []float64
+	lastGoodOutput    runtime.Reading
 	validDuringWarmup bool
 }
 
-// Make sure EMA complies with Component interface.
+// Make sure SMA complies with Component interface.
 var _ runtime.Component = (*SMA)(nil)
 
 // NewSMAAndOptions returns a new SMA filter and its Fx options.
 func NewSMAAndOptions(smaProto *policylangv1.SMA, _ string, policyReadAPI iface.Policy) (*SMA, fx.Option, error) {
-	evaluationInterval := policyReadAPI.GetEvaluationInterval()
 	params := smaProto.GetParameters()
-
-	runs := math.Ceil(float64(params.SmaWindow.AsDuration()) / float64(evaluationInterval))
 
 	sma := &SMA{
 		policyReadAPI:     policyReadAPI,
-		runs:              uint32(runs),
+		window:            int(params.SmaWindow.AsDuration() / policyReadAPI.GetEvaluationInterval()),
+		buffer:            make([]float64, 0),
+		lastGoodOutput:    runtime.InvalidReading(),
 		validDuringWarmup: params.ValidDuringWarmup,
 	}
-	sma.reset()
+
 	return sma, fx.Options(), nil
 }
 
@@ -55,45 +52,34 @@ func (sma *SMA) Type() runtime.ComponentType {
 
 // ShortDescription returns a short description of the component.
 func (sma *SMA) ShortDescription() string {
-	return fmt.Sprintf("runs: %v", sma.runs)
+	return fmt.Sprintf("window: %d", sma.window)
 }
 
-// IsActuator implements runtime.Component.
+// IsActuator returns whether this component is a actuator or not.
 func (*SMA) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.Execute.
 func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	retErr := func(err error) (runtime.PortToReading, error) {
-		return runtime.PortToReading{
-			"output": []runtime.Reading{runtime.InvalidReading()},
-		}, err
-	}
-
 	input := inPortReadings.ReadSingleReadingPort("input")
-	output := runtime.InvalidReading()
+	var output runtime.Reading
 
 	if input.Valid() {
-		sma.sum += input.Value()
-		sma.count++
-		if sma.count <= sma.runs {
-			if sma.validDuringWarmup {
-				avg, err := sma.computeAverage()
-				if err != nil {
-					return retErr(err)
-				}
-				output = avg
-			} else {
-				output = runtime.InvalidReading()
-			}
+		sma.buffer = append(sma.buffer, input.Value())
+		if len(sma.buffer) > sma.window {
+			sma.sum -= sma.buffer[0]
+			sma.buffer = sma.buffer[1:]
+		} else {
+			sma.sum += input.Value()
 		}
-		if sma.count == sma.runs {
-			sma.reset()
+		if len(sma.buffer) == sma.window || sma.validDuringWarmup {
+			avg := sma.computeAverage()
+			output = runtime.NewReading(avg)
+		} else {
+			output = runtime.InvalidReading()
 		}
 	} else {
-		sma.invalidCount++
-		if sma.invalidCount >= sma.runs {
-			sma.reset()
-		}
+		sma.buffer = []float64{}
+		sma.sum = 0
 		output = sma.lastGoodOutput
 	}
 
@@ -101,24 +87,18 @@ func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 	if output.Valid() {
 		sma.lastGoodOutput = output
 	}
-	reading := runtime.PortToReading{"output": []runtime.Reading{output}}
-	return reading, nil
+
+	return runtime.PortToReading{
+		"output": []runtime.Reading{output},
+	}, nil
 }
 
 // DynamicConfigUpdate is a no-op for SMA.
 func (sma *SMA) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
-func (sma *SMA) reset() {
-	sma.invalidCount = 0
-	sma.sum = 0
-	sma.count = 0
-	sma.lastGoodOutput = runtime.InvalidReading()
-}
-
-func (sma *SMA) computeAverage() (runtime.Reading, error) {
-	if sma.count > 0 {
-		avg := sma.sum / float64(sma.count)
-		return runtime.NewReading(avg), nil
+func (sma *SMA) computeAverage() float64 {
+	if len(sma.buffer) > 0 {
+		return sma.sum / float64(len(sma.buffer))
 	}
-	return runtime.InvalidReading(), nil
+	return 0
 }
