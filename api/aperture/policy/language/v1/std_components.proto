@@ -207,7 +207,7 @@ message EMA {
     // Correction factor to apply on the output value if its in violation of the max envelope.
     double correction_factor_on_max_envelope_violation = 4; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
 
-    // Whether the output is valid during the warm up stage.
+    // Whether the output is valid during the warm-up stage.
     bool valid_during_warmup = 5; // @gotags: default:"false"
   }
 
@@ -218,6 +218,33 @@ message EMA {
   Outs out_ports = 2;
 
   // Parameters for the EMA component.
+  Parameters parameters = 3; // @gotags: validate:"required"
+}
+
+// Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
+message SMA {
+  message Ins {
+    // Signal to be used for the moving average computation.
+    InPort input = 1;
+  }
+  message Outs {
+    // Computed moving average.
+    OutPort output = 1;
+  }
+  message Parameters {
+    // Window of time over which the moving average is computed.
+    google.protobuf.Duration sma_window = 1; // @gotags: validate:"required"
+    // Whether the output is valid during the warm-up stage.
+    bool valid_during_warmup = 2; // @gotags: default:"false"
+  }
+
+  // Input ports for the SMA component.
+  Ins in_ports = 1;
+
+  // Output ports for the SMA component.
+  Outs out_ports = 2;
+
+  // Parameters for the SMA component.
   Parameters parameters = 3; // @gotags: validate:"required"
 }
 

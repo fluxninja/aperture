@@ -1426,6 +1426,18 @@ Query components that are query databases such as Prometheus.
 Generates the specified signal.
 
 </dd>
+<dt>sma</dt>
+<dd>
+
+<!-- vale off -->
+
+([SMA](#s-m-a))
+
+<!-- vale on -->
+
+Simple Moving Average filter.
+
+</dd>
 <dt>switcher</dt>
 <dd>
 
@@ -2135,11 +2147,11 @@ Duration of EMA sampling window.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
-Whether the output is valid during the warm up stage.
+Whether the output is valid during the warm-up stage.
 
 </dd>
 <dt>warmup_window</dt>
@@ -3313,7 +3325,7 @@ Dynamic Configuration for a Controller
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -5855,7 +5867,7 @@ Dynamic Configuration for ScaleActuator
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -6446,7 +6458,7 @@ The label value must be a valid uint64 number.
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -6764,6 +6776,136 @@ Note: Must include a "package" declaration.
 
 <!-- vale off -->
 
+### SMA {#s-m-a}
+
+<!-- vale on -->
+
+Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([SMAIns](#s-m-a-ins))
+
+<!-- vale on -->
+
+Input ports for the SMA component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([SMAOuts](#s-m-a-outs))
+
+<!-- vale on -->
+
+Output ports for the SMA component.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([SMAParameters](#s-m-a-parameters))
+
+<!-- vale on -->
+
+Parameters for the SMA component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SMAIns {#s-m-a-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>input</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Signal to be used for the moving average computation.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SMAOuts {#s-m-a-outs}
+
+<!-- vale on -->
+
+<dl>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Computed moving average.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SMAParameters {#s-m-a-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>sma_window</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Window of time over which the moving average is computed.
+
+</dd>
+<dt>valid_during_warmup</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Whether the output is valid during the warm-up stage.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### ScaleInController {#scale-in-controller}
 
 <!-- vale on -->
@@ -6996,7 +7138,7 @@ Scheduler parameters
 
 <!-- vale off -->
 
-(bool)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -7064,7 +7206,7 @@ Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored
 
 <!-- vale off -->
 
-(float64)
+(float64, default: `0`)
 
 <!-- vale on -->
 
@@ -7190,7 +7332,7 @@ you have a classifier that sets `user` flow label, you might want to set
 
 <!-- vale off -->
 
-(int64, minimum: `0`, maximum: `255`)
+(int64, minimum: `0`, maximum: `255`, default: `0`)
 
 <!-- vale on -->
 

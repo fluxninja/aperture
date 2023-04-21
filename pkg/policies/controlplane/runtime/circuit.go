@@ -262,16 +262,17 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	for sig, reading := range circuit.loopedSignals {
 		circuitSignalReadings[sig] = reading
 	}
+
 	// Clear looped signals for next tick
 	circuit.loopedSignals = signalToReading{}
 	// Map of executed components for this tick
 	executedComponents := make(map[int]bool)
 	// Number of components executed
 	var numExecutedBefore, numExecutedAfter int
+
 	// Loop rounds until no components are executed
 	for len(executedComponents) < len(circuit.components) {
 		numExecutedBefore = len(executedComponents)
-
 	OUTER:
 		// Check readiness by component and execute if ready
 		for cmpIdx, cmp := range circuit.components {

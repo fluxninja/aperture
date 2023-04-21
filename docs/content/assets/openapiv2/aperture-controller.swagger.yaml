@@ -859,6 +859,9 @@ definitions:
       signal_generator:
         description: Generates the specified signal.
         $ref: '#/definitions/SignalGenerator'
+      sma:
+        description: Simple Moving Average filter.
+        $ref: '#/definitions/SMA'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
@@ -1176,7 +1179,7 @@ definitions:
         x-go-tag-validate: required
       valid_during_warmup:
         description: |+
-          Whether the output is valid during the warm up stage.
+          Whether the output is valid during the warm-up stage.
 
         type: boolean
         default: false
@@ -3275,6 +3278,53 @@ definitions:
         type: string
         x-deprecated: true
         x-go-tag-validate: deprecated,required
+  SMA:
+    description: Simple Moving Average (SMA) is a type of moving average that computes
+      the average of a fixed number of signal readings.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the SMA component.
+        $ref: '#/definitions/SMAIns'
+      out_ports:
+        description: Output ports for the SMA component.
+        $ref: '#/definitions/SMAOuts'
+      parameters:
+        description: |+
+          Parameters for the SMA component.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/SMAParameters'
+  SMAIns:
+    type: object
+    properties:
+      input:
+        description: Signal to be used for the moving average computation.
+        $ref: '#/definitions/InPort'
+  SMAOuts:
+    type: object
+    properties:
+      output:
+        description: Computed moving average.
+        $ref: '#/definitions/OutPort'
+  SMAParameters:
+    type: object
+    required:
+    - sma_window
+    properties:
+      sma_window:
+        description: |+
+          Window of time over which the moving average is computed.
+
+        type: string
+        x-go-tag-validate: required
+      valid_during_warmup:
+        description: |+
+          Whether the output is valid during the warm-up stage.
+
+        type: boolean
+        default: false
+        x-go-tag-default: "false"
   ScaleInController:
     type: object
     properties:

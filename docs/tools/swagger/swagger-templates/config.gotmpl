@@ -85,8 +85,8 @@
 
 {{/* Like fnDefault, but appropriate to rendering within body of text */ -}}
 {{- define "fnDefaultInline" }}
-  {{- with .Default -}}
-    , default: `{{ json . }}`
+  {{- if ne (json .Default) "null" -}}
+    , default: `{{ json .Default }}`
   {{- end -}}
 {{- end -}}
 

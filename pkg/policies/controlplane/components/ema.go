@@ -58,10 +58,7 @@ func (*EMA) IsActuator() bool { return false }
 var _ runtime.Component = (*EMA)(nil)
 
 // NewEMAAndOptions returns a new EMA filter and its Fx options.
-func NewEMAAndOptions(emaProto *policylangv1.EMA,
-	_ string,
-	policyReadAPI iface.Policy,
-) (*EMA, fx.Option, error) {
+func NewEMAAndOptions(emaProto *policylangv1.EMA, _ string, policyReadAPI iface.Policy) (*EMA, fx.Option, error) {
 	// period of tick
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 	params := emaProto.GetParameters()
