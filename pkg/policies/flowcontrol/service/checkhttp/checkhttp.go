@@ -148,7 +148,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
-	classifierMsgs, newFlowLabels, tokens := h.classifier.Classify(ctx, destinationSvcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, destinationSvcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -175,7 +175,6 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 			Services:     destinationSvcs,
 			ControlPoint: ctrlPt,
 			FlowLabels:   flowLabels,
-			Tokens:       tokens,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs

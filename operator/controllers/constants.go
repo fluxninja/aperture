@@ -113,6 +113,12 @@ const (
 	AgentControllerClientCertPath = "/etc/aperture/aperture-agent/certs"
 	// AgentControllerClientCertCMName defines Controller client cert ConfigMap name.
 	AgentControllerClientCertCMName = AgentServiceName + "-client-cert"
+	// OperatorCertName defines operator cert name.
+	OperatorCertName = "crt.pem"
+	// OperatorCertKeyName defines operator key name.
+	OperatorCertKeyName = "key.pem"
+	// OperatorCAName defines operator CA name.
+	OperatorCAName = "ca.pem"
 )
 
 var (

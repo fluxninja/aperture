@@ -105,7 +105,7 @@ const (
 	PolicyHashLabel = "policy_hash"
 	// ComponentIDLabel - index of component in circuit label.
 	ComponentIDLabel = "component_id"
-	// DecisionTypeLabel - label for decision type dropped or accepted.
+	// DecisionTypeLabel - label for decision type rejected or accepted.
 	DecisionTypeLabel = "decision_type"
 	// WorkloadIndexLabel - label for choosing correct workload.
 	WorkloadIndexLabel = "workload_index"

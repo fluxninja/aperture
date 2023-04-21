@@ -12,6 +12,7 @@ import (
 
 	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -186,7 +187,10 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 					merr = multierr.Append(merr, err)
 				}
 			}
-			return merr
+			if merr != nil {
+				log.Info().Msgf("stopping circuit: %v", merr)
+			}
+			return nil
 		},
 	})
 }

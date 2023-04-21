@@ -23,6 +23,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -175,7 +176,7 @@ func applyObjectToKubernetesWithRetry(unstructuredObject *unstructured.Unstructu
 	for attempt < 5 {
 		attempt++
 		err := applyObjectToKubernetes(unstructuredObject)
-		if err == nil || (!strings.Contains(err.Error(), "no matches for kind") && !apierrors.IsConflict(err)) {
+		if err == nil || (!apimeta.IsNoMatchError(err) && !apierrors.IsConflict(err)) {
 			return err
 		}
 		time.Sleep(time.Second * time.Duration(attempt))

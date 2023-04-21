@@ -138,7 +138,7 @@ func main() {
 	var server *webhook.Server
 
 	if agentManager || controllerManager {
-		if err = controllers.CheckAndGenerateCertForOperator(); err != nil {
+		if err = controllers.CheckAndGenerateCertForOperator(ctrl.GetConfigOrDie()); err != nil {
 			setupLog.Error(err, "unable to manage webhook certificates")
 			os.Exit(1)
 		}

@@ -63,17 +63,13 @@ func secretForControllerCert(instance *controllerv1alpha1.Controller, scheme *ru
 		ObjectMeta: v1.ObjectMeta{
 			Name:        fmt.Sprintf("%s-controller-cert", instance.GetName()),
 			Namespace:   instance.GetNamespace(),
-			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
+			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AppName),
 			Annotations: instance.Spec.Annotations,
 		},
 		Data: map[string][]byte{
 			controllers.ControllerCertName:    serverCert.Bytes(),
 			controllers.ControllerCertKeyName: serverKey.Bytes(),
 		},
-	}
-
-	if err := ctrl.SetControllerReference(instance, secret, scheme); err != nil {
-		return nil, err
 	}
 
 	return secret, nil
@@ -84,7 +80,7 @@ func createSecretForController(
 	client client.Client, recorder record.EventRecorder, secret *corev1.Secret, ctx context.Context, instance *controllerv1alpha1.Controller) (
 	controllerutil.OperationResult, error,
 ) {
-	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, controllers.SecretMutate(secret, secret.Data))
+	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, controllers.SecretMutate(secret, secret.Data, secret.OwnerReferences))
 	if err != nil {
 		if errors.IsConflict(err) {
 			return createSecretForController(client, recorder, secret, ctx, instance)

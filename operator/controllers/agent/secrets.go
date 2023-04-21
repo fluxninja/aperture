@@ -66,7 +66,7 @@ func CreateSecretForAgent(
 	client client.Client, recorder record.EventRecorder, secret *corev1.Secret, ctx context.Context, instance *agentv1alpha1.Agent) (
 	controllerutil.OperationResult, error,
 ) {
-	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, controllers.SecretMutate(secret, secret.Data))
+	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, controllers.SecretMutate(secret, secret.Data, secret.OwnerReferences))
 	if err != nil {
 		if errors.IsConflict(err) {
 			return CreateSecretForAgent(client, recorder, secret, ctx, instance)

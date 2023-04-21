@@ -4819,6 +4819,8 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for TokensLabelKey
+
 	if len(errors) > 0 {
 		return RateLimiter_ParametersMultiError(errors)
 	}
@@ -5683,6 +5685,8 @@ func (m *Scheduler_Parameters) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for TokensLabelKey
 
 	if len(errors) > 0 {
 		return Scheduler_ParametersMultiError(errors)

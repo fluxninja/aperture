@@ -231,7 +231,7 @@ func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err 
 	secrets, err := clientset.CoreV1().Secrets(controllerNs).List(
 		context.Background(),
 		metav1.ListOptions{
-			LabelSelector: labels.Set{"app.kubernetes.io/component": "aperture-controller"}.String(),
+			LabelSelector: labels.Set{"app.kubernetes.io/name": "aperture"}.String(),
 		},
 	)
 	if err != nil || len(secrets.Items) == 0 {

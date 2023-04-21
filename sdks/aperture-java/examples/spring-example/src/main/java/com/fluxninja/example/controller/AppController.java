@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AppController {
-    // /super endpoint is protected by a Filter created using Aperture SDK feature flow
+    // /super endpoint is protected by imported, ready-to-use Aperture Filter
     @RequestMapping(value = "/super", method = RequestMethod.GET)
     public String hello() {
         return "Hello World";
     }
 
-    // /super2 endpoint is protected by imported, ready-to-use Aperture Filter
+    // /super2 endpoint is protected by a Filter created using Aperture SDK feature flow
     @RequestMapping(value = "/super2", method = RequestMethod.GET)
     public String hello2() {
         return "Hello World 2";
@@ -45,6 +45,8 @@ public class AppController {
         registrationBean.addInitParameter("agent_host", agentHost);
         String agentPort = env.getProperty("FN_AGENT_PORT");
         registrationBean.addInitParameter("agent_port", agentPort);
+        String grpcTimeoutMs = env.getProperty("FN_GRPC_TIMEOUT_MS");
+        registrationBean.addInitParameter("timeout_ms", grpcTimeoutMs);
         String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
         registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
         String rootCertificateFile = env.getProperty("FN_ROOT_CERTIFICATE_FILE");

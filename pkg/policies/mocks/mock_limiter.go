@@ -38,6 +38,20 @@ func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 	return m.recorder
 }
 
+// Decide mocks base method.
+func (m *MockLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Decide", ctx, labels)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	return ret0
+}
+
+// Decide indicates an expected call of Decide.
+func (mr *MockLimiterMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockLimiter)(nil).Decide), ctx, labels)
+}
+
 // GetFlowSelector mocks base method.
 func (m *MockLimiter) GetFlowSelector() *languagev1.FlowSelector {
 	m.ctrl.T.Helper()
@@ -94,18 +108,16 @@ func (mr *MockLimiterMockRecorder) GetRequestCounter(labels interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockLimiter)(nil).GetRequestCounter), labels)
 }
 
-// RunLimiter mocks base method.
-func (m *MockLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *checkv1.LimiterDecision {
+// Revert mocks base method.
+func (m *MockLimiter) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels, tokens)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
-	return ret0
+	m.ctrl.Call(m, "Revert", labels, decision)
 }
 
-// RunLimiter indicates an expected call of RunLimiter.
-func (mr *MockLimiterMockRecorder) RunLimiter(ctx, labels, tokens interface{}) *gomock.Call {
+// Revert indicates an expected call of Revert.
+func (mr *MockLimiterMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockLimiter)(nil).RunLimiter), ctx, labels, tokens)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockLimiter)(nil).Revert), labels, decision)
 }
 
 // MockRateLimiter is a mock of RateLimiter interface.
@@ -129,6 +141,20 @@ func NewMockRateLimiter(ctrl *gomock.Controller) *MockRateLimiter {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockRateLimiter) EXPECT() *MockRateLimiterMockRecorder {
 	return m.recorder
+}
+
+// Decide mocks base method.
+func (m *MockRateLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Decide", ctx, labels)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	return ret0
+}
+
+// Decide indicates an expected call of Decide.
+func (mr *MockRateLimiterMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockRateLimiter)(nil).Decide), ctx, labels)
 }
 
 // GetFlowSelector mocks base method.
@@ -187,18 +213,16 @@ func (mr *MockRateLimiterMockRecorder) GetRequestCounter(labels interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockRateLimiter)(nil).GetRequestCounter), labels)
 }
 
-// RunLimiter mocks base method.
-func (m *MockRateLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *checkv1.LimiterDecision {
+// Revert mocks base method.
+func (m *MockRateLimiter) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels, tokens)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
-	return ret0
+	m.ctrl.Call(m, "Revert", labels, decision)
 }
 
-// RunLimiter indicates an expected call of RunLimiter.
-func (mr *MockRateLimiterMockRecorder) RunLimiter(ctx, labels, tokens interface{}) *gomock.Call {
+// Revert indicates an expected call of Revert.
+func (mr *MockRateLimiterMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockRateLimiter)(nil).RunLimiter), ctx, labels, tokens)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockRateLimiter)(nil).Revert), labels, decision)
 }
 
 // TakeN mocks base method.
@@ -239,6 +263,20 @@ func NewMockConcurrencyLimiter(ctrl *gomock.Controller) *MockConcurrencyLimiter 
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockConcurrencyLimiter) EXPECT() *MockConcurrencyLimiterMockRecorder {
 	return m.recorder
+}
+
+// Decide mocks base method.
+func (m *MockConcurrencyLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Decide", ctx, labels)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	return ret0
+}
+
+// Decide indicates an expected call of Decide.
+func (mr *MockConcurrencyLimiterMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockConcurrencyLimiter)(nil).Decide), ctx, labels)
 }
 
 // GetFlowSelector mocks base method.
@@ -311,16 +349,14 @@ func (mr *MockConcurrencyLimiterMockRecorder) GetRequestCounter(labels interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetRequestCounter), labels)
 }
 
-// RunLimiter mocks base method.
-func (m *MockConcurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *checkv1.LimiterDecision {
+// Revert mocks base method.
+func (m *MockConcurrencyLimiter) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels, tokens)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
-	return ret0
+	m.ctrl.Call(m, "Revert", labels, decision)
 }
 
-// RunLimiter indicates an expected call of RunLimiter.
-func (mr *MockConcurrencyLimiterMockRecorder) RunLimiter(ctx, labels, tokens interface{}) *gomock.Call {
+// Revert indicates an expected call of Revert.
+func (mr *MockConcurrencyLimiterMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).RunLimiter), ctx, labels, tokens)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockConcurrencyLimiter)(nil).Revert), labels, decision)
 }

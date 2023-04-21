@@ -17,9 +17,11 @@ limitations under the License.
 package controllers
 
 import (
+	"golang.org/x/exp/slices"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
@@ -62,9 +64,12 @@ func MutatingWebhookConfigurationMutate(mwc *admissionregistrationv1.MutatingWeb
 }
 
 // SecretMutate returns a mutate function that can be used to update the Secret's data.
-func SecretMutate(secret *corev1.Secret, data map[string][]byte) controllerutil.MutateFn {
+func SecretMutate(secret *corev1.Secret, data map[string][]byte, ownerReferences []v1.OwnerReference) controllerutil.MutateFn {
 	return func() error {
 		secret.Data = data
+		if !slices.Equal(secret.OwnerReferences, ownerReferences) {
+			secret.OwnerReferences = ownerReferences
+		}
 		return nil
 	}
 }
@@ -91,7 +96,6 @@ func ValidatingWebhookConfigurationMutate(vwc *admissionregistrationv1.Validatin
 	return func() error {
 		vwc.Webhooks[0].AdmissionReviewVersions = webhooks[0].AdmissionReviewVersions
 		vwc.Webhooks[0].ClientConfig = webhooks[0].ClientConfig
-		vwc.Webhooks[0].NamespaceSelector = webhooks[0].NamespaceSelector
 		vwc.Webhooks[0].ObjectSelector = webhooks[0].ObjectSelector
 		vwc.Webhooks[0].Rules = webhooks[0].Rules
 		vwc.Webhooks[0].FailurePolicy = webhooks[0].FailurePolicy

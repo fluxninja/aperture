@@ -13,7 +13,6 @@ type RequestContext struct {
 	FlowLabels   map[string]string
 	ControlPoint string
 	Services     []string
-	Tokens       uint64
 }
 
 // Engine is an interface for registering fluxmeters and schedulers.

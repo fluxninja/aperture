@@ -142,7 +142,7 @@ workflows:
             packaging/cli/.* updated-aperturectl-packaging true
             operator/(api|config|controllers|hack)/.*|operator/main.go updated-aperture-operator true
             (go.mod|go.sum) updated-aperture true
-            docs/.* updated-aperture-docs true
+            docs/.*|.github/styles/Vocab/FluxNinja/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
             operator/config/crd/bases/.* updated-aperture-charts true
             playground/demo_app/.* updated-demo-app true
