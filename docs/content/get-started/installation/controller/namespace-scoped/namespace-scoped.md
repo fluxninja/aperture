@@ -190,6 +190,13 @@ Aperture Controller into your cluster.
    <CodeBlock language="bash">
    {`helm template controller aperture/aperture-controller -f values.yaml | kubectl apply -f -`}
    </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade controller aperture/aperture-controller -f values.yaml`}
+   </CodeBlock>
    </TabItem>
    </Tabs>
 
@@ -205,6 +212,13 @@ Aperture Controller into your cluster.
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template controller aperture/aperture-controller -f values.yaml --namespace aperture-controller | kubectl apply -f -`}
+   </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade controller aperture/aperture-controller -f values.yaml --namespace aperture-controller`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -264,6 +278,6 @@ Use the same `values.yaml` file created as part of
    you want to delete them, run the below commands:
 
    ```bash
-   kubectl delete secret controller-aperture-controller-cert
-   kubectl delete configmap controller-aperture-controller-client-cert
+   kubectl delete secret -l app.kubernetes.io/instance=controller-aperture-controller
+   kubectl delete configmap -l app.kubernetes.io/instance=controller-aperture-controller
    ```
