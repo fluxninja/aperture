@@ -191,7 +191,7 @@ Aperture Controller into your cluster.
    {`helm template controller aperture/aperture-controller -f values.yaml | kubectl apply -f -`}
    </CodeBlock>
 
-   Once all the pods are in running state after upgrade, run the below command
+   Once all the pods are in a running state after upgrade, run the below command
    to keep the Helm release updated:
 
    <CodeBlock language="bash">
@@ -214,7 +214,7 @@ Aperture Controller into your cluster.
    {`helm template controller aperture/aperture-controller -f values.yaml --namespace aperture-controller | kubectl apply -f -`}
    </CodeBlock>
 
-   Once all the pods are in running state after upgrade, run the below command
+   Once all the pods are in a running state after upgrade, run the below command
    to keep the Helm release updated:
 
    <CodeBlock language="bash">

@@ -173,7 +173,7 @@ Aperture Agent into your cluster.
    {`helm template agent aperture/aperture-agent -f values.yaml | kubectl apply -f -`}
    </CodeBlock>
 
-   Once all the pods are in running state after upgrade, run the below command
+   Once all the pods are in a running state after upgrade, run the below command
    to keep the Helm release updated:
 
    <CodeBlock language="bash">
@@ -196,7 +196,7 @@ Aperture Agent into your cluster.
    {`helm template agent aperture/aperture-agent -f values.yaml --namespace aperture-agent | kubectl apply -f -`}
    </CodeBlock>
 
-   Once all the pods are in running state after upgrade, run the below command
+   Once all the pods are in a running state after upgrade, run the below command
    to keep the Helm release updated:
 
    <CodeBlock language="bash">
