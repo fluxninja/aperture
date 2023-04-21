@@ -20,6 +20,7 @@ type SMA struct {
 	buffer            []float64
 	lastGoodOutput    runtime.Reading
 	validDuringWarmup bool
+	invalidCounter    int
 }
 
 // Make sure SMA complies with Component interface.
@@ -35,6 +36,7 @@ func NewSMAAndOptions(smaProto *policylangv1.SMA, _ string, policyReadAPI iface.
 		buffer:            make([]float64, 0),
 		lastGoodOutput:    runtime.InvalidReading(),
 		validDuringWarmup: params.ValidDuringWarmup,
+		invalidCounter:    0,
 	}
 
 	return sma, fx.Options(), nil
@@ -77,8 +79,12 @@ func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 			output = runtime.InvalidReading()
 		}
 	} else {
-		sma.buffer = []float64{}
-		sma.sum = 0
+		sma.invalidCounter++
+		if sma.invalidCounter >= sma.window {
+			sma.buffer = []float64{}
+			sma.sum = 0
+			sma.invalidCounter = 0
+		}
 		output = sma.lastGoodOutput
 	}
 
