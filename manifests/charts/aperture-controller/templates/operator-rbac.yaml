@@ -30,6 +30,7 @@ rules:
   - apps
   resources:
   - deployments
+  - statefulsets
   verbs:
   - create
   - delete
@@ -74,6 +75,7 @@ rules:
   - secrets
   - serviceaccounts
   - services
+  - pods
   verbs:
   - create
   - delete
@@ -117,6 +119,14 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - delete
+  - get
+  - list
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
