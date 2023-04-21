@@ -303,6 +303,12 @@ jobs:
             tanka
             yq
       - run:
+          name: Install Go tools
+          command: scripts/manage_go_tools.sh
+      - run:
+          name: Install Python tools
+          command: scripts/manage_python_tools.sh
+      - run:
           name: Install additional system dependencies for pre-commit
           command: |
             sudo apt-get update
