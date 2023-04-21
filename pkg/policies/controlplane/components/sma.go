@@ -68,9 +68,8 @@ func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 		if len(sma.buffer) > sma.window {
 			sma.sum -= sma.buffer[0]
 			sma.buffer = sma.buffer[1:]
-		} else {
-			sma.sum += input.Value()
 		}
+		sma.sum += input.Value()
 		if len(sma.buffer) == sma.window || sma.validDuringWarmup {
 			avg := sma.computeAverage()
 			output = runtime.NewReading(avg)
