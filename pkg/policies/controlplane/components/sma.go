@@ -75,6 +75,7 @@ func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 		if len(sma.buffer) == sma.window || sma.validDuringWarmup {
 			avg := sma.computeAverage()
 			output = runtime.NewReading(avg)
+			sma.invalidCounter = 0
 		} else {
 			output = runtime.InvalidReading()
 		}
