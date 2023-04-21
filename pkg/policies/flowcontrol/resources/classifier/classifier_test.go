@@ -147,7 +147,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies input by returning flow labels", func() {
-			_, labels, _ := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
@@ -164,7 +164,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("does not classify if direction does not match", func() {
-			_, labels, _ := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"egress",
@@ -178,7 +178,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("skips rules with non-matching labels", func() {
-			_, labels, _ := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
@@ -196,8 +196,8 @@ var _ = Describe("Classifier", func() {
 		Context("when ruleset is dropped", func() {
 			BeforeEach(func() { ars1.Drop() })
 
-			It("removes removes subset of rules", func() {
-				_, labels, _ := classifier.Classify(
+			It("removes subset of rules", func() {
+				_, labels := classifier.Classify(
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
 					"ingress",
@@ -270,7 +270,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("marks the returned flow labels with those flags", func() {
-			_, labels, _ := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
@@ -313,7 +313,7 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			_, labels, _ := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
@@ -369,7 +369,7 @@ var _ = Describe("Classifier", func() {
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
 			// Perhaps we can specify order by sorting rulesets? (eg. giving
 			// them names from filenames)
-			_, labels, _ := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
@@ -432,7 +432,7 @@ var _ = Describe("Classifier", func() {
 		})
 
 		It("classifies and returns empty flow labels - could not decide which rego to use", func() {
-			_, labels, _ := classifier.Classify(
+			_, labels := classifier.Classify(
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
@@ -490,7 +490,8 @@ func attributesWithHeaders(headers object) ast.Value {
 					"headers": headers,
 				},
 			},
-		}}
+		},
+	}
 	return ast.MustInterfaceToValue(input)
 }
 

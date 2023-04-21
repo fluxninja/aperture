@@ -35,9 +35,11 @@ public final class Flow {
         }
         this.ended = true;
 
-        String checkResponseJSONBytes;
+        String checkResponseJSONBytes = "";
         try {
-            checkResponseJSONBytes = JsonFormat.printer().print(this.checkResponse);
+            if (this.checkResponse != null) {
+                checkResponseJSONBytes = JsonFormat.printer().print(this.checkResponse);
+            }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             throw new ApertureSDKException(e);
         }

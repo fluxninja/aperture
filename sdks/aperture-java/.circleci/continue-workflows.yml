@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Publish to Sonatype
           command: |
-            GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) gradle assemble publishToSonatype
+            GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) ./gradlew assemble publishToSonatype
       - save_cache:
           paths:
             - ~/.gradle

@@ -173,17 +173,6 @@ java.lang.String defaultValue) {
     return map.get(key);
   }
 
-  public static final int TOKENS_FIELD_NUMBER = 3;
-  private long tokens_ = 0L;
-  /**
-   * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
-   * @return The tokens.
-   */
-  @java.lang.Override
-  public long getTokens() {
-    return tokens_;
-  }
-
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -207,9 +196,6 @@ java.lang.String defaultValue) {
         internalGetLabels(),
         LabelsDefaultEntryHolder.defaultEntry,
         2);
-    if (tokens_ != 0L) {
-      output.writeUInt64(3, tokens_);
-    }
     getUnknownFields().writeTo(output);
   }
 
@@ -232,10 +218,6 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, labels__);
     }
-    if (tokens_ != 0L) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeUInt64Size(3, tokens_);
-    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -255,8 +237,6 @@ java.lang.String defaultValue) {
         .equals(other.getControlPoint())) return false;
     if (!internalGetLabels().equals(
         other.internalGetLabels())) return false;
-    if (getTokens()
-        != other.getTokens()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -274,9 +254,6 @@ java.lang.String defaultValue) {
       hash = (37 * hash) + LABELS_FIELD_NUMBER;
       hash = (53 * hash) + internalGetLabels().hashCode();
     }
-    hash = (37 * hash) + TOKENS_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getTokens());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -434,7 +411,6 @@ java.lang.String defaultValue) {
       bitField0_ = 0;
       controlPoint_ = "";
       internalGetMutableLabels().clear();
-      tokens_ = 0L;
       return this;
     }
 
@@ -475,9 +451,6 @@ java.lang.String defaultValue) {
         result.labels_ = internalGetLabels();
         result.labels_.makeImmutable();
       }
-      if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.tokens_ = tokens_;
-      }
     }
 
     @java.lang.Override
@@ -500,9 +473,6 @@ java.lang.String defaultValue) {
       internalGetMutableLabels().mergeFrom(
           other.internalGetLabels());
       bitField0_ |= 0x00000002;
-      if (other.getTokens() != 0L) {
-        setTokens(other.getTokens());
-      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -543,11 +513,6 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00000002;
               break;
             } // case 18
-            case 24: {
-              tokens_ = input.readUInt64();
-              bitField0_ |= 0x00000004;
-              break;
-            } // case 24
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -761,38 +726,6 @@ java.lang.String defaultValue) {
       internalGetMutableLabels().getMutableMap()
           .putAll(values);
       bitField0_ |= 0x00000002;
-      return this;
-    }
-
-    private long tokens_ ;
-    /**
-     * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
-     * @return The tokens.
-     */
-    @java.lang.Override
-    public long getTokens() {
-      return tokens_;
-    }
-    /**
-     * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
-     * @param value The tokens to set.
-     * @return This builder for chaining.
-     */
-    public Builder setTokens(long value) {
-
-      tokens_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearTokens() {
-      bitField0_ = (bitField0_ & ~0x00000004);
-      tokens_ = 0L;
-      onChanged();
       return this;
     }
     @java.lang.Override

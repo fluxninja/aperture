@@ -6,14 +6,14 @@ WORKDIR /
 
 COPY --link . .
 
-RUN gradle javaagent:agent:shadowJar
-RUN gradle javaagent:test-services:armeria-test-service:shadowJar
-RUN gradle javaagent:test-services:netty-test-service:shadowJar
+RUN ./gradlew javaagent:agent:shadowJar
+RUN ./gradlew javaagent:test-services:armeria-test-service:shadowJar
+RUN ./gradlew javaagent:test-services:netty-test-service:shadowJar
 
-RUN gradle examples:armeria-example:shadowJar
-RUN gradle examples:netty-example:shadowJar
-RUN gradle examples:standalone-example:shadowJar
-RUN gradle examples:spring-example:assemble
+RUN ./gradlew examples:armeria-example:shadowJar
+RUN ./gradlew examples:netty-example:shadowJar
+RUN ./gradlew examples:standalone-example:shadowJar
+RUN ./gradlew examples:spring-example:assemble
 # TODO: also add tomcat here
 
 FROM --platform=linux/amd64 openjdk:18-jdk-alpine

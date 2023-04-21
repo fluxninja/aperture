@@ -32,7 +32,7 @@ Supported technologies:
 Jar of the java agent can be built from aperture-java root directory, using the
 following command:
 
-`gradle javaagent:agent:shadowJar`
+`./gradlew javaagent:agent:shadowJar`
 
 The resulting jar can be found in the `aperture-java/javaagent/agent/build/libs`
 directory.

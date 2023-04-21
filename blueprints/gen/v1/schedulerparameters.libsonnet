@@ -31,6 +31,12 @@
   withTimeoutFactorMixin(timeout_factor):: {
     timeout_factor+: timeout_factor,
   },
+  withTokensLabelKey(tokens_label_key):: {
+    tokens_label_key: tokens_label_key,
+  },
+  withTokensLabelKeyMixin(tokens_label_key):: {
+    tokens_label_key+: tokens_label_key,
+  },
   withWorkloads(workloads):: {
     workloads:
       if std.isArray(workloads)

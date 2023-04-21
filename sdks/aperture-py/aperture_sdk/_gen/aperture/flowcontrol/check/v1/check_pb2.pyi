@@ -8,7 +8,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CheckRequest(_message.Message):
-    __slots__ = ["control_point", "labels", "tokens"]
+    __slots__ = ["control_point", "labels"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -18,11 +18,9 @@ class CheckRequest(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     CONTROL_POINT_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
-    TOKENS_FIELD_NUMBER: _ClassVar[int]
     control_point: str
     labels: _containers.ScalarMap[str, str]
-    tokens: int
-    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., tokens: _Optional[int] = ...) -> None: ...
+    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CheckResponse(_message.Message):
     __slots__ = ["start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions"]
@@ -108,19 +106,23 @@ class LimiterDecision(_message.Message):
     LIMITER_REASON_UNSPECIFIED: LimiterDecision.LimiterReason
     LIMITER_REASON_KEY_NOT_FOUND: LimiterDecision.LimiterReason
     class RateLimiterInfo(_message.Message):
-        __slots__ = ["remaining", "current", "label"]
+        __slots__ = ["remaining", "current", "label", "tokens_consumed"]
         REMAINING_FIELD_NUMBER: _ClassVar[int]
         CURRENT_FIELD_NUMBER: _ClassVar[int]
         LABEL_FIELD_NUMBER: _ClassVar[int]
+        TOKENS_CONSUMED_FIELD_NUMBER: _ClassVar[int]
         remaining: int
         current: int
         label: str
-        def __init__(self, remaining: _Optional[int] = ..., current: _Optional[int] = ..., label: _Optional[str] = ...) -> None: ...
+        tokens_consumed: int
+        def __init__(self, remaining: _Optional[int] = ..., current: _Optional[int] = ..., label: _Optional[str] = ..., tokens_consumed: _Optional[int] = ...) -> None: ...
     class ConcurrencyLimiterInfo(_message.Message):
-        __slots__ = ["workload_index"]
+        __slots__ = ["workload_index", "tokens_consumed"]
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
+        TOKENS_CONSUMED_FIELD_NUMBER: _ClassVar[int]
         workload_index: str
-        def __init__(self, workload_index: _Optional[str] = ...) -> None: ...
+        tokens_consumed: int
+        def __init__(self, workload_index: _Optional[str] = ..., tokens_consumed: _Optional[int] = ...) -> None: ...
     class FlowRegulatorInfo(_message.Message):
         __slots__ = ["label"]
         LABEL_FIELD_NUMBER: _ClassVar[int]
