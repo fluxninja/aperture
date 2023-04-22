@@ -67,11 +67,7 @@ func NewFlowRegulatorAndOptions(
 		dynamicConfigEtcdPath: dynamicConfigEtcdPath,
 		componentID:           componentID,
 	}
-	return regulatorSync, fx.Options(
-		fx.Invoke(
-			regulatorSync.setupSync,
-		),
-	), nil
+	return regulatorSync, fx.Invoke(regulatorSync.setupSync), nil
 }
 
 func (regulatorSync *flowRegulatorSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
