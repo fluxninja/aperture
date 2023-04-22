@@ -78,7 +78,7 @@ func NewRateLimiterAndOptions(
 		flowSelectorProto:     flowSelectorProto,
 	}
 
-	return limiterSync, fx.Options(fx.Invoke(limiterSync.setupSync)), nil
+	return limiterSync, fx.Invoke(limiterSync.setupSync), nil
 }
 
 func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
