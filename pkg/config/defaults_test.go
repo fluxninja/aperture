@@ -48,15 +48,20 @@ type ExampleBasic struct {
 	IntSliceSlice    [][]int       `default:"[[1],[2],[3],[4]]"`
 	StringSliceSlice [][]string    `default:"[[1],[]]"`
 
-	ConfigDuration Duration             `default:"10s"`
-	PBDuration     *durationpb.Duration `default:"3s"`
-	ExamplePtr     *ExamplePtr
-	ExamplePtrPtr  **ExamplePtr
+	ConfigDuration      Duration             `default:"10s"`
+	ConfigDurationSlice []Duration           `default:"[1s,2s,3s,4s]"`
+	PBDuration          *durationpb.Duration `default:"3s"`
+	ExamplePtr          *ExamplePtr
+	ExamplePtrPtr       **ExamplePtr
+
+	StringStringMap   map[string]string        `default:"{foo:bar}"`
+	StringIntMap      map[string]int           `default:"{foo:1}"`
+	StringDurationMap map[string]time.Duration `default:"{foo:1s}"`
 }
 
 type ExamplePtr struct {
-	Integer    int       `default:"33"`
 	FloatSlice []float64 `default:"[1.1,2.2,3.3,4.4]"`
+	Integer    int       `default:"33"`
 }
 
 type ExampleNested struct {
@@ -110,21 +115,32 @@ var _ = Describe("DefaultTest", func() {
 
 		It("should set defaults with values", func() {
 			exampleBasic = &ExampleBasic{
-				Integer:  55,
-				UInteger: 22,
-				Float32:  9.9,
-				String:   "bar",
-				Bytes:    []byte("foo"),
-				Children: []Child{{Name: "alice"}, {Name: "bob", Age: 2}},
+				Integer:     55,
+				UInteger:    22,
+				Float32:     9.9,
+				String:      "bar",
+				Bytes:       []byte("foo"),
+				Children:    []Child{{Name: "alice"}, {Name: "bob", Age: 2}},
+				Duration:    2 * time.Second,
+				PBDuration:  durationpb.New(2 * time.Second),
+				StringSlice: []string{"11", "22"},
 			}
 			SetDefaults(exampleBasic)
 
 			Expect(exampleBasic.Integer).To(Equal(55))
+			Expect(exampleBasic.Integer8).To(Equal(int8(8)))
 			Expect(exampleBasic.UInteger).To(Equal(uint(22)))
 			Expect(exampleBasic.Float32).To(Equal(float32(9.9)))
 			Expect(exampleBasic.String).To(Equal("bar"))
 			Expect(string(exampleBasic.Bytes)).To(Equal("foo"))
 			Expect(exampleBasic.Children).To(HaveLen(2))
+			Expect(exampleBasic.Children[0].Name).To(Equal("alice"))
+			Expect(exampleBasic.Children[0].Age).To(Equal(10))
+			Expect(exampleBasic.Children[1].Name).To(Equal("bob"))
+			Expect(exampleBasic.Children[1].Age).To(Equal(2))
+			Expect(exampleBasic.Duration).To(Equal(2 * time.Second))
+			Expect(exampleBasic.PBDuration.AsDuration()).To(Equal(2 * time.Second))
+			Expect(exampleBasic.StringSlice).To(Equal([]string{"11", "22"}))
 		})
 
 		It("should set defaults efficiently", Serial, Label("benchmark measurement"), func() {
@@ -225,19 +241,6 @@ var _ = Describe("DefaultTest", func() {
 			calledA = false
 		})
 
-		It("should not fill the struct with the filler func by kind", func() {
-			f := &filler{
-				FuncByKind: map[reflect.Kind]fillerFunc{
-					reflect.Int: func(field *fieldData) {
-						calledA = true
-					},
-				},
-			}
-
-			f.fill(&struct{ Foo int }{Foo: 42})
-			Expect(calledA).To(BeFalse())
-		})
-
 		It("should fill the struct with the filler func by kind", func() {
 			f := &filler{
 				FuncByKind: map[reflect.Kind]fillerFunc{
@@ -294,8 +297,16 @@ func testDefaultTypes(foo *ExampleBasic) {
 	Expect(foo.IntSliceSlice).To(Equal([][]int{{1}, {2}, {3}, {4}}))
 	Expect(foo.StringSliceSlice).To(Equal([][]string{{"1"}, {}}))
 	Expect(foo.ConfigDuration.AsDuration()).To(Equal(time.Second * 10))
+	Expect(foo.ConfigDurationSlice).To(HaveLen(4))
+	Expect(foo.ConfigDurationSlice[0].AsDuration()).To(Equal(time.Second * 1))
+	Expect(foo.ConfigDurationSlice[1].AsDuration()).To(Equal(time.Second * 2))
+	Expect(foo.ConfigDurationSlice[2].AsDuration()).To(Equal(time.Second * 3))
+	Expect(foo.ConfigDurationSlice[3].AsDuration()).To(Equal(time.Second * 4))
 	Expect(foo.PBDuration.AsDuration()).To(Equal(time.Second * 3))
 	Expect(foo.ExamplePtr).NotTo(BeNil())
 	Expect(foo.ExamplePtr.Integer).To(Equal(33))
 	Expect(foo.ExamplePtr.FloatSlice).To(Equal([]float64{1.1, 2.2, 3.3, 4.4}))
+	Expect(foo.StringStringMap).To(Equal(map[string]string{"foo": "bar"}))
+	Expect(foo.StringIntMap).To(Equal(map[string]int{"foo": 1}))
+	Expect(foo.StringDurationMap).To(Equal(map[string]time.Duration{"foo": time.Second}))
 }
