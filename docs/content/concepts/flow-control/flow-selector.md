@@ -23,9 +23,9 @@ See also [_Flow Selector_ reference](/reference/policies/spec.md#flow-selector)
 
 _Flow Selectors_ are used by flow control and observability components
 instantiated by Aperture Agents like [_Classifiers_][classifier], [_Flux
-Meters_][flux-meter] and [_Concurrency Limiters_][cl]. _Flow Selectors_ define
-scoping rules that decide how these components should select flows for their
-operations.
+Meters_][flux-meter] and [_Load Scheduler_][load-scheduler]. _Flow Selectors_
+define scoping rules that decide how these components should select flows for
+their operations.
 
 A _Flow Selector_ consists of:
 
@@ -317,7 +317,7 @@ rejected.
 
 [label]: ./flow-label.md
 [flux-meter]: ./resources/flux-meter.md
-[cl]: ./components/concurrency-limiter.md
+[load-scheduler]: ./components/load-scheduler.md
 [classifier]: ./resources/classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
 [aperturectl]: /get-started/aperture-cli/aperture-cli.md

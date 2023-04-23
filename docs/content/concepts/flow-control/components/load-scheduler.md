@@ -1,5 +1,5 @@
 ---
-title: Concurrency Limiter
+title: Load Scheduler
 keywords:
   - scheduler
   - tokens
@@ -94,6 +94,27 @@ have strict rate limits.
 By default, Aperture can automatically estimate the tokens for each workload.
 See the `auto_tokens` [configuration](/reference/policies/spec.md#scheduler) for
 more details.
+
+Tokens are determined in the following order of precedence:
+
+- Specified in the flow labels
+- Specified in the `Workload.tokens` setting.
+- Estimated using the `auto_tokens` feature.
+
+### Token rate {#token-rate}
+
+The Scheduler provides token rates for both incoming and accepted (admitted)
+requests as output signals.
+
+When tokens represent the number of requests, with each request counting as 1
+token, the token rate is simply the number of requests per second.
+
+However, when using the auto-tokens setting, tokens correspond to seconds of
+response latency (work-seconds). In this case, the token rate represents the
+work-seconds completed per unit of time (that is, work-seconds per second),
+which is a measure of the system's concurrency. Concurrency is a dimensionless
+metric that indicates the average number of flows being processed concurrently
+by the system.
 
 ### Token bucket {#token-bucket}
 
