@@ -68,15 +68,20 @@
     "AIMDConcurrencyControllerIns": {
       "description": "Inputs for the AIMDConcurrencyController component.",
       "properties": {
+        "enabled": {
+          "$ref": "#/definitions/InPort",
+          "description": "The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.",
+          "x-order": 0
+        },
         "setpoint": {
           "$ref": "#/definitions/InPort",
           "description": "The setpoint to the controller.",
-          "x-order": 0
+          "x-order": 1
         },
         "signal": {
           "$ref": "#/definitions/InPort",
           "description": "The signal to the controller.",
-          "x-order": 1
+          "x-order": 2
         }
       },
       "type": "object",
@@ -102,7 +107,7 @@
         },
         "is_overload": {
           "$ref": "#/definitions/OutPort",
-          "description": "Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.",
+          "title": "Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.\nDeprecated: 1.6.0",
           "x-order": 3
         },
         "observed_load_multiplier": {

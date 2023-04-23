@@ -81,8 +81,6 @@ spec:
               signal_name: DESIRED_LOAD_MULTIPLIER
             incoming_concurrency:
               signal_name: INCOMING_CONCURRENCY
-            is_overload:
-              signal_name: IS_OVERLOAD
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           scheduler_parameters:

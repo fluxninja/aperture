@@ -166,6 +166,18 @@ Scheduler parameters.
 Inputs for the AIMDConcurrencyController component.
 
 <dl>
+<dt>enabled</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+
+</dd>
 <dt>setpoint</dt>
 <dd>
 
@@ -249,6 +261,7 @@ IncomingConcurrency is the number of concurrent requests that are received by th
 <!-- vale on -->
 
 Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+Deprecated: 1.6.0
 
 </dd>
 <dt>observed_load_multiplier</dt>
@@ -4848,7 +4861,7 @@ An ordered list of load shapers that get applied in order.
 
 <!-- vale on -->
 
-Defines a `[map<string, string> → bool]` expression to be evaluated on labels
+Defines a `[map<string, string> → bool]` expression to be evaluated on labels
 
 MatchExpression has multiple variants, exactly one should be set.
 

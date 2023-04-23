@@ -4,6 +4,7 @@ import (
 	"time"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
@@ -11,6 +12,7 @@ import (
 const (
 	aimdSignalPortName                 = "signal"
 	aimdSetpointPortName               = "setpoint"
+	aimdEnabledPortName                = "enabled"
 	aimdIsOverloadPortName             = "is_overload"
 	aimdDesiredLoadMultiplierPortName  = "desired_load_multiplier"
 	aimdObservedLoadMultiplierPortName = "observed_load_multiplier"
@@ -32,6 +34,10 @@ func ParseAIMDConcurrencyController(
 		setpointPort := inPorts.Setpoint
 		if setpointPort != nil {
 			nestedInPortsMap[aimdSetpointPortName] = setpointPort
+		}
+		enabled := inPorts.Enabled
+		if enabled != nil {
+			nestedInPortsMap[aimdEnabledPortName] = enabled
 		}
 	}
 
@@ -162,6 +168,67 @@ func ParseAIMDConcurrencyController(
 							},
 						},
 						OutPorts: &policylangv1.Extrapolator_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "EXTRAPOLATED_LOAD_MULTIPLIER",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_FirstValid{
+					FirstValid: &policylangv1.FirstValid{
+						InPorts: &policylangv1.FirstValid_Ins{
+							Inputs: []*policylangv1.InPort{
+								{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "ENABLED",
+									},
+								},
+								{
+									Value: &policylangv1.InPort_ConstantSignal{
+										ConstantSignal: &policylangv1.ConstantSignal{
+											Const: &policylangv1.ConstantSignal_Value{
+												Value: 1, // enabled by default
+											},
+										},
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.FirstValid_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "IS_ENABLED",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Switcher{
+					Switcher: &policylangv1.Switcher{
+						InPorts: &policylangv1.Switcher_Ins{
+							Switch: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "IS_ENABLED",
+								},
+							},
+							OnSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "EXTRAPOLATED_LOAD_MULTIPLIER",
+								},
+							},
+							OffSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_SpecialValue{
+											SpecialValue: "NaN",
+										},
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.Switcher_Outs{
 							Output: &policylangv1.OutPort{
 								SignalName: "DESIRED_LOAD_MULTIPLIER",
 							},
@@ -308,102 +375,17 @@ func ParseAIMDConcurrencyController(
 					},
 				},
 			},
-			{
-				Component: &policylangv1.Component_NestedSignalIngress{
-					NestedSignalIngress: &policylangv1.NestedSignalIngress{
-						PortName: aimdSignalPortName,
-						OutPorts: &policylangv1.NestedSignalIngress_Outs{
-							Signal: &policylangv1.OutPort{
-								SignalName: "SIGNAL",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalIngress{
-					NestedSignalIngress: &policylangv1.NestedSignalIngress{
-						PortName: aimdSetpointPortName,
-						OutPorts: &policylangv1.NestedSignalIngress_Outs{
-							Signal: &policylangv1.OutPort{
-								SignalName: "SETPOINT",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdIsOverloadPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "IS_OVERLOAD",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdDesiredLoadMultiplierPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_LOAD_MULTIPLIER",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdObservedLoadMultiplierPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "OBSERVED_LOAD_MULTIPLIER",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdAcceptedConcurrencyPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_CONCURRENCY",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdIncomingConcurrencyPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "INCOMING_CONCURRENCY",
-								},
-							},
-						},
-					},
-				},
-			},
 		},
 	}
+
+	components.AddNestedIngress(nestedCircuit, aimdSignalPortName, "SIGNAL")
+	components.AddNestedIngress(nestedCircuit, aimdSetpointPortName, "SETPOINT")
+	components.AddNestedIngress(nestedCircuit, aimdEnabledPortName, "ENABLED")
+	components.AddNestedEgress(nestedCircuit, aimdIsOverloadPortName, "IS_OVERLOAD")
+	components.AddNestedEgress(nestedCircuit, aimdDesiredLoadMultiplierPortName, "DESIRED_LOAD_MULTIPLIER")
+	components.AddNestedEgress(nestedCircuit, aimdObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
+	components.AddNestedEgress(nestedCircuit, aimdAcceptedConcurrencyPortName, "ACCEPTED_CONCURRENCY")
+	components.AddNestedEgress(nestedCircuit, aimdIncomingConcurrencyPortName, "INCOMING_CONCURRENCY")
 
 	return nestedCircuit, nil
 }

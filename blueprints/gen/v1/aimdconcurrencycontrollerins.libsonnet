@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withEnabled(enabled):: {
+    enabled: enabled,
+  },
+  withEnabledMixin(enabled):: {
+    enabled+: enabled,
+  },
   withSetpoint(setpoint):: {
     setpoint: setpoint,
   },

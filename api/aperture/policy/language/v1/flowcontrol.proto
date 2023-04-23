@@ -858,11 +858,14 @@ message AIMDConcurrencyController {
     InPort signal = 1;
     // The setpoint to the controller.
     InPort setpoint = 2;
+    // The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+    InPort enabled = 3;
   }
 
   // Outputs for the AIMDConcurrencyController component.
   message Outs {
     // Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+    // Deprecated: 1.6.0
     OutPort is_overload = 1;
     // Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
     OutPort desired_load_multiplier = 2;

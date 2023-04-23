@@ -287,6 +287,10 @@ definitions:
     description: Inputs for the AIMDConcurrencyController component.
     type: object
     properties:
+      enabled:
+        description: The enabled port controls whether the _Load Scheduler_ can load
+          shed _Flows_. By default, the _Load Scheduler_ is enabled.
+        $ref: '#/definitions/InPort'
       setpoint:
         description: The setpoint to the controller.
         $ref: '#/definitions/InPort'
@@ -310,9 +314,9 @@ definitions:
           are received by the service.
         $ref: '#/definitions/OutPort'
       is_overload:
-        description: Is overload is a Boolean signal that indicates whether the service
-          is overloaded based on the deviation of the signal from the setpoint taking
-          into account some tolerance.
+        title: |-
+          Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+          Deprecated: 1.6.0
         $ref: '#/definitions/OutPort'
       observed_load_multiplier:
         description: Observed Load multiplier is the ratio of accepted concurrency
