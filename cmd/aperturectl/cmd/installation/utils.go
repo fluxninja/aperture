@@ -480,13 +480,20 @@ func CheckCertificate(secret *corev1.Secret, cm *corev1.ConfigMap, certFileName,
 	existingSecret := &corev1.Secret{}
 	name := secret.GetName()
 	err := kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: namespace}, existingSecret)
-	if apierrors.IsNotFound(err) {
-		return true, nil
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return true, nil
+		} else if apierrors.IsForbidden(err) {
+			return false, fmt.Errorf(
+				"failed to create Aperture Controller Certificate secret as the user does not have permission to access the secret '%s' in namespace '%s'", name, namespace)
+		} else {
+			return false, fmt.Errorf("failed to get secret '%s' in namespace '%s': %v", name, namespace, err)
+		}
 	} else {
 		existingCert, ok := existingSecret.Data[certFileName]
 		if !ok {
 			return false, fmt.Errorf(
-				"failed to create Aperture Controller Certificate secret as a secret named '%s' already exists without '%s' certificate key", certFileName, name)
+				"failed to create Aperture Controller Certificate secret as a secret named '%s' already exists without '%s' certificate key", name, certFileName)
 		}
 
 		block, _ := pem.Decode(existingCert)
@@ -541,12 +548,16 @@ func manageAgentControllerClientCertConfigMap(values map[string]interface{}, rel
 
 	agentFunctions, ok := config["agent_functions"].(map[string]interface{})
 	if !ok {
-		return nil, nil
+		return values, nil
 	}
 
 	endpoints, ok := agentFunctions["endpoints"].([]interface{})
 	if !ok {
-		return nil, nil
+		return values, nil
+	}
+
+	if len(endpoints) == 0 {
+		return values, nil
 	}
 
 	// Convert the endpoints to []string
@@ -559,16 +570,15 @@ func manageAgentControllerClientCertConfigMap(values map[string]interface{}, rel
 		endpointsStr = append(endpointsStr, endpointStr)
 	}
 
-	controllerClientCert := controllers.GetControllerClientCert(endpointsStr, kubeClient, context.Background())
-	if controllerClientCert == nil {
-		return nil, nil
-	}
-
 	if slices.Equal(order, releaseutil.InstallOrder) {
 		existingCM := &corev1.ConfigMap{}
 		err := kubeClient.Get(context.Background(), types.NamespacedName{Name: cmName, Namespace: namespace}, existingCM)
 		if err == nil ||
 			apierrors.IsNotFound(err) || (existingCM.Labels != nil && existingCM.Labels["app.kubernetes.io/managed-by"] == "aperturectl") {
+			controllerClientCert := controllers.GetControllerClientCert(endpointsStr, kubeClient, context.Background())
+			if controllerClientCert == nil {
+				return values, fmt.Errorf("failed to fetch ConfigMap ending with '-controller-client-cert' in namespace '%s'", namespace)
+			}
 			cm := &corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:        cmName,
