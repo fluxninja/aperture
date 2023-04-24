@@ -9,9 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`awsecscontainermetricsreceiver` extension enabled, so that
-[awsecscontainermetricsreceiver][receiver] is available.
+::: info
+
+See also [awsecscontainermetricsreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The awsecscontainermetricsreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/awsecscontainermetricsreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for AWS ECS Container Metrics
 using the following configuration in the [Aperture Agent's

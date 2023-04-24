@@ -9,9 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`purefareceiver` extension enabled, so that [purefareceiver][receiver] is
-available.
+::: info
+
+See also [purefareceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The purefareceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/purefareceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Pure Storage FlashArray
 using the following configuration in the [Aperture Agent's

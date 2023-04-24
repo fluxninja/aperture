@@ -9,9 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`elasticsearchreceiver` extension enabled, so that
-[elasticsearchreceiver][receiver] is available.
+::: info
+
+See also [elasticsearchreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The elasticsearchreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/elasticsearchreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Elasticsearch using the
 following configuration in the [Aperture Agent's config][agent-config]:

@@ -9,8 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`riakreceiver` extension enabled, so that [riakreceiver][receiver] is available.
+::: info
+
+See also [riakreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The riakreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/riakreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Riak using the following
 configuration in the [Aperture Agent's config][agent-config]:

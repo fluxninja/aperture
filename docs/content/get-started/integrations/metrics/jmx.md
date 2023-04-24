@@ -9,8 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`jmxreceiver` extension enabled, so that [jmxreceiver][receiver] is available.
+::: info
+
+See also [jmxreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The jmxreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/jmxreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for JMX using the following
 configuration in the [Aperture Agent's config][agent-config]:

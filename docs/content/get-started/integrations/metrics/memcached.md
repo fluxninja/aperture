@@ -9,9 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`memcachedreceiver` extension enabled, so that [memcachedreceiver][receiver] is
-available.
+::: info
+
+See also [memcachedreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The memcachedreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/memcachedreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Memcached using the
 following configuration in the [Aperture Agent's config][agent-config]:

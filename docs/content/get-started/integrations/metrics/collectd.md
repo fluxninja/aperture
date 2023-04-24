@@ -9,9 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`collectdreceiver` extension enabled, so that [collectdreceiver][receiver] is
-available.
+::: info
+
+See also [collectdreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The collectdreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/collectdreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for CollectD `write_http`
 plugin JSON using the following configuration in the [Aperture Agent's

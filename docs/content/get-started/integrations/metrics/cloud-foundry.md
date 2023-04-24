@@ -9,9 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`cloudfoundryreceiver` extension enabled, so that
-[cloudfoundryreceiver][receiver] is available.
+::: info
+
+See also [cloudfoundryreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The cloudfoundryreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/cloudfoundryreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Cloud Foundry using the
 following configuration in the [Aperture Agent's config][agent-config]:

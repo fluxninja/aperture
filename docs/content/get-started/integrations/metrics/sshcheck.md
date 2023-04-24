@@ -9,9 +9,17 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`sshcheckreceiver` extension enabled, so that [sshcheckreceiver][receiver] is
-available.
+::: info
+
+See also [sshcheckreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+
+:::
+
+::: note
+
+The sshcheckreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/sshcheckreceiver` to `bundled_extensions` list.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for SSH Check using the
 following configuration in the [Aperture Agent's config][agent-config]:
