@@ -11,13 +11,13 @@ keywords:
 
 ::: info
 
-See also [vcenterreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+See also [vcenterreceiver docs][receiver] in opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The vcenterreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/vcenterreceiver` to `bundled_extensions` list.
+The `vcenterreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/vcenterreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

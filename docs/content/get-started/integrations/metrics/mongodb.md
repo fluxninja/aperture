@@ -11,13 +11,13 @@ keywords:
 
 ::: info
 
-See also [mongodbreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+See also [mongodbreceiver docs][receiver] in opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The mongodbreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/mongodbreceiver` to `bundled_extensions` list.
+The `mongodbreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/mongodbreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

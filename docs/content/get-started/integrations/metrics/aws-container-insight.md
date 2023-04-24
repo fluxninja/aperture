@@ -11,13 +11,13 @@ keywords:
 
 ::: info
 
-See also [awscontainerinsightreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+See also [awscontainerinsightreceiver docs][receiver] in opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The awscontainerinsightreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/awscontainerinsightreceiver` to `bundled_extensions` list.
+The `awscontainerinsightreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/awscontainerinsightreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

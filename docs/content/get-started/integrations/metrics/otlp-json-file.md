@@ -11,13 +11,13 @@ keywords:
 
 ::: info
 
-See also [otlpjsonfilereceiver docs][receiver] in opentelemetry-collect-contrib repo.
+See also [otlpjsonfilereceiver docs][receiver] in opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The otlpjsonfilereceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/otlpjsonfilereceiver` to `bundled_extensions` list.
+The `otlpjsonfilereceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/otlpjsonfilereceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

@@ -11,13 +11,13 @@ keywords:
 
 ::: info
 
-See also [purefareceiver docs][receiver] in opentelemetry-collect-contrib repo.
+See also [purefareceiver docs][receiver] in opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The purefareceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/purefareceiver` to `bundled_extensions` list.
+The `purefareceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/purefareceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

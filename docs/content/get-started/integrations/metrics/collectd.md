@@ -11,13 +11,13 @@ keywords:
 
 ::: info
 
-See also [collectdreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+See also [collectdreceiver docs][receiver] in opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The collectdreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/collectdreceiver` to `bundled_extensions` list.
+The `collectdreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/collectdreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

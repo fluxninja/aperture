@@ -11,13 +11,13 @@ keywords:
 
 ::: info
 
-See also [simpleprometheusreceiver docs][receiver] in opentelemetry-collect-contrib repo.
+See also [simpleprometheusreceiver docs][receiver] in opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The simpleprometheusreceiver extension is available in default agent image, but if you're [building][build] your own Aperture Agent, make sure to add `integrations/otel/simpleprometheusreceiver` to `bundled_extensions` list.
+The `simpleprometheusreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/simpleprometheusreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 
