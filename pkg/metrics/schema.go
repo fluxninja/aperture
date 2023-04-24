@@ -145,6 +145,8 @@ const (
 	FlowControlCheckErrorReasonLabel = "error_reason"
 	// FlowControlCheckRejectReasonLabel - label for reject reason on FCS Check request.
 	FlowControlCheckRejectReasonLabel = "reject_reason"
+	// AgentGroupLabel - label for agent group.
+	AgentGroupLabel = "agent_group"
 
 	// DEFAULTS.
 

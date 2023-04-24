@@ -103,11 +103,7 @@ var _ AutoScaleControlPointStore = (*autoScaleControlPoints)(nil)
 var _ AutoScaleControlPoints = (*autoScaleControlPoints)(nil)
 
 // newAutoScaleControlPoints returns a new AutoScaleControlPoints.
-func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient, pr *prometheus.Registry, electionTracker notifiers.Trackers, lc fx.Lifecycle) (*autoScaleControlPoints, error) {
-	pn, err := newPodNotifier(pr, electionTracker, lc)
-	if err != nil {
-		return nil, err
-	}
+func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient, pn *podNotifier) (*autoScaleControlPoints, error) {
 	cpc := &autoScaleControlPoints{
 		controlPoints: make(map[AutoScaleControlPoint]*controlPointState),
 		trackers:      trackers,
@@ -123,37 +119,44 @@ type podNotifier struct {
 	isLeader         bool
 	podCounter       *prometheus.GaugeVec
 	electionTrackers notifiers.Trackers
+	agentGroup       string
 }
 
-func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers, lifecycle fx.Lifecycle) (*podNotifier, error) {
+func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers, lifecycle fx.Lifecycle, agentGroup string) (*podNotifier, error) {
 	pn := &podNotifier{
 		electionTrackers: electionTrackers,
+		agentGroup:       agentGroup,
 	}
 	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, pn.electionResultCallback)
-	lifecycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			return pn.electionTrackers.AddKeyNotifier(electionNotifier)
-		},
-		OnStop: func(ctx context.Context) error {
-			return pn.electionTrackers.RemoveKeyNotifier(electionNotifier)
-		},
-	})
 
 	defaultLabels := []string{
-		metrics.K8sNamespaceName, metrics.K8sDaemonsetName, metrics.K8sDeploymentName, metrics.K8sReplicasetName, metrics.K8sStatefulsetName,
+		metrics.K8sNamespaceName, metrics.K8sDaemonsetName, metrics.K8sDeploymentName, metrics.K8sReplicasetName, metrics.K8sStatefulsetName, metrics.AgentGroupLabel,
 	}
 	podCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: metrics.K8sPodCount,
 		Help: "The number of pods",
 	}, defaultLabels)
-	err := pr.Register(podCounter)
-	if err != nil {
-		// Ignore already registered error, as this is not harmful. Metrics may
-		// be registered by other running server.
-		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-			return nil, fmt.Errorf("could not register prometheus metrics: %w", err)
-		}
-	}
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			err := pr.Register(podCounter)
+			if err != nil {
+				// Ignore already registered error, as this is not harmful. Metrics may
+				// be registered by other running server.
+				if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+					return fmt.Errorf("could not register prometheus metrics: %w", err)
+				}
+			}
+			return pn.electionTrackers.AddKeyNotifier(electionNotifier)
+		},
+		OnStop: func(ctx context.Context) error {
+			unregistered := pr.Unregister(podCounter)
+			if !unregistered {
+				return fmt.Errorf("failed to unregister metric %s", metrics.K8sPodCount)
+			}
+			return pn.electionTrackers.RemoveKeyNotifier(electionNotifier)
+		},
+	})
 	pn.podCounter = podCounter
 
 	return pn, nil
@@ -172,7 +175,9 @@ func (p *podNotifier) setScale(scale *autoscalingv1.Scale, cp AutoScaleControlPo
 	}
 	p.stateMutex.Lock()
 	defer p.stateMutex.Unlock()
-	pcMetric, err := p.podCounter.GetMetricWith(scaleLabels(scale, cp))
+	labels := scaleLabels(scale, cp)
+	labels[metrics.AgentGroupLabel] = p.agentGroup
+	pcMetric, err := p.podCounter.GetMetricWith(labels)
 	if err != nil {
 		return err
 	}

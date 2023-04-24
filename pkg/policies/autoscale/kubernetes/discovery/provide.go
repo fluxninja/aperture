@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
@@ -42,13 +43,18 @@ type FxIn struct {
 	ElectionTrackers   notifiers.Trackers `name:"etcd_election"`
 	Config             autoscalek8sconfig.AutoScaleKubernetesConfig
 	PrometheusRegistry *prometheus.Registry
+	AgentInfo          *agentinfo.AgentInfo
 }
 
 // provideAutoScaleControlPoints provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
 func provideAutoScaleControlPoints(in FxIn) (AutoScaleControlPoints, error) {
-	controlPointCache, err := newAutoScaleControlPoints(in.Trackers, in.KubernetesClient, in.PrometheusRegistry, in.ElectionTrackers, in.Lifecycle)
+	pn, err := newPodNotifier(in.PrometheusRegistry, in.ElectionTrackers, in.Lifecycle, in.AgentInfo.GetAgentGroup())
 	if err != nil {
-		return nil, fmt.Errorf("could not create auto sclae control points: %w", err)
+		return nil, err
+	}
+	controlPointCache, err := newAutoScaleControlPoints(in.Trackers, in.KubernetesClient, pn)
+	if err != nil {
+		return nil, fmt.Errorf("could not create auto scale control points: %w", err)
 	}
 
 	if !in.Config.Enabled {
