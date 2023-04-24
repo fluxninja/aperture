@@ -548,10 +548,10 @@ message FlowControl {
     LoadShaperSeries load_shaper_series = 6;
 
     // _Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
-    LoadScheduler flow_scheduler = 7;
+    LoadScheduler load_scheduler = 7;
 
     // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
-    AdaptiveLoadScheduler adaptive_flow_scheduler = 8;
+    AdaptiveLoadScheduler adaptive_load_scheduler = 8;
 
     // Load Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
     LoadRegulator load_regulator = 9;

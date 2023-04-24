@@ -9,30 +9,34 @@ local flow_selector_defaults = {
 
 local promql_driver_defaults = {
   query_string: '__REQUIRED_FIELD__',
-  forward: {
-    threshold: '__REQUIRED_FIELD__',
-    operator: '__REQUIRED_FIELD__',
-  },
-  backward: {
-    threshold: '__REQUIRED_FIELD__',
-    operator: '__REQUIRED_FIELD__',
-  },
-  reset: {
-    threshold: '__REQUIRED_FIELD__',
-    operator: '__REQUIRED_FIELD__',
+  criteria: {
+    forward: {
+      threshold: '__REQUIRED_FIELD__',
+      operator: '__REQUIRED_FIELD__',
+    },
+    backward: {
+      threshold: '__REQUIRED_FIELD__',
+      operator: '__REQUIRED_FIELD__',
+    },
+    reset: {
+      threshold: '__REQUIRED_FIELD__',
+      operator: '__REQUIRED_FIELD__',
+    },
   },
 };
 
 local average_latency_driver_defaults = {
   flow_selector: flow_selector_defaults,
-  forward: {
-    threshold: '__REQUIRED_FIELD__',
-  },
-  backward: {
-    threshold: '__REQUIRED_FIELD__',
-  },
-  reset: {
-    threshold: '__REQUIRED_FIELD__',
+  criteria: {
+    forward: {
+      threshold: '__REQUIRED_FIELD__',
+    },
+    backward: {
+      threshold: '__REQUIRED_FIELD__',
+    },
+    reset: {
+      threshold: '__REQUIRED_FIELD__',
+    },
   },
 };
 
@@ -43,14 +47,16 @@ local percentile_latency_driver_defaults = {
       buckets: [5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0],
     },
   },
-  forward: {
-    threshold: '__REQUIRED_FIELD__',
-  },
-  backward: {
-    threshold: '__REQUIRED_FIELD__',
-  },
-  reset: {
-    threshold: '__REQUIRED_FIELD__',
+  criteria: {
+    forward: {
+      threshold: '__REQUIRED_FIELD__',
+    },
+    backward: {
+      threshold: '__REQUIRED_FIELD__',
+    },
+    reset: {
+      threshold: '__REQUIRED_FIELD__',
+    },
   },
   percentile: 95,
 };
@@ -61,21 +67,23 @@ local ema_latency_driver_defaults = {
     ema_window: '1500s',
     warmup_window: '60s',
   },
-  forward: {
-    latency_tolerance_multiplier: 1.05,
-  },
-  backward: {
-    latency_tolerance_multiplier: 1.05,
-  },
-  reset: {
-    latency_tolerance_multiplier: 1.25,
+  criteria: {
+    forward: {
+      latency_tolerance_multiplier: 1.05,
+    },
+    backward: {
+      latency_tolerance_multiplier: 1.05,
+    },
+    reset: {
+      latency_tolerance_multiplier: 1.25,
+    },
   },
 };
 
 local rollout_policy_base_defaults = {
 
   load_shaper: {
-    flow_regulator_parameters: {
+    load_regulator_parameters: {
       flow_selector: flow_selector_defaults,
       label_key: '',
     },
@@ -133,34 +141,34 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   policy: rollout_policy_base_defaults,
   /**
   * @schema (promql_driver.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
-  * @schema (promql_driver.forward.threshold: float64) The threshold for the forward criteria.
-  * @schema (promql_driver.forward.operator: string) The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`
-  * @schema (promql_driver.backward.threshold: float64) The threshold for the backward criteria.
-  * @schema (promql_driver.backward.operator: string) The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`
-  * @schema (promql_driver.reset.threshold: float64) The threshold for the reset criteria.
-  * @schema (promql_driver.reset.operator: string) The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`
+  * @schema (promql_driver.criteria.forward.threshold: float64) The threshold for the forward criteria.
+  * @schema (promql_driver.criteria.forward.operator: string) The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`
+  * @schema (promql_driver.criteria.backward.threshold: float64) The threshold for the backward criteria.
+  * @schema (promql_driver.criteria.backward.operator: string) The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`
+  * @schema (promql_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
+  * @schema (promql_driver.criteria.reset.operator: string) The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`
   */
   promql_driver: promql_driver_defaults,
   /**
   * @schema (average_latency_driver.flow_selector: aperture.spec.v1.FlowSelector required) Identify the service and flows whose latency needs to be measured.
-  * @schema (average_latency_driver.forward.threshold: float64) The threshold for the forward criteria.
-  * @schema (average_latency_driver.backward.threshold: float64) The threshold for the backward criteria.
-  * @schema (average_latency_driver.reset.threshold: float64) The threshold for the reset criteria.
+  * @schema (average_latency_driver.criteria.forward.threshold: float64) The threshold for the forward criteria.
+  * @schema (average_latency_driver.criteria.backward.threshold: float64) The threshold for the backward criteria.
+  * @schema (average_latency_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
   */
   average_latency_driver: average_latency_driver_defaults,
   /**
   * @schema (percentile_latency_driver.flux_meter: aperture.spec.v1.FluxMeter required) FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.
-  * @schema (percentile_latency_driver.forward.threshold: float64) The threshold for the forward criteria.
-  * @schema (percentile_latency_driver.backward.threshold: float64) The threshold for the backward criteria.
-  * @schema (percentile_latency_driver.reset.threshold: float64) The threshold for the reset criteria.
+  * @schema (percentile_latency_driver.criteria.forward.threshold: float64) The threshold for the forward criteria.
+  * @schema (percentile_latency_driver.criteria.backward.threshold: float64) The threshold for the backward criteria.
+  * @schema (percentile_latency_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
   * @schema (percentile_latency_driver.percentile: float64) The percentile to be used for latency measurement.
   */
   percentile_latency_driver: percentile_latency_driver_defaults,
   /**
   * @schema (ema_latency_driver.flow_selector: aperture.spec.v1.FlowSelector required) Identify the service and flows whose latency needs to be measured.
-  * @schema (ema_latency_driver.forward.latency_tolerance_multiplier: float64) The threshold for the forward criteria.
-  * @schema (ema_latency_driver.backward.latency_tolerance_multiplier: float64) The threshold for the backward criteria.
-  * @schema (ema_latency_driver.reset.latency_tolerance_multiplier: float64) The threshold for the reset criteria.
+  * @schema (ema_latency_driver.criteria.forward.latency_tolerance_multiplier: float64) The threshold for the forward criteria.
+  * @schema (ema_latency_driver.criteria.backward.latency_tolerance_multiplier: float64) The threshold for the backward criteria.
+  * @schema (ema_latency_driver.criteria.reset.latency_tolerance_multiplier: float64) The threshold for the reset criteria.
   * @schema (ema_latency_driver.ema: aperture.spec.v1.EMAParameters required) The parameters for the exponential moving average.
   */
   ema_latency_driver: ema_latency_driver_defaults,

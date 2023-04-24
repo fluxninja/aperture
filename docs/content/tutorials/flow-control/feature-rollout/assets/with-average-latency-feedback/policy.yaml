@@ -125,6 +125,13 @@ spec:
                 service_selector:
                   service: service1-demo-app.demoapp.svc.cluster.local
               label_key: ""
+            load_regulator_parameters:
+              flow_selector:
+                flow_matcher:
+                  control_point: __REQUIRED_FIELD__
+                service_selector:
+                  service: __REQUIRED_FIELD__
+              label_key: ""
             steps:
             - duration: 0s
               target_accept_percentage: 1

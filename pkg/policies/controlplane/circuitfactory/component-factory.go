@@ -9,7 +9,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -98,8 +98,8 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
-		case *policylangv1.FlowControl_FlowRegulator:
-			ctor = mkCtor(flowControlConfig.FlowRegulator, flowregulator.NewFlowRegulatorAndOptions)
+		case *policylangv1.FlowControl_LoadRegulator:
+			ctor = mkCtor(flowControlConfig.LoadRegulator, loadregulator.NewLoadRegulatorAndOptions)
 		default:
 			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
 		}

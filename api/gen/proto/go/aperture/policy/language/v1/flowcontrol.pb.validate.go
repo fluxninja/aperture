@@ -2405,7 +2405,7 @@ func (m *FlowControl) validate(all bool) error {
 			}
 		}
 
-	case *FlowControl_FlowScheduler:
+	case *FlowControl_LoadScheduler:
 		if v == nil {
 			err := FlowControlValidationError{
 				field:  "Component",
@@ -2418,11 +2418,11 @@ func (m *FlowControl) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetFlowScheduler()).(type) {
+			switch v := interface{}(m.GetLoadScheduler()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "FlowScheduler",
+						field:  "LoadScheduler",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -2430,23 +2430,23 @@ func (m *FlowControl) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "FlowScheduler",
+						field:  "LoadScheduler",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetFlowScheduler()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetLoadScheduler()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FlowControlValidationError{
-					field:  "FlowScheduler",
+					field:  "LoadScheduler",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
 			}
 		}
 
-	case *FlowControl_AdaptiveFlowScheduler:
+	case *FlowControl_AdaptiveLoadScheduler:
 		if v == nil {
 			err := FlowControlValidationError{
 				field:  "Component",
@@ -2459,11 +2459,11 @@ func (m *FlowControl) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetAdaptiveFlowScheduler()).(type) {
+			switch v := interface{}(m.GetAdaptiveLoadScheduler()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "AdaptiveFlowScheduler",
+						field:  "AdaptiveLoadScheduler",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -2471,16 +2471,16 @@ func (m *FlowControl) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "AdaptiveFlowScheduler",
+						field:  "AdaptiveLoadScheduler",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetAdaptiveFlowScheduler()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetAdaptiveLoadScheduler()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FlowControlValidationError{
-					field:  "AdaptiveFlowScheduler",
+					field:  "AdaptiveLoadScheduler",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

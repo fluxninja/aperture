@@ -28,7 +28,7 @@ const (
 	CheckResponse_REJECT_REASON_NONE                CheckResponse_RejectReason = 0
 	CheckResponse_REJECT_REASON_RATE_LIMITED        CheckResponse_RejectReason = 1
 	CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED CheckResponse_RejectReason = 2
-	CheckResponse_REJECT_REASON_FLOW_REGULATED      CheckResponse_RejectReason = 3
+	CheckResponse_REJECT_REASON_LOAD_REGULATED      CheckResponse_RejectReason = 3
 )
 
 // Enum value maps for CheckResponse_RejectReason.
@@ -37,13 +37,13 @@ var (
 		0: "REJECT_REASON_NONE",
 		1: "REJECT_REASON_RATE_LIMITED",
 		2: "REJECT_REASON_CONCURRENCY_LIMITED",
-		3: "REJECT_REASON_FLOW_REGULATED",
+		3: "REJECT_REASON_LOAD_REGULATED",
 	}
 	CheckResponse_RejectReason_value = map[string]int32{
 		"REJECT_REASON_NONE":                0,
 		"REJECT_REASON_RATE_LIMITED":        1,
 		"REJECT_REASON_CONCURRENCY_LIMITED": 2,
-		"REJECT_REASON_FLOW_REGULATED":      3,
+		"REJECT_REASON_LOAD_REGULATED":      3,
 	}
 )
 
@@ -508,7 +508,7 @@ type LimiterDecision struct {
 	//
 	//	*LimiterDecision_RateLimiterInfo_
 	//	*LimiterDecision_ConcurrencyLimiterInfo_
-	//	*LimiterDecision_FlowRegulatorInfo_
+	//	*LimiterDecision_LoadRegulatorInfo_
 	Details isLimiterDecision_Details `protobuf_oneof:"details"`
 }
 
@@ -600,9 +600,9 @@ func (x *LimiterDecision) GetConcurrencyLimiterInfo() *LimiterDecision_Concurren
 	return nil
 }
 
-func (x *LimiterDecision) GetFlowRegulatorInfo() *LimiterDecision_FlowRegulatorInfo {
-	if x, ok := x.GetDetails().(*LimiterDecision_FlowRegulatorInfo_); ok {
-		return x.FlowRegulatorInfo
+func (x *LimiterDecision) GetLoadRegulatorInfo() *LimiterDecision_LoadRegulatorInfo {
+	if x, ok := x.GetDetails().(*LimiterDecision_LoadRegulatorInfo_); ok {
+		return x.LoadRegulatorInfo
 	}
 	return nil
 }
@@ -619,15 +619,15 @@ type LimiterDecision_ConcurrencyLimiterInfo_ struct {
 	ConcurrencyLimiterInfo *LimiterDecision_ConcurrencyLimiterInfo `protobuf:"bytes,7,opt,name=concurrency_limiter_info,json=concurrencyLimiterInfo,proto3,oneof"`
 }
 
-type LimiterDecision_FlowRegulatorInfo_ struct {
-	FlowRegulatorInfo *LimiterDecision_FlowRegulatorInfo `protobuf:"bytes,8,opt,name=flow_regulator_info,json=flowRegulatorInfo,proto3,oneof"`
+type LimiterDecision_LoadRegulatorInfo_ struct {
+	LoadRegulatorInfo *LimiterDecision_LoadRegulatorInfo `protobuf:"bytes,8,opt,name=load_regulator_info,json=loadRegulatorInfo,proto3,oneof"`
 }
 
 func (*LimiterDecision_RateLimiterInfo_) isLimiterDecision_Details() {}
 
 func (*LimiterDecision_ConcurrencyLimiterInfo_) isLimiterDecision_Details() {}
 
-func (*LimiterDecision_FlowRegulatorInfo_) isLimiterDecision_Details() {}
+func (*LimiterDecision_LoadRegulatorInfo_) isLimiterDecision_Details() {}
 
 // FluxMeterInfo describes detail for each FluxMeterInfo.
 type FluxMeterInfo struct {
@@ -803,7 +803,7 @@ func (x *LimiterDecision_ConcurrencyLimiterInfo) GetTokensConsumed() uint64 {
 	return 0
 }
 
-type LimiterDecision_FlowRegulatorInfo struct {
+type LimiterDecision_LoadRegulatorInfo struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -811,8 +811,8 @@ type LimiterDecision_FlowRegulatorInfo struct {
 	Label string `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 }
 
-func (x *LimiterDecision_FlowRegulatorInfo) Reset() {
-	*x = LimiterDecision_FlowRegulatorInfo{}
+func (x *LimiterDecision_LoadRegulatorInfo) Reset() {
+	*x = LimiterDecision_LoadRegulatorInfo{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_flowcontrol_check_v1_check_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -820,13 +820,13 @@ func (x *LimiterDecision_FlowRegulatorInfo) Reset() {
 	}
 }
 
-func (x *LimiterDecision_FlowRegulatorInfo) String() string {
+func (x *LimiterDecision_LoadRegulatorInfo) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LimiterDecision_FlowRegulatorInfo) ProtoMessage() {}
+func (*LimiterDecision_LoadRegulatorInfo) ProtoMessage() {}
 
-func (x *LimiterDecision_FlowRegulatorInfo) ProtoReflect() protoreflect.Message {
+func (x *LimiterDecision_LoadRegulatorInfo) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_flowcontrol_check_v1_check_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -838,12 +838,12 @@ func (x *LimiterDecision_FlowRegulatorInfo) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LimiterDecision_FlowRegulatorInfo.ProtoReflect.Descriptor instead.
-func (*LimiterDecision_FlowRegulatorInfo) Descriptor() ([]byte, []int) {
+// Deprecated: Use LimiterDecision_LoadRegulatorInfo.ProtoReflect.Descriptor instead.
+func (*LimiterDecision_LoadRegulatorInfo) Descriptor() ([]byte, []int) {
 	return file_aperture_flowcontrol_check_v1_check_proto_rawDescGZIP(), []int{3, 2}
 }
 
-func (x *LimiterDecision_FlowRegulatorInfo) GetLabel() string {
+func (x *LimiterDecision_LoadRegulatorInfo) GetLabel() string {
 	if x != nil {
 		return x.Label
 	}
@@ -934,7 +934,7 @@ var file_aperture_flowcontrol_check_v1_check_proto_rawDesc = []byte{
 	0x44, 0x10, 0x01, 0x12, 0x25, 0x0a, 0x21, 0x52, 0x45, 0x4a, 0x45, 0x43, 0x54, 0x5f, 0x52, 0x45,
 	0x41, 0x53, 0x4f, 0x4e, 0x5f, 0x43, 0x4f, 0x4e, 0x43, 0x55, 0x52, 0x52, 0x45, 0x4e, 0x43, 0x59,
 	0x5f, 0x4c, 0x49, 0x4d, 0x49, 0x54, 0x45, 0x44, 0x10, 0x02, 0x12, 0x20, 0x0a, 0x1c, 0x52, 0x45,
-	0x4a, 0x45, 0x43, 0x54, 0x5f, 0x52, 0x45, 0x41, 0x53, 0x4f, 0x4e, 0x5f, 0x46, 0x4c, 0x4f, 0x57,
+	0x4a, 0x45, 0x43, 0x54, 0x5f, 0x52, 0x45, 0x41, 0x53, 0x4f, 0x4e, 0x5f, 0x4c, 0x4f, 0x41, 0x44,
 	0x5f, 0x52, 0x45, 0x47, 0x55, 0x4c, 0x41, 0x54, 0x45, 0x44, 0x10, 0x03, 0x22, 0x46, 0x0a, 0x0c,
 	0x44, 0x65, 0x63, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1a, 0x0a, 0x16,
 	0x44, 0x45, 0x43, 0x49, 0x53, 0x49, 0x4f, 0x4e, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x41, 0x43,
@@ -993,13 +993,13 @@ var file_aperture_flowcontrol_check_v1_check_proto_rawDesc = []byte{
 	0x6f, 0x6e, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x65,
 	0x72, 0x49, 0x6e, 0x66, 0x6f, 0x48, 0x00, 0x52, 0x16, 0x63, 0x6f, 0x6e, 0x63, 0x75, 0x72, 0x72,
 	0x65, 0x6e, 0x63, 0x79, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x12,
-	0x72, 0x0a, 0x13, 0x66, 0x6c, 0x6f, 0x77, 0x5f, 0x72, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f,
+	0x72, 0x0a, 0x13, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x72, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f,
 	0x72, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x40, 0x2e, 0x61,
 	0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x63, 0x6f, 0x6e, 0x74,
 	0x72, 0x6f, 0x6c, 0x2e, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x6d,
-	0x69, 0x74, 0x65, 0x72, 0x44, 0x65, 0x63, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x2e, 0x46, 0x6c, 0x6f,
-	0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x48, 0x00,
-	0x52, 0x11, 0x66, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x49,
+	0x69, 0x74, 0x65, 0x72, 0x44, 0x65, 0x63, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x2e, 0x4c, 0x6f, 0x61,
+	0x64, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x48, 0x00,
+	0x52, 0x11, 0x6c, 0x6f, 0x61, 0x64, 0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x49,
 	0x6e, 0x66, 0x6f, 0x1a, 0x88, 0x01, 0x0a, 0x0f, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69,
 	0x74, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x1c, 0x0a, 0x09, 0x72, 0x65, 0x6d, 0x61, 0x69,
 	0x6e, 0x69, 0x6e, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x72, 0x65, 0x6d, 0x61,
@@ -1015,7 +1015,7 @@ var file_aperture_flowcontrol_check_v1_check_proto_rawDesc = []byte{
 	0x52, 0x0d, 0x77, 0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x12,
 	0x27, 0x0a, 0x0f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x73, 0x75, 0x6d,
 	0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0e, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73,
-	0x43, 0x6f, 0x6e, 0x73, 0x75, 0x6d, 0x65, 0x64, 0x1a, 0x29, 0x0a, 0x11, 0x46, 0x6c, 0x6f, 0x77,
+	0x43, 0x6f, 0x6e, 0x73, 0x75, 0x6d, 0x65, 0x64, 0x1a, 0x29, 0x0a, 0x11, 0x4c, 0x6f, 0x61, 0x64,
 	0x52, 0x65, 0x67, 0x75, 0x6c, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x14, 0x0a,
 	0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61,
 	0x62, 0x65, 0x6c, 0x22, 0x51, 0x0a, 0x0d, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x65, 0x72, 0x52, 0x65,
@@ -1086,7 +1086,7 @@ var file_aperture_flowcontrol_check_v1_check_proto_goTypes = []interface{}{
 	nil,                                     // 10: aperture.flowcontrol.check.v1.CheckResponse.TelemetryFlowLabelsEntry
 	(*LimiterDecision_RateLimiterInfo)(nil), // 11: aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo
 	(*LimiterDecision_ConcurrencyLimiterInfo)(nil), // 12: aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo
-	(*LimiterDecision_FlowRegulatorInfo)(nil),      // 13: aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo
+	(*LimiterDecision_LoadRegulatorInfo)(nil),      // 13: aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo
 	(*timestamppb.Timestamp)(nil),                  // 14: google.protobuf.Timestamp
 }
 var file_aperture_flowcontrol_check_v1_check_proto_depIdxs = []int32{
@@ -1103,7 +1103,7 @@ var file_aperture_flowcontrol_check_v1_check_proto_depIdxs = []int32{
 	3,  // 10: aperture.flowcontrol.check.v1.LimiterDecision.reason:type_name -> aperture.flowcontrol.check.v1.LimiterDecision.LimiterReason
 	11, // 11: aperture.flowcontrol.check.v1.LimiterDecision.rate_limiter_info:type_name -> aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo
 	12, // 12: aperture.flowcontrol.check.v1.LimiterDecision.concurrency_limiter_info:type_name -> aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo
-	13, // 13: aperture.flowcontrol.check.v1.LimiterDecision.flow_regulator_info:type_name -> aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo
+	13, // 13: aperture.flowcontrol.check.v1.LimiterDecision.load_regulator_info:type_name -> aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo
 	4,  // 14: aperture.flowcontrol.check.v1.FlowControlService.Check:input_type -> aperture.flowcontrol.check.v1.CheckRequest
 	5,  // 15: aperture.flowcontrol.check.v1.FlowControlService.Check:output_type -> aperture.flowcontrol.check.v1.CheckResponse
 	15, // [15:16] is the sub-list for method output_type
@@ -1204,7 +1204,7 @@ func file_aperture_flowcontrol_check_v1_check_proto_init() {
 			}
 		}
 		file_aperture_flowcontrol_check_v1_check_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LimiterDecision_FlowRegulatorInfo); i {
+			switch v := v.(*LimiterDecision_LoadRegulatorInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1219,7 +1219,7 @@ func file_aperture_flowcontrol_check_v1_check_proto_init() {
 	file_aperture_flowcontrol_check_v1_check_proto_msgTypes[3].OneofWrappers = []interface{}{
 		(*LimiterDecision_RateLimiterInfo_)(nil),
 		(*LimiterDecision_ConcurrencyLimiterInfo_)(nil),
-		(*LimiterDecision_FlowRegulatorInfo_)(nil),
+		(*LimiterDecision_LoadRegulatorInfo_)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

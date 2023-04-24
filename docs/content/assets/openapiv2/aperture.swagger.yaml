@@ -628,7 +628,7 @@ definitions:
             - REJECT_REASON_NONE
             - REJECT_REASON_RATE_LIMITED
             - REJECT_REASON_CONCURRENCY_LIMITED
-            - REJECT_REASON_FLOW_REGULATED
+            - REJECT_REASON_LOAD_REGULATED
         type: string
     Circuit:
         description: |-
@@ -1468,7 +1468,7 @@ definitions:
     FlowControl:
         description: _Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
         properties:
-            adaptive_flow_scheduler:
+            adaptive_load_scheduler:
                 $ref: '#/definitions/AdaptiveLoadScheduler'
                 description: _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
             aimd_concurrency_controller:
@@ -1486,12 +1486,12 @@ definitions:
                 title: |-
                     Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
                     Deprecated: 1.6.0
-            flow_scheduler:
-                $ref: '#/definitions/LoadScheduler'
-                description: _Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
             load_regulator:
                 $ref: '#/definitions/LoadRegulator'
                 description: Load Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+            load_scheduler:
+                $ref: '#/definitions/LoadScheduler'
+                description: _Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
             load_shaper:
                 $ref: '#/definitions/LoadShaper'
                 description: _Load Shaper_ is a component that shapes the load at a _Control Point_.
@@ -2395,8 +2395,8 @@ definitions:
                 $ref: '#/definitions/LimiterDecisionConcurrencyLimiterInfo'
             dropped:
                 type: boolean
-            flow_regulator_info:
-                $ref: '#/definitions/LimiterDecisionFlowRegulatorInfo'
+            load_regulator_info:
+                $ref: '#/definitions/LimiterDecisionLoadRegulatorInfo'
             policy_hash:
                 type: string
             policy_name:
@@ -2414,17 +2414,17 @@ definitions:
             workload_index:
                 type: string
         type: object
-    LimiterDecisionFlowRegulatorInfo:
-        properties:
-            label:
-                type: string
-        type: object
     LimiterDecisionLimiterReason:
         default: LIMITER_REASON_UNSPECIFIED
         enum:
             - LIMITER_REASON_UNSPECIFIED
             - LIMITER_REASON_KEY_NOT_FOUND
         type: string
+    LimiterDecisionLoadRegulatorInfo:
+        properties:
+            label:
+                type: string
+        type: object
     LimiterDecisionRateLimiterInfo:
         properties:
             current:

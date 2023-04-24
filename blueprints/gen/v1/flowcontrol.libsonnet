@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withAdaptiveFlowScheduler(adaptive_flow_scheduler):: {
-    adaptive_flow_scheduler: adaptive_flow_scheduler,
+  withAdaptiveLoadScheduler(adaptive_load_scheduler):: {
+    adaptive_load_scheduler: adaptive_load_scheduler,
   },
-  withAdaptiveFlowSchedulerMixin(adaptive_flow_scheduler):: {
-    adaptive_flow_scheduler+: adaptive_flow_scheduler,
+  withAdaptiveLoadSchedulerMixin(adaptive_load_scheduler):: {
+    adaptive_load_scheduler+: adaptive_load_scheduler,
   },
   withAimdConcurrencyController(aimd_concurrency_controller):: {
     aimd_concurrency_controller: aimd_concurrency_controller,
@@ -25,17 +25,17 @@
   withFlowRegulatorMixin(flow_regulator):: {
     flow_regulator+: flow_regulator,
   },
-  withFlowScheduler(flow_scheduler):: {
-    flow_scheduler: flow_scheduler,
-  },
-  withFlowSchedulerMixin(flow_scheduler):: {
-    flow_scheduler+: flow_scheduler,
-  },
   withLoadRegulator(load_regulator):: {
     load_regulator: load_regulator,
   },
   withLoadRegulatorMixin(load_regulator):: {
     load_regulator+: load_regulator,
+  },
+  withLoadScheduler(load_scheduler):: {
+    load_scheduler: load_scheduler,
+  },
+  withLoadSchedulerMixin(load_scheduler):: {
+    load_scheduler+: load_scheduler,
   },
   withLoadShaper(load_shaper):: {
     load_shaper: load_shaper,

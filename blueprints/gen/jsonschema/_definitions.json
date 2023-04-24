@@ -1265,7 +1265,7 @@
     "FlowControl": {
       "description": "_Flow Control_ encompasses components that manage the flow of requests or access to features within a service.",
       "properties": {
-        "adaptive_flow_scheduler": {
+        "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
           "description": "_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.",
           "x-order": 0
@@ -1285,14 +1285,14 @@
           "title": "Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.\nDeprecated: 1.6.0",
           "x-order": 3
         },
-        "flow_scheduler": {
-          "$ref": "#/definitions/LoadScheduler",
-          "description": "_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
-          "x-order": 4
-        },
         "load_regulator": {
           "$ref": "#/definitions/LoadRegulator",
           "description": "Load Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
+          "x-order": 4
+        },
+        "load_scheduler": {
+          "$ref": "#/definitions/LoadScheduler",
+          "description": "_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
           "x-order": 5
         },
         "load_shaper": {

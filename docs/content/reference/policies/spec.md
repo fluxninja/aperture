@@ -2786,7 +2786,7 @@ First valid input signal as an output signal.
 _Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
 
 <dl>
-<dt>adaptive_flow_scheduler</dt>
+<dt>adaptive_load_scheduler</dt>
 <dd>
 
 <!-- vale off -->
@@ -2837,18 +2837,6 @@ Flow Regulator is a component that regulates the flow of requests to the service
 Deprecated: 1.6.0
 
 </dd>
-<dt>flow_scheduler</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadScheduler](#load-scheduler))
-
-<!-- vale on -->
-
-_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
-
-</dd>
 <dt>load_regulator</dt>
 <dd>
 
@@ -2859,6 +2847,18 @@ _Load Scheduler_ provides service protection by applying prioritized load sheddi
 <!-- vale on -->
 
 Load Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+
+</dd>
+<dt>load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadScheduler](#load-scheduler))
+
+<!-- vale on -->
+
+_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
 
 </dd>
 <dt>load_shaper</dt>

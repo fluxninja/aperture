@@ -1364,7 +1364,7 @@ definitions:
       or access to features within a service.
     type: object
     properties:
-      adaptive_flow_scheduler:
+      adaptive_load_scheduler:
         description: _Adaptive Load Scheduler_ component is based on additive increase
           and multiplicative decrease of token rate. It takes a signal and setpoint
           as inputs and reduces token rate proportionally (or any arbitrary power)
@@ -1389,18 +1389,18 @@ definitions:
           Deprecated: 1.6.0
         x-order: 3
         $ref: '#/definitions/FlowRegulator'
-      flow_scheduler:
-        description: _Load Scheduler_ provides service protection by applying prioritized
-          load shedding of flows using a network scheduler (for example, Weighted
-          Fair Queuing).
-        x-order: 4
-        $ref: '#/definitions/LoadScheduler'
       load_regulator:
         description: Load Regulator is a component that regulates the flow of requests
           to the service by allowing only the specified percentage of requests or
           sticky sessions.
-        x-order: 5
+        x-order: 4
         $ref: '#/definitions/LoadRegulator'
+      load_scheduler:
+        description: _Load Scheduler_ provides service protection by applying prioritized
+          load shedding of flows using a network scheduler (for example, Weighted
+          Fair Queuing).
+        x-order: 5
+        $ref: '#/definitions/LoadScheduler'
       load_shaper:
         description: _Load Shaper_ is a component that shapes the load at a _Control
           Point_.

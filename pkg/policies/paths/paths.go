@@ -44,12 +44,12 @@ var (
 	PodScalerStatusPath = path.Join(StatusPrefix, "pod_scaler")
 	// PodScalerDynamicConfigPath is config path in etcd for dynamic config of pod scaler.
 	PodScalerDynamicConfigPath = path.Join(ConfigPrefix, "pod_scaler_dynamic_config")
-	// FlowRegulatorConfigPath is config path in etcd for flow regulator.
-	FlowRegulatorConfigPath = path.Join(ConfigPrefix, "flow_regulator")
-	// FlowRegulatorDecisionsPath is decision path in etcd for flow regulator decisions.
-	FlowRegulatorDecisionsPath = path.Join(DecisionsPrefix, "flow_regulator")
-	// FlowRegulatorDynamicConfigPath is config path in etcd for dynamic config of flow regulator.
-	FlowRegulatorDynamicConfigPath = path.Join(ConfigPrefix, "flow_regulator_dynamic_config")
+	// LoadRegulatorConfigPath is config path in etcd for load regulator.
+	LoadRegulatorConfigPath = path.Join(ConfigPrefix, "load_regulator")
+	// LoadRegulatorDecisionsPath is decision path in etcd for load regulator decisions.
+	LoadRegulatorDecisionsPath = path.Join(DecisionsPrefix, "load_regulator")
+	// LoadRegulatorDynamicConfigPath is config path in etcd for dynamic config of load regulator.
+	LoadRegulatorDynamicConfigPath = path.Join(ConfigPrefix, "load_regulator_dynamic_config")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.

@@ -24,8 +24,8 @@ policy:
               "service_selector":
                 { "service": "service1-demo-app.demoapp.svc.cluster.local" },
             },
-          "forward": { "threshold": 75 },
-          "reset": { "threshold": 75 },
+          "criteria":
+            { "forward": { "threshold": 75 }, "reset": { "threshold": 75 } },
         },
       ]
   evaluation_interval: "1s"

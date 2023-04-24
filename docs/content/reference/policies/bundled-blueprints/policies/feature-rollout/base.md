@@ -75,7 +75,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Parameters for the Feature Rollout policy.'
     type='Object (rollout_policy)'
     reference='#rollout-policy'
-    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_shaper": {"flow_regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "resources": {"flow_control": {"classifiers": []}}}'
+    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_shaper": {"load_regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "resources": {"flow_control": {"classifiers": []}}}'
 />
 
 <!-- vale on -->
@@ -190,13 +190,19 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### forward {#promql-driver-forward}
+##### criteria {#promql-driver-criteria}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-forward-threshold"></a>
+###### forward {#promql-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-forward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -210,7 +216,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="promql-driver-forward-operator"></a>
+<a id="promql-driver-criteria-forward-operator"></a>
 
 <ParameterDescription
     name='operator'
@@ -224,13 +230,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### backward {#promql-driver-backward}
+###### backward {#promql-driver-criteria-backward}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-backward-threshold"></a>
+<a id="promql-driver-criteria-backward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -244,7 +250,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="promql-driver-backward-operator"></a>
+<a id="promql-driver-criteria-backward-operator"></a>
 
 <ParameterDescription
     name='operator'
@@ -258,13 +264,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### reset {#promql-driver-reset}
+###### reset {#promql-driver-criteria-reset}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-reset-threshold"></a>
+<a id="promql-driver-criteria-reset-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -278,7 +284,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="promql-driver-reset-operator"></a>
+<a id="promql-driver-criteria-reset-operator"></a>
 
 <ParameterDescription
     name='operator'
@@ -314,13 +320,19 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### forward {#average-latency-driver-forward}
+##### criteria {#average-latency-driver-criteria}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="average-latency-driver-forward-threshold"></a>
+###### forward {#average-latency-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="average-latency-driver-criteria-forward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -334,13 +346,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### backward {#average-latency-driver-backward}
+###### backward {#average-latency-driver-criteria-backward}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="average-latency-driver-backward-threshold"></a>
+<a id="average-latency-driver-criteria-backward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -354,13 +366,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### reset {#average-latency-driver-reset}
+###### reset {#average-latency-driver-criteria-reset}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="average-latency-driver-reset-threshold"></a>
+<a id="average-latency-driver-criteria-reset-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -410,13 +422,19 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### forward {#percentile-latency-driver-forward}
+##### criteria {#percentile-latency-driver-criteria}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-forward-threshold"></a>
+###### forward {#percentile-latency-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="percentile-latency-driver-criteria-forward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -430,13 +448,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### backward {#percentile-latency-driver-backward}
+###### backward {#percentile-latency-driver-criteria-backward}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-backward-threshold"></a>
+<a id="percentile-latency-driver-criteria-backward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -450,13 +468,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### reset {#percentile-latency-driver-reset}
+###### reset {#percentile-latency-driver-criteria-reset}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="percentile-latency-driver-reset-threshold"></a>
+<a id="percentile-latency-driver-criteria-reset-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -506,13 +524,19 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### forward {#ema-latency-driver-forward}
+##### criteria {#ema-latency-driver-criteria}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="ema-latency-driver-forward-latency-tolerance-multiplier"></a>
+###### forward {#ema-latency-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="ema-latency-driver-criteria-forward-latency-tolerance-multiplier"></a>
 
 <ParameterDescription
     name='latency_tolerance_multiplier'
@@ -526,13 +550,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### backward {#ema-latency-driver-backward}
+###### backward {#ema-latency-driver-criteria-backward}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="ema-latency-driver-backward-latency-tolerance-multiplier"></a>
+<a id="ema-latency-driver-criteria-backward-latency-tolerance-multiplier"></a>
 
 <ParameterDescription
     name='latency_tolerance_multiplier'
@@ -546,13 +570,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### reset {#ema-latency-driver-reset}
+###### reset {#ema-latency-driver-criteria-reset}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="ema-latency-driver-reset-latency-tolerance-multiplier"></a>
+<a id="ema-latency-driver-criteria-reset-latency-tolerance-multiplier"></a>
 
 <ParameterDescription
     name='latency_tolerance_multiplier'
@@ -581,7 +605,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.'
     type='Object (aperture.spec.v1.LoadShaperParameters)'
     reference='../../../spec#load-shaper-parameters'
-    value='{"flow_regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
+    value='{"load_regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
 />
 
 <!-- vale on -->
@@ -643,7 +667,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.'
     type='Array of Object (promql_driver)'
     reference='#promql-driver'
-    value='[{"backward": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}, "forward": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}, "query_string": "__REQUIRED_FIELD__", "reset": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}}]'
+    value='[{"criteria": {"backward": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}, "forward": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}, "reset": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}}, "query_string": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->
@@ -657,7 +681,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='List of drivers that compare average latency against forward, backward and reset thresholds.'
     type='Array of Object (average_latency_driver)'
     reference='#average-latency-driver'
-    value='[{"backward": {"threshold": "__REQUIRED_FIELD__"}, "flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "forward": {"threshold": "__REQUIRED_FIELD__"}, "reset": {"threshold": "__REQUIRED_FIELD__"}}]'
+    value='[{"criteria": {"backward": {"threshold": "__REQUIRED_FIELD__"}, "forward": {"threshold": "__REQUIRED_FIELD__"}, "reset": {"threshold": "__REQUIRED_FIELD__"}}, "flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}}]'
 />
 
 <!-- vale on -->
@@ -671,7 +695,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='List of drivers that compare percentile latency against forward, backward and reset thresholds.'
     type='Array of Object (percentile_latency_driver)'
     reference='#percentile-latency-driver'
-    value='[{"backward": {"threshold": "__REQUIRED_FIELD__"}, "flux_meter": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "static_buckets": {"buckets": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, "forward": {"threshold": "__REQUIRED_FIELD__"}, "percentile": 95, "reset": {"threshold": "__REQUIRED_FIELD__"}}]'
+    value='[{"criteria": {"backward": {"threshold": "__REQUIRED_FIELD__"}, "forward": {"threshold": "__REQUIRED_FIELD__"}, "reset": {"threshold": "__REQUIRED_FIELD__"}}, "flux_meter": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "static_buckets": {"buckets": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, "percentile": 95}]'
 />
 
 <!-- vale on -->
@@ -685,7 +709,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='List of drivers that compare trend latency against forward, backward and reset thresholds.'
     type='Array of Object (ema_latency_driver)'
     reference='#ema-latency-driver'
-    value='[{"backward": {"latency_tolerance_multiplier": 1.05}, "ema": {"ema_window": "1500s", "warmup_window": "60s"}, "flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "forward": {"latency_tolerance_multiplier": 1.05}, "reset": {"latency_tolerance_multiplier": 1.25}}]'
+    value='[{"criteria": {"backward": {"latency_tolerance_multiplier": 1.05}, "forward": {"latency_tolerance_multiplier": 1.05}, "reset": {"latency_tolerance_multiplier": 1.25}}, "ema": {"ema_window": "1500s", "warmup_window": "60s"}, "flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}}]'
 />
 
 <!-- vale on -->
@@ -706,13 +730,13 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="load-shaper"></a>
+<a id="load-regulator"></a>
 
 <ParameterDescription
-    name='load_shaper'
-    description='Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.FlowRegulatorDynamicConfig)'
-    reference='../../../spec#flow-regulator-dynamic-config'
+    name='load_regulator'
+    description='Default configuration for load regulator that can be updated at the runtime without shutting down the policy.'
+    type='Object (aperture.spec.v1.LoadRegulatorDynamicConfig)'
+    reference='../../../spec#load-regulator-dynamic-config'
     value='"__REQUIRED_FIELD__"'
 />
 
