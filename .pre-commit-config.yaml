@@ -91,6 +91,8 @@ repos:
     rev: "v3.0.0-alpha.6"
     hooks:
       - id: prettier
+        additional_dependencies:
+          - prettier@2.8.8
         exclude: ^(docs/content/reference/.*|docs/content/reference/aperturectl/.*|manifests/charts/.*/README*|.github)
         types_or:
           [
