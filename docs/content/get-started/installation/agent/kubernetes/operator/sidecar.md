@@ -430,9 +430,18 @@ following these steps:
 
 1. Delete the Aperture Agent chart:
 
-   ```bash
-   helm uninstall agent
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent --version ${apertureVersion}`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm uninstall agent`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
 2. If you have installed the Aperture Agent Custom Resource, follow the steps
    below:
@@ -448,7 +457,7 @@ following these steps:
       <Tabs groupId="setup" queryString>
       <TabItem value="aperturectl" label="aperturectl">
       <CodeBlock language="bash">
-      {`aperturectl uninstall agent`}
+      {`aperturectl uninstall agent --version ${apertureVersion}`}
       </CodeBlock>
       </TabItem>
       <TabItem value="Helm" label="Helm">
@@ -464,7 +473,7 @@ following these steps:
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall agent --namespace aperture-agent`}
+   {`aperturectl uninstall agent --namespace aperture-agent --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">

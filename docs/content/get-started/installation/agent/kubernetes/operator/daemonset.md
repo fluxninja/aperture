@@ -305,7 +305,7 @@ following these steps:
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall agent`}
+   {`aperturectl uninstall agent --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
@@ -329,7 +329,7 @@ following these steps:
       <Tabs groupId="setup" queryString>
       <TabItem value="aperturectl" label="aperturectl">
       <CodeBlock language="bash">
-      {`aperturectl uninstall agent`}
+      {`aperturectl uninstall agent --version ${apertureVersion}`}
       </CodeBlock>
       </TabItem>
       <TabItem value="Helm" label="Helm">

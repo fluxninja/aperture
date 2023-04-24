@@ -25,7 +25,7 @@ data:
       {{- end }}
       disable_kubernetes_scraper: true
       custom_metrics:
-        {{- if (omit .Values.agent.config.otel.custom_metrics "kubeletstats")}}
+        {{- if and .Values.agent.config.otel .Values.agent.config.otel.custom_metrics (omit .Values.agent.config.otel.custom_metrics "kubeletstats")}}
         {{- omit .Values.agent.config.otel.custom_metrics "kubeletstats" | toYaml | nindent 8 }}
         {{- end }}
         kubeletstats: {}
