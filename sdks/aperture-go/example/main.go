@@ -86,11 +86,10 @@ func main() {
 	}
 
 	// Adding the http middleware to be executed before the actual business logic execution.
-	mux.PathPrefix("/super").Handler(
-		a.apertureClient.HTTPMiddleware("awesomeFeature", labels, 30*time.Second)(
-			a.SuperHandler(),
-		),
-	)
+	superRouter := mux.PathPrefix("/super").Subrouter()
+	superRouter.HandleFunc("", a.SuperHandler)
+	superRouter.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", labels, 30*time.Second))
+
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
 
@@ -113,12 +112,10 @@ func main() {
 }
 
 // SuperHandler handles HTTP requests on /super endpoint.
-func (a *app) SuperHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusAccepted)
-		// Simulate work being done
-		time.Sleep(2 * time.Second)
-	})
+func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusAccepted)
+	// Simulate work being done
+	time.Sleep(2 * time.Second)
 }
 
 // ConnectedHandler handles HTTP requests on /connected endpoint.
