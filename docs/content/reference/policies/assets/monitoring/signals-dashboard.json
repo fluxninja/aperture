@@ -215,7 +215,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "avg by (valid) (rate(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval]))\n",
+          "expr": "avg(rate(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval]))\n",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",

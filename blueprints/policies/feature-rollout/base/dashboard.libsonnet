@@ -36,9 +36,9 @@ function(cfg) {
                                 .addTarget(
     prometheus.target(
       expr=(
-        'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE",valid="true"}[$__rate_interval])' +
+        'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])' +
         '/' +
-        'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE",valid="true"}[$__rate_interval])'
+        'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])'
       ),
       intervalFactor=1,
     ),
