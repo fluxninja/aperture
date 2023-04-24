@@ -18,8 +18,8 @@ repository.
 
 ::: note
 
-The `azureeventhubreceiver` extension is available in default agent image. If
-you're [building][build] your own Aperture Agent, add
+The `azureeventhubreceiver` extension is available in the default agent image.
+If you're [building][build] your own Aperture Agent, add
 `integrations/otel/azureeventhubreceiver` to `bundled_extensions` list to make
 [the receiver][receiver] available.
 

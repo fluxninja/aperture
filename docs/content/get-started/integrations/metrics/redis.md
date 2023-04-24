@@ -18,7 +18,7 @@ repository.
 
 ::: note
 
-The `redisreceiver` extension is available in default agent image. If you're
+The `redisreceiver` extension is available in the default agent image. If you're
 [building][build] your own Aperture Agent, add `integrations/otel/redisreceiver`
 to `bundled_extensions` list to make [the receiver][receiver] available.
 

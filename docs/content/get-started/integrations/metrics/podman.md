@@ -18,8 +18,8 @@ repository.
 
 ::: note
 
-The `podmanreceiver` extension is available in default agent image. If you're
-[building][build] your own Aperture Agent, add
+The `podmanreceiver` extension is available in the default agent image. If
+you're [building][build] your own Aperture Agent, add
 `integrations/otel/podmanreceiver` to `bundled_extensions` list to make [the
 receiver][receiver] available.
 

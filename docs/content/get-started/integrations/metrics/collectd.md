@@ -18,8 +18,8 @@ repository.
 
 ::: note
 
-The `collectdreceiver` extension is available in default agent image. If you're
-[building][build] your own Aperture Agent, add
+The `collectdreceiver` extension is available in the default agent image. If
+you're [building][build] your own Aperture Agent, add
 `integrations/otel/collectdreceiver` to `bundled_extensions` list to make [the
 receiver][receiver] available.
 

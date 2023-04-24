@@ -18,8 +18,8 @@ repository.
 
 ::: note
 
-The `signalfxreceiver` extension is available in default agent image. If you're
-[building][build] your own Aperture Agent, add
+The `signalfxreceiver` extension is available in the default agent image. If
+you're [building][build] your own Aperture Agent, add
 `integrations/otel/signalfxreceiver` to `bundled_extensions` list to make [the
 receiver][receiver] available.
 
