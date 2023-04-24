@@ -14,6 +14,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/gogo/protobuf/jsonpb"
 )
 
 // FactoryModule for component factory run via the main app.
@@ -98,6 +99,20 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+		case *policylangv1.FlowControl_FlowRegulator:
+			// Convert from *policylangv1.FlowControl_FlowRegulator to *policylangv1.FlowControl_LoadRegulator since they have the same fields
+			marshaller := jsonpb.Marshaler{}
+			jsonStr, err := marshaller.MarshalToString(flowControl.GetFlowRegulator())
+			if err != nil {
+				return Tree{}, nil, nil, fmt.Errorf("error marshaling FlowRegulator to JSON: %v", err)
+			}
+
+			loadRegulatorProto := &policylangv1.LoadRegulator{}
+			err = jsonpb.UnmarshalString(jsonStr, loadRegulatorProto)
+			if err != nil {
+				return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to LoadRegulator: %v", err)
+			}
+			ctor = mkCtor(loadRegulatorProto, loadregulator.NewLoadRegulatorAndOptions)
 		case *policylangv1.FlowControl_LoadRegulator:
 			ctor = mkCtor(flowControlConfig.LoadRegulator, loadregulator.NewLoadRegulatorAndOptions)
 		default:
