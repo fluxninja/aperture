@@ -42,7 +42,7 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 	if err := protojson.Unmarshal(b, d.duration); err != nil {
-		log.Error().Err(err).Bytes("b", b).Msg("Unable to unmarshal duration")
+		log.Error().Err(err).Bytes("bytes", b).Msg("Unable to unmarshal duration")
 		return err
 	}
 	return nil
