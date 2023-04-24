@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [splunkhecreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [splunkhecreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `splunkhecreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/splunkhecreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `splunkhecreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/splunkhecreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [httpcheckreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [httpcheckreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `httpcheckreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/httpcheckreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `httpcheckreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/httpcheckreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

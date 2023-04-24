@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [aerospikereceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [aerospikereceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `aerospikereceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/aerospikereceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `aerospikereceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/aerospikereceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

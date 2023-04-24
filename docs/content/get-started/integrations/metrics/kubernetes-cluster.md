@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [k8sclusterreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [k8sclusterreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `k8sclusterreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/k8sclusterreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `k8sclusterreceiver` extension is available in default agent image. If
+you're [building][build] your own Aperture Agent, add
+`integrations/otel/k8sclusterreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

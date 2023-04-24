@@ -11,13 +11,16 @@ keywords:
 
 ::: info
 
-See also [jmxreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [jmxreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `jmxreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/jmxreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `jmxreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add `integrations/otel/jmxreceiver`
+to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

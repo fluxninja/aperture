@@ -12,13 +12,16 @@ keywords:
 
 ::: info
 
-See also [bigipreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [bigipreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `bigipreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/bigipreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `bigipreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add `integrations/otel/bigipreceiver`
+to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

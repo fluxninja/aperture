@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [expvarreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [expvarreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `expvarreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/expvarreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `expvarreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/expvarreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [awsecscontainermetricsreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [awsecscontainermetricsreceiver docs][receiver] in
+opentelemetry-collect-contrib repository.
 
 :::
 
 ::: note
 
-The `awsecscontainermetricsreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/awsecscontainermetricsreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `awsecscontainermetricsreceiver` extension is available in default agent
+image. If you're [building][build] your own Aperture Agent, add
+`integrations/otel/awsecscontainermetricsreceiver` to `bundled_extensions` list
+to make [the receiver][receiver] available.
 
 :::
 

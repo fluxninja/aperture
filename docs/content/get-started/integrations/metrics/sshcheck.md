@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [sshcheckreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [sshcheckreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `sshcheckreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/sshcheckreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `sshcheckreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/sshcheckreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

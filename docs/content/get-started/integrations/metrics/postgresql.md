@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [postgresqlreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [postgresqlreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `postgresqlreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/postgresqlreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `postgresqlreceiver` extension is available in default agent image. If
+you're [building][build] your own Aperture Agent, add
+`integrations/otel/postgresqlreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

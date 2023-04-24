@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [kafkametricsreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [kafkametricsreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `kafkametricsreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/kafkametricsreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `kafkametricsreceiver` extension is available in default agent image. If
+you're [building][build] your own Aperture Agent, add
+`integrations/otel/kafkametricsreceiver` to `bundled_extensions` list to make
+[the receiver][receiver] available.
 
 :::
 

@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [flinkmetricsreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [flinkmetricsreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `flinkmetricsreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/flinkmetricsreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `flinkmetricsreceiver` extension is available in default agent image. If
+you're [building][build] your own Aperture Agent, add
+`integrations/otel/flinkmetricsreceiver` to `bundled_extensions` list to make
+[the receiver][receiver] available.
 
 :::
 

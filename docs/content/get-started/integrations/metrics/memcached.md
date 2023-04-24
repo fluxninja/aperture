@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [memcachedreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [memcachedreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `memcachedreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/memcachedreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `memcachedreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/memcachedreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

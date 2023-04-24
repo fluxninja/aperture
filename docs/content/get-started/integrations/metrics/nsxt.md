@@ -11,13 +11,16 @@ keywords:
 
 ::: info
 
-See also [nsxtreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [nsxtreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `nsxtreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/nsxtreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `nsxtreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add `integrations/otel/nsxtreceiver`
+to `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

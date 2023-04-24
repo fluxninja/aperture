@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [wavefrontreceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [wavefrontreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `wavefrontreceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/wavefrontreceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `wavefrontreceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/wavefrontreceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 

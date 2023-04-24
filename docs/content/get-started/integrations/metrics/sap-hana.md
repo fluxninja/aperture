@@ -11,13 +11,17 @@ keywords:
 
 ::: info
 
-See also [saphanareceiver docs][receiver] in opentelemetry-collect-contrib repository.
+See also [saphanareceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
 
 :::
 
 ::: note
 
-The `saphanareceiver` extension is available in default agent image. If you're [building][build] your own Aperture Agent, add `integrations/otel/saphanareceiver` to `bundled_extensions` list to make [the receiver][receiver] available.
+The `saphanareceiver` extension is available in default agent image. If you're
+[building][build] your own Aperture Agent, add
+`integrations/otel/saphanareceiver` to `bundled_extensions` list to make [the
+receiver][receiver] available.
 
 :::
 
