@@ -53,7 +53,8 @@ const (
 
 // Logger is wrapper around zerolog.Logger and io.writers.
 type Logger struct {
-	logger *zerolog.Logger
+	logger  *zerolog.Logger
+	writers []io.Writer
 }
 
 var global *Logger
@@ -106,6 +107,23 @@ func NewLogger(w io.Writer, levelString string) *Logger {
 	}
 
 	return logger
+}
+
+// NewLoggerWithWriters creates a new logger instance and stores a list of additional io.Writers.
+func NewLoggerWithWriters(w io.Writer, writers []io.Writer, levelString string) *Logger {
+	logger := NewLogger(w, levelString)
+	logger.writers = writers
+
+	return logger
+}
+
+// CloseWriters iterate over a list of additional writers to close them.
+func (lg *Logger) CloseWriters() {
+	for _, writer := range lg.writers {
+		if closer, ok := writer.(io.Closer); ok {
+			_ = closer.Close()
+		}
+	}
 }
 
 // WaitFlush waits a few ms to let the the buffer to flush.
