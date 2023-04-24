@@ -85,8 +85,10 @@ func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 			sma.buffer = []float64{}
 			sma.sum = 0
 			sma.invalidCounter = 0
+			output = runtime.InvalidReading()
+		} else {
+			output = sma.lastGoodOutput
 		}
-		output = sma.lastGoodOutput
 	}
 
 	// Set the last good output
