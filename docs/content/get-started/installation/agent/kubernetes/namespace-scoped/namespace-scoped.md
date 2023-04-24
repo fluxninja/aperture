@@ -172,6 +172,13 @@ Aperture Agent into your cluster.
    <CodeBlock language="bash">
    {`helm template agent aperture/aperture-agent -f values.yaml | kubectl apply -f -`}
    </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade agent aperture/aperture-agent -f values.yaml`}
+   </CodeBlock>
    </TabItem>
    </Tabs>
 
@@ -187,6 +194,13 @@ Aperture Agent into your cluster.
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template agent aperture/aperture-agent -f values.yaml --namespace aperture-agent | kubectl apply -f -`}
+   </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade agent aperture/aperture-agent -f values.yaml --namespace aperture-agent`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -215,7 +229,7 @@ Use the same `values.yaml` file created as part of
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall agent --values-file values.yaml`}
+   {`aperturectl uninstall agent --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
@@ -231,7 +245,7 @@ Use the same `values.yaml` file created as part of
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall agent --namespace aperture-agent --values-file values.yaml`}
+   {`aperturectl uninstall agent --namespace aperture-agent --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
@@ -246,5 +260,5 @@ Use the same `values.yaml` file created as part of
    you want to delete them, run the below commands:
 
    ```bash
-   kubectl delete configmap aperture-agent-client-cert
+   kubectl delete configmap -l app.kubernetes.io/instance=agent-aperture-agent
    ```

@@ -251,6 +251,9 @@ message Component {
     // Switcher acts as a switch that emits one of the two signals based on third signal.
     Switcher switcher = 5;
 
+    // Simple Moving Average filter.
+    SMA sma = 6;
+
     // Emits a variable signal which can be set to invalid.
     Variable variable = 9;
 

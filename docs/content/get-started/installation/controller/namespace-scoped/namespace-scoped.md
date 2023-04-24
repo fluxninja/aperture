@@ -19,13 +19,6 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVers
 Aperture Controller can be installed in a single namespace without any cluster
 level resources.
 
-:::info
-
-The Aperture Controller will only perform as expected with Aperture SDKs as
-integration in this mode.
-
-:::
-
 ## Prerequisites
 
 1. Prepare a `values.yaml` file which switches the Aperture Controller to
@@ -197,6 +190,13 @@ Aperture Controller into your cluster.
    <CodeBlock language="bash">
    {`helm template controller aperture/aperture-controller -f values.yaml | kubectl apply -f -`}
    </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade controller aperture/aperture-controller -f values.yaml`}
+   </CodeBlock>
    </TabItem>
    </Tabs>
 
@@ -212,6 +212,13 @@ Aperture Controller into your cluster.
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template controller aperture/aperture-controller -f values.yaml --namespace aperture-controller | kubectl apply -f -`}
+   </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade controller aperture/aperture-controller -f values.yaml --namespace aperture-controller`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -240,7 +247,7 @@ Use the same `values.yaml` file created as part of
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall controller --values-file values.yaml`}
+   {`aperturectl uninstall controller --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
@@ -256,7 +263,7 @@ Use the same `values.yaml` file created as part of
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall controller --namespace aperture-controller --values-file values.yaml`}
+   {`aperturectl uninstall controller --namespace aperture-controller --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
@@ -271,6 +278,6 @@ Use the same `values.yaml` file created as part of
    you want to delete them, run the below commands:
 
    ```bash
-   kubectl delete secret controller-aperture-controller-cert
-   kubectl delete configmap controller-aperture-controller-client-cert
+   kubectl delete secret -l app.kubernetes.io/instance=controller-aperture-controller
+   kubectl delete configmap -l app.kubernetes.io/instance=controller-aperture-controller
    ```

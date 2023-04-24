@@ -139,6 +139,12 @@
   withSignalGeneratorMixin(signal_generator):: {
     signal_generator+: signal_generator,
   },
+  withSma(sma):: {
+    sma: sma,
+  },
+  withSmaMixin(sma):: {
+    sma+: sma,
+  },
   withSwitcher(switcher):: {
     switcher: switcher,
   },

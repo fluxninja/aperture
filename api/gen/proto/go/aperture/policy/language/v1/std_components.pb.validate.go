@@ -440,6 +440,191 @@ var _ interface {
 	ErrorName() string
 } = EMAValidationError{}
 
+// Validate checks the field values on SMA with the rules defined in the proto
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
+func (m *SMA) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SMA with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SMAMultiError, or nil if none found.
+func (m *SMA) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SMA) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SMAValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SMAValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SMAValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SMAValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SMAValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SMAValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SMAValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SMAValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SMAValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SMAMultiError(errors)
+	}
+
+	return nil
+}
+
+// SMAMultiError is an error wrapping multiple validation errors returned by
+// SMA.ValidateAll() if the designated constraints aren't met.
+type SMAMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SMAMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SMAMultiError) AllErrors() []error { return m }
+
+// SMAValidationError is the validation error returned by SMA.Validate if the
+// designated constraints aren't met.
+type SMAValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SMAValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SMAValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SMAValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SMAValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SMAValidationError) ErrorName() string { return "SMAValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SMAValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSMA.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SMAValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SMAValidationError{}
+
 // Validate checks the field values on ArithmeticCombinator with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -4842,6 +5027,392 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = EMA_ParametersValidationError{}
+
+// Validate checks the field values on SMA_Ins with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SMA_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SMA_Ins with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SMA_InsMultiError, or nil if none found.
+func (m *SMA_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SMA_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SMA_InsValidationError{
+					field:  "Input",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SMA_InsValidationError{
+					field:  "Input",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SMA_InsValidationError{
+				field:  "Input",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SMA_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// SMA_InsMultiError is an error wrapping multiple validation errors returned
+// by SMA_Ins.ValidateAll() if the designated constraints aren't met.
+type SMA_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SMA_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SMA_InsMultiError) AllErrors() []error { return m }
+
+// SMA_InsValidationError is the validation error returned by SMA_Ins.Validate
+// if the designated constraints aren't met.
+type SMA_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SMA_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SMA_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SMA_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SMA_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SMA_InsValidationError) ErrorName() string { return "SMA_InsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SMA_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSMA_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SMA_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SMA_InsValidationError{}
+
+// Validate checks the field values on SMA_Outs with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SMA_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SMA_Outs with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SMA_OutsMultiError, or nil
+// if none found.
+func (m *SMA_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SMA_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SMA_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SMA_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SMA_OutsValidationError{
+				field:  "Output",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SMA_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// SMA_OutsMultiError is an error wrapping multiple validation errors returned
+// by SMA_Outs.ValidateAll() if the designated constraints aren't met.
+type SMA_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SMA_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SMA_OutsMultiError) AllErrors() []error { return m }
+
+// SMA_OutsValidationError is the validation error returned by
+// SMA_Outs.Validate if the designated constraints aren't met.
+type SMA_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SMA_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SMA_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SMA_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SMA_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SMA_OutsValidationError) ErrorName() string { return "SMA_OutsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SMA_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSMA_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SMA_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SMA_OutsValidationError{}
+
+// Validate checks the field values on SMA_Parameters with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SMA_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SMA_Parameters with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SMA_ParametersMultiError,
+// or nil if none found.
+func (m *SMA_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SMA_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetSmaWindow()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SMA_ParametersValidationError{
+					field:  "SmaWindow",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SMA_ParametersValidationError{
+					field:  "SmaWindow",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSmaWindow()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SMA_ParametersValidationError{
+				field:  "SmaWindow",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ValidDuringWarmup
+
+	if len(errors) > 0 {
+		return SMA_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// SMA_ParametersMultiError is an error wrapping multiple validation errors
+// returned by SMA_Parameters.ValidateAll() if the designated constraints
+// aren't met.
+type SMA_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SMA_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SMA_ParametersMultiError) AllErrors() []error { return m }
+
+// SMA_ParametersValidationError is the validation error returned by
+// SMA_Parameters.Validate if the designated constraints aren't met.
+type SMA_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SMA_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SMA_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SMA_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SMA_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SMA_ParametersValidationError) ErrorName() string { return "SMA_ParametersValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SMA_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSMA_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SMA_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SMA_ParametersValidationError{}
 
 // Validate checks the field values on ArithmeticCombinator_Ins with the rules
 // defined in the proto definition for this message. If any rules are

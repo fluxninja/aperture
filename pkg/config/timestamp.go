@@ -38,7 +38,7 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 	t.timestamp = timestamppb.Now()
 	err := protojson.Unmarshal(b, t.timestamp)
 	if err != nil {
-		log.Error().Err(err).Bytes("b", b).Msg("Unable to unmarshal timestamp")
+		log.Error().Err(err).Bytes("bytes", b).Msg("Unable to unmarshal timestamp")
 		return err
 	}
 	return nil

@@ -808,6 +808,9 @@ definitions:
             signal_generator:
                 $ref: '#/definitions/SignalGenerator'
                 description: Generates the specified signal.
+            sma:
+                $ref: '#/definitions/SMA'
+                description: Simple Moving Average filter.
             switcher:
                 $ref: '#/definitions/Switcher'
                 description: Switcher acts as a switch that emits one of the two signals based on third signal.
@@ -1185,7 +1188,7 @@ definitions:
             valid_during_warmup:
                 default: false
                 description: |+
-                    Whether the output is valid during the warm up stage.
+                    Whether the output is valid during the warm-up stage.
 
                 type: boolean
                 x-go-tag-default: "false"
@@ -3680,6 +3683,52 @@ definitions:
             - query
             - source
         title: Raw Rego rules are compiled 1:1 to Rego queries
+        type: object
+    SMA:
+        description: Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
+        properties:
+            in_ports:
+                $ref: '#/definitions/SMAIns'
+                description: Input ports for the SMA component.
+            out_ports:
+                $ref: '#/definitions/SMAOuts'
+                description: Output ports for the SMA component.
+            parameters:
+                $ref: '#/definitions/SMAParameters'
+                description: |+
+                    Parameters for the SMA component.
+
+                x-go-tag-validate: required
+        type: object
+    SMAIns:
+        properties:
+            input:
+                $ref: '#/definitions/InPort'
+                description: Signal to be used for the moving average computation.
+        type: object
+    SMAOuts:
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+                description: Computed moving average.
+        type: object
+    SMAParameters:
+        properties:
+            sma_window:
+                description: |+
+                    Window of time over which the moving average is computed.
+
+                type: string
+                x-go-tag-validate: required
+            valid_during_warmup:
+                default: false
+                description: |+
+                    Whether the output is valid during the warm-up stage.
+
+                type: boolean
+                x-go-tag-default: "false"
+        required:
+            - sma_window
         type: object
     ScaleInController:
         properties:

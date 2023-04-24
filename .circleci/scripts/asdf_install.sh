@@ -9,4 +9,4 @@ if [ "${#tools[@]}" -eq 1 ] && [ -z "${tools[0]:-}" ]; then
 	tools=()
 fi
 
-(yes || true) | ./scripts/manage_tools.sh setup "${tools[@]}"
+(yes || true) | ./scripts/manage_asdf_tools.sh setup "${tools[@]}"

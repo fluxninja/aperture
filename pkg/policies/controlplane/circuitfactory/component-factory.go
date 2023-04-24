@@ -43,6 +43,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
 	case *policylangv1.Component_Ema:
 		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
+	case *policylangv1.Component_Sma:
+		ctor = mkCtor(config.Sma, components.NewSMAAndOptions)
 	case *policylangv1.Component_ArithmeticCombinator:
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Variable:

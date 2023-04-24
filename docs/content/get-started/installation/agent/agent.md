@@ -30,6 +30,13 @@ All the configuration parameters for Aperture Agent are listed
 
 The Aperture Agent can be installed in the following modes:
 
+:::caution warning
+
+Upgrading from one of the installation modes below to the other is discouraged
+and can result in unpredictable behavior.
+
+:::
+
 1. **Kubernetes**
 
    1. [**Install with Operator**](kubernetes/operator/operator.md)

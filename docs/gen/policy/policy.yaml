@@ -735,19 +735,23 @@ definitions:
         description: Generates the specified signal.
         x-order: 22
         $ref: '#/definitions/SignalGenerator'
+      sma:
+        description: Simple Moving Average filter.
+        x-order: 23
+        $ref: '#/definitions/SMA'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 23
+        x-order: 24
         $ref: '#/definitions/Switcher'
       unary_operator:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 24
+        x-order: 25
         $ref: '#/definitions/UnaryOperator'
       variable:
         description: Emits a variable signal which can be set to invalid.
-        x-order: 25
+        x-order: 26
         $ref: '#/definitions/Variable'
   ConcurrencyLimiter:
     description: |-
@@ -1089,7 +1093,7 @@ definitions:
         x-order: 2
       valid_during_warmup:
         description: |+
-          Whether the output is valid during the warm up stage.
+          Whether the output is valid during the warm-up stage.
 
         type: boolean
         default: false
@@ -3374,6 +3378,60 @@ definitions:
         type: string
         x-deprecated: true
         x-go-tag-validate: deprecated,required
+        x-order: 1
+  SMA:
+    description: Simple Moving Average (SMA) is a type of moving average that computes
+      the average of a fixed number of signal readings.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the SMA component.
+        x-order: 0
+        $ref: '#/definitions/SMAIns'
+      out_ports:
+        description: Output ports for the SMA component.
+        x-order: 1
+        $ref: '#/definitions/SMAOuts'
+      parameters:
+        description: |+
+          Parameters for the SMA component.
+
+        x-go-tag-validate: required
+        x-order: 2
+        $ref: '#/definitions/SMAParameters'
+  SMAIns:
+    type: object
+    properties:
+      input:
+        description: Signal to be used for the moving average computation.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+  SMAOuts:
+    type: object
+    properties:
+      output:
+        description: Computed moving average.
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+  SMAParameters:
+    type: object
+    required:
+    - sma_window
+    properties:
+      sma_window:
+        description: |+
+          Window of time over which the moving average is computed.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 0
+      valid_during_warmup:
+        description: |+
+          Whether the output is valid during the warm-up stage.
+
+        type: boolean
+        default: false
+        x-go-tag-default: "false"
         x-order: 1
   ScaleInController:
     type: object

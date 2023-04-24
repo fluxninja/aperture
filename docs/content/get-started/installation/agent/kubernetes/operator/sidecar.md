@@ -306,6 +306,13 @@ Aperture Agent into your cluster.
    <CodeBlock language="bash">
    {`helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -`}
    </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade agent aperture/aperture-agent -f values.yaml`}
+   </CodeBlock>
    </TabItem>
    </Tabs>
 
@@ -321,6 +328,13 @@ Aperture Agent into your cluster.
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml --namespace aperture-agent | kubectl apply -f -`}
+   </CodeBlock>
+
+   Once all the pods are in a running state after upgrade, run the below command
+   to keep the Helm release updated:
+
+   <CodeBlock language="bash">
+   {`helm upgrade agent aperture/aperture-agent -f values.yaml --namespace aperture-agent`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -416,9 +430,18 @@ following these steps:
 
 1. Delete the Aperture Agent chart:
 
-   ```bash
-   helm uninstall agent
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent --version ${apertureVersion}`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm uninstall agent`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
 2. If you have installed the Aperture Agent Custom Resource, follow the steps
    below:
@@ -434,7 +457,7 @@ following these steps:
       <Tabs groupId="setup" queryString>
       <TabItem value="aperturectl" label="aperturectl">
       <CodeBlock language="bash">
-      {`aperturectl uninstall agent`}
+      {`aperturectl uninstall agent --version ${apertureVersion}`}
       </CodeBlock>
       </TabItem>
       <TabItem value="Helm" label="Helm">
@@ -450,7 +473,7 @@ following these steps:
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall agent --namespace aperture-agent`}
+   {`aperturectl uninstall agent --namespace aperture-agent --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
@@ -487,7 +510,7 @@ following these steps:
    to delete it, run the below commands:
 
    ```bash
-   kubectl delete secret -l app.kubernetes.io/component=aperture
+   kubectl delete secret -l app.kubernetes.io/instance=agent-aperture-agent-manager
    ```
 
 9. **Optional**: Delete the CRD installed by the Helm chart:
