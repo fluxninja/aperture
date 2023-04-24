@@ -229,7 +229,7 @@ Use the same `values.yaml` file created as part of
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall agent --values-file values.yaml`}
+   {`aperturectl uninstall agent --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
@@ -245,7 +245,7 @@ Use the same `values.yaml` file created as part of
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall agent --namespace aperture-agent --values-file values.yaml`}
+   {`aperturectl uninstall agent --namespace aperture-agent --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
