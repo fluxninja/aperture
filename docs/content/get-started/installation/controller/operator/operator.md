@@ -277,7 +277,7 @@ following the below steps:
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl uninstall controller`}
+   {`aperturectl uninstall controller --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">

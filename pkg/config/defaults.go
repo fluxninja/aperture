@@ -18,10 +18,10 @@ import (
 // Most of the code ported from github.com/mcuadros/go-defaults
 
 type fieldData struct {
-	Parent   *fieldData
 	TagValue string
 	Value    reflect.Value
-	Field    reflect.StructField
+	Type     reflect.Type
+	Name     string
 }
 
 type fillerFunc func(field *fieldData)
@@ -44,10 +44,10 @@ func (f *filler) fill(variable interface{}) {
 func (f *filler) getFields(variable interface{}) []*fieldData {
 	valueObject := reflect.ValueOf(variable).Elem()
 
-	return f.getFieldsFromValue(valueObject, nil)
+	return f.getFieldsFromValue(valueObject)
 }
 
-func (f *filler) getFieldsFromValue(valueObject reflect.Value, parent *fieldData) []*fieldData {
+func (f *filler) getFieldsFromValue(valueObject reflect.Value) []*fieldData {
 	typeObject := valueObject.Type()
 
 	count := valueObject.NumField()
@@ -59,9 +59,9 @@ func (f *filler) getFieldsFromValue(valueObject reflect.Value, parent *fieldData
 		if value.CanSet() {
 			results = append(results, &fieldData{
 				Value:    value,
-				Field:    field,
+				Type:     field.Type,
+				Name:     field.Name,
 				TagValue: field.Tag.Get(f.Tag),
-				Parent:   parent,
 			})
 		}
 	}
@@ -71,35 +71,8 @@ func (f *filler) getFieldsFromValue(valueObject reflect.Value, parent *fieldData
 
 func (f *filler) setDefaultValues(fields []*fieldData) {
 	for _, field := range fields {
-		if f.isEmpty(field) {
-			f.setDefaultValue(field)
-		}
+		f.setDefaultValue(field)
 	}
-}
-
-func (f *filler) isEmpty(field *fieldData) bool {
-	switch field.Value.Kind() {
-	case reflect.Bool:
-		return !field.Value.Bool()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return field.Value.Int() == 0
-	case reflect.Float32, reflect.Float64:
-		return field.Value.Float() == .0
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return field.Value.Uint() == 0
-	case reflect.Slice:
-		switch field.Value.Type().Elem().Kind() {
-		case reflect.Struct, reflect.Ptr, reflect.Interface:
-			// always assume the structs, ptrs, interfaces in the slice is empty and can be filled
-			// the actually filling logic should take care of the rest
-			return true
-		default:
-			return field.Value.Len() == 0
-		}
-	case reflect.String:
-		return field.Value.String() == ""
-	}
-	return true
 }
 
 func (f *filler) setDefaultValue(field *fieldData) {
@@ -119,7 +92,7 @@ func (f *filler) setDefaultValue(field *fieldData) {
 }
 
 func (f *filler) getFunctionByName(field *fieldData) fillerFunc {
-	if f, ok := f.FuncByName[field.Field.Name]; ok {
+	if f, ok := f.FuncByName[field.Name]; ok {
 		return f
 	}
 
@@ -127,7 +100,7 @@ func (f *filler) getFunctionByName(field *fieldData) fillerFunc {
 }
 
 func (f *filler) getFunctionByType(field *fieldData) fillerFunc {
-	if f, ok := f.FuncByType[getTypeHash(field.Field.Type)]; ok {
+	if f, ok := f.FuncByType[getTypeHash(field.Type)]; ok {
 		return f
 	}
 
@@ -135,7 +108,7 @@ func (f *filler) getFunctionByType(field *fieldData) fillerFunc {
 }
 
 func (f *filler) getFunctionByKind(field *fieldData) fillerFunc {
-	if f, ok := f.FuncByKind[field.Field.Type.Kind()]; ok {
+	if f, ok := f.FuncByKind[field.Type.Kind()]; ok {
 		return f
 	}
 
@@ -198,11 +171,17 @@ func newDefaultFiller() *filler {
 
 	funcs := make(map[reflect.Kind]fillerFunc, 0)
 	funcs[reflect.Bool] = func(field *fieldData) {
+		if field.Value.Bool() {
+			return
+		}
 		value, _ := strconv.ParseBool(field.TagValue)
 		field.Value.SetBool(value)
 	}
 
 	funcs[reflect.Int] = func(field *fieldData) {
+		if field.Value.Int() != 0 {
+			return
+		}
 		value, _ := strconv.ParseInt(field.TagValue, 10, 64)
 		field.Value.SetInt(value)
 	}
@@ -211,7 +190,10 @@ func newDefaultFiller() *filler {
 	funcs[reflect.Int16] = funcs[reflect.Int]
 	funcs[reflect.Int32] = funcs[reflect.Int]
 	funcs[reflect.Int64] = func(field *fieldData) {
-		if field.Field.Type == reflect.TypeOf(time.Second) {
+		if field.Value.Int() != 0 {
+			return
+		}
+		if field.Type == reflect.TypeOf(time.Second) {
 			value, _ := time.ParseDuration(field.TagValue)
 			field.Value.Set(reflect.ValueOf(value))
 		} else {
@@ -221,6 +203,9 @@ func newDefaultFiller() *filler {
 	}
 
 	funcs[reflect.Float32] = func(field *fieldData) {
+		if field.Value.Float() != 0 {
+			return
+		}
 		value, _ := strconv.ParseFloat(field.TagValue, 64)
 		field.Value.SetFloat(value)
 	}
@@ -228,6 +213,9 @@ func newDefaultFiller() *filler {
 	funcs[reflect.Float64] = funcs[reflect.Float32]
 
 	funcs[reflect.Uint] = func(field *fieldData) {
+		if field.Value.Uint() != 0 {
+			return
+		}
 		value, _ := strconv.ParseUint(field.TagValue, 10, 64)
 		field.Value.SetUint(value)
 	}
@@ -238,12 +226,15 @@ func newDefaultFiller() *filler {
 	funcs[reflect.Uint64] = funcs[reflect.Uint]
 
 	funcs[reflect.String] = func(field *fieldData) {
+		if field.Value.String() != "" {
+			return
+		}
 		tagValue := parseDateTimeString(field.TagValue)
 		field.Value.SetString(tagValue)
 	}
 
 	funcs[reflect.Struct] = func(field *fieldData) {
-		fields := filler.getFieldsFromValue(field.Value, nil)
+		fields := filler.getFieldsFromValue(field.Value)
 		filler.setDefaultValues(fields)
 	}
 
@@ -257,8 +248,161 @@ func newDefaultFiller() *filler {
 		setPtrDefaults(val)
 	}
 
+	processSliceElements := func(count int, field *fieldData, valueGetter func(int) reflect.Value) {
+		for i := 0; i < count; i++ {
+			val := valueGetter(i)
+			elementField := &fieldData{
+				Value:    val,
+				TagValue: field.TagValue,
+				Type:     val.Type(),
+			}
+			filler.setDefaultValue(elementField)
+		}
+	}
+
+	funcs[reflect.Slice] = func(field *fieldData) {
+		k := field.Value.Type().Elem().Kind()
+		if field.Value.Len() > 0 {
+			// set defaults for existing elements by diving into the slice
+			switch k {
+			case reflect.Struct:
+				count := field.Value.Len()
+				for i := 0; i < count; i++ {
+					fields := filler.getFieldsFromValue(field.Value.Index(i))
+					filler.setDefaultValues(fields)
+				}
+			case reflect.Ptr, reflect.Interface:
+				count := field.Value.Len()
+				for i := 0; i < count; i++ {
+					val := field.Value.Index(i)
+					setPtrDefaults(val)
+				}
+			case reflect.Slice:
+				// Descend into slice of slices
+				count := field.Value.Len()
+				processSliceElements(count, field, field.Value.Index)
+			case reflect.Map:
+				// Descend into slice of maps
+				count := field.Value.Len()
+				processSliceElements(count, field, field.Value.Index)
+			}
+			return
+		}
+
+		// need to set defaults for the slice itself
+		switch k {
+		case reflect.Uint8:
+			field.Value.SetBytes([]byte(field.TagValue))
+		default:
+			reg := regexp.MustCompile(`^\[(.*)\]$`)
+			matches := reg.FindStringSubmatch(field.TagValue)
+			if len(matches) != 2 {
+				return
+			}
+			if matches[1] == "" {
+				field.Value.Set(reflect.MakeSlice(field.Value.Type(), 0, 0))
+			} else {
+				defaultValue := strings.Split(matches[1], ",")
+				result := reflect.MakeSlice(field.Value.Type(), len(defaultValue), len(defaultValue))
+				for i := 0; i < len(defaultValue); i++ {
+					itemValue := result.Index(i)
+					item := &fieldData{
+						Value:    itemValue,
+						TagValue: defaultValue[i],
+						Type:     itemValue.Type(),
+					}
+					filler.setDefaultValue(item)
+				}
+				field.Value.Set(result)
+			}
+		}
+	}
+
+	processMapElements := func(keys []reflect.Value, field *fieldData, valueGetter func(reflect.Value) reflect.Value) {
+		for _, key := range keys {
+			val := valueGetter(key)
+			elementField := &fieldData{
+				Value:    val,
+				TagValue: field.TagValue,
+				Type:     val.Type(),
+			}
+			filler.setDefaultValue(elementField)
+		}
+	}
+
+	funcs[reflect.Map] = func(field *fieldData) {
+		k := field.Type.Elem().Kind()
+		keys := field.Value.MapKeys()
+		if len(keys) > 0 {
+			switch k {
+			case reflect.Struct:
+				for _, key := range keys {
+					value := field.Value.MapIndex(key)
+					tmp := reflect.New(value.Type()).Elem()
+					tmp.Set(value)
+					fields := filler.getFieldsFromValue(tmp)
+					filler.setDefaultValues(fields)
+					field.Value.SetMapIndex(key, tmp)
+				}
+			case reflect.Ptr, reflect.Interface:
+				iter := field.Value.MapRange()
+				for iter.Next() {
+					setPtrDefaults(iter.Value())
+				}
+			case reflect.Slice:
+				// Descend into map of slices
+				processMapElements(keys, field, field.Value.MapIndex)
+			case reflect.Map:
+				// Descend into map of maps
+				processMapElements(keys, field, field.Value.MapIndex)
+			}
+			return
+		}
+		// Handle actual default tags on maps
+		if field.Value.IsNil() && field.TagValue != "" {
+			reg := regexp.MustCompile(`^\{(.*)\}$`)
+			matches := reg.FindStringSubmatch(field.TagValue)
+			if len(matches) != 2 {
+				return
+			}
+			if matches[1] == "" {
+				field.Value.Set(reflect.MakeMap(field.Value.Type()))
+			} else {
+				mapKeyValuePairs := strings.Split(matches[1], ",")
+				resultMap := reflect.MakeMap(field.Value.Type())
+				for _, pair := range mapKeyValuePairs {
+					keyValue := strings.Split(pair, ":")
+					if len(keyValue) == 2 {
+						key := keyValue[0]
+						valueStr := keyValue[1]
+
+						keyElem := reflect.New(field.Type.Key()).Elem()
+						valueElem := reflect.New(field.Type.Elem()).Elem()
+
+						if keyElem.Kind() == reflect.String {
+							keyElem.SetString(key)
+						}
+
+						// For simple values, use filler.setDefaultValue
+						fieldValueData := &fieldData{
+							Value:    valueElem,
+							TagValue: valueStr,
+							Type:     valueElem.Type(),
+						}
+						filler.setDefaultValue(fieldValueData)
+						resultMap.SetMapIndex(keyElem, valueElem)
+					}
+				}
+				field.Value.Set(resultMap)
+			}
+		}
+	}
+
 	types := make(map[typeHash]fillerFunc, 5)
 	types["time.Duration"] = func(field *fieldData) {
+		if field.Value.Interface().(time.Duration) != 0 {
+			return
+		}
 		d, _ := time.ParseDuration(field.TagValue)
 		field.Value.Set(reflect.ValueOf(d))
 	}
@@ -340,79 +484,6 @@ func newDefaultFiller() *filler {
 		}
 	}
 
-	funcs[reflect.Slice] = func(field *fieldData) {
-		k := field.Value.Type().Elem().Kind()
-		switch k {
-		case reflect.Uint8:
-			if field.Value.Bytes() != nil {
-				return
-			}
-			field.Value.SetBytes([]byte(field.TagValue))
-		case reflect.Struct:
-			count := field.Value.Len()
-			for i := 0; i < count; i++ {
-				fields := filler.getFieldsFromValue(field.Value.Index(i), nil)
-				filler.setDefaultValues(fields)
-			}
-		case reflect.Ptr, reflect.Interface:
-			count := field.Value.Len()
-			for i := 0; i < count; i++ {
-				val := field.Value.Index(i)
-				setPtrDefaults(val)
-			}
-			// FIXME: also descend into slice of slices
-			// FIXME: also descend into slice of maps
-		default:
-			reg := regexp.MustCompile(`^\[(.*)\]$`)
-			matches := reg.FindStringSubmatch(field.TagValue)
-			if len(matches) != 2 {
-				return
-			}
-			if matches[1] == "" {
-				field.Value.Set(reflect.MakeSlice(field.Value.Type(), 0, 0))
-			} else {
-				defaultValue := strings.Split(matches[1], ",")
-				result := reflect.MakeSlice(field.Value.Type(), len(defaultValue), len(defaultValue))
-				for i := 0; i < len(defaultValue); i++ {
-					itemValue := result.Index(i)
-					item := &fieldData{
-						Value:    itemValue,
-						Field:    reflect.StructField{},
-						TagValue: defaultValue[i],
-						Parent:   nil,
-					}
-					funcs[k](item)
-				}
-				field.Value.Set(result)
-			}
-		}
-	}
-	funcs[reflect.Map] = func(field *fieldData) {
-		switch field.Field.Type.Elem().Kind() {
-		case reflect.Struct:
-			keys := field.Value.MapKeys()
-			for _, key := range keys {
-				// We need to pull the value from map, copy to a settable
-				// location, fill in defaults, and then put it back into map.
-				value := field.Value.MapIndex(key)
-				tmp := reflect.New(value.Type()).Elem()
-				tmp.Set(value)
-				fields := filler.getFieldsFromValue(tmp, nil)
-				filler.setDefaultValues(fields)
-				field.Value.SetMapIndex(key, tmp)
-			}
-		case reflect.Ptr, reflect.Interface:
-			iter := field.Value.MapRange()
-			for iter.Next() {
-				setPtrDefaults(iter.Value())
-			}
-		case reflect.Slice:
-			// FIXME: also descend into map of slices
-		case reflect.Map:
-			// FIXME: also descend into map of maps
-		}
-		// FIXME: handle actual default Tags on maps?
-	}
 	filler.FuncByKind = funcs
 	filler.FuncByType = types
 	filler.Tag = "default"

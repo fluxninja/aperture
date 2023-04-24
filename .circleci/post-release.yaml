@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  gcp-gcr: circleci/gcp-gcr@0.13.0
+  gcp-gcr: circleci/gcp-gcr@0.15.1
 
 executors:
   base-cimg-executor:
