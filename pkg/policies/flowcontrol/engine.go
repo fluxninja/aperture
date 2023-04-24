@@ -19,11 +19,11 @@ import (
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	concurrencyLimiters []iface.Limiter
-	fluxMeters          []iface.FluxMeter
-	rateLimiters        []iface.Limiter
-	loadRegulators      []iface.Limiter
-	labelPreviews       []iface.LabelPreview
+	loadSchedulers []iface.Limiter
+	fluxMeters     []iface.FluxMeter
+	rateLimiters   []iface.Limiter
+	loadRegulators []iface.Limiter
+	labelPreviews  []iface.LabelPreview
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -32,7 +32,7 @@ type multiMatcher = multimatcher.MultiMatcher[string, multiMatchResult]
 // PopulateFromMultiMatcher populates result object with results from MultiMatcher.
 func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, multiMatchResult], labels map[string]string) {
 	resultCollection := mm.Match(multimatcher.Labels(labels))
-	result.concurrencyLimiters = append(result.concurrencyLimiters, resultCollection.concurrencyLimiters...)
+	result.loadSchedulers = append(result.loadSchedulers, resultCollection.loadSchedulers...)
 	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
 	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
 	result.loadRegulators = append(result.loadRegulators, resultCollection.loadRegulators...)
@@ -44,7 +44,7 @@ func NewEngine() iface.Engine {
 	e := &Engine{
 		multiMatchers:    make(map[selectors.ControlPointID]*multiMatcher),
 		fluxMetersMap:    make(map[iface.FluxMeterID]iface.FluxMeter),
-		conLimiterMap:    make(map[iface.LimiterID]iface.ConcurrencyLimiter),
+		conLimiterMap:    make(map[iface.LimiterID]iface.LoadScheduler),
 		rateLimiterMap:   make(map[iface.LimiterID]iface.RateLimiter),
 		loadRegulatorMap: make(map[iface.LimiterID]iface.Limiter),
 		labelPreviewMap:  make(map[iface.PreviewID]iface.LabelPreview),
@@ -58,7 +58,7 @@ func NewEngine() iface.Engine {
 type Engine struct {
 	mutex            sync.RWMutex
 	fluxMetersMap    map[iface.FluxMeterID]iface.FluxMeter
-	conLimiterMap    map[iface.LimiterID]iface.ConcurrencyLimiter
+	conLimiterMap    map[iface.LimiterID]iface.LoadScheduler
 	rateLimiterMap   map[iface.LimiterID]iface.RateLimiter
 	loadRegulatorMap map[iface.LimiterID]iface.Limiter
 	labelPreviewMap  map[iface.PreviewID]iface.LabelPreview
@@ -107,7 +107,7 @@ func (e *Engine) ProcessRequest(
 	}{
 		{mmr.loadRegulators, flowcontrolv1.CheckResponse_REJECT_REASON_LOAD_REGULATED},
 		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
-		{mmr.concurrencyLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED},
+		{mmr.loadSchedulers, flowcontrolv1.CheckResponse_REJECT_REASON_LOAD_SHED},
 	}
 
 	for _, limiterType := range limiterTypes {
@@ -191,30 +191,30 @@ func revertRemaining(
 	}
 }
 
-// RegisterConcurrencyLimiter adds concurrency limiter to multimatcher.
-func (e *Engine) RegisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
+// RegisterLoadScheduler adds load scheduler to multimatcher.
+func (e *Engine) RegisterLoadScheduler(cl iface.LoadScheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 	if _, ok := e.conLimiterMap[cl.GetLimiterID()]; !ok {
 		e.conLimiterMap[cl.GetLimiterID()] = cl
 	} else {
-		return fmt.Errorf("concurrency limiter already registered")
+		return fmt.Errorf("load scheduler already registered")
 	}
 
-	concurrencyLimiterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.concurrencyLimiters = append(mmr.concurrencyLimiters, cl)
+	loadSchedulerMatchedCB := func(mmr multiMatchResult) multiMatchResult {
+		mmr.loadSchedulers = append(mmr.loadSchedulers, cl)
 		return mmr
 	}
-	return e.register("ConcurrencyLimiter:"+cl.GetLimiterID().String(), cl.GetFlowSelector(), concurrencyLimiterMatchedCB)
+	return e.register("LoadScheduler:"+cl.GetLimiterID().String(), cl.GetFlowSelector(), loadSchedulerMatchedCB)
 }
 
-// UnregisterConcurrencyLimiter removes concurrency limiter from multimatcher.
-func (e *Engine) UnregisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
+// UnregisterLoadScheduler removes load scheduler from multimatcher.
+func (e *Engine) UnregisterLoadScheduler(cl iface.LoadScheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 	delete(e.conLimiterMap, cl.GetLimiterID())
 
-	return e.unregister("ConcurrencyLimiter:"+cl.GetLimiterID().String(), cl.GetFlowSelector())
+	return e.unregister("LoadScheduler:"+cl.GetLimiterID().String(), cl.GetFlowSelector())
 }
 
 // RegisterFluxMeter adds fluxmeter to histogram map and multimatcher.
@@ -259,8 +259,8 @@ func (e *Engine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 	return e.fluxMetersMap[fmID]
 }
 
-// GetConcurrencyLimiter Lookup function for getting concurrency limiter.
-func (e *Engine) GetConcurrencyLimiter(limiterID iface.LimiterID) iface.ConcurrencyLimiter {
+// GetLoadScheduler Lookup function for getting load scheduler.
+func (e *Engine) GetLoadScheduler(limiterID iface.LimiterID) iface.LoadScheduler {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
 	return e.conLimiterMap[limiterID]

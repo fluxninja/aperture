@@ -22,7 +22,7 @@ message CheckResponse {
   enum RejectReason {
     REJECT_REASON_NONE = 0;
     REJECT_REASON_RATE_LIMITED = 1;
-    REJECT_REASON_CONCURRENCY_LIMITED = 2;
+    REJECT_REASON_LOAD_SHED = 2;
     REJECT_REASON_LOAD_REGULATED = 3;
   }
 
@@ -83,7 +83,7 @@ message LimiterDecision {
     uint64 tokens_consumed = 4;
   }
 
-  message ConcurrencyLimiterInfo {
+  message LoadSchedulerInfo {
     string workload_index = 1;
     uint64 tokens_consumed = 2;
   }
@@ -104,7 +104,7 @@ message LimiterDecision {
   LimiterReason reason = 5;
   oneof details {
     RateLimiterInfo rate_limiter_info = 6;
-    ConcurrencyLimiterInfo concurrency_limiter_info = 7;
+    LoadSchedulerInfo load_scheduler_info = 7;
     LoadRegulatorInfo load_regulator_info = 8;
   }
 }

@@ -6,11 +6,11 @@ import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
 import "aperture/policy/sync/v1/tick.proto";
 
-message ConcurrencyLimiterWrapper {
+message LoadSchedulerWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
-  // Concurrency Limiter
-  policy.language.v1.ConcurrencyLimiter concurrency_limiter = 2;
+  // Load Scheduler
+  policy.language.v1.LoadScheduler load_scheduler = 2;
 }
 
 message LoadDecisionWrapper {

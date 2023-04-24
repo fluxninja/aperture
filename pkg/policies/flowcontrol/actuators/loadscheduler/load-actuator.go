@@ -1,4 +1,4 @@
-package concurrency
+package loadscheduler
 
 import (
 	"context"
@@ -139,7 +139,7 @@ func newLoadActuatorFactory(
 // newLoadActuator creates a new load actuator based on proto spec.
 func (lsaFactory *loadActuatorFactory) newLoadActuator(
 	loadActuatorMsg *policylangv1.LoadActuator,
-	conLimiter *concurrencyLimiter,
+	ls *loadScheduler,
 	registry status.Registry,
 	clock clockwork.Clock,
 	lifecycle fx.Lifecycle,
@@ -148,12 +148,12 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 	reg := registry.Child("component", "load_actuator")
 
 	la := &loadActuator{
-		conLimiter:     conLimiter,
+		loadScheduler:  ls,
 		clock:          clock,
 		statusRegistry: reg,
 	}
 
-	etcdKey := paths.AgentComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentId())
+	etcdKey := paths.AgentComponentKey(lsaFactory.agentGroupName, la.loadScheduler.GetPolicyName(), la.loadScheduler.GetComponentId())
 
 	decisionUnmarshaller, protoErr := config.NewProtobufUnmarshaller(nil)
 	if protoErr != nil {
@@ -250,7 +250,7 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 
 // loadActuator saves load decisions received from controller.
 type loadActuator struct {
-	conLimiter                *concurrencyLimiter
+	loadScheduler             *loadScheduler
 	clock                     clockwork.Clock
 	tokenBucketLoadMultiplier *scheduler.TokenBucketLoadMultiplier
 	statusRegistry            status.Registry
@@ -281,9 +281,9 @@ func (la *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshall
 		return
 	}
 	// check if this decision is for the same policy id as what we have
-	if commonAttributes.PolicyHash != la.conLimiter.GetPolicyHash() {
+	if commonAttributes.PolicyHash != la.loadScheduler.GetPolicyHash() {
 		err = errors.New("policy id mismatch")
-		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", la.conLimiter.GetPolicyHash(), commonAttributes.PolicyHash)
+		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", la.loadScheduler.GetPolicyHash(), commonAttributes.PolicyHash)
 		logger.Warn().Err(err).Msg(statusMsg)
 		la.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return

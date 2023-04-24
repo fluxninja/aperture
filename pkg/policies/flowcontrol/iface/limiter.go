@@ -40,8 +40,8 @@ type RateLimiter interface {
 	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
 }
 
-// ConcurrencyLimiter interface.
-type ConcurrencyLimiter interface {
+// LoadScheduler interface.
+type LoadScheduler interface {
 	Limiter
 	GetLatencyObserver(labels map[string]string) prometheus.Observer
 }

@@ -26,8 +26,8 @@ var (
 	LoadActuatorDecisionsPath = path.Join(DecisionsPrefix, "load")
 	// AutoTokenResultsPath is config path in etcd for query tokens.
 	AutoTokenResultsPath = path.Join(ConfigPrefix, "tokens")
-	// ConcurrencyLimiterConfigPath is config path in etcd for concurrency limiter.
-	ConcurrencyLimiterConfigPath = path.Join(ConfigPrefix, "concurrency_limiter")
+	// LoadSchedulerConfigPath is config path in etcd for load scheduler.
+	LoadSchedulerConfigPath = path.Join(ConfigPrefix, "load_scheduler")
 	// RateLimiterConfigPath is config path in etcd for rate limiter.
 	RateLimiterConfigPath = path.Join(ConfigPrefix, "rate_limiter")
 	// RateLimiterDecisionsPath is decision path in etcd for rate limiter decisions.

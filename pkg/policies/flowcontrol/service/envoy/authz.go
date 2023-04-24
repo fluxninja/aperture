@@ -219,7 +219,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 					},
 				},
 			}
-		case flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED:
+		case flowcontrolv1.CheckResponse_REJECT_REASON_LOAD_SHED:
 			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
 				DeniedResponse: &authv3.DeniedHttpResponse{
 					Status: &typev3.HttpStatus{

@@ -242,31 +242,31 @@ func (mr *MockRateLimiterMockRecorder) TakeN(labels, count interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeN", reflect.TypeOf((*MockRateLimiter)(nil).TakeN), labels, count)
 }
 
-// MockConcurrencyLimiter is a mock of ConcurrencyLimiter interface.
-type MockConcurrencyLimiter struct {
+// MockLoadScheduler is a mock of LoadScheduler interface.
+type MockLoadScheduler struct {
 	ctrl     *gomock.Controller
-	recorder *MockConcurrencyLimiterMockRecorder
+	recorder *MockLoadSchedulerMockRecorder
 }
 
-// MockConcurrencyLimiterMockRecorder is the mock recorder for MockConcurrencyLimiter.
-type MockConcurrencyLimiterMockRecorder struct {
-	mock *MockConcurrencyLimiter
+// MockLoadSchedulerMockRecorder is the mock recorder for MockLoadScheduler.
+type MockLoadSchedulerMockRecorder struct {
+	mock *MockLoadScheduler
 }
 
-// NewMockConcurrencyLimiter creates a new mock instance.
-func NewMockConcurrencyLimiter(ctrl *gomock.Controller) *MockConcurrencyLimiter {
-	mock := &MockConcurrencyLimiter{ctrl: ctrl}
-	mock.recorder = &MockConcurrencyLimiterMockRecorder{mock}
+// NewMockLoadScheduler creates a new mock instance.
+func NewMockLoadScheduler(ctrl *gomock.Controller) *MockLoadScheduler {
+	mock := &MockLoadScheduler{ctrl: ctrl}
+	mock.recorder = &MockLoadSchedulerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockConcurrencyLimiter) EXPECT() *MockConcurrencyLimiterMockRecorder {
+func (m *MockLoadScheduler) EXPECT() *MockLoadSchedulerMockRecorder {
 	return m.recorder
 }
 
 // Decide mocks base method.
-func (m *MockConcurrencyLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockLoadScheduler) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", ctx, labels)
 	ret0, _ := ret[0].(*checkv1.LimiterDecision)
@@ -274,13 +274,13 @@ func (m *MockConcurrencyLimiter) Decide(ctx context.Context, labels map[string]s
 }
 
 // Decide indicates an expected call of Decide.
-func (mr *MockConcurrencyLimiterMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+func (mr *MockLoadSchedulerMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockConcurrencyLimiter)(nil).Decide), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockLoadScheduler)(nil).Decide), ctx, labels)
 }
 
 // GetFlowSelector mocks base method.
-func (m *MockConcurrencyLimiter) GetFlowSelector() *languagev1.FlowSelector {
+func (m *MockLoadScheduler) GetFlowSelector() *languagev1.FlowSelector {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFlowSelector")
 	ret0, _ := ret[0].(*languagev1.FlowSelector)
@@ -288,13 +288,13 @@ func (m *MockConcurrencyLimiter) GetFlowSelector() *languagev1.FlowSelector {
 }
 
 // GetFlowSelector indicates an expected call of GetFlowSelector.
-func (mr *MockConcurrencyLimiterMockRecorder) GetFlowSelector() *gomock.Call {
+func (mr *MockLoadSchedulerMockRecorder) GetFlowSelector() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetFlowSelector))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockLoadScheduler)(nil).GetFlowSelector))
 }
 
 // GetLatencyObserver mocks base method.
-func (m *MockConcurrencyLimiter) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+func (m *MockLoadScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLatencyObserver", labels)
 	ret0, _ := ret[0].(prometheus.Observer)
@@ -302,13 +302,13 @@ func (m *MockConcurrencyLimiter) GetLatencyObserver(labels map[string]string) pr
 }
 
 // GetLatencyObserver indicates an expected call of GetLatencyObserver.
-func (mr *MockConcurrencyLimiterMockRecorder) GetLatencyObserver(labels interface{}) *gomock.Call {
+func (mr *MockLoadSchedulerMockRecorder) GetLatencyObserver(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatencyObserver", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetLatencyObserver), labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatencyObserver", reflect.TypeOf((*MockLoadScheduler)(nil).GetLatencyObserver), labels)
 }
 
 // GetLimiterID mocks base method.
-func (m *MockConcurrencyLimiter) GetLimiterID() iface.LimiterID {
+func (m *MockLoadScheduler) GetLimiterID() iface.LimiterID {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLimiterID")
 	ret0, _ := ret[0].(iface.LimiterID)
@@ -316,13 +316,13 @@ func (m *MockConcurrencyLimiter) GetLimiterID() iface.LimiterID {
 }
 
 // GetLimiterID indicates an expected call of GetLimiterID.
-func (mr *MockConcurrencyLimiterMockRecorder) GetLimiterID() *gomock.Call {
+func (mr *MockLoadSchedulerMockRecorder) GetLimiterID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetLimiterID))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockLoadScheduler)(nil).GetLimiterID))
 }
 
 // GetPolicyName mocks base method.
-func (m *MockConcurrencyLimiter) GetPolicyName() string {
+func (m *MockLoadScheduler) GetPolicyName() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPolicyName")
 	ret0, _ := ret[0].(string)
@@ -330,13 +330,13 @@ func (m *MockConcurrencyLimiter) GetPolicyName() string {
 }
 
 // GetPolicyName indicates an expected call of GetPolicyName.
-func (mr *MockConcurrencyLimiterMockRecorder) GetPolicyName() *gomock.Call {
+func (mr *MockLoadSchedulerMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetPolicyName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockLoadScheduler)(nil).GetPolicyName))
 }
 
 // GetRequestCounter mocks base method.
-func (m *MockConcurrencyLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
+func (m *MockLoadScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRequestCounter", labels)
 	ret0, _ := ret[0].(prometheus.Counter)
@@ -344,19 +344,19 @@ func (m *MockConcurrencyLimiter) GetRequestCounter(labels map[string]string) pro
 }
 
 // GetRequestCounter indicates an expected call of GetRequestCounter.
-func (mr *MockConcurrencyLimiterMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
+func (mr *MockLoadSchedulerMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetRequestCounter), labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockLoadScheduler)(nil).GetRequestCounter), labels)
 }
 
 // Revert mocks base method.
-func (m *MockConcurrencyLimiter) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockLoadScheduler) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Revert", labels, decision)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockConcurrencyLimiterMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
+func (mr *MockLoadSchedulerMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockConcurrencyLimiter)(nil).Revert), labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockLoadScheduler)(nil).Revert), labels, decision)
 }

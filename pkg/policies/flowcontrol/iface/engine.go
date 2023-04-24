@@ -22,9 +22,9 @@ type Engine interface {
 		requestContext RequestContext,
 	) *flowcontrolv1.CheckResponse
 
-	RegisterConcurrencyLimiter(sa ConcurrencyLimiter) error
-	UnregisterConcurrencyLimiter(sa ConcurrencyLimiter) error
-	GetConcurrencyLimiter(limiterID LimiterID) ConcurrencyLimiter
+	RegisterLoadScheduler(ls LoadScheduler) error
+	UnregisterLoadScheduler(ls LoadScheduler) error
+	GetLoadScheduler(limiterID LimiterID) LoadScheduler
 
 	RegisterFluxMeter(fm FluxMeter) error
 	UnregisterFluxMeter(fm FluxMeter) error

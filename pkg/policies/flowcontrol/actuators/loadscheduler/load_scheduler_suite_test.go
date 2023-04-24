@@ -1,4 +1,4 @@
-package concurrency_test
+package loadscheduler_test
 
 import (
 	"testing"

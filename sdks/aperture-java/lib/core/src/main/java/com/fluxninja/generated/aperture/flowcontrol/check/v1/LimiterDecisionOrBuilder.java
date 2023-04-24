@@ -76,19 +76,19 @@ public interface LimiterDecisionOrBuilder extends
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfoOrBuilder getRateLimiterInfoOrBuilder();
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-   * @return Whether the concurrencyLimiterInfo field is set.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+   * @return Whether the loadSchedulerInfo field is set.
    */
-  boolean hasConcurrencyLimiterInfo();
+  boolean hasLoadSchedulerInfo();
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-   * @return The concurrencyLimiterInfo.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+   * @return The loadSchedulerInfo.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getConcurrencyLimiterInfo();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo getLoadSchedulerInfo();
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder getLoadSchedulerInfoOrBuilder();
 
   /**
    * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>

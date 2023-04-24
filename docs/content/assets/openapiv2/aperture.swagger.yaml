@@ -627,7 +627,7 @@ definitions:
         enum:
             - REJECT_REASON_NONE
             - REJECT_REASON_RATE_LIMITED
-            - REJECT_REASON_CONCURRENCY_LIMITED
+            - REJECT_REASON_LOAD_SHED
             - REJECT_REASON_LOAD_REGULATED
         type: string
     Circuit:
@@ -2391,12 +2391,12 @@ definitions:
         properties:
             component_id:
                 type: string
-            concurrency_limiter_info:
-                $ref: '#/definitions/LimiterDecisionConcurrencyLimiterInfo'
             dropped:
                 type: boolean
             load_regulator_info:
                 $ref: '#/definitions/LimiterDecisionLoadRegulatorInfo'
+            load_scheduler_info:
+                $ref: '#/definitions/LimiterDecisionLoadSchedulerInfo'
             policy_hash:
                 type: string
             policy_name:
@@ -2405,14 +2405,6 @@ definitions:
                 $ref: '#/definitions/LimiterDecisionRateLimiterInfo'
             reason:
                 $ref: '#/definitions/LimiterDecisionLimiterReason'
-        type: object
-    LimiterDecisionConcurrencyLimiterInfo:
-        properties:
-            tokens_consumed:
-                format: uint64
-                type: string
-            workload_index:
-                type: string
         type: object
     LimiterDecisionLimiterReason:
         default: LIMITER_REASON_UNSPECIFIED
@@ -2423,6 +2415,14 @@ definitions:
     LimiterDecisionLoadRegulatorInfo:
         properties:
             label:
+                type: string
+        type: object
+    LimiterDecisionLoadSchedulerInfo:
+        properties:
+            tokens_consumed:
+                format: uint64
+                type: string
+            workload_index:
                 type: string
         type: object
     LimiterDecisionRateLimiterInfo:

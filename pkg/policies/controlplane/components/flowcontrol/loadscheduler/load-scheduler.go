@@ -1,4 +1,4 @@
-package concurrency
+package loadscheduler
 
 import (
 	"context"
@@ -16,32 +16,32 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-type concurrencyLimiterConfigSync struct {
-	policyBaseAPI           iface.Policy
-	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter
-	etcdPath                string
-	componentID             string
+type loadSchedulerConfigSync struct {
+	policyBaseAPI      iface.Policy
+	loadSchedulerProto *policylangv1.LoadScheduler
+	etcdPath           string
+	componentID        string
 }
 
-// NewConcurrencyLimiterOptions creates fx options for ConcurrencyLimiter and also returns the agent group name associated with it.
-func NewConcurrencyLimiterOptions(
-	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter,
+// NewLoadSchedulerOptions creates fx options for LoadScheduler and also returns the agent group name associated with it.
+func NewLoadSchedulerOptions(
+	loadSchedulerProto *policylangv1.LoadScheduler,
 	componentStackID string,
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
-	// Get Agent Group Name from ConcurrencyLimiter.FlowSelector.ServiceSelector.AgentGroup
-	flowSelectorProto := concurrencyLimiterProto.GetFlowSelector()
+	// Get Agent Group Name from LoadScheduler.FlowSelector.ServiceSelector.AgentGroup
+	flowSelectorProto := loadSchedulerProto.GetFlowSelector()
 	if flowSelectorProto == nil {
-		return fx.Options(), "", errors.New("concurrencyLimiter.Selector is nil")
+		return fx.Options(), "", errors.New("loadScheduler.Selector is nil")
 	}
 	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
-	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath,
+	etcdPath := path.Join(paths.LoadSchedulerConfigPath,
 		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
-	configSync := &concurrencyLimiterConfigSync{
-		concurrencyLimiterProto: concurrencyLimiterProto,
-		policyBaseAPI:           policyReadAPI,
-		etcdPath:                etcdPath,
-		componentID:             componentStackID,
+	configSync := &loadSchedulerConfigSync{
+		loadSchedulerProto: loadSchedulerProto,
+		policyBaseAPI:      policyReadAPI,
+		etcdPath:           etcdPath,
+		componentID:        componentStackID,
 	}
 
 	return fx.Options(
@@ -51,13 +51,13 @@ func NewConcurrencyLimiterOptions(
 	), agentGroup, nil
 }
 
-func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (configSync *loadSchedulerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := configSync.policyBaseAPI.GetStatusRegistry().GetLogger()
 	// Add/remove file in lifecycle hooks in order to sync with etcd.
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.ConcurrencyLimiterWrapper{
-				ConcurrencyLimiter: configSync.concurrencyLimiterProto,
+			wrapper := &policysyncv1.LoadSchedulerWrapper{
+				LoadScheduler: configSync.loadSchedulerProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
 					PolicyName:  configSync.policyBaseAPI.GetPolicyName(),
 					PolicyHash:  configSync.policyBaseAPI.GetPolicyHash(),

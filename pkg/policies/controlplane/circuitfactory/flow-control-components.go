@@ -1,13 +1,15 @@
 package circuitfactory
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/concurrency"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadregulator"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -26,24 +28,43 @@ func newFlowControlCompositeAndOptions(
 	if !ok {
 		return retErr(fmt.Errorf("parent circuit ID not found for component %s", componentID))
 	}
+	loadSchedulerProto := &policylangv1.LoadScheduler{}
+	isLoadScheduler := false
+	if proto := flowControlComponentProto.GetLoadScheduler(); proto != nil {
+		loadSchedulerProto = proto
+		isLoadScheduler = true
+	} else if proto := flowControlComponentProto.GetConcurrencyLimiter(); proto != nil {
+		// Convert from *policylangv1.FlowControl_ConcurrencyLimiter to *policylangv1.FlowControl_LoadScheduler since they have the same fields
+		jsonStr, err := json.Marshal(proto)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error marshaling ConcurrencyLimiter to JSON: %v", err)
+		}
+
+		err = protojson.Unmarshal(jsonStr, loadSchedulerProto)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to LoadScheduler: %v", err)
+		}
+		isLoadScheduler = true
+	}
+
 	// Factory parser to determine what kind of composite component to create
-	if concurrencyLimiterProto := flowControlComponentProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
+	if isLoadScheduler {
 		var (
 			configuredComponents []*runtime.ConfiguredComponent
 			tree                 Tree
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentID.String(), policyReadAPI)
-		if concurrencyLimiterErr != nil {
-			return retErr(concurrencyLimiterErr)
+		loadSchedulerOptions, agentGroupName, loadSchedulerErr := loadscheduler.NewLoadSchedulerOptions(loadSchedulerProto, componentID.String(), policyReadAPI)
+		if loadSchedulerErr != nil {
+			return retErr(loadSchedulerErr)
 		}
-		options = append(options, concurrencyLimiterOptions)
+		options = append(options, loadSchedulerOptions)
 
 		// Scheduler
-		if schedulerProto := concurrencyLimiterProto.GetScheduler(); schedulerProto != nil {
+		if schedulerProto := loadSchedulerProto.GetScheduler(); schedulerProto != nil {
 			// Use the same id as the component stack since agent sees only the component stack and generates metrics tagged with the component stack id
-			scheduler, schedulerOptions, err := concurrency.NewSchedulerAndOptions(schedulerProto, componentID.String(), policyReadAPI, agentGroupName)
+			scheduler, schedulerOptions, err := loadscheduler.NewSchedulerAndOptions(schedulerProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return retErr(err)
 			}
@@ -67,8 +88,8 @@ func newFlowControlCompositeAndOptions(
 		}
 
 		// Actuation Strategy
-		if loadActuatorProto := concurrencyLimiterProto.GetLoadActuator(); loadActuatorProto != nil {
-			loadActuator, loadActuatorOptions, err := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
+		if loadActuatorProto := loadSchedulerProto.GetLoadActuator(); loadActuatorProto != nil {
+			loadActuator, loadActuatorOptions, err := loadscheduler.NewLoadActuatorAndOptions(loadActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return retErr(err)
 			}
@@ -89,11 +110,11 @@ func newFlowControlCompositeAndOptions(
 			}
 		}
 
-		concurrencyLimiterConfComp, err := prepareComponent(
-			runtime.NewDummyComponent("ConcurrencyLimiter",
-				iface.GetServiceShortDescription(concurrencyLimiterProto.FlowSelector.ServiceSelector),
+		loadSchedulerConfComp, err := prepareComponent(
+			runtime.NewDummyComponent("LoadScheduler",
+				iface.GetServiceShortDescription(loadSchedulerProto.FlowSelector.ServiceSelector),
 				runtime.ComponentTypeSignalProcessor),
-			concurrencyLimiterProto,
+			loadSchedulerProto,
 			componentID,
 			false,
 		)
@@ -101,12 +122,12 @@ func newFlowControlCompositeAndOptions(
 			return retErr(err)
 		}
 
-		concurrencyLimiterConfComp.PortMapping = portMapping
-		tree.Node = concurrencyLimiterConfComp
+		loadSchedulerConfComp.PortMapping = portMapping
+		tree.Node = loadSchedulerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if aimdConcurrencyController := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
-		nestedCircuit, err := concurrency.ParseAIMDConcurrencyController(aimdConcurrencyController)
+		nestedCircuit, err := loadscheduler.ParseAIMDConcurrencyController(aimdConcurrencyController)
 		if err != nil {
 			return retErr(err)
 		}

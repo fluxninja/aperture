@@ -891,8 +891,8 @@ private static final long serialVersionUID = 0L;
 
   }
 
-  public interface ConcurrencyLimiterInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
+  public interface LoadSchedulerInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -914,18 +914,18 @@ private static final long serialVersionUID = 0L;
     long getTokensConsumed();
   }
   /**
-   * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo}
+   * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo}
    */
-  public static final class ConcurrencyLimiterInfo extends
+  public static final class LoadSchedulerInfo extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
-      ConcurrencyLimiterInfoOrBuilder {
+      // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo)
+      LoadSchedulerInfoOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use ConcurrencyLimiterInfo.newBuilder() to construct.
-    private ConcurrencyLimiterInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use LoadSchedulerInfo.newBuilder() to construct.
+    private LoadSchedulerInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private ConcurrencyLimiterInfo() {
+    private LoadSchedulerInfo() {
       workloadIndex_ = "";
     }
 
@@ -933,20 +933,20 @@ private static final long serialVersionUID = 0L;
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new ConcurrencyLimiterInfo();
+      return new LoadSchedulerInfo();
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_fieldAccessorTable
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder.class);
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.Builder.class);
     }
 
     public static final int WORKLOAD_INDEX_FIELD_NUMBER = 1;
@@ -1045,10 +1045,10 @@ private static final long serialVersionUID = 0L;
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)) {
+      if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo)) {
         return super.equals(obj);
       }
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) obj;
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) obj;
 
       if (!getWorkloadIndex()
           .equals(other.getWorkloadIndex())) return false;
@@ -1075,69 +1075,69 @@ private static final long serialVersionUID = 0L;
       return hash;
     }
 
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(byte[] data)
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(java.io.InputStream input)
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseDelimitedFrom(java.io.InputStream input)
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseDelimitedFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1150,7 +1150,7 @@ private static final long serialVersionUID = 0L;
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo prototype) {
+    public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -1166,26 +1166,26 @@ private static final long serialVersionUID = 0L;
       return builder;
     }
     /**
-     * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo}
+     * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder {
+        // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo)
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_fieldAccessorTable
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder.class);
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.Builder.class);
       }
 
-      // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.newBuilder()
+      // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.newBuilder()
       private Builder() {
 
       }
@@ -1207,17 +1207,17 @@ private static final long serialVersionUID = 0L;
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor;
       }
 
       @java.lang.Override
-      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getDefaultInstanceForType() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo getDefaultInstanceForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
       }
 
       @java.lang.Override
-      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo build() {
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo result = buildPartial();
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo build() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -1225,14 +1225,14 @@ private static final long serialVersionUID = 0L;
       }
 
       @java.lang.Override
-      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo buildPartial() {
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo(this);
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo buildPartial() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo result) {
+      private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.workloadIndex_ = workloadIndex_;
@@ -1244,16 +1244,16 @@ private static final long serialVersionUID = 0L;
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) {
-          return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)other);
+        if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) {
+          return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo other) {
-        if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance()) return this;
+      public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo other) {
+        if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance()) return this;
         if (!other.getWorkloadIndex().isEmpty()) {
           workloadIndex_ = other.workloadIndex_;
           bitField0_ |= 0x00000001;
@@ -1431,23 +1431,23 @@ private static final long serialVersionUID = 0L;
       }
 
 
-      // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
+      // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo)
     }
 
-    // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
-    private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo)
+    private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo();
+      DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo();
     }
 
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getDefaultInstance() {
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<ConcurrencyLimiterInfo>
-        PARSER = new com.google.protobuf.AbstractParser<ConcurrencyLimiterInfo>() {
+    private static final com.google.protobuf.Parser<LoadSchedulerInfo>
+        PARSER = new com.google.protobuf.AbstractParser<LoadSchedulerInfo>() {
       @java.lang.Override
-      public ConcurrencyLimiterInfo parsePartialFrom(
+      public LoadSchedulerInfo parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1466,17 +1466,17 @@ private static final long serialVersionUID = 0L;
       }
     };
 
-    public static com.google.protobuf.Parser<ConcurrencyLimiterInfo> parser() {
+    public static com.google.protobuf.Parser<LoadSchedulerInfo> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<ConcurrencyLimiterInfo> getParserForType() {
+    public com.google.protobuf.Parser<LoadSchedulerInfo> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getDefaultInstanceForType() {
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -2007,7 +2007,7 @@ private static final long serialVersionUID = 0L;
       implements com.google.protobuf.Internal.EnumLite,
           com.google.protobuf.AbstractMessage.InternalOneOfEnum {
     RATE_LIMITER_INFO(6),
-    CONCURRENCY_LIMITER_INFO(7),
+    LOAD_SCHEDULER_INFO(7),
     LOAD_REGULATOR_INFO(8),
     DETAILS_NOT_SET(0);
     private final int value;
@@ -2027,7 +2027,7 @@ private static final long serialVersionUID = 0L;
     public static DetailsCase forNumber(int value) {
       switch (value) {
         case 6: return RATE_LIMITER_INFO;
-        case 7: return CONCURRENCY_LIMITER_INFO;
+        case 7: return LOAD_SCHEDULER_INFO;
         case 8: return LOAD_REGULATOR_INFO;
         case 0: return DETAILS_NOT_SET;
         default: return null;
@@ -2221,35 +2221,35 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo.getDefaultInstance();
   }
 
-  public static final int CONCURRENCY_LIMITER_INFO_FIELD_NUMBER = 7;
+  public static final int LOAD_SCHEDULER_INFO_FIELD_NUMBER = 7;
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-   * @return Whether the concurrencyLimiterInfo field is set.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+   * @return Whether the loadSchedulerInfo field is set.
    */
   @java.lang.Override
-  public boolean hasConcurrencyLimiterInfo() {
+  public boolean hasLoadSchedulerInfo() {
     return detailsCase_ == 7;
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-   * @return The concurrencyLimiterInfo.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+   * @return The loadSchedulerInfo.
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getConcurrencyLimiterInfo() {
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo getLoadSchedulerInfo() {
     if (detailsCase_ == 7) {
-       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_;
     }
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder() {
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder getLoadSchedulerInfoOrBuilder() {
     if (detailsCase_ == 7) {
-       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_;
     }
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
   }
 
   public static final int LOAD_REGULATOR_INFO_FIELD_NUMBER = 8;
@@ -2316,7 +2316,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(6, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo) details_);
     }
     if (detailsCase_ == 7) {
-      output.writeMessage(7, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
+      output.writeMessage(7, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_);
     }
     if (detailsCase_ == 8) {
       output.writeMessage(8, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_);
@@ -2353,7 +2353,7 @@ private static final long serialVersionUID = 0L;
     }
     if (detailsCase_ == 7) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
+        .computeMessageSize(7, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_);
     }
     if (detailsCase_ == 8) {
       size += com.google.protobuf.CodedOutputStream
@@ -2390,8 +2390,8 @@ private static final long serialVersionUID = 0L;
             .equals(other.getRateLimiterInfo())) return false;
         break;
       case 7:
-        if (!getConcurrencyLimiterInfo()
-            .equals(other.getConcurrencyLimiterInfo())) return false;
+        if (!getLoadSchedulerInfo()
+            .equals(other.getLoadSchedulerInfo())) return false;
         break;
       case 8:
         if (!getLoadRegulatorInfo()
@@ -2428,8 +2428,8 @@ private static final long serialVersionUID = 0L;
         hash = (53 * hash) + getRateLimiterInfo().hashCode();
         break;
       case 7:
-        hash = (37 * hash) + CONCURRENCY_LIMITER_INFO_FIELD_NUMBER;
-        hash = (53 * hash) + getConcurrencyLimiterInfo().hashCode();
+        hash = (37 * hash) + LOAD_SCHEDULER_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getLoadSchedulerInfo().hashCode();
         break;
       case 8:
         hash = (37 * hash) + LOAD_REGULATOR_INFO_FIELD_NUMBER;
@@ -2579,8 +2579,8 @@ private static final long serialVersionUID = 0L;
       if (rateLimiterInfoBuilder_ != null) {
         rateLimiterInfoBuilder_.clear();
       }
-      if (concurrencyLimiterInfoBuilder_ != null) {
-        concurrencyLimiterInfoBuilder_.clear();
+      if (loadSchedulerInfoBuilder_ != null) {
+        loadSchedulerInfoBuilder_.clear();
       }
       if (loadRegulatorInfoBuilder_ != null) {
         loadRegulatorInfoBuilder_.clear();
@@ -2646,8 +2646,8 @@ private static final long serialVersionUID = 0L;
         result.details_ = rateLimiterInfoBuilder_.build();
       }
       if (detailsCase_ == 7 &&
-          concurrencyLimiterInfoBuilder_ != null) {
-        result.details_ = concurrencyLimiterInfoBuilder_.build();
+          loadSchedulerInfoBuilder_ != null) {
+        result.details_ = loadSchedulerInfoBuilder_.build();
       }
       if (detailsCase_ == 8 &&
           loadRegulatorInfoBuilder_ != null) {
@@ -2693,8 +2693,8 @@ private static final long serialVersionUID = 0L;
           mergeRateLimiterInfo(other.getRateLimiterInfo());
           break;
         }
-        case CONCURRENCY_LIMITER_INFO: {
-          mergeConcurrencyLimiterInfo(other.getConcurrencyLimiterInfo());
+        case LOAD_SCHEDULER_INFO: {
+          mergeLoadSchedulerInfo(other.getLoadSchedulerInfo());
           break;
         }
         case LOAD_REGULATOR_INFO: {
@@ -2765,7 +2765,7 @@ private static final long serialVersionUID = 0L;
             } // case 50
             case 58: {
               input.readMessage(
-                  getConcurrencyLimiterInfoFieldBuilder().getBuilder(),
+                  getLoadSchedulerInfoFieldBuilder().getBuilder(),
                   extensionRegistry);
               detailsCase_ = 7;
               break;
@@ -3253,71 +3253,71 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder> concurrencyLimiterInfoBuilder_;
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder> loadSchedulerInfoBuilder_;
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-     * @return Whether the concurrencyLimiterInfo field is set.
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+     * @return Whether the loadSchedulerInfo field is set.
      */
     @java.lang.Override
-    public boolean hasConcurrencyLimiterInfo() {
+    public boolean hasLoadSchedulerInfo() {
       return detailsCase_ == 7;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-     * @return The concurrencyLimiterInfo.
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+     * @return The loadSchedulerInfo.
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getConcurrencyLimiterInfo() {
-      if (concurrencyLimiterInfoBuilder_ == null) {
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo getLoadSchedulerInfo() {
+      if (loadSchedulerInfoBuilder_ == null) {
         if (detailsCase_ == 7) {
-          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_;
         }
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
       } else {
         if (detailsCase_ == 7) {
-          return concurrencyLimiterInfoBuilder_.getMessage();
+          return loadSchedulerInfoBuilder_.getMessage();
         }
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
       }
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
      */
-    public Builder setConcurrencyLimiterInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo value) {
-      if (concurrencyLimiterInfoBuilder_ == null) {
+    public Builder setLoadSchedulerInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo value) {
+      if (loadSchedulerInfoBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
         details_ = value;
         onChanged();
       } else {
-        concurrencyLimiterInfoBuilder_.setMessage(value);
+        loadSchedulerInfoBuilder_.setMessage(value);
       }
       detailsCase_ = 7;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
      */
-    public Builder setConcurrencyLimiterInfo(
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder builderForValue) {
-      if (concurrencyLimiterInfoBuilder_ == null) {
+    public Builder setLoadSchedulerInfo(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.Builder builderForValue) {
+      if (loadSchedulerInfoBuilder_ == null) {
         details_ = builderForValue.build();
         onChanged();
       } else {
-        concurrencyLimiterInfoBuilder_.setMessage(builderForValue.build());
+        loadSchedulerInfoBuilder_.setMessage(builderForValue.build());
       }
       detailsCase_ = 7;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
      */
-    public Builder mergeConcurrencyLimiterInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo value) {
-      if (concurrencyLimiterInfoBuilder_ == null) {
+    public Builder mergeLoadSchedulerInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo value) {
+      if (loadSchedulerInfoBuilder_ == null) {
         if (detailsCase_ == 7 &&
-            details_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance()) {
-          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.newBuilder((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_)
+            details_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance()) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.newBuilder((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_)
               .mergeFrom(value).buildPartial();
         } else {
           details_ = value;
@@ -3325,19 +3325,19 @@ private static final long serialVersionUID = 0L;
         onChanged();
       } else {
         if (detailsCase_ == 7) {
-          concurrencyLimiterInfoBuilder_.mergeFrom(value);
+          loadSchedulerInfoBuilder_.mergeFrom(value);
         } else {
-          concurrencyLimiterInfoBuilder_.setMessage(value);
+          loadSchedulerInfoBuilder_.setMessage(value);
         }
       }
       detailsCase_ = 7;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
      */
-    public Builder clearConcurrencyLimiterInfo() {
-      if (concurrencyLimiterInfoBuilder_ == null) {
+    public Builder clearLoadSchedulerInfo() {
+      if (loadSchedulerInfoBuilder_ == null) {
         if (detailsCase_ == 7) {
           detailsCase_ = 0;
           details_ = null;
@@ -3348,50 +3348,50 @@ private static final long serialVersionUID = 0L;
           detailsCase_ = 0;
           details_ = null;
         }
-        concurrencyLimiterInfoBuilder_.clear();
+        loadSchedulerInfoBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
      */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder getConcurrencyLimiterInfoBuilder() {
-      return getConcurrencyLimiterInfoFieldBuilder().getBuilder();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.Builder getLoadSchedulerInfoBuilder() {
+      return getLoadSchedulerInfoFieldBuilder().getBuilder();
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder() {
-      if ((detailsCase_ == 7) && (concurrencyLimiterInfoBuilder_ != null)) {
-        return concurrencyLimiterInfoBuilder_.getMessageOrBuilder();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder getLoadSchedulerInfoOrBuilder() {
+      if ((detailsCase_ == 7) && (loadSchedulerInfoBuilder_ != null)) {
+        return loadSchedulerInfoBuilder_.getMessageOrBuilder();
       } else {
         if (detailsCase_ == 7) {
-          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_;
         }
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
       }
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder> 
-        getConcurrencyLimiterInfoFieldBuilder() {
-      if (concurrencyLimiterInfoBuilder_ == null) {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder> 
+        getLoadSchedulerInfoFieldBuilder() {
+      if (loadSchedulerInfoBuilder_ == null) {
         if (!(detailsCase_ == 7)) {
-          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
         }
-        concurrencyLimiterInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder>(
-                (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_,
+        loadSchedulerInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder>(
+                (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_,
                 getParentForChildren(),
                 isClean());
         details_ = null;
       }
       detailsCase_ = 7;
       onChanged();
-      return concurrencyLimiterInfoBuilder_;
+      return loadSchedulerInfoBuilder_;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<

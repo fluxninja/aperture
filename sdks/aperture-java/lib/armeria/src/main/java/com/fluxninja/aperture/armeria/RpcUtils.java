@@ -23,7 +23,7 @@ class RpcUtils {
         switch (reason) {
             case REJECT_REASON_RATE_LIMITED:
                 return HttpStatus.TOO_MANY_REQUESTS;
-            case REJECT_REASON_CONCURRENCY_LIMITED:
+            case REJECT_REASON_LOAD_SHED:
                 return HttpStatus.SERVICE_UNAVAILABLE;
             default:
                 return HttpStatus.FORBIDDEN;

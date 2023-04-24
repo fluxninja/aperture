@@ -1,4 +1,4 @@
-package concurrency
+package loadscheduler
 
 import (
 	"context"
@@ -93,7 +93,7 @@ func NewSchedulerAndOptions(
 
 	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.AcceptedWorkSecondsMetricName,
+			metrics.AcceptedTokensMetricName,
 			policyParams),
 		concurrencyQueryInterval,
 		componentID,
@@ -107,7 +107,7 @@ func NewSchedulerAndOptions(
 
 	incomingQuery, incomingQueryOptions, incomingQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.IncomingWorkSecondsMetricName,
+			metrics.IncomingTokensMetricName,
 			policyParams),
 		concurrencyQueryInterval,
 		componentID,

@@ -1,4 +1,4 @@
-package concurrency
+package loadscheduler
 
 import (
 	"context"
@@ -33,15 +33,15 @@ import (
 )
 
 var (
-	// FxNameTag is Concurrency Limiter Watcher's Fx Tag.
-	fxNameTag = config.NameTag("concurrency_limiter_watcher")
+	// FxNameTag is Load Scheduler Watcher's Fx Tag.
+	fxNameTag = config.NameTag("load_scheduler_watcher")
 
 	// Array of Label Keys for WFQ and Token Bucket Metrics.
 	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 )
 
-// concurrencyLimiterModule returns the fx options for flowcontrol side pieces of concurrency limiter in the main fx app.
-func concurrencyLimiterModule() fx.Option {
+// loadSchedulerModule returns the fx options for flowcontrol side pieces of load scheduler in the main fx app.
+func loadSchedulerModule() fx.Option {
 	return fx.Options(
 		// Tag the watcher so that other modules can find it.
 		fx.Provide(
@@ -52,14 +52,14 @@ func concurrencyLimiterModule() fx.Option {
 		),
 		fx.Invoke(
 			fx.Annotate(
-				setupConcurrencyLimiterFactory,
+				setupLoadSchedulerFactory,
 				fx.ParamTags(fxNameTag),
 			),
 		),
 	)
 }
 
-// provideWatcher provides pointer to concurrency limiter watcher.
+// provideWatcher provides pointer to load scheduler watcher.
 func provideWatcher(
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
@@ -67,7 +67,7 @@ func provideWatcher(
 	// Get Agent Group from host info gatherer
 	agentGroupName := ai.GetAgentGroup()
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath,
+	etcdPath := path.Join(paths.LoadSchedulerConfigPath,
 		paths.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
@@ -76,7 +76,7 @@ func provideWatcher(
 	return watcher, nil
 }
 
-type concurrencyLimiterFactory struct {
+type loadSchedulerFactory struct {
 	engineAPI iface.Engine
 	registry  status.Registry
 
@@ -88,15 +88,15 @@ type concurrencyLimiterFactory struct {
 	wfqRequestsGaugeVec *prometheus.GaugeVec
 
 	// TODO: following will be moved to scheduler.
-	incomingWorkSecondsCounterVec *prometheus.CounterVec
-	acceptedWorkSecondsCounterVec *prometheus.CounterVec
+	incomingTokensCounterVec *prometheus.CounterVec
+	acceptedTokensCounterVec *prometheus.CounterVec
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
 }
 
-// setupConcurrencyLimiterFactory sets up the concurrency limiter module in the main fx app.
-func setupConcurrencyLimiterFactory(
+// setupLoadSchedulerFactory sets up the load scheduler module in the main fx app.
+func setupLoadSchedulerFactory(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 	e iface.Engine,
@@ -118,9 +118,9 @@ func setupConcurrencyLimiterFactory(
 		return err
 	}
 
-	reg := statusRegistry.Child("component", "concurrency_limiter")
+	reg := statusRegistry.Child("component", "load_scheduler")
 
-	conLimiterFactory := &concurrencyLimiterFactory{
+	conLimiterFactory := &loadSchedulerFactory{
 		engineAPI:           e,
 		autoTokensFactory:   autoTokensFactory,
 		loadActuatorFactory: loadActuatorFactory,
@@ -141,16 +141,16 @@ func setupConcurrencyLimiterFactory(
 		},
 		metricLabelKeys,
 	)
-	conLimiterFactory.incomingWorkSecondsCounterVec = prometheus.NewCounterVec(
+	conLimiterFactory.incomingTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.IncomingWorkSecondsMetricName,
+			Name: metrics.IncomingTokensMetricName,
 			Help: "A counter measuring work incoming into Scheduler",
 		},
 		metricLabelKeys,
 	)
-	conLimiterFactory.acceptedWorkSecondsCounterVec = prometheus.NewCounterVec(
+	conLimiterFactory.acceptedTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.AcceptedWorkSecondsMetricName,
+			Name: metrics.AcceptedTokensMetricName,
 			Help: "A counter measuring work admitted by Scheduler",
 		},
 		metricLabelKeys,
@@ -179,7 +179,7 @@ func setupConcurrencyLimiterFactory(
 	})
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
 		config.NewProtobufUnmarshaller,
-		[]notifiers.FxOptionsFunc{conLimiterFactory.newConcurrencyLimiterOptions},
+		[]notifiers.FxOptionsFunc{conLimiterFactory.newLoadSchedulerOptions},
 	)
 	if err != nil {
 		return err
@@ -197,11 +197,11 @@ func setupConcurrencyLimiterFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(conLimiterFactory.incomingWorkSecondsCounterVec)
+			err = prometheusRegistry.Register(conLimiterFactory.incomingTokensCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(conLimiterFactory.acceptedWorkSecondsCounterVec)
+			err = prometheusRegistry.Register(conLimiterFactory.acceptedTokensCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -227,12 +227,12 @@ func setupConcurrencyLimiterFactory(
 				err := fmt.Errorf("failed to unregister wfq_requests metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(conLimiterFactory.incomingWorkSecondsCounterVec) {
-				err := fmt.Errorf("failed to unregister incoming_concurrency metric")
+			if !prometheusRegistry.Unregister(conLimiterFactory.incomingTokensCounterVec) {
+				err := fmt.Errorf("failed to unregister incoming_work_seconds_total metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(conLimiterFactory.acceptedWorkSecondsCounterVec) {
-				err := fmt.Errorf("failed to unregister accepted_concurrency metric")
+			if !prometheusRegistry.Unregister(conLimiterFactory.acceptedTokensCounterVec) {
+				err := fmt.Errorf("failed to unregister accepted_work_seconds_total metric")
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(conLimiterFactory.workloadLatencySummaryVec) {
@@ -261,24 +261,24 @@ type multiMatchResult struct {
 // multiMatcher is MultiMatcher instantiation used in this package.
 type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 
-// newConcurrencyLimiterOptions returns fx options for the concurrency limiter fx app.
-func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions(
+// newLoadSchedulerOptions returns fx options for the load scheduler fx app.
+func (conLimiterFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
 	logger := conLimiterFactory.registry.GetLogger()
-	wrapperMessage := &policysyncv1.ConcurrencyLimiterWrapper{}
+	wrapperMessage := &policysyncv1.LoadSchedulerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	concurrencyLimiterMessage := wrapperMessage.ConcurrencyLimiter
-	if err != nil || concurrencyLimiterMessage == nil {
+	loadSchedulerMessage := wrapperMessage.LoadScheduler
+	if err != nil || loadSchedulerMessage == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		logger.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config wrapper")
+		logger.Warn().Err(err).Msg("Failed to unmarshal load scheduler config wrapper")
 		return fx.Options(), err
 	}
 
 	// Scheduler config
-	schedulerMsg := concurrencyLimiterMessage.Scheduler
+	schedulerMsg := loadSchedulerMessage.Scheduler
 	if schedulerMsg == nil {
 		err = fmt.Errorf("no scheduler specified")
 		reg.SetStatus(status.NewStatus(nil, err))
@@ -307,11 +307,11 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		}
 	}
 
-	conLimiter := &concurrencyLimiter{
+	conLimiter := &loadScheduler{
 		Component:                    wrapperMessage.GetCommonAttributes(),
-		concurrencyLimiterMsg:        concurrencyLimiterMessage,
+		loadSchedulerMsg:             loadSchedulerMessage,
 		registry:                     reg,
-		concurrencyLimiterFactory:    conLimiterFactory,
+		loadSchedulerFactory:         conLimiterFactory,
 		workloadMultiMatcher:         mm,
 		defaultWorkloadParametersMsg: schedulerParams.GetDefaultWorkloadParameters(),
 		schedulerParameters:          schedulerParams,
@@ -343,27 +343,27 @@ func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult 
 	return mmr
 }
 
-// concurrencyLimiter implements concurrency limiter on the flowcontrol side.
-type concurrencyLimiter struct {
+// loadScheduler implements load scheduler on the flowcontrol side.
+type loadScheduler struct {
 	iface.Component
 	scheduler                    scheduler.Scheduler
 	registry                     status.Registry
-	incomingWorkSecondsCounter   prometheus.Counter
-	acceptedWorkSecondsCounter   prometheus.Counter
-	concurrencyLimiterMsg        *policylangv1.ConcurrencyLimiter
-	concurrencyLimiterFactory    *concurrencyLimiterFactory
+	incomingTokensCounter        prometheus.Counter
+	acceptedTokensCounter        prometheus.Counter
+	loadSchedulerMsg             *policylangv1.LoadScheduler
+	loadSchedulerFactory         *loadSchedulerFactory
 	autoTokens                   *autoTokens
 	workloadMultiMatcher         *multiMatcher
 	defaultWorkloadParametersMsg *policylangv1.Scheduler_Workload_Parameters
 	schedulerParameters          *policylangv1.Scheduler_Parameters
 }
 
-// Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
-var _ iface.Limiter = &concurrencyLimiter{}
+// Make sure LoadScheduler implements the iface.LoadScheduler.
+var _ iface.Limiter = &loadScheduler{}
 
-func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
+func (conLimiter *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	// Factories
-	conLimiterFactory := conLimiter.concurrencyLimiterFactory
+	conLimiterFactory := conLimiter.loadSchedulerFactory
 	loadActuatorFactory := conLimiterFactory.loadActuatorFactory
 	autoTokensFactory := conLimiterFactory.autoTokensFactory
 	// Form metric labels
@@ -373,7 +373,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.ComponentIDLabel] = conLimiter.GetComponentId()
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.concurrencyLimiterMsg.GetLoadActuator(),
+	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.loadSchedulerMsg.GetLoadActuator(),
 		conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
@@ -391,8 +391,8 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	engineAPI := conLimiterFactory.engineAPI
 	wfqFlowsGaugeVec := conLimiterFactory.wfqFlowsGaugeVec
 	wfqRequestsGaugeVec := conLimiterFactory.wfqRequestsGaugeVec
-	incomingWorkSecondsCounterVec := conLimiterFactory.incomingWorkSecondsCounterVec
-	acceptedWorkSecondsCounterVec := conLimiterFactory.acceptedWorkSecondsCounterVec
+	incomingTokensCounterVec := conLimiterFactory.incomingTokensCounterVec
+	acceptedTokensCounterVec := conLimiterFactory.acceptedTokensCounterVec
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -419,16 +419,16 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			// setup scheduler
 			conLimiter.scheduler = scheduler.NewWFQScheduler(loadActuator.tokenBucketLoadMultiplier, clock, wfqMetrics)
 
-			conLimiter.incomingWorkSecondsCounter, err = incomingWorkSecondsCounterVec.GetMetricWith(metricLabels)
+			conLimiter.incomingTokensCounter, err = incomingTokensCounterVec.GetMetricWith(metricLabels)
 			if err != nil {
 				return err
 			}
-			conLimiter.acceptedWorkSecondsCounter, err = acceptedWorkSecondsCounterVec.GetMetricWith(metricLabels)
+			conLimiter.acceptedTokensCounter, err = acceptedTokensCounterVec.GetMetricWith(metricLabels)
 			if err != nil {
 				return err
 			}
 
-			err = engineAPI.RegisterConcurrencyLimiter(conLimiter)
+			err = engineAPI.RegisterLoadScheduler(conLimiter)
 			if err != nil {
 				return retErr(err)
 			}
@@ -438,7 +438,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 		OnStop: func(context.Context) error {
 			var errMulti error
 
-			err := engineAPI.UnregisterConcurrencyLimiter(conLimiter)
+			err := engineAPI.UnregisterLoadScheduler(conLimiter)
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
@@ -452,19 +452,19 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete wfq_requests gauge from its metric vector"))
 			}
-			deleted = incomingWorkSecondsCounterVec.Delete(metricLabels)
+			deleted = incomingTokensCounterVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete incoming_concurrency counter from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete incoming_work_seconds_total counter from its metric vector"))
 			}
-			deleted = acceptedWorkSecondsCounterVec.Delete(metricLabels)
+			deleted = acceptedTokensCounterVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_concurrency counter from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_work_seconds_total counter from its metric vector"))
 			}
-			deletedCount := conLimiter.concurrencyLimiterFactory.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
+			deletedCount := conLimiter.loadSchedulerFactory.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {
 				log.Warn().Msg("Could not delete workload_latency_ms summary from its metric vector. No traffic to generate metrics?")
 			}
-			deletedCount = conLimiter.concurrencyLimiterFactory.workloadCounterVec.DeletePartialMatch(metricLabels)
+			deletedCount = conLimiter.loadSchedulerFactory.workloadCounterVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {
 				log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
 			}
@@ -478,14 +478,14 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 }
 
 // GetFlowSelector returns selector.
-func (conLimiter *concurrencyLimiter) GetFlowSelector() *policylangv1.FlowSelector {
-	return conLimiter.concurrencyLimiterMsg.GetFlowSelector()
+func (conLimiter *loadScheduler) GetFlowSelector() *policylangv1.FlowSelector {
+	return conLimiter.loadSchedulerMsg.GetFlowSelector()
 }
 
-// Decide processes a single flow by concurrency limiter in a blocking manner.
+// Decide processes a single flow by load scheduler in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (conLimiter *concurrencyLimiter) Decide(ctx context.Context,
+func (conLimiter *loadScheduler) Decide(ctx context.Context,
 	labels map[string]string,
 ) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
@@ -572,11 +572,11 @@ func (conLimiter *concurrencyLimiter) Decide(ctx context.Context,
 		tokensConsumed = req.Tokens
 	}
 
-	// update concurrency metrics and decisionType
-	conLimiter.incomingWorkSecondsCounter.Add(float64(req.Tokens) / 1000)
+	// update load scheduler metrics and decisionType
+	conLimiter.incomingTokensCounter.Add(float64(req.Tokens) / 1000)
 
 	if accepted {
-		conLimiter.acceptedWorkSecondsCounter.Add(float64(req.Tokens) / 1000)
+		conLimiter.acceptedTokensCounter.Add(float64(req.Tokens) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{
@@ -584,8 +584,8 @@ func (conLimiter *concurrencyLimiter) Decide(ctx context.Context,
 		PolicyHash:  conLimiter.GetPolicyHash(),
 		ComponentId: conLimiter.GetComponentId(),
 		Dropped:     !accepted,
-		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
-			ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
+		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
+			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 				WorkloadIndex:  matchedWorkloadIndex,
 				TokensConsumed: tokensConsumed,
 			},
@@ -594,9 +594,9 @@ func (conLimiter *concurrencyLimiter) Decide(ctx context.Context,
 }
 
 // Revert reverts the decision made by the limiter.
-func (conLimiter *concurrencyLimiter) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
-	if conLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_); ok {
-		tokens := conLimiterDecision.ConcurrencyLimiterInfo.TokensConsumed
+func (conLimiter *loadScheduler) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+	if conLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo_); ok {
+		tokens := conLimiterDecision.LoadSchedulerInfo.TokensConsumed
 		if tokens > 0 {
 			conLimiter.scheduler.Revert(tokens)
 		}
@@ -604,7 +604,7 @@ func (conLimiter *concurrencyLimiter) Revert(labels map[string]string, decision 
 }
 
 // GetLimiterID returns the limiter ID.
-func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
+func (conLimiter *loadScheduler) GetLimiterID() iface.LimiterID {
 	// TODO: move this to limiter base.
 	return iface.LimiterID{
 		PolicyName:  conLimiter.GetPolicyName(),
@@ -614,8 +614,8 @@ func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
 }
 
 // GetLatencyObserver returns histogram for specific workload.
-func (conLimiter *concurrencyLimiter) GetLatencyObserver(labels map[string]string) prometheus.Observer {
-	latencySummary, err := conLimiter.concurrencyLimiterFactory.workloadLatencySummaryVec.GetMetricWith(labels)
+func (conLimiter *loadScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+	latencySummary, err := conLimiter.loadSchedulerFactory.workloadLatencySummaryVec.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting latency histogram")
 		return nil
@@ -625,8 +625,8 @@ func (conLimiter *concurrencyLimiter) GetLatencyObserver(labels map[string]strin
 }
 
 // GetRequestCounter returns request counter for specific workload.
-func (conLimiter *concurrencyLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
-	counter, err := conLimiter.concurrencyLimiterFactory.workloadCounterVec.GetMetricWith(labels)
+func (conLimiter *loadScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	counter, err := conLimiter.loadSchedulerFactory.workloadCounterVec.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting counter")
 		return nil

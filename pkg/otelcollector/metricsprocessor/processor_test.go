@@ -31,7 +31,7 @@ var _ = Describe("Metrics Processor", func() {
 		processor         *metricsProcessor
 		engine            *mocks.MockEngine
 		clasEngine        *mocks.MockClassificationEngine
-		conLimiter        *mocks.MockConcurrencyLimiter
+		loadScheduler     *mocks.MockLoadScheduler
 		rateLimiter       *mocks.MockRateLimiter
 		classifier        *mocks.MockClassifier
 		summaryVec        *prometheus.SummaryVec
@@ -53,7 +53,7 @@ var _ = Describe("Metrics Processor", func() {
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
 		clasEngine = mocks.NewMockClassificationEngine(ctrl)
-		conLimiter = mocks.NewMockConcurrencyLimiter(ctrl)
+		loadScheduler = mocks.NewMockLoadScheduler(ctrl)
 		rateLimiter = mocks.NewMockRateLimiter(ctrl)
 		classifier = mocks.NewMockClassifier(ctrl)
 		expectedLabels = make(map[string]interface{})
@@ -114,8 +114,8 @@ var _ = Describe("Metrics Processor", func() {
 					PolicyHash:  "foo-hash",
 					ComponentId: "1",
 					Dropped:     true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
-						ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
+					Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
+						LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 							WorkloadIndex: "0",
 						},
 					},
@@ -140,7 +140,7 @@ var _ = Describe("Metrics Processor", func() {
 			m.ComponentIDLabel:   "2",
 			m.WorkloadIndexLabel: "2",
 		}
-		engine.EXPECT().GetConcurrencyLimiter(gomock.Any()).Return(conLimiter).AnyTimes()
+		engine.EXPECT().GetLoadScheduler(gomock.Any()).Return(loadScheduler).AnyTimes()
 		engine.EXPECT().GetRateLimiter(gomock.Any()).Return(rateLimiter).AnyTimes()
 		clasEngine.EXPECT().GetClassifier(gomock.Any()).Return(classifier).AnyTimes()
 	})
@@ -231,14 +231,14 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 			oc.ApertureClassifierErrorsLabel: []interface{}{fmt.Sprintf("%s,policy_name:foo,classifier_index:1,policy_hash:foo-hash",
 				flowcontrolv1.ClassifierInfo_ERROR_EMPTY_RESULTSET.String())},
 
-			oc.ApertureFluxMetersLabel:                  []interface{}{"bar"},
-			oc.ApertureFlowLabelKeysLabel:               []interface{}{"someLabel"},
-			oc.ApertureRateLimitersLabel:                []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
-			oc.ApertureDroppingRateLimitersLabel:        []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
-			oc.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
-			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
-			oc.ApertureWorkloadsLabel:                   []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
-			oc.ApertureDroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureFluxMetersLabel:             []interface{}{"bar"},
+			oc.ApertureFlowLabelKeysLabel:          []interface{}{"someLabel"},
+			oc.ApertureRateLimitersLabel:           []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
+			oc.ApertureDroppingRateLimitersLabel:   []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
+			oc.ApertureLoadSchedulersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureDroppingLoadSchedulersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureWorkloadsLabel:              []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureDroppingWorkloadsLabel:      []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
 
 			oc.ApertureProcessingDurationLabel: float64(1000),
 			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
@@ -252,10 +252,10 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 
 		summary, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
+		loadScheduler.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
 		counter, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
+		loadScheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
 
 		labels := map[string]string{
 			m.PolicyNameLabel:     "foo",
@@ -280,14 +280,14 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 `
 
 		expectedLabels = map[string]interface{}{
-			oc.ApertureDecisionTypeLabel:                "DECISION_TYPE_REJECTED",
-			oc.ApertureRejectReasonLabel:                "REJECT_REASON_RATE_LIMITED",
-			oc.ApertureRateLimitersLabel:                []interface{}{},
-			oc.ApertureDroppingRateLimitersLabel:        []interface{}{},
-			oc.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
-			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
-			oc.ApertureWorkloadsLabel:                   []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
-			oc.ApertureDroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureDecisionTypeLabel:           "DECISION_TYPE_REJECTED",
+			oc.ApertureRejectReasonLabel:           "REJECT_REASON_RATE_LIMITED",
+			oc.ApertureRateLimitersLabel:           []interface{}{},
+			oc.ApertureDroppingRateLimitersLabel:   []interface{}{},
+			oc.ApertureLoadSchedulersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureDroppingLoadSchedulersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureWorkloadsLabel:              []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureDroppingWorkloadsLabel:      []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
 		}
 		source = oc.ApertureSourceSDK
 
@@ -296,10 +296,10 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 
 		summary, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
+		loadScheduler.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
 		counter, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
+		loadScheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
 	})
 
 	It("Processes logs for two policies - ingress", func() {
@@ -309,8 +309,8 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 				PolicyHash:  "fizz-hash",
 				ComponentId: "1",
 				Dropped:     true,
-				Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
-					ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
+				Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
+					LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 						WorkloadIndex: "1",
 					},
 				},
@@ -320,8 +320,8 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 				PolicyHash:  "fizz-hash",
 				ComponentId: "2",
 				Dropped:     false,
-				Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
-					ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
+				Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
+					LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 						WorkloadIndex: "2",
 					},
 				},
@@ -341,12 +341,12 @@ workload_latency_ms_count{component_id="2",policy_hash="fizz-hash",policy_name="
 			oc.ApertureDecisionTypeLabel:         flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
 			oc.ApertureRateLimitersLabel:         []interface{}{},
 			oc.ApertureDroppingRateLimitersLabel: []interface{}{},
-			oc.ApertureConcurrencyLimitersLabel: []interface{}{
+			oc.ApertureLoadSchedulersLabel: []interface{}{
 				"policy_name:foo,component_id:1,policy_hash:foo-hash",
 				"policy_name:fizz,component_id:1,policy_hash:fizz-hash",
 				"policy_name:fizz,component_id:2,policy_hash:fizz-hash",
 			},
-			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{
+			oc.ApertureDroppingLoadSchedulersLabel: []interface{}{
 				"policy_name:foo,component_id:1,policy_hash:foo-hash",
 				"policy_name:fizz,component_id:1,policy_hash:fizz-hash",
 			},
@@ -367,30 +367,30 @@ workload_latency_ms_count{component_id="2",policy_hash="fizz-hash",policy_name="
 
 		summaryFoo, err := summaryVec.GetMetricWith(labelsFoo1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summaryFoo).Times(1)
+		loadScheduler.EXPECT().GetLatencyObserver(labelsFoo1).Return(summaryFoo).Times(1)
 		counterFoo, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counterFoo).Times(1)
+		loadScheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counterFoo).Times(1)
 
 		labelsFizz1WithReject := insertRejectLabel(labelsFizz1)
 		labelsFizz1WithRejectAndDropped := insertDroppedLabel(labelsFizz1WithReject, true)
 
 		summaryFizz1, err := summaryVec.GetMetricWith(labelsFizz1)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFizz1).Return(summaryFizz1).Times(1)
+		loadScheduler.EXPECT().GetLatencyObserver(labelsFizz1).Return(summaryFizz1).Times(1)
 		counterFizz1, err := counterVec.GetMetricWith(labelsFizz1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetRequestCounter(labelsFizz1WithRejectAndDropped).Return(counterFizz1).Times(1)
+		loadScheduler.EXPECT().GetRequestCounter(labelsFizz1WithRejectAndDropped).Return(counterFizz1).Times(1)
 
 		labelsFizz2WithReject := insertRejectLabel(labelsFizz2)
 		labelsFizz2WithRejectAndDropped := insertDroppedLabel(labelsFizz2WithReject, false)
 
 		summaryFizz2, err := summaryVec.GetMetricWith(labelsFizz2)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFizz2).Return(summaryFizz2).Times(1)
+		loadScheduler.EXPECT().GetLatencyObserver(labelsFizz2).Return(summaryFizz2).Times(1)
 		counterFizz2, err := counterVec.GetMetricWith(labelsFizz2WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetRequestCounter(labelsFizz2WithRejectAndDropped).Return(counterFizz2).Times(1)
+		loadScheduler.EXPECT().GetRequestCounter(labelsFizz2WithRejectAndDropped).Return(counterFizz2).Times(1)
 	})
 })
 

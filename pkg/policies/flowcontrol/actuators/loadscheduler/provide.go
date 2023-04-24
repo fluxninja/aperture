@@ -1,4 +1,4 @@
-package concurrency
+package loadscheduler
 
 import (
 	"go.uber.org/fx"
@@ -7,6 +7,6 @@ import (
 // Module returns the fx options for dataplane side pieces of concurrency control.
 func Module() fx.Option {
 	return fx.Options(
-		concurrencyLimiterModule(),
+		loadSchedulerModule(),
 	)
 }

@@ -82,9 +82,9 @@ private static final long serialVersionUID = 0L;
      */
     REJECT_REASON_RATE_LIMITED(1),
     /**
-     * <code>REJECT_REASON_CONCURRENCY_LIMITED = 2;</code>
+     * <code>REJECT_REASON_LOAD_SHED = 2;</code>
      */
-    REJECT_REASON_CONCURRENCY_LIMITED(2),
+    REJECT_REASON_LOAD_SHED(2),
     /**
      * <code>REJECT_REASON_LOAD_REGULATED = 3;</code>
      */
@@ -101,9 +101,9 @@ private static final long serialVersionUID = 0L;
      */
     public static final int REJECT_REASON_RATE_LIMITED_VALUE = 1;
     /**
-     * <code>REJECT_REASON_CONCURRENCY_LIMITED = 2;</code>
+     * <code>REJECT_REASON_LOAD_SHED = 2;</code>
      */
-    public static final int REJECT_REASON_CONCURRENCY_LIMITED_VALUE = 2;
+    public static final int REJECT_REASON_LOAD_SHED_VALUE = 2;
     /**
      * <code>REJECT_REASON_LOAD_REGULATED = 3;</code>
      */
@@ -136,7 +136,7 @@ private static final long serialVersionUID = 0L;
       switch (value) {
         case 0: return REJECT_REASON_NONE;
         case 1: return REJECT_REASON_RATE_LIMITED;
-        case 2: return REJECT_REASON_CONCURRENCY_LIMITED;
+        case 2: return REJECT_REASON_LOAD_SHED;
         case 3: return REJECT_REASON_LOAD_REGULATED;
         default: return null;
       }
