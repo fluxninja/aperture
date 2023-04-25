@@ -165,9 +165,6 @@ const (
 	ProcessorCustomMetrics = "resource/custom_metrics"
 	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
 	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
-	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
-	// log exporter.
-	ProcessorTracesToLogs = "tracestologs"
 	// ProcessorAlertsNamespace adds host info as `namespace` attribute.
 	ProcessorAlertsNamespace = "attributes/alerts"
 	// ProcessorFilterKubeletStats filters in only metrics of interest.
@@ -179,11 +176,11 @@ const (
 	ExporterLogging = "logging"
 	// ExporterPrometheusRemoteWrite exports metrics to local prometheus instance.
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
-	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
-	// with ProcessorSpanToLog.
-	ExporterOTLPLoopback = "otlp/loopback"
 	// ExporterAlerts exports alerts via alertmanager clients.
 	ExporterAlerts = "alerts"
+
+	// ConnectorAdapter adapts OTEL signals between pipelines.
+	ConnectorAdapter = "adapter"
 
 	/* Specific to alerts pipeline. */
 
