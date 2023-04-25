@@ -20,8 +20,8 @@ repository.
 
 The `oracledbreceiver` extension is available in the default agent image. If
 you're [building][build] your own Aperture Agent, add
-`integrations/otel/oracledbreceiver` to `bundled_extensions` list to make [the
-receiver][receiver] available.
+`integrations/otel/oracledbreceiver` to the `bundled_extensions` list to make
+[the receiver][receiver] available.
 
 :::
 

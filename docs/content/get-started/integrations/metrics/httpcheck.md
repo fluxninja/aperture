@@ -20,8 +20,8 @@ repository.
 
 The `httpcheckreceiver` extension is available in the default agent image. If
 you're [building][build] your own Aperture Agent, add
-`integrations/otel/httpcheckreceiver` to `bundled_extensions` list to make [the
-receiver][receiver] available.
+`integrations/otel/httpcheckreceiver` to the `bundled_extensions` list to make
+[the receiver][receiver] available.
 
 :::
 

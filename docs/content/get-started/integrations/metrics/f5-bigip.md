@@ -21,7 +21,7 @@ repository.
 
 The `bigipreceiver` extension is available in the default agent image. If you're
 [building][build] your own Aperture Agent, add `integrations/otel/bigipreceiver`
-to `bundled_extensions` list to make [the receiver][receiver] available.
+to the `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 

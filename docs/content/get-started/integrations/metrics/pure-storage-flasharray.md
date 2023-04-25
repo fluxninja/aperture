@@ -20,7 +20,7 @@ repository.
 
 The `purefareceiver` extension is available in the default agent image. If
 you're [building][build] your own Aperture Agent, add
-`integrations/otel/purefareceiver` to `bundled_extensions` list to make [the
+`integrations/otel/purefareceiver` to the `bundled_extensions` list to make [the
 receiver][receiver] available.
 
 :::

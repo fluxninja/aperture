@@ -20,8 +20,8 @@ repository.
 
 The `aerospikereceiver` extension is available in the default agent image. If
 you're [building][build] your own Aperture Agent, add
-`integrations/otel/aerospikereceiver` to `bundled_extensions` list to make [the
-receiver][receiver] available.
+`integrations/otel/aerospikereceiver` to the `bundled_extensions` list to make
+[the receiver][receiver] available.
 
 :::
 
