@@ -34,8 +34,8 @@ import (
 type Client interface {
 	StartFlow(ctx context.Context, controlPoint string, labels map[string]string) (Flow, error)
 	Shutdown(ctx context.Context) error
-	HTTPMiddleware(controlPoint string, labels map[string]string, timeout time.Duration) mux.MiddlewareFunc
-	GRPCUnaryInterceptor(controlPoint string, labels map[string]string, timeout time.Duration) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error)
+	HTTPMiddleware(controlPoint string, labels map[string]string) mux.MiddlewareFunc
+	GRPCUnaryInterceptor(controlPoint string, labels map[string]string) grpc.UnaryServerInterceptor
 }
 
 type apertureClient struct {
@@ -110,8 +110,12 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
 func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string) (Flow, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.timeout)
-	defer cancel()
+	// if c.timeout is not 0, then create a new context with timeout
+	if c.timeout != 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.timeout)
+		defer cancel()
+	}
 
 	labels := make(map[string]string)
 
@@ -159,7 +163,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 }
 
 // HTTPMiddleware takes a control point name, labels and timeout and creates a Middleware which can be used with HTTP server.
-func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]string, timeout time.Duration) mux.MiddlewareFunc {
+func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			newLabels := make(map[string]string, len(labels))
@@ -169,7 +173,10 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 				newLabels[key] = strings.Join(value, ",")
 			}
 
-			flow := c.executeFlow(r.Context(), controlPoint, newLabels, timeout)
+			flow, err := c.StartFlow(r.Context(), controlPoint, labels)
+			if err != nil {
+				c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
+			}
 
 			if flow.Accepted() {
 				// Simulate work being done
@@ -198,7 +205,7 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 }
 
 // GRPCUnaryInterceptor takes a control point name, labels and timeout and creates a UnaryInterceptor which can be used with gRPC server.
-func (c *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[string]string, timeout time.Duration) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (c *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[string]string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		newLabels := make(map[string]string, len(labels))
 		maps.Copy(newLabels, labels)
@@ -210,7 +217,10 @@ func (c *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[st
 			}
 		}
 
-		flow := c.executeFlow(ctx, controlPoint, newLabels, timeout)
+		flow, err := c.StartFlow(ctx, controlPoint, labels)
+		if err != nil {
+			c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
+		}
 
 		if flow.Accepted() {
 			// Simulate work being done
@@ -235,25 +245,6 @@ func (c *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[st
 			)
 		}
 	}
-}
-
-func (c *apertureClient) executeFlow(ctx context.Context, controlPoint string, labels map[string]string, timeout time.Duration) Flow {
-	var newCtx context.Context
-	var cancel context.CancelFunc
-	if timeout == 0 {
-		newCtx = ctx
-	} else {
-		newCtx, cancel = context.WithTimeout(ctx, timeout)
-	}
-	defer cancel()
-
-	// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
-	flow, err := c.StartFlow(newCtx, controlPoint, labels)
-	if err != nil {
-		c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
-	}
-
-	return flow
 }
 
 // Shutdown shuts down the aperture client.
