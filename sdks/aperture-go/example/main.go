@@ -88,7 +88,7 @@ func main() {
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", labels, 30*time.Second))
+	superRouter.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", labels))
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
