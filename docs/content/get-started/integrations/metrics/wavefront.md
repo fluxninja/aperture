@@ -9,9 +9,21 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`wavefrontreceiver` extension enabled, so that [wavefrontreceiver][receiver] is
-available.
+::: info
+
+See also [wavefrontreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
+
+:::
+
+::: note
+
+The `wavefrontreceiver` extension is available in the default agent image. If
+you're [building][build] your own Aperture Agent, add
+`integrations/otel/wavefrontreceiver` to the `bundled_extensions` list to make
+[the receiver][receiver] available.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Wavefront using the
 following configuration in the [Aperture Agent's config][agent-config]:

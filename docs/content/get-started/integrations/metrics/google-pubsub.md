@@ -9,9 +9,21 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`googlecloudpubsubreceiver` extension enabled, so that
-[googlecloudpubsubreceiver][receiver] is available.
+::: info
+
+See also [googlecloudpubsubreceiver docs][receiver] in
+opentelemetry-collect-contrib repository.
+
+:::
+
+::: note
+
+The `googlecloudpubsubreceiver` extension is available in the default agent
+image. If you're [building][build] your own Aperture Agent, add
+`integrations/otel/googlecloudpubsubreceiver` to the `bundled_extensions` list
+to make [the receiver][receiver] available.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Google Cloud Pub/Sub
 using the following configuration in the [Aperture Agent's

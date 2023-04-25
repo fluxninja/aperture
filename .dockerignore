@@ -8,6 +8,7 @@
 !tools
 !cmd/*/build-config.yaml
 !scripts/build_aperturectl.sh
+!scripts/generate_full_build_config.sh
 !.git
 !playground/resources/nginx/*
 !playground/resources/kong/*

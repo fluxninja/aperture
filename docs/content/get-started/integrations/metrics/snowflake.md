@@ -9,9 +9,21 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`snowflakereceiver` extension enabled, so that [snowflakereceiver][receiver] is
-available.
+::: info
+
+See also [snowflakereceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
+
+:::
+
+::: note
+
+The `snowflakereceiver` extension is available in the default agent image. If
+you're [building][build] your own Aperture Agent, add
+`integrations/otel/snowflakereceiver` to the `bundled_extensions` list to make
+[the receiver][receiver] available.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Snowflake using the
 following configuration in the [Aperture Agent's config][agent-config]:

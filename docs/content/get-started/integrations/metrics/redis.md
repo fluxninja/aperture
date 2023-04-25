@@ -9,9 +9,20 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`redisreceiver` extension enabled, so that [redisreceiver][receiver] is
-available.
+::: info
+
+See also [redisreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
+
+:::
+
+::: note
+
+The `redisreceiver` extension is available in the default agent image. If you're
+[building][build] your own Aperture Agent, add `integrations/otel/redisreceiver`
+to the `bundled_extensions` list to make [the receiver][receiver] available.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Redis using the following
 configuration in the [Aperture Agent's config][agent-config]:

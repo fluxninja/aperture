@@ -9,8 +9,20 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`nsxtreceiver` extension enabled, so that [nsxtreceiver][receiver] is available.
+::: info
+
+See also [nsxtreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
+
+:::
+
+::: note
+
+The `nsxtreceiver` extension is available in the default agent image. If you're
+[building][build] your own Aperture Agent, add `integrations/otel/nsxtreceiver`
+to the `bundled_extensions` list to make [the receiver][receiver] available.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for NSX-T using the following
 configuration in the [Aperture Agent's config][agent-config]:

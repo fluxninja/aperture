@@ -9,9 +9,21 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`statsdreceiver` extension enabled, so that [statsdreceiver][receiver] is
-available.
+::: info
+
+See also [statsdreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
+
+:::
+
+::: note
+
+The `statsdreceiver` extension is available in the default agent image. If
+you're [building][build] your own Aperture Agent, add
+`integrations/otel/statsdreceiver` to the `bundled_extensions` list to make [the
+receiver][receiver] available.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for StatsD using the
 following configuration in the [Aperture Agent's config][agent-config]:

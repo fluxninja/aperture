@@ -9,9 +9,21 @@ keywords:
   - metrics
 ---
 
-Before proceeding, ensure that you have [built][build] Aperture Agent with the
-`azureeventhubreceiver` extension enabled, so that
-[azureeventhubreceiver][receiver] is available.
+::: info
+
+See also [azureeventhubreceiver docs][receiver] in opentelemetry-collect-contrib
+repository.
+
+:::
+
+::: note
+
+The `azureeventhubreceiver` extension is available in the default agent image.
+If you're [building][build] your own Aperture Agent, add
+`integrations/otel/azureeventhubreceiver` to the `bundled_extensions` list to
+make [the receiver][receiver] available.
+
+:::
 
 You can configure [Custom metrics][custom-metrics] for Microsoft Azure Event Hub
 using the following configuration in the [Aperture Agent's
