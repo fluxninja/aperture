@@ -110,19 +110,17 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
 func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string) (Flow, error) {
-	var newCtx context.Context
-	var cancel context.CancelFunc
-	if c.timeout == 0 {
-		newCtx = ctx
-	} else {
-		newCtx, cancel = context.WithTimeout(ctx, c.timeout)
+	// if c.timeout is not 0, then create a new context with timeout
+	if c.timeout != 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.timeout)
+		defer cancel()
 	}
-	defer cancel()
 
 	labels := make(map[string]string)
 
 	// Inherit labels from baggage
-	baggageCtx := baggage.FromContext(newCtx)
+	baggageCtx := baggage.FromContext(ctx)
 	for _, member := range baggageCtx.Members() {
 		value, err := url.QueryUnescape(member.Value())
 		if err != nil {
@@ -141,7 +139,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		Labels:       labels,
 	}
 
-	_, span := c.tracer.Start(newCtx, "Aperture Check", trace.WithAttributes(
+	_, span := c.tracer.Start(ctx, "Aperture Check", trace.WithAttributes(
 		attribute.Int64(flowStartTimestampLabel, time.Now().UnixNano()),
 		attribute.String(sourceLabel, "sdk"),
 	))
@@ -150,7 +148,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		span: span,
 	}
 
-	res, err := c.flowControlClient.Check(newCtx, req)
+	res, err := c.flowControlClient.Check(ctx, req)
 	if err != nil {
 		f.checkResponse = nil
 	} else {
