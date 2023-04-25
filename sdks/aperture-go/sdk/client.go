@@ -81,13 +81,6 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 
 	fcClient := flowcontrol.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
 
-	var timeout time.Duration
-	if opts.CheckTimeout == 0 {
-		timeout = defaultRPCTimeout
-	} else {
-		timeout = opts.CheckTimeout
-	}
-
 	var logger logr.Logger
 	if opts.Logger != nil {
 		logger = *opts.Logger
@@ -98,7 +91,7 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 	c := &apertureClient{
 		flowControlClient: fcClient,
 		tracer:            tracer,
-		timeout:           timeout,
+		timeout:           opts.CheckTimeout,
 		exporter:          exporter,
 		log:               logger,
 	}

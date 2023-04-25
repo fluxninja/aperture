@@ -1,17 +1,9 @@
 package aperture
 
-import (
-	"time"
-)
-
 const (
 	// Library name and version can be used by the user to create a resource that connects to telemetry exporter.
 	libraryName    = "aperture-go"
 	libraryVersion = "v0.1.0"
-
-	// Config defaults.
-	defaultRPCTimeout           = 200 * time.Millisecond
-	defaultGRPCReconnectionTime = 10 * time.Second
 
 	// Label keys.
 	// Label to hold source of flow.
