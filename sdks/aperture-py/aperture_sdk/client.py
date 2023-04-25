@@ -11,8 +11,6 @@ from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
 )
 from aperture_sdk.const import (
-    default_grpc_reconnection_time,
-    default_rpc_timeout,
     flow_start_timestamp_label,
     library_name,
     library_version,
@@ -38,7 +36,7 @@ class ApertureClient:
         self,
         channel: grpc.Channel,
         otlp_exporter: OTLPSpanExporter,
-        check_timeout: datetime.timedelta = default_rpc_timeout,
+        check_timeout: datetime.timedelta = datetime.timedelta(seconds=0),
     ):
         self.logger = logging.getLogger("aperture-py-sdk")
         self.timeout = check_timeout
@@ -63,8 +61,8 @@ class ApertureClient:
         cls: Type[TApertureClient],
         endpoint: str = "http://localhost:4317",
         insecure: bool = False,
-        check_timeout: datetime.timedelta = default_rpc_timeout,
-        grpc_timeout: datetime.timedelta = default_grpc_reconnection_time,
+        check_timeout: datetime.timedelta = datetime.timedelta(seconds=0),
+        grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=0),
         credentials: Optional[grpc.ChannelCredentials] = None,
         compression: grpc.Compression = grpc.Compression.NoCompression,
     ) -> TApertureClient:

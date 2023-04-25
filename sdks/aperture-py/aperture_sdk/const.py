@@ -1,12 +1,6 @@
-from datetime import timedelta
-
 # Library name and version can be used by the user to create a resource that connects to telemetry exporter.
 library_name = "aperture-py"
 library_version = "v0.1.0"
-
-# Config defaults.
-default_rpc_timeout = timedelta(milliseconds=200)
-default_grpc_reconnection_time = timedelta(seconds=10)
 
 # Label keys.
 # Label to hold source of flow.
