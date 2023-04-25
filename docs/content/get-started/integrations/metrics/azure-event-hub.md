@@ -9,14 +9,14 @@ keywords:
   - metrics
 ---
 
-::: info
+:::info
 
 See also [azureeventhubreceiver docs][receiver] in opentelemetry-collect-contrib
 repository.
 
 :::
 
-::: note
+:::note
 
 The `azureeventhubreceiver` extension is available in the default agent image.
 If you're [building][build] your own Aperture Agent, add

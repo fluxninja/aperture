@@ -9,14 +9,14 @@ keywords:
   - metrics
 ---
 
-::: info
+:::info
 
 See also [sqlqueryreceiver docs][receiver] in opentelemetry-collect-contrib
 repository.
 
 :::
 
-::: note
+:::note
 
 The `sqlqueryreceiver` extension is available in the default agent image. If
 you're [building][build] your own Aperture Agent, add
