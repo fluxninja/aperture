@@ -189,7 +189,7 @@ server:
     - 250
     - 1000
   grpc_gateway:
-    grpc_server_address: 0.0.0.0:1
+    grpc_server_address: ""
   http:
     disable_http_keep_alives: false
     idle_timeout: 30s

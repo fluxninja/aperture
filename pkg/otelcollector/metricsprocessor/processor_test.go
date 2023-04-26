@@ -216,10 +216,6 @@ classifier_counter{component_id="1",policy_hash="foo-hash",policy_name="foo"} 1
 <split># HELP rate_limiter_counter dummy
 # TYPE rate_limiter_counter counter
 rate_limiter_counter{component_id="2",policy_hash="foo-hash",policy_name="foo"} 1
-<split># HELP workload_latency_ms dummy
-# TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 `
 
 		expectedLabels = map[string]interface{}{
@@ -250,9 +246,6 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 		labelsFoo1WithReject := insertRejectLabel(labelsFoo1)
 		labelsFoo1WithRejectAndDropped := insertDroppedLabel(labelsFoo1WithReject, true)
 
-		summary, err := summaryVec.GetMetricWith(labelsFoo1)
-		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
 		counter, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
@@ -273,11 +266,7 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 		baseCheckResp.ControlPoint = "featureX"
 		baseCheckResp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
 
-		expectedMetrics = `# HELP workload_latency_ms dummy
-# TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
-`
+		expectedMetrics = ``
 
 		expectedLabels = map[string]interface{}{
 			oc.ApertureDecisionTypeLabel:                "DECISION_TYPE_REJECTED",
@@ -294,9 +283,6 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 		labelsFoo1WithReject := insertRejectLabel(labelsFoo1)
 		labelsFoo1WithRejectAndDropped := insertDroppedLabel(labelsFoo1WithReject, true)
 
-		summary, err := summaryVec.GetMetricWith(labelsFoo1)
-		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summary).Times(1)
 		counter, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
@@ -327,15 +313,7 @@ workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="f
 				},
 			})
 
-		expectedMetrics = `# HELP workload_latency_ms dummy
-# TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_id="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
-workload_latency_ms_count{component_id="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-workload_latency_ms_sum{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
-workload_latency_ms_sum{component_id="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
-workload_latency_ms_count{component_id="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
-`
+		expectedMetrics = ``
 
 		expectedLabels = map[string]interface{}{
 			oc.ApertureDecisionTypeLabel:         flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED.String(),
@@ -365,9 +343,6 @@ workload_latency_ms_count{component_id="2",policy_hash="fizz-hash",policy_name="
 		labelsFoo1WithReject := insertRejectLabel(labelsFoo1)
 		labelsFoo1WithRejectAndDropped := insertDroppedLabel(labelsFoo1WithReject, true)
 
-		summaryFoo, err := summaryVec.GetMetricWith(labelsFoo1)
-		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFoo1).Return(summaryFoo).Times(1)
 		counterFoo, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counterFoo).Times(1)
@@ -375,9 +350,6 @@ workload_latency_ms_count{component_id="2",policy_hash="fizz-hash",policy_name="
 		labelsFizz1WithReject := insertRejectLabel(labelsFizz1)
 		labelsFizz1WithRejectAndDropped := insertDroppedLabel(labelsFizz1WithReject, true)
 
-		summaryFizz1, err := summaryVec.GetMetricWith(labelsFizz1)
-		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFizz1).Return(summaryFizz1).Times(1)
 		counterFizz1, err := counterVec.GetMetricWith(labelsFizz1WithReject)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetRequestCounter(labelsFizz1WithRejectAndDropped).Return(counterFizz1).Times(1)
@@ -385,9 +357,6 @@ workload_latency_ms_count{component_id="2",policy_hash="fizz-hash",policy_name="
 		labelsFizz2WithReject := insertRejectLabel(labelsFizz2)
 		labelsFizz2WithRejectAndDropped := insertDroppedLabel(labelsFizz2WithReject, false)
 
-		summaryFizz2, err := summaryVec.GetMetricWith(labelsFizz2)
-		Expect(err).NotTo(HaveOccurred())
-		conLimiter.EXPECT().GetLatencyObserver(labelsFizz2).Return(summaryFizz2).Times(1)
 		counterFizz2, err := counterVec.GetMetricWith(labelsFizz2WithReject)
 		Expect(err).NotTo(HaveOccurred())
 		conLimiter.EXPECT().GetRequestCounter(labelsFizz2WithRejectAndDropped).Return(counterFizz2).Times(1)
