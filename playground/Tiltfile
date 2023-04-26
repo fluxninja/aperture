@@ -135,7 +135,7 @@ DEP_TREE = {
                 "controller-prometheus-server": "9090:9090",
                 "controller-etcd": "2379:2379",
             },
-            "pvc_selectors": ["app.kubernetes.io/name=etcd"],
+            "pvc_selectors": ["app.kubernetes.io/name=etcd","app=prometheus"],
             "kinds": [
                 dict(kind="Controller", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
             ],
