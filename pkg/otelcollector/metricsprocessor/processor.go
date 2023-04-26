@@ -193,27 +193,14 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
-		invalidCount := make(map[string]int)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
-			valid := p.updateMetricsForFluxMeters(
+			p.updateMetricsForFluxMeters(
 				fluxMeter,
 				checkResponse.DecisionType,
 				statusCode, flowStatus,
 				attributes,
 				treatAsMissing)
-			if !valid {
-				invalidCount[fluxMeter.FluxMeterName]++
-			}
 		}
-		for fluxMeterName, count := range invalidCount {
-			fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterName)
-			metric, err := fluxMeter.GetInvalidFluxMeterTotal(nil)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
-			}
-			metric.Set(float64(count))
-		}
-
 	}
 
 	if len(checkResponse.ClassifierInfos) > 0 {
@@ -239,8 +226,8 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 			Msg("ConcurrencyLimiter not found")
 		return
 	}
-	// Observe latency only if the latency is found I.E. the request was allowed and response was received
-	if latencyFound {
+	// Observe latency only if the request was allowed by Aperture and response was received from the server (I.E. latency is found)
+	if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED && latencyFound {
 		latencyObserver := concurrencyLimiter.GetLatencyObserver(labels)
 		if latencyObserver != nil {
 			latencyObserver.Observe(latency)
@@ -317,7 +304,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	flowStatus string,
 	attributes pcommon.Map,
 	treatAsMissing []string,
-) (valid bool) {
+) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
 		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
@@ -325,7 +312,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FlowStatusLabel, flowStatus).
 			Msg("FluxMeter not found")
-		return true
+		return
 	}
 
 	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
@@ -334,15 +321,18 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)
 
 	// Add attribute found label to the flux meter metric
-	if !found {
-		fluxMeter.DeleteFromHistogram(labels)
-		return false
+	if found {
+		fluxMeterHistogram := fluxMeter.GetHistogram(labels)
+		if fluxMeterHistogram != nil {
+			fluxMeterHistogram.Observe(metricValue)
+		}
+	} else {
+		metric, err := fluxMeter.GetInvalidFluxMeterTotal(labels)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
+		}
+		metric.Inc()
 	}
-	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
-	if fluxMeterHistogram != nil {
-		fluxMeterHistogram.Observe(metricValue)
-	}
-	return true
 }
 
 func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse, controlPointType string) {
