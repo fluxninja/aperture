@@ -268,7 +268,7 @@ definitions:
         properties:
             backoff:
                 $ref: '#/definitions/BackoffConfig'
-                description: Backoff config
+                description: Backoff configuration
                 x-go-tag-json: backoff
             insecure:
                 default: false

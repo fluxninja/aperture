@@ -872,7 +872,7 @@ BatchAlerts configures batch alerts processor.
 
 <!-- vale on -->
 
-BatchPostrollup configures batch postrollup processor.
+BatchPostrollup configures batch_postrollup processor.
 
 </dd>
 <dt>batch_prerollup</dt>
@@ -884,7 +884,7 @@ BatchPostrollup configures batch postrollup processor.
 
 <!-- vale on -->
 
-BatchPrerollup configures batch prerollup processor.
+BatchPrerollup configures batch_prerollup processor.
 
 </dd>
 <dt>ports</dt>
@@ -1733,7 +1733,7 @@ Use HTTP CONNECT Proxy
 
 <!-- vale on -->
 
-Backoff config
+Backoff configuration
 
 </dd>
 <dt>tls</dt>

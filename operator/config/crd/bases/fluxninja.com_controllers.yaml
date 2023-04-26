@@ -1052,7 +1052,7 @@ spec:
                             description: gRPC client settings.
                             properties:
                               backoff:
-                                description: Backoff config
+                                description: Backoff configuration
                                 properties:
                                   base_delay:
                                     description: Base Delay

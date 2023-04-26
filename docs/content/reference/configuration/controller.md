@@ -1007,7 +1007,7 @@ Use HTTP CONNECT Proxy
 
 <!-- vale on -->
 
-Backoff config
+Backoff configuration
 
 </dd>
 <dt>tls</dt>

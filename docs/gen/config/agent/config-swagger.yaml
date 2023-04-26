@@ -96,11 +96,11 @@ definitions:
                 x-go-tag-json: batch_alerts
             batch_postrollup:
                 $ref: '#/definitions/BatchPostrollupConfig'
-                description: BatchPostrollup configures batch postrollup processor.
+                description: BatchPostrollup configures batch_postrollup processor.
                 x-go-tag-json: batch_postrollup
             batch_prerollup:
                 $ref: '#/definitions/BatchPrerollupConfig'
-                description: BatchPrerollup configures batch prerollup processor.
+                description: BatchPrerollup configures batch_prerollup processor.
                 x-go-tag-json: batch_prerollup
             custom_metrics:
                 additionalProperties:
@@ -622,7 +622,7 @@ definitions:
         properties:
             backoff:
                 $ref: '#/definitions/BackoffConfig'
-                description: Backoff config
+                description: Backoff configuration
                 x-go-tag-json: backoff
             insecure:
                 default: false
