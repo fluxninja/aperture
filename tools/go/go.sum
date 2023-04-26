@@ -86,8 +86,8 @@ github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBd
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/fluxninja/analysis v0.21.2-fn.patch.3 h1:A1829BqfgROVin6LqHELT234hRrwqKkkvdZgh6EZsDg=
 github.com/fluxninja/analysis v0.21.2-fn.patch.3/go.mod h1:4zQ35W4neeZTqh3ol0rv/O8JBbka9QyAgQRPp9y3pfo=
-github.com/fluxninja/go-swagger v0.29.0-fn.patch.12 h1:CdtWzAqYXeTvA9/jUTtVO1zxMVXAJy6QuGlpWEZOtGU=
-github.com/fluxninja/go-swagger v0.29.0-fn.patch.12/go.mod h1:h3zeMrYCz5TLTdB7ECf4pTvYEbvWKC1dkPqgNt1r4r0=
+github.com/fluxninja/go-swagger v0.29.0-fn.patch.13 h1:5SC6FCIXqfljWyG0fdkhUbTuoSqTbwS7v3tj+dTgYBs=
+github.com/fluxninja/go-swagger v0.29.0-fn.patch.13/go.mod h1:h3zeMrYCz5TLTdB7ECf4pTvYEbvWKC1dkPqgNt1r4r0=
 github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmVXmkdnm1bU=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=

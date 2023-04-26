@@ -3132,7 +3132,7 @@ definitions:
         description: |+
           Source code of the Rego module.
 
-          :::Note
+          :::note
 
           Must include a "package" declaration.
 
@@ -3175,37 +3175,10 @@ definitions:
     type: object
     title: Resources that need to be setup for the policy to function
     properties:
-      classifiers:
-        description: |+
-          Classifiers are installed in the data-plane and are used to label the requests based on payload content.
-
-          The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
-
-          Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
-
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/Classifier'
-        x-deprecated: true
-        x-go-tag-validate: deprecated,dive
       flow_control:
         description: FlowControlResources are resources that are provided by flow
           control integration.
         $ref: '#/definitions/FlowControlResources'
-      flux_meters:
-        description: |+
-          Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
-
-          Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
-
-          Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
-
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/FluxMeter'
-        x-deprecated: true
-        x-go-tag-validate: deprecated,dive
   Rule:
     description: |-
       Example of a JSON extractor:
@@ -3221,12 +3194,6 @@ definitions:
       extractor:
         description: High-level declarative extractor.
         $ref: '#/definitions/Extractor'
-      rego:
-        description: |-
-          Rego module to extract a value from.
-
-          Deprecated: 1.5.0
-        $ref: '#/definitions/RuleRego'
       telemetry:
         description: |+
           :::note
@@ -3249,35 +3216,6 @@ definitions:
           propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
         default: true
         x-go-tag-default: "true"
-  RuleRego:
-    description: |-
-      High-level extractor-based rules are compiled into a single Rego query.
-
-      Deprecated: 1.5.0
-    type: object
-    title: Raw Rego rules are compiled 1:1 to Rego queries
-    required:
-    - query
-    - source
-    properties:
-      query:
-        description: |+
-          Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
-
-          Note: The module name must match the package name from the `source`.
-
-        type: string
-        x-deprecated: true
-        x-go-tag-validate: deprecated,required
-      source:
-        description: |+
-          Source code of the Rego module.
-
-          Note: Must include a "package" declaration.
-
-        type: string
-        x-deprecated: true
-        x-go-tag-validate: deprecated,required
   SMA:
     description: Simple Moving Average (SMA) is a type of moving average that computes
       the average of a fixed number of signal readings.
@@ -3455,22 +3393,6 @@ definitions:
         description: Parameters to be used if none of workloads specified in `workloads`
           match.
         $ref: '#/definitions/SchedulerWorkloadParameters'
-      max_timeout:
-        description: |+
-          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-
-        type: string
-        default: 0s
-        x-go-tag-default: 0s
-      timeout_factor:
-        description: |+
-          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-
-        type: number
-        format: double
-        default: 0
-        x-go-tag-default: "0"
-        x-go-tag-validate: gte=0.0
       tokens_label_key:
         description: |+
           Flow label key that will be used to override the number of tokens for this request.

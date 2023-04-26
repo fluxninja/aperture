@@ -1175,47 +1175,6 @@ func (m *Rule) validate(all bool) error {
 			}
 		}
 
-	case *Rule_Rego_:
-		if v == nil {
-			err := RuleValidationError{
-				field:  "Source",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetRego()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, RuleValidationError{
-						field:  "Rego",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, RuleValidationError{
-						field:  "Rego",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetRego()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RuleValidationError{
-					field:  "Rego",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	default:
 		_ = v // ensures v is used
 	}
@@ -4530,109 +4489,6 @@ var _ interface {
 	ErrorName() string
 } = FluxMeter_ExponentialBucketsRangeValidationError{}
 
-// Validate checks the field values on Rule_Rego with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *Rule_Rego) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Rule_Rego with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in Rule_RegoMultiError, or nil
-// if none found.
-func (m *Rule_Rego) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Rule_Rego) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Source
-
-	// no validation rules for Query
-
-	if len(errors) > 0 {
-		return Rule_RegoMultiError(errors)
-	}
-
-	return nil
-}
-
-// Rule_RegoMultiError is an error wrapping multiple validation errors returned
-// by Rule_Rego.ValidateAll() if the designated constraints aren't met.
-type Rule_RegoMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m Rule_RegoMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m Rule_RegoMultiError) AllErrors() []error { return m }
-
-// Rule_RegoValidationError is the validation error returned by
-// Rule_Rego.Validate if the designated constraints aren't met.
-type Rule_RegoValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e Rule_RegoValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e Rule_RegoValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e Rule_RegoValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e Rule_RegoValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e Rule_RegoValidationError) ErrorName() string { return "Rule_RegoValidationError" }
-
-// Error satisfies the builtin error interface
-func (e Rule_RegoValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRule_Rego.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = Rule_RegoValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = Rule_RegoValidationError{}
-
 // Validate checks the field values on Rego_LabelProperties with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -5625,37 +5481,6 @@ func (m *Scheduler_Parameters) validate(all bool) error {
 	}
 
 	// no validation rules for AutoTokens
-
-	// no validation rules for TimeoutFactor
-
-	if all {
-		switch v := interface{}(m.GetMaxTimeout()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Scheduler_ParametersValidationError{
-					field:  "MaxTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, Scheduler_ParametersValidationError{
-					field:  "MaxTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetMaxTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Scheduler_ParametersValidationError{
-				field:  "MaxTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
 
 	if all {
 		switch v := interface{}(m.GetDecisionDeadlineMargin()).(type) {

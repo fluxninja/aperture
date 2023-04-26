@@ -7,12 +7,6 @@
   withExtractorMixin(extractor):: {
     extractor+: extractor,
   },
-  withRego(rego):: {
-    rego: rego,
-  },
-  withRegoMixin(rego):: {
-    rego+: rego,
-  },
   withTelemetry(telemetry):: {
     telemetry: telemetry,
   },

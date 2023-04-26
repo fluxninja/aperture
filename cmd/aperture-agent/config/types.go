@@ -77,7 +77,7 @@ type AgentOTelConfig struct {
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
 
-// BatchPrerol[.*?]upConfig defines configuration for OTel batch processor.
+// BatchPrerollupConfig defines configuration for OTel batch processor.
 // +kubebuilder:object:generate=true
 //
 //swagger:model
