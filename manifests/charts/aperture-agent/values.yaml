@@ -322,6 +322,9 @@ agent:
   ## @param agent.namespaceScoped Specifies whether the Aperture Agent installation should be namespace-scoped, avoiding the creation of cluster-level resources. This takes precedence over agent.create.
   ##
   namespaceScoped: false
+  ## @param agent.replicaCount Specifies the number of replicas for the Aperture Agent deployment. Only applicable when .Values.agent.namespaceScoped is set to true.
+  ##
+  replicaCount: 1
   ## @param agent.controllerCert.cmName Specifies the name of the ConfigMap containing the client certificate for Controller. Used when .Values.agent.namespaceScoped is true.
   ## @param agent.controllerCert.certFileName Specifies the key for Cert file in the ConfigMap containing the client certificate for Controller.
   ##

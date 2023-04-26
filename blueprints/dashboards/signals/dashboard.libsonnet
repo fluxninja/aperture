@@ -47,7 +47,7 @@ function(cfg) {
 
   local InvalidFrequencyPanel =
     local query = |||
-      avg by (valid) (rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))
+      avg(rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))
     ||| % { policy_name: policyName };
     local target =
       grafana.prometheus.target(query) +
