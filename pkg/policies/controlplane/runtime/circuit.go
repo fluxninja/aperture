@@ -57,22 +57,25 @@ func newCircuitMetrics() *CircuitMetrics {
 			},
 			circuitMetricsLabels,
 		),
-		InvalidSignalReadingsTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
-			Name: metrics.InvalidSignalReadingsTotal,
-			Help: "The number of invalid readings from a signal",
-		}, []string{metrics.PolicyNameLabel}),
+		InvalidSignalReadingsTotal: prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: metrics.InvalidSignalReadingsTotal,
+				Help: "The number of invalid readings from a signal",
+			},
+			circuitMetricsLabels,
+		),
 	}
 	return &circuitMetrics
 }
 
 func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.Lifecycle) {
 	type metric struct {
-		name   string
 		metric prometheus.Collector
+		name   string
 	}
 	circuitMetrics := []metric{
-		{metrics.SignalReadingMetricName, circuitMetrics.SignalSummaryVec},
-		{metrics.InvalidSignalReadingsTotal, circuitMetrics.InvalidSignalReadingsTotal},
+		{circuitMetrics.SignalSummaryVec, metrics.SignalReadingMetricName},
+		{circuitMetrics.InvalidSignalReadingsTotal, metrics.InvalidSignalReadingsTotal},
 	}
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
