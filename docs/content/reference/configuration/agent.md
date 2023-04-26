@@ -872,7 +872,7 @@ BatchAlerts configures batch alerts processor.
 
 <!-- vale on -->
 
-BatchPostrollup configures batch_postrollup processor.
+BatchPostrollup configures batch post rollup processor.
 
 </dd>
 <dt>batch_prerollup</dt>
@@ -884,7 +884,7 @@ BatchPostrollup configures batch_postrollup processor.
 
 <!-- vale on -->
 
-BatchPrerollup configures batch_prerollup processor.
+BatchPrerollup configures batch pre rollup processor.
 
 </dd>
 <dt>ports</dt>

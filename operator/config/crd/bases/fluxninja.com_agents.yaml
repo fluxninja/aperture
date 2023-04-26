@@ -1489,7 +1489,8 @@ spec:
                             type: string
                         type: object
                       batch_postrollup:
-                        description: BatchPostrollup configures batch_postrollup processor.
+                        description: BatchPostrollup configures batch post rollup
+                          processor.
                         properties:
                           send_batch_max_size:
                             description: SendBatchMaxSize is the upper limit of the
@@ -1508,7 +1509,7 @@ spec:
                             type: string
                         type: object
                       batch_prerollup:
-                        description: BatchPrerollup configures batch_prerollup processor.
+                        description: BatchPrerollup configures batch pre rollup processor.
                         properties:
                           send_batch_max_size:
                             description: SendBatchMaxSize is the upper limit of the

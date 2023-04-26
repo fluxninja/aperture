@@ -58,9 +58,9 @@ type AgentOTelConfig struct {
 	otelconfig.CommonOTelConfig `json:",inline"`
 	// DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 	DisableKubernetesScraper bool `json:"disable_kubernetes_scraper" default:"false"`
-	// BatchPrerollup configures batch_prerollup processor.
+	// BatchPrerollup configures batch pre rollup processor.
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
-	// BatchPostrollup configures batch_postrollup processor.
+	// BatchPostrollup configures batch post rollup processor.
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
 	// CustomMetrics configures custom metrics OTel pipelines, which will send data to
 	// the controller Prometheus.

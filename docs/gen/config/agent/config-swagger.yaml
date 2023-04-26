@@ -96,11 +96,11 @@ definitions:
                 x-go-tag-json: batch_alerts
             batch_postrollup:
                 $ref: '#/definitions/BatchPostrollupConfig'
-                description: BatchPostrollup configures batch_postrollup processor.
+                description: BatchPostrollup configures batch post rollup processor.
                 x-go-tag-json: batch_postrollup
             batch_prerollup:
                 $ref: '#/definitions/BatchPrerollupConfig'
-                description: BatchPrerollup configures batch_prerollup processor.
+                description: BatchPrerollup configures batch pre rollup processor.
                 x-go-tag-json: batch_prerollup
             custom_metrics:
                 additionalProperties:
