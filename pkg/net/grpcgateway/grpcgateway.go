@@ -48,7 +48,7 @@ type Constructor struct {
 // swagger:model
 type GRPCGatewayConfig struct {
 	// gRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs gRPC and HTTP servers on the same port
-	GRPCAddr string `json:"grpc_server_address" validate:"hostname_port" default:"0.0.0.0:1"`
+	GRPCAddr string `json:"grpc_server_address" validate:"omitempty,hostname_port"`
 }
 
 // GRPCGateway holds fields required for grpc-http gateway.
@@ -175,7 +175,7 @@ func (constructor Constructor) setupGRPCGateway(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			if gw.grpcAddr == "0.0.0.0:1" {
+			if gw.grpcAddr == "" {
 				gw.grpcAddr = httpServer.Listener.GetListener().Addr().String()
 			}
 
