@@ -80,15 +80,10 @@ func main() {
 		grpcClient:     apertureAgentGRPCClient,
 	}
 
-	// do some business logic to collect labels
-	labels := map[string]string{
-		"user": "kenobi",
-	}
-
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", labels))
+	superRouter.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", nil))
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
