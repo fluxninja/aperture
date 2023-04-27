@@ -255,7 +255,7 @@ func setupLoadSchedulerFactory(
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_Workload_Parameters
+	matchedWorkloads map[int]*policylangv1.LoadScheduler_Scheduler_Workload_Parameters
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -318,7 +318,7 @@ func (conLimiterFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 	}
 	// default workload params is not a required param so it can be nil
 	if conLimiter.defaultWorkloadParametersMsg == nil {
-		conLimiter.defaultWorkloadParametersMsg = &policylangv1.Scheduler_Workload_Parameters{}
+		conLimiter.defaultWorkloadParametersMsg = &policylangv1.LoadScheduler_Scheduler_Workload_Parameters{}
 		config.SetDefaults(conLimiter.defaultWorkloadParametersMsg)
 	}
 
@@ -330,14 +330,14 @@ func (conLimiterFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 }
 
 type workloadMatcher struct {
-	workloadProto *policylangv1.Scheduler_Workload
+	workloadProto *policylangv1.LoadScheduler_Scheduler_Workload
 	workloadIndex int
 }
 
 func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
 	// mmr.matchedWorkloads is nil on first match.
 	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload_Parameters)
+		mmr.matchedWorkloads = make(map[int]*policylangv1.LoadScheduler_Scheduler_Workload_Parameters)
 	}
 	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetParameters()
 	return mmr
@@ -354,8 +354,8 @@ type loadScheduler struct {
 	loadSchedulerFactory         *loadSchedulerFactory
 	autoTokens                   *autoTokens
 	workloadMultiMatcher         *multiMatcher
-	defaultWorkloadParametersMsg *policylangv1.Scheduler_Workload_Parameters
-	schedulerParameters          *policylangv1.Scheduler_Parameters
+	defaultWorkloadParametersMsg *policylangv1.LoadScheduler_Scheduler_Workload_Parameters
+	schedulerParameters          *policylangv1.LoadScheduler_Scheduler_Parameters
 }
 
 // Make sure LoadScheduler implements the iface.LoadScheduler.
@@ -488,7 +488,7 @@ func (conLimiter *loadScheduler) GetFlowSelector() *policylangv1.FlowSelector {
 func (conLimiter *loadScheduler) Decide(ctx context.Context,
 	labels map[string]string,
 ) *flowcontrolv1.LimiterDecision {
-	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
+	var matchedWorkloadProto *policylangv1.LoadScheduler_Scheduler_Workload_Parameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
 	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels))

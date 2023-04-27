@@ -27,16 +27,16 @@ import (
 )
 
 var (
-	concurrencyQueryInterval = time.Second * 1
-	tokensQueryInterval      = time.Second * 10
+	tokenRateQueryInterval  = time.Second * 1
+	autoTokensQueryInterval = time.Second * 10
 )
 
-// Scheduler is part of the concurrency control component stack.
+// Scheduler is part of the LoadScheduler component stack.
 type Scheduler struct {
 	policyReadAPI iface.Policy
-	// Prometheus query for accepted concurrency
+	// Prometheus query for accepted token rate
 	acceptedQuery *promql.ScalarQuery
-	// Prometheus query for incoming concurrency
+	// Prometheus query for incoming token rate
 	incomingQuery *promql.ScalarQuery
 	// Prometheus query for tokens based on ms latency
 	tokensQuery *promql.TaggedQuery
@@ -63,7 +63,7 @@ func (*Scheduler) IsActuator() bool { return false }
 
 // NewSchedulerAndOptions creates scheduler and its fx options.
 func NewSchedulerAndOptions(
-	schedulerProto *policylangv1.Scheduler,
+	schedulerProto *policylangv1.LoadScheduler_Scheduler,
 	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroupName string,
@@ -95,10 +95,10 @@ func NewSchedulerAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
 			metrics.AcceptedTokensMetricName,
 			policyParams),
-		concurrencyQueryInterval,
+		tokenRateQueryInterval,
 		componentID,
 		policyReadAPI,
-		"AcceptedConcurrency",
+		"AcceptedTokenRate",
 	)
 	if acceptedQueryErr != nil {
 		return nil, fx.Options(), acceptedQueryErr
@@ -109,10 +109,10 @@ func NewSchedulerAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
 			metrics.IncomingTokensMetricName,
 			policyParams),
-		concurrencyQueryInterval,
+		tokenRateQueryInterval,
 		componentID,
 		policyReadAPI,
-		"IncomingConcurrency",
+		"IncomingTokenRate",
 	)
 	if incomingQueryErr != nil {
 		return nil, nil, incomingQueryErr
@@ -133,7 +133,7 @@ func NewSchedulerAndOptions(
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencyCountMetricName,
 				autoTokensPolicyParams),
-			tokensQueryInterval,
+			autoTokensQueryInterval,
 			componentID,
 			policyReadAPI,
 			"Tokens",
@@ -240,7 +240,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 	} else {
 		acceptedReading = runtime.NewReading(acceptedValue)
 	}
-	outPortReadings["accepted_concurrency"] = []runtime.Reading{acceptedReading}
+	outPortReadings["accepted_token_rate"] = []runtime.Reading{acceptedReading}
 
 	incomingScalarResult, err := s.incomingQuery.ExecuteScalarQuery(tickInfo)
 	incomingValue := incomingScalarResult.Value
@@ -252,7 +252,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 	} else {
 		incomingReading = runtime.NewReading(incomingValue)
 	}
-	outPortReadings["incoming_concurrency"] = []runtime.Reading{incomingReading}
+	outPortReadings["incoming_token_rate"] = []runtime.Reading{incomingReading}
 
 	return outPortReadings, errMulti
 }

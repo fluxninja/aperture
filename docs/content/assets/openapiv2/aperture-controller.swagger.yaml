@@ -372,7 +372,7 @@ definitions:
           Scheduler parameters.
 
         x-go-tag-validate: required
-        $ref: '#/definitions/SchedulerParameters'
+        $ref: '#/definitions/LoadSchedulerSchedulerParameters'
   AdaptiveLoadSchedulerIns:
     description: Inputs for the _Adaptive Load Scheduler_ component.
     type: object
@@ -2523,7 +2523,7 @@ definitions:
           output signals.
 
         x-go-tag-validate: required
-        $ref: '#/definitions/Scheduler'
+        $ref: '#/definitions/LoadSchedulerScheduler'
   LoadSchedulerActuator:
     type: object
     title: Takes the load multiplier input signal and publishes it to the schedulers
@@ -2556,6 +2556,190 @@ definitions:
           Load multiplier is proportion of [incoming
           token rate](#scheduler-outs) that needs to be accepted.
         $ref: '#/definitions/InPort'
+  LoadSchedulerScheduler:
+    type: object
+    properties:
+      out_ports:
+        description: Output ports for the Scheduler component.
+        $ref: '#/definitions/LoadSchedulerSchedulerOuts'
+      parameters:
+        description: |+
+          Scheduler parameters.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/LoadSchedulerSchedulerParameters'
+  LoadSchedulerSchedulerOuts:
+    description: Output for the Scheduler component.
+    type: object
+    properties:
+      accepted_token_rate:
+        description: |-
+          Accepted token rate is the tokens admitted per second by the scheduler.
+          Value of this signal is aggregated from all the relevant schedulers.
+        $ref: '#/definitions/OutPort'
+      incoming_token_rate:
+        description: |-
+          Incoming token rate is the incoming tokens per second for all the
+          flows entering the scheduler including the rejected ones.
+
+          This is computed similar to `accepted_token_rate`,
+          by summing up tokens from all the flows entering scheduler.
+        $ref: '#/definitions/OutPort'
+  LoadSchedulerSchedulerParameters:
+    type: object
+    title: Scheduler parameters
+    properties:
+      auto_tokens:
+        description: |+
+          Automatically estimate the size of a flow in each workload, based on
+          historical latency. Each workload's `tokens` will be set to average
+          latency of flows in that workload during last few seconds (exact duration
+          of this average can change).
+          This setting is useful in concurrency limiting use-case, where the
+          concurrency is calculated as (avg. latency \* in-flight flows).
+
+          The value of tokens estimated by `auto_tokens` takes lower precedence
+          than the value of `tokens` specified in the workload definition
+          and `tokens` explicitly specified in the flow labels.
+
+        type: boolean
+        default: false
+        x-go-tag-default: "false"
+      decision_deadline_margin:
+        description: |+
+          Decision deadline margin is the amount of time that the scheduler will
+          subtract from the request deadline to determine the deadline for the
+          decision. This is to ensure that the scheduler has enough time to
+          make a decision before the request deadline happens, accounting for
+          processing delays.
+          The request deadline is based on the
+          [gRPC deadline](https://grpc.io/blog/deadlines) or the
+          [`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+
+          Fail-open logic is use for flow control APIs, so if the gRPC deadline
+          reaches, the flow will end up being unconditionally allowed while
+          it is still waiting on the scheduler.
+
+        type: string
+        default: 0.01s
+        x-go-tag-default: 0.01s
+      default_workload_parameters:
+        description: Parameters to be used if none of workloads specified in `workloads`
+          match.
+        $ref: '#/definitions/LoadSchedulerSchedulerWorkloadParameters'
+      max_timeout:
+        description: |+
+          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+        type: string
+        default: 0s
+        x-go-tag-default: 0s
+      timeout_factor:
+        description: |+
+          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+        type: number
+        format: double
+        default: 0
+        x-go-tag-default: "0"
+        x-go-tag-validate: gte=0.0
+      tokens_label_key:
+        description: |+
+          * Key for a flow label that can be used to override the default number of tokens for this flow.
+          * The value associated with this key must be a valid uint64 number.
+          * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+
+        type: string
+        default: tokens
+        x-go-tag-default: tokens
+      workloads:
+        description: |+
+          List of workloads to be used in scheduler.
+
+          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+          allows for load-shedding to be "intelligent" compared to random rejections.
+          There are two aspects of this "intelligence":
+          * Scheduler can more precisely calculate concurrency if it understands
+            that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
+          * Setting different priorities to different workloads lets the scheduler
+            avoid dropping important traffic during overload.
+
+          Each workload in this list specifies also a matcher that is used to
+          determine which flow will be categorized into which workload.
+          In case of multiple matching workloads, the first matching one will be used.
+          If none of workloads match, `default_workload` will be used.
+
+          :::info
+
+          See also [workload definition in the concepts
+          section](/concepts/flow-control/components/load-scheduler.md#workload).
+
+          :::
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/LoadSchedulerSchedulerWorkload'
+        x-go-tag-validate: dive
+  LoadSchedulerSchedulerWorkload:
+    description: Workload defines a class of flows that preferably have similar properties
+      such as response latency and desired priority.
+    type: object
+    properties:
+      label_matcher:
+        description: |+
+          Label Matcher to select a Workload based on
+          [flow labels](/concepts/flow-control/flow-label.md).
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/LabelMatcher'
+      parameters:
+        description: |+
+          Parameters associated with flows matching the label matcher.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/LoadSchedulerSchedulerWorkloadParameters'
+  LoadSchedulerSchedulerWorkloadParameters:
+    description: |-
+      Parameters such as priority, tokens and fairness key that
+      are applicable to flows within a workload.
+    type: object
+    properties:
+      fairness_key:
+        description: |-
+          Fairness key is a label key that can be used to provide fairness within a workload.
+          Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
+          you have a classifier that sets `user` flow label, you might want to set
+          `fairness_key = "user"`.
+        type: string
+      priority:
+        description: |+
+          $$
+          \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+          $$
+
+        type: integer
+        format: int64
+        title: |-
+          Describes priority level of the flows within the workload.
+          Priority level ranges from 0 to 255.
+          Higher numbers means higher priority level.
+          Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+        default: 0
+        maximum: 255
+        minimum: 0
+        x-go-tag-default: "0"
+        x-go-tag-validate: gte=0,lte=255
+      tokens:
+        description: |-
+          Tokens determines the cost of admitting a single flow in the workload,
+          which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
+          simply equal to 1 if the resource being accessed is constrained by the
+          number of flows (3rd party rate limiters).
+          This override is applicable only if tokens for the flow aren't specified
+          in the flow labels.
+        type: string
+        format: uint64
   LoadShaper:
     description: |-
       The _Load Shaper_ produces a smooth and continuous traffic load
@@ -3762,15 +3946,9 @@ definitions:
     type: object
     properties:
       accepted_concurrency:
-        title: |-
+        description: |-
           Accepted concurrency is actual concurrency on a control point that this
           scheduler is applied on.
-          Value of this signal is aggregated from all the relevant schedulers.
-          Deprecated: 1.6.0
-        $ref: '#/definitions/OutPort'
-      accepted_token_rate:
-        description: |-
-          Accepted token rate is the tokens admitted per second by the scheduler.
           Value of this signal is aggregated from all the relevant schedulers.
         $ref: '#/definitions/OutPort'
       incoming_concurrency:
@@ -3781,15 +3959,6 @@ definitions:
           This is computed in the same way as `accepted_concurrency`,
           by summing up tokens from all the flows entering scheduler,
           including rejected ones.
-          Deprecated: 1.6.0
-        $ref: '#/definitions/OutPort'
-      incoming_token_rate:
-        description: |-
-          Incoming token rate is the incoming tokens per second for all the
-          flows entering the scheduler including the rejected ones.
-
-          This is computed similar to `accepted_token_rate`,
-          by summing up tokens from all the flows entering scheduler.
         $ref: '#/definitions/OutPort'
   SchedulerParameters:
     type: object

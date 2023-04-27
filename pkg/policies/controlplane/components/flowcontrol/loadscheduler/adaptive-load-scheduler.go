@@ -10,80 +10,80 @@ import (
 )
 
 const (
-	aimdSignalPortName                 = "signal"
-	aimdSetpointPortName               = "setpoint"
-	aimdEnabledPortName                = "enabled"
-	aimdIsOverloadPortName             = "is_overload"
-	aimdDesiredLoadMultiplierPortName  = "desired_load_multiplier"
-	aimdObservedLoadMultiplierPortName = "observed_load_multiplier"
-	aimdAcceptedConcurrencyPortName    = "accepted_concurrency"
-	aimdIncomingConcurrencyPortName    = "incoming_concurrency"
+	alsSignalPortName                 = "signal"
+	alsSetpointPortName               = "setpoint"
+	alsEnabledPortName                = "enabled"
+	alsIsOverloadPortName             = "is_overload"
+	alsDesiredLoadMultiplierPortName  = "desired_load_multiplier"
+	alsObservedLoadMultiplierPortName = "observed_load_multiplier"
+	alsAcceptedTokenRatePortName      = "accepted_token_rate"
+	alsIncomingTokenRatePortName      = "incoming_token_rate"
 )
 
-// ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns its nested circuit representation.
-func ParseAIMDConcurrencyController(
-	aimdConcurrencyController *policylangv1.AIMDConcurrencyController,
+// ParseAdaptiveLoadScheduler parses and returns nested circuit representation of AdaptiveLoadScheduler.
+func ParseAdaptiveLoadScheduler(
+	adaptiveLoadScheduler *policylangv1.AdaptiveLoadScheduler,
 ) (*policylangv1.NestedCircuit, error) {
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
-	inPorts := aimdConcurrencyController.InPorts
+	inPorts := adaptiveLoadScheduler.InPorts
 	if inPorts != nil {
 		signalPort := inPorts.Signal
 		if signalPort != nil {
-			nestedInPortsMap[aimdSignalPortName] = signalPort
+			nestedInPortsMap[alsSignalPortName] = signalPort
 		}
 		setpointPort := inPorts.Setpoint
 		if setpointPort != nil {
-			nestedInPortsMap[aimdSetpointPortName] = setpointPort
+			nestedInPortsMap[alsSetpointPortName] = setpointPort
 		}
 		enabled := inPorts.Enabled
 		if enabled != nil {
-			nestedInPortsMap[aimdEnabledPortName] = enabled
+			nestedInPortsMap[alsEnabledPortName] = enabled
 		}
 	}
 
 	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
-	outPorts := aimdConcurrencyController.OutPorts
+	outPorts := adaptiveLoadScheduler.OutPorts
 	if outPorts != nil {
 		isOverloadPort := outPorts.IsOverload
 		if isOverloadPort != nil {
-			nestedOutPortsMap[aimdIsOverloadPortName] = isOverloadPort
+			nestedOutPortsMap[alsIsOverloadPortName] = isOverloadPort
 		}
 		desiredLoadMultiplierPort := outPorts.DesiredLoadMultiplier
 		if desiredLoadMultiplierPort != nil {
-			nestedOutPortsMap[aimdDesiredLoadMultiplierPortName] = desiredLoadMultiplierPort
+			nestedOutPortsMap[alsDesiredLoadMultiplierPortName] = desiredLoadMultiplierPort
 		}
 		observedLoadMultiplierPort := outPorts.ObservedLoadMultiplier
 		if observedLoadMultiplierPort != nil {
-			nestedOutPortsMap[aimdObservedLoadMultiplierPortName] = observedLoadMultiplierPort
+			nestedOutPortsMap[alsObservedLoadMultiplierPortName] = observedLoadMultiplierPort
 		}
-		acceptedConcurrencyPort := outPorts.AcceptedConcurrency
-		if acceptedConcurrencyPort != nil {
-			nestedOutPortsMap[aimdAcceptedConcurrencyPortName] = acceptedConcurrencyPort
+		acceptedTokenRatePort := outPorts.AcceptedTokenRate
+		if acceptedTokenRatePort != nil {
+			nestedOutPortsMap[alsAcceptedTokenRatePortName] = acceptedTokenRatePort
 		}
-		incomingConcurrencyPort := outPorts.IncomingConcurrency
-		if incomingConcurrencyPort != nil {
-			nestedOutPortsMap[aimdIncomingConcurrencyPortName] = incomingConcurrencyPort
+		incomingTokenRatePort := outPorts.IncomingTokenRate
+		if incomingTokenRatePort != nil {
+			nestedOutPortsMap[alsIncomingTokenRatePortName] = incomingTokenRatePort
 		}
 	}
 
 	isOverloadDeciderOperator := "gt"
 	// if slope is greater than 0 then we want to use less than operator
-	if aimdConcurrencyController.GradientParameters.Slope > 0 {
+	if adaptiveLoadScheduler.GradientParameters.Slope > 0 {
 		isOverloadDeciderOperator = "lt"
 	}
 
-	alerterLabels := aimdConcurrencyController.AlerterParameters.Labels
+	alerterLabels := adaptiveLoadScheduler.AlerterParameters.Labels
 	if alerterLabels == nil {
 		alerterLabels = make(map[string]string)
 	}
-	alerterLabels["type"] = "concurrency_limiter"
-	alerterLabels["agent_group"] = aimdConcurrencyController.FlowSelector.ServiceSelector.GetAgentGroup()
-	alerterLabels["service"] = aimdConcurrencyController.FlowSelector.ServiceSelector.GetService()
-	aimdConcurrencyController.AlerterParameters.Labels = alerterLabels
+	alerterLabels["type"] = "load_scheduler"
+	alerterLabels["agent_group"] = adaptiveLoadScheduler.FlowSelector.ServiceSelector.GetAgentGroup()
+	alerterLabels["service"] = adaptiveLoadScheduler.FlowSelector.ServiceSelector.GetService()
+	adaptiveLoadScheduler.AlerterParameters.Labels = alerterLabels
 
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "AIMDConcurrencyController",
-		ShortDescription: iface.GetServiceShortDescription(aimdConcurrencyController.FlowSelector.ServiceSelector),
+		Name:             "AdaptiveLoadScheduler",
+		ShortDescription: iface.GetServiceShortDescription(adaptiveLoadScheduler.FlowSelector.ServiceSelector),
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
@@ -94,12 +94,12 @@ func ParseAIMDConcurrencyController(
 						InPorts: &policylangv1.ArithmeticCombinator_Ins{
 							Lhs: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_CONCURRENCY",
+									SignalName: "ACCEPTED_TOKEN_RATE",
 								},
 							},
 							Rhs: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "INCOMING_CONCURRENCY",
+									SignalName: "INCOMING_TOKEN_RATE",
 								},
 							},
 						},
@@ -114,7 +114,7 @@ func ParseAIMDConcurrencyController(
 			{
 				Component: &policylangv1.Component_GradientController{
 					GradientController: &policylangv1.GradientController{
-						Parameters: aimdConcurrencyController.GradientParameters,
+						Parameters: adaptiveLoadScheduler.GradientParameters,
 						InPorts: &policylangv1.GradientController_Ins{
 							ControlVariable: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -125,7 +125,7 @@ func ParseAIMDConcurrencyController(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: aimdConcurrencyController.MaxLoadMultiplier,
+											Value: adaptiveLoadScheduler.MaxLoadMultiplier,
 										},
 									},
 								},
@@ -239,29 +239,27 @@ func ParseAIMDConcurrencyController(
 			{
 				Component: &policylangv1.Component_FlowControl{
 					FlowControl: &policylangv1.FlowControl{
-						Component: &policylangv1.FlowControl_ConcurrencyLimiter{
-							ConcurrencyLimiter: &policylangv1.ConcurrencyLimiter{
-								FlowSelector: aimdConcurrencyController.FlowSelector,
-								Scheduler: &policylangv1.Scheduler{
-									Parameters: aimdConcurrencyController.SchedulerParameters,
-									OutPorts: &policylangv1.Scheduler_Outs{
-										AcceptedConcurrency: &policylangv1.OutPort{
-											SignalName: "ACCEPTED_CONCURRENCY",
+						Component: &policylangv1.FlowControl_LoadScheduler{
+							LoadScheduler: &policylangv1.LoadScheduler{
+								FlowSelector: adaptiveLoadScheduler.FlowSelector,
+								Scheduler: &policylangv1.LoadScheduler_Scheduler{
+									Parameters: adaptiveLoadScheduler.SchedulerParameters,
+									OutPorts: &policylangv1.LoadScheduler_Scheduler_Outs{
+										AcceptedTokenRate: &policylangv1.OutPort{
+											SignalName: "ACCEPTED_TOKEN_RATE",
 										},
-										IncomingConcurrency: &policylangv1.OutPort{
-											SignalName: "INCOMING_CONCURRENCY",
+										IncomingTokenRate: &policylangv1.OutPort{
+											SignalName: "INCOMING_TOKEN_RATE",
 										},
 									},
 								},
-								ActuationStrategy: &policylangv1.ConcurrencyLimiter_LoadActuator{
-									LoadActuator: &policylangv1.LoadActuator{
-										DynamicConfigKey: aimdConcurrencyController.DynamicConfigKey,
-										DefaultConfig:    aimdConcurrencyController.DefaultConfig,
-										InPorts: &policylangv1.LoadActuator_Ins{
-											LoadMultiplier: &policylangv1.InPort{
-												Value: &policylangv1.InPort_SignalName{
-													SignalName: "DESIRED_LOAD_MULTIPLIER",
-												},
+								Actuator: &policylangv1.LoadScheduler_Actuator{
+									DynamicConfigKey: adaptiveLoadScheduler.DynamicConfigKey,
+									DefaultConfig:    adaptiveLoadScheduler.DefaultConfig,
+									InPorts: &policylangv1.LoadScheduler_Actuator_Ins{
+										LoadMultiplier: &policylangv1.InPort{
+											Value: &policylangv1.InPort_SignalName{
+												SignalName: "DESIRED_LOAD_MULTIPLIER",
 											},
 										},
 									},
@@ -302,7 +300,7 @@ func ParseAIMDConcurrencyController(
 			{
 				Component: &policylangv1.Component_Alerter{
 					Alerter: &policylangv1.Alerter{
-						Parameters: aimdConcurrencyController.AlerterParameters,
+						Parameters: adaptiveLoadScheduler.AlerterParameters,
 						InPorts: &policylangv1.Alerter_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -347,7 +345,7 @@ func ParseAIMDConcurrencyController(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: aimdConcurrencyController.LoadMultiplierLinearIncrement,
+											Value: adaptiveLoadScheduler.LoadMultiplierLinearIncrement,
 										},
 									},
 								},
@@ -356,7 +354,7 @@ func ParseAIMDConcurrencyController(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: aimdConcurrencyController.MaxLoadMultiplier,
+											Value: adaptiveLoadScheduler.MaxLoadMultiplier,
 										},
 									},
 								},
@@ -378,14 +376,14 @@ func ParseAIMDConcurrencyController(
 		},
 	}
 
-	components.AddNestedIngress(nestedCircuit, aimdSignalPortName, "SIGNAL")
-	components.AddNestedIngress(nestedCircuit, aimdSetpointPortName, "SETPOINT")
-	components.AddNestedIngress(nestedCircuit, aimdEnabledPortName, "ENABLED")
-	components.AddNestedEgress(nestedCircuit, aimdIsOverloadPortName, "IS_OVERLOAD")
-	components.AddNestedEgress(nestedCircuit, aimdDesiredLoadMultiplierPortName, "DESIRED_LOAD_MULTIPLIER")
-	components.AddNestedEgress(nestedCircuit, aimdObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
-	components.AddNestedEgress(nestedCircuit, aimdAcceptedConcurrencyPortName, "ACCEPTED_CONCURRENCY")
-	components.AddNestedEgress(nestedCircuit, aimdIncomingConcurrencyPortName, "INCOMING_CONCURRENCY")
+	components.AddNestedIngress(nestedCircuit, alsSignalPortName, "SIGNAL")
+	components.AddNestedIngress(nestedCircuit, alsSetpointPortName, "SETPOINT")
+	components.AddNestedIngress(nestedCircuit, alsEnabledPortName, "ENABLED")
+	components.AddNestedEgress(nestedCircuit, alsIsOverloadPortName, "IS_OVERLOAD")
+	components.AddNestedEgress(nestedCircuit, alsDesiredLoadMultiplierPortName, "DESIRED_LOAD_MULTIPLIER")
+	components.AddNestedEgress(nestedCircuit, alsObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
+	components.AddNestedEgress(nestedCircuit, alsAcceptedTokenRatePortName, "ACCEPTED_TOKEN_RATE")
+	components.AddNestedEgress(nestedCircuit, alsIncomingTokenRatePortName, "INCOMING_TOKEN_RATE")
 
 	return nestedCircuit, nil
 }

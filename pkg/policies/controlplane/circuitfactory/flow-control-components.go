@@ -63,6 +63,53 @@ func newFlowControlCompositeAndOptions(
 		isLoadScheduler = true
 	}
 
+	adaptiveLoadSchedulerProto := &policylangv1.AdaptiveLoadScheduler{}
+	isAdaptiveLoadScheduler := false
+	if proto := flowControlComponentProto.GetAdaptiveLoadScheduler(); proto != nil {
+		adaptiveLoadSchedulerProto = proto
+		isAdaptiveLoadScheduler = true
+	} else if aimdConcurrencyControllerProto := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyControllerProto != nil {
+		// Convert from *policylangv1.FlowControl_AimdConcurrencyController to *policylangv1.FlowControl_AdaptiveLoadScheduler since they have mostly same fields
+		jsonStr, err := json.Marshal(aimdConcurrencyControllerProto)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error marshaling AimdConcurrencyController to JSON: %v", err)
+		}
+
+		// Unmarshal the JSON into a map
+		var data map[string]interface{}
+		if err2 := json.Unmarshal(jsonStr, &data); err2 != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON: %v", err)
+		}
+
+		// Modify the .out_ports.accepted_concurrency and .out_ports.incoming_concurrency fields in the JSON to .out_ports.accepted_token_rate and .out_ports.incoming_token_rate since the field name changed
+		outPorts := data["out_ports"]
+		if outPorts != nil {
+			outPortsMap := outPorts.(map[string]interface{})
+			acceptedConcurrency := outPortsMap["accepted_concurrency"]
+			if acceptedConcurrency != nil {
+				outPortsMap["accepted_token_rate"] = acceptedConcurrency
+				delete(outPortsMap, "accepted_concurrency")
+			}
+			incomingConcurrency := outPortsMap["incoming_concurrency"]
+			if incomingConcurrency != nil {
+				outPortsMap["incoming_token_rate"] = incomingConcurrency
+				delete(outPortsMap, "incoming_concurrency")
+			}
+		}
+
+		// Marshal the modified map back into JSON
+		newJSONStr, err := json.Marshal(data)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error marshaling modified JSON: %v", err)
+		}
+
+		err = protojson.Unmarshal(newJSONStr, adaptiveLoadSchedulerProto)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to AdaptiveLoadScheduler: %v", err)
+		}
+		isAdaptiveLoadScheduler = true
+	}
+
 	loadRampProto := &policylangv1.LoadRamp{}
 	isLoadRamp := false
 	if proto := flowControlComponentProto.GetLoadRamp(); proto != nil {
@@ -177,8 +224,8 @@ func newFlowControlCompositeAndOptions(
 		tree.Node = loadSchedulerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
-	} else if aimdConcurrencyController := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
-		nestedCircuit, err := loadscheduler.ParseAIMDConcurrencyController(aimdConcurrencyController)
+	} else if isAdaptiveLoadScheduler {
+		nestedCircuit, err := loadscheduler.ParseAdaptiveLoadScheduler(adaptiveLoadSchedulerProto)
 		if err != nil {
 			return retErr(err)
 		}

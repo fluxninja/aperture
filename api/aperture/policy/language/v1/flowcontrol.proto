@@ -698,6 +698,132 @@ message ConcurrencyLimiter {
 // LoadScheduler configuration is split into two parts: An actuation
 // strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 message LoadScheduler {
+  message Scheduler {
+    // Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
+    message Workload {
+      // Parameters such as priority, tokens and fairness key that
+      // are applicable to flows within a workload.
+      message Parameters {
+        // Describes priority level of the flows within the workload.
+        // Priority level ranges from 0 to 255.
+        // Higher numbers means higher priority level.
+        // Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+        //
+        // $$
+        // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+        // $$
+        //
+        uint32 priority = 1; // @gotags: validate:"gte=0,lte=255" default:"0"
+
+        // Tokens determines the cost of admitting a single flow in the workload,
+        // which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
+        // simply equal to 1 if the resource being accessed is constrained by the
+        // number of flows (3rd party rate limiters).
+        // This override is applicable only if tokens for the flow aren't specified
+        // in the flow labels.
+        uint64 tokens = 2;
+
+        // Fairness key is a label key that can be used to provide fairness within a workload.
+        // Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
+        // you have a classifier that sets `user` flow label, you might want to set
+        // `fairness_key = "user"`.
+        string fairness_key = 3;
+      }
+
+      // Parameters associated with flows matching the label matcher.
+      Parameters parameters = 1; // @gotags: validate:"required"
+
+      // Label Matcher to select a Workload based on
+      // [flow labels](/concepts/flow-control/flow-label.md).
+      LabelMatcher label_matcher = 2; // @gotags: validate:"required"
+    }
+
+    // Scheduler parameters
+    message Parameters {
+      // List of workloads to be used in scheduler.
+      //
+      // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+      // allows for load-shedding to be "intelligent" compared to random rejections.
+      // There are two aspects of this "intelligence":
+      // * Scheduler can more precisely calculate concurrency if it understands
+      //   that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
+      // * Setting different priorities to different workloads lets the scheduler
+      //   avoid dropping important traffic during overload.
+      //
+      // Each workload in this list specifies also a matcher that is used to
+      // determine which flow will be categorized into which workload.
+      // In case of multiple matching workloads, the first matching one will be used.
+      // If none of workloads match, `default_workload` will be used.
+      //
+      // :::info
+      //
+      // See also [workload definition in the concepts
+      // section](/concepts/flow-control/components/load-scheduler.md#workload).
+      //
+      // :::
+      repeated Workload workloads = 1; // @gotags: validate:"dive"
+
+      // Parameters to be used if none of workloads specified in `workloads` match.
+      Workload.Parameters default_workload_parameters = 2;
+
+      // Automatically estimate the size of a flow in each workload, based on
+      // historical latency. Each workload's `tokens` will be set to average
+      // latency of flows in that workload during last few seconds (exact duration
+      // of this average can change).
+      // This setting is useful in concurrency limiting use-case, where the
+      // concurrency is calculated as (avg. latency \* in-flight flows).
+      //
+      // The value of tokens estimated by `auto_tokens` takes lower precedence
+      // than the value of `tokens` specified in the workload definition
+      // and `tokens` explicitly specified in the flow labels.
+      bool auto_tokens = 3; // @gotags: default:"false"
+
+      // Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+      double timeout_factor = 4; // @gotags: validate:"gte=0.0" default:"0"
+      // Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+      google.protobuf.Duration max_timeout = 5; // @gotags: default:"0s"
+
+      // Decision deadline margin is the amount of time that the scheduler will
+      // subtract from the request deadline to determine the deadline for the
+      // decision. This is to ensure that the scheduler has enough time to
+      // make a decision before the request deadline happens, accounting for
+      // processing delays.
+      // The request deadline is based on the
+      // [gRPC deadline](https://grpc.io/blog/deadlines) or the
+      // [`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+      //
+      // Fail-open logic is use for flow control APIs, so if the gRPC deadline
+      // reaches, the flow will end up being unconditionally allowed while
+      // it is still waiting on the scheduler.
+      google.protobuf.Duration decision_deadline_margin = 6; // @gotags: default:"0.01s"
+
+      // * Key for a flow label that can be used to override the default number of tokens for this flow.
+      // * The value associated with this key must be a valid uint64 number.
+      // * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+      string tokens_label_key = 7; // @gotags: default:"tokens"
+    }
+
+    // Output for the Scheduler component.
+    message Outs {
+      // Accepted token rate is the tokens admitted per second by the scheduler.
+      // Value of this signal is aggregated from all the relevant schedulers.
+      OutPort accepted_token_rate = 1;
+
+      // Incoming token rate is the incoming tokens per second for all the
+      // flows entering the scheduler including the rejected ones.
+      //
+      // This is computed similar to `accepted_token_rate`,
+      // by summing up tokens from all the flows entering scheduler.
+      OutPort incoming_token_rate = 2;
+    }
+
+    // Output ports for the Scheduler component.
+    Outs out_ports = 1;
+
+    // Scheduler parameters.
+    Parameters parameters = 2; // @gotags: validate:"required"
+  }
+
   // Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
   message Actuator {
     // Dynamic Configuration for Actuator
@@ -855,7 +981,6 @@ message Scheduler {
     // Accepted concurrency is actual concurrency on a control point that this
     // scheduler is applied on.
     // Value of this signal is aggregated from all the relevant schedulers.
-    // Deprecated: 1.6.0
     OutPort accepted_concurrency = 1;
 
     // Incoming concurrency is concurrency that'd be needed to accept all the
@@ -864,19 +989,7 @@ message Scheduler {
     // This is computed in the same way as `accepted_concurrency`,
     // by summing up tokens from all the flows entering scheduler,
     // including rejected ones.
-    // Deprecated: 1.6.0
     OutPort incoming_concurrency = 2;
-
-    // Accepted token rate is the tokens admitted per second by the scheduler.
-    // Value of this signal is aggregated from all the relevant schedulers.
-    OutPort accepted_token_rate = 3;
-
-    // Incoming token rate is the incoming tokens per second for all the
-    // flows entering the scheduler including the rejected ones.
-    //
-    // This is computed similar to `accepted_token_rate`,
-    // by summing up tokens from all the flows entering scheduler.
-    OutPort incoming_token_rate = 4;
   }
 
   // Output ports for the Scheduler component.
@@ -949,7 +1062,7 @@ message AdaptiveLoadScheduler {
   FlowSelector flow_selector = 3; // @gotags: validate:"required"
 
   // Scheduler parameters.
-  Scheduler.Parameters scheduler_parameters = 4; // @gotags: validate:"required"
+  LoadScheduler.Scheduler.Parameters scheduler_parameters = 4; // @gotags: validate:"required"
 
   // Gradient parameters for the controller.
   GradientController.Parameters gradient_parameters = 5;

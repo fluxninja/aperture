@@ -6645,6 +6645,166 @@ var _ interface {
 	ErrorName() string
 } = RateLimiter_Parameters_LazySyncValidationError{}
 
+// Validate checks the field values on LoadScheduler_Scheduler with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadScheduler_Scheduler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler_Scheduler with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadScheduler_SchedulerMultiError, or nil if none found.
+func (m *LoadScheduler_Scheduler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Scheduler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_SchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_SchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_SchedulerValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_SchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_SchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_SchedulerValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadScheduler_SchedulerMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_SchedulerMultiError is an error wrapping multiple validation
+// errors returned by LoadScheduler_Scheduler.ValidateAll() if the designated
+// constraints aren't met.
+type LoadScheduler_SchedulerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_SchedulerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_SchedulerMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_SchedulerValidationError is the validation error returned by
+// LoadScheduler_Scheduler.Validate if the designated constraints aren't met.
+type LoadScheduler_SchedulerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_SchedulerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_SchedulerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_SchedulerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_SchedulerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_SchedulerValidationError) ErrorName() string {
+	return "LoadScheduler_SchedulerValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_SchedulerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Scheduler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_SchedulerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_SchedulerValidationError{}
+
 // Validate checks the field values on LoadScheduler_Actuator with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -6806,6 +6966,674 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadScheduler_ActuatorValidationError{}
+
+// Validate checks the field values on LoadScheduler_Scheduler_Workload with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *LoadScheduler_Scheduler_Workload) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler_Scheduler_Workload with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// LoadScheduler_Scheduler_WorkloadMultiError, or nil if none found.
+func (m *LoadScheduler_Scheduler_Workload) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Scheduler_Workload) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_WorkloadValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_WorkloadValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Scheduler_WorkloadValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetLabelMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_WorkloadValidationError{
+					field:  "LabelMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_WorkloadValidationError{
+					field:  "LabelMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLabelMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Scheduler_WorkloadValidationError{
+				field:  "LabelMatcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadScheduler_Scheduler_WorkloadMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_Scheduler_WorkloadMultiError is an error wrapping multiple
+// validation errors returned by
+// LoadScheduler_Scheduler_Workload.ValidateAll() if the designated
+// constraints aren't met.
+type LoadScheduler_Scheduler_WorkloadMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_Scheduler_WorkloadMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_Scheduler_WorkloadMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_Scheduler_WorkloadValidationError is the validation error
+// returned by LoadScheduler_Scheduler_Workload.Validate if the designated
+// constraints aren't met.
+type LoadScheduler_Scheduler_WorkloadValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_Scheduler_WorkloadValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_Scheduler_WorkloadValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_Scheduler_WorkloadValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_Scheduler_WorkloadValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_Scheduler_WorkloadValidationError) ErrorName() string {
+	return "LoadScheduler_Scheduler_WorkloadValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_Scheduler_WorkloadValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Scheduler_Workload.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_Scheduler_WorkloadValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_Scheduler_WorkloadValidationError{}
+
+// Validate checks the field values on LoadScheduler_Scheduler_Parameters with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *LoadScheduler_Scheduler_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler_Scheduler_Parameters
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// LoadScheduler_Scheduler_ParametersMultiError, or nil if none found.
+func (m *LoadScheduler_Scheduler_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Scheduler_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetWorkloads() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+						field:  fmt.Sprintf("Workloads[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+						field:  fmt.Sprintf("Workloads[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LoadScheduler_Scheduler_ParametersValidationError{
+					field:  fmt.Sprintf("Workloads[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if all {
+		switch v := interface{}(m.GetDefaultWorkloadParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+					field:  "DefaultWorkloadParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+					field:  "DefaultWorkloadParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultWorkloadParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Scheduler_ParametersValidationError{
+				field:  "DefaultWorkloadParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for AutoTokens
+
+	// no validation rules for TimeoutFactor
+
+	if all {
+		switch v := interface{}(m.GetMaxTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+					field:  "MaxTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+					field:  "MaxTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMaxTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Scheduler_ParametersValidationError{
+				field:  "MaxTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDecisionDeadlineMargin()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+					field:  "DecisionDeadlineMargin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_ParametersValidationError{
+					field:  "DecisionDeadlineMargin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDecisionDeadlineMargin()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Scheduler_ParametersValidationError{
+				field:  "DecisionDeadlineMargin",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for TokensLabelKey
+
+	if len(errors) > 0 {
+		return LoadScheduler_Scheduler_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_Scheduler_ParametersMultiError is an error wrapping multiple
+// validation errors returned by
+// LoadScheduler_Scheduler_Parameters.ValidateAll() if the designated
+// constraints aren't met.
+type LoadScheduler_Scheduler_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_Scheduler_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_Scheduler_ParametersMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_Scheduler_ParametersValidationError is the validation error
+// returned by LoadScheduler_Scheduler_Parameters.Validate if the designated
+// constraints aren't met.
+type LoadScheduler_Scheduler_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_Scheduler_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_Scheduler_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_Scheduler_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_Scheduler_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_Scheduler_ParametersValidationError) ErrorName() string {
+	return "LoadScheduler_Scheduler_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_Scheduler_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Scheduler_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_Scheduler_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_Scheduler_ParametersValidationError{}
+
+// Validate checks the field values on LoadScheduler_Scheduler_Outs with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadScheduler_Scheduler_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler_Scheduler_Outs with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadScheduler_Scheduler_OutsMultiError, or nil if none found.
+func (m *LoadScheduler_Scheduler_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Scheduler_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetAcceptedTokenRate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_OutsValidationError{
+					field:  "AcceptedTokenRate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_OutsValidationError{
+					field:  "AcceptedTokenRate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAcceptedTokenRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Scheduler_OutsValidationError{
+				field:  "AcceptedTokenRate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetIncomingTokenRate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_OutsValidationError{
+					field:  "IncomingTokenRate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Scheduler_OutsValidationError{
+					field:  "IncomingTokenRate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIncomingTokenRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Scheduler_OutsValidationError{
+				field:  "IncomingTokenRate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadScheduler_Scheduler_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_Scheduler_OutsMultiError is an error wrapping multiple
+// validation errors returned by LoadScheduler_Scheduler_Outs.ValidateAll() if
+// the designated constraints aren't met.
+type LoadScheduler_Scheduler_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_Scheduler_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_Scheduler_OutsMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_Scheduler_OutsValidationError is the validation error returned
+// by LoadScheduler_Scheduler_Outs.Validate if the designated constraints
+// aren't met.
+type LoadScheduler_Scheduler_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_Scheduler_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_Scheduler_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_Scheduler_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_Scheduler_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_Scheduler_OutsValidationError) ErrorName() string {
+	return "LoadScheduler_Scheduler_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_Scheduler_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Scheduler_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_Scheduler_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_Scheduler_OutsValidationError{}
+
+// Validate checks the field values on
+// LoadScheduler_Scheduler_Workload_Parameters with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadScheduler_Scheduler_Workload_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// LoadScheduler_Scheduler_Workload_Parameters with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// LoadScheduler_Scheduler_Workload_ParametersMultiError, or nil if none found.
+func (m *LoadScheduler_Scheduler_Workload_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Scheduler_Workload_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Priority
+
+	// no validation rules for Tokens
+
+	// no validation rules for FairnessKey
+
+	if len(errors) > 0 {
+		return LoadScheduler_Scheduler_Workload_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_Scheduler_Workload_ParametersMultiError is an error wrapping
+// multiple validation errors returned by
+// LoadScheduler_Scheduler_Workload_Parameters.ValidateAll() if the designated
+// constraints aren't met.
+type LoadScheduler_Scheduler_Workload_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_Scheduler_Workload_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_Scheduler_Workload_ParametersMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_Scheduler_Workload_ParametersValidationError is the validation
+// error returned by LoadScheduler_Scheduler_Workload_Parameters.Validate if
+// the designated constraints aren't met.
+type LoadScheduler_Scheduler_Workload_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_Scheduler_Workload_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_Scheduler_Workload_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_Scheduler_Workload_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_Scheduler_Workload_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_Scheduler_Workload_ParametersValidationError) ErrorName() string {
+	return "LoadScheduler_Scheduler_Workload_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_Scheduler_Workload_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Scheduler_Workload_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_Scheduler_Workload_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_Scheduler_Workload_ParametersValidationError{}
 
 // Validate checks the field values on LoadScheduler_Actuator_DynamicConfig
 // with the rules defined in the proto definition for this message. If any
@@ -7508,64 +8336,6 @@ func (m *Scheduler_Outs) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return Scheduler_OutsValidationError{
 				field:  "IncomingConcurrency",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetAcceptedTokenRate()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Scheduler_OutsValidationError{
-					field:  "AcceptedTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, Scheduler_OutsValidationError{
-					field:  "AcceptedTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetAcceptedTokenRate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Scheduler_OutsValidationError{
-				field:  "AcceptedTokenRate",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetIncomingTokenRate()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Scheduler_OutsValidationError{
-					field:  "IncomingTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, Scheduler_OutsValidationError{
-					field:  "IncomingTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetIncomingTokenRate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Scheduler_OutsValidationError{
-				field:  "IncomingTokenRate",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

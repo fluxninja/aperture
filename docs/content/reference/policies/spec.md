@@ -402,7 +402,7 @@ Output ports for the _Adaptive Load Scheduler_ component.
 
 <!-- vale off -->
 
-([SchedulerParameters](#scheduler-parameters))
+([LoadSchedulerSchedulerParameters](#load-scheduler-scheduler-parameters))
 
 <!-- vale on -->
 
@@ -5221,7 +5221,7 @@ Flow Selector decides the service and flows at which the _Load Scheduler_ is app
 
 <!-- vale off -->
 
-([Scheduler](#scheduler))
+([LoadSchedulerScheduler](#load-scheduler-scheduler))
 
 <!-- vale on -->
 
@@ -5330,6 +5330,326 @@ Input for the Actuator component.
 
 Load multiplier is proportion of [incoming
 token rate](#scheduler-outs) that needs to be accepted.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerScheduler {#load-scheduler-scheduler}
+
+<!-- vale on -->
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerOuts](#load-scheduler-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the Scheduler component.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerParameters](#load-scheduler-scheduler-parameters))
+
+<!-- vale on -->
+
+Scheduler parameters.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerOuts {#load-scheduler-scheduler-outs}
+
+<!-- vale on -->
+
+Output for the Scheduler component.
+
+<dl>
+<dt>accepted_token_rate</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Accepted token rate is the tokens admitted per second by the scheduler.
+Value of this signal is aggregated from all the relevant schedulers.
+
+</dd>
+<dt>incoming_token_rate</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Incoming token rate is the incoming tokens per second for all the
+flows entering the scheduler including the rejected ones.
+
+This is computed similar to `accepted_token_rate`,
+by summing up tokens from all the flows entering scheduler.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerParameters {#load-scheduler-scheduler-parameters}
+
+<!-- vale on -->
+
+Scheduler parameters
+
+<dl>
+<dt>auto_tokens</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Automatically estimate the size of a flow in each workload, based on
+historical latency. Each workload's `tokens` will be set to average
+latency of flows in that workload during last few seconds (exact duration
+of this average can change).
+This setting is useful in concurrency limiting use-case, where the
+concurrency is calculated as (avg. latency \* in-flight flows).
+
+The value of tokens estimated by `auto_tokens` takes lower precedence
+than the value of `tokens` specified in the workload definition
+and `tokens` explicitly specified in the flow labels.
+
+</dd>
+<dt>decision_deadline_margin</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"0.01s"`)
+
+<!-- vale on -->
+
+Decision deadline margin is the amount of time that the scheduler will
+subtract from the request deadline to determine the deadline for the
+decision. This is to ensure that the scheduler has enough time to
+make a decision before the request deadline happens, accounting for
+processing delays.
+The request deadline is based on the
+[gRPC deadline](https://grpc.io/blog/deadlines) or the
+[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+
+Fail-open logic is use for flow control APIs, so if the gRPC deadline
+reaches, the flow will end up being unconditionally allowed while
+it is still waiting on the scheduler.
+
+</dd>
+<dt>default_workload_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerWorkloadParameters](#load-scheduler-scheduler-workload-parameters))
+
+<!-- vale on -->
+
+Parameters to be used if none of workloads specified in `workloads` match.
+
+</dd>
+<dt>max_timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"0s"`)
+
+<!-- vale on -->
+
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+</dd>
+<dt>timeout_factor</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `0`)
+
+<!-- vale on -->
+
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+</dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"tokens"`)
+
+<!-- vale on -->
+
+- Key for a flow label that can be used to override the default number of tokens for this flow.
+- The value associated with this key must be a valid uint64 number.
+- If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+
+</dd>
+<dt>workloads</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadSchedulerSchedulerWorkload](#load-scheduler-scheduler-workload))
+
+<!-- vale on -->
+
+List of workloads to be used in scheduler.
+
+Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+allows for load-shedding to be "intelligent" compared to random rejections.
+There are two aspects of this "intelligence":
+
+- Scheduler can more precisely calculate concurrency if it understands
+  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
+- Setting different priorities to different workloads lets the scheduler
+  avoid dropping important traffic during overload.
+
+Each workload in this list specifies also a matcher that is used to
+determine which flow will be categorized into which workload.
+In case of multiple matching workloads, the first matching one will be used.
+If none of workloads match, `default_workload` will be used.
+
+:::info
+
+See also [workload definition in the concepts
+section](/concepts/flow-control/components/load-scheduler.md#workload).
+
+:::
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerWorkload {#load-scheduler-scheduler-workload}
+
+<!-- vale on -->
+
+Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
+
+<dl>
+<dt>label_matcher</dt>
+<dd>
+
+<!-- vale off -->
+
+([LabelMatcher](#label-matcher))
+
+<!-- vale on -->
+
+Label Matcher to select a Workload based on
+[flow labels](/concepts/flow-control/flow-label.md).
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerWorkloadParameters](#load-scheduler-scheduler-workload-parameters))
+
+<!-- vale on -->
+
+Parameters associated with flows matching the label matcher.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerWorkloadParameters {#load-scheduler-scheduler-workload-parameters}
+
+<!-- vale on -->
+
+Parameters such as priority, tokens and fairness key that
+are applicable to flows within a workload.
+
+<dl>
+<dt>fairness_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Fairness key is a label key that can be used to provide fairness within a workload.
+Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
+you have a classifier that sets `user` flow label, you might want to set
+`fairness_key = "user"`.
+
+</dd>
+<dt>priority</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, minimum: `0`, maximum: `255`, default: `0`)
+
+<!-- vale on -->
+
+Describes priority level of the flows within the workload.
+Priority level ranges from 0 to 255.
+Higher numbers means higher priority level.
+Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+
+$$
+\text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+$$
+
+</dd>
+<dt>tokens</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Tokens determines the cost of admitting a single flow in the workload,
+which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
+simply equal to 1 if the resource being accessed is constrained by the
+number of flows (3rd party rate limiters).
+This override is applicable only if tokens for the flow aren't specified
+in the flow labels.
 
 </dd>
 </dl>
@@ -8121,20 +8441,6 @@ Output for the Scheduler component.
 Accepted concurrency is actual concurrency on a control point that this
 scheduler is applied on.
 Value of this signal is aggregated from all the relevant schedulers.
-Deprecated: 1.6.0
-
-</dd>
-<dt>accepted_token_rate</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-Accepted token rate is the tokens admitted per second by the scheduler.
-Value of this signal is aggregated from all the relevant schedulers.
 
 </dd>
 <dt>incoming_concurrency</dt>
@@ -8152,23 +8458,6 @@ flows entering the scheduler.
 This is computed in the same way as `accepted_concurrency`,
 by summing up tokens from all the flows entering scheduler,
 including rejected ones.
-Deprecated: 1.6.0
-
-</dd>
-<dt>incoming_token_rate</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-Incoming token rate is the incoming tokens per second for all the
-flows entering the scheduler including the rejected ones.
-
-This is computed similar to `accepted_token_rate`,
-by summing up tokens from all the flows entering scheduler.
 
 </dd>
 </dl>
