@@ -10,6 +10,10 @@ description = {
    homepage = "https://github.com/fluxninja/aperture/tree/master/gateways/lua",
    issues_url = "https://github.com/fluxninja/aperture/issues",
 }
+dependencies = {
+   "lua-resty-http = 0.17.1-0",
+   "lua-cjson = 2.1.0.10",
+}
 build = {
    type = "builtin",
    modules = {
