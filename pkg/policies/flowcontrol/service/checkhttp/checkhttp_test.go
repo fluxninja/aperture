@@ -121,7 +121,7 @@ var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 				},
 			},
 			Module: `
-				package envoy.authz
+				package flowcontrol.checkhttp
 				destination := v {
 					v := input.attributes.destination.address.socketAddress.address
 				}
