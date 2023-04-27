@@ -2,7 +2,3 @@ label: Configuration
 position: 2
 collapsible: true
 collapsed: true
-link:
-  type: "generated-index"
-  title: "Configuration"
-  keywords: ["configuration"]
