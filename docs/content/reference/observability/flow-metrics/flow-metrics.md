@@ -1,7 +1,10 @@
 ---
 title: Flow Metrics
-sidebar_position: 1
-sidebar_label: Flow Metrics
+sidebar_position: 2
+keywords:
+    - flow
+    - olap
+    - metrics
 ---
 
 Aperture Agents emit an OpenTelemetry stream for flow data, which provides a

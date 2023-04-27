@@ -1,6 +1,7 @@
 ---
 title: Policy
 sidebar_position: 1
+sidebar_label: Policy Language
 ---
 
 :::info

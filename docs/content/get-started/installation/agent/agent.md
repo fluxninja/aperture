@@ -60,7 +60,7 @@ and can result in unpredictable behavior.
 
    2. [**Namespace-Scoped Installation**](kubernetes/namespace-scoped/namespace-scoped.md)
 
-      The Aperture Agent can also be installed with only namespace scoped
+      The Aperture Agent can also be installed with only namespace-scoped
       resources.
 
 2. [**Bare Metal or VM**](bare_metal.md)
