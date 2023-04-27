@@ -82,8 +82,8 @@ local ema_latency_driver_defaults = {
 
 local rollout_policy_base_defaults = {
 
-  load_shaper: {
-    load_regulator_parameters: {
+  load_ramp: {
+    regulator_parameters: {
       flow_selector: flow_selector_defaults,
       label_key: '',
     },
@@ -173,7 +173,7 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   */
   ema_latency_driver: ema_latency_driver_defaults,
   /**
-  * @schema (rollout_policy.load_shaper: aperture.spec.v1.LoadShaperParameters required) Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
+  * @schema (rollout_policy.load_ramp: aperture.spec.v1.LoadRampParameters required) Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
   * @schema (rollout_policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   * @schema (rollout_policy.resources: aperture.spec.v1.Resources) List of additional resources.
   * @schema (rollout_policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.

@@ -1482,8 +1482,8 @@ private static final long serialVersionUID = 0L;
 
   }
 
-  public interface LoadRegulatorInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo)
+  public interface RegulatorInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -1499,18 +1499,18 @@ private static final long serialVersionUID = 0L;
         getLabelBytes();
   }
   /**
-   * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo}
+   * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo}
    */
-  public static final class LoadRegulatorInfo extends
+  public static final class RegulatorInfo extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo)
-      LoadRegulatorInfoOrBuilder {
+      // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo)
+      RegulatorInfoOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use LoadRegulatorInfo.newBuilder() to construct.
-    private LoadRegulatorInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use RegulatorInfo.newBuilder() to construct.
+    private RegulatorInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private LoadRegulatorInfo() {
+    private RegulatorInfo() {
       label_ = "";
     }
 
@@ -1518,20 +1518,20 @@ private static final long serialVersionUID = 0L;
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new LoadRegulatorInfo();
+      return new RegulatorInfo();
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadRegulatorInfo_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadRegulatorInfo_fieldAccessorTable
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.Builder.class);
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.Builder.class);
     }
 
     public static final int LABEL_FIELD_NUMBER = 1;
@@ -1612,10 +1612,10 @@ private static final long serialVersionUID = 0L;
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo)) {
+      if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo)) {
         return super.equals(obj);
       }
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) obj;
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) obj;
 
       if (!getLabel()
           .equals(other.getLabel())) return false;
@@ -1637,69 +1637,69 @@ private static final long serialVersionUID = 0L;
       return hash;
     }
 
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(byte[] data)
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(java.io.InputStream input)
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseDelimitedFrom(java.io.InputStream input)
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseDelimitedFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo parseFrom(
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1712,7 +1712,7 @@ private static final long serialVersionUID = 0L;
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo prototype) {
+    public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -1728,26 +1728,26 @@ private static final long serialVersionUID = 0L;
       return builder;
     }
     /**
-     * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo}
+     * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo)
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfoOrBuilder {
+        // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo)
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadRegulatorInfo_descriptor;
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadRegulatorInfo_fieldAccessorTable
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.Builder.class);
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.Builder.class);
       }
 
-      // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.newBuilder()
+      // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.newBuilder()
       private Builder() {
 
       }
@@ -1768,17 +1768,17 @@ private static final long serialVersionUID = 0L;
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadRegulatorInfo_descriptor;
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor;
       }
 
       @java.lang.Override
-      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo getDefaultInstanceForType() {
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance();
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo getDefaultInstanceForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance();
       }
 
       @java.lang.Override
-      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo build() {
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo result = buildPartial();
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo build() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -1786,14 +1786,14 @@ private static final long serialVersionUID = 0L;
       }
 
       @java.lang.Override
-      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo buildPartial() {
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo(this);
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo buildPartial() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo result) {
+      private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.label_ = label_;
@@ -1802,16 +1802,16 @@ private static final long serialVersionUID = 0L;
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) {
-          return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo)other);
+        if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) {
+          return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo other) {
-        if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance()) return this;
+      public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo other) {
+        if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance()) return this;
         if (!other.getLabel().isEmpty()) {
           label_ = other.label_;
           bitField0_ |= 0x00000001;
@@ -1949,23 +1949,23 @@ private static final long serialVersionUID = 0L;
       }
 
 
-      // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo)
+      // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo)
     }
 
-    // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo)
-    private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo)
+    private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo();
+      DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo();
     }
 
-    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo getDefaultInstance() {
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<LoadRegulatorInfo>
-        PARSER = new com.google.protobuf.AbstractParser<LoadRegulatorInfo>() {
+    private static final com.google.protobuf.Parser<RegulatorInfo>
+        PARSER = new com.google.protobuf.AbstractParser<RegulatorInfo>() {
       @java.lang.Override
-      public LoadRegulatorInfo parsePartialFrom(
+      public RegulatorInfo parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1984,17 +1984,17 @@ private static final long serialVersionUID = 0L;
       }
     };
 
-    public static com.google.protobuf.Parser<LoadRegulatorInfo> parser() {
+    public static com.google.protobuf.Parser<RegulatorInfo> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<LoadRegulatorInfo> getParserForType() {
+    public com.google.protobuf.Parser<RegulatorInfo> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo getDefaultInstanceForType() {
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -2008,7 +2008,7 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.AbstractMessage.InternalOneOfEnum {
     RATE_LIMITER_INFO(6),
     LOAD_SCHEDULER_INFO(7),
-    LOAD_REGULATOR_INFO(8),
+    REGULATOR_INFO(8),
     DETAILS_NOT_SET(0);
     private final int value;
     private DetailsCase(int value) {
@@ -2028,7 +2028,7 @@ private static final long serialVersionUID = 0L;
       switch (value) {
         case 6: return RATE_LIMITER_INFO;
         case 7: return LOAD_SCHEDULER_INFO;
-        case 8: return LOAD_REGULATOR_INFO;
+        case 8: return REGULATOR_INFO;
         case 0: return DETAILS_NOT_SET;
         default: return null;
       }
@@ -2252,35 +2252,35 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo.getDefaultInstance();
   }
 
-  public static final int LOAD_REGULATOR_INFO_FIELD_NUMBER = 8;
+  public static final int REGULATOR_INFO_FIELD_NUMBER = 8;
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
-   * @return Whether the loadRegulatorInfo field is set.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
+   * @return Whether the regulatorInfo field is set.
    */
   @java.lang.Override
-  public boolean hasLoadRegulatorInfo() {
+  public boolean hasRegulatorInfo() {
     return detailsCase_ == 8;
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
-   * @return The loadRegulatorInfo.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
+   * @return The regulatorInfo.
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo getLoadRegulatorInfo() {
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo getRegulatorInfo() {
     if (detailsCase_ == 8) {
-       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_;
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_;
     }
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance();
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance();
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfoOrBuilder getLoadRegulatorInfoOrBuilder() {
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfoOrBuilder getRegulatorInfoOrBuilder() {
     if (detailsCase_ == 8) {
-       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_;
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_;
     }
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance();
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance();
   }
 
   private byte memoizedIsInitialized = -1;
@@ -2319,7 +2319,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(7, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo) details_);
     }
     if (detailsCase_ == 8) {
-      output.writeMessage(8, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_);
+      output.writeMessage(8, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -2357,7 +2357,7 @@ private static final long serialVersionUID = 0L;
     }
     if (detailsCase_ == 8) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(8, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_);
+        .computeMessageSize(8, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -2394,8 +2394,8 @@ private static final long serialVersionUID = 0L;
             .equals(other.getLoadSchedulerInfo())) return false;
         break;
       case 8:
-        if (!getLoadRegulatorInfo()
-            .equals(other.getLoadRegulatorInfo())) return false;
+        if (!getRegulatorInfo()
+            .equals(other.getRegulatorInfo())) return false;
         break;
       case 0:
       default:
@@ -2432,8 +2432,8 @@ private static final long serialVersionUID = 0L;
         hash = (53 * hash) + getLoadSchedulerInfo().hashCode();
         break;
       case 8:
-        hash = (37 * hash) + LOAD_REGULATOR_INFO_FIELD_NUMBER;
-        hash = (53 * hash) + getLoadRegulatorInfo().hashCode();
+        hash = (37 * hash) + REGULATOR_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getRegulatorInfo().hashCode();
         break;
       case 0:
       default:
@@ -2582,8 +2582,8 @@ private static final long serialVersionUID = 0L;
       if (loadSchedulerInfoBuilder_ != null) {
         loadSchedulerInfoBuilder_.clear();
       }
-      if (loadRegulatorInfoBuilder_ != null) {
-        loadRegulatorInfoBuilder_.clear();
+      if (regulatorInfoBuilder_ != null) {
+        regulatorInfoBuilder_.clear();
       }
       detailsCase_ = 0;
       details_ = null;
@@ -2650,8 +2650,8 @@ private static final long serialVersionUID = 0L;
         result.details_ = loadSchedulerInfoBuilder_.build();
       }
       if (detailsCase_ == 8 &&
-          loadRegulatorInfoBuilder_ != null) {
-        result.details_ = loadRegulatorInfoBuilder_.build();
+          regulatorInfoBuilder_ != null) {
+        result.details_ = regulatorInfoBuilder_.build();
       }
     }
 
@@ -2697,8 +2697,8 @@ private static final long serialVersionUID = 0L;
           mergeLoadSchedulerInfo(other.getLoadSchedulerInfo());
           break;
         }
-        case LOAD_REGULATOR_INFO: {
-          mergeLoadRegulatorInfo(other.getLoadRegulatorInfo());
+        case REGULATOR_INFO: {
+          mergeRegulatorInfo(other.getRegulatorInfo());
           break;
         }
         case DETAILS_NOT_SET: {
@@ -2772,7 +2772,7 @@ private static final long serialVersionUID = 0L;
             } // case 58
             case 66: {
               input.readMessage(
-                  getLoadRegulatorInfoFieldBuilder().getBuilder(),
+                  getRegulatorInfoFieldBuilder().getBuilder(),
                   extensionRegistry);
               detailsCase_ = 8;
               break;
@@ -3395,71 +3395,71 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfoOrBuilder> loadRegulatorInfoBuilder_;
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfoOrBuilder> regulatorInfoBuilder_;
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
-     * @return Whether the loadRegulatorInfo field is set.
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
+     * @return Whether the regulatorInfo field is set.
      */
     @java.lang.Override
-    public boolean hasLoadRegulatorInfo() {
+    public boolean hasRegulatorInfo() {
       return detailsCase_ == 8;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
-     * @return The loadRegulatorInfo.
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
+     * @return The regulatorInfo.
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo getLoadRegulatorInfo() {
-      if (loadRegulatorInfoBuilder_ == null) {
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo getRegulatorInfo() {
+      if (regulatorInfoBuilder_ == null) {
         if (detailsCase_ == 8) {
-          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_;
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_;
         }
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance();
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance();
       } else {
         if (detailsCase_ == 8) {
-          return loadRegulatorInfoBuilder_.getMessage();
+          return regulatorInfoBuilder_.getMessage();
         }
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance();
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance();
       }
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
      */
-    public Builder setLoadRegulatorInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo value) {
-      if (loadRegulatorInfoBuilder_ == null) {
+    public Builder setRegulatorInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo value) {
+      if (regulatorInfoBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
         details_ = value;
         onChanged();
       } else {
-        loadRegulatorInfoBuilder_.setMessage(value);
+        regulatorInfoBuilder_.setMessage(value);
       }
       detailsCase_ = 8;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
      */
-    public Builder setLoadRegulatorInfo(
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.Builder builderForValue) {
-      if (loadRegulatorInfoBuilder_ == null) {
+    public Builder setRegulatorInfo(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.Builder builderForValue) {
+      if (regulatorInfoBuilder_ == null) {
         details_ = builderForValue.build();
         onChanged();
       } else {
-        loadRegulatorInfoBuilder_.setMessage(builderForValue.build());
+        regulatorInfoBuilder_.setMessage(builderForValue.build());
       }
       detailsCase_ = 8;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
      */
-    public Builder mergeLoadRegulatorInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo value) {
-      if (loadRegulatorInfoBuilder_ == null) {
+    public Builder mergeRegulatorInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo value) {
+      if (regulatorInfoBuilder_ == null) {
         if (detailsCase_ == 8 &&
-            details_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance()) {
-          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.newBuilder((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_)
+            details_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance()) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.newBuilder((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_)
               .mergeFrom(value).buildPartial();
         } else {
           details_ = value;
@@ -3467,19 +3467,19 @@ private static final long serialVersionUID = 0L;
         onChanged();
       } else {
         if (detailsCase_ == 8) {
-          loadRegulatorInfoBuilder_.mergeFrom(value);
+          regulatorInfoBuilder_.mergeFrom(value);
         } else {
-          loadRegulatorInfoBuilder_.setMessage(value);
+          regulatorInfoBuilder_.setMessage(value);
         }
       }
       detailsCase_ = 8;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
      */
-    public Builder clearLoadRegulatorInfo() {
-      if (loadRegulatorInfoBuilder_ == null) {
+    public Builder clearRegulatorInfo() {
+      if (regulatorInfoBuilder_ == null) {
         if (detailsCase_ == 8) {
           detailsCase_ = 0;
           details_ = null;
@@ -3490,50 +3490,50 @@ private static final long serialVersionUID = 0L;
           detailsCase_ = 0;
           details_ = null;
         }
-        loadRegulatorInfoBuilder_.clear();
+        regulatorInfoBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
      */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.Builder getLoadRegulatorInfoBuilder() {
-      return getLoadRegulatorInfoFieldBuilder().getBuilder();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.Builder getRegulatorInfoBuilder() {
+      return getRegulatorInfoFieldBuilder().getBuilder();
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfoOrBuilder getLoadRegulatorInfoOrBuilder() {
-      if ((detailsCase_ == 8) && (loadRegulatorInfoBuilder_ != null)) {
-        return loadRegulatorInfoBuilder_.getMessageOrBuilder();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfoOrBuilder getRegulatorInfoOrBuilder() {
+      if ((detailsCase_ == 8) && (regulatorInfoBuilder_ != null)) {
+        return regulatorInfoBuilder_.getMessageOrBuilder();
       } else {
         if (detailsCase_ == 8) {
-          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_;
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_;
         }
-        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance();
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance();
       }
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo load_regulator_info = 8 [json_name = "loadRegulatorInfo"];</code>
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfoOrBuilder> 
-        getLoadRegulatorInfoFieldBuilder() {
-      if (loadRegulatorInfoBuilder_ == null) {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfoOrBuilder> 
+        getRegulatorInfoFieldBuilder() {
+      if (regulatorInfoBuilder_ == null) {
         if (!(detailsCase_ == 8)) {
-          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.getDefaultInstance();
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.getDefaultInstance();
         }
-        loadRegulatorInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfoOrBuilder>(
-                (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadRegulatorInfo) details_,
+        regulatorInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfoOrBuilder>(
+                (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo) details_,
                 getParentForChildren(),
                 isClean());
         details_ = null;
       }
       detailsCase_ = 8;
       onChanged();
-      return loadRegulatorInfoBuilder_;
+      return regulatorInfoBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

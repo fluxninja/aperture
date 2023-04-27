@@ -75,7 +75,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Parameters for the Feature Rollout policy.'
     type='Object (rollout_policy)'
     reference='#rollout-policy'
-    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_shaper": {"load_regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "resources": {"flow_control": {"classifiers": []}}}'
+    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "resources": {"flow_control": {"classifiers": []}}}'
 />
 
 <!-- vale on -->
@@ -598,14 +598,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="rollout-policy-load-shaper"></a>
+<a id="rollout-policy-load-ramp"></a>
 
 <ParameterDescription
-    name='load_shaper'
+    name='load_ramp'
     description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.'
-    type='Object (aperture.spec.v1.LoadShaperParameters)'
-    reference='../../../spec#load-shaper-parameters'
-    value='{"load_regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
+    type='Object (aperture.spec.v1.LoadRampParameters)'
+    reference='../../../spec#load-ramp-parameters'
+    value='{"regulator_parameters": {"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
 />
 
 <!-- vale on -->
@@ -730,13 +730,13 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="load-regulator"></a>
+<a id="regulator"></a>
 
 <ParameterDescription
-    name='load_regulator'
+    name='regulator'
     description='Default configuration for load regulator that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.LoadRegulatorDynamicConfig)'
-    reference='../../../spec#load-regulator-dynamic-config'
+    type='Object (aperture.spec.v1.RegulatorDynamicConfig)'
+    reference='../../../spec#regulator-dynamic-config'
     value='"__REQUIRED_FIELD__"'
 />
 

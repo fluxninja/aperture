@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/flowcontrol.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message RegulatorWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  //  Regulator
+  policy.language.v1.Regulator regulator = 2;
+}
+
+message RegulatorDynamicConfigWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // RegulatorDynamicConfig is the dynamic configuration for the  Regulator.
+  policy.language.v1.Regulator.DynamicConfig regulator_dynamic_config = 2;
+}
+
+message RegulatorDecisionWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  //  Regulator Decision
+  RegulatorDecision regulator_decision = 2;
+}
+
+message RegulatorDecision {
+  double accept_percentage = 1;
+}

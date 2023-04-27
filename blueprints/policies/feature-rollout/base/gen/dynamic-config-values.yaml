@@ -3,6 +3,6 @@
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/base
 
 # Default configuration for load regulator that can be updated at the runtime without shutting down the policy.
-# Type: aperture.spec.v1.LoadRegulatorDynamicConfig
+# Type: aperture.spec.v1.RegulatorDynamicConfig
 # Required: True
-load_regulator: __REQUIRED_FIELD__
+regulator: __REQUIRED_FIELD__

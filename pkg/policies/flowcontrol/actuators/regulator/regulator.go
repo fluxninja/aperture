@@ -1,4 +1,4 @@
-package loadregulator
+package regulator
 
 import (
 	"context"
@@ -29,10 +29,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-const loadRegulatorStatusRoot = "load_regulators"
+const regulatorStatusRoot = "load_regulators"
 
 var (
-	fxNameTag       = config.NameTag(loadRegulatorStatusRoot)
+	fxNameTag       = config.NameTag(regulatorStatusRoot)
 	metricLabelKeys = []string{
 		metrics.PolicyNameLabel,
 		metrics.PolicyHashLabel,
@@ -53,7 +53,7 @@ func Module() fx.Option {
 		),
 		fx.Invoke(
 			fx.Annotate(
-				setupLoadRegulatorFactory,
+				setupRegulatorFactory,
 				fx.ParamTags(fxNameTag),
 			),
 		),
@@ -66,7 +66,7 @@ func provideWatchers(
 ) (notifiers.Watcher, error) {
 	agentGroupName := ai.GetAgentGroup()
 
-	etcdPath := path.Join(paths.LoadRegulatorConfigPath,
+	etcdPath := path.Join(paths.RegulatorConfigPath,
 		paths.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
@@ -76,7 +76,7 @@ func provideWatchers(
 	return watcher, nil
 }
 
-type loadRegulatorFactory struct {
+type regulatorFactory struct {
 	engineAPI            iface.Engine
 	registry             status.Registry
 	distCache            *distcache.DistCache
@@ -86,7 +86,7 @@ type loadRegulatorFactory struct {
 	agentGroupName       string
 }
 
-func setupLoadRegulatorFactory(
+func setupRegulatorFactory(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 	e iface.Engine,
@@ -97,28 +97,28 @@ func setupLoadRegulatorFactory(
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
-	etcdPath := path.Join(paths.LoadRegulatorDecisionsPath)
+	etcdPath := path.Join(paths.RegulatorDecisionsPath)
 	decisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
 	}
 
 	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		paths.LoadRegulatorDynamicConfigPath)
+		paths.RegulatorDynamicConfigPath)
 	if err != nil {
 		return err
 	}
 
-	reg := statusRegistry.Child("component", loadRegulatorStatusRoot)
+	reg := statusRegistry.Child("component", regulatorStatusRoot)
 	counterVector := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.LoadRegulatorCounterMetricName,
+			Name: metrics.RegulatorCounterMetricName,
 			Help: "Total number of decisions made by load regulators.",
 		},
 		metricLabelKeys,
 	)
 
-	factory := &loadRegulatorFactory{
+	factory := &regulatorFactory{
 		engineAPI:            e,
 		registry:             statusRegistry,
 		distCache:            distCache,
@@ -130,7 +130,7 @@ func setupLoadRegulatorFactory(
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
 		config.NewProtobufUnmarshaller,
-		[]notifiers.FxOptionsFunc{factory.newLoadRegulatorOptions})
+		[]notifiers.FxOptionsFunc{factory.newRegulatorOptions})
 	if err != nil {
 		return err
 	}
@@ -175,25 +175,25 @@ func setupLoadRegulatorFactory(
 	return nil
 }
 
-func (frf *loadRegulatorFactory) newLoadRegulatorOptions(
+func (frf *regulatorFactory) newRegulatorOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
 	logger := frf.registry.GetLogger()
-	wrapperMessage := &policysyncv1.LoadRegulatorWrapper{}
+	wrapperMessage := &policysyncv1.RegulatorWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	if err != nil || wrapperMessage.LoadRegulator == nil {
+	if err != nil || wrapperMessage.Regulator == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
 		logger.Warn().Err(err).Msg("Failed to unmarshal load regulator config")
 		return fx.Options(), err
 	}
 
-	loadRegulatorProto := wrapperMessage.LoadRegulator
-	fr := &loadRegulator{
+	regulatorProto := wrapperMessage.Regulator
+	fr := &regulator{
 		Component:         wrapperMessage.GetCommonAttributes(),
-		proto:             loadRegulatorProto,
-		labelKey:          loadRegulatorProto.GetParameters().GetLabelKey(),
+		proto:             regulatorProto,
+		labelKey:          regulatorProto.GetParameters().GetLabelKey(),
 		factory:           frf,
 		registry:          reg,
 		enableLabelValues: make(map[string]bool),
@@ -207,22 +207,22 @@ func (frf *loadRegulatorFactory) newLoadRegulatorOptions(
 	), nil
 }
 
-type loadRegulator struct {
+type regulator struct {
 	enableValuesMutex sync.RWMutex
 	iface.Component
 	registry          status.Registry
-	factory           *loadRegulatorFactory
-	proto             *policylangv1.LoadRegulator
+	factory           *regulatorFactory
+	proto             *policylangv1.Regulator
 	enableLabelValues map[string]bool
 	name              string
 	labelKey          string
 	acceptPercentage  float64
 }
 
-// Make sure loadRegulator implements iface.Limiter.
-var _ iface.Limiter = (*loadRegulator)(nil)
+// Make sure regulator implements iface.Limiter.
+var _ iface.Limiter = (*regulator)(nil)
 
-func (fr *loadRegulator) setup(lifecycle fx.Lifecycle) error {
+func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 	logger := fr.registry.GetLogger()
 	etcdKey := paths.AgentComponentKey(fr.factory.agentGroupName,
 		fr.GetPolicyName(),
@@ -279,7 +279,7 @@ func (fr *loadRegulator) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// add to data engine
-			err = fr.factory.engineAPI.RegisterLoadRegulator(fr)
+			err = fr.factory.engineAPI.RegisterRegulator(fr)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to register load regulator")
 				return err
@@ -294,7 +294,7 @@ func (fr *loadRegulator) setup(lifecycle fx.Lifecycle) error {
 				logger.Warn().Msg("Could not delete load regulator counter from its metric vector. No traffic to generate metrics?")
 			}
 			// remove from data engine
-			err = fr.factory.engineAPI.UnregisterLoadRegulator(fr)
+			err = fr.factory.engineAPI.UnregisterRegulator(fr)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
 				merr = multierr.Append(merr, err)
@@ -319,7 +319,7 @@ func (fr *loadRegulator) setup(lifecycle fx.Lifecycle) error {
 	return nil
 }
 
-func (fr *loadRegulator) updateDynamicConfig(dynamicConfig *policylangv1.LoadRegulator_DynamicConfig) {
+func (fr *regulator) updateDynamicConfig(dynamicConfig *policylangv1.Regulator_DynamicConfig) {
 	logger := fr.registry.GetLogger()
 
 	if dynamicConfig == nil {
@@ -336,19 +336,19 @@ func (fr *loadRegulator) updateDynamicConfig(dynamicConfig *policylangv1.LoadReg
 	fr.setEnableValues(labelValues)
 }
 
-func (fr *loadRegulator) setEnableValues(labelValues map[string]bool) {
+func (fr *regulator) setEnableValues(labelValues map[string]bool) {
 	fr.enableValuesMutex.Lock()
 	defer fr.enableValuesMutex.Unlock()
 	fr.enableLabelValues = labelValues
 }
 
 // GetFlowSelector returns the selector for the load regulator.
-func (fr *loadRegulator) GetFlowSelector() *policylangv1.FlowSelector {
+func (fr *regulator) GetFlowSelector() *policylangv1.FlowSelector {
 	return fr.proto.Parameters.GetFlowSelector()
 }
 
 // Decide runs the limiter.
-func (fr *loadRegulator) Decide(ctx context.Context,
+func (fr *regulator) Decide(ctx context.Context,
 	labels map[string]string,
 ) *flowcontrolv1.LimiterDecision {
 	var (
@@ -367,8 +367,8 @@ func (fr *loadRegulator) Decide(ctx context.Context,
 		ComponentId: fr.GetComponentId(),
 		Dropped:     false,
 		Reason:      flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED,
-		Details: &flowcontrolv1.LimiterDecision_LoadRegulatorInfo_{
-			LoadRegulatorInfo: &flowcontrolv1.LimiterDecision_LoadRegulatorInfo{
+		Details: &flowcontrolv1.LimiterDecision_RegulatorInfo_{
+			RegulatorInfo: &flowcontrolv1.LimiterDecision_RegulatorInfo{
 				Label: labelKey + ":" + labelValue,
 			},
 		},
@@ -404,12 +404,12 @@ func (fr *loadRegulator) Decide(ctx context.Context,
 	return limiterDecision
 }
 
-// Revert implements the Revert method of the flowcontrolv1.LoadRegulator interface.
-func (fr *loadRegulator) Revert(_ map[string]string, _ *flowcontrolv1.LimiterDecision) {
+// Revert implements the Revert method of the flowcontrolv1.Regulator interface.
+func (fr *regulator) Revert(_ map[string]string, _ *flowcontrolv1.LimiterDecision) {
 	// No-op
 }
 
-func (fr *loadRegulator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (fr *regulator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := fr.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
@@ -417,9 +417,9 @@ func (fr *loadRegulator) decisionUpdateCallback(event notifiers.Event, unmarshal
 		return
 	}
 
-	var wrapperMessage policysyncv1.LoadRegulatorDecisionWrapper
+	var wrapperMessage policysyncv1.RegulatorDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.LoadRegulatorDecision == nil {
+	if err != nil || wrapperMessage.RegulatorDecision == nil {
 		return
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
@@ -430,11 +430,11 @@ func (fr *loadRegulator) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if commonAttributes.PolicyHash != fr.GetPolicyHash() {
 		return
 	}
-	loadRegulatorDecision := wrapperMessage.LoadRegulatorDecision
-	fr.acceptPercentage = loadRegulatorDecision.AcceptPercentage
+	regulatorDecision := wrapperMessage.RegulatorDecision
+	fr.acceptPercentage = regulatorDecision.AcceptPercentage
 }
 
-func (fr *loadRegulator) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (fr *regulator) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := fr.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Dynamic config removed")
@@ -442,9 +442,9 @@ func (fr *loadRegulator) dynamicConfigUpdateCallback(event notifiers.Event, unma
 		return
 	}
 
-	var wrapperMessage policysyncv1.LoadRegulatorDynamicConfigWrapper
+	var wrapperMessage policysyncv1.RegulatorDynamicConfigWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.LoadRegulatorDynamicConfig == nil {
+	if err != nil || wrapperMessage.RegulatorDynamicConfig == nil {
 		return
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
@@ -455,12 +455,12 @@ func (fr *loadRegulator) dynamicConfigUpdateCallback(event notifiers.Event, unma
 	if commonAttributes.PolicyHash != fr.GetPolicyHash() {
 		return
 	}
-	dynamicConfig := wrapperMessage.LoadRegulatorDynamicConfig
+	dynamicConfig := wrapperMessage.RegulatorDynamicConfig
 	fr.updateDynamicConfig(dynamicConfig)
 }
 
 // GetLimiterID returns the limiter ID.
-func (fr *loadRegulator) GetLimiterID() iface.LimiterID {
+func (fr *regulator) GetLimiterID() iface.LimiterID {
 	return iface.LimiterID{
 		PolicyName:  fr.GetPolicyName(),
 		PolicyHash:  fr.GetPolicyHash(),
@@ -468,8 +468,8 @@ func (fr *loadRegulator) GetLimiterID() iface.LimiterID {
 	}
 }
 
-// GetRequestCounter returns counter for tracking number of times loadRegulator was triggered.
-func (fr *loadRegulator) GetRequestCounter(labels map[string]string) prometheus.Counter {
+// GetRequestCounter returns counter for tracking number of times regulator was triggered.
+func (fr *regulator) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	counter, err := fr.factory.counterVector.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to get counter")

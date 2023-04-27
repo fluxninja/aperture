@@ -3,13 +3,13 @@
   "type": "object",
   "title": "policies/feature-rollout/base blueprint",
   "additionalProperties": false,
-  "required": ["load_regulator"],
+  "required": ["regulator"],
   "properties": {
-    "load_regulator": {
+    "regulator": {
       "description": "Default configuration for load regulator that can be updated at the runtime without shutting down the policy.",
       "default": "__REQUIRED_FIELD__",
       "type": "object",
-      "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/LoadRegulatorDynamicConfig"
+      "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/RegulatorDynamicConfig"
     }
   },
   "$defs": null

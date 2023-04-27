@@ -8,8 +8,8 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/regulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -33,18 +33,69 @@ func newFlowControlCompositeAndOptions(
 	if proto := flowControlComponentProto.GetLoadScheduler(); proto != nil {
 		loadSchedulerProto = proto
 		isLoadScheduler = true
-	} else if proto := flowControlComponentProto.GetConcurrencyLimiter(); proto != nil {
-		// Convert from *policylangv1.FlowControl_ConcurrencyLimiter to *policylangv1.FlowControl_LoadScheduler since they have the same fields
-		jsonStr, err := json.Marshal(proto)
+	} else if concurrencyLimiterProto := flowControlComponentProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
+		// Convert from *policylangv1.FlowControl_ConcurrencyLimiter to *policylangv1.FlowControl_LoadScheduler since they have mostly same fields
+		jsonStr, err := json.Marshal(concurrencyLimiterProto)
 		if err != nil {
 			return Tree{}, nil, nil, fmt.Errorf("error marshaling ConcurrencyLimiter to JSON: %v", err)
 		}
 
-		err = protojson.Unmarshal(jsonStr, loadSchedulerProto)
+		// Unmarshal the JSON into a map
+		var data map[string]interface{}
+		if err2 := json.Unmarshal(jsonStr, &data); err2 != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON: %v", err)
+		}
+
+		// Modify the .load_actuator field in the JSON to .actuator since the field name changed
+		data["actuator"] = data["load_actuator"]
+		delete(data, "load_actuator")
+
+		// Marshal the modified map back into JSON
+		newJSONStr, err := json.Marshal(data)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error marshaling modified JSON: %v", err)
+		}
+
+		err = protojson.Unmarshal(newJSONStr, loadSchedulerProto)
 		if err != nil {
 			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to LoadScheduler: %v", err)
 		}
 		isLoadScheduler = true
+	}
+
+	loadRampProto := &policylangv1.LoadRamp{}
+	isLoadRamp := false
+	if proto := flowControlComponentProto.GetLoadRamp(); proto != nil {
+		loadRampProto = proto
+		isLoadRamp = true
+	} else if loadShaperProto := flowControlComponentProto.GetLoadShaper(); loadShaperProto != nil {
+		// Convert from *policylangv1.FlowControl_LoadShaper to *policylangv1.FlowControl_LoadRamp since they have mostly same fields
+		jsonStr, err := json.Marshal(loadShaperProto)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error marshaling LoadShaper to JSON: %v", err)
+		}
+
+		// Unmarshal the JSON into a map
+		var data map[string]interface{}
+		if err2 := json.Unmarshal(jsonStr, &data); err2 != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON: %v", err)
+		}
+
+		// Modify the .flow_regulator_parameters field in the JSON to .regulator_parameters since the field name changed
+		data["regulator_parameters"] = data["flow_regulator_parameters"]
+		delete(data, "flow_regulator_parameters")
+
+		// Marshal the modified map back into JSON
+		newJSONStr, err := json.Marshal(data)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error marshaling modified JSON: %v", err)
+		}
+
+		err = protojson.Unmarshal(newJSONStr, loadRampProto)
+		if err != nil {
+			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to LoadRamp: %v", err)
+		}
+		isLoadRamp = true
 	}
 
 	// Factory parser to determine what kind of composite component to create
@@ -88,23 +139,23 @@ func newFlowControlCompositeAndOptions(
 		}
 
 		// Actuation Strategy
-		if loadActuatorProto := loadSchedulerProto.GetLoadActuator(); loadActuatorProto != nil {
-			loadActuator, loadActuatorOptions, err := loadscheduler.NewLoadActuatorAndOptions(loadActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
+		if actuatorProto := loadSchedulerProto.GetActuator(); actuatorProto != nil {
+			actuator, actuatorOptions, err := loadscheduler.NewActuatorAndOptions(actuatorProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return retErr(err)
 			}
 
-			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID.ChildID("LoadActuator"), parentCircuitID, true)
+			actuatorConfComp, err := prepareComponentInCircuit(actuator, actuatorProto, componentID.ChildID("Actuator"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
 			}
-			configuredComponents = append(configuredComponents, loadActuatorConfComp)
-			tree.Children = append(tree.Children, Tree{Node: loadActuatorConfComp})
+			configuredComponents = append(configuredComponents, actuatorConfComp)
+			tree.Children = append(tree.Children, Tree{Node: actuatorConfComp})
 
-			options = append(options, loadActuatorOptions)
+			options = append(options, actuatorOptions)
 
 			// Merge port mapping for parent component
-			err = portMapping.Merge(loadActuatorConfComp.PortMapping)
+			err = portMapping.Merge(actuatorConfComp.PortMapping)
 			if err != nil {
 				return retErr(err)
 			}
@@ -133,14 +184,13 @@ func newFlowControlCompositeAndOptions(
 		}
 
 		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
-	} else if loadShaper := flowControlComponentProto.GetLoadShaper(); loadShaper != nil {
-		nestedCircuit, err := loadregulator.ParseLoadShaper(loadShaper)
+	} else if isLoadRamp {
+		nestedCircuit, err := regulator.ParseLoadRamp(loadRampProto)
 		if err != nil {
 			return retErr(err)
 		}
 
-		tree, configuredComponents, options, err := ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
-		return tree, configuredComponents, options, err
+		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }

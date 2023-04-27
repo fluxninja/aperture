@@ -629,7 +629,7 @@ func (m *LimiterDecision) validate(all bool) error {
 			}
 		}
 
-	case *LimiterDecision_LoadRegulatorInfo_:
+	case *LimiterDecision_RegulatorInfo_:
 		if v == nil {
 			err := LimiterDecisionValidationError{
 				field:  "Details",
@@ -642,11 +642,11 @@ func (m *LimiterDecision) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetLoadRegulatorInfo()).(type) {
+			switch v := interface{}(m.GetRegulatorInfo()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, LimiterDecisionValidationError{
-						field:  "LoadRegulatorInfo",
+						field:  "RegulatorInfo",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -654,16 +654,16 @@ func (m *LimiterDecision) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, LimiterDecisionValidationError{
-						field:  "LoadRegulatorInfo",
+						field:  "RegulatorInfo",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetLoadRegulatorInfo()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetRegulatorInfo()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return LimiterDecisionValidationError{
-					field:  "LoadRegulatorInfo",
+					field:  "RegulatorInfo",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1074,23 +1074,22 @@ var _ interface {
 	ErrorName() string
 } = LimiterDecision_LoadSchedulerInfoValidationError{}
 
-// Validate checks the field values on LimiterDecision_LoadRegulatorInfo with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the first error encountered is returned, or nil if there are
-// no violations.
-func (m *LimiterDecision_LoadRegulatorInfo) Validate() error {
+// Validate checks the field values on LimiterDecision_RegulatorInfo with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LimiterDecision_RegulatorInfo) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on LimiterDecision_LoadRegulatorInfo
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the result is a list of violation errors wrapped in
-// LimiterDecision_LoadRegulatorInfoMultiError, or nil if none found.
-func (m *LimiterDecision_LoadRegulatorInfo) ValidateAll() error {
+// ValidateAll checks the field values on LimiterDecision_RegulatorInfo with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// LimiterDecision_RegulatorInfoMultiError, or nil if none found.
+func (m *LimiterDecision_RegulatorInfo) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *LimiterDecision_LoadRegulatorInfo) validate(all bool) error {
+func (m *LimiterDecision_RegulatorInfo) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1100,20 +1099,19 @@ func (m *LimiterDecision_LoadRegulatorInfo) validate(all bool) error {
 	// no validation rules for Label
 
 	if len(errors) > 0 {
-		return LimiterDecision_LoadRegulatorInfoMultiError(errors)
+		return LimiterDecision_RegulatorInfoMultiError(errors)
 	}
 
 	return nil
 }
 
-// LimiterDecision_LoadRegulatorInfoMultiError is an error wrapping multiple
-// validation errors returned by
-// LimiterDecision_LoadRegulatorInfo.ValidateAll() if the designated
-// constraints aren't met.
-type LimiterDecision_LoadRegulatorInfoMultiError []error
+// LimiterDecision_RegulatorInfoMultiError is an error wrapping multiple
+// validation errors returned by LimiterDecision_RegulatorInfo.ValidateAll()
+// if the designated constraints aren't met.
+type LimiterDecision_RegulatorInfoMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m LimiterDecision_LoadRegulatorInfoMultiError) Error() string {
+func (m LimiterDecision_RegulatorInfoMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1122,12 +1120,12 @@ func (m LimiterDecision_LoadRegulatorInfoMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m LimiterDecision_LoadRegulatorInfoMultiError) AllErrors() []error { return m }
+func (m LimiterDecision_RegulatorInfoMultiError) AllErrors() []error { return m }
 
-// LimiterDecision_LoadRegulatorInfoValidationError is the validation error
-// returned by LimiterDecision_LoadRegulatorInfo.Validate if the designated
+// LimiterDecision_RegulatorInfoValidationError is the validation error
+// returned by LimiterDecision_RegulatorInfo.Validate if the designated
 // constraints aren't met.
-type LimiterDecision_LoadRegulatorInfoValidationError struct {
+type LimiterDecision_RegulatorInfoValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1135,24 +1133,24 @@ type LimiterDecision_LoadRegulatorInfoValidationError struct {
 }
 
 // Field function returns field value.
-func (e LimiterDecision_LoadRegulatorInfoValidationError) Field() string { return e.field }
+func (e LimiterDecision_RegulatorInfoValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LimiterDecision_LoadRegulatorInfoValidationError) Reason() string { return e.reason }
+func (e LimiterDecision_RegulatorInfoValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LimiterDecision_LoadRegulatorInfoValidationError) Cause() error { return e.cause }
+func (e LimiterDecision_RegulatorInfoValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LimiterDecision_LoadRegulatorInfoValidationError) Key() bool { return e.key }
+func (e LimiterDecision_RegulatorInfoValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LimiterDecision_LoadRegulatorInfoValidationError) ErrorName() string {
-	return "LimiterDecision_LoadRegulatorInfoValidationError"
+func (e LimiterDecision_RegulatorInfoValidationError) ErrorName() string {
+	return "LimiterDecision_RegulatorInfoValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e LimiterDecision_LoadRegulatorInfoValidationError) Error() string {
+func (e LimiterDecision_RegulatorInfoValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1164,14 +1162,14 @@ func (e LimiterDecision_LoadRegulatorInfoValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLimiterDecision_LoadRegulatorInfo.%s: %s%s",
+		"invalid %sLimiterDecision_RegulatorInfo.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LimiterDecision_LoadRegulatorInfoValidationError{}
+var _ error = LimiterDecision_RegulatorInfoValidationError{}
 
 var _ interface {
 	Field() string
@@ -1179,4 +1177,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LimiterDecision_LoadRegulatorInfoValidationError{}
+} = LimiterDecision_RegulatorInfoValidationError{}

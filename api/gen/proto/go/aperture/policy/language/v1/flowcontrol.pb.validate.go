@@ -2487,7 +2487,7 @@ func (m *FlowControl) validate(all bool) error {
 			}
 		}
 
-	case *FlowControl_LoadRegulator:
+	case *FlowControl_Regulator:
 		if v == nil {
 			err := FlowControlValidationError{
 				field:  "Component",
@@ -2500,11 +2500,11 @@ func (m *FlowControl) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetLoadRegulator()).(type) {
+			switch v := interface{}(m.GetRegulator()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "LoadRegulator",
+						field:  "Regulator",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -2512,16 +2512,98 @@ func (m *FlowControl) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "LoadRegulator",
+						field:  "Regulator",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetLoadRegulator()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetRegulator()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FlowControlValidationError{
-					field:  "LoadRegulator",
+					field:  "Regulator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_LoadRamp:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLoadRamp()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRamp",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRamp",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLoadRamp()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "LoadRamp",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_LoadRampSeries:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLoadRampSeries()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRampSeries",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRampSeries",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLoadRampSeries()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "LoadRampSeries",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -3112,50 +3194,33 @@ func (m *LoadScheduler) validate(all bool) error {
 		}
 	}
 
-	switch v := m.ActuationStrategy.(type) {
-	case *LoadScheduler_LoadActuator:
-		if v == nil {
-			err := LoadSchedulerValidationError{
-				field:  "ActuationStrategy",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetLoadActuator()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, LoadSchedulerValidationError{
-						field:  "LoadActuator",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, LoadSchedulerValidationError{
-						field:  "LoadActuator",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetLoadActuator()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return LoadSchedulerValidationError{
-					field:  "LoadActuator",
+	if all {
+		switch v := interface{}(m.GetActuator()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "Actuator",
 					reason: "embedded message failed validation",
 					cause:  err,
-				}
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "Actuator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
 		}
-
-	default:
-		_ = v // ensures v is used
+	} else if v, ok := interface{}(m.GetActuator()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadSchedulerValidationError{
+				field:  "Actuator",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {
@@ -4363,22 +4428,22 @@ var _ interface {
 	ErrorName() string
 } = FlowRegulatorValidationError{}
 
-// Validate checks the field values on LoadRegulator with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
+// Validate checks the field values on Regulator with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *LoadRegulator) Validate() error {
+func (m *Regulator) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on LoadRegulator with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in LoadRegulatorMultiError, or
-// nil if none found.
-func (m *LoadRegulator) ValidateAll() error {
+// ValidateAll checks the field values on Regulator with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RegulatorMultiError, or nil
+// if none found.
+func (m *Regulator) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *LoadRegulator) validate(all bool) error {
+func (m *Regulator) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -4389,7 +4454,7 @@ func (m *LoadRegulator) validate(all bool) error {
 		switch v := interface{}(m.GetInPorts()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRegulatorValidationError{
+				errors = append(errors, RegulatorValidationError{
 					field:  "InPorts",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -4397,7 +4462,7 @@ func (m *LoadRegulator) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRegulatorValidationError{
+				errors = append(errors, RegulatorValidationError{
 					field:  "InPorts",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -4406,7 +4471,7 @@ func (m *LoadRegulator) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return LoadRegulatorValidationError{
+			return RegulatorValidationError{
 				field:  "InPorts",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -4418,7 +4483,7 @@ func (m *LoadRegulator) validate(all bool) error {
 		switch v := interface{}(m.GetParameters()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRegulatorValidationError{
+				errors = append(errors, RegulatorValidationError{
 					field:  "Parameters",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -4426,7 +4491,7 @@ func (m *LoadRegulator) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRegulatorValidationError{
+				errors = append(errors, RegulatorValidationError{
 					field:  "Parameters",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -4435,7 +4500,7 @@ func (m *LoadRegulator) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return LoadRegulatorValidationError{
+			return RegulatorValidationError{
 				field:  "Parameters",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -4449,7 +4514,7 @@ func (m *LoadRegulator) validate(all bool) error {
 		switch v := interface{}(m.GetDefaultConfig()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRegulatorValidationError{
+				errors = append(errors, RegulatorValidationError{
 					field:  "DefaultConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -4457,7 +4522,7 @@ func (m *LoadRegulator) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRegulatorValidationError{
+				errors = append(errors, RegulatorValidationError{
 					field:  "DefaultConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -4466,7 +4531,7 @@ func (m *LoadRegulator) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return LoadRegulatorValidationError{
+			return RegulatorValidationError{
 				field:  "DefaultConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -4475,19 +4540,18 @@ func (m *LoadRegulator) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return LoadRegulatorMultiError(errors)
+		return RegulatorMultiError(errors)
 	}
 
 	return nil
 }
 
-// LoadRegulatorMultiError is an error wrapping multiple validation errors
-// returned by LoadRegulator.ValidateAll() if the designated constraints
-// aren't met.
-type LoadRegulatorMultiError []error
+// RegulatorMultiError is an error wrapping multiple validation errors returned
+// by Regulator.ValidateAll() if the designated constraints aren't met.
+type RegulatorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m LoadRegulatorMultiError) Error() string {
+func (m RegulatorMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -4496,11 +4560,11 @@ func (m LoadRegulatorMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m LoadRegulatorMultiError) AllErrors() []error { return m }
+func (m RegulatorMultiError) AllErrors() []error { return m }
 
-// LoadRegulatorValidationError is the validation error returned by
-// LoadRegulator.Validate if the designated constraints aren't met.
-type LoadRegulatorValidationError struct {
+// RegulatorValidationError is the validation error returned by
+// Regulator.Validate if the designated constraints aren't met.
+type RegulatorValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -4508,22 +4572,22 @@ type LoadRegulatorValidationError struct {
 }
 
 // Field function returns field value.
-func (e LoadRegulatorValidationError) Field() string { return e.field }
+func (e RegulatorValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LoadRegulatorValidationError) Reason() string { return e.reason }
+func (e RegulatorValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LoadRegulatorValidationError) Cause() error { return e.cause }
+func (e RegulatorValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LoadRegulatorValidationError) Key() bool { return e.key }
+func (e RegulatorValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LoadRegulatorValidationError) ErrorName() string { return "LoadRegulatorValidationError" }
+func (e RegulatorValidationError) ErrorName() string { return "RegulatorValidationError" }
 
 // Error satisfies the builtin error interface
-func (e LoadRegulatorValidationError) Error() string {
+func (e RegulatorValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -4535,14 +4599,14 @@ func (e LoadRegulatorValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLoadRegulator.%s: %s%s",
+		"invalid %sRegulator.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LoadRegulatorValidationError{}
+var _ error = RegulatorValidationError{}
 
 var _ interface {
 	Field() string
@@ -4550,7 +4614,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LoadRegulatorValidationError{}
+} = RegulatorValidationError{}
 
 // Validate checks the field values on LoadShaper with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -4926,6 +4990,381 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadShaperSeriesValidationError{}
+
+// Validate checks the field values on LoadRamp with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadRamp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRamp with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LoadRampMultiError, or nil
+// if none found.
+func (m *LoadRamp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRamp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRampMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRampMultiError is an error wrapping multiple validation errors returned
+// by LoadRamp.ValidateAll() if the designated constraints aren't met.
+type LoadRampMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRampMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRampMultiError) AllErrors() []error { return m }
+
+// LoadRampValidationError is the validation error returned by
+// LoadRamp.Validate if the designated constraints aren't met.
+type LoadRampValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRampValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRampValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRampValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRampValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRampValidationError) ErrorName() string { return "LoadRampValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadRampValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRamp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRampValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRampValidationError{}
+
+// Validate checks the field values on LoadRampSeries with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadRampSeries) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRampSeries with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LoadRampSeriesMultiError,
+// or nil if none found.
+func (m *LoadRampSeries) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRampSeries) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeriesValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeriesValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRampSeriesMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRampSeriesMultiError is an error wrapping multiple validation errors
+// returned by LoadRampSeries.ValidateAll() if the designated constraints
+// aren't met.
+type LoadRampSeriesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRampSeriesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRampSeriesMultiError) AllErrors() []error { return m }
+
+// LoadRampSeriesValidationError is the validation error returned by
+// LoadRampSeries.Validate if the designated constraints aren't met.
+type LoadRampSeriesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRampSeriesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRampSeriesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRampSeriesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRampSeriesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRampSeriesValidationError) ErrorName() string { return "LoadRampSeriesValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadRampSeriesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRampSeries.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRampSeriesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRampSeriesValidationError{}
 
 // Validate checks the field values on FluxMeter_StaticBuckets with the rules
 // defined in the proto definition for this message. If any rules are
@@ -6205,6 +6644,406 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimiter_Parameters_LazySyncValidationError{}
+
+// Validate checks the field values on LoadScheduler_Actuator with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadScheduler_Actuator) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler_Actuator with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadScheduler_ActuatorMultiError, or nil if none found.
+func (m *LoadScheduler_Actuator) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Actuator) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_ActuatorValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_ActuatorValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_ActuatorValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_ActuatorValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_ActuatorValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_ActuatorValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadScheduler_ActuatorMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_ActuatorMultiError is an error wrapping multiple validation
+// errors returned by LoadScheduler_Actuator.ValidateAll() if the designated
+// constraints aren't met.
+type LoadScheduler_ActuatorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_ActuatorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_ActuatorMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_ActuatorValidationError is the validation error returned by
+// LoadScheduler_Actuator.Validate if the designated constraints aren't met.
+type LoadScheduler_ActuatorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_ActuatorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_ActuatorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_ActuatorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_ActuatorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_ActuatorValidationError) ErrorName() string {
+	return "LoadScheduler_ActuatorValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_ActuatorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Actuator.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_ActuatorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_ActuatorValidationError{}
+
+// Validate checks the field values on LoadScheduler_Actuator_DynamicConfig
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *LoadScheduler_Actuator_DynamicConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler_Actuator_DynamicConfig
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// LoadScheduler_Actuator_DynamicConfigMultiError, or nil if none found.
+func (m *LoadScheduler_Actuator_DynamicConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Actuator_DynamicConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for DryRun
+
+	if len(errors) > 0 {
+		return LoadScheduler_Actuator_DynamicConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_Actuator_DynamicConfigMultiError is an error wrapping multiple
+// validation errors returned by
+// LoadScheduler_Actuator_DynamicConfig.ValidateAll() if the designated
+// constraints aren't met.
+type LoadScheduler_Actuator_DynamicConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_Actuator_DynamicConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_Actuator_DynamicConfigMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_Actuator_DynamicConfigValidationError is the validation error
+// returned by LoadScheduler_Actuator_DynamicConfig.Validate if the designated
+// constraints aren't met.
+type LoadScheduler_Actuator_DynamicConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_Actuator_DynamicConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_Actuator_DynamicConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_Actuator_DynamicConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_Actuator_DynamicConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_Actuator_DynamicConfigValidationError) ErrorName() string {
+	return "LoadScheduler_Actuator_DynamicConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_Actuator_DynamicConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Actuator_DynamicConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_Actuator_DynamicConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_Actuator_DynamicConfigValidationError{}
+
+// Validate checks the field values on LoadScheduler_Actuator_Ins with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadScheduler_Actuator_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler_Actuator_Ins with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadScheduler_Actuator_InsMultiError, or nil if none found.
+func (m *LoadScheduler_Actuator_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler_Actuator_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetLoadMultiplier()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadScheduler_Actuator_InsValidationError{
+					field:  "LoadMultiplier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadScheduler_Actuator_InsValidationError{
+					field:  "LoadMultiplier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLoadMultiplier()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadScheduler_Actuator_InsValidationError{
+				field:  "LoadMultiplier",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadScheduler_Actuator_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadScheduler_Actuator_InsMultiError is an error wrapping multiple
+// validation errors returned by LoadScheduler_Actuator_Ins.ValidateAll() if
+// the designated constraints aren't met.
+type LoadScheduler_Actuator_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadScheduler_Actuator_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadScheduler_Actuator_InsMultiError) AllErrors() []error { return m }
+
+// LoadScheduler_Actuator_InsValidationError is the validation error returned
+// by LoadScheduler_Actuator_Ins.Validate if the designated constraints aren't met.
+type LoadScheduler_Actuator_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadScheduler_Actuator_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadScheduler_Actuator_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadScheduler_Actuator_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadScheduler_Actuator_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadScheduler_Actuator_InsValidationError) ErrorName() string {
+	return "LoadScheduler_Actuator_InsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadScheduler_Actuator_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler_Actuator_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadScheduler_Actuator_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadScheduler_Actuator_InsValidationError{}
 
 // Validate checks the field values on Scheduler_Workload with the rules
 // defined in the proto definition for this message. If any rules are
@@ -8394,22 +9233,22 @@ var _ interface {
 	ErrorName() string
 } = FlowRegulator_InsValidationError{}
 
-// Validate checks the field values on LoadRegulator_DynamicConfig with the
-// rules defined in the proto definition for this message. If any rules are
+// Validate checks the field values on Regulator_DynamicConfig with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *LoadRegulator_DynamicConfig) Validate() error {
+func (m *Regulator_DynamicConfig) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on LoadRegulator_DynamicConfig with the
+// ValidateAll checks the field values on Regulator_DynamicConfig with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// LoadRegulator_DynamicConfigMultiError, or nil if none found.
-func (m *LoadRegulator_DynamicConfig) ValidateAll() error {
+// Regulator_DynamicConfigMultiError, or nil if none found.
+func (m *Regulator_DynamicConfig) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *LoadRegulator_DynamicConfig) validate(all bool) error {
+func (m *Regulator_DynamicConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -8417,19 +9256,19 @@ func (m *LoadRegulator_DynamicConfig) validate(all bool) error {
 	var errors []error
 
 	if len(errors) > 0 {
-		return LoadRegulator_DynamicConfigMultiError(errors)
+		return Regulator_DynamicConfigMultiError(errors)
 	}
 
 	return nil
 }
 
-// LoadRegulator_DynamicConfigMultiError is an error wrapping multiple
-// validation errors returned by LoadRegulator_DynamicConfig.ValidateAll() if
-// the designated constraints aren't met.
-type LoadRegulator_DynamicConfigMultiError []error
+// Regulator_DynamicConfigMultiError is an error wrapping multiple validation
+// errors returned by Regulator_DynamicConfig.ValidateAll() if the designated
+// constraints aren't met.
+type Regulator_DynamicConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m LoadRegulator_DynamicConfigMultiError) Error() string {
+func (m Regulator_DynamicConfigMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -8438,12 +9277,11 @@ func (m LoadRegulator_DynamicConfigMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m LoadRegulator_DynamicConfigMultiError) AllErrors() []error { return m }
+func (m Regulator_DynamicConfigMultiError) AllErrors() []error { return m }
 
-// LoadRegulator_DynamicConfigValidationError is the validation error returned
-// by LoadRegulator_DynamicConfig.Validate if the designated constraints
-// aren't met.
-type LoadRegulator_DynamicConfigValidationError struct {
+// Regulator_DynamicConfigValidationError is the validation error returned by
+// Regulator_DynamicConfig.Validate if the designated constraints aren't met.
+type Regulator_DynamicConfigValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -8451,24 +9289,24 @@ type LoadRegulator_DynamicConfigValidationError struct {
 }
 
 // Field function returns field value.
-func (e LoadRegulator_DynamicConfigValidationError) Field() string { return e.field }
+func (e Regulator_DynamicConfigValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LoadRegulator_DynamicConfigValidationError) Reason() string { return e.reason }
+func (e Regulator_DynamicConfigValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LoadRegulator_DynamicConfigValidationError) Cause() error { return e.cause }
+func (e Regulator_DynamicConfigValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LoadRegulator_DynamicConfigValidationError) Key() bool { return e.key }
+func (e Regulator_DynamicConfigValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LoadRegulator_DynamicConfigValidationError) ErrorName() string {
-	return "LoadRegulator_DynamicConfigValidationError"
+func (e Regulator_DynamicConfigValidationError) ErrorName() string {
+	return "Regulator_DynamicConfigValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e LoadRegulator_DynamicConfigValidationError) Error() string {
+func (e Regulator_DynamicConfigValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -8480,14 +9318,14 @@ func (e LoadRegulator_DynamicConfigValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLoadRegulator_DynamicConfig.%s: %s%s",
+		"invalid %sRegulator_DynamicConfig.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LoadRegulator_DynamicConfigValidationError{}
+var _ error = Regulator_DynamicConfigValidationError{}
 
 var _ interface {
 	Field() string
@@ -8495,24 +9333,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LoadRegulator_DynamicConfigValidationError{}
+} = Regulator_DynamicConfigValidationError{}
 
-// Validate checks the field values on LoadRegulator_Parameters with the rules
+// Validate checks the field values on Regulator_Parameters with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *LoadRegulator_Parameters) Validate() error {
+func (m *Regulator_Parameters) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on LoadRegulator_Parameters with the
-// rules defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on Regulator_Parameters with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// LoadRegulator_ParametersMultiError, or nil if none found.
-func (m *LoadRegulator_Parameters) ValidateAll() error {
+// Regulator_ParametersMultiError, or nil if none found.
+func (m *Regulator_Parameters) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *LoadRegulator_Parameters) validate(all bool) error {
+func (m *Regulator_Parameters) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -8523,7 +9361,7 @@ func (m *LoadRegulator_Parameters) validate(all bool) error {
 		switch v := interface{}(m.GetFlowSelector()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRegulator_ParametersValidationError{
+				errors = append(errors, Regulator_ParametersValidationError{
 					field:  "FlowSelector",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -8531,7 +9369,7 @@ func (m *LoadRegulator_Parameters) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRegulator_ParametersValidationError{
+				errors = append(errors, Regulator_ParametersValidationError{
 					field:  "FlowSelector",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -8540,7 +9378,7 @@ func (m *LoadRegulator_Parameters) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetFlowSelector()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return LoadRegulator_ParametersValidationError{
+			return Regulator_ParametersValidationError{
 				field:  "FlowSelector",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -8551,19 +9389,19 @@ func (m *LoadRegulator_Parameters) validate(all bool) error {
 	// no validation rules for LabelKey
 
 	if len(errors) > 0 {
-		return LoadRegulator_ParametersMultiError(errors)
+		return Regulator_ParametersMultiError(errors)
 	}
 
 	return nil
 }
 
-// LoadRegulator_ParametersMultiError is an error wrapping multiple validation
-// errors returned by LoadRegulator_Parameters.ValidateAll() if the designated
+// Regulator_ParametersMultiError is an error wrapping multiple validation
+// errors returned by Regulator_Parameters.ValidateAll() if the designated
 // constraints aren't met.
-type LoadRegulator_ParametersMultiError []error
+type Regulator_ParametersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m LoadRegulator_ParametersMultiError) Error() string {
+func (m Regulator_ParametersMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -8572,11 +9410,11 @@ func (m LoadRegulator_ParametersMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m LoadRegulator_ParametersMultiError) AllErrors() []error { return m }
+func (m Regulator_ParametersMultiError) AllErrors() []error { return m }
 
-// LoadRegulator_ParametersValidationError is the validation error returned by
-// LoadRegulator_Parameters.Validate if the designated constraints aren't met.
-type LoadRegulator_ParametersValidationError struct {
+// Regulator_ParametersValidationError is the validation error returned by
+// Regulator_Parameters.Validate if the designated constraints aren't met.
+type Regulator_ParametersValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -8584,24 +9422,24 @@ type LoadRegulator_ParametersValidationError struct {
 }
 
 // Field function returns field value.
-func (e LoadRegulator_ParametersValidationError) Field() string { return e.field }
+func (e Regulator_ParametersValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LoadRegulator_ParametersValidationError) Reason() string { return e.reason }
+func (e Regulator_ParametersValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LoadRegulator_ParametersValidationError) Cause() error { return e.cause }
+func (e Regulator_ParametersValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LoadRegulator_ParametersValidationError) Key() bool { return e.key }
+func (e Regulator_ParametersValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LoadRegulator_ParametersValidationError) ErrorName() string {
-	return "LoadRegulator_ParametersValidationError"
+func (e Regulator_ParametersValidationError) ErrorName() string {
+	return "Regulator_ParametersValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e LoadRegulator_ParametersValidationError) Error() string {
+func (e Regulator_ParametersValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -8613,14 +9451,14 @@ func (e LoadRegulator_ParametersValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLoadRegulator_Parameters.%s: %s%s",
+		"invalid %sRegulator_Parameters.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LoadRegulator_ParametersValidationError{}
+var _ error = Regulator_ParametersValidationError{}
 
 var _ interface {
 	Field() string
@@ -8628,24 +9466,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LoadRegulator_ParametersValidationError{}
+} = Regulator_ParametersValidationError{}
 
-// Validate checks the field values on LoadRegulator_Ins with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *LoadRegulator_Ins) Validate() error {
+// Validate checks the field values on Regulator_Ins with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Regulator_Ins) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on LoadRegulator_Ins with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// LoadRegulator_InsMultiError, or nil if none found.
-func (m *LoadRegulator_Ins) ValidateAll() error {
+// ValidateAll checks the field values on Regulator_Ins with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in Regulator_InsMultiError, or
+// nil if none found.
+func (m *Regulator_Ins) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *LoadRegulator_Ins) validate(all bool) error {
+func (m *Regulator_Ins) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -8656,7 +9494,7 @@ func (m *LoadRegulator_Ins) validate(all bool) error {
 		switch v := interface{}(m.GetAcceptPercentage()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRegulator_InsValidationError{
+				errors = append(errors, Regulator_InsValidationError{
 					field:  "AcceptPercentage",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -8664,7 +9502,7 @@ func (m *LoadRegulator_Ins) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRegulator_InsValidationError{
+				errors = append(errors, Regulator_InsValidationError{
 					field:  "AcceptPercentage",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -8673,7 +9511,7 @@ func (m *LoadRegulator_Ins) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetAcceptPercentage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return LoadRegulator_InsValidationError{
+			return Regulator_InsValidationError{
 				field:  "AcceptPercentage",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -8682,19 +9520,19 @@ func (m *LoadRegulator_Ins) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return LoadRegulator_InsMultiError(errors)
+		return Regulator_InsMultiError(errors)
 	}
 
 	return nil
 }
 
-// LoadRegulator_InsMultiError is an error wrapping multiple validation errors
-// returned by LoadRegulator_Ins.ValidateAll() if the designated constraints
+// Regulator_InsMultiError is an error wrapping multiple validation errors
+// returned by Regulator_Ins.ValidateAll() if the designated constraints
 // aren't met.
-type LoadRegulator_InsMultiError []error
+type Regulator_InsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m LoadRegulator_InsMultiError) Error() string {
+func (m Regulator_InsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -8703,11 +9541,11 @@ func (m LoadRegulator_InsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m LoadRegulator_InsMultiError) AllErrors() []error { return m }
+func (m Regulator_InsMultiError) AllErrors() []error { return m }
 
-// LoadRegulator_InsValidationError is the validation error returned by
-// LoadRegulator_Ins.Validate if the designated constraints aren't met.
-type LoadRegulator_InsValidationError struct {
+// Regulator_InsValidationError is the validation error returned by
+// Regulator_Ins.Validate if the designated constraints aren't met.
+type Regulator_InsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -8715,24 +9553,22 @@ type LoadRegulator_InsValidationError struct {
 }
 
 // Field function returns field value.
-func (e LoadRegulator_InsValidationError) Field() string { return e.field }
+func (e Regulator_InsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LoadRegulator_InsValidationError) Reason() string { return e.reason }
+func (e Regulator_InsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LoadRegulator_InsValidationError) Cause() error { return e.cause }
+func (e Regulator_InsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LoadRegulator_InsValidationError) Key() bool { return e.key }
+func (e Regulator_InsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LoadRegulator_InsValidationError) ErrorName() string {
-	return "LoadRegulator_InsValidationError"
-}
+func (e Regulator_InsValidationError) ErrorName() string { return "Regulator_InsValidationError" }
 
 // Error satisfies the builtin error interface
-func (e LoadRegulator_InsValidationError) Error() string {
+func (e Regulator_InsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -8744,14 +9580,14 @@ func (e LoadRegulator_InsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLoadRegulator_Ins.%s: %s%s",
+		"invalid %sRegulator_Ins.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LoadRegulator_InsValidationError{}
+var _ error = Regulator_InsValidationError{}
 
 var _ interface {
 	Field() string
@@ -8759,7 +9595,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LoadRegulator_InsValidationError{}
+} = Regulator_InsValidationError{}
 
 // Validate checks the field values on LoadShaper_Parameters with the rules
 // defined in the proto definition for this message. If any rules are
@@ -8844,35 +9680,6 @@ func (m *LoadShaper_Parameters) validate(all bool) error {
 			}
 		}
 
-	}
-
-	if all {
-		switch v := interface{}(m.GetLoadRegulatorParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadShaper_ParametersValidationError{
-					field:  "LoadRegulatorParameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadShaper_ParametersValidationError{
-					field:  "LoadRegulatorParameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetLoadRegulatorParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadShaper_ParametersValidationError{
-				field:  "LoadRegulatorParameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
 	}
 
 	if len(errors) > 0 {
@@ -9950,3 +10757,1160 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadShaperSeries_InsValidationError{}
+
+// Validate checks the field values on LoadRamp_Parameters with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadRamp_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRamp_Parameters with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadRamp_ParametersMultiError, or nil if none found.
+func (m *LoadRamp_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRamp_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRegulatorParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_ParametersValidationError{
+					field:  "RegulatorParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_ParametersValidationError{
+					field:  "RegulatorParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRegulatorParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_ParametersValidationError{
+				field:  "RegulatorParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetSteps() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LoadRamp_ParametersValidationError{
+						field:  fmt.Sprintf("Steps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LoadRamp_ParametersValidationError{
+						field:  fmt.Sprintf("Steps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LoadRamp_ParametersValidationError{
+					field:  fmt.Sprintf("Steps[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return LoadRamp_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRamp_ParametersMultiError is an error wrapping multiple validation
+// errors returned by LoadRamp_Parameters.ValidateAll() if the designated
+// constraints aren't met.
+type LoadRamp_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRamp_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRamp_ParametersMultiError) AllErrors() []error { return m }
+
+// LoadRamp_ParametersValidationError is the validation error returned by
+// LoadRamp_Parameters.Validate if the designated constraints aren't met.
+type LoadRamp_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRamp_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRamp_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRamp_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRamp_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRamp_ParametersValidationError) ErrorName() string {
+	return "LoadRamp_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadRamp_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRamp_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRamp_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRamp_ParametersValidationError{}
+
+// Validate checks the field values on LoadRamp_Ins with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadRamp_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRamp_Ins with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LoadRamp_InsMultiError, or
+// nil if none found.
+func (m *LoadRamp_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRamp_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetForward()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_InsValidationError{
+					field:  "Forward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_InsValidationError{
+					field:  "Forward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetForward()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_InsValidationError{
+				field:  "Forward",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetBackward()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_InsValidationError{
+					field:  "Backward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_InsValidationError{
+					field:  "Backward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBackward()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_InsValidationError{
+				field:  "Backward",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetReset_()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_InsValidationError{
+					field:  "Reset_",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_InsValidationError{
+					field:  "Reset_",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetReset_()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_InsValidationError{
+				field:  "Reset_",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRamp_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRamp_InsMultiError is an error wrapping multiple validation errors
+// returned by LoadRamp_Ins.ValidateAll() if the designated constraints aren't met.
+type LoadRamp_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRamp_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRamp_InsMultiError) AllErrors() []error { return m }
+
+// LoadRamp_InsValidationError is the validation error returned by
+// LoadRamp_Ins.Validate if the designated constraints aren't met.
+type LoadRamp_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRamp_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRamp_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRamp_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRamp_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRamp_InsValidationError) ErrorName() string { return "LoadRamp_InsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadRamp_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRamp_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRamp_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRamp_InsValidationError{}
+
+// Validate checks the field values on LoadRamp_Outs with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadRamp_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRamp_Outs with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LoadRamp_OutsMultiError, or
+// nil if none found.
+func (m *LoadRamp_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRamp_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetAcceptPercentage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_OutsValidationError{
+					field:  "AcceptPercentage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_OutsValidationError{
+					field:  "AcceptPercentage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAcceptPercentage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_OutsValidationError{
+				field:  "AcceptPercentage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAtStart()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_OutsValidationError{
+					field:  "AtStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_OutsValidationError{
+					field:  "AtStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAtStart()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_OutsValidationError{
+				field:  "AtStart",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAtEnd()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_OutsValidationError{
+					field:  "AtEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_OutsValidationError{
+					field:  "AtEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAtEnd()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_OutsValidationError{
+				field:  "AtEnd",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRamp_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRamp_OutsMultiError is an error wrapping multiple validation errors
+// returned by LoadRamp_Outs.ValidateAll() if the designated constraints
+// aren't met.
+type LoadRamp_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRamp_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRamp_OutsMultiError) AllErrors() []error { return m }
+
+// LoadRamp_OutsValidationError is the validation error returned by
+// LoadRamp_Outs.Validate if the designated constraints aren't met.
+type LoadRamp_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRamp_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRamp_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRamp_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRamp_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRamp_OutsValidationError) ErrorName() string { return "LoadRamp_OutsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadRamp_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRamp_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRamp_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRamp_OutsValidationError{}
+
+// Validate checks the field values on LoadRamp_Parameters_Step with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadRamp_Parameters_Step) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRamp_Parameters_Step with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadRamp_Parameters_StepMultiError, or nil if none found.
+func (m *LoadRamp_Parameters_Step) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRamp_Parameters_Step) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for TargetAcceptPercentage
+
+	if all {
+		switch v := interface{}(m.GetDuration()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRamp_Parameters_StepValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRamp_Parameters_StepValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRamp_Parameters_StepValidationError{
+				field:  "Duration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRamp_Parameters_StepMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRamp_Parameters_StepMultiError is an error wrapping multiple validation
+// errors returned by LoadRamp_Parameters_Step.ValidateAll() if the designated
+// constraints aren't met.
+type LoadRamp_Parameters_StepMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRamp_Parameters_StepMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRamp_Parameters_StepMultiError) AllErrors() []error { return m }
+
+// LoadRamp_Parameters_StepValidationError is the validation error returned by
+// LoadRamp_Parameters_Step.Validate if the designated constraints aren't met.
+type LoadRamp_Parameters_StepValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRamp_Parameters_StepValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRamp_Parameters_StepValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRamp_Parameters_StepValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRamp_Parameters_StepValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRamp_Parameters_StepValidationError) ErrorName() string {
+	return "LoadRamp_Parameters_StepValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadRamp_Parameters_StepValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRamp_Parameters_Step.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRamp_Parameters_StepValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRamp_Parameters_StepValidationError{}
+
+// Validate checks the field values on LoadRampSeries_LoadRampInstance with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadRampSeries_LoadRampInstance) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRampSeries_LoadRampInstance with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// LoadRampSeries_LoadRampInstanceMultiError, or nil if none found.
+func (m *LoadRampSeries_LoadRampInstance) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRampSeries_LoadRampInstance) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetLoadRamp()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeries_LoadRampInstanceValidationError{
+					field:  "LoadRamp",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeries_LoadRampInstanceValidationError{
+					field:  "LoadRamp",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLoadRamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeries_LoadRampInstanceValidationError{
+				field:  "LoadRamp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeries_LoadRampInstanceValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeries_LoadRampInstanceValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeries_LoadRampInstanceValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRampSeries_LoadRampInstanceMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRampSeries_LoadRampInstanceMultiError is an error wrapping multiple
+// validation errors returned by LoadRampSeries_LoadRampInstance.ValidateAll()
+// if the designated constraints aren't met.
+type LoadRampSeries_LoadRampInstanceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRampSeries_LoadRampInstanceMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRampSeries_LoadRampInstanceMultiError) AllErrors() []error { return m }
+
+// LoadRampSeries_LoadRampInstanceValidationError is the validation error
+// returned by LoadRampSeries_LoadRampInstance.Validate if the designated
+// constraints aren't met.
+type LoadRampSeries_LoadRampInstanceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRampSeries_LoadRampInstanceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRampSeries_LoadRampInstanceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRampSeries_LoadRampInstanceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRampSeries_LoadRampInstanceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRampSeries_LoadRampInstanceValidationError) ErrorName() string {
+	return "LoadRampSeries_LoadRampInstanceValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadRampSeries_LoadRampInstanceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRampSeries_LoadRampInstance.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRampSeries_LoadRampInstanceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRampSeries_LoadRampInstanceValidationError{}
+
+// Validate checks the field values on LoadRampSeries_Parameters with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadRampSeries_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRampSeries_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadRampSeries_ParametersMultiError, or nil if none found.
+func (m *LoadRampSeries_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRampSeries_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetLoadRamps() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LoadRampSeries_ParametersValidationError{
+						field:  fmt.Sprintf("LoadRamps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LoadRampSeries_ParametersValidationError{
+						field:  fmt.Sprintf("LoadRamps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LoadRampSeries_ParametersValidationError{
+					field:  fmt.Sprintf("LoadRamps[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return LoadRampSeries_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRampSeries_ParametersMultiError is an error wrapping multiple validation
+// errors returned by LoadRampSeries_Parameters.ValidateAll() if the
+// designated constraints aren't met.
+type LoadRampSeries_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRampSeries_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRampSeries_ParametersMultiError) AllErrors() []error { return m }
+
+// LoadRampSeries_ParametersValidationError is the validation error returned by
+// LoadRampSeries_Parameters.Validate if the designated constraints aren't met.
+type LoadRampSeries_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRampSeries_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRampSeries_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRampSeries_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRampSeries_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRampSeries_ParametersValidationError) ErrorName() string {
+	return "LoadRampSeries_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadRampSeries_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRampSeries_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRampSeries_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRampSeries_ParametersValidationError{}
+
+// Validate checks the field values on LoadRampSeries_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LoadRampSeries_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRampSeries_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadRampSeries_InsMultiError, or nil if none found.
+func (m *LoadRampSeries_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRampSeries_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetForward()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeries_InsValidationError{
+					field:  "Forward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeries_InsValidationError{
+					field:  "Forward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetForward()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeries_InsValidationError{
+				field:  "Forward",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetBackward()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeries_InsValidationError{
+					field:  "Backward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeries_InsValidationError{
+					field:  "Backward",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBackward()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeries_InsValidationError{
+				field:  "Backward",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetReset_()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeries_InsValidationError{
+					field:  "Reset_",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeries_InsValidationError{
+					field:  "Reset_",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetReset_()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeries_InsValidationError{
+				field:  "Reset_",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRampSeries_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRampSeries_InsMultiError is an error wrapping multiple validation errors
+// returned by LoadRampSeries_Ins.ValidateAll() if the designated constraints
+// aren't met.
+type LoadRampSeries_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRampSeries_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRampSeries_InsMultiError) AllErrors() []error { return m }
+
+// LoadRampSeries_InsValidationError is the validation error returned by
+// LoadRampSeries_Ins.Validate if the designated constraints aren't met.
+type LoadRampSeries_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRampSeries_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRampSeries_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRampSeries_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRampSeries_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRampSeries_InsValidationError) ErrorName() string {
+	return "LoadRampSeries_InsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LoadRampSeries_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRampSeries_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRampSeries_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRampSeries_InsValidationError{}

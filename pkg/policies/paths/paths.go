@@ -22,12 +22,12 @@ var (
 	PoliciesDynamicConfigPath = path.Join(ConfigPrefix, "dynamic-config-policies")
 	// ClassifiersPath is config path in etcd for classifiers.
 	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
-	// LoadActuatorDecisionsPath is decision path in etcd for load decisions.
-	LoadActuatorDecisionsPath = path.Join(DecisionsPrefix, "load")
 	// AutoTokenResultsPath is config path in etcd for query tokens.
 	AutoTokenResultsPath = path.Join(ConfigPrefix, "tokens")
 	// LoadSchedulerConfigPath is config path in etcd for load scheduler.
 	LoadSchedulerConfigPath = path.Join(ConfigPrefix, "load_scheduler")
+	// LoadSchedulerDecisionsPath is decision path in etcd for load decisions.
+	LoadSchedulerDecisionsPath = path.Join(DecisionsPrefix, "load_scheduler")
 	// RateLimiterConfigPath is config path in etcd for rate limiter.
 	RateLimiterConfigPath = path.Join(ConfigPrefix, "rate_limiter")
 	// RateLimiterDecisionsPath is decision path in etcd for rate limiter decisions.
@@ -44,12 +44,12 @@ var (
 	PodScalerStatusPath = path.Join(StatusPrefix, "pod_scaler")
 	// PodScalerDynamicConfigPath is config path in etcd for dynamic config of pod scaler.
 	PodScalerDynamicConfigPath = path.Join(ConfigPrefix, "pod_scaler_dynamic_config")
-	// LoadRegulatorConfigPath is config path in etcd for load regulator.
-	LoadRegulatorConfigPath = path.Join(ConfigPrefix, "load_regulator")
-	// LoadRegulatorDecisionsPath is decision path in etcd for load regulator decisions.
-	LoadRegulatorDecisionsPath = path.Join(DecisionsPrefix, "load_regulator")
-	// LoadRegulatorDynamicConfigPath is config path in etcd for dynamic config of load regulator.
-	LoadRegulatorDynamicConfigPath = path.Join(ConfigPrefix, "load_regulator_dynamic_config")
+	// RegulatorConfigPath is config path in etcd for load regulator.
+	RegulatorConfigPath = path.Join(ConfigPrefix, "regulator")
+	// RegulatorDecisionsPath is decision path in etcd for load regulator decisions.
+	RegulatorDecisionsPath = path.Join(DecisionsPrefix, "regulator")
+	// RegulatorDynamicConfigPath is config path in etcd for dynamic config of load regulator.
+	RegulatorDynamicConfigPath = path.Join(ConfigPrefix, "regulator_dynamic_config")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.

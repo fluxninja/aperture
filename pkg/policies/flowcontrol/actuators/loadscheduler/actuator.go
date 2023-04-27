@@ -24,7 +24,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-type loadActuatorFactory struct {
+type actuatorFactory struct {
 	loadDecisionWatcher                notifiers.Watcher
 	tokenBucketLMGaugeVec              *prometheus.GaugeVec
 	tokenBucketFillRateGaugeVec        *prometheus.GaugeVec
@@ -33,21 +33,21 @@ type loadActuatorFactory struct {
 	agentGroupName                     string
 }
 
-// newLoadActuatorFactory sets up the load actuator module in the main fx app.
-func newLoadActuatorFactory(
+// newActuatorFactory sets up the load actuator module in the main fx app.
+func newActuatorFactory(
 	lc fx.Lifecycle,
 	etcdClient *etcdclient.Client,
 	agentGroup string,
 	prometheusRegistry *prometheus.Registry,
-) (*loadActuatorFactory, error) {
+) (*actuatorFactory, error) {
 	// Scope the sync to the agent group.
-	etcdDecisionsPath := path.Join(paths.LoadActuatorDecisionsPath,
+	etcdDecisionsPath := path.Join(paths.LoadSchedulerDecisionsPath,
 		paths.AgentGroupPrefix(agentGroup))
 	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdDecisionsPath)
 	if err != nil {
 		return nil, err
 	}
-	f := &loadActuatorFactory{
+	f := &actuatorFactory{
 		loadDecisionWatcher: loadDecisionWatcher,
 		agentGroupName:      agentGroup,
 	}
@@ -136,18 +136,18 @@ func newLoadActuatorFactory(
 	return f, nil
 }
 
-// newLoadActuator creates a new load actuator based on proto spec.
-func (lsaFactory *loadActuatorFactory) newLoadActuator(
-	loadActuatorMsg *policylangv1.LoadActuator,
+// newActuator creates a new load actuator based on proto spec.
+func (lsaFactory *actuatorFactory) newActuator(
+	actuatorMsg *policylangv1.LoadScheduler_Actuator,
 	ls *loadScheduler,
 	registry status.Registry,
 	clock clockwork.Clock,
 	lifecycle fx.Lifecycle,
 	metricLabels prometheus.Labels,
-) (*loadActuator, error) {
+) (*actuator, error) {
 	reg := registry.Child("component", "load_actuator")
 
-	la := &loadActuator{
+	la := &actuator{
 		loadScheduler:  ls,
 		clock:          clock,
 		statusRegistry: reg,
@@ -248,15 +248,15 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 	return la, nil
 }
 
-// loadActuator saves load decisions received from controller.
-type loadActuator struct {
+// actuator saves load decisions received from controller.
+type actuator struct {
 	loadScheduler             *loadScheduler
 	clock                     clockwork.Clock
 	tokenBucketLoadMultiplier *scheduler.TokenBucketLoadMultiplier
 	statusRegistry            status.Registry
 }
 
-func (la *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (la *actuator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := la.statusRegistry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision was removed, set pass through mode")

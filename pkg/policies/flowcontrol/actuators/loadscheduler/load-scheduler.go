@@ -80,8 +80,8 @@ type loadSchedulerFactory struct {
 	engineAPI iface.Engine
 	registry  status.Registry
 
-	autoTokensFactory   *autoTokensFactory
-	loadActuatorFactory *loadActuatorFactory
+	autoTokensFactory *autoTokensFactory
+	actuatorFactory   *actuatorFactory
 
 	// WFQ Metrics.
 	wfqFlowsGaugeVec    *prometheus.GaugeVec
@@ -108,7 +108,7 @@ func setupLoadSchedulerFactory(
 	agentGroup := ai.GetAgentGroup()
 
 	// Create factories
-	loadActuatorFactory, err := newLoadActuatorFactory(lifecycle, etcdClient, agentGroup, prometheusRegistry)
+	actuatorFactory, err := newActuatorFactory(lifecycle, etcdClient, agentGroup, prometheusRegistry)
 	if err != nil {
 		return err
 	}
@@ -121,10 +121,10 @@ func setupLoadSchedulerFactory(
 	reg := statusRegistry.Child("component", "load_scheduler")
 
 	conLimiterFactory := &loadSchedulerFactory{
-		engineAPI:           e,
-		autoTokensFactory:   autoTokensFactory,
-		loadActuatorFactory: loadActuatorFactory,
-		registry:            reg,
+		engineAPI:         e,
+		autoTokensFactory: autoTokensFactory,
+		actuatorFactory:   actuatorFactory,
+		registry:          reg,
 	}
 
 	conLimiterFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
@@ -364,7 +364,7 @@ var _ iface.Limiter = &loadScheduler{}
 func (conLimiter *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	// Factories
 	conLimiterFactory := conLimiter.loadSchedulerFactory
-	loadActuatorFactory := conLimiterFactory.loadActuatorFactory
+	actuatorFactory := conLimiterFactory.actuatorFactory
 	autoTokensFactory := conLimiterFactory.autoTokensFactory
 	// Form metric labels
 	metricLabels := make(prometheus.Labels)
@@ -373,7 +373,7 @@ func (conLimiter *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.ComponentIDLabel] = conLimiter.GetComponentId()
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.loadSchedulerMsg.GetLoadActuator(),
+	actuator, err := actuatorFactory.newActuator(conLimiter.loadSchedulerMsg.GetActuator(),
 		conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
@@ -417,7 +417,7 @@ func (conLimiter *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// setup scheduler
-			conLimiter.scheduler = scheduler.NewWFQScheduler(loadActuator.tokenBucketLoadMultiplier, clock, wfqMetrics)
+			conLimiter.scheduler = scheduler.NewWFQScheduler(actuator.tokenBucketLoadMultiplier, clock, wfqMetrics)
 
 			conLimiter.incomingTokensCounter, err = incomingTokensCounterVec.GetMetricWith(metricLabels)
 			if err != nil {

@@ -27,8 +27,8 @@ policy:
           service_selector:
             service: service1-demo-app.demoapp.svc.cluster.local
   evaluation_interval: "1s"
-  load_shaper:
-    flow_regulator_parameters:
+  load_ramp:
+    regulator_parameters:
       flow_selector:
         flow_matcher:
           control_point: ingress

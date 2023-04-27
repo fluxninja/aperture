@@ -22,7 +22,7 @@ type multiMatchResult struct {
 	loadSchedulers []iface.Limiter
 	fluxMeters     []iface.FluxMeter
 	rateLimiters   []iface.Limiter
-	loadRegulators []iface.Limiter
+	regulators     []iface.Limiter
 	labelPreviews  []iface.LabelPreview
 }
 
@@ -35,19 +35,19 @@ func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiM
 	result.loadSchedulers = append(result.loadSchedulers, resultCollection.loadSchedulers...)
 	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
 	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
-	result.loadRegulators = append(result.loadRegulators, resultCollection.loadRegulators...)
+	result.regulators = append(result.regulators, resultCollection.regulators...)
 	result.labelPreviews = append(result.labelPreviews, resultCollection.labelPreviews...)
 }
 
 // NewEngine Main fx app.
 func NewEngine() iface.Engine {
 	e := &Engine{
-		multiMatchers:    make(map[selectors.ControlPointID]*multiMatcher),
-		fluxMetersMap:    make(map[iface.FluxMeterID]iface.FluxMeter),
-		conLimiterMap:    make(map[iface.LimiterID]iface.LoadScheduler),
-		rateLimiterMap:   make(map[iface.LimiterID]iface.RateLimiter),
-		loadRegulatorMap: make(map[iface.LimiterID]iface.Limiter),
-		labelPreviewMap:  make(map[iface.PreviewID]iface.LabelPreview),
+		multiMatchers:   make(map[selectors.ControlPointID]*multiMatcher),
+		fluxMetersMap:   make(map[iface.FluxMeterID]iface.FluxMeter),
+		conLimiterMap:   make(map[iface.LimiterID]iface.LoadScheduler),
+		rateLimiterMap:  make(map[iface.LimiterID]iface.RateLimiter),
+		regulatorMap:    make(map[iface.LimiterID]iface.Limiter),
+		labelPreviewMap: make(map[iface.PreviewID]iface.LabelPreview),
 	}
 	return e
 }
@@ -56,13 +56,13 @@ func NewEngine() iface.Engine {
 // (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
-	mutex            sync.RWMutex
-	fluxMetersMap    map[iface.FluxMeterID]iface.FluxMeter
-	conLimiterMap    map[iface.LimiterID]iface.LoadScheduler
-	rateLimiterMap   map[iface.LimiterID]iface.RateLimiter
-	loadRegulatorMap map[iface.LimiterID]iface.Limiter
-	labelPreviewMap  map[iface.PreviewID]iface.LabelPreview
-	multiMatchers    map[selectors.ControlPointID]*multiMatcher
+	mutex           sync.RWMutex
+	fluxMetersMap   map[iface.FluxMeterID]iface.FluxMeter
+	conLimiterMap   map[iface.LimiterID]iface.LoadScheduler
+	rateLimiterMap  map[iface.LimiterID]iface.RateLimiter
+	regulatorMap    map[iface.LimiterID]iface.Limiter
+	labelPreviewMap map[iface.PreviewID]iface.LabelPreview
+	multiMatchers   map[selectors.ControlPointID]*multiMatcher
 }
 
 // ProcessRequest .
@@ -105,9 +105,9 @@ func (e *Engine) ProcessRequest(
 		limiters     []iface.Limiter
 		rejectReason flowcontrolv1.CheckResponse_RejectReason
 	}{
-		{mmr.loadRegulators, flowcontrolv1.CheckResponse_REJECT_REASON_LOAD_REGULATED},
+		{mmr.regulators, flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED},
 		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
-		{mmr.loadSchedulers, flowcontrolv1.CheckResponse_REJECT_REASON_LOAD_SHED},
+		{mmr.loadSchedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS},
 	}
 
 	for _, limiterType := range limiterTypes {
@@ -303,41 +303,41 @@ func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 	return e.rateLimiterMap[limiterID]
 }
 
-// RegisterLoadRegulator adds limiter actuator to multimatcher.
-func (e *Engine) RegisterLoadRegulator(l iface.Limiter) error {
+// RegisterRegulator adds limiter actuator to multimatcher.
+func (e *Engine) RegisterRegulator(l iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	if _, ok := e.loadRegulatorMap[l.GetLimiterID()]; !ok {
-		e.loadRegulatorMap[l.GetLimiterID()] = l
+	if _, ok := e.regulatorMap[l.GetLimiterID()]; !ok {
+		e.regulatorMap[l.GetLimiterID()] = l
 	} else {
 		return fmt.Errorf("load regulator already registered")
 	}
 
-	loadRegulatorMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.loadRegulators = append(
-			mmr.loadRegulators,
+	regulatorMatchedCB := func(mmr multiMatchResult) multiMatchResult {
+		mmr.regulators = append(
+			mmr.regulators,
 			l,
 		)
 		return mmr
 	}
 
-	return e.register("LoadRegulator:"+l.GetLimiterID().String(), l.GetFlowSelector(), loadRegulatorMatchedCB)
+	return e.register("Regulator:"+l.GetLimiterID().String(), l.GetFlowSelector(), regulatorMatchedCB)
 }
 
-// UnregisterLoadRegulator removes limiter actuator from multimatcher.
-func (e *Engine) UnregisterLoadRegulator(rl iface.Limiter) error {
+// UnregisterRegulator removes limiter actuator from multimatcher.
+func (e *Engine) UnregisterRegulator(rl iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.loadRegulatorMap, rl.GetLimiterID())
+	delete(e.regulatorMap, rl.GetLimiterID())
 
-	return e.unregister("LoadRegulator:"+rl.GetLimiterID().String(), rl.GetFlowSelector())
+	return e.unregister("Regulator:"+rl.GetLimiterID().String(), rl.GetFlowSelector())
 }
 
-// GetLoadRegulator Lookup function for getting load regulator.
-func (e *Engine) GetLoadRegulator(limiterID iface.LimiterID) iface.Limiter {
+// GetRegulator Lookup function for getting load regulator.
+func (e *Engine) GetRegulator(limiterID iface.LimiterID) iface.Limiter {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
-	return e.loadRegulatorMap[limiterID]
+	return e.regulatorMap[limiterID]
 }
 
 // RegisterLabelPreview adds label preview to multimatcher.

@@ -410,15 +410,15 @@ function(cfg) {
     }),
   ),
 
-  local loadShaper = spec.v1.Component.withFlowControl(
-    spec.v1.FlowControl.withLoadShaper(
-      spec.v1.LoadShaper.withInPorts({
+  local loadRamp = spec.v1.Component.withFlowControl(
+    spec.v1.FlowControl.withLoadRamp(
+      spec.v1.LoadRamp.withInPorts({
         forward: spec.v1.Port.withSignalName('FORWARD'),
         backward: spec.v1.Port.withSignalName('BACKWARD'),
         reset: spec.v1.Port.withSignalName('RESET'),
       })
-      + spec.v1.LoadShaper.withParameters(params.load_shaper)
-      + spec.v1.LoadShaper.withDynamicConfigKey('load_shaper'),
+      + spec.v1.LoadRamp.withParameters(params.load_ramp)
+      + spec.v1.LoadRamp.withDynamicConfigKey('regulator'),
     ),
   ),
 
@@ -442,7 +442,7 @@ function(cfg) {
         ] + notBackwardIntentComponents + notResetComponents + [
           forwardCriteriaComponent,
           backwardCriteriaComponent,
-          loadShaper,
+          loadRamp,
         ] + params.components,
       ),
     ),

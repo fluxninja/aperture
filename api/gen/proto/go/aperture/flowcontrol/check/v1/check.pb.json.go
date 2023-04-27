@@ -104,7 +104,7 @@ func (msg *LimiterDecision_LoadSchedulerInfo) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *LimiterDecision_LoadRegulatorInfo) MarshalJSON() ([]byte, error) {
+func (msg *LimiterDecision_RegulatorInfo) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -113,7 +113,7 @@ func (msg *LimiterDecision_LoadRegulatorInfo) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *LimiterDecision_LoadRegulatorInfo) UnmarshalJSON(b []byte) error {
+func (msg *LimiterDecision_RegulatorInfo) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

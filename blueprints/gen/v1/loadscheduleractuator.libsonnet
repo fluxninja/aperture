@@ -1,8 +1,8 @@
-local loadregulatorins = import './loadregulatorins.libsonnet';
+local loadscheduleractuatorins = import './loadscheduleractuatorins.libsonnet';
 {
   new():: {
   },
-  inPorts:: loadregulatorins,
+  inPorts:: loadscheduleractuatorins,
   withDefaultConfig(default_config):: {
     default_config: default_config,
   },
@@ -20,11 +20,5 @@ local loadregulatorins = import './loadregulatorins.libsonnet';
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
-  },
-  withParameters(parameters):: {
-    parameters: parameters,
-  },
-  withParametersMixin(parameters):: {
-    parameters+: parameters,
   },
 }

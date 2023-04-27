@@ -179,13 +179,13 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 			}
 
 			// Update flow regulator metrics.
-			if fr := decision.GetLoadRegulatorInfo(); fr != nil {
+			if fr := decision.GetRegulatorInfo(); fr != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:  decision.PolicyName,
 					metrics.PolicyHashLabel:  decision.PolicyHash,
 					metrics.ComponentIDLabel: decision.ComponentId,
 				}
-				p.updateMetricsForLoadRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+				p.updateMetricsForRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
 		}
 	}
@@ -274,20 +274,20 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForLoadRegulator(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
-	loadRegulator := p.cfg.engine.GetLoadRegulator(limiterID)
-	if loadRegulator == nil {
-		log.Sample(noLoadRegulatorSampler).Warn().
+func (p *metricsProcessor) updateMetricsForRegulator(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
+	regulator := p.cfg.engine.GetRegulator(limiterID)
+	if regulator == nil {
+		log.Sample(noRegulatorSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
-			Msg("LoadRegulator not found")
+			Msg("Regulator not found")
 		return
 	}
 	// Add decision type label to the request counter metric
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.RegulatorDroppedLabel] = strconv.FormatBool(dropped)
-	requestCounter := loadRegulator.GetRequestCounter(labels)
+	requestCounter := regulator.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
 	}
@@ -354,7 +354,7 @@ func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv
 var (
 	noLoadSchedulerSampler = log.NewRatelimitingSampler()
 	noRateLimiterSampler   = log.NewRatelimitingSampler()
-	noLoadRegulatorSampler = log.NewRatelimitingSampler()
+	noRegulatorSampler     = log.NewRatelimitingSampler()
 	noClassifierSampler    = log.NewRatelimitingSampler()
 	noFluxMeterSampler     = log.NewRatelimitingSampler()
 )

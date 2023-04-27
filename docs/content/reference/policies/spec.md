@@ -306,7 +306,7 @@ Configuration for embedded Alerter.
 
 <!-- vale off -->
 
-([LoadActuatorDynamicConfig](#load-actuator-dynamic-config))
+([LoadSchedulerActuatorDynamicConfig](#load-scheduler-actuator-dynamic-config))
 
 <!-- vale on -->
 
@@ -2837,16 +2837,28 @@ Flow Regulator is a component that regulates the flow of requests to the service
 Deprecated: 1.6.0
 
 </dd>
-<dt>load_regulator</dt>
+<dt>load_ramp</dt>
 <dd>
 
 <!-- vale off -->
 
-([LoadRegulator](#load-regulator))
+([LoadRamp](#load-ramp))
 
 <!-- vale on -->
 
-Load Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+_Load Ramp_ smoothly regulates the flow of requests over specified steps.
+
+</dd>
+<dt>load_ramp_series</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampSeries](#load-ramp-series))
+
+<!-- vale on -->
+
+_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -2871,6 +2883,7 @@ _Load Scheduler_ provides service protection by applying prioritized load sheddi
 <!-- vale on -->
 
 _Load Shaper_ is a component that shapes the load at a _Control Point_.
+Deprecated: 1.6.0
 
 </dd>
 <dt>load_shaper_series</dt>
@@ -2883,6 +2896,7 @@ _Load Shaper_ is a component that shapes the load at a _Control Point_.
 <!-- vale on -->
 
 _Load Shaper Series_ is a series of _Load Shaper_ components that can shape load one after another at same or different _Control Points_.
+Deprecated: 1.6.0
 
 </dd>
 <dt>rate_limiter</dt>
@@ -2895,6 +2909,18 @@ _Load Shaper Series_ is a series of _Load Shaper_ components that can shape load
 <!-- vale on -->
 
 _Rate Limiter_ provides service protection by applying rate limits.
+
+</dd>
+<dt>regulator</dt>
+<dd>
+
+<!-- vale off -->
+
+([Regulator](#regulator))
+
+<!-- vale on -->
+
+Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
 
 </dd>
 </dl>
@@ -4757,19 +4783,24 @@ token rate](#scheduler-outs) that needs to be accepted.
 
 <!-- vale off -->
 
-### LoadRegulator {#load-regulator}
+### LoadRamp {#load-ramp}
 
 <!-- vale on -->
 
-_Load Regulator_ is a component that regulates the load at a
-[_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
-flows at random or by sticky sessions.
+The _Load Ramp_ produces a smooth and continuous traffic load
+that changes progressively over time, based on the specified steps.
 
-:::info
+Each step is defined by two parameters:
 
-See also [\_Load Regulator overview](/concepts/flow-control/components/load-regulator.md).
+- The `target_accept_percentage`.
+- The `duration` for the signal to change from the
+  previous step's `target_accept_percentage` to the current step's
+  `target_accept_percentage`.
 
-:::
+The percentage of requests accepted starts at the `target_accept_percentage`
+defined in the first step and gradually ramps up or down linearly from
+the previous step's `target_accept_percentage` to the next
+`target_accept_percentage`, over the `duration` specified for each step.
 
 <dl>
 <dt>default_config</dt>
@@ -4777,7 +4808,7 @@ See also [\_Load Regulator overview](/concepts/flow-control/components/load-regu
 
 <!-- vale off -->
 
-([LoadRegulatorDynamicConfig](#load-regulator-dynamic-config))
+([RegulatorDynamicConfig](#regulator-dynamic-config))
 
 <!-- vale on -->
 
@@ -4793,7 +4824,7 @@ Default configuration.
 
 <!-- vale on -->
 
-Configuration key for DynamicConfig.
+Dynamic configuration key for flow regulator.
 
 </dd>
 <dt>in_ports</dt>
@@ -4801,11 +4832,19 @@ Configuration key for DynamicConfig.
 
 <!-- vale off -->
 
-([LoadRegulatorIns](#load-regulator-ins))
+([LoadRampIns](#load-ramp-ins))
 
 <!-- vale on -->
 
-Input ports for the _Load Regulator_.
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampOuts](#load-ramp-outs))
+
+<!-- vale on -->
 
 </dd>
 <dt>parameters</dt>
@@ -4813,11 +4852,9 @@ Input ports for the _Load Regulator_.
 
 <!-- vale off -->
 
-([LoadRegulatorParameters](#load-regulator-parameters))
+([LoadRampParameters](#load-ramp-parameters))
 
 <!-- vale on -->
-
-Parameters for the _Load Regulator_.
 
 </dd>
 </dl>
@@ -4826,37 +4863,14 @@ Parameters for the _Load Regulator_.
 
 <!-- vale off -->
 
-### LoadRegulatorDynamicConfig {#load-regulator-dynamic-config}
+### LoadRampIns {#load-ramp-ins}
 
 <!-- vale on -->
 
-Dynamic Configuration for _Load Regulator_
+Inputs for the _Load Ramp_ component.
 
 <dl>
-<dt>enable_label_values</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-Specify certain label values to be accepted by this flow filter regardless of accept percentage.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRegulatorIns {#load-regulator-ins}
-
-<!-- vale on -->
-
-<dl>
-<dt>accept_percentage</dt>
+<dt>backward</dt>
 <dd>
 
 <!-- vale off -->
@@ -4865,7 +4879,31 @@ Specify certain label values to be accepted by this flow filter regardless of ac
 
 <!-- vale on -->
 
-The percentage of requests to accept.
+Whether to progress the _Load Ramp_ towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the _Load Ramp_ towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to reset the _Load Ramp_ to the first step.
 
 </dd>
 </dl>
@@ -4874,39 +4912,257 @@ The percentage of requests to accept.
 
 <!-- vale off -->
 
-### LoadRegulatorParameters {#load-regulator-parameters}
+### LoadRampOuts {#load-ramp-outs}
+
+<!-- vale on -->
+
+Outputs for the _Load Ramp_ component.
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The percentage of flows being accepted by the _Load Ramp_.
+
+</dd>
+<dt>at_end</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation.
+
+</dd>
+<dt>at_start</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampParameters {#load-ramp-parameters}
+
+<!-- vale on -->
+
+Parameters for the _Load Ramp_ component.
+
+<dl>
+<dt>regulator_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorParameters](#regulator-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Regulator_.
+
+</dd>
+<dt>steps</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadRampParametersStep](#load-ramp-parameters-step), **required**)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampParametersStep {#load-ramp-parameters-step}
 
 <!-- vale on -->
 
 <dl>
-<dt>flow_selector</dt>
+<dt>duration</dt>
 <dd>
 
 <!-- vale off -->
 
-([FlowSelector](#flow-selector))
+(string, **required**)
 
 <!-- vale on -->
 
-_Flow Selector_ selects the _Flows_ at which the _Load Regulator_ is applied.
+Duration for which the step is active.
 
 </dd>
-<dt>label_key</dt>
+<dt>target_accept_percentage</dt>
 <dd>
 
 <!-- vale off -->
 
-(string)
+(float64, minimum: `0`, maximum: `100`)
 
 <!-- vale on -->
 
-The flow label key for identifying sessions.
+The value of the step.
 
-- When label key is specified, _Load Regulator_ acts as a sticky filter.
-  The series of flows with the same value of label key get the same
-  decision provided that the `accept_percentage` is same or higher.
-- When label key is not specified, _Load Regulator_ acts as a stateless filter.
-  Percentage of flows are selected randomly for rejection.
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeries {#load-ramp-series}
+
+<!-- vale on -->
+
+_LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampSeriesIns](#load-ramp-series-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampSeriesParameters](#load-ramp-series-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeriesIns {#load-ramp-series-ins}
+
+<!-- vale on -->
+
+Inputs for the _LoadRampSeries_ component.
+
+<dl>
+<dt>backward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the load ramp series towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the load ramp series towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to reset the load ramp series to the first step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeriesLoadRampInstance {#load-ramp-series-load-ramp-instance}
+
+<!-- vale on -->
+
+<dl>
+<dt>load_ramp</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampParameters](#load-ramp-parameters))
+
+<!-- vale on -->
+
+The load ramp.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampOuts](#load-ramp-outs))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeriesParameters {#load-ramp-series-parameters}
+
+<!-- vale on -->
+
+Parameters for the _LoadRampSeries_ component.
+
+<dl>
+<dt>load_ramps</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadRampSeriesLoadRampInstance](#load-ramp-series-load-ramp-instance), **required**)
+
+<!-- vale on -->
+
+An ordered list of load ramps that get applied in order.
 
 </dd>
 </dl>
@@ -4936,6 +5192,18 @@ LoadScheduler configuration is split into two parts: An actuation
 strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 
 <dl>
+<dt>actuator</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerActuator](#load-scheduler-actuator))
+
+<!-- vale on -->
+
+Actuator based on limiting the accepted token rate under incoming token rate \* load multiplier.
+
+</dd>
 <dt>flow_selector</dt>
 <dd>
 
@@ -4946,18 +5214,6 @@ strategy and a scheduler. At this time, only `load_actuator` strategy is availab
 <!-- vale on -->
 
 Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-
-</dd>
-<dt>load_actuator</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadActuator](#load-actuator))
-
-<!-- vale on -->
-
-Actuator based on limiting the accepted token rate at incoming token rate \* load multiplier.
 
 </dd>
 <dt>scheduler</dt>
@@ -4973,6 +5229,107 @@ Configuration of Weighted Fair Queuing-based workload scheduler.
 
 Contains configuration of per-agent scheduler, and also defines some
 output signals.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerActuator {#load-scheduler-actuator}
+
+<!-- vale on -->
+
+Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerActuatorDynamicConfig](#load-scheduler-actuator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerActuatorIns](#load-scheduler-actuator-ins))
+
+<!-- vale on -->
+
+Input ports for the Actuator component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerActuatorDynamicConfig {#load-scheduler-actuator-dynamic-config}
+
+<!-- vale on -->
+
+Dynamic Configuration for Actuator
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
+Useful for observing the behavior of actuator without disrupting any real traffic.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerActuatorIns {#load-scheduler-actuator-ins}
+
+<!-- vale on -->
+
+Input for the Actuator component.
+
+<dl>
+<dt>load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Load multiplier is proportion of [incoming
+token rate](#scheduler-outs) that needs to be accepted.
 
 </dd>
 </dl>
@@ -5006,7 +5363,7 @@ the previous step's `target_accept_percentage` to the next
 
 <!-- vale off -->
 
-([LoadRegulatorDynamicConfig](#load-regulator-dynamic-config))
+([RegulatorDynamicConfig](#regulator-dynamic-config))
 
 <!-- vale on -->
 
@@ -5176,20 +5533,6 @@ Parameters for the _Load Shaper_ component.
 <!-- vale on -->
 
 Parameters for the _Flow Regulator_.
-Deprecated: 1.6.0
-
-</dd>
-<dt>load_regulator_parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRegulatorParameters](#load-regulator-parameters))
-
-<!-- vale on -->
-
-Parameters for the _Load Regulator_.
-TODO: add required validation once the deprecated field is removed.
 
 </dd>
 <dt>steps</dt>
@@ -7124,6 +7467,164 @@ labels are sent to FluxNinja ARC for observability. Telemetry should be disabled
 sensitive labels.
 
 :::
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### Regulator {#regulator}
+
+<!-- vale on -->
+
+_Regulator_ is a component that regulates the load at a
+[_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+flows at random or by sticky sessions.
+
+:::info
+
+See also [\_Load Regulator overview](/concepts/flow-control/components/load-regulator.md).
+
+:::
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorDynamicConfig](#regulator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorIns](#regulator-ins))
+
+<!-- vale on -->
+
+Input ports for the _Regulator_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorParameters](#regulator-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Regulator_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RegulatorDynamicConfig {#regulator-dynamic-config}
+
+<!-- vale on -->
+
+Dynamic Configuration for _Regulator_
+
+<dl>
+<dt>enable_label_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RegulatorIns {#regulator-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The percentage of requests to accept.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RegulatorParameters {#regulator-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>flow_selector</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+_Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The flow label key for identifying sessions.
+
+- When label key is specified, _Regulator_ acts as a sticky filter.
+  The series of flows with the same value of label key get the same
+  decision provided that the `accept_percentage` is same or higher.
+- When label key is not specified, _Regulator_ acts as a stateless filter.
+  Percentage of flows are selected randomly for rejection.
 
 </dd>
 </dl>

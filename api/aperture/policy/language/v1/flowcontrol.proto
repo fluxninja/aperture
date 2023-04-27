@@ -542,9 +542,11 @@ message FlowControl {
     FlowRegulator flow_regulator = 4;
 
     // _Load Shaper_ is a component that shapes the load at a _Control Point_.
+    // Deprecated: 1.6.0
     LoadShaper load_shaper = 5;
 
     // _Load Shaper Series_ is a series of _Load Shaper_ components that can shape load one after another at same or different _Control Points_.
+    // Deprecated: 1.6.0
     LoadShaperSeries load_shaper_series = 6;
 
     // _Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
@@ -553,8 +555,14 @@ message FlowControl {
     // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
     AdaptiveLoadScheduler adaptive_load_scheduler = 8;
 
-    // Load Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
-    LoadRegulator load_regulator = 9;
+    // Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+    Regulator regulator = 9;
+
+    // _Load Ramp_ smoothly regulates the flow of requests over specified steps.
+    LoadRamp load_ramp = 10;
+
+    // _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
+    LoadRampSeries load_ramp_series = 11;
   }
 }
 
@@ -690,6 +698,32 @@ message ConcurrencyLimiter {
 // LoadScheduler configuration is split into two parts: An actuation
 // strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 message LoadScheduler {
+  // Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
+  message Actuator {
+    // Dynamic Configuration for Actuator
+    message DynamicConfig {
+      // Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
+      // Useful for observing the behavior of actuator without disrupting any real traffic.
+      bool dry_run = 1;
+    }
+
+    // Input for the Actuator component.
+    message Ins {
+      // Load multiplier is proportion of [incoming
+      // token rate](#scheduler-outs) that needs to be accepted.
+      InPort load_multiplier = 1;
+    }
+
+    // Input ports for the Actuator component.
+    Ins in_ports = 1;
+
+    // Configuration key for DynamicConfig.
+    string dynamic_config_key = 2;
+
+    // Default configuration.
+    DynamicConfig default_config = 3;
+  }
+
   // Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
   FlowSelector flow_selector = 1; // @gotags: validate:"required"
 
@@ -699,10 +733,8 @@ message LoadScheduler {
   // output signals.
   Scheduler scheduler = 2; // @gotags: validate:"required"
 
-  oneof actuation_strategy {
-    // Actuator based on limiting the accepted token rate at incoming token rate * load multiplier.
-    LoadActuator load_actuator = 3;
-  }
+  // Actuator based on limiting the accepted token rate under incoming token rate * load multiplier.
+  Actuator actuator = 3;
 }
 
 // Weighted Fair Queuing-based workload scheduler
@@ -935,7 +967,7 @@ message AdaptiveLoadScheduler {
   string dynamic_config_key = 9;
 
   // Default configuration.
-  LoadActuator.DynamicConfig default_config = 10;
+  LoadScheduler.Actuator.DynamicConfig default_config = 10;
 }
 
 // High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
@@ -1035,7 +1067,7 @@ message FlowRegulator {
   DynamicConfig default_config = 4;
 }
 
-// _Load Regulator_ is a component that regulates the load at a
+// _Regulator_ is a component that regulates the load at a
 // [_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
 // flows at random or by sticky sessions.
 //
@@ -1044,22 +1076,22 @@ message FlowRegulator {
 // See also [_Load Regulator overview](/concepts/flow-control/components/load-regulator.md).
 //
 // :::
-message LoadRegulator {
-  // Dynamic Configuration for _Load Regulator_
+message Regulator {
+  // Dynamic Configuration for _Regulator_
   message DynamicConfig {
     // Specify certain label values to be accepted by this flow filter regardless of accept percentage.
     repeated string enable_label_values = 1;
   }
 
   message Parameters {
-    // _Flow Selector_ selects the _Flows_ at which the _Load Regulator_ is applied.
+    // _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
     FlowSelector flow_selector = 1; // @gotags: validate:"required"
 
     // The flow label key for identifying sessions.
-    // - When label key is specified, _Load Regulator_ acts as a sticky filter.
+    // - When label key is specified, _Regulator_ acts as a sticky filter.
     //   The series of flows with the same value of label key get the same
     //   decision provided that the `accept_percentage` is same or higher.
-    // - When label key is not specified, _Load Regulator_ acts as a stateless filter.
+    // - When label key is not specified, _Regulator_ acts as a stateless filter.
     //   Percentage of flows are selected randomly for rejection.
     string label_key = 2;
   }
@@ -1069,10 +1101,10 @@ message LoadRegulator {
     InPort accept_percentage = 1;
   }
 
-  // Input ports for the _Load Regulator_.
+  // Input ports for the _Regulator_.
   Ins in_ports = 1;
 
-  // Parameters for the _Load Regulator_.
+  // Parameters for the _Regulator_.
   Parameters parameters = 2;
 
   // Configuration key for DynamicConfig.
@@ -1106,14 +1138,9 @@ message LoadShaper {
     }
 
     // Parameters for the _Flow Regulator_.
-    // Deprecated: 1.6.0
     FlowRegulator.Parameters flow_regulator_parameters = 1;
 
     repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
-
-    // Parameters for the _Load Regulator_.
-    // TODO: add required validation once the deprecated field is removed.
-    LoadRegulator.Parameters load_regulator_parameters = 3;
   }
 
   // Inputs for the _Load Shaper_ component.
@@ -1144,7 +1171,7 @@ message LoadShaper {
   string dynamic_config_key = 9;
 
   // Default configuration.
-  LoadRegulator.DynamicConfig default_config = 10;
+  Regulator.DynamicConfig default_config = 10;
 }
 
 // _LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
@@ -1167,6 +1194,94 @@ message LoadShaperSeries {
     // Whether to progress the load shaper series towards the previous step.
     InPort backward = 2;
     // Whether to reset the load shaper series to the first step.
+    InPort reset = 3;
+  }
+
+  Ins in_ports = 1;
+
+  Parameters parameters = 2; // @gotags: validate:"required"
+}
+
+// The _Load Ramp_ produces a smooth and continuous traffic load
+// that changes progressively over time, based on the specified steps.
+//
+// Each step is defined by two parameters:
+// - The `target_accept_percentage`.
+// - The `duration` for the signal to change from the
+//   previous step's `target_accept_percentage` to the current step's
+//   `target_accept_percentage`.
+//
+// The percentage of requests accepted starts at the `target_accept_percentage`
+// defined in the first step and gradually ramps up or down linearly from
+// the previous step's `target_accept_percentage` to the next
+// `target_accept_percentage`, over the `duration` specified for each step.
+message LoadRamp {
+  // Parameters for the _Load Ramp_ component.
+  message Parameters {
+    message Step {
+      // The value of the step.
+      double target_accept_percentage = 1; // @gotags: validate:"gte=0,lte=100"
+      // Duration for which the step is active.
+      google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+    }
+
+    // Parameters for the _Regulator_.
+    Regulator.Parameters regulator_parameters = 1;
+
+    repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
+  }
+
+  // Inputs for the _Load Ramp_ component.
+  message Ins {
+    // Whether to progress the _Load Ramp_ towards the next step.
+    InPort forward = 1;
+    // Whether to progress the _Load Ramp_ towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the _Load Ramp_ to the first step.
+    InPort reset = 3;
+  }
+  // Outputs for the _Load Ramp_ component.
+  message Outs {
+    // The percentage of flows being accepted by the _Load Ramp_.
+    OutPort accept_percentage = 1;
+    // A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation.
+    OutPort at_start = 2;
+    // A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation.
+    OutPort at_end = 3;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Dynamic configuration key for flow regulator.
+  string dynamic_config_key = 9;
+
+  // Default configuration.
+  Regulator.DynamicConfig default_config = 10;
+}
+
+// _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
+message LoadRampSeries {
+  message LoadRampInstance {
+    // The load ramp.
+    LoadRamp.Parameters load_ramp = 1; // @gotags: validate:"required"
+    LoadRamp.Outs out_ports = 2;
+  }
+  // Parameters for the _LoadRampSeries_ component.
+  message Parameters {
+    // An ordered list of load ramps that get applied in order.
+    repeated LoadRampInstance load_ramps = 1; // @gotags: validate:"required,dive"
+  }
+
+  // Inputs for the _LoadRampSeries_ component.
+  message Ins {
+    // Whether to progress the load ramp series towards the next step.
+    InPort forward = 1;
+    // Whether to progress the load ramp series towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the load ramp series to the first step.
     InPort reset = 3;
   }
 

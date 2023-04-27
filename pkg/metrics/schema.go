@@ -26,8 +26,8 @@ const (
 	RateLimiterCounterMetricName = "rate_limiter_counter"
 	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
 	ClassifierCounterMetricName = "classifier_counter"
-	// LoadRegulatorCounterMetricName - name of the counter describing times load regulator was triggered.
-	LoadRegulatorCounterMetricName = "load_regulator_counter"
+	// RegulatorCounterMetricName - name of the counter describing times load regulator was triggered.
+	RegulatorCounterMetricName = "regulator_counter"
 
 	// DistCache metrics scraped from Olric DMaps statistics.
 

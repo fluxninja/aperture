@@ -20,11 +20,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
-// LoadActuator struct.
-type LoadActuator struct {
+// Actuator struct.
+type Actuator struct {
 	policyReadAPI     iface.Policy
 	decisionWriter    *etcdwriter.Writer
-	loadActuatorProto *policylangv1.LoadActuator
+	actuatorProto     *policylangv1.LoadScheduler_Actuator
 	decisionsEtcdPath string
 	agentGroupName    string
 	componentID       string
@@ -32,36 +32,36 @@ type LoadActuator struct {
 }
 
 // Name implements runtime.Component.
-func (*LoadActuator) Name() string { return "LoadActuator" }
+func (*Actuator) Name() string { return "Actuator" }
 
 // Type implements runtime.Component.
-func (*LoadActuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+func (*Actuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
 
 // ShortDescription implements runtime.Component.
-func (la *LoadActuator) ShortDescription() string { return la.agentGroupName }
+func (la *Actuator) ShortDescription() string { return la.agentGroupName }
 
 // IsActuator implements runtime.Component.
-func (*LoadActuator) IsActuator() bool { return true }
+func (*Actuator) IsActuator() bool { return true }
 
-// NewLoadActuatorAndOptions creates load actuator and its fx options.
-func NewLoadActuatorAndOptions(
-	loadActuatorProto *policylangv1.LoadActuator,
+// NewActuatorAndOptions creates load actuator and its fx options.
+func NewActuatorAndOptions(
+	actuatorProto *policylangv1.LoadScheduler_Actuator,
 	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
 	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
-	decisionsEtcdPath := path.Join(paths.LoadActuatorDecisionsPath, etcdKey)
+	decisionsEtcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
 	dryRun := false
-	if loadActuatorProto.GetDefaultConfig() != nil {
-		dryRun = loadActuatorProto.GetDefaultConfig().GetDryRun()
+	if actuatorProto.GetDefaultConfig() != nil {
+		dryRun = actuatorProto.GetDefaultConfig().GetDryRun()
 	}
-	lsa := &LoadActuator{
+	lsa := &Actuator{
 		policyReadAPI:     policyReadAPI,
 		agentGroupName:    agentGroup,
 		componentID:       componentID,
 		decisionsEtcdPath: decisionsEtcdPath,
-		loadActuatorProto: loadActuatorProto,
+		actuatorProto:     actuatorProto,
 		dryRun:            dryRun,
 	}
 
@@ -70,7 +70,7 @@ func NewLoadActuatorAndOptions(
 	), nil
 }
 
-func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (la *Actuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -93,7 +93,7 @@ func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.
 }
 
 // Execute implements runtime.Component.Execute.
-func (la *LoadActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Get the decision from the port
 	lm, ok := inPortReadings["load_multiplier"]
@@ -122,23 +122,23 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToReading, tickInfo r
 }
 
 // DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
-func (la *LoadActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (la *Actuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
-	key := la.loadActuatorProto.GetDynamicConfigKey()
+	key := la.actuatorProto.GetDynamicConfigKey()
 	// read dynamic config
 	if unmarshaller.IsSet(key) {
-		dynamicConfig := &policylangv1.LoadActuator_DynamicConfig{}
+		dynamicConfig := &policylangv1.LoadScheduler_Actuator_DynamicConfig{}
 		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
 			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
 			return
 		}
 		la.setConfig(dynamicConfig)
 	} else {
-		la.setConfig(la.loadActuatorProto.GetDefaultConfig())
+		la.setConfig(la.actuatorProto.GetDefaultConfig())
 	}
 }
 
-func (la *LoadActuator) setConfig(config *policylangv1.LoadActuator_DynamicConfig) {
+func (la *Actuator) setConfig(config *policylangv1.LoadScheduler_Actuator_DynamicConfig) {
 	if config != nil {
 		la.dryRun = config.GetDryRun()
 	} else {
@@ -146,11 +146,11 @@ func (la *LoadActuator) setConfig(config *policylangv1.LoadActuator_DynamicConfi
 	}
 }
 
-func (la *LoadActuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
+func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
 	return la.publishDecision(tickInfo, 1.0, true)
 }
 
-func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool) error {
+func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool) error {
 	if la.dryRun {
 		passThrough = true
 	}

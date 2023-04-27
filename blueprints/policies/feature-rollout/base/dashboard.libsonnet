@@ -2,7 +2,6 @@ local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
-local annotation = grafana.annotation;
 local prometheus = grafana.prometheus;
 local graphPanel = grafana.graphPanel;
 
@@ -36,9 +35,9 @@ function(cfg) {
                                 .addTarget(
     prometheus.target(
       expr=(
-        'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE",valid="true"}[$__rate_interval])' +
+        'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])' +
         '/' +
-        'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE",valid="true"}[$__rate_interval])'
+        'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])'
       ),
       intervalFactor=1,
     ),
