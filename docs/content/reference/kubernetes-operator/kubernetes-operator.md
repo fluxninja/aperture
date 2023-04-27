@@ -1,9 +1,9 @@
+---
 title: Kubernetes Operator
 keywords:
-- operator
+  - operator
 sidebar_position: 6
 sidebar_label: Kubernetes Operator
-
 ---
 
 Aperture Operator for Aperture Controller and Agent manages installation for
