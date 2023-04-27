@@ -1,6 +1,6 @@
 ---
-title: Namespace scoped Installation
-description: Install Aperture Agent using namespace scoped resources
+title: Namespace-scoped Installation
+description: Install Aperture Agent using namespace-scoped resources
 keywords:
   - install
   - setup
@@ -21,8 +21,8 @@ resources.
 
 ## Prerequisites
 
-1. Prepare a `values.yaml` file which switches the Aperture Agent to namespace
-   scoped:
+1. Prepare a `values.yaml` file which switches the Aperture Agent to
+   namespace-scoped:
 
    ```yaml
    agent:

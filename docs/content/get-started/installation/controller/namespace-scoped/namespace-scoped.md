@@ -1,6 +1,6 @@
 ---
-title: Namespace scoped Installation
-description: Install Aperture Controller using namespace scoped resources
+title: Namespace-scoped Installation
+description: Install Aperture Controller using namespace-scoped resources
 keywords:
   - install
   - setup
@@ -22,7 +22,7 @@ level resources.
 ## Prerequisites
 
 1. Prepare a `values.yaml` file which switches the Aperture Controller to
-   namespace scoped:
+   namespace-scoped:
 
    ```yaml
    controller:
