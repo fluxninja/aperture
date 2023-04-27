@@ -1489,8 +1489,7 @@ spec:
                             type: string
                         type: object
                       batch_postrollup:
-                        description: BatchPostrollup configures batch post rollup
-                          processor.
+                        description: BatchPostrollup configures the OTel batch post-processor.
                         properties:
                           send_batch_max_size:
                             description: SendBatchMaxSize is the upper limit of the
@@ -1509,7 +1508,7 @@ spec:
                             type: string
                         type: object
                       batch_prerollup:
-                        description: BatchPrerollup configures batch pre rollup processor.
+                        description: BatchPrerollup configures the OTel batch pre-processor.
                         properties:
                           send_batch_max_size:
                             description: SendBatchMaxSize is the upper limit of the

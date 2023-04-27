@@ -126,7 +126,7 @@ var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 					v := input.attributes.destination.address.socketAddress.address
 				}
 				source := v {
-					v := input.attributes.destination.address.socketAddress.address
+					v := input.attributes.source.address.socketAddress.address
 				}
 			`,
 		},
