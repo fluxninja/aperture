@@ -228,11 +228,11 @@ func setupLoadSchedulerFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(conLimiterFactory.incomingTokensCounterVec) {
-				err := fmt.Errorf("failed to unregister incoming_work_seconds_total metric")
+				err := fmt.Errorf("failed to unregister incoming_tokens_total metric")
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(conLimiterFactory.acceptedTokensCounterVec) {
-				err := fmt.Errorf("failed to unregister accepted_work_seconds_total metric")
+				err := fmt.Errorf("failed to unregister accepted_tokens_total metric")
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(conLimiterFactory.workloadLatencySummaryVec) {
@@ -454,11 +454,11 @@ func (conLimiter *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			}
 			deleted = incomingTokensCounterVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete incoming_work_seconds_total counter from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
 			}
 			deleted = acceptedTokensCounterVec.Delete(metricLabels)
 			if !deleted {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_work_seconds_total counter from its metric vector"))
+				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_tokens_total counter from its metric vector"))
 			}
 			deletedCount := conLimiter.loadSchedulerFactory.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {

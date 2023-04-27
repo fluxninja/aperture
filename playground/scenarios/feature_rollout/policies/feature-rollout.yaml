@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=file:/home/tgill/Work/fluxninja/aperture/blueprints/policies/feature-rollout/average-latency/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/policies/feature-rollout/average-latency/gen/definitions.json
 # Generated values file for policies/feature-rollout/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency

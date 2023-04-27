@@ -165,7 +165,7 @@ var _ = Describe("SMA component", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"SMA": sim.NewReadings([]float64{nan, 0.0, 0.5, 1, 1.5, 2.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 1, 3.0, 4.0}),
+				"SMA": sim.NewReadings([]float64{nan, 0.0, 0.5, 1, 1.5, 2.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, nan, 1, 3.0, 4.0}),
 			},
 		))
 	})

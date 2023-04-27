@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -458,10 +459,12 @@ func generateExtensionsCode(dest string) error {
 	return nil
 }
 
+var vversionRegex = regexp.MustCompile("^v[0-9]+$")
+
 func getGoPkgName(goModName string) string {
 	goModNameParts := strings.Split(goModName, "/")
 	// if the last part is v{version}, use the second last part
-	if strings.HasPrefix(goModNameParts[len(goModNameParts)-1], "v") {
+	if vversionRegex.MatchString(goModNameParts[len(goModNameParts)-1]) {
 		return goModNameParts[len(goModNameParts)-2]
 	} else {
 		return goModNameParts[len(goModNameParts)-1]

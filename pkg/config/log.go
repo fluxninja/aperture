@@ -111,16 +111,8 @@ func (constructor LoggerConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor LoggerConstructor) provideLogger(w []io.Writer,
-	unmarshaller Unmarshaller,
-	lifecycle fx.Lifecycle,
-) (*log.Logger, error) {
-	config := constructor.DefaultConfig
-
-	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
-		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
-	}
-
+// NewLogger creates a new logger instances with the provided config, and a list of additional writers.
+func NewLogger(config LogConfig, w []io.Writer, isGlobalLogger bool) (*log.Logger, io.Writer) {
 	var writers []io.Writer
 	// append file writers
 	for _, writerConfig := range config.Writers {
@@ -179,14 +171,29 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		wr = zerolog.SyncWriter(multi)
 	}
 
-	logger := log.NewLogger(wr, strings.ToLower(config.LogLevel))
+	logger := log.NewLoggerWithWriters(wr, writers, strings.ToLower(config.LogLevel))
 
-	if constructor.IsGlobal {
+	if isGlobalLogger {
 		// set global logger
 		log.SetGlobalLogger(logger)
 		// set standard loggers
 		log.SetStdLogger(logger)
 	}
+
+	return logger, wr
+}
+
+func (constructor LoggerConstructor) provideLogger(w []io.Writer,
+	unmarshaller Unmarshaller,
+	lifecycle fx.Lifecycle,
+) (*log.Logger, error) {
+	config := constructor.DefaultConfig
+
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
+		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
+	}
+
+	logger, writer := NewLogger(config, w, constructor.IsGlobal)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -197,14 +204,11 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 				log.WaitFlush()
 				// close diode writer
 				if config.NonBlocking {
-					dr := wr.(diode.Writer)
-					dr.Close()
-				}
-				for _, writer := range writers {
-					if closer, ok := writer.(io.Closer); ok {
-						_ = closer.Close()
+					if dr, ok := writer.(diode.Writer); ok {
+						dr.Close()
 					}
 				}
+				logger.CloseWriters()
 			})
 			return nil
 		},
