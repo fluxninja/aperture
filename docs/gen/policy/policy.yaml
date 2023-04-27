@@ -3223,7 +3223,7 @@ definitions:
         description: |+
           Source code of the Rego module.
 
-          :::Note
+          :::note
 
           Must include a "package" declaration.
 
@@ -3268,40 +3268,11 @@ definitions:
     type: object
     title: Resources that need to be setup for the policy to function
     properties:
-      classifiers:
-        description: |+
-          Classifiers are installed in the data-plane and are used to label the requests based on payload content.
-
-          The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
-
-          Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
-
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/Classifier'
-        x-deprecated: true
-        x-go-tag-validate: deprecated,dive
-        x-order: 0
       flow_control:
         description: FlowControlResources are resources that are provided by flow
           control integration.
-        x-order: 1
+        x-order: 0
         $ref: '#/definitions/FlowControlResources'
-      flux_meters:
-        description: |+
-          Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
-
-          Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
-
-          Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
-
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/FluxMeter'
-        x-deprecated: true
-        x-go-tag-validate: deprecated,dive
-        x-order: 2
   Rule:
     description: |-
       Example of a JSON extractor:
@@ -3318,13 +3289,6 @@ definitions:
         description: High-level declarative extractor.
         x-order: 0
         $ref: '#/definitions/Extractor'
-      rego:
-        description: |-
-          Rego module to extract a value from.
-
-          Deprecated: 1.5.0
-        x-order: 1
-        $ref: '#/definitions/RuleRego'
       telemetry:
         description: |+
           :::note
@@ -3347,37 +3311,6 @@ definitions:
           propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
         default: true
         x-go-tag-default: "true"
-        x-order: 2
-  RuleRego:
-    description: |-
-      High-level extractor-based rules are compiled into a single Rego query.
-
-      Deprecated: 1.5.0
-    type: object
-    title: Raw Rego rules are compiled 1:1 to Rego queries
-    required:
-    - query
-    - source
-    properties:
-      query:
-        description: |+
-          Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
-
-          Note: The module name must match the package name from the `source`.
-
-        type: string
-        x-deprecated: true
-        x-go-tag-validate: deprecated,required
-        x-order: 0
-      source:
-        description: |+
-          Source code of the Rego module.
-
-          Note: Must include a "package" declaration.
-
-        type: string
-        x-deprecated: true
-        x-go-tag-validate: deprecated,required
         x-order: 1
   SMA:
     description: Simple Moving Average (SMA) is a type of moving average that computes
@@ -3576,24 +3509,6 @@ definitions:
           match.
         x-order: 2
         $ref: '#/definitions/SchedulerWorkloadParameters'
-      max_timeout:
-        description: |+
-          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-
-        type: string
-        default: 0s
-        x-go-tag-default: 0s
-        x-order: 3
-      timeout_factor:
-        description: |+
-          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-
-        type: number
-        format: double
-        default: 0
-        x-go-tag-default: "0"
-        x-go-tag-validate: gte=0.0
-        x-order: 4
       tokens_label_key:
         description: |+
           Flow label key that will be used to override the number of tokens for this request.
@@ -3603,7 +3518,7 @@ definitions:
         type: string
         default: tokens
         x-go-tag-default: tokens
-        x-order: 5
+        x-order: 3
       workloads:
         description: |+
           List of workloads to be used in scheduler.
@@ -3633,7 +3548,7 @@ definitions:
           type: object
           $ref: '#/definitions/SchedulerWorkload'
         x-go-tag-validate: dive
-        x-order: 6
+        x-order: 4
   SchedulerWorkload:
     description: Workload defines a class of requests that preferably have similar
       properties such as response latency or desired priority.

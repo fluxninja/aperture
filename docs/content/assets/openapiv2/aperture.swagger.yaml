@@ -3474,7 +3474,7 @@ definitions:
                 description: |+
                     Source code of the Rego module.
 
-                    :::Note
+                    :::note
 
                     Must include a "package" declaration.
 
@@ -3568,36 +3568,9 @@ definitions:
 
             :::
         properties:
-            classifiers:
-                description: |+
-                    Classifiers are installed in the data-plane and are used to label the requests based on payload content.
-
-                    The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
-
-                    Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
-
-                items:
-                    $ref: '#/definitions/Classifier'
-                    type: object
-                type: array
-                x-deprecated: true
-                x-go-tag-validate: deprecated,dive
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
-            flux_meters:
-                additionalProperties:
-                    $ref: '#/definitions/FluxMeter'
-                description: |+
-                    Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
-
-                    Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
-
-                    Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
-
-                type: object
-                x-deprecated: true
-                x-go-tag-validate: deprecated,dive
         title: Resources that need to be setup for the policy to function
         type: object
     Response:
@@ -3625,12 +3598,6 @@ definitions:
             extractor:
                 $ref: '#/definitions/Extractor'
                 description: High-level declarative extractor.
-            rego:
-                $ref: '#/definitions/RuleRego'
-                description: |-
-                    Rego module to extract a value from.
-
-                    Deprecated: 1.5.0
             telemetry:
                 default: true
                 description: |+
@@ -3654,35 +3621,6 @@ definitions:
                 type: boolean
                 x-go-tag-default: "true"
         title: Rule describes a single classification Rule
-        type: object
-    RuleRego:
-        description: |-
-            High-level extractor-based rules are compiled into a single Rego query.
-
-            Deprecated: 1.5.0
-        properties:
-            query:
-                description: |+
-                    Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
-
-                    Note: The module name must match the package name from the `source`.
-
-                type: string
-                x-deprecated: true
-                x-go-tag-validate: deprecated,required
-            source:
-                description: |+
-                    Source code of the Rego module.
-
-                    Note: Must include a "package" declaration.
-
-                type: string
-                x-deprecated: true
-                x-go-tag-validate: deprecated,required
-        required:
-            - query
-            - source
-        title: Raw Rego rules are compiled 1:1 to Rego queries
         type: object
     SMA:
         description: Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
@@ -3857,22 +3795,6 @@ definitions:
             default_workload_parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters to be used if none of workloads specified in `workloads` match.
-            max_timeout:
-                default: 0s
-                description: |+
-                    Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-
-                type: string
-                x-go-tag-default: 0s
-            timeout_factor:
-                default: 0
-                description: |+
-                    Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-
-                format: double
-                type: number
-                x-go-tag-default: "0"
-                x-go-tag-validate: gte=0.0
             tokens_label_key:
                 default: tokens
                 description: |+

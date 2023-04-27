@@ -690,6 +690,8 @@ ClientConfig is the client configuration.
 
 <!-- vale on -->
 
+gRPC client settings.
+
 </dd>
 <dt>http</dt>
 <dd>
@@ -699,6 +701,8 @@ ClientConfig is the client configuration.
 ([HTTPClientConfig](#http-client-config))
 
 <!-- vale on -->
+
+HTTP client settings.
 
 </dd>
 </dl>
@@ -786,6 +790,8 @@ ControllerOTelConfig is the configuration for Controller's OTel collector.
 
 <!-- vale on -->
 
+BatchAlerts configures batch alerts processor.
+
 </dd>
 <dt>ports</dt>
 <dd>
@@ -795,6 +801,8 @@ ControllerOTelConfig is the configuration for Controller's OTel collector.
 ([PortsConfig](#ports-config))
 
 <!-- vale on -->
+
+Ports configures debug, health and extension ports values.
 
 </dd>
 </dl>
@@ -864,6 +872,8 @@ Authentication
 ([ClientTLSConfig](#client-tls-config))
 
 <!-- vale on -->
+
+Client TLS configuration
 
 </dd>
 </dl>
@@ -936,6 +946,8 @@ Installation mode describes on which underlying platform the Agent or the Contro
 
 <!-- vale on -->
 
+Client configuration.
+
 </dd>
 </dl>
 
@@ -995,6 +1007,8 @@ Use HTTP CONNECT Proxy
 
 <!-- vale on -->
 
+Backoff configuration
+
 </dd>
 <dt>tls</dt>
 <dd>
@@ -1004,6 +1018,8 @@ Use HTTP CONNECT Proxy
 ([ClientTLSConfig](#client-tls-config))
 
 <!-- vale on -->
+
+Client TLS configuration
 
 </dd>
 </dl>
@@ -1306,6 +1322,8 @@ Write Buffer Size. 0 = 4 KB.
 
 <!-- vale on -->
 
+Proxy Connect Header - map[string][]string
+
 </dd>
 <dt>tls</dt>
 <dd>
@@ -1315,6 +1333,8 @@ Write Buffer Size. 0 = 4 KB.
 ([ClientTLSConfig](#client-tls-config))
 
 <!-- vale on -->
+
+Client TLS configuration
 
 </dd>
 </dl>

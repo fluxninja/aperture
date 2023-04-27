@@ -44,11 +44,6 @@ type Labeler struct {
 	Query rego.PreparedEvalQuery
 	// flags for created flow labels:
 	Labels map[string]LabelProperties
-	// flow label that the result should be assigned to (single-label variant)
-	// Deprecated: 1.5.0
-	LabelName string
-	// Deprecated: 1.5.0
-	Telemetry bool // single-label variant
 }
 
 // LabelProperties is a set of properties for a label.
@@ -163,36 +158,6 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 				labelsProperties[labelName] = LabelProperties{
 					Telemetry: rule.GetTelemetry(),
 				}
-			case *policylangv1.Rule_Rego_:
-				query, err := rego.New(
-					//nolint
-					rego.Query(source.Rego.Query),
-					//nolint
-					rego.Module("tmp.rego", source.Rego.Source),
-				).PrepareForEval(ctx)
-				if err != nil {
-					//nolint
-					log.Trace().Str("src", source.Rego.Source).Str("query", source.Rego.Query).
-						Msg("Failed to prepare for eval")
-					return nil, fmt.Errorf(
-						"failed to compile raw rego module, label: %s, query: %s: %w: %v",
-						labelName,
-						// nolint
-						source.Rego.Query,
-						BadRego,
-						err,
-					)
-				}
-				labelers = append(labelers, LabelerWithSelector{
-					LabelSelector: labelSelector,
-					Labeler: &Labeler{
-						Query:     query,
-						LabelName: labelName,
-						Telemetry: rule.GetTelemetry(),
-					},
-					ClassifierAttributes: classifierAttributes,
-				})
-				rawRegoCount++
 			}
 		}
 
@@ -246,7 +211,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 
 		// get package name in module
 		// package name is specified in a line like "package foo"
-		p := regexp.MustCompile(`package\s+(\w+)`)
+		p := regexp.MustCompile(`package\s+(\S+)`)
 		m := p.FindStringSubmatch(module)
 		if len(m) != 2 {
 			return nil, fmt.Errorf("failed to get package name from rego module")

@@ -898,7 +898,7 @@ spec:
                             description: gRPC client settings.
                             properties:
                               backoff:
-                                description: Backoff config
+                                description: Backoff configuration
                                 properties:
                                   base_delay:
                                     description: Base Delay
@@ -1164,7 +1164,7 @@ spec:
                             description: gRPC client settings.
                             properties:
                               backoff:
-                                description: Backoff config
+                                description: Backoff configuration
                                 properties:
                                   base_delay:
                                     description: Base Delay
@@ -1489,7 +1489,7 @@ spec:
                             type: string
                         type: object
                       batch_postrollup:
-                        description: BatchPostrollup configures batch postrollup processor.
+                        description: BatchPostrollup configures the OTel batch post-processor.
                         properties:
                           send_batch_max_size:
                             description: SendBatchMaxSize is the upper limit of the
@@ -1508,7 +1508,7 @@ spec:
                             type: string
                         type: object
                       batch_prerollup:
-                        description: BatchPrerollup configures batch prerollup processor.
+                        description: BatchPrerollup configures the OTel batch pre-processor.
                         properties:
                           send_batch_max_size:
                             description: SendBatchMaxSize is the upper limit of the

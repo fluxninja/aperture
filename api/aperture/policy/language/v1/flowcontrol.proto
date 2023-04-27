@@ -285,31 +285,9 @@ message Classifier {
 //     pointer: /user/name
 // ```
 message Rule {
-  // Raw Rego rules are compiled 1:1 to Rego queries
-  //
-  // High-level extractor-based rules are compiled into a single Rego query.
-  //
-  // Deprecated: 1.5.0
-  message Rego {
-    // Source code of the Rego module.
-    //
-    // Note: Must include a "package" declaration.
-    string source = 1; // @gotags: validate:"deprecated,required"
-
-    // Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
-    //
-    // Note: The module name must match the package name from the `source`.
-    string query = 2; // @gotags: validate:"deprecated,required"
-  }
-
   oneof source {
     // High-level declarative extractor.
     Extractor extractor = 1;
-
-    // Rego module to extract a value from.
-    //
-    // Deprecated: 1.5.0
-    Rego rego = 2;
   } // @gotags: validate:"required"
 
   // Decides if the created flow label should be available as an attribute in OLAP telemetry and
@@ -386,7 +364,7 @@ message Rego {
 
   // Source code of the Rego module.
   //
-  // :::Note
+  // :::note
   //
   // Must include a "package" declaration.
   //
@@ -755,11 +733,6 @@ message Scheduler {
     // than the value of `tokens` specified in the workload definition
     // and `tokens` explicitly specified in the request labels.
     bool auto_tokens = 3; // @gotags: default:"false"
-
-    // Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-    double timeout_factor = 4; // @gotags: validate:"gte=0.0" default:"0"
-    // Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-    google.protobuf.Duration max_timeout = 5; // @gotags: default:"0s"
 
     // Decision deadline margin is the amount of time that the scheduler will
     // subtract from the request deadline to determine the deadline for the

@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
+	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -18,7 +19,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -45,7 +45,7 @@ type AcceptingHandler struct{}
 
 func (s *AcceptingHandler) CheckRequest(
 	context.Context,
-  iface.RequestContext,
+	iface.RequestContext,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
@@ -111,33 +111,24 @@ var service1FlowSelector = policylangv1.FlowSelector{
 var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 	Classifier: &policylangv1.Classifier{
 		FlowSelector: &service1FlowSelector,
-		Rules: map[string]*policylangv1.Rule{
-			"destination": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package envoy.authz
-						destination := v {
-							v := input.attributes.destination.address.socketAddress.address
-						}
-					`,
-						Query: "data.envoy.authz.destination",
-					},
+		Rego: &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"destination": {
+					Telemetry: true,
+				},
+				"source": {
+					Telemetry: true,
 				},
 			},
-			"source": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package envoy.authz
-						source := v {
-							v := input.attributes.destination.address.socketAddress.address
-						}
-					`,
-						Query: "data.envoy.authz.source",
-					},
-				},
-			},
+			Module: `
+				package envoy.authz
+				destination := v {
+					v := input.attributes.destination.address.socketAddress.address
+				}
+				source := v {
+					v := input.attributes.source.address.socketAddress.address
+				}
+			`,
 		},
 	},
 	ClassifierAttributes: &policysyncv1.ClassifierAttributes{

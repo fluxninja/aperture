@@ -3,7 +3,6 @@ package checkhttp_test
 import (
 	"context"
 
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
@@ -12,6 +11,7 @@ import (
 
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/alerts"
@@ -111,33 +111,24 @@ var service1FlowSelector = policylangv1.FlowSelector{
 var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 	Classifier: &policylangv1.Classifier{
 		FlowSelector: &service1FlowSelector,
-		Rules: map[string]*policylangv1.Rule{
-			"destination": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package flowcontrol.checkhttp
-						destination := v {
-							v := input.destination.address
-						}
-					`,
-						Query: "data.flowcontrol.checkhttp.destination",
-					},
+		Rego: &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"destination": {
+					Telemetry: true,
+				},
+				"source": {
+					Telemetry: true,
 				},
 			},
-			"source": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package flowcontrol.checkhttp
-						source := v {
-							v := input.source.address
-						}
-					`,
-						Query: "data.flowcontrol.checkhttp.source",
-					},
-				},
-			},
+			Module: `
+				package flowcontrol.checkhttp
+				destination := v {
+					v := input.attributes.destination.address.socketAddress.address
+				}
+				source := v {
+					v := input.attributes.source.address.socketAddress.address
+				}
+			`,
 		},
 	},
 	ClassifierAttributes: &policysyncv1.ClassifierAttributes{

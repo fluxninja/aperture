@@ -6542,7 +6542,7 @@ The name of the label maps to a variable in the Rego module. It maps to `data.<p
 
 Source code of the Rego module.
 
-:::Note
+:::note
 
 Must include a "package" declaration.
 
@@ -6606,22 +6606,6 @@ See also [Resources overview](/concepts/policy/resources.md).
 :::
 
 <dl>
-<dt>classifiers</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]Classifier](#classifier), **DEPRECATED**)
-
-<!-- vale on -->
-
-Classifiers are installed in the data-plane and are used to label the requests based on payload content.
-
-The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
-
-Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
-
-</dd>
 <dt>flow_control</dt>
 <dd>
 
@@ -6632,22 +6616,6 @@ Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 <!-- vale on -->
 
 FlowControlResources are resources that are provided by flow control integration.
-
-</dd>
-<dt>flux_meters</dt>
-<dd>
-
-<!-- vale off -->
-
-(map of [FluxMeter](#flux-meter), **DEPRECATED**)
-
-<!-- vale on -->
-
-Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
-
-Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
-
-Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
 </dd>
 </dl>
@@ -6684,20 +6652,6 @@ extractor:
 High-level declarative extractor.
 
 </dd>
-<dt>rego</dt>
-<dd>
-
-<!-- vale off -->
-
-([RuleRego](#rule-rego))
-
-<!-- vale on -->
-
-Rego module to extract a value from.
-
-Deprecated: 1.5.0
-
-</dd>
 <dt>telemetry</dt>
 <dd>
 
@@ -6723,51 +6677,6 @@ labels are sent to FluxNinja ARC for observability. Telemetry should be disabled
 sensitive labels.
 
 :::
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RuleRego {#rule-rego}
-
-<!-- vale on -->
-
-Raw Rego rules are compiled 1:1 to Rego queries
-
-High-level extractor-based rules are compiled into a single Rego query.
-
-Deprecated: 1.5.0
-
-<dl>
-<dt>query</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **DEPRECATED**, **required**)
-
-<!-- vale on -->
-
-Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
-
-Note: The module name must match the package name from the `source`.
-
-</dd>
-<dt>source</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **DEPRECATED**, **required**)
-
-<!-- vale on -->
-
-Source code of the Rego module.
-
-Note: Must include a "package" declaration.
 
 </dd>
 </dl>
@@ -7187,30 +7096,6 @@ it is still waiting on the scheduler.
 <!-- vale on -->
 
 Parameters to be used if none of workloads specified in `workloads` match.
-
-</dd>
-<dt>max_timeout</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"0s"`)
-
-<!-- vale on -->
-
-Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
-
-</dd>
-<dt>timeout_factor</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `0`)
-
-<!-- vale on -->
-
-Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
 
 </dd>
 <dt>tokens_label_key</dt>

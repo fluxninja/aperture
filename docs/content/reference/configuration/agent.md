@@ -741,6 +741,8 @@ RPC servers to connect to (which will be able to call agent functions)
 
 <!-- vale on -->
 
+Network client configuration
+
 </dd>
 </dl>
 
@@ -858,6 +860,8 @@ DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 
 <!-- vale on -->
 
+BatchAlerts configures batch alerts processor.
+
 </dd>
 <dt>batch_postrollup</dt>
 <dd>
@@ -867,6 +871,8 @@ DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 ([BatchPostrollupConfig](#batch-postrollup-config))
 
 <!-- vale on -->
+
+BatchPostrollup configures the OTel batch post-processor.
 
 </dd>
 <dt>batch_prerollup</dt>
@@ -878,6 +884,8 @@ DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 
 <!-- vale on -->
 
+BatchPrerollup configures the OTel batch pre-processor.
+
 </dd>
 <dt>ports</dt>
 <dd>
@@ -887,6 +895,8 @@ DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 ([PortsConfig](#ports-config))
 
 <!-- vale on -->
+
+Ports configures debug, health and extension ports values.
 
 </dd>
 </dl>
@@ -1085,7 +1095,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPrerol[.*?]upConfig defines configuration for OTel batch processor.
+BatchPrerollupConfig defines configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -1147,6 +1157,8 @@ ClientConfig is the client configuration.
 
 <!-- vale on -->
 
+gRPC client settings.
+
 </dd>
 <dt>http</dt>
 <dd>
@@ -1156,6 +1168,8 @@ ClientConfig is the client configuration.
 ([HTTPClientConfig](#http-client-config))
 
 <!-- vale on -->
+
+HTTP client settings.
 
 </dd>
 </dl>
@@ -1277,6 +1291,15 @@ metrics. When not set, pipeline will be instantiated on every Agent.
 
 <!-- vale on -->
 
+Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
+and processors defined above. Exporter would be added automatically.
+
+If there are no processors defined or only one processor is defined, the
+pipeline definition can be omitted. In such cases, the pipeline will
+automatically use all given receivers and the defined processor (if
+any). However, if there are more than one processor, the pipeline must
+be defined explicitly.
+
 </dd>
 <dt>processors</dt>
 <dd>
@@ -1287,6 +1310,9 @@ metrics. When not set, pipeline will be instantiated on every Agent.
 
 <!-- vale on -->
 
+Processors define processors to be used in custom metrics pipelines. This should
+be in OTel format - https://opentelemetry.io/docs/collector/configuration/#processors.
+
 </dd>
 <dt>receivers</dt>
 <dd>
@@ -1296,6 +1322,9 @@ metrics. When not set, pipeline will be instantiated on every Agent.
 ([Components](#components))
 
 <!-- vale on -->
+
+Receivers define receivers to be used in custom metrics pipelines. This should
+be in OTel format - https://opentelemetry.io/docs/collector/configuration/#receivers.
 
 </dd>
 </dl>
@@ -1545,6 +1574,8 @@ Authentication
 
 <!-- vale on -->
 
+Client TLS configuration
+
 </dd>
 </dl>
 
@@ -1641,6 +1672,8 @@ Installation mode describes on which underlying platform the Agent or the Contro
 
 <!-- vale on -->
 
+Client configuration.
+
 </dd>
 </dl>
 
@@ -1700,6 +1733,8 @@ Use HTTP CONNECT Proxy
 
 <!-- vale on -->
 
+Backoff configuration
+
 </dd>
 <dt>tls</dt>
 <dd>
@@ -1709,6 +1744,8 @@ Use HTTP CONNECT Proxy
 ([ClientTLSConfig](#client-tls-config))
 
 <!-- vale on -->
+
+Client TLS configuration
 
 </dd>
 </dl>
@@ -2011,6 +2048,8 @@ Write Buffer Size. 0 = 4 KB.
 
 <!-- vale on -->
 
+Proxy Connect Header - map[string][]string
+
 </dd>
 <dt>tls</dt>
 <dd>
@@ -2020,6 +2059,8 @@ Write Buffer Size. 0 = 4 KB.
 ([ClientTLSConfig](#client-tls-config))
 
 <!-- vale on -->
+
+Client TLS configuration
 
 </dd>
 </dl>

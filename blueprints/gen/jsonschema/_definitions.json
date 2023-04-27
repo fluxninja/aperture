@@ -3026,7 +3026,7 @@
           "x-order": 0
         },
         "module": {
-          "description": "Source code of the Rego module.\n\n:::Note\n\nMust include a \"package\" declaration.\n\n:::\n\n",
+          "description": "Source code of the Rego module.\n\n:::note\n\nMust include a \"package\" declaration.\n\n:::\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 1
@@ -3053,31 +3053,10 @@
     "Resources": {
       "description": ":::info\n\nSee also [Resources overview](/concepts/policy/resources.md).\n\n:::",
       "properties": {
-        "classifiers": {
-          "description": "Classifiers are installed in the data-plane and are used to label the requests based on payload content.\n\nThe flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.\n\nDeprecated: v1.5.0. Use `flow_control.classifiers` instead.\n\n",
-          "items": {
-            "$ref": "#/definitions/Classifier",
-            "type": "object"
-          },
-          "type": "array",
-          "x-deprecated": true,
-          "x-go-tag-validate": "deprecated,dive",
-          "x-order": 0
-        },
         "flow_control": {
           "$ref": "#/definitions/FlowControlResources",
           "description": "FlowControlResources are resources that are provided by flow control integration.",
-          "x-order": 1
-        },
-        "flux_meters": {
-          "additionalProperties": {
-            "$ref": "#/definitions/FluxMeter"
-          },
-          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit through the PromQL component.\n\nDeprecated: v1.5.0. Use `flow_control.flux_meters` instead.\n\n",
-          "type": "object",
-          "x-deprecated": true,
-          "x-go-tag-validate": "deprecated,dive",
-          "x-order": 2
+          "x-order": 0
         }
       },
       "title": "Resources that need to be setup for the policy to function",
@@ -3092,44 +3071,16 @@
           "description": "High-level declarative extractor.",
           "x-order": 0
         },
-        "rego": {
-          "$ref": "#/definitions/RuleRego",
-          "description": "Rego module to extract a value from.\n\nDeprecated: 1.5.0",
-          "x-order": 1
-        },
         "telemetry": {
           "default": true,
           "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja ARC extension](arc/extension.md), telemetry enabled\nlabels are sent to FluxNinja ARC for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
           "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/flow-control/flow-label.md#baggage)",
           "type": "boolean",
           "x-go-tag-default": "true",
-          "x-order": 2
-        }
-      },
-      "title": "Rule describes a single classification Rule",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RuleRego": {
-      "description": "High-level extractor-based rules are compiled into a single Rego query.\n\nDeprecated: 1.5.0",
-      "properties": {
-        "query": {
-          "description": "Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).\n\nNote: The module name must match the package name from the `source`.\n\n",
-          "type": "string",
-          "x-deprecated": true,
-          "x-go-tag-validate": "deprecated,required",
-          "x-order": 0
-        },
-        "source": {
-          "description": "Source code of the Rego module.\n\nNote: Must include a \"package\" declaration.\n\n",
-          "type": "string",
-          "x-deprecated": true,
-          "x-go-tag-validate": "deprecated,required",
           "x-order": 1
         }
       },
-      "required": ["query", "source"],
-      "title": "Raw Rego rules are compiled 1:1 to Rego queries",
+      "title": "Rule describes a single classification Rule",
       "type": "object",
       "additionalProperties": false
     },
@@ -3308,28 +3259,12 @@
           "description": "Parameters to be used if none of workloads specified in `workloads` match.",
           "x-order": 2
         },
-        "max_timeout": {
-          "default": "0s",
-          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
-          "type": "string",
-          "x-go-tag-default": "0s",
-          "x-order": 3
-        },
-        "timeout_factor": {
-          "default": 0,
-          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0.0",
-          "x-order": 4
-        },
         "tokens_label_key": {
           "default": "tokens",
           "description": "Flow label key that will be used to override the number of tokens for this request.\nThe label value must be a valid uint64 number.\nIf this parameter is not provided then each request is assumed to consume 1 token.\n\n",
           "type": "string",
           "x-go-tag-default": "tokens",
-          "x-order": 5
+          "x-order": 3
         },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
@@ -3339,7 +3274,7 @@
           },
           "type": "array",
           "x-go-tag-validate": "dive",
-          "x-order": 6
+          "x-order": 4
         }
       },
       "title": "Scheduler parameters",
