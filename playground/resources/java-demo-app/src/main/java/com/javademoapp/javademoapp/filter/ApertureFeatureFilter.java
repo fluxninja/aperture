@@ -37,7 +37,7 @@ public class ApertureFeatureFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
-        System.out.println("INSIDE FILTER!");
+        // System.out.println("INSIDE FILTER!");
         Map<String, String> labels = new HashMap<>();
         labels.put("app", "demoapp");
         labels.put("instance", System.getenv().getOrDefault("HOSTNAME", "instance-1"));
@@ -57,13 +57,29 @@ public class ApertureFeatureFilter implements Filter {
                     (oldValue, newValue) -> newValue,
                     HttpHeaders::new
                 ));
+
+            for (Map.Entry<String, String> header : httpHeaders.toSingleValueMap().entrySet()) {
+                System.out.println(header.getKey() + ": " + header.getValue());
+                labels.put(header.getKey(), header.getValue());
+            }
+
             String userType = httpHeaders.getFirst("User-Type");
             if (userType != null) {
                 labels.put("user_type", userType);
+            } else {
+                userType = httpHeaders.getFirst("user_type");
+                if (userType != null) {
+                    labels.put("user_type", userType);
+                }
             }
             String userID = httpHeaders.getFirst("User-Id");
             if (userID != null) {
                 labels.put("user_id", userID);
+            } else {
+                userID = httpHeaders.getFirst("user_id");
+                if (userID != null) {
+                    labels.put("user_id", userID);
+                }
             }
 
             log.debug("Starting Aperture SDK flow");
@@ -72,12 +88,12 @@ public class ApertureFeatureFilter implements Filter {
 //            System.out.println(flow.checkResponse());
 
             if (flow.accepted()) {
-                System.out.println("Flow accepted");
+                // System.out.println("Flow accepted");
                 log.debug("Flow accepted by Aperture Agent");
                 chain.doFilter(request, response);
                 flow.end(FlowStatus.OK);
             } else {
-                System.out.println("Flow rejected");
+                // System.out.println("Flow rejected");
                 log.debug("Flow rejected by Aperture Agent");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Request denied");
                 flow.end(FlowStatus.Error);
@@ -89,7 +105,7 @@ public class ApertureFeatureFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        System.out.println("Initing Filter");
+        // System.out.println("Initing Filter");
         String agentHost;
         String agentPort;
         try {
@@ -109,7 +125,7 @@ public class ApertureFeatureFilter implements Filter {
             log.error(message);
             throw new ServletException(message);
         }
-        System.out.println("Inited Filter");
+        // System.out.println("Inited Filter");
     }
 
     @Override

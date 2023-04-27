@@ -49,7 +49,7 @@ public class RequestController {
     @RequestMapping(value = "/super", method = RequestMethod.GET)
     // /super endpoint is protected by a Filter created using Aperture SDK feature flow
     public String hello() {
-        System.out.println("Request on /super");
+        // System.out.println("Request on /super");
         String message = "Hello World";
         log.info(message);
         return message;
@@ -79,7 +79,7 @@ public class RequestController {
 
     @Bean
     public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env){
-        System.out.println("Preparing Filter");
+        // System.out.println("Preparing Filter");
         FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(apertureFilter);

@@ -224,6 +224,7 @@ public final class ApertureSDKBuilder {
                 flowControlClient,
                 httpFlowControlClient,
                 tracer,
+                spanExporter,
                 timeout,
                 ignoredPaths,
                 ignoredPathsMatchRegex);
