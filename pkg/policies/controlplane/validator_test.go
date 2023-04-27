@@ -3,6 +3,7 @@ package controlplane_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -35,8 +36,12 @@ var _ = Describe("Validator", Ordered, func() {
 			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
 		}
 
-		ok, _, err := policyValidator.ValidateObject(context.TODO(), request)
+		ok, msg, err := policyValidator.ValidateObject(context.TODO(), request)
 		Expect(err).NotTo(HaveOccurred())
+		// print msg if validation fails
+		if !ok {
+			fmt.Println(msg)
+		}
 		Expect(ok).To(BeTrue())
 	}
 

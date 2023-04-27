@@ -50,6 +50,23 @@ func newFlowControlCompositeAndOptions(
 		data["actuator"] = data["load_actuator"]
 		delete(data, "load_actuator")
 
+		actuator := data["scheduler"].(map[string]interface{})
+		// Modify the .out_ports.accepted_concurrency and .out_ports.incoming_concurrency fields in the JSON to .out_ports.accepted_token_rate and .out_ports.incoming_token_rate since the field name changed
+		outPorts := actuator["out_ports"]
+		if outPorts != nil {
+			outPortsMap := outPorts.(map[string]interface{})
+			acceptedConcurrency := outPortsMap["accepted_concurrency"]
+			if acceptedConcurrency != nil {
+				outPortsMap["accepted_token_rate"] = acceptedConcurrency
+				delete(outPortsMap, "accepted_concurrency")
+			}
+			incomingConcurrency := outPortsMap["incoming_concurrency"]
+			if incomingConcurrency != nil {
+				outPortsMap["incoming_token_rate"] = incomingConcurrency
+				delete(outPortsMap, "incoming_concurrency")
+			}
+		}
+
 		// Marshal the modified map back into JSON
 		newJSONStr, err := json.Marshal(data)
 		if err != nil {
