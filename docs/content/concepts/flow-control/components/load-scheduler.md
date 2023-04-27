@@ -13,20 +13,20 @@ sidebar_position: 6
 :::info
 
 See also
-[_AIMD Concurrency Controller_ reference](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
+[_Adaptive Load Scheduler_ reference](/reference/policies/spec.md#adaptive-load-scheduler)
 and
-[_Concurrency Limiter_ reference](/reference/policies/spec.md#concurrency-limiter).
+[_Load Scheduler_ reference](/reference/policies/spec.md#adaptive-load-scheduler).
 
 :::
 
-The _Concurrency Limiter_ is a powerful tool designed to protect your services
-from overloads and prevent cascading failures. Its **primary goal is to limit**
-the number of concurrent requests to a service, ensuring that the service can
-handle the incoming workload. By defining workloads with different priorities
-and weights, the _Concurrency Limiter_ can prioritize certain requests over
-others, enabling graceful degradation of service during times of high traffic.
+The _Load Scheduler_ is a powerful tool designed to protect your services from
+overloads and prevent cascading failures. Its **primary goal is to limit** the
+number of concurrent requests to a service, ensuring that the service can handle
+the incoming workload. By defining workloads with different priorities and
+weights, the _Load Scheduler_ can prioritize certain requests over others,
+enabling graceful degradation of service during times of high traffic.
 
-As with other components of the Aperture platform, the _Concurrency Limiter_ is
+As with other components of the Aperture platform, the _Load Scheduler_ is
 configured using a [policy][policies] component.
 
 ## Scheduler {#scheduler}

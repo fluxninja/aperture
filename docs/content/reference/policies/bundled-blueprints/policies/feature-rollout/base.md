@@ -12,9 +12,8 @@ healthy.
 
 :::info
 
-Please see reference for the
-[`LoadShaper`](/reference/policies/spec.md#load-shaper) component that is used
-within this blueprint.
+Please see reference for the [`LoadRamp`](/reference/policies/spec.md#load-ramp)
+component that is used within this blueprint.
 
 :::
 
