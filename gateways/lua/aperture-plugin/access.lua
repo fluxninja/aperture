@@ -1,6 +1,6 @@
 local json = require("cjson")
 local socket = require("socket")
-local http = require("socket.http")
+local http = require("resty.http")
 local ltn12 = require("ltn12")
 
 local apertureAgentEndpoint = os.getenv("APERTURE_AGENT_ENDPOINT")
@@ -10,7 +10,7 @@ end
 
 local apertureCheckTimeout = os.getenv("APERTURE_CHECK_TIMEOUT")
 if apertureCheckTimeout == nil or apertureCheckTimeout == "" then
-  apertureCheckTimeout = "500m"
+  apertureCheckTimeout = "250m"
 end
 
 local otlp_tracer_provider_new = require("opentelemetry.trace.tracer_provider").new
@@ -98,22 +98,24 @@ return function(destination_hostname, destination_port)
   })
   ngx.ctx.otlp_span = span
 
-  local response, code, response_headers = http.request{
-    url = apertureAgentEndpoint .. "/v1/flowcontrol/checkhttp",
+  local httpc = http.new()
+  local request_options = {
     method = "POST",
+    body = request_body_json,
     headers = request_headers,
-    source = ltn12.source.string(request_body_json),
     ssl_verify = false,
-    sink = ltn12.sink.table(response_body),
   }
+  local res, err = httpc:request_uri(apertureAgentEndpoint .. "/v1/flowcontrol/checkhttp", request_options)
+  httpc:close()
 
-  if response == nil then
-    ngx.log(ngx.ERR, "failed to call Aperture CheckHTTP. Code: " .. code)
+  if not res or err ~= nil then
+    ngx.log(ngx.ERR, "failed to call Aperture CheckHTTP. Error: ", err)
     return 200
   end
 
+  local code = res.status
   if code == 200 then
-    local response_json = json.decode(response_body[1])
+    local response_json = json.decode(res.body)
     ngx.ctx.aperture_check_reponse = response_json.dynamic_metadata["aperture.check_response"]
     if response_json.ok_response ~= nil then
       for header_name, header_value in pairs(response_json.ok_response.headers) do
@@ -127,7 +129,7 @@ return function(destination_hostname, destination_port)
     span:set_attributes(otlp_attr.int("aperture.flow_start_timestamp", ngx.req.start_time() * 1000))
     span:set_attributes(otlp_attr.int("aperture.workload_start_timestamp", math.floor(socket.gettime() * 1000)))
   else
-    ngx.log(ngx.ERR, "failed to send Aperture CheckHTTP request. Code: " .. code .. ", Response: " .. response_body[1])
+    ngx.log(ngx.ERR, "failed to send Aperture CheckHTTP request. Code: " .. code .. ", Response: " .. res.body)
     code = 200
   end
   return code
