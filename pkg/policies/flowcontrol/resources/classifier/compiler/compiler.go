@@ -211,7 +211,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 
 		// get package name in module
 		// package name is specified in a line like "package foo"
-		p := regexp.MustCompile(`package\s+(\w+)`)
+		p := regexp.MustCompile(`package\s+(\S+)`)
 		m := p.FindStringSubmatch(module)
 		if len(m) != 2 {
 			return nil, fmt.Errorf("failed to get package name from rego module")

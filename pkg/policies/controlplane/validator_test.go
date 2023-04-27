@@ -83,36 +83,37 @@ metadata:
     fluxninja.com/validate: "true"
 spec:
   resources:
-    flux_meters:
-      "service_latency":
-        flow_selector:
-          service_selector:
-            service: "service1-demo-app.demoapp.svc.cluster.local"
-          flow_matcher:
-            control_point: "ingress"
-    classifiers:
-      - flow_selector:
-          service_selector:
-            service: service1-demo-app.demoapp.svc.cluster.local
-          flow_matcher:
-            control_point: ingress
-        rules:
-          # An example rule using extractor.
-          # See following RFC for list of available extractors and their syntax.
-          ua:
-            extractor:
-              from: request.http.headers.user-agent
-          # The same rule using raw rego. Requires specifying rego source code and a query
-          also-ua:
-            rego:
-              source: |
-                package my.rego.pkg
-                import input.attributes.request.http
-                ua = http.headers["user-agent"]
-              query: data.my.rego.pkg.ua
-          user_type:
-            extractor:
-              from: request.http.headers.user_type
+    flow_control:
+      flux_meters:
+        "service_latency":
+          flow_selector:
+            service_selector:
+              service: "service1-demo-app.demoapp.svc.cluster.local"
+            flow_matcher:
+              control_point: "ingress"
+      classifiers:
+        - flow_selector:
+            service_selector:
+              service: service1-demo-app.demoapp.svc.cluster.local
+            flow_matcher:
+              control_point: ingress
+          rego:
+            labels:
+              also_ua:
+                telemetry: true
+            module: |
+              package my.rego.pkg
+              import input.attributes.request.http
+              also_ua = http.headers["user-agent"]
+          rules:
+            # An example rule using extractor.
+            # See following RFC for list of available extractors and their syntax.
+            ua:
+              extractor:
+                from: request.http.headers.user-agent
+            user_type:
+              extractor:
+                from: request.http.headers.user_type
   circuit:
     evaluation_interval: "0.5s"
     components:
@@ -342,30 +343,32 @@ metadata:
     fluxninja.com/validate: "true"
 spec:
   resources:
-    classifiers:
-      - flow_selector:
-          service_selector:
-            service: productpage.bookinfo.svc.cluster.local
-          flow_matcher:
-            control_point: ingress
-        rules:
-          ua:
-            extractor:
-              from: request.http.headers.user-agent
-          user:
-            rego:
-              query: data.user_from_cookie.user
-              source: |
-                package user_from_cookie
-                cookies := split(input.attributes.request.http.headers.cookie, "; ")
-                user := user {
-                    cookie := cookies[_]
-                    startswith(cookie, "session=")
-                    session := substring(cookie, count("session="), -1)
-                    parts := split(session, ".")
-                    object := json.unmarshal(base64url.decode(parts[0]))
-                    user := object.user
-                }
+    flow_control:
+      classifiers:
+        - flow_selector:
+            service_selector:
+              service: productpage.bookinfo.svc.cluster.local
+            flow_matcher:
+              control_point: ingress
+          rego:
+            labels:
+              user:
+                telemetry: true
+            module: |
+              package user_from_cookie
+              cookies := split(input.attributes.request.http.headers.cookie, "; ")
+              user := user {
+                  cookie := cookies[_]
+                  startswith(cookie, "session=")
+                  session := substring(cookie, count("session="), -1)
+                  parts := split(session, ".")
+                  object := json.unmarshal(base64url.decode(parts[0]))
+                  user := object.user
+              }
+          rules:
+            ua:
+              extractor:
+                from: request.http.headers.user-agent
 `
 
 const rateLimitPolicy = `
