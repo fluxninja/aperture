@@ -2,7 +2,3 @@ label: Feature Rollout
 position: 4
 collapsible: true
 collapsed: true
-link:
-  type: "generated-index"
-  title: "Feature Rollout"
-  keywords: ["blueprints"]
