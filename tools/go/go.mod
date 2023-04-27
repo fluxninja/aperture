@@ -90,5 +90,5 @@ require (
 
 replace (
 	github.com/go-openapi/analysis => github.com/fluxninja/analysis v0.21.2-fn.patch.3
-	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.12
+	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.13
 )

@@ -19,18 +19,6 @@
   withDefaultWorkloadParametersMixin(default_workload_parameters):: {
     default_workload_parameters+: default_workload_parameters,
   },
-  withMaxTimeout(max_timeout):: {
-    max_timeout: max_timeout,
-  },
-  withMaxTimeoutMixin(max_timeout):: {
-    max_timeout+: max_timeout,
-  },
-  withTimeoutFactor(timeout_factor):: {
-    timeout_factor: timeout_factor,
-  },
-  withTimeoutFactorMixin(timeout_factor):: {
-    timeout_factor+: timeout_factor,
-  },
   withTokensLabelKey(tokens_label_key):: {
     tokens_label_key: tokens_label_key,
   },

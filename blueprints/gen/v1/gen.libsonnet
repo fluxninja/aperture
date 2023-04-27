@@ -160,7 +160,6 @@
   RegulatorParameters: import 'regulatorparameters.libsonnet',
   Resources: import 'resources.libsonnet',
   Rule: import 'rule.libsonnet',
-  RuleRego: import 'rulerego.libsonnet',
   SMA: import 'sma.libsonnet',
   SMAIns: import 'smains.libsonnet',
   SMAOuts: import 'smaouts.libsonnet',

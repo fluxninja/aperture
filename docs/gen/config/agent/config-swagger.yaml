@@ -27,6 +27,7 @@ definitions:
         properties:
             client:
                 $ref: '#/definitions/ClientConfig'
+                description: Network client configuration
                 x-go-tag-json: client
             endpoints:
                 description: RPC servers to connect to (which will be able to call agent functions)
@@ -91,12 +92,15 @@ definitions:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
+                description: BatchAlerts configures batch alerts processor.
                 x-go-tag-json: batch_alerts
             batch_postrollup:
                 $ref: '#/definitions/BatchPostrollupConfig'
+                description: BatchPostrollup configures the OTel batch post-processor.
                 x-go-tag-json: batch_postrollup
             batch_prerollup:
                 $ref: '#/definitions/BatchPrerollupConfig'
+                description: BatchPrerollup configures the OTel batch pre-processor.
                 x-go-tag-json: batch_prerollup
             custom_metrics:
                 additionalProperties:
@@ -125,6 +129,7 @@ definitions:
                 x-go-tag-json: disable_kubernetes_scraper
             ports:
                 $ref: '#/definitions/PortsConfig'
+                description: Ports configures debug, health and extension ports values.
                 x-go-tag-json: ports
         title: AgentOTelConfig is the configuration for Agent's OTel collector.
         type: object
@@ -345,13 +350,14 @@ definitions:
                 x-go-tag-default: 10s
                 x-go-tag-json: timeout
                 x-go-tag-validate: gt=0
-        title: BatchPrerol[.*?]upConfig defines configuration for OTel batch processor.
+        title: BatchPrerollupConfig defines configuration for OTel batch processor.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
     ClientConfig:
         properties:
             grpc:
                 $ref: '#/definitions/GRPCClientConfig'
+                description: gRPC client settings.
                 x-go-tag-json: grpc
         title: ClientConfig is configuration for network clients used by agent-functions.
         type: object
@@ -385,9 +391,11 @@ definitions:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
+                description: BatchAlerts configures batch alerts processor.
                 x-go-tag-json: batch_alerts
             ports:
                 $ref: '#/definitions/PortsConfig'
+                description: Ports configures debug, health and extension ports values.
                 x-go-tag-json: ports
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
@@ -418,12 +426,27 @@ definitions:
                 x-go-tag-json: per_agent_group
             pipeline:
                 $ref: '#/definitions/CustomMetricsPipelineConfig'
+                description: |-
+                    Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
+                    and processors defined above. Exporter would be added automatically.
+
+                    If there are no processors defined or only one processor is defined, the
+                    pipeline definition can be omitted. In such cases, the pipeline will
+                    automatically use all given receivers and the defined processor (if
+                    any).  However, if there are more than one processor, the pipeline must
+                    be defined explicitly.
                 x-go-tag-json: pipeline
             processors:
                 $ref: '#/definitions/Components'
+                description: |-
+                    Processors define processors to be used in custom metrics pipelines. This should
+                    be in OTel format - https://opentelemetry.io/docs/collector/configuration/#processors.
                 x-go-tag-json: processors,omitempty
             receivers:
                 $ref: '#/definitions/Components'
+                description: |-
+                    Receivers define receivers to be used in custom metrics pipelines. This should
+                    be in OTel format - https://opentelemetry.io/docs/collector/configuration/#receivers.
                 x-go-tag-json: receivers
         title: |-
             CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller Prometheus.
@@ -571,6 +594,7 @@ definitions:
                 x-go-tag-json: password
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             username:
                 description: Authentication
@@ -598,6 +622,7 @@ definitions:
         properties:
             backoff:
                 $ref: '#/definitions/BackoffConfig'
+                description: Backoff configuration
                 x-go-tag-json: backoff
             insecure:
                 default: false
@@ -618,6 +643,7 @@ definitions:
                 x-go-tag-validate: gte=0
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             use_proxy:
                 default: false
@@ -779,6 +805,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             proxy_connect_header:
                 $ref: '#/definitions/Header'
+                description: Proxy Connect Header - map[string][]string
                 x-go-tag-json: proxy_connect_header,omitempty
                 x-go-tag-validate: omitempty
             read_buffer_size:
@@ -811,6 +838,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             tls_handshake_timeout:
                 default: 10s

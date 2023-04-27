@@ -72,25 +72,25 @@ var _ = Describe("Classifier", func() {
 					ControlPoint: "ingress",
 				},
 			},
-			Rules: map[string]*policylangv1.Rule{
-				"bar-twice": {
-					Source: &policylangv1.Rule_Rego_{
-						Rego: &policylangv1.Rule_Rego{
-							Source: `
-								package my.pkg
-								answer := input.attributes.request.http.headers.bar * 2
-							`,
-							Query: "data.my.pkg.answer",
-						},
+			Rego: &policylangv1.Rego{
+				Labels: map[string]*policylangv1.Rego_LabelProperties{
+					"bar_twice": {
+						Telemetry: true,
 					},
-					Telemetry: true,
 				},
+				Module: `
+					package my.pkg
+					bar_twice := input.attributes.request.http.headers.bar * 2
+				`,
 			},
 		}
 
 		// Classifier with a no service populated
 		rs3 := &policylangv1.Classifier{
 			FlowSelector: &policylangv1.FlowSelector{
+				ServiceSelector: &policylangv1.ServiceSelector{
+					Service: "any",
+				},
 				FlowMatcher: &policylangv1.FlowMatcher{
 					ControlPoint: "ingress",
 				},
@@ -132,12 +132,6 @@ var _ = Describe("Classifier", func() {
 					FlowSelector: rs1.FlowSelector,
 				},
 				compiler.ReportedRule{
-					RulesetName:  "two",
-					LabelName:    "bar-twice",
-					Rule:         rs2.Rules["bar-twice"],
-					FlowSelector: rs2.FlowSelector,
-				},
-				compiler.ReportedRule{
 					RulesetName:  "three",
 					LabelName:    "fuu",
 					Rule:         rs3.Rules["fuu"],
@@ -159,7 +153,7 @@ var _ = Describe("Classifier", func() {
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
 				"foo":       fl("hello"),
-				"bar-twice": fl("42"),
+				"bar_twice": fl("42"),
 			}))
 		})
 
@@ -208,7 +202,7 @@ var _ = Describe("Classifier", func() {
 					}),
 				)
 				Expect(labels).To(Equal(flowlabel.FlowLabels{
-					"bar-twice": fl("42"),
+					"bar_twice": fl("42"),
 				}))
 			})
 		})
@@ -227,7 +221,7 @@ var _ = Describe("Classifier", func() {
 	})
 
 	// helper for setting rules with a "default" selector
-	setRulesForMyService := func(labelRules map[string]*policylangv1.Rule) error {
+	setRulesForMyService := func(labelRules map[string]*policylangv1.Rule, rego *policylangv1.Rego) error {
 		_, err := classifier.AddRules(context.TODO(), "test", &policysyncv1.ClassifierWrapper{
 			Classifier: &policylangv1.Classifier{
 				FlowSelector: &policylangv1.FlowSelector{
@@ -239,6 +233,7 @@ var _ = Describe("Classifier", func() {
 					},
 				},
 				Rules: labelRules,
+				Rego:  rego,
 			},
 			ClassifierAttributes: classifierAttributes,
 		})
@@ -251,22 +246,22 @@ var _ = Describe("Classifier", func() {
 				Source:    headerExtractor("foo"),
 				Telemetry: false,
 			},
-			"bar": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-							package my.pkg
-							answer := input.attributes.request.http.headers.bar
-							`,
-						Query: "data.my.pkg.answer",
-					},
+		}
+
+		rego := &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"bar": {
+					Telemetry: true,
 				},
-				Telemetry: true,
 			},
+			Module: `
+				package my.pkg
+				bar := input.attributes.request.http.headers.bar
+			`,
 		}
 
 		BeforeEach(func() {
-			Expect(setRulesForMyService(rules)).To(Succeed())
+			Expect(setRulesForMyService(rules, rego)).To(Succeed())
 		})
 
 		It("marks the returned flow labels with those flags", func() {
@@ -306,8 +301,8 @@ var _ = Describe("Classifier", func() {
 		}
 
 		BeforeEach(func() {
-			Expect(setRulesForMyService(rules1)).To(Succeed())
-			Expect(setRulesForMyService(rules2)).To(Succeed())
+			Expect(setRulesForMyService(rules1, nil)).To(Succeed())
+			Expect(setRulesForMyService(rules2, nil)).To(Succeed())
 		})
 
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
@@ -332,38 +327,33 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("configured with same label for different rules in rego", func() {
-		rules1 := map[string]*policylangv1.Rule{
-			"bar": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-							package my.pkg
-							answer := input.attributes.request.http.headers.bar * 3
-						`,
-						Query: "data.my.pkg.answer",
-					},
+		rego1 := &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"bar": {
+					Telemetry: true,
 				},
-				Telemetry: true,
 			},
+			Module: `
+				package my.pkg
+				bar := input.attributes.request.http.headers.bar * 3
+			`,
 		}
-		rules2 := map[string]*policylangv1.Rule{
-			"bar": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-							package my.pkg
-							answer2 := input.attributes.request.http.headers.bar * 2
-						`,
-						Query: "data.my.pkg.answer2",
-					},
+
+		rego2 := &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"bar": {
+					Telemetry: true,
 				},
-				Telemetry: true,
 			},
+			Module: `
+				package my.pkg
+				bar := input.attributes.request.http.headers.bar * 2
+			`,
 		}
 
 		BeforeEach(func() {
-			Expect(setRulesForMyService(rules1)).To(Succeed())
-			Expect(setRulesForMyService(rules2)).To(Succeed())
+			Expect(setRulesForMyService(nil, rego1)).To(Succeed())
+			Expect(setRulesForMyService(nil, rego2)).To(Succeed())
 		})
 
 		It("classifies and returns flow labels (overwrite order not specified)", func() {
@@ -387,48 +377,42 @@ var _ = Describe("Classifier", func() {
 	})
 
 	Context("incorrect rego passed", func() {
-		rules := map[string]*policylangv1.Rule{
-			"bar-twice": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-							Package my.pkg
-							bar := input.attributes.request.http.headers.bar * 2
-							bar := input.attributes.request.http.headers.foo
-						`,
-						Query: "data.my.pkg.bar",
-					},
+		rego := &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"bar_twice": {
+					Telemetry: true,
 				},
-				Telemetry: true,
 			},
+			Module: `
+				Package my.pkg
+				bar_twice := input.attributes.request.http.headers.bar * 2
+				bar_twice := input.attributes.request.http.headers.foo
+			`,
 		}
 
 		It("fails to compile rego", func() {
-			err := setRulesForMyService(rules)
+			err := setRulesForMyService(nil, rego)
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(compiler.BadRego))
+			Expect(err.Error()).To(ContainSubstring("failed to get package name from rego module"))
 		})
 	})
 
 	Context("configured with ambiguous rules in rego", func() {
-		rules := map[string]*policylangv1.Rule{
-			"bar": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-							package my.pkg
-							answer = input.attributes.request.http.headers.bar * 3
-							answer = input.attributes.request.http.headers.foo
-						`,
-						Query: "data.my.pkg.answer",
-					},
+		rego := &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"bar": {
+					Telemetry: true,
 				},
-				Telemetry: true,
 			},
+			Module: `
+				package my.pkg
+				bar = input.attributes.request.http.headers.bar * 3
+				bar = input.attributes.request.http.headers.foo
+			`,
 		}
 
 		BeforeEach(func() {
-			Expect(setRulesForMyService(rules)).To(Succeed())
+			Expect(setRulesForMyService(nil, rego)).To(Succeed())
 		})
 
 		It("classifies and returns empty flow labels - could not decide which rego to use", func() {

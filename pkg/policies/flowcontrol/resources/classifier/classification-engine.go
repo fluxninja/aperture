@@ -145,31 +145,20 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 			continue
 		}
 
-		if labeler.LabelName != "" {
-			// single-label-query
-			flowLabels[labeler.LabelName] = flowlabel.FlowLabelValue{
-				Value: resultSet[0].Expressions[0].String(),
-				// nolint
-				Telemetry: labeler.Telemetry,
-			}
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
-		} else {
-			// multi-label-query
-			variables, isMap := resultSet[0].Expressions[0].Value.(map[string]interface{})
-			if !isMap {
-				logger.Bug().Msg("bug: Rego: Expression is not a map")
-				appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EXPRESSION_NOT_MAP)
-				continue
-			}
+		variables, isMap := resultSet[0].Expressions[0].Value.(map[string]interface{})
+		if !isMap {
+			logger.Bug().Msg("bug: Rego: Expression is not a map")
+			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EXPRESSION_NOT_MAP)
+			continue
+		}
 
-			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
-			for key, value := range variables {
-				// copy this variable to labels
-				if l, ok := labeler.Labels[key]; ok {
-					flowLabels[key] = flowlabel.FlowLabelValue{
-						Value:     fmt.Sprint(value),
-						Telemetry: l.Telemetry,
-					}
+		appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
+		for key, value := range variables {
+			// copy this variable to labels
+			if l, ok := labeler.Labels[key]; ok {
+				flowLabels[key] = flowlabel.FlowLabelValue{
+					Value:     fmt.Sprint(value),
+					Telemetry: l.Telemetry,
 				}
 			}
 		}

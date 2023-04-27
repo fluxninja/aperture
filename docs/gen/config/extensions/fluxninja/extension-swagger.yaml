@@ -48,9 +48,11 @@ definitions:
         properties:
             grpc:
                 $ref: '#/definitions/GRPCClientConfig'
+                description: gRPC client settings.
                 x-go-tag-json: grpc
             http:
                 $ref: '#/definitions/HTTPClientConfig'
+                description: HTTP client settings.
                 x-go-tag-json: http
         title: ClientConfig is the client configuration.
         type: object
@@ -94,6 +96,7 @@ definitions:
                 x-go-tag-json: api_key
             client:
                 $ref: '#/definitions/ClientConfig'
+                description: Client configuration.
                 x-go-tag-json: client
             endpoint:
                 description: Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
@@ -132,6 +135,7 @@ definitions:
         properties:
             backoff:
                 $ref: '#/definitions/BackoffConfig'
+                description: Backoff configuration
                 x-go-tag-json: backoff
             insecure:
                 default: false
@@ -152,6 +156,7 @@ definitions:
                 x-go-tag-validate: gte=0
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             use_proxy:
                 default: false
@@ -262,6 +267,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             proxy_connect_header:
                 $ref: '#/definitions/Header'
+                description: Proxy Connect Header - map[string][]string
                 x-go-tag-json: proxy_connect_header,omitempty
                 x-go-tag-validate: omitempty
             read_buffer_size:
@@ -294,6 +300,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             tls_handshake_timeout:
                 default: 10s

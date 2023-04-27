@@ -35,7 +35,7 @@ type GRPCClientConfig struct {
 	MinConnectionTimeout config.Duration `json:"min_connection_timeout" validate:"gte=0" default:"20s"`
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
-	// Backoff config
+	// Backoff configuration
 	Backoff BackoffConfig `json:"backoff"`
 	// Disable ClientTLS
 	Insecure bool `json:"insecure" default:"false"`
