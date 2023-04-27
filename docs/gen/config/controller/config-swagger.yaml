@@ -298,15 +298,13 @@ definitions:
         description: GRPCGatewayConfig holds configuration for gRPC to HTTP gateway
         properties:
             grpc_server_address:
-                default: 0.0.0.0:1
                 description: gRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs gRPC and HTTP servers on the same port
-                pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
+                pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: GRPCAddr
-                x-go-tag-default: 0.0.0.0:1
                 x-go-tag-json: grpc_server_address
-                x-go-tag-validate: hostname_port
-                x-pattern-rules: hostname_port
+                x-go-tag-validate: omitempty,hostname_port
+                x-pattern-rules: empty | hostname_port
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpcgateway
     GRPCServerConfig:

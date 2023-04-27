@@ -1729,7 +1729,7 @@ GRPCGatewayConfig holds configuration for gRPC to HTTP gateway
 
 <!-- vale off -->
 
-(string, format: `hostname_port`, default: `"0.0.0.0:1"`)
+(string, format: `empty | hostname_port`)
 
 <!-- vale on -->
 

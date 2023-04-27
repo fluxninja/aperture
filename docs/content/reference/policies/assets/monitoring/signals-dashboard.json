@@ -12,247 +12,196 @@
   "links": [],
   "panels": [
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": "controller-prometheus",
-      "defaults": {
-        "color": {
-          "mode": "palette-classic"
-        },
-        "custom": {
-          "drawStyle": "line",
-          "lineInterpolation": "linear",
-          "lineWidth": 1,
-          "pointSize": 5,
-          "scaleDistribution": {
-            "type": "linear"
-          },
-          "showPoints": "auto",
-          "spanNulls": false
-        }
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": null
-        }
-      },
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 0
       },
       "id": 2,
-      "interval": "1s",
-      "minSpan": 24,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "sideWidth": null,
+        "total": false,
+        "values": false
       },
-      "span": 24,
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeat": null,
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n/\nincrease(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])\n",
+          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])/increase(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval])",
           "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "Avg",
-          "range": true,
+          "intervalFactor": 1,
+          "legendFormat": "",
           "refId": "A"
         }
       ],
-      "thresholds": {
-        "mode": "absolute",
-        "steps": [
-          {
-            "color": "green",
-            "value": null
-          },
-          {
-            "color": "red",
-            "value": 80
-          }
-        ]
-      },
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
       "title": "Signal Average",
-      "type": "timeseries"
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
     },
     {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": "controller-prometheus",
-      "defaults": {
-        "color": {
-          "mode": "palette-classic"
-        },
-        "custom": {
-          "drawStyle": "line",
-          "lineInterpolation": "linear",
-          "lineWidth": 1,
-          "pointSize": 5,
-          "scaleDistribution": {
-            "type": "linear"
-          },
-          "showPoints": "auto",
-          "spanNulls": false
-        }
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": null
-        }
-      },
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 15
       },
       "id": 3,
-      "interval": "1s",
-      "minSpan": 24,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "sideWidth": null,
+        "total": false,
+        "values": false
       },
-      "span": 24,
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeat": null,
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "avg(rate(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval]))\n",
+          "expr": "avg(rate(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval]))",
           "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "",
-          "range": true,
+          "intervalFactor": 1,
+          "legendFormat": "Valid",
           "refId": "A"
+        },
+        {
+          "expr": "sum(rate(invalid_signal_readings_total{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}[$__rate_interval]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Invalid",
+          "refId": "B"
         }
       ],
-      "thresholds": {
-        "mode": "absolute",
-        "steps": [
-          {
-            "color": "green",
-            "value": null
-          },
-          {
-            "color": "red",
-            "value": 80
-          }
-        ]
-      },
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
       "title": "Signal Validity (Frequency)",
-      "type": "timeseries"
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
     }
   ],
   "refresh": "5s",
   "rows": [],
-  "schemaVersion": 18,
+  "schemaVersion": 36,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "text": "default",
+          "text": "controller-prometheus",
           "value": "controller-prometheus"
         },
-        "hide": 0,
+        "hide": 2,
         "label": "Data Source",
         "name": "datasource",
         "options": [],
@@ -262,11 +211,6 @@
         "type": "datasource"
       },
       {
-        "current": {
-          "selected": false,
-          "text": "ACCEPTED_CONCURRENCY",
-          "value": "ACCEPTED_CONCURRENCY"
-        },
         "datasource": {
           "type": "prometheus",
           "uid": "${datasource}"
