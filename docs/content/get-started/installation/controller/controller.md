@@ -70,9 +70,9 @@ and can result in unpredictable behavior.
    resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition and
    so on.
 
-2. [**Namespace scoped Installation**](namespace-scoped/namespace-scoped.md)
+2. [**Namespace-scoped Installation**](namespace-scoped/namespace-scoped.md)
 
-   The Aperture Controller can also be installed with only namespace scoped
+   The Aperture Controller can also be installed with only namespace-scoped
    resources.
 
 <!-- vale off -->

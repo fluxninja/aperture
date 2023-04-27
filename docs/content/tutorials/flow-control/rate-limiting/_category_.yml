@@ -1,8 +1,0 @@
-label: Rate Limiting
-position: 2
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Rate Limiting"
-  keywords: ["tutorial"]

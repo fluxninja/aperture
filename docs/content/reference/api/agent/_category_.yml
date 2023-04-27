@@ -2,7 +2,3 @@ label: Aperture Agent
 position: 2
 collapsible: true
 collapsed: true
-link:
-  type: "generated-index"
-  title: "Aperture Agent"
-  keywords: ["api"]
