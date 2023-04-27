@@ -8,7 +8,7 @@ sidebar_label: Kubernetes Operator
 
 Aperture Operator for Aperture Controller and Agent manages installation for
 the user and creates required Kubernetes Objects. It uses the configurations
-provided via the Custom Resources and manages the Kubernetes Objects
+provided through the Custom Resources and manages the Kubernetes Objects
 accordingly.
 
 ```mdx-code-block
