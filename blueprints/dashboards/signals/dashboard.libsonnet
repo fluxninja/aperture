@@ -1,110 +1,75 @@
-local aperture = import '../../grafana/aperture.libsonnet';
-local lib = import '../../grafana/grafana.libsonnet';
 local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
-local timeSeriesPanel = lib.TimeSeriesPanel;
-
+local prometheus = grafana.prometheus;
+local graphPanel = grafana.graphPanel;
 
 function(cfg) {
   local params = config.common + config.dashboard + cfg,
+  local policyName = params.policy_name,
   local ds = params.datasource,
   local dsName = ds.name,
-  local policyName = params.policy_name,
+  local refresh = params.refresh_interval,
+  local time_from = params.time_from,
+  local time_to = params.time_to,
 
-  local SignalAveragePanel =
-    local query = |||
-      increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval])
-      /
-      increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval])
-    ||| % { policy_name: policyName };
-    local target =
-      grafana.prometheus.target(query) +
-      {
-        legendFormat: 'Avg',
-        editorMode: 'code',
-        range: true,
-      };
-    local thresholds =
-      {
-        mode: 'absolute',
-        steps: [
-          { color: 'green', value: null },
-          { color: 'red', value: 80 },
-        ],
-      };
-    aperture.timeSeriesPanel.new('Signal Average', dsName)
-    + timeSeriesPanel.withTarget(target)
-    + timeSeriesPanel.defaults.withThresholds(thresholds)
-    + timeSeriesPanel.withFieldConfigMixin(
-      timeSeriesPanel.fieldConfig.withDefaultsMixin(
-        timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
-      )
-    ) + {
-      interval: '1s',
-    },
+  local signalAveragePanel = graphPanel.new(
+    title='Signal Average',
+    datasource=dsName,
+  )
+                             .addTarget(
+    prometheus.target(
+      expr=(
+        'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])' +
+        '/' +
+        'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])'
+      ),
+      intervalFactor=1,
+    ),
+  ),
 
-  local InvalidFrequencyPanel =
-    local query = |||
-      avg(rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))
-    ||| % { policy_name: policyName };
-    local target =
-      grafana.prometheus.target(query) +
-      {
-        editorMode: 'code',
-        range: true,
-      };
-    local thresholds =
-      {
-        mode: 'absolute',
-        steps: [
-          { color: 'green', value: null },
-          { color: 'red', value: 80 },
-        ],
-      };
-    aperture.timeSeriesPanel.new('Signal Validity (Frequency)', dsName)
-    + timeSeriesPanel.withTarget(target)
-    + timeSeriesPanel.defaults.withThresholds(thresholds)
-    + timeSeriesPanel.withFieldConfigMixin(
-      timeSeriesPanel.fieldConfig.withDefaultsMixin(
-        timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
-      )
-    ) + {
-      interval: '1s',
-    },
+  local InvalidFrequencyPanel = graphPanel.new(
+    title='Signal Validity (Frequency)',
+    datasource=dsName,
+    stack=true,
+    bars=true,
+  )
+                                .addTarget(
+    prometheus.target(
+      expr='avg(rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
+      intervalFactor=1,
+      legendFormat='Valid',
+    ),
+  )
+                                .addTarget(
+    prometheus.target(
+      expr='sum(rate(invalid_signal_readings_total{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
+      intervalFactor=1,
+      legendFormat='Invalid',
+    ),
+  ),
 
-  dashboard:
+  local dashboardDef =
     dashboard.new(
       title='Signals',
+      schemaVersion=36,
       editable=true,
-      schemaVersion=18,
-      refresh=params.refresh_interval,
-      time_from=params.time_from,
-      time_to=params.time_to
+      refresh=refresh,
+      time_from=time_from,
+      time_to=time_to,
     )
     .addTemplate(
-      {
-        current: {
-          text: 'default',
-          value: dsName,
-        },
-        regex: ds.filter_regex,
-        hide: 0,
-        label: 'Data Source',
-        name: 'datasource',
-        options: [],
-        query: 'prometheus',
-        refresh: 1,
-        type: 'datasource',
-      }
+      grafana.template.datasource(
+        name='datasource',
+        query='prometheus',
+        label='Data Source',
+        current=dsName,
+        hide=0,
+        regex=ds.filter_regex,
+      )
     )
     .addTemplate({
-      current: {
-        selected: false,
-        text: 'ACCEPTED_CONCURRENCY',
-        value: 'ACCEPTED_CONCURRENCY',
-      },
       datasource: {
         type: 'prometheus',
         uid: '${datasource}',
@@ -121,6 +86,14 @@ function(cfg) {
       sort: 0,
       type: 'query',
     })
-    .addPanel(SignalAveragePanel, gridPos={ h: 10, w: 24, x: 0, y: 0 })
-    .addPanel(InvalidFrequencyPanel, gridPos={ h: 10, w: 24, x: 0, y: 10 }),
+    .addPanel(
+      panel=signalAveragePanel,
+      gridPos={ x: 0, y: 0, w: 24, h: 8 },
+    )
+    .addPanel(
+      panel=InvalidFrequencyPanel,
+      gridPos={ x: 0, y: 15, w: 24, h: 8 },
+    ),
+
+  dashboard: dashboardDef,
 }

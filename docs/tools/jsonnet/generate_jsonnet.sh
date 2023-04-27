@@ -71,13 +71,13 @@ function generate_jsonnet_files() {
 		"$scriptroot"/json2yaml "$jsonfilepath" "$yamlfilepath"
 		rm -rf "$jsonfilepath"
 		# run prettier
-		npx prettier --write "$yamlfilepath"
+		npx prettier@latest --write "$yamlfilepath"
 		# generate mermaid diagram
 		mermaidfilepath="${jsonnet_file%.*}".mmd
 		# compile the policy
 		"$aperturectl" compile --cr "$yamlfilepath" --mermaid "$mermaidfilepath"
 	else
-		npx prettier --write "$jsonfilepath"
+		npx prettier@latest --write "$jsonfilepath"
 	fi
 	rm -rf "$tmpdir"
 }

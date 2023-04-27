@@ -119,8 +119,6 @@ func NewSchedulerAndOptions(
 	}
 	scheduler.incomingQuery = incomingQuery
 
-	// add decision_type filter to the params
-	autoTokensPolicyParams := policyParams + ",decision_type!=\"DECISION_TYPE_REJECTED\""
 	if schedulerProto.Parameters == nil {
 		return nil, nil, fmt.Errorf("scheduler parameters are nil")
 	}
@@ -129,10 +127,10 @@ func NewSchedulerAndOptions(
 			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencySumMetricName,
-				autoTokensPolicyParams,
+				policyParams,
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencyCountMetricName,
-				autoTokensPolicyParams),
+				policyParams),
 			tokensQueryInterval,
 			componentID,
 			policyReadAPI,

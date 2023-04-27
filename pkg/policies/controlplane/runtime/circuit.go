@@ -29,7 +29,7 @@ func CircuitModule() fx.Option {
 // CircuitMetrics holds prometheus metrics related circuit.
 type CircuitMetrics struct {
 	SignalSummaryVec           *prometheus.SummaryVec
-	InvalidSignalReadingsTotal *prometheus.GaugeVec
+	InvalidSignalReadingsTotal *prometheus.CounterVec
 }
 
 var circuitMetrics = newCircuitMetrics()
@@ -57,22 +57,25 @@ func newCircuitMetrics() *CircuitMetrics {
 			},
 			circuitMetricsLabels,
 		),
-		InvalidSignalReadingsTotal: prometheus.NewGaugeVec(prometheus.GaugeOpts{
-			Name: metrics.InvalidSignalReadingsTotal,
-			Help: "The number of invalid readings from a signal",
-		}, []string{metrics.PolicyNameLabel}),
+		InvalidSignalReadingsTotal: prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: metrics.InvalidSignalReadingsTotal,
+				Help: "The number of invalid readings from a signal",
+			},
+			circuitMetricsLabels,
+		),
 	}
 	return &circuitMetrics
 }
 
 func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.Lifecycle) {
 	type metric struct {
-		name   string
 		metric prometheus.Collector
+		name   string
 	}
 	circuitMetrics := []metric{
-		{metrics.SignalReadingMetricName, circuitMetrics.SignalSummaryVec},
-		{metrics.InvalidSignalReadingsTotal, circuitMetrics.InvalidSignalReadingsTotal},
+		{circuitMetrics.SignalSummaryVec, metrics.SignalReadingMetricName},
+		{circuitMetrics.InvalidSignalReadingsTotal, metrics.InvalidSignalReadingsTotal},
 	}
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -220,18 +223,12 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			PolicyHash:    circuit.GetPolicyHash(),
 			SignalReading: make([]*policymonitoringv1.SignalReading, 0),
 		}
-		var invalidCount int
 		// log all circuitSignalReadings
 		for signal, reading := range circuitSignalReadings {
 			circuitMetricsLabels := prometheus.Labels{
 				metrics.SignalNameLabel:   signal.SignalName,
 				metrics.SubCircuitIDLabel: signal.SubCircuitID,
 				metrics.PolicyNameLabel:   circuit.Policy.GetPolicyName(),
-			}
-			if !reading.Valid() {
-				circuitMetrics.SignalSummaryVec.Delete(circuitMetricsLabels)
-				invalidCount++
-				continue
 			}
 			signalReadingProto := &policymonitoringv1.SignalReading{
 				SignalName: signal.SignalName,
@@ -240,22 +237,25 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			}
 			signalInfo.SignalReading = append(signalInfo.SignalReading, signalReadingProto)
 
-			signalSummaryMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to get signal metric")
-				panic(err)
+			if reading.Valid() {
+				signalSummaryMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to get signal metric")
+					panic(err)
+				}
+				signalSummaryMetric.Observe(reading.Value())
+			} else {
+				pcMetric, err := circuitMetrics.InvalidSignalReadingsTotal.GetMetricWith(circuitMetricsLabels)
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
+					panic(err)
+				}
+				pcMetric.Inc()
 			}
-			signalSummaryMetric.Observe(reading.Value())
+
 		}
 		signalStatus := status.NewStatus(signalInfo, nil)
 		reg.SetStatus(signalStatus)
-		pcMetric, err := circuitMetrics.InvalidSignalReadingsTotal.GetMetricWith(map[string]string{
-			metrics.PolicyNameLabel: circuit.GetPolicyName(),
-		})
-		if err != nil {
-			logger.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
-		}
-		pcMetric.Set(float64(invalidCount))
 	}()
 
 	// Populate with last run's looped signal
