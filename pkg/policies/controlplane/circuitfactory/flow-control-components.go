@@ -35,8 +35,8 @@ func newFlowControlCompositeAndOptions(
 		// Convert from *policylangv1.FlowControl_ConcurrencyLimiter to *policylangv1.FlowControl_LoadScheduler
 		fieldMappings := map[string]string{
 			"load_actuator": "actuator",
-			"load_actuator.scheduler.accepted_concurrency": "accepted_token_rate",
-			"load_actuator.scheduler.incoming_concurrency": "incoming_token_rate",
+			"scheduler.out_ports.accepted_concurrency": "accepted_token_rate",
+			"scheduler.out_ports.incoming_concurrency": "incoming_token_rate",
 		}
 		err := convertOldComponentToNew(concurrencyLimiterProto, loadSchedulerProto, fieldMappings)
 		if err != nil {
