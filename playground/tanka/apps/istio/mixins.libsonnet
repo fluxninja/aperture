@@ -6,7 +6,15 @@ local istioAppMixin =
       base+: {},
       istiod+: {},
       gateway+: {},
-      envoyfilter+: {},
+      envoyfilter+: {
+        envoyFilter+: {
+          workloadSelector: {
+            labels: {
+              'app.kubernetes.io/name': 'demo-app',
+            },
+          },
+        },
+      },
     },
   };
 
