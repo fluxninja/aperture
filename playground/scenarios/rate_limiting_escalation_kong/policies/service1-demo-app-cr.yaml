@@ -59,9 +59,9 @@ spec:
           dynamic_config_key: concurrency_controller
           flow_selector:
             flow_matcher:
-              control_point: ingress
+              control_point: service1-demo-app
             service_selector:
-              service: service1-demo-app.demoapp.svc.cluster.local
+              service: any
           gradient_parameters:
             max_gradient: 1
             min_gradient: 0.1
@@ -125,12 +125,12 @@ spec:
           dynamic_config_key: rate_limiter
           flow_selector:
             flow_matcher:
-              control_point: ingress
+              control_point: service1-demo-app
               label_matcher:
                 match_labels:
                   http.request.header.user_type: bot
             service_selector:
-              service: service1-demo-app.demoapp.svc.cluster.local
+              service: any
           in_ports:
             limit:
               signal_name: RATE_LIMIT
@@ -143,9 +143,9 @@ spec:
       classifiers:
       - flow_selector:
           flow_matcher:
-            control_point: ingress
+            control_point: service1-demo-app
           service_selector:
-            service: service1-demo-app.demoapp.svc.cluster.local
+            service: any
         rules:
           user_type:
             extractor:
@@ -154,6 +154,6 @@ spec:
         service1-demo-app:
           flow_selector:
             flow_matcher:
-              control_point: ingress
+              control_point: service3-demo-app
             service_selector:
-              service: service3-demo-app.demoapp.svc.cluster.local
+              service: any
