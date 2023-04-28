@@ -107,8 +107,8 @@ spec:
           output:
             signal_name: BACKWARD
     - flow_control:
-        load_shaper:
-          dynamic_config_key: load_shaper
+        load_ramp:
+          dynamic_config_key: regulator
           in_ports:
             backward:
               signal_name: BACKWARD
@@ -117,7 +117,7 @@ spec:
             reset:
               signal_name: RESET
           parameters:
-            flow_regulator_parameters:
+            regulator_parameters:
               flow_selector:
                 flow_matcher:
                   control_point: ingress

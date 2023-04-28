@@ -23,8 +23,8 @@
         "components": [],
         "drivers": {},
         "evaluation_interval": "1s",
-        "load_shaper": {
-          "flow_regulator_parameters": {
+        "load_ramp": {
+          "regulator_parameters": {
             "flow_selector": {
               "flow_matcher": {
                 "control_point": "__REQUIRED_FIELD__"
@@ -100,54 +100,60 @@
           "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
-        "forward": {
+        "criteria": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "threshold": {
-              "description": "The threshold for the forward criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
+            "forward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the forward criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                },
+                "operator": {
+                  "description": "The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "string"
+                }
+              }
             },
-            "operator": {
-              "description": "The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-              "default": "__REQUIRED_FIELD__",
-              "type": "string"
-            }
-          }
-        },
-        "backward": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "threshold": {
-              "description": "The threshold for the backward criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
+            "backward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the backward criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                },
+                "operator": {
+                  "description": "The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "string"
+                }
+              }
             },
-            "operator": {
-              "description": "The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-              "default": "__REQUIRED_FIELD__",
-              "type": "string"
-            }
-          }
-        },
-        "reset": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "threshold": {
-              "description": "The threshold for the reset criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            },
-            "operator": {
-              "description": "The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-              "default": "__REQUIRED_FIELD__",
-              "type": "string"
+            "reset": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the reset criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                },
+                "operator": {
+                  "description": "The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "string"
+                }
+              }
             }
           }
         }
@@ -171,39 +177,45 @@
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
         },
-        "forward": {
+        "criteria": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "threshold": {
-              "description": "The threshold for the forward criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            }
-          }
-        },
-        "backward": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "threshold": {
-              "description": "The threshold for the backward criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            }
-          }
-        },
-        "reset": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "threshold": {
-              "description": "The threshold for the reset criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
+            "forward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the forward criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "backward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the backward criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "reset": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the reset criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
             }
           }
         }
@@ -232,39 +244,45 @@
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
         },
-        "forward": {
+        "criteria": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "threshold": {
-              "description": "The threshold for the forward criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            }
-          }
-        },
-        "backward": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "threshold": {
-              "description": "The threshold for the backward criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            }
-          }
-        },
-        "reset": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "threshold": {
-              "description": "The threshold for the reset criteria.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
+            "forward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the forward criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "backward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the backward criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "reset": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold for the reset criteria.",
+                  "default": "__REQUIRED_FIELD__",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
             }
           }
         },
@@ -294,39 +312,45 @@
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
         },
-        "forward": {
+        "criteria": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "latency_tolerance_multiplier": {
-              "description": "The threshold for the forward criteria.",
-              "default": 1.05,
-              "type": "number",
-              "format": "double"
-            }
-          }
-        },
-        "backward": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "latency_tolerance_multiplier": {
-              "description": "The threshold for the backward criteria.",
-              "default": 1.05,
-              "type": "number",
-              "format": "double"
-            }
-          }
-        },
-        "reset": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "latency_tolerance_multiplier": {
-              "description": "The threshold for the reset criteria.",
-              "default": 1.25,
-              "type": "number",
-              "format": "double"
+            "forward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "latency_tolerance_multiplier": {
+                  "description": "The threshold for the forward criteria.",
+                  "default": 1.05,
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "backward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "latency_tolerance_multiplier": {
+                  "description": "The threshold for the backward criteria.",
+                  "default": 1.05,
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "reset": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "latency_tolerance_multiplier": {
+                  "description": "The threshold for the reset criteria.",
+                  "default": 1.25,
+                  "type": "number",
+                  "format": "double"
+                }
+              }
             }
           }
         },
@@ -344,12 +368,12 @@
     "rollout_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["load_shaper"],
+      "required": ["load_ramp"],
       "properties": {
-        "load_shaper": {
+        "load_ramp": {
           "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
           "default": {
-            "flow_regulator_parameters": {
+            "regulator_parameters": {
               "flow_selector": {
                 "flow_matcher": {
                   "control_point": "__REQUIRED_FIELD__"
@@ -368,7 +392,7 @@
             ]
           },
           "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/LoadShaperParameters"
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/LoadRampParameters"
         },
         "components": {
           "description": "List of additional circuit components.",
@@ -402,19 +426,21 @@
               "description": "List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.",
               "default": [
                 {
-                  "backward": {
-                    "operator": "__REQUIRED_FIELD__",
-                    "threshold": "__REQUIRED_FIELD__"
+                  "criteria": {
+                    "backward": {
+                      "operator": "__REQUIRED_FIELD__",
+                      "threshold": "__REQUIRED_FIELD__"
+                    },
+                    "forward": {
+                      "operator": "__REQUIRED_FIELD__",
+                      "threshold": "__REQUIRED_FIELD__"
+                    },
+                    "reset": {
+                      "operator": "__REQUIRED_FIELD__",
+                      "threshold": "__REQUIRED_FIELD__"
+                    }
                   },
-                  "forward": {
-                    "operator": "__REQUIRED_FIELD__",
-                    "threshold": "__REQUIRED_FIELD__"
-                  },
-                  "query_string": "__REQUIRED_FIELD__",
-                  "reset": {
-                    "operator": "__REQUIRED_FIELD__",
-                    "threshold": "__REQUIRED_FIELD__"
-                  }
+                  "query_string": "__REQUIRED_FIELD__"
                 }
               ],
               "type": "array",
@@ -427,8 +453,16 @@
               "description": "List of drivers that compare average latency against forward, backward and reset thresholds.",
               "default": [
                 {
-                  "backward": {
-                    "threshold": "__REQUIRED_FIELD__"
+                  "criteria": {
+                    "backward": {
+                      "threshold": "__REQUIRED_FIELD__"
+                    },
+                    "forward": {
+                      "threshold": "__REQUIRED_FIELD__"
+                    },
+                    "reset": {
+                      "threshold": "__REQUIRED_FIELD__"
+                    }
                   },
                   "flow_selector": {
                     "flow_matcher": {
@@ -437,12 +471,6 @@
                     "service_selector": {
                       "service": "__REQUIRED_FIELD__"
                     }
-                  },
-                  "forward": {
-                    "threshold": "__REQUIRED_FIELD__"
-                  },
-                  "reset": {
-                    "threshold": "__REQUIRED_FIELD__"
                   }
                 }
               ],
@@ -456,8 +484,16 @@
               "description": "List of drivers that compare percentile latency against forward, backward and reset thresholds.",
               "default": [
                 {
-                  "backward": {
-                    "threshold": "__REQUIRED_FIELD__"
+                  "criteria": {
+                    "backward": {
+                      "threshold": "__REQUIRED_FIELD__"
+                    },
+                    "forward": {
+                      "threshold": "__REQUIRED_FIELD__"
+                    },
+                    "reset": {
+                      "threshold": "__REQUIRED_FIELD__"
+                    }
                   },
                   "flux_meter": {
                     "flow_selector": {
@@ -474,13 +510,7 @@
                       ]
                     }
                   },
-                  "forward": {
-                    "threshold": "__REQUIRED_FIELD__"
-                  },
-                  "percentile": 95,
-                  "reset": {
-                    "threshold": "__REQUIRED_FIELD__"
-                  }
+                  "percentile": 95
                 }
               ],
               "type": "array",
@@ -493,8 +523,16 @@
               "description": "List of drivers that compare trend latency against forward, backward and reset thresholds.",
               "default": [
                 {
-                  "backward": {
-                    "latency_tolerance_multiplier": 1.05
+                  "criteria": {
+                    "backward": {
+                      "latency_tolerance_multiplier": 1.05
+                    },
+                    "forward": {
+                      "latency_tolerance_multiplier": 1.05
+                    },
+                    "reset": {
+                      "latency_tolerance_multiplier": 1.25
+                    }
                   },
                   "ema": {
                     "ema_window": "1500s",
@@ -507,12 +545,6 @@
                     "service_selector": {
                       "service": "__REQUIRED_FIELD__"
                     }
-                  },
-                  "forward": {
-                    "latency_tolerance_multiplier": 1.05
-                  },
-                  "reset": {
-                    "latency_tolerance_multiplier": 1.25
                   }
                 }
               ],

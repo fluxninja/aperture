@@ -1,16 +1,18 @@
 package circuitfactory
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/regulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -99,7 +101,36 @@ func NewComponentAndOptions(
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
 		case *policylangv1.FlowControl_FlowRegulator:
-			ctor = mkCtor(flowControlConfig.FlowRegulator, flowregulator.NewFlowRegulatorAndOptions)
+			// Convert from *policylangv1.FlowControl_FlowRegulator to *policylangv1.FlowControl_Regulator since they have mostly the same fields
+			jsonStr, err := json.Marshal(flowControl.GetFlowRegulator())
+			if err != nil {
+				return Tree{}, nil, nil, fmt.Errorf("error marshaling FlowRegulator to JSON: %v", err)
+			}
+
+			// Unmarshal the JSON into a map
+			var data map[string]interface{}
+			if err2 := json.Unmarshal(jsonStr, &data); err2 != nil {
+				return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON: %v", err)
+			}
+
+			// Modify the .flow_regulator_parameters field in the JSON to .regulator_parameters since the field name changed
+			data["regulator_parameters"] = data["flow_regulator_parameters"]
+			delete(data, "flow_regulator_parameters")
+
+			// Marshal the modified map back into JSON
+			newJSONStr, err := json.Marshal(data)
+			if err != nil {
+				return Tree{}, nil, nil, fmt.Errorf("error marshaling modified JSON: %v", err)
+			}
+
+			regulatorProto := &policylangv1.Regulator{}
+			err = protojson.Unmarshal(newJSONStr, regulatorProto)
+			if err != nil {
+				return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to Regulator: %v", err)
+			}
+			ctor = mkCtor(regulatorProto, regulator.NewRegulatorAndOptions)
+		case *policylangv1.FlowControl_Regulator:
+			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
 		default:
 			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
 		}

@@ -38,7 +38,7 @@ At a high-level, this policy consists of:
   [`average_latency_driver`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#average-latency-driver).
 - Rollout control: Gradually increase the percentage of requests that are to be
   served the new feature using
-  [`steps`](/reference/policies/spec#load-shaper-parameters-step). Monitor the
+  [`steps`](/reference/policies/spec#load-ramp-parameters-step). Monitor the
   application's latency and roll back the feature if the latency deteriorates
   beyond the configured limit.
 

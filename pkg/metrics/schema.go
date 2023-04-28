@@ -26,8 +26,8 @@ const (
 	RateLimiterCounterMetricName = "rate_limiter_counter"
 	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
 	ClassifierCounterMetricName = "classifier_counter"
-	// FlowRegulatorCounterMetricName - name of the counter describing times flow regulator was triggered.
-	FlowRegulatorCounterMetricName = "flow_regulator_counter"
+	// RegulatorCounterMetricName - name of the counter describing times load regulator was triggered.
+	RegulatorCounterMetricName = "regulator_counter"
 
 	// DistCache metrics scraped from Olric DMaps statistics.
 
@@ -56,10 +56,10 @@ const (
 	// WorkloadCounterMetricName - metric used for counting workload requests.
 	WorkloadCounterMetricName = "workload_requests_total"
 
-	// AcceptedWorkSecondsMetricName - total work measured in seconds of estimated duration of all accepted requests.
-	AcceptedWorkSecondsMetricName = "accepted_work_seconds_total"
-	// IncomingWorkSecondsMetricName - total work measured in seconds of estimated duration of all incoming requests.
-	IncomingWorkSecondsMetricName = "incoming_work_seconds_total"
+	// AcceptedTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all accepted requests.
+	AcceptedTokensMetricName = "accepted_tokens_total"
+	// IncomingTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all incoming requests.
+	IncomingTokensMetricName = "incoming_tokens_total"
 
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
 	WFQFlowsMetricName = "wfq_flows_total"

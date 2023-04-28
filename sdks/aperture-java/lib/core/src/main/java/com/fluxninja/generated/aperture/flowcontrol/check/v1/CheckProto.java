@@ -50,15 +50,15 @@ public final class CheckProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_fieldAccessorTable;
+      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_descriptor;
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_fieldAccessorTable;
+      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor;
   static final 
@@ -80,7 +80,7 @@ public final class CheckProto {
       "t\022O\n\006labels\030\002 \003(\01327.aperture.flowcontrol" +
       ".check.v1.CheckRequest.LabelsEntryR\006labe" +
       "ls\0329\n\013LabelsEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005v" +
-      "alue\030\002 \001(\tR\005value:\0028\001\"\304\010\n\rCheckResponse\022" +
+      "alue\030\002 \001(\tR\005value:\0028\001\"\265\010\n\rCheckResponse\022" +
       "0\n\005start\030\001 \001(\0132\032.google.protobuf.Timesta" +
       "mpR\005start\022,\n\003end\030\002 \001(\0132\032.google.protobuf" +
       ".TimestampR\003end\022\032\n\010services\030\004 \003(\tR\010servi" +
@@ -102,58 +102,57 @@ public final class CheckProto {
       "2..aperture.flowcontrol.check.v1.Limiter" +
       "DecisionR\020limiterDecisions\032F\n\030TelemetryF" +
       "lowLabelsEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005valu" +
-      "e\030\002 \001(\tR\005value:\0028\001\"\217\001\n\014RejectReason\022\026\n\022R" +
+      "e\030\002 \001(\tR\005value:\0028\001\"\200\001\n\014RejectReason\022\026\n\022R" +
       "EJECT_REASON_NONE\020\000\022\036\n\032REJECT_REASON_RAT" +
-      "E_LIMITED\020\001\022%\n!REJECT_REASON_CONCURRENCY" +
-      "_LIMITED\020\002\022 \n\034REJECT_REASON_FLOW_REGULAT" +
-      "ED\020\003\"F\n\014DecisionType\022\032\n\026DECISION_TYPE_AC" +
-      "CEPTED\020\000\022\032\n\026DECISION_TYPE_REJECTED\020\001\"\355\002\n" +
-      "\016ClassifierInfo\022\037\n\013policy_name\030\001 \001(\tR\npo" +
-      "licyName\022\037\n\013policy_hash\030\002 \001(\tR\npolicyHas" +
-      "h\022)\n\020classifier_index\030\003 \001(\003R\017classifierI" +
-      "ndex\022I\n\005error\030\005 \001(\01623.aperture.flowcontr" +
-      "ol.check.v1.ClassifierInfo.ErrorR\005error\"" +
-      "\242\001\n\005Error\022\016\n\nERROR_NONE\020\000\022\025\n\021ERROR_EVAL_" +
-      "FAILED\020\001\022\031\n\025ERROR_EMPTY_RESULTSET\020\002\022\035\n\031E" +
-      "RROR_AMBIGUOUS_RESULTSET\020\003\022\032\n\026ERROR_MULT" +
-      "I_EXPRESSION\020\004\022\034\n\030ERROR_EXPRESSION_NOT_M" +
-      "AP\020\005\"\312\007\n\017LimiterDecision\022\037\n\013policy_name\030" +
-      "\001 \001(\tR\npolicyName\022\037\n\013policy_hash\030\002 \001(\tR\n" +
-      "policyHash\022!\n\014component_id\030\003 \001(\tR\013compon" +
-      "entId\022\030\n\007dropped\030\004 \001(\010R\007dropped\022T\n\006reaso" +
-      "n\030\005 \001(\0162<.aperture.flowcontrol.check.v1." +
-      "LimiterDecision.LimiterReasonR\006reason\022l\n" +
-      "\021rate_limiter_info\030\006 \001(\0132>.aperture.flow" +
-      "control.check.v1.LimiterDecision.RateLim" +
-      "iterInfoH\000R\017rateLimiterInfo\022\201\001\n\030concurre" +
-      "ncy_limiter_info\030\007 \001(\0132E.aperture.flowco" +
-      "ntrol.check.v1.LimiterDecision.Concurren" +
-      "cyLimiterInfoH\000R\026concurrencyLimiterInfo\022" +
-      "r\n\023flow_regulator_info\030\010 \001(\0132@.aperture." +
-      "flowcontrol.check.v1.LimiterDecision.Flo" +
-      "wRegulatorInfoH\000R\021flowRegulatorInfo\032\210\001\n\017" +
-      "RateLimiterInfo\022\034\n\tremaining\030\001 \001(\003R\trema" +
-      "ining\022\030\n\007current\030\002 \001(\003R\007current\022\024\n\005label" +
-      "\030\003 \001(\tR\005label\022\'\n\017tokens_consumed\030\004 \001(\004R\016" +
-      "tokensConsumed\032h\n\026ConcurrencyLimiterInfo" +
-      "\022%\n\016workload_index\030\001 \001(\tR\rworkloadIndex\022" +
-      "\'\n\017tokens_consumed\030\002 \001(\004R\016tokensConsumed" +
-      "\032)\n\021FlowRegulatorInfo\022\024\n\005label\030\001 \001(\tR\005la" +
-      "bel\"Q\n\rLimiterReason\022\036\n\032LIMITER_REASON_U" +
-      "NSPECIFIED\020\000\022 \n\034LIMITER_REASON_KEY_NOT_F" +
-      "OUND\020\001B\t\n\007details\"7\n\rFluxMeterInfo\022&\n\017fl" +
-      "ux_meter_name\030\001 \001(\tR\rfluxMeterName2z\n\022Fl" +
-      "owControlService\022d\n\005Check\022+.aperture.flo" +
-      "wcontrol.check.v1.CheckRequest\032,.apertur" +
-      "e.flowcontrol.check.v1.CheckResponse\"\000B\260" +
-      "\002\n5com.fluxninja.generated.aperture.flow" +
-      "control.check.v1B\nCheckProtoP\001ZTgithub.c" +
-      "om/fluxninja/aperture/api/gen/proto/go/a" +
-      "perture/flowcontrol/check/v1;checkv1\242\002\003A" +
-      "FC\252\002\035Aperture.Flowcontrol.Check.V1\312\002\035Ape" +
-      "rture\\Flowcontrol\\Check\\V1\342\002)Aperture\\Fl" +
-      "owcontrol\\Check\\V1\\GPBMetadata\352\002 Apertur" +
-      "e::Flowcontrol::Check::V1b\006proto3"
+      "E_LIMITED\020\001\022\033\n\027REJECT_REASON_NO_TOKENS\020\002" +
+      "\022\033\n\027REJECT_REASON_REGULATED\020\003\"F\n\014Decisio" +
+      "nType\022\032\n\026DECISION_TYPE_ACCEPTED\020\000\022\032\n\026DEC" +
+      "ISION_TYPE_REJECTED\020\001\"\355\002\n\016ClassifierInfo" +
+      "\022\037\n\013policy_name\030\001 \001(\tR\npolicyName\022\037\n\013pol" +
+      "icy_hash\030\002 \001(\tR\npolicyHash\022)\n\020classifier" +
+      "_index\030\003 \001(\003R\017classifierIndex\022I\n\005error\030\005" +
+      " \001(\01623.aperture.flowcontrol.check.v1.Cla" +
+      "ssifierInfo.ErrorR\005error\"\242\001\n\005Error\022\016\n\nER" +
+      "ROR_NONE\020\000\022\025\n\021ERROR_EVAL_FAILED\020\001\022\031\n\025ERR" +
+      "OR_EMPTY_RESULTSET\020\002\022\035\n\031ERROR_AMBIGUOUS_" +
+      "RESULTSET\020\003\022\032\n\026ERROR_MULTI_EXPRESSION\020\004\022" +
+      "\034\n\030ERROR_EXPRESSION_NOT_MAP\020\005\"\244\007\n\017Limite" +
+      "rDecision\022\037\n\013policy_name\030\001 \001(\tR\npolicyNa" +
+      "me\022\037\n\013policy_hash\030\002 \001(\tR\npolicyHash\022!\n\014c" +
+      "omponent_id\030\003 \001(\tR\013componentId\022\030\n\007droppe" +
+      "d\030\004 \001(\010R\007dropped\022T\n\006reason\030\005 \001(\0162<.apert" +
+      "ure.flowcontrol.check.v1.LimiterDecision" +
+      ".LimiterReasonR\006reason\022l\n\021rate_limiter_i" +
+      "nfo\030\006 \001(\0132>.aperture.flowcontrol.check.v" +
+      "1.LimiterDecision.RateLimiterInfoH\000R\017rat" +
+      "eLimiterInfo\022r\n\023load_scheduler_info\030\007 \001(" +
+      "\0132@.aperture.flowcontrol.check.v1.Limite" +
+      "rDecision.LoadSchedulerInfoH\000R\021loadSched" +
+      "ulerInfo\022e\n\016regulator_info\030\010 \001(\0132<.apert" +
+      "ure.flowcontrol.check.v1.LimiterDecision" +
+      ".RegulatorInfoH\000R\rregulatorInfo\032\210\001\n\017Rate" +
+      "LimiterInfo\022\034\n\tremaining\030\001 \001(\003R\tremainin" +
+      "g\022\030\n\007current\030\002 \001(\003R\007current\022\024\n\005label\030\003 \001" +
+      "(\tR\005label\022\'\n\017tokens_consumed\030\004 \001(\004R\016toke" +
+      "nsConsumed\032c\n\021LoadSchedulerInfo\022%\n\016workl" +
+      "oad_index\030\001 \001(\tR\rworkloadIndex\022\'\n\017tokens" +
+      "_consumed\030\002 \001(\004R\016tokensConsumed\032%\n\rRegul" +
+      "atorInfo\022\024\n\005label\030\001 \001(\tR\005label\"Q\n\rLimite" +
+      "rReason\022\036\n\032LIMITER_REASON_UNSPECIFIED\020\000\022" +
+      " \n\034LIMITER_REASON_KEY_NOT_FOUND\020\001B\t\n\007det" +
+      "ails\"7\n\rFluxMeterInfo\022&\n\017flux_meter_name" +
+      "\030\001 \001(\tR\rfluxMeterName2z\n\022FlowControlServ" +
+      "ice\022d\n\005Check\022+.aperture.flowcontrol.chec" +
+      "k.v1.CheckRequest\032,.aperture.flowcontrol" +
+      ".check.v1.CheckResponse\"\000B\260\002\n5com.fluxni" +
+      "nja.generated.aperture.flowcontrol.check" +
+      ".v1B\nCheckProtoP\001ZTgithub.com/fluxninja/" +
+      "aperture/api/gen/proto/go/aperture/flowc" +
+      "ontrol/check/v1;checkv1\242\002\003AFC\252\002\035Aperture" +
+      ".Flowcontrol.Check.V1\312\002\035Aperture\\Flowcon" +
+      "trol\\Check\\V1\342\002)Aperture\\Flowcontrol\\Che" +
+      "ck\\V1\\GPBMetadata\352\002 Aperture::Flowcontro" +
+      "l::Check::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -195,24 +194,24 @@ public final class CheckProto {
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor,
-        new java.lang.String[] { "PolicyName", "PolicyHash", "ComponentId", "Dropped", "Reason", "RateLimiterInfo", "ConcurrencyLimiterInfo", "FlowRegulatorInfo", "Details", });
+        new java.lang.String[] { "PolicyName", "PolicyHash", "ComponentId", "Dropped", "Reason", "RateLimiterInfo", "LoadSchedulerInfo", "RegulatorInfo", "Details", });
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_descriptor =
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(0);
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_descriptor,
         new java.lang.String[] { "Remaining", "Current", "Label", "TokensConsumed", });
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor =
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor =
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(1);
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_fieldAccessorTable = new
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor,
+        internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor,
         new java.lang.String[] { "WorkloadIndex", "TokensConsumed", });
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_descriptor =
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor =
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(2);
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_fieldAccessorTable = new
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_descriptor,
+        internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor,
         new java.lang.String[] { "Label", });
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor =
       getDescriptor().getMessageTypes().get(4);

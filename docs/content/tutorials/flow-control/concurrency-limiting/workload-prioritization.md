@@ -12,16 +12,16 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-When services are resource constrained and concurrency limits are being applied,
-it is often crucial to preserve key user-experience by gracefully degrading
-application behavior. Graceful degradation allows prioritizing business critical
-features while throttling background workloads and less critical features. For
-instance, for an e-commerce application, the ability to check out a shopping
-cart is more critical than personalized recommendations and should be
-prioritized when resources are constrained.
+When services are resource constrained, it is often crucial to preserve key
+user-experience by gracefully degrading application behavior. Graceful
+degradation allows prioritizing business critical features while throttling
+background workloads and less critical features. For instance, for an e-commerce
+application, the ability to check out a shopping cart is more critical than
+personalized recommendations and should be prioritized when resources are
+constrained.
 
 Aperture's
-[weighted fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md#scheduler)
+[weighted fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md#scheduler)
 enables prioritization of certain flows over others based on their flow labels,
 ensuring that the user experience or revenue is maximized in the face of
 overloads and other failures, while maintaining graceful degradation.

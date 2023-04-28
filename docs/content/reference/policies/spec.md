@@ -166,6 +166,18 @@ Scheduler parameters.
 Inputs for the AIMDConcurrencyController component.
 
 <dl>
+<dt>enabled</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+
+</dd>
 <dt>setpoint</dt>
 <dd>
 
@@ -249,6 +261,7 @@ IncomingConcurrency is the number of concurrent requests that are received by th
 <!-- vale on -->
 
 Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+Deprecated: 1.6.0
 
 </dd>
 <dt>observed_load_multiplier</dt>
@@ -261,6 +274,262 @@ Is overload is a Boolean signal that indicates whether the service is overloaded
 <!-- vale on -->
 
 Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadScheduler {#adaptive-load-scheduler}
+
+<!-- vale on -->
+
+The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration parameters for the embedded Alerter.
+
+</dd>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerActuatorDynamicConfig](#load-scheduler-actuator-dynamic-config))
+
+<!-- vale on -->
+
+Default dynamic configuration for load actuation.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Dynamic configuration key for load actuation.
+
+</dd>
+<dt>flow_selector</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
+
+</dd>
+<dt>gradient_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([GradientControllerParameters](#gradient-controller-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Gradient Controller_.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerIns](#adaptive-load-scheduler-ins))
+
+<!-- vale on -->
+
+Collection of input ports for the _Adaptive Load Scheduler_ component.
+
+</dd>
+<dt>load_multiplier_linear_increment</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `0.0025`)
+
+<!-- vale on -->
+
+Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+</dd>
+<dt>max_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `2`)
+
+<!-- vale on -->
+
+The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerOuts](#adaptive-load-scheduler-outs))
+
+<!-- vale on -->
+
+Collection of output ports for the _Adaptive Load Scheduler_ component.
+
+</dd>
+<dt>scheduler_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerParameters](#load-scheduler-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Load Scheduler_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerIns {#adaptive-load-scheduler-ins}
+
+<!-- vale on -->
+
+Input ports for the _Adaptive Load Scheduler_ component.
+
+<dl>
+<dt>enabled</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint input to the controller.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal to the controller.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerOuts {#adaptive-load-scheduler-outs}
+
+<!-- vale on -->
+
+Output ports for the _Adaptive Load Scheduler_ component.
+
+<dl>
+<dt>accepted_token_rate</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Accepted token rate is the number of tokens per second accepted by the service.
+
+</dd>
+<dt>desired_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+
+</dd>
+<dt>incoming_token_rate</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Incoming token rate is the number of tokens per second incoming to the service (including rejected ones).
+
+</dd>
+<dt>is_overload</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
+Deprecated: 1.6.0
+
+</dd>
+<dt>observed_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
 
 </dd>
 </dl>
@@ -1486,12 +1755,6 @@ Emits a variable signal which can be set to invalid.
 
 _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
 
-:::info
-
-See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).
-
-:::
-
 It's based on the actuation strategy (for example, load actuator) and workload scheduling
 which is based on Weighted Fair Queuing principles.
 Concurrency is calculated in terms of total tokens per second, which can translate
@@ -2520,9 +2783,21 @@ First valid input signal as an output signal.
 
 <!-- vale on -->
 
-FlowControl components are used to regulate requests flow.
+_Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
 
 <dl>
+<dt>adaptive_load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadScheduler](#adaptive-load-scheduler))
+
+<!-- vale on -->
+
+_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+
+</dd>
 <dt>aimd_concurrency_controller</dt>
 <dd>
 
@@ -2533,6 +2808,7 @@ FlowControl components are used to regulate requests flow.
 <!-- vale on -->
 
 AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
+Deprecated: 1.6.0
 
 </dd>
 <dt>concurrency_limiter</dt>
@@ -2545,6 +2821,7 @@ AIMD Concurrency control component is based on Additive Increase and Multiplicat
 <!-- vale on -->
 
 _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+Deprecated: 1.6.0
 
 </dd>
 <dt>flow_regulator</dt>
@@ -2557,6 +2834,43 @@ _Concurrency Limiter_ provides service protection by applying prioritized load s
 <!-- vale on -->
 
 Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+Deprecated: 1.6.0
+
+</dd>
+<dt>load_ramp</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRamp](#load-ramp))
+
+<!-- vale on -->
+
+_Load Ramp_ smoothly regulates the flow of requests over specified steps.
+
+</dd>
+<dt>load_ramp_series</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampSeries](#load-ramp-series))
+
+<!-- vale on -->
+
+_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
+
+</dd>
+<dt>load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadScheduler](#load-scheduler))
+
+<!-- vale on -->
+
+_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
 
 </dd>
 <dt>load_shaper</dt>
@@ -2568,7 +2882,8 @@ Flow Regulator is a component that regulates the flow of requests to the service
 
 <!-- vale on -->
 
-LoadShaper is a component that shapes the load of the service.
+_Load Shaper_ is a component that shapes the load at a _Control Point_.
+Deprecated: 1.6.0
 
 </dd>
 <dt>load_shaper_series</dt>
@@ -2580,7 +2895,8 @@ LoadShaper is a component that shapes the load of the service.
 
 <!-- vale on -->
 
-LoadShaperSeries is a series of LoadShaper components that shape load one after another in series.
+_Load Shaper Series_ is a series of _Load Shaper_ components that can shape load one after another at same or different _Control Points_.
+Deprecated: 1.6.0
 
 </dd>
 <dt>rate_limiter</dt>
@@ -2592,7 +2908,19 @@ LoadShaperSeries is a series of LoadShaper components that shape load one after 
 
 <!-- vale on -->
 
-_Rate Limiter_ provides service protection by applying rate limiter.
+_Rate Limiter_ provides service protection by applying rate limits.
+
+</dd>
+<dt>regulator</dt>
+<dd>
+
+<!-- vale off -->
+
+([Regulator](#regulator))
+
+<!-- vale on -->
+
+Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
 
 </dd>
 </dl>
@@ -2852,7 +3180,7 @@ The percentage of requests to accept.
 
 <!-- vale on -->
 
-_Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
+_Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
 
 </dd>
 <dt>label_key</dt>
@@ -2883,9 +3211,8 @@ The flow label key for identifying sessions.
 
 <!-- vale on -->
 
-Describes which flow in which service a [flow control
-component](/concepts/flow-control/flow-control.md#components) should apply
-to
+Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control
+component](/concepts/flow-control/flow-control.md#components) operates on.
 
 :::info
 
@@ -4446,8 +4773,883 @@ Input for the Load Actuator component.
 
 <!-- vale on -->
 
-Load multiplier is ratio of [incoming
-concurrency](#scheduler-outs) that needs to be accepted.
+Load multiplier is proportion of [incoming
+token rate](#scheduler-outs) that needs to be accepted.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRamp {#load-ramp}
+
+<!-- vale on -->
+
+The _Load Ramp_ produces a smooth and continuous traffic load
+that changes progressively over time, based on the specified steps.
+
+Each step is defined by two parameters:
+
+- The `target_accept_percentage`.
+- The `duration` for the signal to change from the
+  previous step's `target_accept_percentage` to the current step's
+  `target_accept_percentage`.
+
+The percentage of requests accepted starts at the `target_accept_percentage`
+defined in the first step and gradually ramps up or down linearly from
+the previous step's `target_accept_percentage` to the next
+`target_accept_percentage`, over the `duration` specified for each step.
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorDynamicConfig](#regulator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Dynamic configuration key for flow regulator.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampIns](#load-ramp-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampOuts](#load-ramp-outs))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampParameters](#load-ramp-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampIns {#load-ramp-ins}
+
+<!-- vale on -->
+
+Inputs for the _Load Ramp_ component.
+
+<dl>
+<dt>backward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the _Load Ramp_ towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the _Load Ramp_ towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to reset the _Load Ramp_ to the first step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampOuts {#load-ramp-outs}
+
+<!-- vale on -->
+
+Outputs for the _Load Ramp_ component.
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The percentage of flows being accepted by the _Load Ramp_.
+
+</dd>
+<dt>at_end</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation.
+
+</dd>
+<dt>at_start</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampParameters {#load-ramp-parameters}
+
+<!-- vale on -->
+
+Parameters for the _Load Ramp_ component.
+
+<dl>
+<dt>regulator_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorParameters](#regulator-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Regulator_.
+
+</dd>
+<dt>steps</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadRampParametersStep](#load-ramp-parameters-step), **required**)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampParametersStep {#load-ramp-parameters-step}
+
+<!-- vale on -->
+
+<dl>
+<dt>duration</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Duration for which the step is active.
+
+</dd>
+<dt>target_accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, maximum: `100`)
+
+<!-- vale on -->
+
+The value of the step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeries {#load-ramp-series}
+
+<!-- vale on -->
+
+_LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampSeriesIns](#load-ramp-series-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampSeriesParameters](#load-ramp-series-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeriesIns {#load-ramp-series-ins}
+
+<!-- vale on -->
+
+Inputs for the _LoadRampSeries_ component.
+
+<dl>
+<dt>backward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the load ramp series towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to progress the load ramp series towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Whether to reset the load ramp series to the first step.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeriesLoadRampInstance {#load-ramp-series-load-ramp-instance}
+
+<!-- vale on -->
+
+<dl>
+<dt>load_ramp</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampParameters](#load-ramp-parameters))
+
+<!-- vale on -->
+
+The load ramp.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadRampOuts](#load-ramp-outs))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadRampSeriesParameters {#load-ramp-series-parameters}
+
+<!-- vale on -->
+
+Parameters for the _LoadRampSeries_ component.
+
+<dl>
+<dt>load_ramps</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadRampSeriesLoadRampInstance](#load-ramp-series-load-ramp-instance), **required**)
+
+<!-- vale on -->
+
+An ordered list of load ramps that get applied in order.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadScheduler {#load-scheduler}
+
+<!-- vale on -->
+
+_Load Scheduler_ is an actuator component that regulates flows to provide active service protection
+
+:::info
+
+See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+
+:::
+
+It's based on the actuation strategy (for example, load actuator) and workload scheduling
+which is based on Weighted Fair Queuing principles.
+It measures and controls the incoming tokens per second, which can translate
+to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
+
+LoadScheduler configuration is split into two parts: An actuation
+strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+
+<dl>
+<dt>actuator</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerActuator](#load-scheduler-actuator))
+
+<!-- vale on -->
+
+Actuator based on limiting the accepted token rate under incoming token rate \* load multiplier.
+
+</dd>
+<dt>flow_selector</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
+
+</dd>
+<dt>scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerScheduler](#load-scheduler-scheduler))
+
+<!-- vale on -->
+
+Configuration of Weighted Fair Queuing-based workload scheduler.
+
+Contains configuration of per-agent scheduler, and also defines some
+output signals.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerActuator {#load-scheduler-actuator}
+
+<!-- vale on -->
+
+Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerActuatorDynamicConfig](#load-scheduler-actuator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerActuatorIns](#load-scheduler-actuator-ins))
+
+<!-- vale on -->
+
+Input ports for the Actuator component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerActuatorDynamicConfig {#load-scheduler-actuator-dynamic-config}
+
+<!-- vale on -->
+
+Dynamic Configuration for Actuator
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
+Useful for observing the behavior of actuator without disrupting any real traffic.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerActuatorIns {#load-scheduler-actuator-ins}
+
+<!-- vale on -->
+
+Input for the Actuator component.
+
+<dl>
+<dt>load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Load multiplier is proportion of [incoming
+token rate](#scheduler-outs) that needs to be accepted.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerScheduler {#load-scheduler-scheduler}
+
+<!-- vale on -->
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerOuts](#load-scheduler-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the Scheduler component.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerParameters](#load-scheduler-scheduler-parameters))
+
+<!-- vale on -->
+
+Scheduler parameters.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerOuts {#load-scheduler-scheduler-outs}
+
+<!-- vale on -->
+
+Output for the Scheduler component.
+
+<dl>
+<dt>accepted_token_rate</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Accepted token rate is the tokens admitted per second by the scheduler.
+Value of this signal is aggregated from all the relevant schedulers.
+
+</dd>
+<dt>incoming_token_rate</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Incoming token rate is the incoming tokens per second for all the
+flows entering the scheduler including the rejected ones.
+
+This is computed similar to `accepted_token_rate`,
+by summing up tokens from all the flows entering scheduler.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerParameters {#load-scheduler-scheduler-parameters}
+
+<!-- vale on -->
+
+Scheduler parameters
+
+<dl>
+<dt>auto_tokens</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Automatically estimate the size of a flow in each workload, based on
+historical latency. Each workload's `tokens` will be set to average
+latency of flows in that workload during last few seconds (exact duration
+of this average can change).
+This setting is useful in concurrency limiting use-case, where the
+concurrency is calculated as (avg. latency \* in-flight flows).
+
+The value of tokens estimated by `auto_tokens` takes lower precedence
+than the value of `tokens` specified in the workload definition
+and `tokens` explicitly specified in the flow labels.
+
+</dd>
+<dt>decision_deadline_margin</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"0.01s"`)
+
+<!-- vale on -->
+
+Decision deadline margin is the amount of time that the scheduler will
+subtract from the request deadline to determine the deadline for the
+decision. This is to ensure that the scheduler has enough time to
+make a decision before the request deadline happens, accounting for
+processing delays.
+The request deadline is based on the
+[gRPC deadline](https://grpc.io/blog/deadlines) or the
+[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+
+Fail-open logic is use for flow control APIs, so if the gRPC deadline
+reaches, the flow will end up being unconditionally allowed while
+it is still waiting on the scheduler.
+
+</dd>
+<dt>default_workload_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerWorkloadParameters](#load-scheduler-scheduler-workload-parameters))
+
+<!-- vale on -->
+
+Parameters to be used if none of workloads specified in `workloads` match.
+
+</dd>
+<dt>max_timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"0s"`)
+
+<!-- vale on -->
+
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+</dd>
+<dt>timeout_factor</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `0`)
+
+<!-- vale on -->
+
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+</dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"tokens"`)
+
+<!-- vale on -->
+
+- Key for a flow label that can be used to override the default number of tokens for this flow.
+- The value associated with this key must be a valid uint64 number.
+- If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+
+</dd>
+<dt>workloads</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]LoadSchedulerSchedulerWorkload](#load-scheduler-scheduler-workload))
+
+<!-- vale on -->
+
+List of workloads to be used in scheduler.
+
+Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+allows for load-shedding to be "intelligent" compared to random rejections.
+There are two aspects of this "intelligence":
+
+- Scheduler can more precisely calculate concurrency if it understands
+  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
+- Setting different priorities to different workloads lets the scheduler
+  avoid dropping important traffic during overload.
+
+Each workload in this list specifies also a matcher that is used to
+determine which flow will be categorized into which workload.
+In case of multiple matching workloads, the first matching one will be used.
+If none of workloads match, `default_workload` will be used.
+
+:::info
+
+See also [workload definition in the concepts
+section](/concepts/flow-control/components/load-scheduler.md#workload).
+
+:::
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerWorkload {#load-scheduler-scheduler-workload}
+
+<!-- vale on -->
+
+Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
+
+<dl>
+<dt>label_matcher</dt>
+<dd>
+
+<!-- vale off -->
+
+([LabelMatcher](#label-matcher))
+
+<!-- vale on -->
+
+Label Matcher to select a Workload based on
+[flow labels](/concepts/flow-control/flow-label.md).
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerSchedulerWorkloadParameters](#load-scheduler-scheduler-workload-parameters))
+
+<!-- vale on -->
+
+Parameters associated with flows matching the label matcher.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LoadSchedulerSchedulerWorkloadParameters {#load-scheduler-scheduler-workload-parameters}
+
+<!-- vale on -->
+
+Parameters such as priority, tokens and fairness key that
+are applicable to flows within a workload.
+
+<dl>
+<dt>fairness_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Fairness key is a label key that can be used to provide fairness within a workload.
+Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
+you have a classifier that sets `user` flow label, you might want to set
+`fairness_key = "user"`.
+
+</dd>
+<dt>priority</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, minimum: `0`, maximum: `255`, default: `0`)
+
+<!-- vale on -->
+
+Describes priority level of the flows within the workload.
+Priority level ranges from 0 to 255.
+Higher numbers means higher priority level.
+Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+
+$$
+\text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+$$
+
+</dd>
+<dt>tokens</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Tokens determines the cost of admitting a single flow in the workload,
+which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
+simply equal to 1 if the resource being accessed is constrained by the
+number of flows (3rd party rate limiters).
+This override is applicable only if tokens for the flow aren't specified
+in the flow labels.
 
 </dd>
 </dl>
@@ -4481,7 +5683,7 @@ the previous step's `target_accept_percentage` to the next
 
 <!-- vale off -->
 
-([FlowRegulatorDynamicConfig](#flow-regulator-dynamic-config))
+([RegulatorDynamicConfig](#regulator-dynamic-config))
 
 <!-- vale on -->
 
@@ -6593,6 +7795,164 @@ sensitive labels.
 
 <!-- vale off -->
 
+### Regulator {#regulator}
+
+<!-- vale on -->
+
+_Regulator_ is a component that regulates the load at a
+[_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+flows at random or by sticky sessions.
+
+:::info
+
+See also [\_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+
+:::
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorDynamicConfig](#regulator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorIns](#regulator-ins))
+
+<!-- vale on -->
+
+Input ports for the _Regulator_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RegulatorParameters](#regulator-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Regulator_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RegulatorDynamicConfig {#regulator-dynamic-config}
+
+<!-- vale on -->
+
+Dynamic Configuration for _Regulator_
+
+<dl>
+<dt>enable_label_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RegulatorIns {#regulator-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The percentage of requests to accept.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RegulatorParameters {#regulator-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>flow_selector</dt>
+<dd>
+
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+_Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The flow label key for identifying sessions.
+
+- When label key is specified, _Regulator_ acts as a sticky filter.
+  The series of flows with the same value of label key get the same
+  decision provided that the `accept_percentage` is same or higher.
+- When label key is not specified, _Regulator_ acts as a stateless filter.
+  Percentage of flows are selected randomly for rejection.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### Resources {#resources}
 
 <!-- vale on -->
@@ -6936,7 +8296,7 @@ Weighted Fair Queuing-based workload scheduler
 :::note
 
 Each Agent instantiates an independent copy of the scheduler, but output
-signals for accepted and incoming concurrency are aggregated across all agents.
+signals for accepted and incoming token rate are aggregated across all agents.
 
 :::
 
@@ -6989,26 +8349,6 @@ Output for the Scheduler component.
 
 Accepted concurrency is actual concurrency on a control point that this
 scheduler is applied on.
-
-:::info
-
-Concurrency is a unit less number describing mean number of
-[flows](/concepts/flow-control/flow-control.md#flow) being
-concurrently processed by the system (system = control point).
-Concurrency is calculated as tokens per second that is being
-accepted by the scheduler.
-If the tokens map to milliseconds of response latency (_work_),
-then the concurrency is _work_ done per unit
-of time (so work-seconds per world-seconds). Work-seconds are
-computed based on token-weights of flows (which are either
-estimated using the `auto_tokens` feature or specified by
-`Workload.tokens` setting).
-Conversely, if the tokens map to number of requests where
-each request is 1 token, then the concurrency is simply
-the number of requests per second.
-
-:::
-
 Value of this signal is aggregated from all the relevant schedulers.
 
 </dd>
@@ -7051,16 +8391,16 @@ Scheduler parameters
 
 <!-- vale on -->
 
-Automatically estimate the size of a request in each workload, based on
+Automatically estimate the size of a flow in each workload, based on
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
-This setting is useful in concurrent limiting use-case, where the
-concurrency is calculated as (avg. latency \* in-flight requests).
+This setting is useful in concurrency limiting use-case, where the
+concurrency is calculated as (avg. latency \* in-flight flows).
 
 The value of tokens estimated by `auto_tokens` takes lower precedence
 than the value of `tokens` specified in the workload definition
-and `tokens` explicitly specified in the request labels.
+and `tokens` explicitly specified in the flow labels.
 
 </dd>
 <dt>decision_deadline_margin</dt>
@@ -7107,9 +8447,9 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 <!-- vale on -->
 
-Flow label key that will be used to override the number of tokens for this request.
-The label value must be a valid uint64 number.
-If this parameter is not provided then each request is assumed to consume 1 token.
+- Key for a flow label that can be used to override the default number of tokens for this flow.
+- The value associated with this key must be a valid uint64 number.
+- If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
 
 </dd>
 <dt>workloads</dt>
@@ -7140,7 +8480,7 @@ If none of workloads match, `default_workload` will be used.
 :::info
 
 See also [workload definition in the concepts
-section](/concepts/flow-control/components/concurrency-limiter.md#workload).
+section](/concepts/flow-control/components/load-scheduler.md#workload).
 
 :::
 
@@ -7155,7 +8495,7 @@ section](/concepts/flow-control/components/concurrency-limiter.md#workload).
 
 <!-- vale on -->
 
-Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
+Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
 
 <dl>
 <dt>label_matcher</dt>
@@ -7193,7 +8533,7 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale on -->
 
-Parameters defines parameters such as priority, tokens and fairness key that
+Parameters such as priority, tokens and fairness key that
 are applicable to flows within a workload.
 
 <dl>
@@ -7221,10 +8561,10 @@ you have a classifier that sets `user` flow label, you might want to set
 
 <!-- vale on -->
 
-Describes priority level of the requests within the workload.
+Describes priority level of the flows within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
-Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
 
 $$
 \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
@@ -7240,12 +8580,12 @@ $$
 
 <!-- vale on -->
 
-Tokens determines the cost of admitting a single request the workload,
-which is typically defined as milliseconds of response latency or
+Tokens determines the cost of admitting a single flow in the workload,
+which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
 simply equal to 1 if the resource being accessed is constrained by the
-number of requests (3rd party rate limiters).
-This override is applicable only if tokens for the request aren't specified
-in the request labels.
+number of flows (3rd party rate limiters).
+This override is applicable only if tokens for the flow aren't specified
+in the flow labels.
 
 </dd>
 </dl>

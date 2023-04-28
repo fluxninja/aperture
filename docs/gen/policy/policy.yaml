@@ -89,13 +89,18 @@ definitions:
     description: Inputs for the AIMDConcurrencyController component.
     type: object
     properties:
+      enabled:
+        description: The enabled port controls whether the _Load Scheduler_ can load
+          shed _Flows_. By default, the _Load Scheduler_ is enabled.
+        x-order: 0
+        $ref: '#/definitions/InPort'
       setpoint:
         description: The setpoint to the controller.
-        x-order: 0
+        x-order: 1
         $ref: '#/definitions/InPort'
       signal:
         description: The signal to the controller.
-        x-order: 1
+        x-order: 2
         $ref: '#/definitions/InPort'
   AIMDConcurrencyControllerOuts:
     description: Outputs for the AIMDConcurrencyController component.
@@ -117,14 +122,123 @@ definitions:
         x-order: 2
         $ref: '#/definitions/OutPort'
       is_overload:
-        description: Is overload is a Boolean signal that indicates whether the service
-          is overloaded based on the deviation of the signal from the setpoint taking
-          into account some tolerance.
+        title: |-
+          Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+          Deprecated: 1.6.0
         x-order: 3
         $ref: '#/definitions/OutPort'
       observed_load_multiplier:
         description: Observed Load multiplier is the ratio of accepted concurrency
           to the incoming concurrency.
+        x-order: 4
+        $ref: '#/definitions/OutPort'
+  AdaptiveLoadScheduler:
+    description: The _Adaptive Load Scheduler_ adjusts the accepted token rate based
+      on the deviation of the input signal from the setpoint..
+    type: object
+    properties:
+      alerter_parameters:
+        description: Configuration parameters for the embedded Alerter.
+        x-order: 0
+        $ref: '#/definitions/AlerterParameters'
+      default_config:
+        description: Default dynamic configuration for load actuation.
+        x-order: 1
+        $ref: '#/definitions/LoadSchedulerActuatorDynamicConfig'
+      dynamic_config_key:
+        description: Dynamic configuration key for load actuation.
+        type: string
+        x-order: 2
+      flow_selector:
+        description: |+
+          _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
+
+        x-go-tag-validate: required
+        x-order: 3
+        $ref: '#/definitions/FlowSelector'
+      gradient_parameters:
+        description: Parameters for the _Gradient Controller_.
+        x-order: 4
+        $ref: '#/definitions/GradientControllerParameters'
+      in_ports:
+        description: Collection of input ports for the _Adaptive Load Scheduler_ component.
+        x-order: 5
+        $ref: '#/definitions/AdaptiveLoadSchedulerIns'
+      load_multiplier_linear_increment:
+        description: |+
+          Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+        type: number
+        format: double
+        default: 0.0025
+        x-go-tag-default: "0.0025"
+        x-order: 6
+      max_load_multiplier:
+        description: |+
+          The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
+
+        type: number
+        format: double
+        default: 2
+        x-go-tag-default: "2.0"
+        x-order: 7
+      out_ports:
+        description: Collection of output ports for the _Adaptive Load Scheduler_
+          component.
+        x-order: 8
+        $ref: '#/definitions/AdaptiveLoadSchedulerOuts'
+      scheduler_parameters:
+        description: |+
+          Parameters for the _Load Scheduler_.
+
+        x-go-tag-validate: required
+        x-order: 9
+        $ref: '#/definitions/LoadSchedulerSchedulerParameters'
+  AdaptiveLoadSchedulerIns:
+    description: Input ports for the _Adaptive Load Scheduler_ component.
+    type: object
+    properties:
+      enabled:
+        description: The enabled port determines if the _Load Scheduler_ can shed
+          _Flows_. By default, the Load Scheduler is enabled.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+      setpoint:
+        description: The setpoint input to the controller.
+        x-order: 1
+        $ref: '#/definitions/InPort'
+      signal:
+        description: The input signal to the controller.
+        x-order: 2
+        $ref: '#/definitions/InPort'
+  AdaptiveLoadSchedulerOuts:
+    description: Output ports for the _Adaptive Load Scheduler_ component.
+    type: object
+    properties:
+      accepted_token_rate:
+        description: Accepted token rate is the number of tokens per second accepted
+          by the service.
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+      desired_load_multiplier:
+        description: Desired Load multiplier is the ratio of desired token rate to
+          the incoming token rate.
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+      incoming_token_rate:
+        description: Incoming token rate is the number of tokens per second incoming
+          to the service (including rejected ones).
+        x-order: 2
+        $ref: '#/definitions/OutPort'
+      is_overload:
+        title: |-
+          A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
+          Deprecated: 1.6.0
+        x-order: 3
+        $ref: '#/definitions/OutPort'
+      observed_load_multiplier:
+        description: Observed Load multiplier is the ratio of accepted token rate
+          to the incoming token rate.
         x-order: 4
         $ref: '#/definitions/OutPort'
   AddressExtractor:
@@ -755,12 +869,6 @@ definitions:
         $ref: '#/definitions/Variable'
   ConcurrencyLimiter:
     description: |-
-      :::info
-
-      See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).
-
-      :::
-
       It's based on the actuation strategy (for example, load actuator) and workload scheduling
       which is based on Weighted Fair Queuing principles.
       Concurrency is calculated in terms of total tokens per second, which can translate
@@ -1253,42 +1361,73 @@ definitions:
         x-order: 0
         $ref: '#/definitions/OutPort'
   FlowControl:
-    description: FlowControl components are used to regulate requests flow.
+    description: _Flow Control_ encompasses components that manage the flow of requests
+      or access to features within a service.
     type: object
     properties:
-      aimd_concurrency_controller:
-        description: AIMD Concurrency control component is based on Additive Increase
-          and Multiplicative Decrease of Concurrency. It takes a signal and setpoint
-          as inputs and reduces concurrency limits proportionally (or any arbitrary
-          power) based on deviation of the signal from setpoint. Internally implemented
-          as a nested circuit.
+      adaptive_load_scheduler:
+        description: _Adaptive Load Scheduler_ component is based on additive increase
+          and multiplicative decrease of token rate. It takes a signal and setpoint
+          as inputs and reduces token rate proportionally (or any arbitrary power)
+          based on deviation of the signal from setpoint.
         x-order: 0
+        $ref: '#/definitions/AdaptiveLoadScheduler'
+      aimd_concurrency_controller:
+        title: |-
+          AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
+          Deprecated: 1.6.0
+        x-order: 1
         $ref: '#/definitions/AIMDConcurrencyController'
       concurrency_limiter:
-        description: _Concurrency Limiter_ provides service protection by applying
-          prioritized load shedding of flows using a network scheduler (for example,
-          Weighted Fair Queuing).
-        x-order: 1
+        title: |-
+          _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+          Deprecated: 1.6.0
+        x-order: 2
         $ref: '#/definitions/ConcurrencyLimiter'
       flow_regulator:
-        description: Flow Regulator is a component that regulates the flow of requests
-          to the service by allowing only the specified percentage of requests or
-          sticky sessions.
-        x-order: 2
-        $ref: '#/definitions/FlowRegulator'
-      load_shaper:
-        description: LoadShaper is a component that shapes the load of the service.
+        title: |-
+          Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+          Deprecated: 1.6.0
         x-order: 3
+        $ref: '#/definitions/FlowRegulator'
+      load_ramp:
+        description: _Load Ramp_ smoothly regulates the flow of requests over specified
+          steps.
+        x-order: 4
+        $ref: '#/definitions/LoadRamp'
+      load_ramp_series:
+        description: _Load Ramp Series_ is a series of _Load Ramp_ components that
+          can shape load one after another at same or different _Control Points_.
+        x-order: 5
+        $ref: '#/definitions/LoadRampSeries'
+      load_scheduler:
+        description: _Load Scheduler_ provides service protection by applying prioritized
+          load shedding of flows using a network scheduler (for example, Weighted
+          Fair Queuing).
+        x-order: 6
+        $ref: '#/definitions/LoadScheduler'
+      load_shaper:
+        title: |-
+          _Load Shaper_ is a component that shapes the load at a _Control Point_.
+          Deprecated: 1.6.0
+        x-order: 7
         $ref: '#/definitions/LoadShaper'
       load_shaper_series:
-        description: LoadShaperSeries is a series of LoadShaper components that shape
-          load one after another in series.
-        x-order: 4
+        title: |-
+          _Load Shaper Series_ is a series of _Load Shaper_ components that can shape load one after another at same or different _Control Points_.
+          Deprecated: 1.6.0
+        x-order: 8
         $ref: '#/definitions/LoadShaperSeries'
       rate_limiter:
-        description: _Rate Limiter_ provides service protection by applying rate limiter.
-        x-order: 5
+        description: _Rate Limiter_ provides service protection by applying rate limits.
+        x-order: 9
         $ref: '#/definitions/RateLimiter'
+      regulator:
+        description: Regulator is a component that regulates the flow of requests
+          to the service by allowing only the specified percentage of requests or
+          sticky sessions.
+        x-order: 10
+        $ref: '#/definitions/Regulator'
   FlowControlResources:
     type: object
     title: FlowControl Resources
@@ -1429,7 +1568,7 @@ definitions:
     properties:
       flow_selector:
         description: |+
-          _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
+          _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
 
         x-go-tag-validate: required
         x-order: 0
@@ -1446,16 +1585,15 @@ definitions:
         x-order: 1
   FlowSelector:
     description: |-
+      Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control
+      component](/concepts/flow-control/flow-control.md#components) operates on.
+
       :::info
 
       See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
       :::
     type: object
-    title: |-
-      Describes which flow in which service a [flow control
-      component](/concepts/flow-control/flow-control.md#components) should apply
-      to
     properties:
       flow_matcher:
         title: Match control points and labels
@@ -2225,10 +2363,455 @@ definitions:
     properties:
       load_multiplier:
         description: |-
-          Load multiplier is ratio of [incoming
-          concurrency](#scheduler-outs) that needs to be accepted.
+          Load multiplier is proportion of [incoming
+          token rate](#scheduler-outs) that needs to be accepted.
         x-order: 0
         $ref: '#/definitions/InPort'
+  LoadRamp:
+    description: |-
+      The _Load Ramp_ produces a smooth and continuous traffic load
+      that changes progressively over time, based on the specified steps.
+
+      Each step is defined by two parameters:
+      - The `target_accept_percentage`.
+      - The `duration` for the signal to change from the
+        previous step's `target_accept_percentage` to the current step's
+        `target_accept_percentage`.
+
+      The percentage of requests accepted starts at the `target_accept_percentage`
+      defined in the first step and gradually ramps up or down linearly from
+      the previous step's `target_accept_percentage` to the next
+      `target_accept_percentage`, over the `duration` specified for each step.
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/RegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Dynamic configuration key for flow regulator.
+        type: string
+        x-order: 1
+      in_ports:
+        x-order: 2
+        $ref: '#/definitions/LoadRampIns'
+      out_ports:
+        x-order: 3
+        $ref: '#/definitions/LoadRampOuts'
+      parameters:
+        x-go-tag-validate: required
+        x-order: 4
+        $ref: '#/definitions/LoadRampParameters'
+  LoadRampIns:
+    description: Inputs for the _Load Ramp_ component.
+    type: object
+    properties:
+      backward:
+        description: Whether to progress the _Load Ramp_ towards the previous step.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+      forward:
+        description: Whether to progress the _Load Ramp_ towards the next step.
+        x-order: 1
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Whether to reset the _Load Ramp_ to the first step.
+        x-order: 2
+        $ref: '#/definitions/InPort'
+  LoadRampOuts:
+    description: Outputs for the _Load Ramp_ component.
+    type: object
+    properties:
+      accept_percentage:
+        description: The percentage of flows being accepted by the _Load Ramp_.
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+      at_end:
+        description: A Boolean signal indicating whether the _Load Ramp_ is at the
+          end of signal generation.
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+      at_start:
+        description: A Boolean signal indicating whether the _Load Ramp_ is at the
+          start of signal generation.
+        x-order: 2
+        $ref: '#/definitions/OutPort'
+  LoadRampParameters:
+    description: Parameters for the _Load Ramp_ component.
+    type: object
+    required:
+    - steps
+    properties:
+      regulator_parameters:
+        description: Parameters for the _Regulator_.
+        x-order: 0
+        $ref: '#/definitions/RegulatorParameters'
+      steps:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          $ref: '#/definitions/LoadRampParametersStep'
+        x-go-tag-validate: required,gt=0,dive
+        x-order: 1
+  LoadRampParametersStep:
+    type: object
+    required:
+    - duration
+    properties:
+      duration:
+        description: |+
+          Duration for which the step is active.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 0
+      target_accept_percentage:
+        description: |+
+          The value of the step.
+
+        type: number
+        format: double
+        maximum: 100
+        minimum: 0
+        x-go-tag-validate: gte=0,lte=100
+        x-order: 1
+  LoadRampSeries:
+    description: _LoadRampSeries_ is a component that applies a series of _Load Ramps_
+      in order.
+    type: object
+    properties:
+      in_ports:
+        x-order: 0
+        $ref: '#/definitions/LoadRampSeriesIns'
+      parameters:
+        x-go-tag-validate: required
+        x-order: 1
+        $ref: '#/definitions/LoadRampSeriesParameters'
+  LoadRampSeriesIns:
+    description: Inputs for the _LoadRampSeries_ component.
+    type: object
+    properties:
+      backward:
+        description: Whether to progress the load ramp series towards the previous
+          step.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+      forward:
+        description: Whether to progress the load ramp series towards the next step.
+        x-order: 1
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Whether to reset the load ramp series to the first step.
+        x-order: 2
+        $ref: '#/definitions/InPort'
+  LoadRampSeriesLoadRampInstance:
+    type: object
+    properties:
+      load_ramp:
+        description: |+
+          The load ramp.
+
+        x-go-tag-validate: required
+        x-order: 0
+        $ref: '#/definitions/LoadRampParameters'
+      out_ports:
+        x-order: 1
+        $ref: '#/definitions/LoadRampOuts'
+  LoadRampSeriesParameters:
+    description: Parameters for the _LoadRampSeries_ component.
+    type: object
+    required:
+    - load_ramps
+    properties:
+      load_ramps:
+        description: |+
+          An ordered list of load ramps that get applied in order.
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/LoadRampSeriesLoadRampInstance'
+        x-go-tag-validate: required,dive
+        x-order: 0
+  LoadScheduler:
+    description: |-
+      :::info
+
+      See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+
+      :::
+
+      It's based on the actuation strategy (for example, load actuator) and workload scheduling
+      which is based on Weighted Fair Queuing principles.
+      It measures and controls the incoming tokens per second, which can translate
+      to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
+
+      LoadScheduler configuration is split into two parts: An actuation
+      strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+    type: object
+    title: _Load Scheduler_ is an actuator component that regulates flows to provide
+      active service protection
+    properties:
+      actuator:
+        description: Actuator based on limiting the accepted token rate under incoming
+          token rate * load multiplier.
+        x-order: 0
+        $ref: '#/definitions/LoadSchedulerActuator'
+      flow_selector:
+        description: |+
+          Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
+
+        x-go-tag-validate: required
+        x-order: 1
+        $ref: '#/definitions/FlowSelector'
+      scheduler:
+        description: |+
+          Configuration of Weighted Fair Queuing-based workload scheduler.
+
+          Contains configuration of per-agent scheduler, and also defines some
+          output signals.
+
+        x-go-tag-validate: required
+        x-order: 2
+        $ref: '#/definitions/LoadSchedulerScheduler'
+  LoadSchedulerActuator:
+    type: object
+    title: Takes the load multiplier input signal and publishes it to the schedulers
+      in the data-plane
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/LoadSchedulerActuatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+        x-order: 1
+      in_ports:
+        description: Input ports for the Actuator component.
+        x-order: 2
+        $ref: '#/definitions/LoadSchedulerActuatorIns'
+  LoadSchedulerActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for Actuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
+          Useful for observing the behavior of actuator without disrupting any real traffic.
+        type: boolean
+        x-order: 0
+  LoadSchedulerActuatorIns:
+    description: Input for the Actuator component.
+    type: object
+    properties:
+      load_multiplier:
+        description: |-
+          Load multiplier is proportion of [incoming
+          token rate](#scheduler-outs) that needs to be accepted.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+  LoadSchedulerScheduler:
+    type: object
+    properties:
+      out_ports:
+        description: Output ports for the Scheduler component.
+        x-order: 0
+        $ref: '#/definitions/LoadSchedulerSchedulerOuts'
+      parameters:
+        description: |+
+          Scheduler parameters.
+
+        x-go-tag-validate: required
+        x-order: 1
+        $ref: '#/definitions/LoadSchedulerSchedulerParameters'
+  LoadSchedulerSchedulerOuts:
+    description: Output for the Scheduler component.
+    type: object
+    properties:
+      accepted_token_rate:
+        description: |-
+          Accepted token rate is the tokens admitted per second by the scheduler.
+          Value of this signal is aggregated from all the relevant schedulers.
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+      incoming_token_rate:
+        description: |-
+          Incoming token rate is the incoming tokens per second for all the
+          flows entering the scheduler including the rejected ones.
+
+          This is computed similar to `accepted_token_rate`,
+          by summing up tokens from all the flows entering scheduler.
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+  LoadSchedulerSchedulerParameters:
+    type: object
+    title: Scheduler parameters
+    properties:
+      auto_tokens:
+        description: |+
+          Automatically estimate the size of a flow in each workload, based on
+          historical latency. Each workload's `tokens` will be set to average
+          latency of flows in that workload during last few seconds (exact duration
+          of this average can change).
+          This setting is useful in concurrency limiting use-case, where the
+          concurrency is calculated as (avg. latency \* in-flight flows).
+
+          The value of tokens estimated by `auto_tokens` takes lower precedence
+          than the value of `tokens` specified in the workload definition
+          and `tokens` explicitly specified in the flow labels.
+
+        type: boolean
+        default: false
+        x-go-tag-default: "false"
+        x-order: 0
+      decision_deadline_margin:
+        description: |+
+          Decision deadline margin is the amount of time that the scheduler will
+          subtract from the request deadline to determine the deadline for the
+          decision. This is to ensure that the scheduler has enough time to
+          make a decision before the request deadline happens, accounting for
+          processing delays.
+          The request deadline is based on the
+          [gRPC deadline](https://grpc.io/blog/deadlines) or the
+          [`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+
+          Fail-open logic is use for flow control APIs, so if the gRPC deadline
+          reaches, the flow will end up being unconditionally allowed while
+          it is still waiting on the scheduler.
+
+        type: string
+        default: 0.01s
+        x-go-tag-default: 0.01s
+        x-order: 1
+      default_workload_parameters:
+        description: Parameters to be used if none of workloads specified in `workloads`
+          match.
+        x-order: 2
+        $ref: '#/definitions/LoadSchedulerSchedulerWorkloadParameters'
+      max_timeout:
+        description: |+
+          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+        type: string
+        default: 0s
+        x-go-tag-default: 0s
+        x-order: 3
+      timeout_factor:
+        description: |+
+          Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+
+        type: number
+        format: double
+        default: 0
+        x-go-tag-default: "0"
+        x-go-tag-validate: gte=0.0
+        x-order: 4
+      tokens_label_key:
+        description: |+
+          * Key for a flow label that can be used to override the default number of tokens for this flow.
+          * The value associated with this key must be a valid uint64 number.
+          * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+
+        type: string
+        default: tokens
+        x-go-tag-default: tokens
+        x-order: 5
+      workloads:
+        description: |+
+          List of workloads to be used in scheduler.
+
+          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+          allows for load-shedding to be "intelligent" compared to random rejections.
+          There are two aspects of this "intelligence":
+          * Scheduler can more precisely calculate concurrency if it understands
+            that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
+          * Setting different priorities to different workloads lets the scheduler
+            avoid dropping important traffic during overload.
+
+          Each workload in this list specifies also a matcher that is used to
+          determine which flow will be categorized into which workload.
+          In case of multiple matching workloads, the first matching one will be used.
+          If none of workloads match, `default_workload` will be used.
+
+          :::info
+
+          See also [workload definition in the concepts
+          section](/concepts/flow-control/components/load-scheduler.md#workload).
+
+          :::
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/LoadSchedulerSchedulerWorkload'
+        x-go-tag-validate: dive
+        x-order: 6
+  LoadSchedulerSchedulerWorkload:
+    description: Workload defines a class of flows that preferably have similar properties
+      such as response latency and desired priority.
+    type: object
+    properties:
+      label_matcher:
+        description: |+
+          Label Matcher to select a Workload based on
+          [flow labels](/concepts/flow-control/flow-label.md).
+
+        x-go-tag-validate: required
+        x-order: 0
+        $ref: '#/definitions/LabelMatcher'
+      parameters:
+        description: |+
+          Parameters associated with flows matching the label matcher.
+
+        x-go-tag-validate: required
+        x-order: 1
+        $ref: '#/definitions/LoadSchedulerSchedulerWorkloadParameters'
+  LoadSchedulerSchedulerWorkloadParameters:
+    description: |-
+      Parameters such as priority, tokens and fairness key that
+      are applicable to flows within a workload.
+    type: object
+    properties:
+      fairness_key:
+        description: |-
+          Fairness key is a label key that can be used to provide fairness within a workload.
+          Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
+          you have a classifier that sets `user` flow label, you might want to set
+          `fairness_key = "user"`.
+        type: string
+        x-order: 0
+      priority:
+        description: |+
+          $$
+          \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+          $$
+
+        type: integer
+        format: int64
+        title: |-
+          Describes priority level of the flows within the workload.
+          Priority level ranges from 0 to 255.
+          Higher numbers means higher priority level.
+          Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+        default: 0
+        maximum: 255
+        minimum: 0
+        x-go-tag-default: "0"
+        x-go-tag-validate: gte=0,lte=255
+        x-order: 1
+      tokens:
+        description: |-
+          Tokens determines the cost of admitting a single flow in the workload,
+          which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
+          simply equal to 1 if the resource being accessed is constrained by the
+          number of flows (3rd party rate limiters).
+          This override is applicable only if tokens for the flow aren't specified
+          in the flow labels.
+        type: string
+        format: uint64
+        x-order: 2
   LoadShaper:
     description: |-
       The _Load Shaper_ produces a smooth and continuous traffic load
@@ -2249,7 +2832,7 @@ definitions:
       default_config:
         description: Default configuration.
         x-order: 0
-        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+        $ref: '#/definitions/RegulatorDynamicConfig'
       dynamic_config_key:
         description: Dynamic configuration key for flow regulator.
         type: string
@@ -2305,10 +2888,7 @@ definitions:
     - steps
     properties:
       flow_regulator_parameters:
-        description: |+
-          Parameters for the _Flow Regulator_.
-
-        x-go-tag-validate: required
+        description: Parameters for the _Flow Regulator_.
         x-order: 0
         $ref: '#/definitions/FlowRegulatorParameters'
       steps:
@@ -3258,6 +3838,73 @@ definitions:
         default: true
         x-go-tag-default: "true"
         x-order: 0
+  Regulator:
+    description: |-
+      _Regulator_ is a component that regulates the load at a
+      [_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+      flows at random or by sticky sessions.
+
+      :::info
+
+      See also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+
+      :::
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/RegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+        x-order: 1
+      in_ports:
+        description: Input ports for the _Regulator_.
+        x-order: 2
+        $ref: '#/definitions/RegulatorIns'
+      parameters:
+        description: Parameters for the _Regulator_.
+        x-order: 3
+        $ref: '#/definitions/RegulatorParameters'
+  RegulatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for _Regulator_
+    properties:
+      enable_label_values:
+        description: Specify certain label values to be accepted by this flow filter
+          regardless of accept percentage.
+        type: array
+        items:
+          type: string
+        x-order: 0
+  RegulatorIns:
+    type: object
+    properties:
+      accept_percentage:
+        description: The percentage of requests to accept.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+  RegulatorParameters:
+    type: object
+    properties:
+      flow_selector:
+        description: |+
+          _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
+
+        x-go-tag-validate: required
+        x-order: 0
+        $ref: '#/definitions/FlowSelector'
+      label_key:
+        description: |-
+          The flow label key for identifying sessions.
+          - When label key is specified, _Regulator_ acts as a sticky filter.
+            The series of flows with the same value of label key get the same
+            decision provided that the `accept_percentage` is same or higher.
+          - When label key is not specified, _Regulator_ acts as a stateless filter.
+            Percentage of flows are selected randomly for rejection.
+        type: string
+        x-order: 1
   Resources:
     description: |-
       :::info
@@ -3406,7 +4053,7 @@ definitions:
       :::note
 
       Each Agent instantiates an independent copy of the scheduler, but output
-      signals for accepted and incoming concurrency are aggregated across all agents.
+      signals for accepted and incoming token rate are aggregated across all agents.
 
       :::
     type: object
@@ -3431,26 +4078,6 @@ definitions:
         description: |-
           Accepted concurrency is actual concurrency on a control point that this
           scheduler is applied on.
-
-          :::info
-
-          Concurrency is a unit less number describing mean number of
-          [flows](/concepts/flow-control/flow-control.md#flow) being
-          concurrently processed by the system (system = control point).
-          Concurrency is calculated as tokens per second that is being
-          accepted by the scheduler.
-          If the tokens map to milliseconds of response latency (_work_),
-          then the concurrency is _work_ done per unit
-          of time (so work-seconds per world-seconds). Work-seconds are
-          computed based on token-weights of flows (which are either
-          estimated using the `auto_tokens` feature or specified by
-          `Workload.tokens` setting).
-          Conversely, if the tokens map to number of requests where
-          each request is 1 token, then the concurrency is simply
-          the number of requests per second.
-
-          :::
-
           Value of this signal is aggregated from all the relevant schedulers.
         x-order: 0
         $ref: '#/definitions/OutPort'
@@ -3470,16 +4097,16 @@ definitions:
     properties:
       auto_tokens:
         description: |+
-          Automatically estimate the size of a request in each workload, based on
+          Automatically estimate the size of a flow in each workload, based on
           historical latency. Each workload's `tokens` will be set to average
           latency of flows in that workload during last few seconds (exact duration
           of this average can change).
-          This setting is useful in concurrent limiting use-case, where the
-          concurrency is calculated as (avg. latency \* in-flight requests).
+          This setting is useful in concurrency limiting use-case, where the
+          concurrency is calculated as (avg. latency \* in-flight flows).
 
           The value of tokens estimated by `auto_tokens` takes lower precedence
           than the value of `tokens` specified in the workload definition
-          and `tokens` explicitly specified in the request labels.
+          and `tokens` explicitly specified in the flow labels.
 
         type: boolean
         default: false
@@ -3511,9 +4138,9 @@ definitions:
         $ref: '#/definitions/SchedulerWorkloadParameters'
       tokens_label_key:
         description: |+
-          Flow label key that will be used to override the number of tokens for this request.
-          The label value must be a valid uint64 number.
-          If this parameter is not provided then each request is assumed to consume 1 token.
+          * Key for a flow label that can be used to override the default number of tokens for this flow.
+          * The value associated with this key must be a valid uint64 number.
+          * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
 
         type: string
         default: tokens
@@ -3539,7 +4166,7 @@ definitions:
           :::info
 
           See also [workload definition in the concepts
-          section](/concepts/flow-control/components/concurrency-limiter.md#workload).
+          section](/concepts/flow-control/components/load-scheduler.md#workload).
 
           :::
 
@@ -3550,8 +4177,8 @@ definitions:
         x-go-tag-validate: dive
         x-order: 4
   SchedulerWorkload:
-    description: Workload defines a class of requests that preferably have similar
-      properties such as response latency or desired priority.
+    description: Workload defines a class of flows that preferably have similar properties
+      such as response latency and desired priority.
     type: object
     properties:
       label_matcher:
@@ -3571,7 +4198,7 @@ definitions:
         $ref: '#/definitions/SchedulerWorkloadParameters'
   SchedulerWorkloadParameters:
     description: |-
-      Parameters defines parameters such as priority, tokens and fairness key that
+      Parameters such as priority, tokens and fairness key that
       are applicable to flows within a workload.
     type: object
     properties:
@@ -3592,10 +4219,10 @@ definitions:
         type: integer
         format: int64
         title: |-
-          Describes priority level of the requests within the workload.
+          Describes priority level of the flows within the workload.
           Priority level ranges from 0 to 255.
           Higher numbers means higher priority level.
-          Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+          Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
         default: 0
         maximum: 255
         minimum: 0
@@ -3604,12 +4231,12 @@ definitions:
         x-order: 1
       tokens:
         description: |-
-          Tokens determines the cost of admitting a single request the workload,
-          which is typically defined as milliseconds of response latency or
+          Tokens determines the cost of admitting a single flow in the workload,
+          which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
           simply equal to 1 if the resource being accessed is constrained by the
-          number of requests (3rd party rate limiters).
-          This override is applicable only if tokens for the request aren't specified
-          in the request labels.
+          number of flows (3rd party rate limiters).
+          This override is applicable only if tokens for the flow aren't specified
+          in the flow labels.
         type: string
         format: uint64
         x-order: 2

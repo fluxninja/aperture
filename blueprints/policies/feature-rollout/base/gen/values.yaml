@@ -15,8 +15,8 @@ policy:
   components: []
   drivers:
   evaluation_interval: "1s"
-  load_shaper:
-    flow_regulator_parameters:
+  load_ramp:
+    regulator_parameters:
       flow_selector:
         flow_matcher:
           control_point: __REQUIRED_FIELD__

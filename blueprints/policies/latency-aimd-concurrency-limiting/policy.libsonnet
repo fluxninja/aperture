@@ -88,7 +88,6 @@ function(cfg) {
                 setpoint: port.withSignalName('LATENCY_SETPOINT'),
               })
               + aimdConcurrencyController.withOutPorts({
-                is_overload: port.withSignalName('IS_OVERLOAD'),
                 desired_load_multiplier: port.withSignalName('DESIRED_LOAD_MULTIPLIER'),
                 observed_load_multiplier: port.withSignalName('OBSERVED_LOAD_MULTIPLIER'),
                 accepted_concurrency: port.withSignalName('ACCEPTED_CONCURRENCY'),

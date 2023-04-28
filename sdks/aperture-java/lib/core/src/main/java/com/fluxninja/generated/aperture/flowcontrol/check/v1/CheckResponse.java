@@ -82,13 +82,13 @@ private static final long serialVersionUID = 0L;
      */
     REJECT_REASON_RATE_LIMITED(1),
     /**
-     * <code>REJECT_REASON_CONCURRENCY_LIMITED = 2;</code>
+     * <code>REJECT_REASON_NO_TOKENS = 2;</code>
      */
-    REJECT_REASON_CONCURRENCY_LIMITED(2),
+    REJECT_REASON_NO_TOKENS(2),
     /**
-     * <code>REJECT_REASON_FLOW_REGULATED = 3;</code>
+     * <code>REJECT_REASON_REGULATED = 3;</code>
      */
-    REJECT_REASON_FLOW_REGULATED(3),
+    REJECT_REASON_REGULATED(3),
     UNRECOGNIZED(-1),
     ;
 
@@ -101,13 +101,13 @@ private static final long serialVersionUID = 0L;
      */
     public static final int REJECT_REASON_RATE_LIMITED_VALUE = 1;
     /**
-     * <code>REJECT_REASON_CONCURRENCY_LIMITED = 2;</code>
+     * <code>REJECT_REASON_NO_TOKENS = 2;</code>
      */
-    public static final int REJECT_REASON_CONCURRENCY_LIMITED_VALUE = 2;
+    public static final int REJECT_REASON_NO_TOKENS_VALUE = 2;
     /**
-     * <code>REJECT_REASON_FLOW_REGULATED = 3;</code>
+     * <code>REJECT_REASON_REGULATED = 3;</code>
      */
-    public static final int REJECT_REASON_FLOW_REGULATED_VALUE = 3;
+    public static final int REJECT_REASON_REGULATED_VALUE = 3;
 
 
     public final int getNumber() {
@@ -136,8 +136,8 @@ private static final long serialVersionUID = 0L;
       switch (value) {
         case 0: return REJECT_REASON_NONE;
         case 1: return REJECT_REASON_RATE_LIMITED;
-        case 2: return REJECT_REASON_CONCURRENCY_LIMITED;
-        case 3: return REJECT_REASON_FLOW_REGULATED;
+        case 2: return REJECT_REASON_NO_TOKENS;
+        case 3: return REJECT_REASON_REGULATED;
         default: return null;
       }
     }

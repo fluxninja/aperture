@@ -15,8 +15,13 @@ policy:
   components: []
   drivers:
     percentile_latency_drivers:
-      - backward:
-          threshold: __REQUIRED_FIELD__
+      - criteria:
+          backward:
+            threshold: __REQUIRED_FIELD__
+          forward:
+            threshold: __REQUIRED_FIELD__
+          reset:
+            threshold: __REQUIRED_FIELD__
         flux_meter:
           flow_selector:
             flow_matcher:
@@ -36,14 +41,10 @@ policy:
               - 2500
               - 5000
               - 10000
-        forward:
-          threshold: __REQUIRED_FIELD__
         percentile: 95
-        reset:
-          threshold: __REQUIRED_FIELD__
   evaluation_interval: "1s"
-  load_shaper:
-    flow_regulator_parameters:
+  load_ramp:
+    regulator_parameters:
       flow_selector:
         flow_matcher:
           control_point: __REQUIRED_FIELD__

@@ -16,32 +16,33 @@ function(cfg) {
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(promQLSignalName),
                                                                                  }))),
-    local isForward = (if std.objectHas(driver, 'forward') then driver.forward != null else false),
+    local criteria = (if std.objectHas(driver, 'criteria') then driver.criteria else {}),
+    local isForward = (if std.objectHas(criteria, 'forward') then criteria.forward != null else false),
     local forwardSignal = 'FORWARD_' + std.toString(driverAccumulator.forward_signals_count),
-    local forwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator(driver.forward.operator)
+    local forwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator(criteria.forward.operator)
                                                          + spec.v1.Decider.withInPorts({
                                                            lhs: spec.v1.Port.withSignalName(promQLSignalName),
-                                                           rhs: spec.v1.Port.withConstantSignal(driver.forward.threshold),
+                                                           rhs: spec.v1.Port.withConstantSignal(criteria.forward.threshold),
                                                          })
                                                          + spec.v1.Decider.withOutPorts({
                                                            output: spec.v1.Port.withSignalName(forwardSignal),
                                                          })),
-    local isBackward = (if std.objectHas(driver, 'backward') then driver.backward != null else false),
+    local isBackward = (if std.objectHas(criteria, 'backward') then criteria.backward != null else false),
     local backwardSignal = 'BACKWARD_' + std.toString(driverAccumulator.backward_signals_count),
-    local backwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator(driver.backward.operator)
+    local backwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator(criteria.backward.operator)
                                                           + spec.v1.Decider.withInPorts({
                                                             lhs: spec.v1.Port.withSignalName(promQLSignalName),
-                                                            rhs: spec.v1.Port.withConstantSignal(driver.backward.threshold),
+                                                            rhs: spec.v1.Port.withConstantSignal(criteria.backward.threshold),
                                                           })
                                                           + spec.v1.Decider.withOutPorts({
                                                             output: spec.v1.Port.withSignalName(backwardSignal),
                                                           })),
-    local isReset = (if std.objectHas(driver, 'reset') then driver.reset != null else false),
+    local isReset = (if std.objectHas(criteria, 'reset') then criteria.reset != null else false),
     local resetSignal = 'RESET_' + std.toString(driverAccumulator.reset_signals_count),
-    local resetDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator(driver.reset.operator)
+    local resetDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator(criteria.reset.operator)
                                                        + spec.v1.Decider.withInPorts({
                                                          lhs: spec.v1.Port.withSignalName(promQLSignalName),
-                                                         rhs: spec.v1.Port.withConstantSignal(driver.reset.threshold),
+                                                         rhs: spec.v1.Port.withConstantSignal(criteria.reset.threshold),
                                                        })
                                                        + spec.v1.Decider.withOutPorts({
                                                          output: spec.v1.Port.withSignalName(resetSignal),
@@ -53,7 +54,7 @@ function(cfg) {
     reset_signals: driverAccumulator.reset_signals + (if isReset then [resetSignal] else []),
     forward_signals_count: driverAccumulator.forward_signals_count + if isForward then 1 else 0,
     backward_signals_count: driverAccumulator.backward_signals_count + if isBackward then 1 else 0,
-    reset_signals_count: driverAccumulator.reset_signals_count + if driver.reset != null then 1 else 0,
+    reset_signals_count: driverAccumulator.reset_signals_count + if isReset then 1 else 0,
     components: driverAccumulator.components + [promQLComponent] + (if isForward then [forwardDecider] else []) + (if isBackward then [backwardDecider] else []) + (if isReset then [resetDecider] else []),
     driver_count: driverAccumulator.driver_count + 1,
     promql_driver_count: driverAccumulator.promql_driver_count + 1,
@@ -73,32 +74,33 @@ function(cfg) {
                                                                                    output: spec.v1.Port.withSignalName(averageLatencySignalName),
                                                                                  }))),
 
-    local isForward = (if std.objectHas(driver, 'forward') then driver.forward != null else false),
+    local criteria = (if std.objectHas(driver, 'criteria') then driver.criteria else {}),
+    local isForward = (if std.objectHas(criteria, 'forward') then criteria.forward != null else false),
     local forwardSignal = 'FORWARD_' + std.toString(driverAccumulator.forward_signals_count),
     local forwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('lt')
                                                          + spec.v1.Decider.withInPorts({
                                                            lhs: spec.v1.Port.withSignalName(averageLatencySignalName),
-                                                           rhs: spec.v1.Port.withConstantSignal(driver.forward.threshold),
+                                                           rhs: spec.v1.Port.withConstantSignal(criteria.forward.threshold),
                                                          })
                                                          + spec.v1.Decider.withOutPorts({
                                                            output: spec.v1.Port.withSignalName(forwardSignal),
                                                          })),
-    local isBackward = (if std.objectHas(driver, 'backward') then driver.backward != null else false),
+    local isBackward = (if std.objectHas(criteria, 'backward') then criteria.backward != null else false),
     local backwardSignal = 'BACKWARD_' + std.toString(driverAccumulator.backward_signals_count),
     local backwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('gt')
                                                           + spec.v1.Decider.withInPorts({
                                                             lhs: spec.v1.Port.withSignalName(averageLatencySignalName),
-                                                            rhs: spec.v1.Port.withConstantSignal(driver.backward.threshold),
+                                                            rhs: spec.v1.Port.withConstantSignal(criteria.backward.threshold),
                                                           })
                                                           + spec.v1.Decider.withOutPorts({
                                                             output: spec.v1.Port.withSignalName(backwardSignal),
                                                           })),
-    local isReset = (if std.objectHas(driver, 'reset') then driver.reset != null else false),
+    local isReset = (if std.objectHas(criteria, 'reset') then criteria.reset != null else false),
     local resetSignal = 'RESET_' + std.toString(driverAccumulator.reset_signals_count),
     local resetDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('gt')
                                                        + spec.v1.Decider.withInPorts({
                                                          lhs: spec.v1.Port.withSignalName(averageLatencySignalName),
-                                                         rhs: spec.v1.Port.withConstantSignal(driver.reset.threshold),
+                                                         rhs: spec.v1.Port.withConstantSignal(criteria.reset.threshold),
                                                        })
                                                        + spec.v1.Decider.withOutPorts({
                                                          output: spec.v1.Port.withSignalName(resetSignal),
@@ -113,7 +115,7 @@ function(cfg) {
     reset_signals: driverAccumulator.reset_signals + (if isReset then [resetSignal] else []),
     forward_signals_count: driverAccumulator.forward_signals_count + if isForward then 1 else 0,
     backward_signals_count: driverAccumulator.backward_signals_count + if isBackward then 1 else 0,
-    reset_signals_count: driverAccumulator.reset_signals_count + if driver.reset != null then 1 else 0,
+    reset_signals_count: driverAccumulator.reset_signals_count + if isReset then 1 else 0,
     components: driverAccumulator.components + [promQLComponent] + (if isForward then [forwardDecider] else []) + (if isBackward then [backwardDecider] else []) + (if isReset then [resetDecider] else []),
     driver_count: driverAccumulator.driver_count + 1,
     promql_driver_count: driverAccumulator.promql_driver_count,
@@ -133,32 +135,33 @@ function(cfg) {
                                                                                    output: spec.v1.Port.withSignalName(percentileLatencySignalName),
                                                                                  }))),
 
-    local isForward = (if std.objectHas(driver, 'forward') then driver.forward != null else false),
+    local criteria = (if std.objectHas(driver, 'criteria') then driver.criteria else {}),
+    local isForward = (if std.objectHas(criteria, 'forward') then criteria.forward != null else false),
     local forwardSignal = 'FORWARD_' + std.toString(driverAccumulator.forward_signals_count),
     local forwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('lt')
                                                          + spec.v1.Decider.withInPorts({
                                                            lhs: spec.v1.Port.withSignalName(percentileLatencySignalName),
-                                                           rhs: spec.v1.Port.withConstantSignal(driver.forward.threshold),
+                                                           rhs: spec.v1.Port.withConstantSignal(criteria.forward.threshold),
                                                          })
                                                          + spec.v1.Decider.withOutPorts({
                                                            output: spec.v1.Port.withSignalName(forwardSignal),
                                                          })),
-    local isBackward = (if std.objectHas(driver, 'backward') then driver.backward != null else false),
+    local isBackward = (if std.objectHas(criteria, 'backward') then criteria.backward != null else false),
     local backwardSignal = 'BACKWARD_' + std.toString(driverAccumulator.backward_signals_count),
     local backwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('gt')
                                                           + spec.v1.Decider.withInPorts({
                                                             lhs: spec.v1.Port.withSignalName(percentileLatencySignalName),
-                                                            rhs: spec.v1.Port.withConstantSignal(driver.backward.threshold),
+                                                            rhs: spec.v1.Port.withConstantSignal(criteria.backward.threshold),
                                                           })
                                                           + spec.v1.Decider.withOutPorts({
                                                             output: spec.v1.Port.withSignalName(backwardSignal),
                                                           })),
-    local isReset = (if std.objectHas(driver, 'reset') then driver.reset != null else false),
+    local isReset = (if std.objectHas(criteria, 'reset') then criteria.reset != null else false),
     local resetSignal = 'RESET_' + std.toString(driverAccumulator.reset_signals_count),
     local resetDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('gt')
                                                        + spec.v1.Decider.withInPorts({
                                                          lhs: spec.v1.Port.withSignalName(percentileLatencySignalName),
-                                                         rhs: spec.v1.Port.withConstantSignal(driver.reset.threshold),
+                                                         rhs: spec.v1.Port.withConstantSignal(criteria.reset.threshold),
                                                        })
                                                        + spec.v1.Decider.withOutPorts({
                                                          output: spec.v1.Port.withSignalName(resetSignal),
@@ -174,7 +177,7 @@ function(cfg) {
     reset_signals: driverAccumulator.reset_signals + (if isReset then [resetSignal] else []),
     forward_signals_count: driverAccumulator.forward_signals_count + if isForward then 1 else 0,
     backward_signals_count: driverAccumulator.backward_signals_count + if isBackward then 1 else 0,
-    reset_signals_count: driverAccumulator.reset_signals_count + if driver.reset != null then 1 else 0,
+    reset_signals_count: driverAccumulator.reset_signals_count + if isReset then 1 else 0,
     components: driverAccumulator.components + [promQLComponent] + (if isForward then [forwardDecider] else []) + (if isBackward then [backwardDecider] else []) + (if isReset then [resetDecider] else []),
     driver_count: driverAccumulator.driver_count + 1,
     promql_driver_count: driverAccumulator.promql_driver_count,
@@ -205,13 +208,14 @@ function(cfg) {
       )
     ),
 
-    local isForward = (if std.objectHas(driver, 'forward') then driver.forward != null else false),
+    local criteria = (if std.objectHas(driver, 'criteria') then driver.criteria else {}),
+    local isForward = (if std.objectHas(criteria, 'forward') then criteria.forward != null else false),
     local forwardLatencySetpoint = 'FORWARD_LATENCY_SETPOINT_' + std.toString(driverAccumulator.ema_latency_driver_count),
     local forwardSignal = 'FORWARD_' + std.toString(driverAccumulator.forward_signals_count),
     local forwardMultiplier = spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.withOperator('mul')
                                                                          + spec.v1.ArithmeticCombinator.withInPorts({
                                                                            lhs: spec.v1.Port.withSignalName(emaLatencySignalName),
-                                                                           rhs: spec.v1.Port.withConstantSignal(driver.forward.latency_tolerance_multiplier),
+                                                                           rhs: spec.v1.Port.withConstantSignal(criteria.forward.latency_tolerance_multiplier),
                                                                          })
                                                                          + spec.v1.ArithmeticCombinator.withOutPorts({
                                                                            output: spec.v1.Port.withSignalName(forwardLatencySetpoint),
@@ -224,13 +228,13 @@ function(cfg) {
                                                          + spec.v1.Decider.withOutPorts({
                                                            output: spec.v1.Port.withSignalName(forwardSignal),
                                                          })),
-    local isBackward = (if std.objectHas(driver, 'backward') then driver.backward != null else false),
+    local isBackward = (if std.objectHas(criteria, 'backward') then criteria.backward != null else false),
     local backwardLatencySetpoint = 'BACKWARD_LATENCY_SETPOINT_' + std.toString(driverAccumulator.ema_latency_driver_count),
     local backwardSignal = 'BACKWARD_' + std.toString(driverAccumulator.backward_signals_count),
     local backwardMultiplier = spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.withOperator('mul')
                                                                           + spec.v1.ArithmeticCombinator.withInPorts({
                                                                             lhs: spec.v1.Port.withSignalName(emaLatencySignalName),
-                                                                            rhs: spec.v1.Port.withConstantSignal(driver.backward.latency_tolerance_multiplier),
+                                                                            rhs: spec.v1.Port.withConstantSignal(criteria.backward.latency_tolerance_multiplier),
                                                                           })
                                                                           + spec.v1.ArithmeticCombinator.withOutPorts({
                                                                             output: spec.v1.Port.withSignalName(backwardLatencySetpoint),
@@ -243,13 +247,13 @@ function(cfg) {
                                                           + spec.v1.Decider.withOutPorts({
                                                             output: spec.v1.Port.withSignalName(backwardSignal),
                                                           })),
-    local isReset = (if std.objectHas(driver, 'reset') then driver.reset != null else false),
+    local isReset = (if std.objectHas(criteria, 'reset') then criteria.reset != null else false),
     local resetLatencySetpoint = 'RESET_LATENCY_SETPOINT_' + std.toString(driverAccumulator.ema_latency_driver_count),
     local resetSignal = 'RESET_' + std.toString(driverAccumulator.reset_signals_count),
     local resetMultiplier = spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.withOperator('mul')
                                                                        + spec.v1.ArithmeticCombinator.withInPorts({
                                                                          lhs: spec.v1.Port.withSignalName(emaLatencySignalName),
-                                                                         rhs: spec.v1.Port.withConstantSignal(driver.reset.latency_tolerance_multiplier),
+                                                                         rhs: spec.v1.Port.withConstantSignal(criteria.reset.latency_tolerance_multiplier),
                                                                        })
                                                                        + spec.v1.ArithmeticCombinator.withOutPorts({
                                                                          output: spec.v1.Port.withSignalName(resetLatencySetpoint),
@@ -406,15 +410,15 @@ function(cfg) {
     }),
   ),
 
-  local loadShaper = spec.v1.Component.withFlowControl(
-    spec.v1.FlowControl.withLoadShaper(
-      spec.v1.LoadShaper.withInPorts({
+  local loadRamp = spec.v1.Component.withFlowControl(
+    spec.v1.FlowControl.withLoadRamp(
+      spec.v1.LoadRamp.withInPorts({
         forward: spec.v1.Port.withSignalName('FORWARD'),
         backward: spec.v1.Port.withSignalName('BACKWARD'),
         reset: spec.v1.Port.withSignalName('RESET'),
       })
-      + spec.v1.LoadShaper.withParameters(params.load_shaper)
-      + spec.v1.LoadShaper.withDynamicConfigKey('load_shaper'),
+      + spec.v1.LoadRamp.withParameters(params.load_ramp)
+      + spec.v1.LoadRamp.withDynamicConfigKey('regulator'),
     ),
   ),
 
@@ -438,7 +442,7 @@ function(cfg) {
         ] + notBackwardIntentComponents + notResetComponents + [
           forwardCriteriaComponent,
           backwardCriteriaComponent,
-          loadShaper,
+          loadRamp,
         ] + params.components,
       ),
     ),

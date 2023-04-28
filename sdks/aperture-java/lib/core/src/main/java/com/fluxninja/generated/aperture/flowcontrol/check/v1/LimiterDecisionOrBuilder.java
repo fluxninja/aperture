@@ -76,34 +76,34 @@ public interface LimiterDecisionOrBuilder extends
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfoOrBuilder getRateLimiterInfoOrBuilder();
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-   * @return Whether the concurrencyLimiterInfo field is set.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+   * @return Whether the loadSchedulerInfo field is set.
    */
-  boolean hasConcurrencyLimiterInfo();
+  boolean hasLoadSchedulerInfo();
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
-   * @return The concurrencyLimiterInfo.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
+   * @return The loadSchedulerInfo.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getConcurrencyLimiterInfo();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo getLoadSchedulerInfo();
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 7 [json_name = "concurrencyLimiterInfo"];</code>
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LoadSchedulerInfoOrBuilder getLoadSchedulerInfoOrBuilder();
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
-   * @return Whether the flowRegulatorInfo field is set.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
+   * @return Whether the regulatorInfo field is set.
    */
-  boolean hasFlowRegulatorInfo();
+  boolean hasRegulatorInfo();
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
-   * @return The flowRegulatorInfo.
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
+   * @return The regulatorInfo.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo getFlowRegulatorInfo();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo getRegulatorInfo();
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfo regulator_info = 8 [json_name = "regulatorInfo"];</code>
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfoOrBuilder getFlowRegulatorInfoOrBuilder();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RegulatorInfoOrBuilder getRegulatorInfoOrBuilder();
 
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.DetailsCase getDetailsCase();
 }
