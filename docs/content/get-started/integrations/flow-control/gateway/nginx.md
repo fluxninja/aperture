@@ -154,7 +154,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    http {
      ...
      access_by_lua_block {
-       local authorized_status = access(ngx.var.destination_hostname, ngx.var.destination_port)
+       local authorized_status = access(ngx.var.destination_hostname, ngx.var.destination_port, ngx.var.control_point)
 
        if authorized_status ~= ngx.HTTP_OK then
          return ngx.exit(authorized_status)
@@ -179,8 +179,9 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    ```
 
 6. Aperture needs the upstream address of the server using
-   `destination_hostname` and `destination_port` variables, which need to be set
-   from Nginx `location` block:
+   `destination_hostname` and `destination_port` variables and also
+   `control_point` variable for referring the service in Aperture Policy, which
+   need to be set from Nginx `location` block:
 
    ```bash
    http {
@@ -189,6 +190,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
        location /service1 {
          set $destination_hostname "service1-demo-app.demoapp.svc.cluster.local";
          set $destination_port "80";
+         set $control_point "service1-demo-app";
          proxy_pass http://$destination_hostname:$destination_port/request;
        }
      }
@@ -219,7 +221,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
      }
 
      access_by_lua_block {
-       local authorized_status = access(ngx.var.destination_hostname, ngx.var.destination_port)
+       local authorized_status = access(ngx.var.destination_hostname, ngx.var.destination_port, ngx.var.control_point)
 
        if authorized_status ~= ngx.HTTP_OK then
          return ngx.exit(authorized_status)
@@ -237,18 +239,21 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
        location /service1 {
          set $destination_hostname "service1-demo-app.demoapp.svc.cluster.local";
          set $destination_port "80";
+         set $control_point "service1-demo-app";
          proxy_pass http://$destination_hostname:$destination_port/request;
        }
 
        location /service2 {
          set $destination_hostname "service2-demo-app.demoapp.svc.cluster.local";
          set $destination_port "80";
+         set $control_point "service2-demo-app";
          proxy_pass http://$destination_hostname:$destination_port/request;
        }
 
        location /service3 {
          set $destination_hostname "service3-demo-app.demoapp.svc.cluster.local";
          set $destination_port "80";
+         set $control_point "service3-demo-app";
          proxy_pass http://$destination_hostname:$destination_port/request;
        }
      }
