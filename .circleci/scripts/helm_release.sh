@@ -25,6 +25,7 @@ main(){
     (( retry_counter-- )) || break
     if upload; then
       echo "git push passed"
+      remove_old_tag
       break
     fi
     sleep 1
@@ -116,5 +117,66 @@ upload(){
     return 1
   fi
 }
+
+remove_old_tag(){
+
+  git clone "${REPO_URL}"
+  cd aperture
+  git checkout main
+
+  MANIFEST_NAME=$(echo "$CIRCLE_TAG" | cut -d "/" -f 3)
+  tags=$(git tag -l releases/charts/"${MANIFEST_NAME}"/* )
+  # sort tags in reverse chronological order
+  sorted_tags=$(echo "$tags" | sort -rV)
+  readarray -d ' ' -t array <<< "$sorted_tags"
+  mapfile -t new_sorted_tags < <(echo "${array[@]}")
+  # keep the latests first 3 tags release with rc
+  latest_tags=()
+  count=3
+  for tag in "${new_sorted_tags[@]}"; do
+    if [[ $count == 0 ]]; then
+        break
+    fi
+    latest_tags+=("$tag")
+    if [[ "$tag" =~ ^releases/charts/${MANIFEST_NAME}/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        count=$((count-1))
+    fi
+  done
+
+  # delete the tags that are not in the latest list
+  for tag in "${new_sorted_tags[@]}"; do
+    if [[ ! "${latest_tags[*]}}" =~ $tag ]]; then
+      git tag -d "$tag"
+      git push origin "$tag"
+    fi
+  done
+
+  # delete the tarballs that are not in the latest list
+  for tag in "${new_sorted_tags[@]}"; do
+    if [[ ! "${latest_tags[*]}}" =~ $tag ]]; then
+      remove_tarball "$tag"
+    fi
+  done
+}
+
+remove_tarball(){
+  tmpDir=$(mktemp -d)
+  pushd "$tmpDir" >& /dev/null
+  trap 'popd &>/dev/null && rm -rf "$tmpDir"' RETURN
+
+  git clone "${REPO_URL}"
+  cd aperture
+  git config user.name "${CIRCLE_PROJECT_USERNAME}"
+  git config user.email "${COMMIT_EMAIL}"
+  git checkout "${BRANCH}"
+
+  tag_name=$(echo "$1" | cut -d "/" -f 4)
+  chart_name=$(echo "$1" | cut -d "/" -f 3)
+  tarball_name="${chart_name}-${tag_name}.tgz"
+  git rm -f "${TARGET_DIR}/${tarball_name}"
+  git commit -m "Remove $tarball_name"
+  git push origin ${BRANCH}
+}
+
 
 main
