@@ -21,6 +21,7 @@ type OTelConfig struct {
 	Receivers  map[string]interface{} `json:"receivers,omitempty"`
 	Processors map[string]interface{} `json:"processors,omitempty"`
 	Exporters  map[string]interface{} `json:"exporters,omitempty"`
+	Connectors map[string]interface{} `json:"connectors,omitempty"`
 	Service    *OTelService           `json:"service"`
 }
 
@@ -31,6 +32,7 @@ func NewOTelConfig() *OTelConfig {
 		Receivers:  map[string]interface{}{},
 		Processors: map[string]interface{}{},
 		Exporters:  map[string]interface{}{},
+		Connectors: map[string]interface{}{},
 		Service:    NewOTelService(),
 	}
 }
@@ -42,6 +44,7 @@ func (o *OTelConfig) AsMap() map[string]interface{} {
 		"receivers":  o.Receivers,
 		"processors": o.Processors,
 		"exporters":  o.Exporters,
+		"connectors": o.Connectors,
 		"service":    o.Service.AsMap(),
 	}
 }
@@ -73,6 +76,11 @@ func (o *OTelConfig) AddProcessor(name string, value interface{}) {
 // AddExporter adds exporter to OTel config.
 func (o *OTelConfig) AddExporter(name string, value interface{}) {
 	o.Exporters[name] = value
+}
+
+// AddConnector adds connector to OTel config.
+func (o *OTelConfig) AddConnector(name string, value interface{}) {
+	o.Connectors[name] = value
 }
 
 // SetDebugPort configures debug port on which OTel server /metrics as specified by user.
