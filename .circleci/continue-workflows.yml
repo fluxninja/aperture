@@ -394,7 +394,7 @@ jobs:
           when: always
 
   validate-publish-java-sdk:
-    executor: python-cimg-executor
+    executor: base-machine-executor
     environment:
       DOCKER_BUILDKIT: 1
     parameters:
