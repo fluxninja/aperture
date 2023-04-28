@@ -128,31 +128,40 @@ the plugin is already installed:
    _format_version: "3.0"
    _transform: true
 
-   plugins:
-   - name: aperture-plugin
-
    services:
-   - name: service1-demo-app
-   url: http://service1-demo-app.demoapp.svc.cluster.local:80/request
-   retries: 3
-   routes:
-   - name: service1
-      paths:
-      - /service1
-   - name: service2-demo-app
-   url: http://service2-demo-app.demoapp.svc.cluster.local:80/request
-   retries: 3
-   routes:
-   - name: service2
-      paths:
-      - /service2
-   - name: service3-demo-app
-   url: http://service3-demo-app.demoapp.svc.cluster.local:80/request
-   retries: 3
-   routes:
-   - name: service3
-      paths:
-      - /service3
+     - name: service1-demo-app
+       url: http://service1-demo-app.demoapp.svc.cluster.local:80/request
+       retries: 3
+       routes:
+         - name: service1
+           paths:
+             - /service1
+       plugins:
+         - name: aperture-plugin
+           config:
+             control_point: service1-demo-app
+     - name: service2-demo-app
+       url: http://service2-demo-app.demoapp.svc.cluster.local:80/request
+       retries: 3
+       routes:
+         - name: service2
+           paths:
+             - /service2
+       plugins:
+         - name: aperture-plugin
+           config:
+             control_point: service2-demo-app
+     - name: service3-demo-app
+       url: http://service3-demo-app.demoapp.svc.cluster.local:80/request
+       retries: 3
+       routes:
+         - name: service3
+           paths:
+             - /service3
+       plugins:
+         - name: aperture-plugin
+           config:
+             control_point: service3-demo-app
    ```
 
    This adds the provided services and routes on Kong and enables the Aperture

@@ -8,7 +8,7 @@ local ApertureHandler = {
 }
 
 function ApertureHandler:access(config)
-  local authorized_status = access(kong.router.get_service().host, kong.router.get_service().port)
+  local authorized_status = access(kong.router.get_service().host, kong.router.get_service().port, config.control_point)
   if authorized_status ~= ngx.HTTP_OK then
     return ngx.exit(authorized_status)
   end
