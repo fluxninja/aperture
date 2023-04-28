@@ -25,6 +25,7 @@ import (
 	"github.com/clarketm/json"
 	"github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/hashicorp/go-version"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
@@ -68,6 +69,18 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_SIDECAR"
 	} else {
 		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
+	}
+
+	// Adding check for older default address for backward compatibility
+	//
+	// Deprecated: 1.9.0
+	if newAgent.Spec.ConfigSpec.Server.GrpcGateway.GRPCAddr == "0.0.0.0:1" {
+		agentVersion := newAgent.Spec.Image.Tag
+		v1, _ := version.NewVersion(agentVersion)
+		v2, _ := version.NewVersion("1.6.0")
+		if v1 == nil || v1.GreaterThanOrEqual(v2) {
+			newAgent.Spec.ConfigSpec.Server.GrpcGateway.GRPCAddr = ""
+		}
 	}
 
 	updatedAgent, err := json.Marshal(newAgent)

@@ -175,7 +175,10 @@ func (constructor Constructor) setupGRPCGateway(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			if gw.grpcAddr == "" {
+			// Adding check for older default address also for backward compatibility
+			//
+			// Deprecated: 1.9.0
+			if gw.grpcAddr == "" || gw.grpcAddr == "0.0.0.0:1" {
 				gw.grpcAddr = httpServer.Listener.GetListener().Addr().String()
 			}
 
