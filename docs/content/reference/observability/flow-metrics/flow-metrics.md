@@ -2,9 +2,9 @@
 title: Flow Metrics
 sidebar_position: 2
 keywords:
-    - flow
-    - olap
-    - metrics
+  - flow
+  - olap
+  - metrics
 ---
 
 Aperture Agents emit an OpenTelemetry stream for flow data, which provides a
@@ -25,11 +25,11 @@ and behavior. The stream can be stored and visualized in
 | --------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------- |
 | aperture.source                   | single      | sdk, envoy                                                                                                                                                                | Aperture Flow source                               | SDKs, Envoy               |
 | aperture.decision_type            | single      | DECISION_TYPE_ACCEPTED, DECISION_TYPE_REJECTED                                                                                                                            | Decision type taken by policy                      | SDKs, Envoy               |
-| aperture.reject_reason            | single      | REJECT_REASON_NONE, REJECT_REASON_RATE_LIMITED, REJECT_REASON_LOAD_SHED                                                                                                   | Reject reason of the decision taken by policy      | SDKs, Envoy               |
+| aperture.reject_reason            | single      | REJECT_REASON_NONE, REJECT_REASON_RATE_LIMITED, REJECT_REASON_NO_TOKENS, REJECT_REASON_REGULATED                                                                          | Reject reason of the decision taken by policy      | SDKs, Envoy               |
 | aperture.rate_limiters            | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Rate limiters matched to the traffic               | SDKs, Envoy               |
 | aperture.dropping_rate_limiters   | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Rate limiters dropping the traffic                 | SDKs, Envoy               |
-| aperture.load_scheduler           | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters matched to the traffic        | SDKs, Envoy               |
-| aperture.dropping_load_scheduler  | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters dropping the traffic          | SDKs, Envoy               |
+| aperture.load_schedulers          | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters matched to the traffic        | SDKs, Envoy               |
+| aperture.dropping_load_schedulers | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters dropping the traffic          | SDKs, Envoy               |
 | aperture.load_regulators          | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Load Regulators matched to the traffic             | SDKs, Envoy               |
 | aperture.dropping_load_regulators | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Load Regulators dropping the traffic               | SDKs, Envoy               |
 | aperture.workloads                | multi-value | "policy_name:s1, component_id:13, workload_index:0, policy_hash:5kZjj"                                                                                                    | Workloads matched to the traffic                   | SDKs, Envoy               |

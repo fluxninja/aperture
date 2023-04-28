@@ -4385,7 +4385,7 @@ type AIMDConcurrencyController_Ins struct {
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
 	// The setpoint to the controller.
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
-	// The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+	// The enabled port controls whether the _Adaptive Load Scheduler_ can load shed _Flows_. By default, the _Adaptive Load Scheduler_ is enabled.
 	Enabled *InPort `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
 }
 

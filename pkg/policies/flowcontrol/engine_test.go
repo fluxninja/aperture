@@ -63,31 +63,31 @@ var _ = Describe("Dataplane Engine", func() {
 		}
 	})
 
-	Context("Scheduler actuator", func() {
+	Context("Load Scheduler", func() {
 		BeforeEach(func() {
 			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
 			mockConLimiter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
 			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 		})
 
-		It("Registers scheduler actuator", func() {
+		It("Registers Load Scheduler", func() {
 			err := engine.RegisterLoadScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("Registers scheduler actuator second time", func() {
+		It("Registers Load Scheduler second time", func() {
 			err := engine.RegisterLoadScheduler(mockConLimiter)
 			err2 := engine.RegisterLoadScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(err2).To(HaveOccurred())
 		})
 
-		It("Unregisters not registered scheduler actuator", func() {
+		It("Unregisters not registered Load Scheduler", func() {
 			err := engine.UnregisterLoadScheduler(mockConLimiter)
 			Expect(err).To(HaveOccurred())
 		})
 
-		It("Unregisters existing scheduler actuator", func() {
+		It("Unregisters existing Load Scheduler", func() {
 			err := engine.RegisterLoadScheduler(mockConLimiter)
 			err2 := engine.UnregisterLoadScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
@@ -172,7 +172,7 @@ var _ = Describe("Dataplane Engine", func() {
 			Expect(mmr.loadSchedulers).To(BeEmpty())
 		})
 
-		It("Return matched schedulers and fluxmeters", func() {
+		It("Return matched Load Schedulers and Flux Meters", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
 			_ = engine.RegisterLoadScheduler(mockConLimiter)
 

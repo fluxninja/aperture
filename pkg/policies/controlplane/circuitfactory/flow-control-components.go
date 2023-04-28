@@ -1,11 +1,9 @@
 package circuitfactory
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"go.uber.org/fx"
-	"google.golang.org/protobuf/encoding/protojson"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
@@ -34,48 +32,15 @@ func newFlowControlCompositeAndOptions(
 		loadSchedulerProto = proto
 		isLoadScheduler = true
 	} else if concurrencyLimiterProto := flowControlComponentProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
-		// Convert from *policylangv1.FlowControl_ConcurrencyLimiter to *policylangv1.FlowControl_LoadScheduler since they have mostly same fields
-		jsonStr, err := json.Marshal(concurrencyLimiterProto)
+		// Convert from *policylangv1.FlowControl_ConcurrencyLimiter to *policylangv1.FlowControl_LoadScheduler
+		fieldMappings := map[string]string{
+			"load_actuator": "actuator",
+			"load_actuator.scheduler.accepted_concurrency": "accepted_token_rate",
+			"load_actuator.scheduler.incoming_concurrency": "incoming_token_rate",
+		}
+		err := convertOldComponentToNew(concurrencyLimiterProto, loadSchedulerProto, fieldMappings)
 		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error marshaling ConcurrencyLimiter to JSON: %v", err)
-		}
-
-		// Unmarshal the JSON into a map
-		var data map[string]interface{}
-		if err2 := json.Unmarshal(jsonStr, &data); err2 != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON: %v", err)
-		}
-
-		// Modify the .load_actuator field in the JSON to .actuator since the field name changed
-		data["actuator"] = data["load_actuator"]
-		delete(data, "load_actuator")
-
-		actuator := data["scheduler"].(map[string]interface{})
-		// Modify the .out_ports.accepted_concurrency and .out_ports.incoming_concurrency fields in the JSON to .out_ports.accepted_token_rate and .out_ports.incoming_token_rate since the field name changed
-		outPorts := actuator["out_ports"]
-		if outPorts != nil {
-			outPortsMap := outPorts.(map[string]interface{})
-			acceptedConcurrency := outPortsMap["accepted_concurrency"]
-			if acceptedConcurrency != nil {
-				outPortsMap["accepted_token_rate"] = acceptedConcurrency
-				delete(outPortsMap, "accepted_concurrency")
-			}
-			incomingConcurrency := outPortsMap["incoming_concurrency"]
-			if incomingConcurrency != nil {
-				outPortsMap["incoming_token_rate"] = incomingConcurrency
-				delete(outPortsMap, "incoming_concurrency")
-			}
-		}
-
-		// Marshal the modified map back into JSON
-		newJSONStr, err := json.Marshal(data)
-		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error marshaling modified JSON: %v", err)
-		}
-
-		err = protojson.Unmarshal(newJSONStr, loadSchedulerProto)
-		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to LoadScheduler: %v", err)
+			return Tree{}, nil, nil, err
 		}
 		isLoadScheduler = true
 	}
@@ -86,43 +51,14 @@ func newFlowControlCompositeAndOptions(
 		adaptiveLoadSchedulerProto = proto
 		isAdaptiveLoadScheduler = true
 	} else if aimdConcurrencyControllerProto := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyControllerProto != nil {
-		// Convert from *policylangv1.FlowControl_AimdConcurrencyController to *policylangv1.FlowControl_AdaptiveLoadScheduler since they have mostly same fields
-		jsonStr, err := json.Marshal(aimdConcurrencyControllerProto)
+		// Convert from *policylangv1.FlowControl_AimdConcurrencyController to *policylangv1.FlowControl_AdaptiveLoadScheduler
+		fieldMappings := map[string]string{
+			"out_ports.accepted_concurrency": "accepted_token_rate",
+			"out_ports.incoming_concurrency": "incoming_token_rate",
+		}
+		err := convertOldComponentToNew(aimdConcurrencyControllerProto, adaptiveLoadSchedulerProto, fieldMappings)
 		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error marshaling AimdConcurrencyController to JSON: %v", err)
-		}
-
-		// Unmarshal the JSON into a map
-		var data map[string]interface{}
-		if err2 := json.Unmarshal(jsonStr, &data); err2 != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON: %v", err)
-		}
-
-		// Modify the .out_ports.accepted_concurrency and .out_ports.incoming_concurrency fields in the JSON to .out_ports.accepted_token_rate and .out_ports.incoming_token_rate since the field name changed
-		outPorts := data["out_ports"]
-		if outPorts != nil {
-			outPortsMap := outPorts.(map[string]interface{})
-			acceptedConcurrency := outPortsMap["accepted_concurrency"]
-			if acceptedConcurrency != nil {
-				outPortsMap["accepted_token_rate"] = acceptedConcurrency
-				delete(outPortsMap, "accepted_concurrency")
-			}
-			incomingConcurrency := outPortsMap["incoming_concurrency"]
-			if incomingConcurrency != nil {
-				outPortsMap["incoming_token_rate"] = incomingConcurrency
-				delete(outPortsMap, "incoming_concurrency")
-			}
-		}
-
-		// Marshal the modified map back into JSON
-		newJSONStr, err := json.Marshal(data)
-		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error marshaling modified JSON: %v", err)
-		}
-
-		err = protojson.Unmarshal(newJSONStr, adaptiveLoadSchedulerProto)
-		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to AdaptiveLoadScheduler: %v", err)
+			return Tree{}, nil, nil, err
 		}
 		isAdaptiveLoadScheduler = true
 	}
@@ -133,31 +69,13 @@ func newFlowControlCompositeAndOptions(
 		loadRampProto = proto
 		isLoadRamp = true
 	} else if loadShaperProto := flowControlComponentProto.GetLoadShaper(); loadShaperProto != nil {
-		// Convert from *policylangv1.FlowControl_LoadShaper to *policylangv1.FlowControl_LoadRamp since they have mostly same fields
-		jsonStr, err := json.Marshal(loadShaperProto)
-		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error marshaling LoadShaper to JSON: %v", err)
+		// Convert from *policylangv1.FlowControl_LoadShaper to *policylangv1.FlowControl_LoadRamp
+		fieldMappings := map[string]string{
+			"flow_regulator_parameters": "regulator_parameters",
 		}
-
-		// Unmarshal the JSON into a map
-		var data map[string]interface{}
-		if err2 := json.Unmarshal(jsonStr, &data); err2 != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON: %v", err)
-		}
-
-		// Modify the .flow_regulator_parameters field in the JSON to .regulator_parameters since the field name changed
-		data["regulator_parameters"] = data["flow_regulator_parameters"]
-		delete(data, "flow_regulator_parameters")
-
-		// Marshal the modified map back into JSON
-		newJSONStr, err := json.Marshal(data)
+		err := convertOldComponentToNew(loadShaperProto, loadRampProto, fieldMappings)
 		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error marshaling modified JSON: %v", err)
-		}
-
-		err = protojson.Unmarshal(newJSONStr, loadRampProto)
-		if err != nil {
-			return Tree{}, nil, nil, fmt.Errorf("error unmarshaling JSON to LoadRamp: %v", err)
+			return Tree{}, nil, nil, err
 		}
 		isLoadRamp = true
 	}
