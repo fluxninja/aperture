@@ -18,20 +18,20 @@ policy:
         # Service Name.
         # Type: string
         # Required: True
-        service: service3-demo-app.demoapp.svc.cluster.local
+        service: any
       flow_matcher:
         # Control Point Name.
         # Type: string
         # Required: True
-        control_point: ingress
+        control_point: service3-demo-app
   # List of classification rules.
   # Type: []aperture.spec.v1.Classifier
   classifiers:
     - flow_selector: &concurrency_flow_selector
         service_selector:
-          service: service1-demo-app.demoapp.svc.cluster.local
+          service: any
         flow_matcher:
-          control_point: ingress
+          control_point: service1-demo-app
       rules:
         user_type:
           extractor:
@@ -68,12 +68,12 @@ policy:
         rate_limiter:
           flow_selector:
             service_selector:
-              service: service1-demo-app.demoapp.svc.cluster.local
+              service: any
             flow_matcher:
               label_matcher:
                 match_labels:
                   "http.request.header.user_type": "bot"
-              control_point: ingress
+              control_point: service1-demo-app
           in_ports:
             limit:
               signal_name: RATE_LIMIT

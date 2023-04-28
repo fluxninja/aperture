@@ -32,7 +32,7 @@ local tp = otlp_tracer_provider_new(simple_span_processor, {
 })
 local otlp_tracer = tp:tracer("aperture-lua")
 
-return function(destination_hostname, destination_port)
+return function(destination_hostname, destination_port, control_point)
   local request = ngx.req
   request.read_body()
   local request_headers = ngx.req.get_headers()
@@ -83,7 +83,7 @@ return function(destination_hostname, destination_port)
       protocol = ngx.var.server_protocol,
       body = request.get_body_data()
     },
-    control_point = "ingress"
+    control_point = control_point
   }
 
   local request_body_json = json.encode(request_body)
