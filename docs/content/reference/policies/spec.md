@@ -286,7 +286,7 @@ Observed Load multiplier is the ratio of accepted concurrency to the incoming co
 
 <!-- vale on -->
 
-_Adaptive Load Scheduler_ adapts the accepted token rate based on deviation of signal from the setpoint.
+The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -298,7 +298,7 @@ _Adaptive Load Scheduler_ adapts the accepted token rate based on deviation of s
 
 <!-- vale on -->
 
-Configuration for embedded Alerter.
+Configuration parameters for the embedded Alerter.
 
 </dd>
 <dt>default_config</dt>
@@ -310,7 +310,7 @@ Configuration for embedded Alerter.
 
 <!-- vale on -->
 
-Default configuration.
+Default dynamic configuration for load actuation.
 
 </dd>
 <dt>dynamic_config_key</dt>
@@ -334,7 +334,7 @@ Dynamic configuration key for load actuation.
 
 <!-- vale on -->
 
-_Flow Selector_ selects the _Flows_ at which the _Load Scheduler_ is applied.
+_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -346,7 +346,7 @@ _Flow Selector_ selects the _Flows_ at which the _Load Scheduler_ is applied.
 
 <!-- vale on -->
 
-Gradient parameters for the controller.
+Parameters for the _Gradient Controller_.
 
 </dd>
 <dt>in_ports</dt>
@@ -358,7 +358,7 @@ Gradient parameters for the controller.
 
 <!-- vale on -->
 
-Input ports for the _Adaptive Load Scheduler_ component.
+Collection of input ports for the _Adaptive Load Scheduler_ component.
 
 </dd>
 <dt>load_multiplier_linear_increment</dt>
@@ -382,7 +382,7 @@ Linear increment to load multiplier in each execution tick when the system is no
 
 <!-- vale on -->
 
-Accepted token rate is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes in incoming token rate.
+The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
 
 </dd>
 <dt>out_ports</dt>
@@ -394,7 +394,7 @@ Accepted token rate is multiplied with this number to dynamically calculate the 
 
 <!-- vale on -->
 
-Output ports for the _Adaptive Load Scheduler_ component.
+Collection of output ports for the _Adaptive Load Scheduler_ component.
 
 </dd>
 <dt>scheduler_parameters</dt>
@@ -406,7 +406,7 @@ Output ports for the _Adaptive Load Scheduler_ component.
 
 <!-- vale on -->
 
-Scheduler parameters.
+Parameters for the _Load Scheduler_.
 
 </dd>
 </dl>
@@ -419,7 +419,7 @@ Scheduler parameters.
 
 <!-- vale on -->
 
-Inputs for the _Adaptive Load Scheduler_ component.
+Input ports for the _Adaptive Load Scheduler_ component.
 
 <dl>
 <dt>enabled</dt>
@@ -431,7 +431,7 @@ Inputs for the _Adaptive Load Scheduler_ component.
 
 <!-- vale on -->
 
-The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.
 
 </dd>
 <dt>setpoint</dt>
@@ -443,7 +443,7 @@ The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By
 
 <!-- vale on -->
 
-The setpoint to the controller.
+The setpoint input to the controller.
 
 </dd>
 <dt>signal</dt>
@@ -455,7 +455,7 @@ The setpoint to the controller.
 
 <!-- vale on -->
 
-The signal to the controller.
+The input signal to the controller.
 
 </dd>
 </dl>
@@ -468,7 +468,7 @@ The signal to the controller.
 
 <!-- vale on -->
 
-Outputs for the _Adaptive Load Scheduler_ component.
+Output ports for the _Adaptive Load Scheduler_ component.
 
 <dl>
 <dt>accepted_token_rate</dt>
@@ -516,7 +516,7 @@ Incoming token rate is the number of tokens per second incoming to the service (
 
 <!-- vale on -->
 
-Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
 Deprecated: 1.6.0
 
 </dd>

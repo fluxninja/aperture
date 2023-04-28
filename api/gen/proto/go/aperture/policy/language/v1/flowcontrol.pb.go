@@ -1871,31 +1871,31 @@ func (x *LoadActuator) GetDefaultConfig() *LoadActuator_DynamicConfig {
 	return nil
 }
 
-// _Adaptive Load Scheduler_ adapts the accepted token rate based on deviation of signal from the setpoint.
+// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..
 type AdaptiveLoadScheduler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Input ports for the _Adaptive Load Scheduler_ component.
+	// Collection of input ports for the _Adaptive Load Scheduler_ component.
 	InPorts *AdaptiveLoadScheduler_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
-	// Output ports for the _Adaptive Load Scheduler_ component.
+	// Collection of output ports for the _Adaptive Load Scheduler_ component.
 	OutPorts *AdaptiveLoadScheduler_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// _Flow Selector_ selects the _Flows_ at which the _Load Scheduler_ is applied.
+	// _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
 	FlowSelector *FlowSelector `protobuf:"bytes,3,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Scheduler parameters.
+	// Parameters for the _Load Scheduler_.
 	SchedulerParameters *LoadScheduler_Scheduler_Parameters `protobuf:"bytes,4,opt,name=scheduler_parameters,json=schedulerParameters,proto3" json:"scheduler_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Gradient parameters for the controller.
+	// Parameters for the _Gradient Controller_.
 	GradientParameters *GradientController_Parameters `protobuf:"bytes,5,opt,name=gradient_parameters,json=gradientParameters,proto3" json:"gradient_parameters,omitempty"`
-	// Accepted token rate is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes in incoming token rate.
+	// The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,6,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,7,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.0025"` // @gotags: default:"0.0025"
-	// Configuration for embedded Alerter.
+	// Configuration parameters for the embedded Alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,8,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
 	// Dynamic configuration key for load actuation.
 	DynamicConfigKey string `protobuf:"bytes,9,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
-	// Default configuration.
+	// Default dynamic configuration for load actuation.
 	DefaultConfig *LoadScheduler_Actuator_DynamicConfig `protobuf:"bytes,10,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
 }
 
@@ -4222,17 +4222,17 @@ func (x *LoadActuator_Ins) GetLoadMultiplier() *InPort {
 	return nil
 }
 
-// Inputs for the _Adaptive Load Scheduler_ component.
+// Input ports for the _Adaptive Load Scheduler_ component.
 type AdaptiveLoadScheduler_Ins struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The signal to the controller.
+	// The input signal to the controller.
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
-	// The setpoint to the controller.
+	// The setpoint input to the controller.
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
-	// The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+	// The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.
 	Enabled *InPort `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
 }
 
@@ -4289,13 +4289,13 @@ func (x *AdaptiveLoadScheduler_Ins) GetEnabled() *InPort {
 	return nil
 }
 
-// Outputs for the _Adaptive Load Scheduler_ component.
+// Output ports for the _Adaptive Load Scheduler_ component.
 type AdaptiveLoadScheduler_Outs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+	// A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
 	// Deprecated: 1.6.0
 	IsOverload *OutPort `protobuf:"bytes,1,opt,name=is_overload,json=isOverload,proto3" json:"is_overload,omitempty"`
 	// Desired Load multiplier is the ratio of desired token rate to the incoming token rate.

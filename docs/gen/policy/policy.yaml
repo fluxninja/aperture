@@ -133,16 +133,16 @@ definitions:
         x-order: 4
         $ref: '#/definitions/OutPort'
   AdaptiveLoadScheduler:
-    description: _Adaptive Load Scheduler_ adapts the accepted token rate based on
-      deviation of signal from the setpoint.
+    description: The _Adaptive Load Scheduler_ adjusts the accepted token rate based
+      on the deviation of the input signal from the setpoint..
     type: object
     properties:
       alerter_parameters:
-        description: Configuration for embedded Alerter.
+        description: Configuration parameters for the embedded Alerter.
         x-order: 0
         $ref: '#/definitions/AlerterParameters'
       default_config:
-        description: Default configuration.
+        description: Default dynamic configuration for load actuation.
         x-order: 1
         $ref: '#/definitions/LoadSchedulerActuatorDynamicConfig'
       dynamic_config_key:
@@ -151,17 +151,17 @@ definitions:
         x-order: 2
       flow_selector:
         description: |+
-          _Flow Selector_ selects the _Flows_ at which the _Load Scheduler_ is applied.
+          _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
 
         x-go-tag-validate: required
         x-order: 3
         $ref: '#/definitions/FlowSelector'
       gradient_parameters:
-        description: Gradient parameters for the controller.
+        description: Parameters for the _Gradient Controller_.
         x-order: 4
         $ref: '#/definitions/GradientControllerParameters'
       in_ports:
-        description: Input ports for the _Adaptive Load Scheduler_ component.
+        description: Collection of input ports for the _Adaptive Load Scheduler_ component.
         x-order: 5
         $ref: '#/definitions/AdaptiveLoadSchedulerIns'
       load_multiplier_linear_increment:
@@ -175,7 +175,7 @@ definitions:
         x-order: 6
       max_load_multiplier:
         description: |+
-          Accepted token rate is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes in incoming token rate.
+          The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
 
         type: number
         format: double
@@ -183,35 +183,36 @@ definitions:
         x-go-tag-default: "2.0"
         x-order: 7
       out_ports:
-        description: Output ports for the _Adaptive Load Scheduler_ component.
+        description: Collection of output ports for the _Adaptive Load Scheduler_
+          component.
         x-order: 8
         $ref: '#/definitions/AdaptiveLoadSchedulerOuts'
       scheduler_parameters:
         description: |+
-          Scheduler parameters.
+          Parameters for the _Load Scheduler_.
 
         x-go-tag-validate: required
         x-order: 9
         $ref: '#/definitions/LoadSchedulerSchedulerParameters'
   AdaptiveLoadSchedulerIns:
-    description: Inputs for the _Adaptive Load Scheduler_ component.
+    description: Input ports for the _Adaptive Load Scheduler_ component.
     type: object
     properties:
       enabled:
-        description: The enabled port controls whether the _Load Scheduler_ can load
-          shed _Flows_. By default, the _Load Scheduler_ is enabled.
+        description: The enabled port determines if the _Load Scheduler_ can shed
+          _Flows_. By default, the Load Scheduler is enabled.
         x-order: 0
         $ref: '#/definitions/InPort'
       setpoint:
-        description: The setpoint to the controller.
+        description: The setpoint input to the controller.
         x-order: 1
         $ref: '#/definitions/InPort'
       signal:
-        description: The signal to the controller.
+        description: The input signal to the controller.
         x-order: 2
         $ref: '#/definitions/InPort'
   AdaptiveLoadSchedulerOuts:
-    description: Outputs for the _Adaptive Load Scheduler_ component.
+    description: Output ports for the _Adaptive Load Scheduler_ component.
     type: object
     properties:
       accepted_token_rate:
@@ -231,7 +232,7 @@ definitions:
         $ref: '#/definitions/OutPort'
       is_overload:
         title: |-
-          Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+          A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
           Deprecated: 1.6.0
         x-order: 3
         $ref: '#/definitions/OutPort'

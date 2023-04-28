@@ -120,16 +120,16 @@
       "additionalProperties": false
     },
     "AdaptiveLoadScheduler": {
-      "description": "_Adaptive Load Scheduler_ adapts the accepted token rate based on deviation of signal from the setpoint.",
+      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..",
       "properties": {
         "alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for embedded Alerter.",
+          "description": "Configuration parameters for the embedded Alerter.",
           "x-order": 0
         },
         "default_config": {
           "$ref": "#/definitions/LoadSchedulerActuatorDynamicConfig",
-          "description": "Default configuration.",
+          "description": "Default dynamic configuration for load actuation.",
           "x-order": 1
         },
         "dynamic_config_key": {
@@ -139,18 +139,18 @@
         },
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "_Flow Selector_ selects the _Flows_ at which the _Load Scheduler_ is applied.\n\n",
+          "description": "_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 3
         },
         "gradient_parameters": {
           "$ref": "#/definitions/GradientControllerParameters",
-          "description": "Gradient parameters for the controller.",
+          "description": "Parameters for the _Gradient Controller_.",
           "x-order": 4
         },
         "in_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerIns",
-          "description": "Input ports for the _Adaptive Load Scheduler_ component.",
+          "description": "Collection of input ports for the _Adaptive Load Scheduler_ component.",
           "x-order": 5
         },
         "load_multiplier_linear_increment": {
@@ -163,7 +163,7 @@
         },
         "max_load_multiplier": {
           "default": 2,
-          "description": "Accepted token rate is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes in incoming token rate.\n\n",
+          "description": "The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "2.0",
@@ -171,12 +171,12 @@
         },
         "out_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerOuts",
-          "description": "Output ports for the _Adaptive Load Scheduler_ component.",
+          "description": "Collection of output ports for the _Adaptive Load Scheduler_ component.",
           "x-order": 8
         },
         "scheduler_parameters": {
           "$ref": "#/definitions/LoadSchedulerSchedulerParameters",
-          "description": "Scheduler parameters.\n\n",
+          "description": "Parameters for the _Load Scheduler_.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 9
         }
@@ -185,21 +185,21 @@
       "additionalProperties": false
     },
     "AdaptiveLoadSchedulerIns": {
-      "description": "Inputs for the _Adaptive Load Scheduler_ component.",
+      "description": "Input ports for the _Adaptive Load Scheduler_ component.",
       "properties": {
         "enabled": {
           "$ref": "#/definitions/InPort",
-          "description": "The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.",
+          "description": "The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.",
           "x-order": 0
         },
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint to the controller.",
+          "description": "The setpoint input to the controller.",
           "x-order": 1
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The signal to the controller.",
+          "description": "The input signal to the controller.",
           "x-order": 2
         }
       },
@@ -207,7 +207,7 @@
       "additionalProperties": false
     },
     "AdaptiveLoadSchedulerOuts": {
-      "description": "Outputs for the _Adaptive Load Scheduler_ component.",
+      "description": "Output ports for the _Adaptive Load Scheduler_ component.",
       "properties": {
         "accepted_token_rate": {
           "$ref": "#/definitions/OutPort",
@@ -226,7 +226,7 @@
         },
         "is_overload": {
           "$ref": "#/definitions/OutPort",
-          "title": "Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.\nDeprecated: 1.6.0",
+          "title": "A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.\nDeprecated: 1.6.0",
           "x-order": 3
         },
         "observed_load_multiplier": {

@@ -998,21 +998,21 @@ message LoadActuator {
   DynamicConfig default_config = 3;
 }
 
-// _Adaptive Load Scheduler_ adapts the accepted token rate based on deviation of signal from the setpoint.
+// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..
 message AdaptiveLoadScheduler {
-  // Inputs for the _Adaptive Load Scheduler_ component.
+  // Input ports for the _Adaptive Load Scheduler_ component.
   message Ins {
-    // The signal to the controller.
+    // The input signal to the controller.
     InPort signal = 1;
-    // The setpoint to the controller.
+    // The setpoint input to the controller.
     InPort setpoint = 2;
-    // The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+    // The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.
     InPort enabled = 3;
   }
 
-  // Outputs for the _Adaptive Load Scheduler_ component.
+  // Output ports for the _Adaptive Load Scheduler_ component.
   message Outs {
-    // Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+    // A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
     // Deprecated: 1.6.0
     OutPort is_overload = 1;
     // Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
@@ -1025,34 +1025,34 @@ message AdaptiveLoadScheduler {
     OutPort incoming_token_rate = 5;
   }
 
-  // Input ports for the _Adaptive Load Scheduler_ component.
+  // Collection of input ports for the _Adaptive Load Scheduler_ component.
   Ins in_ports = 1;
 
-  // Output ports for the _Adaptive Load Scheduler_ component.
+  // Collection of output ports for the _Adaptive Load Scheduler_ component.
   Outs out_ports = 2;
 
-  // _Flow Selector_ selects the _Flows_ at which the _Load Scheduler_ is applied.
+  // _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
   FlowSelector flow_selector = 3; // @gotags: validate:"required"
 
-  // Scheduler parameters.
+  // Parameters for the _Load Scheduler_.
   LoadScheduler.Scheduler.Parameters scheduler_parameters = 4; // @gotags: validate:"required"
 
-  // Gradient parameters for the controller.
+  // Parameters for the _Gradient Controller_.
   GradientController.Parameters gradient_parameters = 5;
 
-  // Accepted token rate is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes in incoming token rate.
+  // The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
   double max_load_multiplier = 6; // @gotags: default:"2.0"
 
   // Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
   double load_multiplier_linear_increment = 7; // @gotags: default:"0.0025"
 
-  // Configuration for embedded Alerter.
+  // Configuration parameters for the embedded Alerter.
   Alerter.Parameters alerter_parameters = 8;
 
   // Dynamic configuration key for load actuation.
   string dynamic_config_key = 9;
 
-  // Default configuration.
+  // Default dynamic configuration for load actuation.
   LoadScheduler.Actuator.DynamicConfig default_config = 10;
 }
 
