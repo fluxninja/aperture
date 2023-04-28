@@ -2213,7 +2213,7 @@ func (x *FlowRegulator) GetDefaultConfig() *FlowRegulator_DynamicConfig {
 //
 // :::info
 //
-// See also [_Load Regulator overview](/concepts/flow-control/components/load-regulator.md).
+// See also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).
 //
 // :::
 type Regulator struct {

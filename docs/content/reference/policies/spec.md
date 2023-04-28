@@ -7805,7 +7805,7 @@ flows at random or by sticky sessions.
 
 :::info
 
-See also [\_Load Regulator overview](/concepts/flow-control/components/load-regulator.md).
+See also [\_Load Regulator overview](/concepts/flow-control/components/regulator.md).
 
 :::
 
