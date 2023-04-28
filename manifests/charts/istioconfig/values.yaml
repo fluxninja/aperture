@@ -18,3 +18,13 @@ envoyFilter:
   maxRequestBytes: 8192
   ## @param envoyFilter.sidecarMode Aperture Agent installed using the Sidecar mode
   sidecarMode: false
+  ## @param envoyFilter.workloadSelector Workload selector for Istio EnvoyFilter. Refer https://istio.io/latest/docs/reference/config/type/workload-selector/ for more details.
+  ## Example:
+  ## workloadSelector:
+  ##   labels:
+  ##     app: service1
+  workloadSelector: {}
+  ## @param envoyFilter.inboundRequestControlPoint Specifies the control point for inbound requests, used to refer the service in Aperture Policy.
+  inboundRequestControlPoint: ~
+  ## @param envoyFilter.outboundRequestControlPoint Specifies the control point for outbound requests, used to refer the service in Aperture Policy.
+  outboundRequestControlPoint: ~
