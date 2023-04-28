@@ -175,7 +175,7 @@ Inputs for the AIMDConcurrencyController component.
 
 <!-- vale on -->
 
-The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+The enabled port controls whether the _Adaptive Load Scheduler_ can load shed _Flows_. By default, the _Adaptive Load Scheduler_ is enabled.
 
 </dd>
 <dt>setpoint</dt>

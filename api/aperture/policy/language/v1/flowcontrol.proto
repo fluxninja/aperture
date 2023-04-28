@@ -1064,7 +1064,7 @@ message AIMDConcurrencyController {
     InPort signal = 1;
     // The setpoint to the controller.
     InPort setpoint = 2;
-    // The enabled port controls whether the _Load Scheduler_ can load shed _Flows_. By default, the _Load Scheduler_ is enabled.
+    // The enabled port controls whether the _Adaptive Load Scheduler_ can load shed _Flows_. By default, the _Adaptive Load Scheduler_ is enabled.
     InPort enabled = 3;
   }
 

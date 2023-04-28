@@ -733,7 +733,7 @@ at runtime, without reloading the policy.
 
 <ParameterDescription
     name='regulator'
-    description='Default configuration for load regulator that can be updated at the runtime without shutting down the policy.'
+    description='Default configuration for _Regulator_ that can be updated at the runtime without shutting down the policy.'
     type='Object (aperture.spec.v1.RegulatorDynamicConfig)'
     reference='../../../spec#regulator-dynamic-config'
     value='"__REQUIRED_FIELD__"'
