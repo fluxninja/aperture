@@ -19,4 +19,10 @@
   withRulesMixin(rules):: {
     rules+: rules,
   },
+  withSelectors(selectors):: {
+    selectors: selectors,
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
 }

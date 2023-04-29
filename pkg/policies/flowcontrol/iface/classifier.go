@@ -31,4 +31,7 @@ type Classifier interface {
 
 	// GetRequestCounter returns the counter for the classifier.
 	GetRequestCounter() prometheus.Counter
+
+	// GetSelectors returns the selectors.
+	GetSelectors() *policylangv1.Selectors
 }

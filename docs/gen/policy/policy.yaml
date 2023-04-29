@@ -42,10 +42,9 @@ definitions:
         type: string
         x-order: 2
       flow_selector:
-        description: |+
+        description: |-
           Flow Selector decides the service and flows at which the concurrency limiter is applied.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 3
         $ref: '#/definitions/FlowSelector'
       gradient_parameters:
@@ -85,6 +84,10 @@ definitions:
         x-go-tag-validate: required
         x-order: 9
         $ref: '#/definitions/SchedulerParameters'
+      selectors:
+        description: Selectors for the component.
+        x-order: 10
+        $ref: '#/definitions/Selectors'
   AIMDConcurrencyControllerIns:
     description: Inputs for the AIMDConcurrencyController component.
     type: object
@@ -150,10 +153,9 @@ definitions:
         type: string
         x-order: 2
       flow_selector:
-        description: |+
+        description: |-
           _Flow Selector_ selects the _Flows_ at which the _Load Scheduler_ is applied.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 3
         $ref: '#/definitions/FlowSelector'
       gradient_parameters:
@@ -193,6 +195,10 @@ definitions:
         x-go-tag-validate: required
         x-order: 9
         $ref: '#/definitions/LoadSchedulerSchedulerParameters'
+      selectors:
+        description: Selectors for the component.
+        x-order: 10
+        $ref: '#/definitions/Selectors'
   AdaptiveLoadSchedulerIns:
     description: Inputs for the _Adaptive Load Scheduler_ component.
     type: object
@@ -667,10 +673,9 @@ definitions:
     title: Set of classification rules sharing a common selector
     properties:
       flow_selector:
-        description: |+
+        description: |-
           Defines where to apply the flow classification rule.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 0
         $ref: '#/definitions/FlowSelector'
       rego:
@@ -692,6 +697,13 @@ definitions:
           $ref: '#/definitions/Rule'
         x-go-tag-validate: dive,keys,required,endkeys,required
         x-order: 2
+      selectors:
+        description: |+
+          Selectors for flows that will be classified by this _Classifier_.
+
+        x-go-tag-validate: required
+        x-order: 3
+        $ref: '#/definitions/Selectors'
   Component:
     description: |-
       :::info
@@ -880,10 +892,9 @@ definitions:
       provide active service protection
     properties:
       flow_selector:
-        description: |+
+        description: |-
           Flow Selector decides the service and flows at which the concurrency limiter is applied.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 0
         $ref: '#/definitions/FlowSelector'
       load_actuator:
@@ -903,6 +914,13 @@ definitions:
         x-go-tag-validate: required
         x-order: 2
         $ref: '#/definitions/Scheduler'
+      selectors:
+        description: |+
+          Selectors for the component.
+
+        x-go-tag-validate: required
+        x-order: 3
+        $ref: '#/definitions/Selectors'
   ConstantSignal:
     description: Special constant input for ports and Variable component. Can provide
       either a constant value or special Nan/+-Inf value.
@@ -1478,6 +1496,8 @@ definitions:
               - label: user_agent
                 regex: ^(?!.*Chrome).*Safari
       ```
+
+      Deprecated 1.8.0: Use `selectors` instead.
     type: object
     title: |-
       Describes which flows a [flow control
@@ -1566,10 +1586,9 @@ definitions:
     type: object
     properties:
       flow_selector:
-        description: |+
+        description: |-
           _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 0
         $ref: '#/definitions/FlowSelector'
       label_key:
@@ -1582,6 +1601,10 @@ definitions:
             Percentage of flows are selected randomly for rejection.
         type: string
         x-order: 1
+      selectors:
+        description: Selectors for the component.
+        x-order: 2
+        $ref: '#/definitions/Selectors'
   FlowSelector:
     description: |-
       Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control
@@ -1592,6 +1615,8 @@ definitions:
       See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
       :::
+
+      Deprecated 1.8.0: Use `selectors` instead.
     type: object
     properties:
       flow_matcher:
@@ -1650,14 +1675,23 @@ definitions:
         x-order: 2
         $ref: '#/definitions/FluxMeterExponentialBucketsRange'
       flow_selector:
-        description: The selection criteria for the traffic that will be measured.
+        description: |-
+          The selection criteria for the traffic that will be measured.
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 3
         $ref: '#/definitions/FlowSelector'
       linear_buckets:
         x-order: 4
         $ref: '#/definitions/FluxMeterLinearBuckets'
-      static_buckets:
+      selectors:
+        description: |+
+          Selectors for the component.
+
+        x-go-tag-validate: required
         x-order: 5
+        $ref: '#/definitions/Selectors'
+      static_buckets:
+        x-order: 6
         $ref: '#/definitions/FluxMeterStaticBuckets'
   FluxMeterExponentialBuckets:
     description: |-
@@ -2558,10 +2592,9 @@ definitions:
         x-order: 0
         $ref: '#/definitions/LoadSchedulerActuator'
       flow_selector:
-        description: |+
+        description: |-
           Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 1
         $ref: '#/definitions/FlowSelector'
       scheduler:
@@ -2574,6 +2607,10 @@ definitions:
         x-go-tag-validate: required
         x-order: 2
         $ref: '#/definitions/LoadSchedulerScheduler'
+      selectors:
+        description: Selectors for the component.
+        x-order: 3
+        $ref: '#/definitions/Selectors'
   LoadSchedulerActuator:
     type: object
     title: Takes the load multiplier input signal and publishes it to the schedulers
@@ -3618,10 +3655,9 @@ definitions:
         title: Configuration key for DynamicConfig
         x-order: 1
       flow_selector:
-        description: |+
+        description: |-
           Which control point to apply this rate limiter to.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 2
         $ref: '#/definitions/FlowSelector'
       in_ports:
@@ -3634,6 +3670,13 @@ definitions:
         x-go-tag-validate: required
         x-order: 4
         $ref: '#/definitions/RateLimiterParameters'
+      selectors:
+        description: |+
+          Selectors for the component.
+
+        x-go-tag-validate: required
+        x-order: 5
+        $ref: '#/definitions/Selectors'
   RateLimiterDynamicConfig:
     type: object
     title: Dynamic Configuration for the rate limiter
@@ -3888,10 +3931,9 @@ definitions:
     type: object
     properties:
       flow_selector:
-        description: |+
+        description: |-
           _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
-
-        x-go-tag-validate: required
+          Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
         x-order: 0
         $ref: '#/definitions/FlowSelector'
       label_key:
@@ -3904,6 +3946,10 @@ definitions:
             Percentage of flows are selected randomly for rejection.
         type: string
         x-order: 1
+      selectors:
+        description: Selectors for the component.
+        x-order: 2
+        $ref: '#/definitions/Selectors'
   Resources:
     description: |-
       :::info
@@ -4239,6 +4285,116 @@ definitions:
         type: string
         format: uint64
         x-order: 2
+  Selector:
+    description: |-
+      Selects flows based on control point, flow labels, agent group and the service
+      that the [flow control component](/concepts/flow-control/flow-control.md#components)
+      will operate on.
+
+      :::info
+
+      See also [Selector overview](/concepts/flow-control/selector.md).
+
+      :::
+
+      Example:
+      ```yaml
+      control_point: ingress
+      label_matcher:
+        match_labels:
+          user_tier: gold
+        match_expressions:
+          - key: query
+            operator: In
+            values:
+              - insert
+              - delete
+        expression:
+          label_matches:
+              - label: user_agent
+                regex: ^(?!.*Chrome).*Safari
+      ```
+    type: object
+    required:
+    - control_point
+    properties:
+      agent_group:
+        description: |+
+          [_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) this
+          selector applies to.
+
+          :::info
+
+          Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+          The agents within an agent group receive exact same policy configuration and
+          form a peer to peer cluster to constantly share state.
+
+          :::
+
+        type: string
+        default: default
+        x-go-tag-default: default
+        x-order: 0
+      control_point:
+        description: |+
+          [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+          identifies location within services where policies can act on flows.
+          For an SDK based insertion,
+          a _Control Point_ can represent a particular feature or execution
+          block within a service. In case of service mesh or middleware insertion, a
+          _Control Point_ can identify ingress or egress calls or distinct listeners
+          or filter chains.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 1
+      label_matcher:
+        description: |-
+          [Label Matcher](/concepts/flow-control/flow-selector.md#label-matcher)
+          can be used to match flows based on flow labels.
+        x-order: 2
+        $ref: '#/definitions/LabelMatcher'
+      service:
+        description: |+
+          The Fully Qualified Domain Name of the
+          [service](/concepts/flow-control/flow-selector.md) to select.
+
+          In Kubernetes, this is the FQDN of the Service object.
+
+          :::info
+
+          `any` matches all services.
+
+          :::
+
+          :::info
+
+          An entity (for example, Kubernetes pod) might belong to multiple services.
+
+          :::
+
+        type: string
+        default: any
+        x-go-tag-default: any
+        x-order: 3
+  Selectors:
+    description: |-
+      Selectors scope the policies to a subset of flows based on flow and infrastructure
+      attributes. Multiple selectors can be provided and flows matching any of the selectors
+      will be selected for actuation.
+    type: object
+    required:
+    - selectors
+    properties:
+      selectors:
+        type: array
+        title: List of selectors
+        minItems: 1
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required,gt=0,dive
+        x-order: 0
   ServiceSelector:
     description: |-
       :::info
@@ -4246,6 +4402,8 @@ definitions:
       See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
       :::
+
+      Deprecated 1.8.0: Use `selectors` instead.
     type: object
     title: |-
       Describes which service a [flow control or observability

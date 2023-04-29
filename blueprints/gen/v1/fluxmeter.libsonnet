@@ -31,6 +31,12 @@
   withLinearBucketsMixin(linear_buckets):: {
     linear_buckets+: linear_buckets,
   },
+  withSelectors(selectors):: {
+    selectors: selectors,
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
   withStaticBuckets(static_buckets):: {
     static_buckets: static_buckets,
   },

@@ -77,3 +77,17 @@ func (mr *MockClassifierMockRecorder) GetRequestCounter() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockClassifier)(nil).GetRequestCounter))
 }
+
+// GetSelectors mocks base method.
+func (m *MockClassifier) GetSelectors() *languagev1.Selectors {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSelectors")
+	ret0, _ := ret[0].(*languagev1.Selectors)
+	return ret0
+}
+
+// GetSelectors indicates an expected call of GetSelectors.
+func (mr *MockClassifierMockRecorder) GetSelectors() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelectors", reflect.TypeOf((*MockClassifier)(nil).GetSelectors))
+}
