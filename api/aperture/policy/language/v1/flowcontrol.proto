@@ -7,6 +7,86 @@ import "aperture/policy/language/v1/ports.proto";
 import "aperture/policy/language/v1/std_components.proto";
 import "google/protobuf/duration.proto";
 
+// Selectors scope the policies to a subset of flows based on flow and infrastructure
+// attributes. Multiple selectors can be provided and flows matching any of the selectors
+// will be selected for actuation.
+message Selectors {
+  // List of selectors
+  repeated Selector selectors = 1; // @gotags: validate:"required,gt=0,dive"
+}
+
+// Selects flows based on control point, flow labels, agent group and the service
+// that the [flow control component](/concepts/flow-control/flow-control.md#components)
+// will operate on.
+//
+// :::info
+//
+// See also [Selector overview](/concepts/flow-control/selector.md).
+//
+// :::
+//
+// Example:
+// ```yaml
+// control_point: ingress
+// label_matcher:
+//   match_labels:
+//     user_tier: gold
+//   match_expressions:
+//     - key: query
+//       operator: In
+//       values:
+//         - insert
+//         - delete
+//   expression:
+//     label_matches:
+//         - label: user_agent
+//           regex: ^(?!.*Chrome).*Safari
+// ```
+message Selector {
+  // [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+  // identifies location within services where policies can act on flows.
+  // For an SDK based insertion,
+  // a _Control Point_ can represent a particular feature or execution
+  // block within a service. In case of service mesh or middleware insertion, a
+  // _Control Point_ can identify ingress or egress calls or distinct listeners
+  // or filter chains.
+  string control_point = 1; // @gotags: validate:"required"
+
+  // [_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) this
+  // selector applies to.
+  //
+  // :::info
+  //
+  // Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+  // The agents within an agent group receive exact same policy configuration and
+  // form a peer to peer cluster to constantly share state.
+  //
+  // :::
+  string agent_group = 2; // @gotags: default:"default"
+
+  // The Fully Qualified Domain Name of the
+  // [service](/concepts/flow-control/flow-selector.md) to select.
+  //
+  // In Kubernetes, this is the FQDN of the Service object.
+  //
+  // :::info
+  //
+  // `any` matches all services.
+  //
+  // :::
+  //
+  // :::info
+  //
+  // An entity (for example, Kubernetes pod) might belong to multiple services.
+  //
+  // :::
+  string service = 3; // @gotags: default:"any"
+
+  // [Label Matcher](/concepts/flow-control/flow-selector.md#label-matcher)
+  // can be used to match flows based on flow labels.
+  LabelMatcher label_matcher = 4;
+}
+
 // Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control
 // component](/concepts/flow-control/flow-control.md#components) operates on.
 //
@@ -15,6 +95,8 @@ import "google/protobuf/duration.proto";
 // See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 //
 // :::
+//
+// Deprecated 1.8.0: Use `selectors` instead.
 message FlowSelector {
   // Match agent group and service
   ServiceSelector service_selector = 1; // @gotags: validate:"required"
@@ -31,6 +113,8 @@ message FlowSelector {
 // See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 //
 // :::
+//
+// Deprecated 1.8.0: Use `selectors` instead.
 message ServiceSelector {
   // Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
   // selector applies to.
@@ -96,6 +180,8 @@ message ServiceSelector {
 //         - label: user_agent
 //           regex: ^(?!.*Chrome).*Safari
 // ```
+//
+// Deprecated 1.8.0: Use `selectors` instead.
 message FlowMatcher {
   // [Control Point](/concepts/flow-control/flow-selector.md#control-point)
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
@@ -208,7 +294,8 @@ message FluxMeter {
   }
 
   // The selection criteria for the traffic that will be measured.
-  FlowSelector flow_selector = 1;
+  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // Latency histogram buckets (in ms) for this Flux Meter.
   oneof histogram_buckets {
@@ -228,6 +315,9 @@ message FluxMeter {
   // :::
   //
   string attribute_key = 6; // @gotags: default:"workload_duration_ms"
+
+  // Selectors for the component.
+  Selectors selectors = 7; // @gotags: validate:"required_without=FlowSelector"
 }
 
 // Set of classification rules sharing a common selector
@@ -259,7 +349,8 @@ message FluxMeter {
 // ```
 message Classifier {
   // Defines where to apply the flow classification rule.
-  FlowSelector flow_selector = 1; // @gotags: validate:"required"
+  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // A map of {key, value} pairs mapping from
   // [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
@@ -272,6 +363,9 @@ message Classifier {
   // It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
   // For simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.
   Rego rego = 3;
+
+  // Selectors for flows that will be classified by this _Classifier_.
+  Selectors selectors = 4; // @gotags: validate:"required_without=FlowSelector"
 }
 
 // Rule describes a single classification Rule
@@ -576,7 +670,7 @@ message RateLimiter {
     // label set up, set `label_key: "user"`.
     string label_key = 2; // @gotags: validate:"required"
 
-    // Configuration of lazy-syncing behaviour of rate limiter
+    // Configuration of lazy-syncing behavior of rate limiter
     LazySync lazy_sync = 3;
 
     // Flow label key that will be used to override the number of tokens
@@ -620,7 +714,8 @@ message RateLimiter {
   Ins in_ports = 1; // @gotags: validate:"required"
 
   // Which control point to apply this rate limiter to.
-  FlowSelector flow_selector = 2; // @gotags: validate:"required"
+  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  FlowSelector flow_selector = 2; // @gotags: validate:"required_without=Selectors"
 
   // Parameters for the RateLimiter component
   Parameters parameters = 3; // @gotags: validate:"required"
@@ -630,6 +725,9 @@ message RateLimiter {
 
   // Default configuration
   DynamicConfig default_config = 5;
+
+  // Selectors for the component.
+  Selectors selectors = 6; // @gotags: validate:"required_without=FlowSelector"
 }
 
 // _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
@@ -644,7 +742,8 @@ message RateLimiter {
 // strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 message ConcurrencyLimiter {
   // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  FlowSelector flow_selector = 1; // @gotags: validate:"required"
+  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // Configuration of Weighted Fair Queuing-based workload scheduler.
   //
@@ -658,6 +757,8 @@ message ConcurrencyLimiter {
     // Actuation strategy defines the input signal that will drive the scheduler.
     LoadActuator load_actuator = 3;
   }
+  // Selectors for the component.
+  Selectors selectors = 4; // @gotags: validate:"required_without=FlowSelector"
 }
 
 // _Load Scheduler_ is an actuator component that regulates flows to provide active service protection
@@ -829,7 +930,8 @@ message LoadScheduler {
   }
 
   // Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-  FlowSelector flow_selector = 1; // @gotags: validate:"required"
+  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // Configuration of Weighted Fair Queuing-based workload scheduler.
   //
@@ -839,6 +941,9 @@ message LoadScheduler {
 
   // Actuator based on limiting the accepted token rate under incoming token rate * load multiplier.
   Actuator actuator = 3;
+
+  // Selectors for the component.
+  Selectors selectors = 4; // @gotags: validate:"required_without=FlowSelector"
 }
 
 // Weighted Fair Queuing-based workload scheduler
@@ -1032,7 +1137,8 @@ message AdaptiveLoadScheduler {
   Outs out_ports = 2;
 
   // _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
-  FlowSelector flow_selector = 3; // @gotags: validate:"required"
+  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  FlowSelector flow_selector = 3; // @gotags: validate:"required_without=Selectors"
 
   // Parameters for the _Load Scheduler_.
   LoadScheduler.Scheduler.Parameters scheduler_parameters = 4; // @gotags: validate:"required"
@@ -1054,6 +1160,9 @@ message AdaptiveLoadScheduler {
 
   // Default dynamic configuration for load actuation.
   LoadScheduler.Actuator.DynamicConfig default_config = 10;
+
+  // Selectors for the component.
+  Selectors selectors = 11; // @gotags: validate:"required_without=FlowSelector"
 }
 
 // High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
@@ -1090,7 +1199,8 @@ message AIMDConcurrencyController {
   Outs out_ports = 2;
 
   // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  FlowSelector flow_selector = 3; // @gotags: validate:"required"
+  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  FlowSelector flow_selector = 3; // @gotags: validate:"required_without=Selectors"
 
   // Scheduler parameters.
   Scheduler.Parameters scheduler_parameters = 4; // @gotags: validate:"required"
@@ -1112,6 +1222,9 @@ message AIMDConcurrencyController {
 
   // Default configuration.
   LoadActuator.DynamicConfig default_config = 10;
+
+  // Selectors for the component.
+  Selectors selectors = 11; // @gotags: validate:"required_without=FlowSelector"
 }
 
 // _Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
@@ -1124,7 +1237,8 @@ message FlowRegulator {
 
   message Parameters {
     // _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
-    FlowSelector flow_selector = 1; // @gotags: validate:"required"
+    // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+    FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
     // The flow label key for identifying sessions.
     // - When label key is specified, _Flow Regulator_ acts as a sticky filter.
@@ -1133,6 +1247,9 @@ message FlowRegulator {
     // - When label key is not specified, _Flow Regulator_ acts as a stateless filter.
     //   Percentage of flows are selected randomly for rejection.
     string label_key = 2;
+
+    // Selectors for the component.
+    Selectors selectors = 3; // @gotags: validate:"required_without=FlowSelector"
   }
 
   message Ins {
@@ -1171,7 +1288,8 @@ message Regulator {
 
   message Parameters {
     // _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
-    FlowSelector flow_selector = 1; // @gotags: validate:"required"
+    // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+    FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
     // The flow label key for identifying sessions.
     // - When label key is specified, _Regulator_ acts as a sticky filter.
@@ -1180,6 +1298,9 @@ message Regulator {
     // - When label key is not specified, _Regulator_ acts as a stateless filter.
     //   Percentage of flows are selected randomly for rejection.
     string label_key = 2;
+
+    // Selectors for the component.
+    Selectors selectors = 3; // @gotags: validate:"required_without=FlowSelector"
   }
 
   message Ins {

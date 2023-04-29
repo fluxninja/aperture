@@ -13,4 +13,10 @@
   withLabelKeyMixin(label_key):: {
     label_key+: label_key,
   },
+  withSelectors(selectors):: {
+    selectors: selectors,
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
 }

@@ -33,4 +33,10 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withParametersMixin(parameters):: {
     parameters+: parameters,
   },
+  withSelectors(selectors):: {
+    selectors: selectors,
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
 }

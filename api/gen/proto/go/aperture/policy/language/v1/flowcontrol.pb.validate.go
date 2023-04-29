@@ -35,6 +35,273 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on Selectors with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Selectors) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Selectors with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SelectorsMultiError, or nil
+// if none found.
+func (m *Selectors) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Selectors) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SelectorsValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SelectorsValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SelectorsValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return SelectorsMultiError(errors)
+	}
+
+	return nil
+}
+
+// SelectorsMultiError is an error wrapping multiple validation errors returned
+// by Selectors.ValidateAll() if the designated constraints aren't met.
+type SelectorsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SelectorsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SelectorsMultiError) AllErrors() []error { return m }
+
+// SelectorsValidationError is the validation error returned by
+// Selectors.Validate if the designated constraints aren't met.
+type SelectorsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SelectorsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SelectorsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SelectorsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SelectorsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SelectorsValidationError) ErrorName() string { return "SelectorsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SelectorsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSelectors.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SelectorsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SelectorsValidationError{}
+
+// Validate checks the field values on Selector with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Selector) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Selector with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SelectorMultiError, or nil
+// if none found.
+func (m *Selector) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Selector) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ControlPoint
+
+	// no validation rules for AgentGroup
+
+	// no validation rules for Service
+
+	if all {
+		switch v := interface{}(m.GetLabelMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SelectorValidationError{
+					field:  "LabelMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SelectorValidationError{
+					field:  "LabelMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLabelMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SelectorValidationError{
+				field:  "LabelMatcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SelectorMultiError(errors)
+	}
+
+	return nil
+}
+
+// SelectorMultiError is an error wrapping multiple validation errors returned
+// by Selector.ValidateAll() if the designated constraints aren't met.
+type SelectorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SelectorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SelectorMultiError) AllErrors() []error { return m }
+
+// SelectorValidationError is the validation error returned by
+// Selector.Validate if the designated constraints aren't met.
+type SelectorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SelectorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SelectorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SelectorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SelectorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SelectorValidationError) ErrorName() string { return "SelectorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SelectorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSelector.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SelectorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SelectorValidationError{}
+
 // Validate checks the field values on FlowSelector with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -661,6 +928,35 @@ func (m *FluxMeter) validate(all bool) error {
 
 	// no validation rules for AttributeKey
 
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, FluxMeterValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, FluxMeterValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FluxMeterValidationError{
+				field:  "Selectors",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.HistogramBuckets.(type) {
 	case *FluxMeter_StaticBuckets_:
 		if v == nil {
@@ -1027,6 +1323,35 @@ func (m *Classifier) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ClassifierValidationError{
 				field:  "Rego",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClassifierValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClassifierValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClassifierValidationError{
+				field:  "Selectors",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -2790,6 +3115,35 @@ func (m *RateLimiter) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiterValidationError{
+				field:  "Selectors",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return RateLimiterMultiError(errors)
 	}
@@ -2941,6 +3295,35 @@ func (m *ConcurrencyLimiter) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ConcurrencyLimiterValidationError{
 				field:  "Scheduler",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConcurrencyLimiterValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConcurrencyLimiterValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConcurrencyLimiterValidationError{
+				field:  "Selectors",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -3176,6 +3559,35 @@ func (m *LoadScheduler) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return LoadSchedulerValidationError{
 				field:  "Actuator",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadSchedulerValidationError{
+				field:  "Selectors",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -3807,6 +4219,35 @@ func (m *AdaptiveLoadScheduler) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdaptiveLoadSchedulerValidationError{
+				field:  "Selectors",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return AdaptiveLoadSchedulerMultiError(errors)
 	}
@@ -4112,6 +4553,35 @@ func (m *AIMDConcurrencyController) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return AIMDConcurrencyControllerValidationError{
 				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIMDConcurrencyControllerValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIMDConcurrencyControllerValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIMDConcurrencyControllerValidationError{
+				field:  "Selectors",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -9617,6 +10087,35 @@ func (m *FlowRegulator_Parameters) validate(all bool) error {
 
 	// no validation rules for LabelKey
 
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, FlowRegulator_ParametersValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, FlowRegulator_ParametersValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FlowRegulator_ParametersValidationError{
+				field:  "Selectors",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return FlowRegulator_ParametersMultiError(errors)
 	}
@@ -9982,6 +10481,35 @@ func (m *Regulator_Parameters) validate(all bool) error {
 	}
 
 	// no validation rules for LabelKey
+
+	if all {
+		switch v := interface{}(m.GetSelectors()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Regulator_ParametersValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Regulator_ParametersValidationError{
+					field:  "Selectors",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Regulator_ParametersValidationError{
+				field:  "Selectors",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return Regulator_ParametersMultiError(errors)

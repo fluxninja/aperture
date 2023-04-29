@@ -19,25 +19,15 @@ import (
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	loadSchedulers []iface.Limiter
-	fluxMeters     []iface.FluxMeter
-	rateLimiters   []iface.Limiter
-	regulators     []iface.Limiter
-	labelPreviews  []iface.LabelPreview
+	loadSchedulers map[iface.Limiter]struct{}
+	fluxMeters     map[iface.FluxMeter]struct{}
+	rateLimiters   map[iface.Limiter]struct{}
+	regulators     map[iface.Limiter]struct{}
+	labelPreviews  map[iface.LabelPreview]struct{}
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
-type multiMatcher = multimatcher.MultiMatcher[string, multiMatchResult]
-
-// PopulateFromMultiMatcher populates result object with results from MultiMatcher.
-func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiMatcher[string, multiMatchResult], labels map[string]string) {
-	resultCollection := mm.Match(multimatcher.Labels(labels))
-	result.loadSchedulers = append(result.loadSchedulers, resultCollection.loadSchedulers...)
-	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
-	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
-	result.regulators = append(result.regulators, resultCollection.regulators...)
-	result.labelPreviews = append(result.labelPreviews, resultCollection.labelPreviews...)
-}
+type multiMatcher = multimatcher.MultiMatcher[string, *multiMatchResult]
 
 // NewEngine Main fx app.
 func NewEngine() iface.Engine {
@@ -88,21 +78,23 @@ func (e *Engine) ProcessRequest(
 	}
 
 	labelPreviews := mmr.labelPreviews
-	for _, labelPreview := range labelPreviews {
+	for labelPreview := range labelPreviews {
 		labelPreview.AddLabelPreview(flowLabels)
 	}
 
 	fluxMeters := mmr.fluxMeters
 	fluxMeterProtos := make([]*flowcontrolv1.FluxMeterInfo, len(fluxMeters))
-	for i, fluxMeter := range fluxMeters {
+	i := 0
+	for fluxMeter := range fluxMeters {
 		fluxMeterProtos[i] = &flowcontrolv1.FluxMeterInfo{
 			FluxMeterName: fluxMeter.GetFluxMeterName(),
 		}
+		i++
 	}
 	response.FluxMeterInfos = fluxMeterProtos
 
 	limiterTypes := []struct {
-		limiters     []iface.Limiter
+		limiters     map[iface.Limiter]struct{}
 		rejectReason flowcontrolv1.CheckResponse_RejectReason
 	}{
 		{mmr.regulators, flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED},
@@ -112,11 +104,13 @@ func (e *Engine) ProcessRequest(
 
 	for _, limiterType := range limiterTypes {
 		limiterDecisions, decisionType := runLimiters(ctx, limiterType.limiters, flowLabels)
-		response.LimiterDecisions = append(response.LimiterDecisions, limiterDecisions...)
+		for _, limiterDecision := range limiterDecisions {
+			response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
+		}
 
 		defer func() {
 			if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-				revertRemaining(limiterType.limiters, flowLabels, limiterDecisions)
+				revertRemaining(flowLabels, limiterDecisions)
 			}
 		}()
 
@@ -130,8 +124,8 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
-func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) (
-	[]*flowcontrolv1.LimiterDecision,
+func runLimiters(ctx context.Context, limiters map[iface.Limiter]struct{}, labels map[string]string) (
+	map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
 	var wg sync.WaitGroup
@@ -141,7 +135,7 @@ func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[strin
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	decisions := make([]*flowcontrolv1.LimiterDecision, len(limiters))
+	decisions := make(map[iface.Limiter]*flowcontrolv1.LimiterDecision, len(limiters))
 
 	decisionType := flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 
@@ -151,24 +145,31 @@ func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[strin
 		cancel()
 	}
 
-	execLimiter := func(limiter iface.Limiter, i int) func() {
+	lock := &sync.Mutex{}
+
+	execLimiter := func(limiter iface.Limiter) func() {
 		return func() {
 			defer wg.Done()
-			decisions[i] = limiter.Decide(ctx, labels)
-			if decisions[i].Dropped {
+			decision := limiter.Decide(ctx, labels)
+			if decision.Dropped {
 				once.Do(setDecisionDropped)
 			}
+			lock.Lock()
+			defer lock.Unlock()
+			decisions[limiter] = decision
 		}
 	}
 
 	// execute limiters
-	for i, limiter := range limiters {
+	i := 0
+	for limiter := range limiters {
 		wg.Add(1)
 		if i == len(limiters)-1 {
-			execLimiter(limiter, i)()
+			execLimiter(limiter)()
 		} else {
-			panichandler.Go(execLimiter(limiter, i))
+			panichandler.Go(execLimiter(limiter))
 		}
+		i++
 	}
 	wg.Wait()
 
@@ -176,17 +177,16 @@ func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[strin
 }
 
 func revertRemaining(
-	limiters []iface.Limiter,
 	labels map[string]string,
-	limiterDecisions []*flowcontrolv1.LimiterDecision,
+	limiterDecisions map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 ) {
 	labelsCopy := make(map[string]string, len(labels))
 	for k, v := range labels {
 		labelsCopy[k] = v
 	}
-	for i, l := range limiterDecisions {
-		if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
-			go limiters[i].Revert(labelsCopy, limiterDecisions[i])
+	for l, d := range limiterDecisions {
+		if !d.Dropped && d.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
+			go l.Revert(labelsCopy, d)
 		}
 	}
 }
@@ -201,8 +201,11 @@ func (e *Engine) RegisterLoadScheduler(cl iface.LoadScheduler) error {
 		return fmt.Errorf("load scheduler already registered")
 	}
 
-	loadSchedulerMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.loadSchedulers = append(mmr.loadSchedulers, cl)
+	loadSchedulerMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
+		if mmr.loadSchedulers == nil {
+			mmr.loadSchedulers = make(map[iface.Limiter]struct{})
+		}
+		mmr.loadSchedulers[cl] = struct{}{}
 		return mmr
 	}
 	return e.register("LoadScheduler:"+cl.GetLimiterID().String(), cl.GetFlowSelector(), loadSchedulerMatchedCB)
@@ -229,8 +232,11 @@ func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	}
 
 	// Save the fluxMeterAPI in multiMatchers
-	fluxMeterMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.fluxMeters = append(mmr.fluxMeters, fm)
+	fluxMeterMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
+		if mmr.fluxMeters == nil {
+			mmr.fluxMeters = make(map[iface.FluxMeter]struct{})
+		}
+		mmr.fluxMeters[fm] = struct{}{}
 		return mmr
 	}
 
@@ -276,11 +282,11 @@ func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 		return fmt.Errorf("rate limiter already registered")
 	}
 
-	limiterActuatorMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.rateLimiters = append(
-			mmr.rateLimiters,
-			rl,
-		)
+	limiterActuatorMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
+		if mmr.rateLimiters == nil {
+			mmr.rateLimiters = make(map[iface.Limiter]struct{})
+		}
+		mmr.rateLimiters[rl] = struct{}{}
 		return mmr
 	}
 
@@ -313,11 +319,11 @@ func (e *Engine) RegisterRegulator(l iface.Limiter) error {
 		return fmt.Errorf("load regulator already registered")
 	}
 
-	regulatorMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.regulators = append(
-			mmr.regulators,
-			l,
-		)
+	regulatorMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
+		if mmr.regulators == nil {
+			mmr.regulators = make(map[iface.Limiter]struct{})
+		}
+		mmr.regulators[l] = struct{}{}
 		return mmr
 	}
 
@@ -350,8 +356,11 @@ func (e *Engine) RegisterLabelPreview(lp iface.LabelPreview) error {
 		return fmt.Errorf("label preview already registered")
 	}
 
-	labelPreviewMatchedCB := func(mmr multiMatchResult) multiMatchResult {
-		mmr.labelPreviews = append(mmr.labelPreviews, lp)
+	labelPreviewMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
+		if mmr.labelPreviews == nil {
+			mmr.labelPreviews = make(map[iface.LabelPreview]struct{})
+		}
+		mmr.labelPreviews[lp] = struct{}{}
 		return mmr
 	}
 	return e.register("LabelPreview:"+lp.GetPreviewID().String(), lp.GetFlowSelector(), labelPreviewMatchedCB)
@@ -374,18 +383,18 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 	mmResult := &multiMatchResult{}
 
 	// Lookup any service multi matchers for controlPoint
-	controlPointID := selectors.NewControlPointID(consts.AnyService, controlPoint)
+	controlPointID := selectors.NewControlPointID(controlPoint, consts.AnyService)
 	camm, ok := e.multiMatchers[controlPointID]
 	if ok {
-		mmResult.populateFromMultiMatcher(camm, labels)
+		camm.MatchWithResultCollection(multimatcher.Labels(labels), mmResult)
 	}
 
 	for _, serviceID := range serviceIDs {
-		controlPointID := selectors.NewControlPointID(serviceID, controlPoint)
+		controlPointID := selectors.NewControlPointID(controlPoint, serviceID)
 		// Lookup multi matcher for controlPointID
 		mm, ok := e.multiMatchers[controlPointID]
 		if ok {
-			mmResult.populateFromMultiMatcher(mm, labels)
+			mm.MatchWithResultCollection(multimatcher.Labels(labels), mmResult)
 		}
 	}
 
@@ -394,7 +403,7 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 
 // Lock must be held by caller.
 func (e *Engine) register(key string, flowSelectorProto *policylangv1.FlowSelector,
-	matchedCB multimatcher.MatchCallback[multiMatchResult],
+	matchedCB multimatcher.MatchCallback[*multiMatchResult],
 ) error {
 	selector, err := selectors.FromProto(flowSelectorProto)
 	if err != nil {
@@ -403,7 +412,7 @@ func (e *Engine) register(key string, flowSelectorProto *policylangv1.FlowSelect
 
 	mm, ok := e.multiMatchers[selector.ControlPointID()]
 	if !ok {
-		mm = multimatcher.New[string, multiMatchResult]()
+		mm = multimatcher.New[string, *multiMatchResult]()
 		e.multiMatchers[selector.ControlPointID()] = mm
 	}
 	err = mm.AddEntry(key, selector.LabelMatcher(), matchedCB)

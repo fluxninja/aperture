@@ -193,7 +193,7 @@ func (c *ClassificationEngine) Classify(
 	var classifierMsgs []*flowcontrolv1.ClassifierInfo
 
 	// Catch all Service
-	cpID := selectors.NewControlPointID(consts.AnyService, ctrlPt)
+	cpID := selectors.NewControlPointID(ctrlPt, consts.AnyService)
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
 		classifierInfos := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
@@ -204,7 +204,7 @@ func (c *ClassificationEngine) Classify(
 
 	// Specific Service
 	for _, svc := range svcs {
-		cpID := selectors.NewControlPointID(svc, ctrlPt)
+		cpID := selectors.NewControlPointID(ctrlPt, svc)
 		mm, ok := r.MultiMatcherByControlPointID[cpID]
 		if !ok {
 			c.registry.GetLogger().Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
