@@ -23,15 +23,12 @@ func (cID ClassifierID) String() string {
 
 // Classifier interface.
 type Classifier interface {
-	// GetFlowSelector returns the selector.
-	GetFlowSelector() *policylangv1.FlowSelector
+	// GetSelectors returns the selectors.
+	GetSelectors() []*policylangv1.Selector
 
 	// GetClassifierID returns ClassifierID object that should uniquely identify classifier.
 	GetClassifierID() ClassifierID
 
 	// GetRequestCounter returns the counter for the classifier.
 	GetRequestCounter() prometheus.Counter
-
-	// GetSelectors returns the selectors.
-	GetSelectors() *policylangv1.Selectors
 }

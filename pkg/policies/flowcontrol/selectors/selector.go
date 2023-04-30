@@ -21,17 +21,30 @@ type selector struct {
 	ctrlPtID     ControlPointID
 }
 
-// FromProto creates a Selector from a "raw" proto-based Selector
+// FromSelectors creates a Selector from a "raw" proto-based Selector.
+func FromSelectors(selectorsProto []*policylangv1.Selector) ([]selector, error) {
+	s := []selector{}
+	for _, selectorProto := range selectorsProto {
+		sel, err := FromSelector(selectorProto)
+		if err != nil {
+			return nil, fmt.Errorf("invalid selector: %w", err)
+		}
+		s = append(s, sel)
+	}
+	return s, nil
+}
+
+// FromSelector creates a Selector from a "raw" proto-based Selector.
 //
 // The selector is assumed to be already validated and non-nil.
-func FromProto(selectorMsg *policylangv1.FlowSelector) (selector, error) {
-	labelMatcher, err := MMExprFromLabelMatcher(selectorMsg.FlowMatcher.GetLabelMatcher())
+func FromSelector(selectorProto *policylangv1.Selector) (selector, error) {
+	labelMatcher, err := MMExprFromLabelMatcher(selectorProto.GetLabelMatcher())
 	if err != nil {
 		return selector{}, fmt.Errorf("invalid label matcher: %w", err)
 	}
-	ctrlPtID, err := controlPointIDFromSelectorProto(selectorMsg)
-	if err != nil {
-		return selector{}, fmt.Errorf("invalid control point: %w", err)
+	ctrlPtID := ControlPointID{
+		ControlPoint: selectorProto.GetControlPoint(),
+		Service:      selectorProto.GetService(),
 	}
 	return selector{
 		ctrlPtID:     ctrlPtID,

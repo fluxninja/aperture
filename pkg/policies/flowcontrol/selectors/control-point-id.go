@@ -3,7 +3,6 @@ package selectors
 import (
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // ControlPointID is the struct that represents a ControlPoint.
@@ -57,6 +56,11 @@ func (cp ControlPointID) WithType(controlPointType string) TypedControlPointID {
 		ControlPointID: cp,
 		Type:           controlPointType,
 	}
+}
+
+// String returns the string representation of the control point.
+func (cp ControlPointID) String() string {
+	return cp.Service + "/" + cp.ControlPoint
 }
 
 // NewTypedControlPointID returns a typedControlPointID.
@@ -119,13 +123,4 @@ func TypedGlobalControlPointIDFromProto(protoCP *cmdv1.GlobalFlowControlPoint) T
 		},
 		AgentGroup: protoCP.GetAgentGroup(),
 	}
-}
-
-func controlPointIDFromSelectorProto(flowSelectorMsg *policylangv1.FlowSelector) (ControlPointID, error) {
-	ctrlPt := flowSelectorMsg.FlowMatcher.GetControlPoint()
-	service := flowSelectorMsg.ServiceSelector.GetService()
-	return ControlPointID{
-		ControlPoint: ctrlPt,
-		Service:      service,
-	}, nil
 }

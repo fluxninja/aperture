@@ -7,14 +7,6 @@ import "aperture/policy/language/v1/ports.proto";
 import "aperture/policy/language/v1/std_components.proto";
 import "google/protobuf/duration.proto";
 
-// Selectors scope the policies to a subset of flows based on flow and infrastructure
-// attributes. Multiple selectors can be provided and flows matching any of the selectors
-// will be selected for actuation.
-message Selectors {
-  // List of selectors
-  repeated Selector selectors = 1; // @gotags: validate:"required,gt=0,dive"
-}
-
 // Selects flows based on control point, flow labels, agent group and the service
 // that the [flow control component](/concepts/flow-control/flow-control.md#components)
 // will operate on.
@@ -317,7 +309,7 @@ message FluxMeter {
   string attribute_key = 6; // @gotags: default:"workload_duration_ms"
 
   // Selectors for the component.
-  Selectors selectors = 7; // @gotags: validate:"required_without=FlowSelector"
+  repeated Selector selectors = 7; // @gotags: validate:"required_without=FlowSelector,dive"
 }
 
 // Set of classification rules sharing a common selector
@@ -365,7 +357,7 @@ message Classifier {
   Rego rego = 3;
 
   // Selectors for flows that will be classified by this _Classifier_.
-  Selectors selectors = 4; // @gotags: validate:"required_without=FlowSelector"
+  repeated Selector selectors = 4; // @gotags: validate:"required_without=FlowSelector,dive"
 }
 
 // Rule describes a single classification Rule
@@ -727,7 +719,7 @@ message RateLimiter {
   DynamicConfig default_config = 5;
 
   // Selectors for the component.
-  Selectors selectors = 6; // @gotags: validate:"required_without=FlowSelector"
+  repeated Selector selectors = 6; // @gotags: validate:"required_without=FlowSelector,dive"
 }
 
 // _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
@@ -758,7 +750,7 @@ message ConcurrencyLimiter {
     LoadActuator load_actuator = 3;
   }
   // Selectors for the component.
-  Selectors selectors = 4; // @gotags: validate:"required_without=FlowSelector"
+  repeated Selector selectors = 4; // @gotags: validate:"required_without=FlowSelector,dive"
 }
 
 // _Load Scheduler_ is an actuator component that regulates flows to provide active service protection
@@ -943,7 +935,7 @@ message LoadScheduler {
   Actuator actuator = 3;
 
   // Selectors for the component.
-  Selectors selectors = 4; // @gotags: validate:"required_without=FlowSelector"
+  repeated Selector selectors = 4; // @gotags: validate:"required_without=FlowSelector,dive"
 }
 
 // Weighted Fair Queuing-based workload scheduler
@@ -1162,7 +1154,7 @@ message AdaptiveLoadScheduler {
   LoadScheduler.Actuator.DynamicConfig default_config = 10;
 
   // Selectors for the component.
-  Selectors selectors = 11; // @gotags: validate:"required_without=FlowSelector"
+  repeated Selector selectors = 11; // @gotags: validate:"required_without=FlowSelector,dive"
 }
 
 // High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
@@ -1224,7 +1216,7 @@ message AIMDConcurrencyController {
   LoadActuator.DynamicConfig default_config = 10;
 
   // Selectors for the component.
-  Selectors selectors = 11; // @gotags: validate:"required_without=FlowSelector"
+  repeated Selector selectors = 11; // @gotags: validate:"required_without=FlowSelector,dive"
 }
 
 // _Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
@@ -1249,7 +1241,7 @@ message FlowRegulator {
     string label_key = 2;
 
     // Selectors for the component.
-    Selectors selectors = 3; // @gotags: validate:"required_without=FlowSelector"
+    repeated Selector selectors = 3; // @gotags: validate:"required_without=FlowSelector,dive"
   }
 
   message Ins {
@@ -1300,7 +1292,7 @@ message Regulator {
     string label_key = 2;
 
     // Selectors for the component.
-    Selectors selectors = 3; // @gotags: validate:"required_without=FlowSelector"
+    repeated Selector selectors = 3; // @gotags: validate:"required_without=FlowSelector,dive"
   }
 
   message Ins {

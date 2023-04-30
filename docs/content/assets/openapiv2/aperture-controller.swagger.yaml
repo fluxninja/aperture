@@ -288,8 +288,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   AIMDConcurrencyControllerIns:
     description: Inputs for the AIMDConcurrencyController component.
     type: object
@@ -386,8 +389,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   AdaptiveLoadSchedulerIns:
     description: Input ports for the _Adaptive Load Scheduler_ component.
     type: object
@@ -840,8 +846,11 @@ definitions:
         description: |+
           Selectors for flows that will be classified by this _Classifier_.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   Component:
     description: |-
       :::info
@@ -1028,8 +1037,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   ConstantSignal:
     description: Special constant input for ports and Variable component. Can provide
       either a constant value or special Nan/+-Inf value.
@@ -1643,8 +1655,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   FlowSelector:
     description: |-
       Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control
@@ -1722,8 +1737,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
       static_buckets:
         $ref: '#/definitions/FluxMeterStaticBuckets'
   FluxMeterExponentialBuckets:
@@ -2579,8 +2597,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   LoadSchedulerActuator:
     type: object
     title: Takes the load multiplier input signal and publishes it to the schedulers
@@ -3545,8 +3566,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   RateLimiterDynamicConfig:
     type: object
     title: Dynamic Configuration for the rate limiter
@@ -3801,8 +3825,11 @@ definitions:
         description: |+
           Selectors for the component.
 
-        x-go-tag-validate: required_without=FlowSelector
-        $ref: '#/definitions/Selectors'
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required_without=FlowSelector,dive
   Resources:
     description: |-
       :::info
@@ -4196,23 +4223,6 @@ definitions:
         type: string
         default: any
         x-go-tag-default: any
-  Selectors:
-    description: |-
-      Selectors scope the policies to a subset of flows based on flow and infrastructure
-      attributes. Multiple selectors can be provided and flows matching any of the selectors
-      will be selected for actuation.
-    type: object
-    required:
-    - selectors
-    properties:
-      selectors:
-        type: array
-        title: List of selectors
-        minItems: 1
-        items:
-          type: object
-          $ref: '#/definitions/Selector'
-        x-go-tag-validate: required,gt=0,dive
   ServiceSelector:
     description: |-
       :::info

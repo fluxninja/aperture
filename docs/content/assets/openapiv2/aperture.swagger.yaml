@@ -52,11 +52,14 @@ definitions:
 
                 x-go-tag-validate: required
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         type: object
     AIMDConcurrencyControllerIns:
         description: Inputs for the AIMDConcurrencyController component.
@@ -143,11 +146,14 @@ definitions:
 
                 x-go-tag-validate: required
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         type: object
     AdaptiveLoadSchedulerIns:
         description: Input ports for the _Adaptive Load Scheduler_ component.
@@ -745,11 +751,14 @@ definitions:
                 type: object
                 x-go-tag-validate: dive,keys,required,endkeys,required
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for flows that will be classified by this _Classifier_.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         title: Set of classification rules sharing a common selector
         type: object
     ClassifierInfo:
@@ -965,11 +974,14 @@ definitions:
 
                 x-go-tag-validate: required
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         title: _Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
         type: object
     ConstantSignal:
@@ -1700,11 +1712,14 @@ definitions:
                       Percentage of flows are selected randomly for rejection.
                 type: string
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         type: object
     FlowSelector:
         description: |-
@@ -1779,11 +1794,14 @@ definitions:
             linear_buckets:
                 $ref: '#/definitions/FluxMeterLinearBuckets'
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
             static_buckets:
                 $ref: '#/definitions/FluxMeterStaticBuckets'
         type: object
@@ -2765,11 +2783,14 @@ definitions:
 
                 x-go-tag-validate: required
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         title: _Load Scheduler_ is an actuator component that regulates flows to provide active service protection
         type: object
     LoadSchedulerActuator:
@@ -3870,11 +3891,14 @@ definitions:
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         title: Limits the traffic on a control point to specified rate
         type: object
     RateLimiterDynamicConfig:
@@ -4126,11 +4150,14 @@ definitions:
                       Percentage of flows are selected randomly for rejection.
                 type: string
             selectors:
-                $ref: '#/definitions/Selectors'
                 description: |+
                     Selectors for the component.
 
-                x-go-tag-validate: required_without=FlowSelector
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                type: array
+                x-go-tag-validate: required_without=FlowSelector,dive
         type: object
     ReportRequest:
         properties:
@@ -4581,23 +4608,6 @@ definitions:
                 x-go-tag-default: any
         required:
             - control_point
-        type: object
-    Selectors:
-        description: |-
-            Selectors scope the policies to a subset of flows based on flow and infrastructure
-            attributes. Multiple selectors can be provided and flows matching any of the selectors
-            will be selected for actuation.
-        properties:
-            selectors:
-                items:
-                    $ref: '#/definitions/Selector'
-                    type: object
-                minItems: 1
-                title: List of selectors
-                type: array
-                x-go-tag-validate: required,gt=0,dive
-        required:
-            - selectors
         type: object
     ServerToClient:
         properties:

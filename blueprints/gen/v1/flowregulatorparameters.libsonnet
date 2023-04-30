@@ -14,7 +14,10 @@
     label_key+: label_key,
   },
   withSelectors(selectors):: {
-    selectors: selectors,
+    selectors:
+      if std.isArray(selectors)
+      then selectors
+      else [selectors],
   },
   withSelectorsMixin(selectors):: {
     selectors+: selectors,

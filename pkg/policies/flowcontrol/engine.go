@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
 	"sync"
 
+	"go.uber.org/multierr"
 	"golang.org/x/exp/maps"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
@@ -26,18 +28,29 @@ type multiMatchResult struct {
 	labelPreviews  map[iface.LabelPreview]struct{}
 }
 
+// multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
+func newMultiMatchResult() *multiMatchResult {
+	return &multiMatchResult{
+		loadSchedulers: make(map[iface.Limiter]struct{}),
+		fluxMeters:     make(map[iface.FluxMeter]struct{}),
+		rateLimiters:   make(map[iface.Limiter]struct{}),
+		regulators:     make(map[iface.Limiter]struct{}),
+		labelPreviews:  make(map[iface.LabelPreview]struct{}),
+	}
+}
+
 // multiMatcher is MultiMatcher instantiation used in this package.
 type multiMatcher = multimatcher.MultiMatcher[string, *multiMatchResult]
 
 // NewEngine Main fx app.
 func NewEngine() iface.Engine {
 	e := &Engine{
-		multiMatchers:   make(map[selectors.ControlPointID]*multiMatcher),
-		fluxMetersMap:   make(map[iface.FluxMeterID]iface.FluxMeter),
-		conLimiterMap:   make(map[iface.LimiterID]iface.LoadScheduler),
-		rateLimiterMap:  make(map[iface.LimiterID]iface.RateLimiter),
-		regulatorMap:    make(map[iface.LimiterID]iface.Limiter),
-		labelPreviewMap: make(map[iface.PreviewID]iface.LabelPreview),
+		multiMatchers:  make(map[selectors.ControlPointID]*multiMatcher),
+		fluxMeters:     make(map[iface.FluxMeterID]iface.FluxMeter),
+		loadSchedulers: make(map[iface.LimiterID]iface.LoadScheduler),
+		rateLimiters:   make(map[iface.LimiterID]iface.RateLimiter),
+		regulators:     make(map[iface.LimiterID]iface.Limiter),
+		labelPreviews:  make(map[iface.PreviewID]iface.LabelPreview),
 	}
 	return e
 }
@@ -46,13 +59,13 @@ func NewEngine() iface.Engine {
 // (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
-	mutex           sync.RWMutex
-	fluxMetersMap   map[iface.FluxMeterID]iface.FluxMeter
-	conLimiterMap   map[iface.LimiterID]iface.LoadScheduler
-	rateLimiterMap  map[iface.LimiterID]iface.RateLimiter
-	regulatorMap    map[iface.LimiterID]iface.Limiter
-	labelPreviewMap map[iface.PreviewID]iface.LabelPreview
-	multiMatchers   map[selectors.ControlPointID]*multiMatcher
+	mutex          sync.RWMutex
+	fluxMeters     map[iface.FluxMeterID]iface.FluxMeter
+	loadSchedulers map[iface.LimiterID]iface.LoadScheduler
+	rateLimiters   map[iface.LimiterID]iface.RateLimiter
+	regulators     map[iface.LimiterID]iface.Limiter
+	labelPreviews  map[iface.PreviewID]iface.LabelPreview
+	multiMatchers  map[selectors.ControlPointID]*multiMatcher
 }
 
 // ProcessRequest .
@@ -195,29 +208,26 @@ func revertRemaining(
 func (e *Engine) RegisterLoadScheduler(cl iface.LoadScheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	if _, ok := e.conLimiterMap[cl.GetLimiterID()]; !ok {
-		e.conLimiterMap[cl.GetLimiterID()] = cl
+	if _, ok := e.loadSchedulers[cl.GetLimiterID()]; !ok {
+		e.loadSchedulers[cl.GetLimiterID()] = cl
 	} else {
 		return fmt.Errorf("load scheduler already registered")
 	}
 
 	loadSchedulerMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
-		if mmr.loadSchedulers == nil {
-			mmr.loadSchedulers = make(map[iface.Limiter]struct{})
-		}
 		mmr.loadSchedulers[cl] = struct{}{}
 		return mmr
 	}
-	return e.register("LoadScheduler:"+cl.GetLimiterID().String(), cl.GetFlowSelector(), loadSchedulerMatchedCB)
+	return e.register(cl.GetLimiterID().String(), cl.GetSelectors(), loadSchedulerMatchedCB)
 }
 
 // UnregisterLoadScheduler removes load scheduler from multimatcher.
 func (e *Engine) UnregisterLoadScheduler(cl iface.LoadScheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.conLimiterMap, cl.GetLimiterID())
+	delete(e.loadSchedulers, cl.GetLimiterID())
 
-	return e.unregister("LoadScheduler:"+cl.GetLimiterID().String(), cl.GetFlowSelector())
+	return e.unregister(cl.GetLimiterID().String(), cl.GetSelectors())
 }
 
 // RegisterFluxMeter adds fluxmeter to histogram map and multimatcher.
@@ -225,23 +235,19 @@ func (e *Engine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	// Save the histogram in fluxMeterHists indexed by metric id
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	if _, ok := e.fluxMetersMap[fm.GetFluxMeterID()]; !ok {
-		e.fluxMetersMap[fm.GetFluxMeterID()] = fm
+	if _, ok := e.fluxMeters[fm.GetFluxMeterID()]; !ok {
+		e.fluxMeters[fm.GetFluxMeterID()] = fm
 	} else {
 		return fmt.Errorf("fluxmeter already registered")
 	}
 
 	// Save the fluxMeterAPI in multiMatchers
 	fluxMeterMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
-		if mmr.fluxMeters == nil {
-			mmr.fluxMeters = make(map[iface.FluxMeter]struct{})
-		}
 		mmr.fluxMeters[fm] = struct{}{}
 		return mmr
 	}
 
-	flowSelectorProto := fm.GetFlowSelector()
-	return e.register("FluxMeter:"+fm.GetFluxMeterID().String(), flowSelectorProto, fluxMeterMatchedCB)
+	return e.register(fm.GetFluxMeterID().String(), fm.GetSelectors(), fluxMeterMatchedCB)
 }
 
 // UnregisterFluxMeter removes fluxmeter from histogram map and multimatcher.
@@ -249,10 +255,36 @@ func (e *Engine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 	// Remove the histogram from fluxMeterHists indexed by metric id
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.fluxMetersMap, fm.GetFluxMeterID())
+	delete(e.fluxMeters, fm.GetFluxMeterID())
 
 	// Remove the fluxMeterAPI from multiMatchers
-	return e.unregister("FluxMeter:"+fm.GetFluxMeterID().String(), fm.GetFlowSelector())
+	return e.unregister(fm.GetFluxMeterID().String(), fm.GetSelectors())
+}
+
+// RegisterLabelPreview adds label preview to multimatcher.
+func (e *Engine) RegisterLabelPreview(lp iface.LabelPreview) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+	if _, ok := e.labelPreviews[lp.GetPreviewID()]; !ok {
+		e.labelPreviews[lp.GetPreviewID()] = lp
+	} else {
+		return fmt.Errorf("label preview already registered")
+	}
+
+	labelPreviewMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
+		mmr.labelPreviews[lp] = struct{}{}
+		return mmr
+	}
+	return e.register(lp.GetPreviewID().String(), lp.GetSelectors(), labelPreviewMatchedCB)
+}
+
+// UnregisterLabelPreview removes label preview from multimatcher.
+func (e *Engine) UnregisterLabelPreview(lp iface.LabelPreview) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+	delete(e.labelPreviews, lp.GetPreviewID())
+
+	return e.unregister(lp.GetPreviewID().String(), lp.GetSelectors())
 }
 
 // GetFluxMeter Lookup function for getting flux meter.
@@ -262,117 +294,82 @@ func (e *Engine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 	fmID := iface.FluxMeterID{
 		FluxMeterName: fluxMeterName,
 	}
-	return e.fluxMetersMap[fmID]
+	return e.fluxMeters[fmID]
 }
 
 // GetLoadScheduler Lookup function for getting load scheduler.
 func (e *Engine) GetLoadScheduler(limiterID iface.LimiterID) iface.LoadScheduler {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
-	return e.conLimiterMap[limiterID]
+	return e.loadSchedulers[limiterID]
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.
 func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	if _, ok := e.rateLimiterMap[rl.GetLimiterID()]; !ok {
-		e.rateLimiterMap[rl.GetLimiterID()] = rl
+	if _, ok := e.rateLimiters[rl.GetLimiterID()]; !ok {
+		e.rateLimiters[rl.GetLimiterID()] = rl
 	} else {
 		return fmt.Errorf("rate limiter already registered")
 	}
 
 	limiterActuatorMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
-		if mmr.rateLimiters == nil {
-			mmr.rateLimiters = make(map[iface.Limiter]struct{})
-		}
 		mmr.rateLimiters[rl] = struct{}{}
 		return mmr
 	}
 
-	return e.register("RateLimiter:"+rl.GetLimiterID().String(), rl.GetFlowSelector(), limiterActuatorMatchedCB)
+	return e.register(rl.GetLimiterID().String(), rl.GetSelectors(), limiterActuatorMatchedCB)
 }
 
 // UnregisterRateLimiter removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.rateLimiterMap, rl.GetLimiterID())
+	delete(e.rateLimiters, rl.GetLimiterID())
 
-	return e.unregister("RateLimiter:"+rl.GetLimiterID().String(), rl.GetFlowSelector())
+	return e.unregister(rl.GetLimiterID().String(), rl.GetSelectors())
 }
 
 // GetRateLimiter Lookup function for getting rate limiter.
 func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
-	return e.rateLimiterMap[limiterID]
+	return e.rateLimiters[limiterID]
 }
 
 // RegisterRegulator adds limiter actuator to multimatcher.
 func (e *Engine) RegisterRegulator(l iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	if _, ok := e.regulatorMap[l.GetLimiterID()]; !ok {
-		e.regulatorMap[l.GetLimiterID()] = l
+	if _, ok := e.regulators[l.GetLimiterID()]; !ok {
+		e.regulators[l.GetLimiterID()] = l
 	} else {
 		return fmt.Errorf("load regulator already registered")
 	}
 
 	regulatorMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
-		if mmr.regulators == nil {
-			mmr.regulators = make(map[iface.Limiter]struct{})
-		}
 		mmr.regulators[l] = struct{}{}
 		return mmr
 	}
 
-	return e.register("Regulator:"+l.GetLimiterID().String(), l.GetFlowSelector(), regulatorMatchedCB)
+	return e.register(l.GetLimiterID().String(), l.GetSelectors(), regulatorMatchedCB)
 }
 
 // UnregisterRegulator removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterRegulator(rl iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.regulatorMap, rl.GetLimiterID())
+	delete(e.regulators, rl.GetLimiterID())
 
-	return e.unregister("Regulator:"+rl.GetLimiterID().String(), rl.GetFlowSelector())
+	return e.unregister(rl.GetLimiterID().String(), rl.GetSelectors())
 }
 
 // GetRegulator Lookup function for getting load regulator.
 func (e *Engine) GetRegulator(limiterID iface.LimiterID) iface.Limiter {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
-	return e.regulatorMap[limiterID]
-}
-
-// RegisterLabelPreview adds label preview to multimatcher.
-func (e *Engine) RegisterLabelPreview(lp iface.LabelPreview) error {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-	if _, ok := e.labelPreviewMap[lp.GetPreviewID()]; !ok {
-		e.labelPreviewMap[lp.GetPreviewID()] = lp
-	} else {
-		return fmt.Errorf("label preview already registered")
-	}
-
-	labelPreviewMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
-		if mmr.labelPreviews == nil {
-			mmr.labelPreviews = make(map[iface.LabelPreview]struct{})
-		}
-		mmr.labelPreviews[lp] = struct{}{}
-		return mmr
-	}
-	return e.register("LabelPreview:"+lp.GetPreviewID().String(), lp.GetFlowSelector(), labelPreviewMatchedCB)
-}
-
-// UnregisterLabelPreview removes label preview from multimatcher.
-func (e *Engine) UnregisterLabelPreview(lp iface.LabelPreview) error {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-	delete(e.labelPreviewMap, lp.GetPreviewID())
-
-	return e.unregister("LabelPreview:"+lp.GetPreviewID().String(), lp.GetFlowSelector())
+	return e.regulators[limiterID]
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
@@ -380,7 +377,7 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
 
-	mmResult := &multiMatchResult{}
+	mmResult := newMultiMatchResult()
 
 	// Lookup any service multi matchers for controlPoint
 	controlPointID := selectors.NewControlPointID(controlPoint, consts.AnyService)
@@ -402,46 +399,52 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 }
 
 // Lock must be held by caller.
-func (e *Engine) register(key string, flowSelectorProto *policylangv1.FlowSelector,
+func (e *Engine) register(key string, selectorsProto []*policylangv1.Selector,
 	matchedCB multimatcher.MatchCallback[*multiMatchResult],
 ) error {
-	selector, err := selectors.FromProto(flowSelectorProto)
+	s, err := selectors.FromSelectors(selectorsProto)
 	if err != nil {
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
 
-	mm, ok := e.multiMatchers[selector.ControlPointID()]
-	if !ok {
-		mm = multimatcher.New[string, *multiMatchResult]()
-		e.multiMatchers[selector.ControlPointID()] = mm
+	var merr error
+	for i, selector := range s {
+		mm, ok := e.multiMatchers[selector.ControlPointID()]
+		if !ok {
+			mm = multimatcher.New[string, *multiMatchResult]()
+			e.multiMatchers[selector.ControlPointID()] = mm
+		}
+		k := key + "_selector_" + strconv.Itoa(i)
+		err = mm.AddEntry(k, selector.LabelMatcher(), matchedCB)
+		if err != nil {
+			merr = multierr.Append(merr, err)
+		}
 	}
-	err = mm.AddEntry(key, selector.LabelMatcher(), matchedCB)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return merr
 }
 
 // Lock must be held by caller.
-func (e *Engine) unregister(key string, flowSelectorProto *policylangv1.FlowSelector) error {
-	selector, err := selectors.FromProto(flowSelectorProto)
+func (e *Engine) unregister(key string, selectorsProto []*policylangv1.Selector) error {
+	s, err := selectors.FromSelectors(selectorsProto)
 	if err != nil {
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
 
-	// check if multi matcher exists for this control point id
-	mm, ok := e.multiMatchers[selector.ControlPointID()]
-	if !ok {
-		return fmt.Errorf("unable to unregister, multi matcher not found for control point id")
-	}
-	err = mm.RemoveEntry(key)
-	if err != nil {
-		return err
-	}
-	// remove this multi matcher if this was the last entry
-	if mm.Length() == 0 {
-		delete(e.multiMatchers, selector.ControlPointID())
+	for i, selector := range s {
+		// check if multi matcher exists for this control point id
+		mm, ok := e.multiMatchers[selector.ControlPointID()]
+		if !ok {
+			return fmt.Errorf("unable to unregister, multi matcher not found for control point id")
+		}
+		k := key + "_selector_" + strconv.Itoa(i)
+		err = mm.RemoveEntry(k)
+		if err != nil {
+			return err
+		}
+		// remove this multi matcher if this was the last entry
+		if mm.Length() == 0 {
+			delete(e.multiMatchers, selector.ControlPointID())
+		}
 	}
 
 	return nil

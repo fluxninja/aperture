@@ -126,16 +126,14 @@ var _ = Describe("Classifier", func() {
 		It("returns active rules", func() {
 			Expect(classifier.ActiveRules()).To(ConsistOf(
 				compiler.ReportedRule{
-					RulesetName:  "one",
-					LabelName:    "foo",
-					Rule:         rs1.Rules["foo"],
-					FlowSelector: rs1.FlowSelector,
+					RulesetName: "one",
+					LabelName:   "foo",
+					Rule:        rs1.Rules["foo"],
 				},
 				compiler.ReportedRule{
-					RulesetName:  "three",
-					LabelName:    "fuu",
-					Rule:         rs3.Rules["fuu"],
-					FlowSelector: rs3.FlowSelector,
+					RulesetName: "three",
+					LabelName:   "fuu",
+					Rule:        rs3.Rules["fuu"],
 				},
 			))
 		})

@@ -24,7 +24,7 @@ import (
 )
 
 type multiMatcherResult struct {
-	labelers []*compiler.LabelerWithSelector
+	labelers []*compiler.LabelerWithAttributes
 	previews []iface.HTTPRequestPreview
 }
 
@@ -89,11 +89,11 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	input ast.Value,
 ) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
 	logger := c.registry.GetLogger()
-	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
+	appendNewClassifier := func(labelerWithAttributes *compiler.LabelerWithAttributes, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
-			PolicyName:      labelerWithSelector.ClassifierAttributes.PolicyName,
-			PolicyHash:      labelerWithSelector.ClassifierAttributes.PolicyHash,
-			ClassifierIndex: labelerWithSelector.ClassifierAttributes.ClassifierIndex,
+			PolicyName:      labelerWithAttributes.ClassifierAttributes.PolicyName,
+			PolicyHash:      labelerWithAttributes.ClassifierAttributes.PolicyHash,
+			ClassifierIndex: labelerWithAttributes.ClassifierAttributes.ClassifierIndex,
 			Error:           error,
 		})
 	}
@@ -306,34 +306,43 @@ func (c *ClassificationEngine) combineRulesets() rules {
 
 	for _, ruleset := range c.activeRulesets {
 		combined.ReportedRules = append(combined.ReportedRules, ruleset.ReportedRules...)
-		for i := range ruleset.Labelers {
-			labelerWithSelector := &ruleset.Labelers[i]
-			err := addToMatcher(ruleset.ControlPointID, labelerWithSelector.LabelSelector, func(mmr multiMatcherResult) multiMatcherResult {
-				mmr.labelers = append(mmr.labelers, labelerWithSelector)
-				return mmr
-			})
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to add entry to multimatcher")
-				return rules{}
+		s, err := selectors.FromSelectors(ruleset.Selectors)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse selector")
+			continue
+		}
+		for _, selector := range s {
+			for i := range ruleset.Labelers {
+				labelerWithAttributes := &ruleset.Labelers[i]
+				err := addToMatcher(selector.ControlPointID(), selector.LabelMatcher(), func(mmr multiMatcherResult) multiMatcherResult {
+					mmr.labelers = append(mmr.labelers, labelerWithAttributes)
+					return mmr
+				})
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to add entry to multimatcher")
+					return rules{}
+				}
 			}
 		}
 	}
 
 	// add activePreviews
 	for _, preview := range c.activePreviews {
-		selector, err := selectors.FromProto(preview.GetFlowSelector())
+		s, err := selectors.FromSelectors(preview.GetSelectors())
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to parse selector")
 			continue
 		}
-		controlPointID := selector.ControlPointID()
-		err = addToMatcher(controlPointID, selector.LabelMatcher(), func(mmr multiMatcherResult) multiMatcherResult {
-			mmr.previews = append(mmr.previews, preview)
-			return mmr
-		})
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to add preview entry to multimatcher")
-			continue
+		for _, selector := range s {
+			controlPointID := selector.ControlPointID()
+			err = addToMatcher(controlPointID, selector.LabelMatcher(), func(mmr multiMatcherResult) multiMatcherResult {
+				mmr.previews = append(mmr.previews, preview)
+				return mmr
+			})
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to add preview entry to multimatcher")
+				continue
+			}
 		}
 	}
 	return combined

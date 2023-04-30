@@ -62,9 +62,13 @@
           "x-order": 9
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 10
         }
       },
@@ -187,9 +191,13 @@
           "x-order": 9
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 10
         }
       },
@@ -645,9 +653,13 @@
           "x-order": 2
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for flows that will be classified by this _Classifier_.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 3
         }
       },
@@ -819,9 +831,13 @@
           "x-order": 2
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 3
         }
       },
@@ -1462,9 +1478,13 @@
           "x-order": 1
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 2
         }
       },
@@ -1519,9 +1539,13 @@
           "x-order": 4
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 5
         },
         "static_buckets": {
@@ -2405,9 +2429,13 @@
           "x-order": 2
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 3
         }
       },
@@ -3496,9 +3524,13 @@
           "x-order": 4
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 5
         }
       },
@@ -3717,9 +3749,13 @@
           "x-order": 1
         },
         "selectors": {
-          "$ref": "#/definitions/Selectors",
           "description": "Selectors for the component.\n\n",
-          "x-go-tag-validate": "required_without=FlowSelector",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
           "x-order": 2
         }
       },
@@ -4036,25 +4072,6 @@
         }
       },
       "required": ["control_point"],
-      "type": "object",
-      "additionalProperties": false
-    },
-    "Selectors": {
-      "description": "Selectors scope the policies to a subset of flows based on flow and infrastructure\nattributes. Multiple selectors can be provided and flows matching any of the selectors\nwill be selected for actuation.",
-      "properties": {
-        "selectors": {
-          "items": {
-            "$ref": "#/definitions/Selector",
-            "type": "object"
-          },
-          "minItems": 1,
-          "title": "List of selectors",
-          "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 0
-        }
-      },
-      "required": ["selectors"],
       "type": "object",
       "additionalProperties": false
     },

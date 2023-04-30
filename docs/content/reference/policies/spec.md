@@ -159,7 +159,7 @@ Scheduler parameters.
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -428,7 +428,7 @@ Parameters for the _Load Scheduler_.
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -1387,7 +1387,7 @@ how to extract and propagate flow labels with that key.
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -1850,7 +1850,7 @@ output signals.
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -3261,7 +3261,7 @@ The flow label key for identifying sessions.
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -3427,7 +3427,7 @@ Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `f
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -5319,7 +5319,7 @@ output signals.
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -7582,7 +7582,7 @@ Parameters for the RateLimiter component
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -8061,7 +8061,7 @@ The flow label key for identifying sessions.
 
 <!-- vale off -->
 
-([Selectors](#selectors))
+([[]Selector](#selector))
 
 <!-- vale on -->
 
@@ -8826,33 +8826,6 @@ In Kubernetes, this is the FQDN of the Service object.
 An entity (for example, Kubernetes pod) might belong to multiple services.
 
 :::
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### Selectors {#selectors}
-
-<!-- vale on -->
-
-Selectors scope the policies to a subset of flows based on flow and infrastructure
-attributes. Multiple selectors can be provided and flows matching any of the selectors
-will be selected for actuation.
-
-<dl>
-<dt>selectors</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]Selector](#selector), **required**)
-
-<!-- vale on -->
-
-List of selectors
 
 </dd>
 </dl>
