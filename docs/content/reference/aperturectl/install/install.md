@@ -6,6 +6,8 @@ keywords:
   - aperturectl_install
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl install
 
 Install Aperture components

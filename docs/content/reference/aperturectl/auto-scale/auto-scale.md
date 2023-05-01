@@ -6,6 +6,8 @@ keywords:
   - aperturectl_auto-scale
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl auto-scale
 
 AutoScale integrations

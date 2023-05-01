@@ -80,7 +80,6 @@ generate-blueprints: generate-config-markdown
 	@echo Generating blueprints
 	@./scripts/generate_blueprints.sh
 
-
 generate-doc-assets: generate-blueprints
 	@cd ./docs && $(MAKE) generate-jsonnet
 	@cd ./docs && $(MAKE) generate-mermaid

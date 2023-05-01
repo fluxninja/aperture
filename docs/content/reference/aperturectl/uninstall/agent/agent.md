@@ -6,6 +6,8 @@ keywords:
   - aperturectl_uninstall_agent
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl uninstall agent
 
 Uninstall Aperture Agent

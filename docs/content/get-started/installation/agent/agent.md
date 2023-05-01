@@ -46,13 +46,13 @@ and can result in unpredictable behavior.
       resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition
       and so on.
 
-      1. [**DaemonSet**](kubernetes/operator/daemonset.md)
+      - [**DaemonSet**](kubernetes/operator/daemonset.md)
 
       The Aperture Agent can be installed as a
       [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
       where it will get deployed on all the nodes of the cluster.
 
-      2. [**Sidecar**](kubernetes/operator/sidecar.md)
+      - [**Sidecar**](kubernetes/operator/sidecar.md)
 
       The Aperture Agent can also be installed as a Sidecar. In this mode,
       whenever a new pod is started with required labels and annotations, the

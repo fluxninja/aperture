@@ -6,6 +6,8 @@ keywords:
   - aperturectl_completion_zsh
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl completion zsh
 
 Generate the autocompletion script for zsh

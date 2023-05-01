@@ -6,6 +6,8 @@ keywords:
   - aperturectl_blueprints_pull
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl blueprints pull
 
 Pull Aperture Blueprints

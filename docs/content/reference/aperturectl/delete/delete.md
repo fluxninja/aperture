@@ -6,6 +6,8 @@ keywords:
   - aperturectl_delete
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl delete
 
 Delete Aperture Policies

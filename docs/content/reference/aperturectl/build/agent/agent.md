@@ -6,6 +6,8 @@ keywords:
   - aperturectl_build_agent
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl build agent
 
 Build agent binary for Aperture
