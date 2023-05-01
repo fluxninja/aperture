@@ -28,7 +28,7 @@ Generated File Starts
 
 <!-- vale off -->
 
-### AIMDConcurrencyController {#a-i-m-d-concurrency-controller}
+### AIMDConcurrencyController \{#a-i-m-d-concurrency-controller}
 
 <!-- vale on -->
 
@@ -179,7 +179,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### AIMDConcurrencyControllerIns {#a-i-m-d-concurrency-controller-ins}
+### AIMDConcurrencyControllerIns \{#a-i-m-d-concurrency-controller-ins}
 
 <!-- vale on -->
 
@@ -229,7 +229,7 @@ The signal to the controller.
 
 <!-- vale off -->
 
-### AIMDConcurrencyControllerOuts {#a-i-m-d-concurrency-controller-outs}
+### AIMDConcurrencyControllerOuts \{#a-i-m-d-concurrency-controller-outs}
 
 <!-- vale on -->
 
@@ -308,7 +308,7 @@ concurrency.
 
 <!-- vale off -->
 
-### AdaptiveLoadScheduler {#adaptive-load-scheduler}
+### AdaptiveLoadScheduler \{#adaptive-load-scheduler}
 
 <!-- vale on -->
 
@@ -458,7 +458,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### AdaptiveLoadSchedulerIns {#adaptive-load-scheduler-ins}
+### AdaptiveLoadSchedulerIns \{#adaptive-load-scheduler-ins}
 
 <!-- vale on -->
 
@@ -508,7 +508,7 @@ The input signal to the controller.
 
 <!-- vale off -->
 
-### AdaptiveLoadSchedulerOuts {#adaptive-load-scheduler-outs}
+### AdaptiveLoadSchedulerOuts \{#adaptive-load-scheduler-outs}
 
 <!-- vale on -->
 
@@ -586,7 +586,7 @@ token rate.
 
 <!-- vale off -->
 
-### AddressExtractor {#address-extractor}
+### AddressExtractor \{#address-extractor}
 
 <!-- vale on -->
 
@@ -630,7 +630,7 @@ Attribute path pointing to some string - for example, `source.address`.
 
 <!-- vale off -->
 
-### Alerter {#alerter}
+### Alerter \{#alerter}
 
 <!-- vale on -->
 
@@ -667,7 +667,7 @@ Alerter configuration
 
 <!-- vale off -->
 
-### AlerterIns {#alerter-ins}
+### AlerterIns \{#alerter-ins}
 
 <!-- vale on -->
 
@@ -693,7 +693,7 @@ generates an alert.
 
 <!-- vale off -->
 
-### AlerterParameters {#alerter-parameters}
+### AlerterParameters \{#alerter-parameters}
 
 <!-- vale on -->
 
@@ -767,7 +767,7 @@ Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 <!-- vale off -->
 
-### And {#and}
+### And \{#and}
 
 <!-- vale on -->
 
@@ -819,7 +819,7 @@ Output ports for the And component.
 
 <!-- vale off -->
 
-### AndIns {#and-ins}
+### AndIns \{#and-ins}
 
 <!-- vale on -->
 
@@ -844,7 +844,7 @@ Array of input signals.
 
 <!-- vale off -->
 
-### AndOuts {#and-outs}
+### AndOuts \{#and-outs}
 
 <!-- vale on -->
 
@@ -871,7 +871,7 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 <!-- vale off -->
 
-### ArithmeticCombinator {#arithmetic-combinator}
+### ArithmeticCombinator \{#arithmetic-combinator}
 
 <!-- vale on -->
 
@@ -924,7 +924,7 @@ Output ports for the Arithmetic Combinator component.
 
 <!-- vale off -->
 
-### ArithmeticCombinatorIns {#arithmetic-combinator-ins}
+### ArithmeticCombinatorIns \{#arithmetic-combinator-ins}
 
 <!-- vale on -->
 
@@ -961,7 +961,7 @@ Right hand side of the arithmetic operation.
 
 <!-- vale off -->
 
-### ArithmeticCombinatorOuts {#arithmetic-combinator-outs}
+### ArithmeticCombinatorOuts \{#arithmetic-combinator-outs}
 
 <!-- vale on -->
 
@@ -986,7 +986,7 @@ Result of arithmetic operation.
 
 <!-- vale off -->
 
-### AutoScale {#auto-scale}
+### AutoScale \{#auto-scale}
 
 <!-- vale on -->
 
@@ -1037,7 +1037,7 @@ resources.
 
 <!-- vale off -->
 
-### AutoScaler {#auto-scaler}
+### AutoScaler \{#auto-scaler}
 
 <!-- vale on -->
 
@@ -1218,7 +1218,7 @@ scale-in operation.
 
 <!-- vale off -->
 
-### AutoScalerOuts {#auto-scaler-outs}
+### AutoScalerOuts \{#auto-scaler-outs}
 
 <!-- vale on -->
 
@@ -1261,7 +1261,7 @@ Outputs for _AutoScaler_.
 
 <!-- vale off -->
 
-### AutoScalerScaler {#auto-scaler-scaler}
+### AutoScalerScaler \{#auto-scaler-scaler}
 
 <!-- vale on -->
 
@@ -1282,7 +1282,7 @@ Outputs for _AutoScaler_.
 
 <!-- vale off -->
 
-### Circuit {#circuit}
+### Circuit \{#circuit}
 
 <!-- vale on -->
 
@@ -1347,7 +1347,7 @@ circuit. This interval is typically aligned with how often the corrective action
 
 <!-- vale off -->
 
-### Classifier {#classifier}
+### Classifier \{#classifier}
 
 <!-- vale on -->
 
@@ -1443,7 +1443,7 @@ Selectors for flows that will be classified by this _Classifier_.
 
 <!-- vale off -->
 
-### Component {#component}
+### Component \{#component}
 
 <!-- vale on -->
 
@@ -1489,18 +1489,6 @@ There are three categories of components:
   [_Rate Limiter_](#rate-limiter). In the UI, represented by orange color. Sink
   components usually come in pairs with a "sources" component which emits a
   feedback signal, like `accepted_concurrency` emitted by _Concurrency Limiter_.
-
-:::tip
-
-Sometimes you might want to use a constant value as one of component's inputs.
-You can create an input port containing the constant value instead of being
-connected to a signal. To do so, use the [InPort](#in_port)'s
-.withConstantSignal(constant_signal) method. You can also use it to provide
-special math values such as NaN and +- Inf. If You need to provide the same
-constant signal to multiple components, You can use the [Variable](#variable)
-component.
-
-:::
 
 See also [Policy](#policy) for a higher-level explanation of circuits.
 
@@ -1845,7 +1833,7 @@ Emits a variable signal which can be set to invalid.
 
 <!-- vale off -->
 
-### ConcurrencyLimiter {#concurrency-limiter}
+### ConcurrencyLimiter \{#concurrency-limiter}
 
 <!-- vale on -->
 
@@ -1922,7 +1910,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### ConstantSignal {#constant-signal}
+### ConstantSignal \{#constant-signal}
 
 <!-- vale on -->
 
@@ -1960,7 +1948,7 @@ A constant value.
 
 <!-- vale off -->
 
-### Decider {#decider}
+### Decider \{#decider}
 
 <!-- vale on -->
 
@@ -2043,7 +2031,7 @@ the change will happen instantaneously.```
 
 <!-- vale off -->
 
-### DeciderIns {#decider-ins}
+### DeciderIns \{#decider-ins}
 
 <!-- vale on -->
 
@@ -2080,7 +2068,7 @@ Right hand side input signal for the comparison operation.
 
 <!-- vale off -->
 
-### DeciderOuts {#decider-outs}
+### DeciderOuts \{#decider-outs}
 
 <!-- vale on -->
 
@@ -2105,7 +2093,7 @@ Selected signal (1.0 or 0.0).
 
 <!-- vale off -->
 
-### DecreasingGradient {#decreasing-gradient}
+### DecreasingGradient \{#decreasing-gradient}
 
 <!-- vale on -->
 
@@ -2147,7 +2135,7 @@ Gradient parameters for the controller. Defaults and constraints:
 
 <!-- vale off -->
 
-### DecreasingGradientIns {#decreasing-gradient-ins}
+### DecreasingGradientIns \{#decreasing-gradient-ins}
 
 <!-- vale on -->
 
@@ -2184,7 +2172,7 @@ The signal to use for scale-in.
 
 <!-- vale off -->
 
-### DecreasingGradientParameters {#decreasing-gradient-parameters}
+### DecreasingGradientParameters \{#decreasing-gradient-parameters}
 
 <!-- vale on -->
 
@@ -2219,7 +2207,7 @@ gradient controller. For full documentation of these parameters, refer to the
 
 <!-- vale off -->
 
-### Differentiator {#differentiator}
+### Differentiator \{#differentiator}
 
 <!-- vale on -->
 
@@ -2268,7 +2256,7 @@ The window of time over which differentiator operates.
 
 <!-- vale off -->
 
-### DifferentiatorIns {#differentiator-ins}
+### DifferentiatorIns \{#differentiator-ins}
 
 <!-- vale on -->
 
@@ -2291,7 +2279,7 @@ Inputs for the Differentiator component.
 
 <!-- vale off -->
 
-### DifferentiatorOuts {#differentiator-outs}
+### DifferentiatorOuts \{#differentiator-outs}
 
 <!-- vale on -->
 
@@ -2314,7 +2302,7 @@ Outputs for the Differentiator component.
 
 <!-- vale off -->
 
-### EMA {#e-m-a}
+### EMA \{#e-m-a}
 
 <!-- vale on -->
 
@@ -2394,7 +2382,7 @@ Parameters for the EMA component.
 
 <!-- vale off -->
 
-### EMAIns {#e-m-a-ins}
+### EMAIns \{#e-m-a-ins}
 
 <!-- vale on -->
 
@@ -2455,7 +2443,7 @@ Behavior is similar to `max_envelope`.
 
 <!-- vale off -->
 
-### EMAOuts {#e-m-a-outs}
+### EMAOuts \{#e-m-a-outs}
 
 <!-- vale on -->
 
@@ -2480,7 +2468,7 @@ Exponential moving average of the series of reading as an output signal.
 
 <!-- vale off -->
 
-### EMAParameters {#e-m-a-parameters}
+### EMAParameters \{#e-m-a-parameters}
 
 <!-- vale on -->
 
@@ -2558,7 +2546,7 @@ the warm up window.
 
 <!-- vale off -->
 
-### EqualsMatchExpression {#equals-match-expression}
+### EqualsMatchExpression \{#equals-match-expression}
 
 <!-- vale on -->
 
@@ -2595,7 +2583,7 @@ Exact value that the label should be equal to.
 
 <!-- vale off -->
 
-### Extractor {#extractor}
+### Extractor \{#extractor}
 
 <!-- vale on -->
 
@@ -2690,7 +2678,7 @@ Match HTTP Path to given path templates.
 
 <!-- vale off -->
 
-### Extrapolator {#extrapolator}
+### Extrapolator \{#extrapolator}
 
 <!-- vale on -->
 
@@ -2743,7 +2731,7 @@ Parameters for the Extrapolator component.
 
 <!-- vale off -->
 
-### ExtrapolatorIns {#extrapolator-ins}
+### ExtrapolatorIns \{#extrapolator-ins}
 
 <!-- vale on -->
 
@@ -2768,7 +2756,7 @@ Input signal for the Extrapolator component.
 
 <!-- vale off -->
 
-### ExtrapolatorOuts {#extrapolator-outs}
+### ExtrapolatorOuts \{#extrapolator-outs}
 
 <!-- vale on -->
 
@@ -2793,7 +2781,7 @@ Extrapolated signal.
 
 <!-- vale off -->
 
-### ExtrapolatorParameters {#extrapolator-parameters}
+### ExtrapolatorParameters \{#extrapolator-parameters}
 
 <!-- vale on -->
 
@@ -2818,7 +2806,7 @@ Maximum time interval to repeat the last valid value of input signal.
 
 <!-- vale off -->
 
-### FirstValid {#first-valid}
+### FirstValid \{#first-valid}
 
 <!-- vale on -->
 
@@ -2856,7 +2844,7 @@ Output ports for the FirstValid component.
 
 <!-- vale off -->
 
-### FirstValidIns {#first-valid-ins}
+### FirstValidIns \{#first-valid-ins}
 
 <!-- vale on -->
 
@@ -2881,7 +2869,7 @@ Array of input signals.
 
 <!-- vale off -->
 
-### FirstValidOuts {#first-valid-outs}
+### FirstValidOuts \{#first-valid-outs}
 
 <!-- vale on -->
 
@@ -2906,7 +2894,7 @@ First valid input signal as an output signal.
 
 <!-- vale off -->
 
-### FlowControl {#flow-control}
+### FlowControl \{#flow-control}
 
 <!-- vale on -->
 
@@ -3069,7 +3057,7 @@ allowing only the specified percentage of requests or sticky sessions.
 
 <!-- vale off -->
 
-### FlowControlResources {#flow-control-resources}
+### FlowControlResources \{#flow-control-resources}
 
 <!-- vale on -->
 
@@ -3114,7 +3102,7 @@ PromQL component.
 
 <!-- vale off -->
 
-### FlowMatcher {#flow-matcher}
+### FlowMatcher \{#flow-matcher}
 
 <!-- vale on -->
 
@@ -3203,7 +3191,7 @@ classifier, and immediately use it for matching on the same control point.
 
 <!-- vale off -->
 
-### FlowRegulator {#flow-regulator}
+### FlowRegulator \{#flow-regulator}
 
 <!-- vale on -->
 
@@ -3266,7 +3254,7 @@ Parameters for the _Flow Regulator_.
 
 <!-- vale off -->
 
-### FlowRegulatorDynamicConfig {#flow-regulator-dynamic-config}
+### FlowRegulatorDynamicConfig \{#flow-regulator-dynamic-config}
 
 <!-- vale on -->
 
@@ -3292,7 +3280,7 @@ accept percentage.
 
 <!-- vale off -->
 
-### FlowRegulatorIns {#flow-regulator-ins}
+### FlowRegulatorIns \{#flow-regulator-ins}
 
 <!-- vale on -->
 
@@ -3315,7 +3303,7 @@ The percentage of requests to accept.
 
 <!-- vale off -->
 
-### FlowRegulatorParameters {#flow-regulator-parameters}
+### FlowRegulatorParameters \{#flow-regulator-parameters}
 
 <!-- vale on -->
 
@@ -3369,7 +3357,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### FlowSelector {#flow-selector}
+### FlowSelector \{#flow-selector}
 
 <!-- vale on -->
 
@@ -3417,7 +3405,7 @@ Match agent group and service
 
 <!-- vale off -->
 
-### FluxMeter {#flux-meter}
+### FluxMeter \{#flux-meter}
 
 <!-- vale on -->
 
@@ -3547,7 +3535,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### FluxMeterExponentialBuckets {#flux-meter-exponential-buckets}
+### FluxMeterExponentialBuckets \{#flux-meter-exponential-buckets}
 
 <!-- vale on -->
 
@@ -3599,7 +3587,7 @@ Upper bound of the lowest bucket.
 
 <!-- vale off -->
 
-### FluxMeterExponentialBucketsRange {#flux-meter-exponential-buckets-range}
+### FluxMeterExponentialBucketsRange \{#flux-meter-exponential-buckets-range}
 
 <!-- vale on -->
 
@@ -3650,7 +3638,7 @@ Lowest bucket.
 
 <!-- vale off -->
 
-### FluxMeterLinearBuckets {#flux-meter-linear-buckets}
+### FluxMeterLinearBuckets \{#flux-meter-linear-buckets}
 
 <!-- vale on -->
 
@@ -3701,7 +3689,7 @@ Width of each bucket.
 
 <!-- vale off -->
 
-### FluxMeterStaticBuckets {#flux-meter-static-buckets}
+### FluxMeterStaticBuckets \{#flux-meter-static-buckets}
 
 <!-- vale on -->
 
@@ -3727,7 +3715,7 @@ The buckets in which latency histogram will be stored.
 
 <!-- vale off -->
 
-### GradientController {#gradient-controller}
+### GradientController \{#gradient-controller}
 
 <!-- vale on -->
 
@@ -3824,7 +3812,7 @@ Gradient Parameters.
 
 <!-- vale off -->
 
-### GradientControllerDynamicConfig {#gradient-controller-dynamic-config}
+### GradientControllerDynamicConfig \{#gradient-controller-dynamic-config}
 
 <!-- vale on -->
 
@@ -3851,7 +3839,7 @@ control variable input.
 
 <!-- vale off -->
 
-### GradientControllerIns {#gradient-controller-ins}
+### GradientControllerIns \{#gradient-controller-ins}
 
 <!-- vale on -->
 
@@ -3938,7 +3926,7 @@ Signal to be used for the gradient computation.
 
 <!-- vale off -->
 
-### GradientControllerOuts {#gradient-controller-outs}
+### GradientControllerOuts \{#gradient-controller-outs}
 
 <!-- vale on -->
 
@@ -3963,7 +3951,7 @@ Computed desired value of the control variable.
 
 <!-- vale off -->
 
-### GradientControllerParameters {#gradient-controller-parameters}
+### GradientControllerParameters \{#gradient-controller-parameters}
 
 <!-- vale on -->
 
@@ -4057,7 +4045,7 @@ _slope_ might not fully describe aggressiveness of the controller.
 
 <!-- vale off -->
 
-### Holder {#holder}
+### Holder \{#holder}
 
 <!-- vale on -->
 
@@ -4108,7 +4096,7 @@ Output ports for the Holder component.
 
 <!-- vale off -->
 
-### HolderIns {#holder-ins}
+### HolderIns \{#holder-ins}
 
 <!-- vale on -->
 
@@ -4146,7 +4134,7 @@ and non-zero.
 
 <!-- vale off -->
 
-### HolderOuts {#holder-outs}
+### HolderOuts \{#holder-outs}
 
 <!-- vale on -->
 
@@ -4171,7 +4159,7 @@ The output signal.
 
 <!-- vale off -->
 
-### InPort {#in-port}
+### InPort \{#in-port}
 
 <!-- vale on -->
 
@@ -4208,7 +4196,7 @@ Name of the incoming Signal on the InPort.
 
 <!-- vale off -->
 
-### IncreasingGradient {#increasing-gradient}
+### IncreasingGradient \{#increasing-gradient}
 
 <!-- vale on -->
 
@@ -4250,7 +4238,7 @@ Gradient parameters for the controller. Defaults and constraints:
 
 <!-- vale off -->
 
-### IncreasingGradientIns {#increasing-gradient-ins}
+### IncreasingGradientIns \{#increasing-gradient-ins}
 
 <!-- vale on -->
 
@@ -4287,7 +4275,7 @@ The signal to use for scale-out.
 
 <!-- vale off -->
 
-### IncreasingGradientParameters {#increasing-gradient-parameters}
+### IncreasingGradientParameters \{#increasing-gradient-parameters}
 
 <!-- vale on -->
 
@@ -4322,7 +4310,7 @@ gradient controller. For full documentation of these parameters, refer to the
 
 <!-- vale off -->
 
-### Integrator {#integrator}
+### Integrator \{#integrator}
 
 <!-- vale on -->
 
@@ -4359,7 +4347,7 @@ Output ports for the Integrator component.
 
 <!-- vale off -->
 
-### IntegratorIns {#integrator-ins}
+### IntegratorIns \{#integrator-ins}
 
 <!-- vale on -->
 
@@ -4421,7 +4409,7 @@ Reset also resets the max and min constraints.
 
 <!-- vale off -->
 
-### IntegratorOuts {#integrator-outs}
+### IntegratorOuts \{#integrator-outs}
 
 <!-- vale on -->
 
@@ -4444,7 +4432,7 @@ Outputs for the Integrator component.
 
 <!-- vale off -->
 
-### Inverter {#inverter}
+### Inverter \{#inverter}
 
 <!-- vale on -->
 
@@ -4483,7 +4471,7 @@ Output ports for the Inverter component.
 
 <!-- vale off -->
 
-### InverterIns {#inverter-ins}
+### InverterIns \{#inverter-ins}
 
 <!-- vale on -->
 
@@ -4508,7 +4496,7 @@ Signal to be negated.
 
 <!-- vale off -->
 
-### InverterOuts {#inverter-outs}
+### InverterOuts \{#inverter-outs}
 
 <!-- vale on -->
 
@@ -4535,7 +4523,7 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 <!-- vale off -->
 
-### JSONExtractor {#json-extractor}
+### JSONExtractor \{#json-extractor}
 
 <!-- vale on -->
 
@@ -4584,7 +4572,7 @@ to a string.
 
 <!-- vale off -->
 
-### JWTExtractor {#j-w-t-extractor}
+### JWTExtractor \{#j-w-t-extractor}
 
 <!-- vale on -->
 
@@ -4638,7 +4626,7 @@ to a string.
 
 <!-- vale off -->
 
-### K8sLabelMatcherRequirement {#k8s-label-matcher-requirement}
+### K8sLabelMatcherRequirement \{#k8s-label-matcher-requirement}
 
 <!-- vale on -->
 
@@ -4691,7 +4679,7 @@ Exists or DoesNotExist, the values array must be empty.
 
 <!-- vale off -->
 
-### KubernetesObjectSelector {#kubernetes-object-selector}
+### KubernetesObjectSelector \{#kubernetes-object-selector}
 
 <!-- vale on -->
 
@@ -4765,7 +4753,7 @@ Kubernetes namespace that the resource belongs to.
 
 <!-- vale off -->
 
-### KubernetesReplicas {#kubernetes-replicas}
+### KubernetesReplicas \{#kubernetes-replicas}
 
 <!-- vale on -->
 
@@ -4814,7 +4802,7 @@ The Kubernetes object on which horizontal scaling is applied.
 
 <!-- vale off -->
 
-### LabelMatcher {#label-matcher}
+### LabelMatcher \{#label-matcher}
 
 <!-- vale on -->
 
@@ -4880,7 +4868,7 @@ Note: The requirements are combined using the logical AND operator.
 
 <!-- vale off -->
 
-### LoadActuator {#load-actuator}
+### LoadActuator \{#load-actuator}
 
 <!-- vale on -->
 
@@ -4930,7 +4918,7 @@ Input ports for the Load Actuator component.
 
 <!-- vale off -->
 
-### LoadActuatorDynamicConfig {#load-actuator-dynamic-config}
+### LoadActuatorDynamicConfig \{#load-actuator-dynamic-config}
 
 <!-- vale on -->
 
@@ -4957,7 +4945,7 @@ behavior of Load Actuator without disrupting any real traffic.
 
 <!-- vale off -->
 
-### LoadActuatorIns {#load-actuator-ins}
+### LoadActuatorIns \{#load-actuator-ins}
 
 <!-- vale on -->
 
@@ -4983,7 +4971,7 @@ needs to be accepted.
 
 <!-- vale off -->
 
-### LoadRamp {#load-ramp}
+### LoadRamp \{#load-ramp}
 
 <!-- vale on -->
 
@@ -5062,7 +5050,7 @@ Dynamic configuration key for flow regulator.
 
 <!-- vale off -->
 
-### LoadRampIns {#load-ramp-ins}
+### LoadRampIns \{#load-ramp-ins}
 
 <!-- vale on -->
 
@@ -5111,7 +5099,7 @@ Whether to reset the _Load Ramp_ to the first step.
 
 <!-- vale off -->
 
-### LoadRampOuts {#load-ramp-outs}
+### LoadRampOuts \{#load-ramp-outs}
 
 <!-- vale on -->
 
@@ -5162,7 +5150,7 @@ generation.
 
 <!-- vale off -->
 
-### LoadRampParameters {#load-ramp-parameters}
+### LoadRampParameters \{#load-ramp-parameters}
 
 <!-- vale on -->
 
@@ -5197,7 +5185,7 @@ Parameters for the _Regulator_.
 
 <!-- vale off -->
 
-### LoadRampParametersStep {#load-ramp-parameters-step}
+### LoadRampParametersStep \{#load-ramp-parameters-step}
 
 <!-- vale on -->
 
@@ -5232,7 +5220,7 @@ The value of the step.
 
 <!-- vale off -->
 
-### LoadRampSeries {#load-ramp-series}
+### LoadRampSeries \{#load-ramp-series}
 
 <!-- vale on -->
 
@@ -5265,7 +5253,7 @@ _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
 
 <!-- vale off -->
 
-### LoadRampSeriesIns {#load-ramp-series-ins}
+### LoadRampSeriesIns \{#load-ramp-series-ins}
 
 <!-- vale on -->
 
@@ -5314,7 +5302,7 @@ Whether to reset the load ramp series to the first step.
 
 <!-- vale off -->
 
-### LoadRampSeriesLoadRampInstance {#load-ramp-series-load-ramp-instance}
+### LoadRampSeriesLoadRampInstance \{#load-ramp-series-load-ramp-instance}
 
 <!-- vale on -->
 
@@ -5347,7 +5335,7 @@ The load ramp.
 
 <!-- vale off -->
 
-### LoadRampSeriesParameters {#load-ramp-series-parameters}
+### LoadRampSeriesParameters \{#load-ramp-series-parameters}
 
 <!-- vale on -->
 
@@ -5373,7 +5361,7 @@ An ordered list of load ramps that get applied in order.
 
 <!-- vale off -->
 
-### LoadScheduler {#load-scheduler}
+### LoadScheduler \{#load-scheduler}
 
 <!-- vale on -->
 
@@ -5455,7 +5443,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### LoadSchedulerActuator {#load-scheduler-actuator}
+### LoadSchedulerActuator \{#load-scheduler-actuator}
 
 <!-- vale on -->
 
@@ -5505,7 +5493,7 @@ Input ports for the Actuator component.
 
 <!-- vale off -->
 
-### LoadSchedulerActuatorDynamicConfig {#load-scheduler-actuator-dynamic-config}
+### LoadSchedulerActuatorDynamicConfig \{#load-scheduler-actuator-dynamic-config}
 
 <!-- vale on -->
 
@@ -5532,7 +5520,7 @@ actuator without disrupting any real traffic.
 
 <!-- vale off -->
 
-### LoadSchedulerActuatorIns {#load-scheduler-actuator-ins}
+### LoadSchedulerActuatorIns \{#load-scheduler-actuator-ins}
 
 <!-- vale on -->
 
@@ -5558,7 +5546,7 @@ needs to be accepted.
 
 <!-- vale off -->
 
-### LoadSchedulerScheduler {#load-scheduler-scheduler}
+### LoadSchedulerScheduler \{#load-scheduler-scheduler}
 
 <!-- vale on -->
 
@@ -5593,7 +5581,7 @@ Scheduler parameters.
 
 <!-- vale off -->
 
-### LoadSchedulerSchedulerOuts {#load-scheduler-scheduler-outs}
+### LoadSchedulerSchedulerOuts \{#load-scheduler-scheduler-outs}
 
 <!-- vale on -->
 
@@ -5635,7 +5623,7 @@ the flows entering scheduler.
 
 <!-- vale off -->
 
-### LoadSchedulerSchedulerParameters {#load-scheduler-scheduler-parameters}
+### LoadSchedulerSchedulerParameters \{#load-scheduler-scheduler-parameters}
 
 <!-- vale on -->
 
@@ -5777,7 +5765,7 @@ See also
 
 <!-- vale off -->
 
-### LoadSchedulerSchedulerWorkload {#load-scheduler-scheduler-workload}
+### LoadSchedulerSchedulerWorkload \{#load-scheduler-scheduler-workload}
 
 <!-- vale on -->
 
@@ -5816,7 +5804,7 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale off -->
 
-### LoadSchedulerSchedulerWorkloadParameters {#load-scheduler-scheduler-workload-parameters}
+### LoadSchedulerSchedulerWorkloadParameters \{#load-scheduler-scheduler-workload-parameters}
 
 <!-- vale on -->
 
@@ -5880,7 +5868,7 @@ only if tokens for the flow aren't specified in the flow labels.
 
 <!-- vale off -->
 
-### LoadShaper {#load-shaper}
+### LoadShaper \{#load-shaper}
 
 <!-- vale on -->
 
@@ -5959,7 +5947,7 @@ Dynamic configuration key for flow regulator.
 
 <!-- vale off -->
 
-### LoadShaperIns {#load-shaper-ins}
+### LoadShaperIns \{#load-shaper-ins}
 
 <!-- vale on -->
 
@@ -6008,7 +5996,7 @@ Whether to reset the _Load Shaper_ to the first step.
 
 <!-- vale off -->
 
-### LoadShaperOuts {#load-shaper-outs}
+### LoadShaperOuts \{#load-shaper-outs}
 
 <!-- vale on -->
 
@@ -6059,7 +6047,7 @@ generation.
 
 <!-- vale off -->
 
-### LoadShaperParameters {#load-shaper-parameters}
+### LoadShaperParameters \{#load-shaper-parameters}
 
 <!-- vale on -->
 
@@ -6094,7 +6082,7 @@ Parameters for the _Flow Regulator_.
 
 <!-- vale off -->
 
-### LoadShaperParametersStep {#load-shaper-parameters-step}
+### LoadShaperParametersStep \{#load-shaper-parameters-step}
 
 <!-- vale on -->
 
@@ -6129,7 +6117,7 @@ The value of the step.
 
 <!-- vale off -->
 
-### LoadShaperSeries {#load-shaper-series}
+### LoadShaperSeries \{#load-shaper-series}
 
 <!-- vale on -->
 
@@ -6163,7 +6151,7 @@ order.
 
 <!-- vale off -->
 
-### LoadShaperSeriesIns {#load-shaper-series-ins}
+### LoadShaperSeriesIns \{#load-shaper-series-ins}
 
 <!-- vale on -->
 
@@ -6212,7 +6200,7 @@ Whether to reset the load shaper series to the first step.
 
 <!-- vale off -->
 
-### LoadShaperSeriesLoadShaperInstance {#load-shaper-series-load-shaper-instance}
+### LoadShaperSeriesLoadShaperInstance \{#load-shaper-series-load-shaper-instance}
 
 <!-- vale on -->
 
@@ -6245,7 +6233,7 @@ The load shaper.
 
 <!-- vale off -->
 
-### LoadShaperSeriesParameters {#load-shaper-series-parameters}
+### LoadShaperSeriesParameters \{#load-shaper-series-parameters}
 
 <!-- vale on -->
 
@@ -6271,7 +6259,7 @@ An ordered list of load shapers that get applied in order.
 
 <!-- vale off -->
 
-### MatchExpression {#match-expression}
+### MatchExpression \{#match-expression}
 
 <!-- vale on -->
 
@@ -6367,7 +6355,7 @@ The expression negates the result of sub expression.
 
 <!-- vale off -->
 
-### MatchExpressionList {#match-expression-list}
+### MatchExpressionList \{#match-expression-list}
 
 <!-- vale on -->
 
@@ -6394,7 +6382,7 @@ List of sub expressions of the match expression.
 
 <!-- vale off -->
 
-### MatchesMatchExpression {#matches-match-expression}
+### MatchesMatchExpression \{#matches-match-expression}
 
 <!-- vale on -->
 
@@ -6432,7 +6420,7 @@ Regular expression that should match the label value. It uses
 
 <!-- vale off -->
 
-### Max {#max}
+### Max \{#max}
 
 <!-- vale on -->
 
@@ -6471,7 +6459,7 @@ Output ports for the Max component.
 
 <!-- vale off -->
 
-### MaxIns {#max-ins}
+### MaxIns \{#max-ins}
 
 <!-- vale on -->
 
@@ -6496,7 +6484,7 @@ Array of input signals.
 
 <!-- vale off -->
 
-### MaxOuts {#max-outs}
+### MaxOuts \{#max-outs}
 
 <!-- vale on -->
 
@@ -6521,7 +6509,7 @@ Signal with maximum value as an output signal.
 
 <!-- vale off -->
 
-### Min {#min}
+### Min \{#min}
 
 <!-- vale on -->
 
@@ -6559,7 +6547,7 @@ Output ports for the Min component.
 
 <!-- vale off -->
 
-### MinIns {#min-ins}
+### MinIns \{#min-ins}
 
 <!-- vale on -->
 
@@ -6584,7 +6572,7 @@ Array of input signals.
 
 <!-- vale off -->
 
-### MinOuts {#min-outs}
+### MinOuts \{#min-outs}
 
 <!-- vale on -->
 
@@ -6609,7 +6597,7 @@ Signal with minimum value as an output signal.
 
 <!-- vale off -->
 
-### NestedCircuit {#nested-circuit}
+### NestedCircuit \{#nested-circuit}
 
 <!-- vale on -->
 
@@ -6685,7 +6673,7 @@ by graph visualization tools.
 
 <!-- vale off -->
 
-### NestedSignalEgress {#nested-signal-egress}
+### NestedSignalEgress \{#nested-signal-egress}
 
 <!-- vale on -->
 
@@ -6723,7 +6711,7 @@ Name of the port.
 
 <!-- vale off -->
 
-### NestedSignalEgressIns {#nested-signal-egress-ins}
+### NestedSignalEgressIns \{#nested-signal-egress-ins}
 
 <!-- vale on -->
 
@@ -6748,7 +6736,7 @@ Egress signal.
 
 <!-- vale off -->
 
-### NestedSignalIngress {#nested-signal-ingress}
+### NestedSignalIngress \{#nested-signal-ingress}
 
 <!-- vale on -->
 
@@ -6786,7 +6774,7 @@ Name of the port.
 
 <!-- vale off -->
 
-### NestedSignalIngressOuts {#nested-signal-ingress-outs}
+### NestedSignalIngressOuts \{#nested-signal-ingress-outs}
 
 <!-- vale on -->
 
@@ -6811,7 +6799,7 @@ Ingress signal.
 
 <!-- vale off -->
 
-### Or {#or}
+### Or \{#or}
 
 <!-- vale on -->
 
@@ -6850,7 +6838,7 @@ Output ports for the Or component.
 
 <!-- vale off -->
 
-### OrIns {#or-ins}
+### OrIns \{#or-ins}
 
 <!-- vale on -->
 
@@ -6875,7 +6863,7 @@ Array of input signals.
 
 <!-- vale off -->
 
-### OrOuts {#or-outs}
+### OrOuts \{#or-outs}
 
 <!-- vale on -->
 
@@ -6902,7 +6890,7 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 <!-- vale off -->
 
-### OutPort {#out-port}
+### OutPort \{#out-port}
 
 <!-- vale on -->
 
@@ -6927,7 +6915,7 @@ Name of the outgoing Signal on the OutPort.
 
 <!-- vale off -->
 
-### PathTemplateMatcher {#path-template-matcher}
+### PathTemplateMatcher \{#path-template-matcher}
 
 <!-- vale on -->
 
@@ -6977,7 +6965,7 @@ Example:
 
 <!-- vale off -->
 
-### PodAutoScaler {#pod-auto-scaler}
+### PodAutoScaler \{#pod-auto-scaler}
 
 <!-- vale on -->
 
@@ -7156,7 +7144,7 @@ scale-in operation.
 
 <!-- vale off -->
 
-### PodAutoScalerOuts {#pod-auto-scaler-outs}
+### PodAutoScalerOuts \{#pod-auto-scaler-outs}
 
 <!-- vale on -->
 
@@ -7199,7 +7187,7 @@ Outputs for _PodAutoScaler_.
 
 <!-- vale off -->
 
-### PodScaler {#pod-scaler}
+### PodScaler \{#pod-scaler}
 
 <!-- vale on -->
 
@@ -7248,7 +7236,7 @@ Reports actual and configured number of replicas.
 
 <!-- vale off -->
 
-### PodScalerScaleActuator {#pod-scaler-scale-actuator}
+### PodScalerScaleActuator \{#pod-scaler-scale-actuator}
 
 <!-- vale on -->
 
@@ -7297,7 +7285,7 @@ Input ports for the PodScaler component.
 
 <!-- vale off -->
 
-### PodScalerScaleActuatorDynamicConfig {#pod-scaler-scale-actuator-dynamic-config}
+### PodScalerScaleActuatorDynamicConfig \{#pod-scaler-scale-actuator-dynamic-config}
 
 <!-- vale on -->
 
@@ -7324,7 +7312,7 @@ Scaler without disrupting any real traffic.
 
 <!-- vale off -->
 
-### PodScalerScaleActuatorIns {#pod-scaler-scale-actuator-ins}
+### PodScalerScaleActuatorIns \{#pod-scaler-scale-actuator-ins}
 
 <!-- vale on -->
 
@@ -7347,7 +7335,7 @@ Inputs for the PodScaler component.
 
 <!-- vale off -->
 
-### PodScalerScaleReporter {#pod-scaler-scale-reporter}
+### PodScalerScaleReporter \{#pod-scaler-scale-reporter}
 
 <!-- vale on -->
 
@@ -7372,7 +7360,7 @@ Output ports for the PodScaler component.
 
 <!-- vale off -->
 
-### PodScalerScaleReporterOuts {#pod-scaler-scale-reporter-outs}
+### PodScalerScaleReporterOuts \{#pod-scaler-scale-reporter-outs}
 
 <!-- vale on -->
 
@@ -7409,7 +7397,7 @@ The number of replicas that are desired.
 
 <!-- vale off -->
 
-### Policy {#policy}
+### Policy \{#policy}
 
 <!-- vale on -->
 
@@ -7455,7 +7443,7 @@ Resources (such as Flux Meters, Classifiers) to setup.
 
 <!-- vale off -->
 
-### PromQL {#prom-q-l}
+### PromQL \{#prom-q-l}
 
 <!-- vale on -->
 
@@ -7532,7 +7520,7 @@ Aperture supports OpenTelemetry metrics. See
 
 <!-- vale off -->
 
-### PromQLOuts {#prom-q-l-outs}
+### PromQLOuts \{#prom-q-l-outs}
 
 <!-- vale on -->
 
@@ -7557,7 +7545,7 @@ The result of the Prometheus query as an output signal.
 
 <!-- vale off -->
 
-### PulseGenerator {#pulse-generator}
+### PulseGenerator \{#pulse-generator}
 
 <!-- vale on -->
 
@@ -7606,7 +7594,7 @@ Emitting 1 for the `true_for` duration.
 
 <!-- vale off -->
 
-### PulseGeneratorOuts {#pulse-generator-outs}
+### PulseGeneratorOuts \{#pulse-generator-outs}
 
 <!-- vale on -->
 
@@ -7629,7 +7617,7 @@ Outputs for the PulseGenerator component.
 
 <!-- vale off -->
 
-### Query {#query}
+### Query \{#query}
 
 <!-- vale on -->
 
@@ -7654,7 +7642,7 @@ Periodically runs a Prometheus query in the background and emits the result.
 
 <!-- vale off -->
 
-### RateLimiter {#rate-limiter}
+### RateLimiter \{#rate-limiter}
 
 <!-- vale on -->
 
@@ -7750,7 +7738,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
+### RateLimiterDynamicConfig \{#rate-limiter-dynamic-config}
 
 <!-- vale on -->
 
@@ -7775,7 +7763,7 @@ Allows to specify different limits for particular label values.
 
 <!-- vale off -->
 
-### RateLimiterIns {#rate-limiter-ins}
+### RateLimiterIns \{#rate-limiter-ins}
 
 <!-- vale on -->
 
@@ -7808,7 +7796,7 @@ certain circumstances. [Decider](#decider) might be helpful.
 
 <!-- vale off -->
 
-### RateLimiterOverride {#rate-limiter-override}
+### RateLimiterOverride \{#rate-limiter-override}
 
 <!-- vale on -->
 
@@ -7843,7 +7831,7 @@ Amount by which the `in_ports.limit` should be multiplied for this label value.
 
 <!-- vale off -->
 
-### RateLimiterParameters {#rate-limiter-parameters}
+### RateLimiterParameters \{#rate-limiter-parameters}
 
 <!-- vale on -->
 
@@ -7909,7 +7897,7 @@ assigning tokens to a request. The label value must be a valid uint64 number.
 
 <!-- vale off -->
 
-### RateLimiterParametersLazySync {#rate-limiter-parameters-lazy-sync}
+### RateLimiterParametersLazySync \{#rate-limiter-parameters-lazy-sync}
 
 <!-- vale on -->
 
@@ -7944,7 +7932,7 @@ Number of times to lazy sync within the `limit_reset_interval`.
 
 <!-- vale off -->
 
-### Rego {#rego}
+### Rego \{#rego}
 
 <!-- vale on -->
 
@@ -8020,7 +8008,7 @@ Must include a "package" declaration.
 
 <!-- vale off -->
 
-### RegoLabelProperties {#rego-label-properties}
+### RegoLabelProperties \{#rego-label-properties}
 
 <!-- vale on -->
 
@@ -8047,9 +8035,9 @@ setting.
 
 :::caution
 
-When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled labels
-are sent to FluxNinja ARC for observability. Telemetry should be disabled for
-sensitive labels.
+When using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled
+labels are sent to FluxNinja ARC for observability. Telemetry should be disabled
+for sensitive labels.
 
 :::
 
@@ -8060,7 +8048,7 @@ sensitive labels.
 
 <!-- vale off -->
 
-### Regulator {#regulator}
+### Regulator \{#regulator}
 
 <!-- vale on -->
 
@@ -8130,7 +8118,7 @@ Parameters for the _Regulator_.
 
 <!-- vale off -->
 
-### RegulatorDynamicConfig {#regulator-dynamic-config}
+### RegulatorDynamicConfig \{#regulator-dynamic-config}
 
 <!-- vale on -->
 
@@ -8156,7 +8144,7 @@ accept percentage.
 
 <!-- vale off -->
 
-### RegulatorIns {#regulator-ins}
+### RegulatorIns \{#regulator-ins}
 
 <!-- vale on -->
 
@@ -8179,7 +8167,7 @@ The percentage of requests to accept.
 
 <!-- vale off -->
 
-### RegulatorParameters {#regulator-parameters}
+### RegulatorParameters \{#regulator-parameters}
 
 <!-- vale on -->
 
@@ -8233,7 +8221,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### Resources {#resources}
+### Resources \{#resources}
 
 <!-- vale on -->
 
@@ -8265,7 +8253,7 @@ integration.
 
 <!-- vale off -->
 
-### Rule {#rule}
+### Rule \{#rule}
 
 <!-- vale on -->
 
@@ -8315,9 +8303,9 @@ setting.
 
 :::caution
 
-When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled labels
-are sent to FluxNinja ARC for observability. Telemetry should be disabled for
-sensitive labels.
+When using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled
+labels are sent to FluxNinja ARC for observability. Telemetry should be disabled
+for sensitive labels.
 
 :::
 
@@ -8328,7 +8316,7 @@ sensitive labels.
 
 <!-- vale off -->
 
-### SMA {#s-m-a}
+### SMA \{#s-m-a}
 
 <!-- vale on -->
 
@@ -8378,7 +8366,7 @@ Parameters for the SMA component.
 
 <!-- vale off -->
 
-### SMAIns {#s-m-a-ins}
+### SMAIns \{#s-m-a-ins}
 
 <!-- vale on -->
 
@@ -8401,7 +8389,7 @@ Signal to be used for the moving average computation.
 
 <!-- vale off -->
 
-### SMAOuts {#s-m-a-outs}
+### SMAOuts \{#s-m-a-outs}
 
 <!-- vale on -->
 
@@ -8424,7 +8412,7 @@ Computed moving average.
 
 <!-- vale off -->
 
-### SMAParameters {#s-m-a-parameters}
+### SMAParameters \{#s-m-a-parameters}
 
 <!-- vale on -->
 
@@ -8459,7 +8447,7 @@ Whether the output is valid during the warm-up stage.
 
 <!-- vale off -->
 
-### ScaleInController {#scale-in-controller}
+### ScaleInController \{#scale-in-controller}
 
 <!-- vale on -->
 
@@ -8494,7 +8482,7 @@ Controller
 
 <!-- vale off -->
 
-### ScaleInControllerController {#scale-in-controller-controller}
+### ScaleInControllerController \{#scale-in-controller-controller}
 
 <!-- vale on -->
 
@@ -8515,7 +8503,7 @@ Controller
 
 <!-- vale off -->
 
-### ScaleOutController {#scale-out-controller}
+### ScaleOutController \{#scale-out-controller}
 
 <!-- vale on -->
 
@@ -8550,7 +8538,7 @@ Controller
 
 <!-- vale off -->
 
-### ScaleOutControllerController {#scale-out-controller-controller}
+### ScaleOutControllerController \{#scale-out-controller-controller}
 
 <!-- vale on -->
 
@@ -8571,7 +8559,7 @@ Controller
 
 <!-- vale off -->
 
-### Scheduler {#scheduler}
+### Scheduler \{#scheduler}
 
 <!-- vale on -->
 
@@ -8615,7 +8603,7 @@ Scheduler parameters.
 
 <!-- vale off -->
 
-### SchedulerOuts {#scheduler-outs}
+### SchedulerOuts \{#scheduler-outs}
 
 <!-- vale on -->
 
@@ -8658,7 +8646,7 @@ from all the flows entering scheduler, including rejected ones.
 
 <!-- vale off -->
 
-### SchedulerParameters {#scheduler-parameters}
+### SchedulerParameters \{#scheduler-parameters}
 
 <!-- vale on -->
 
@@ -8774,7 +8762,7 @@ See also
 
 <!-- vale off -->
 
-### SchedulerWorkload {#scheduler-workload}
+### SchedulerWorkload \{#scheduler-workload}
 
 <!-- vale on -->
 
@@ -8813,7 +8801,7 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale off -->
 
-### SchedulerWorkloadParameters {#scheduler-workload-parameters}
+### SchedulerWorkloadParameters \{#scheduler-workload-parameters}
 
 <!-- vale on -->
 
@@ -8877,7 +8865,7 @@ only if tokens for the flow aren't specified in the flow labels.
 
 <!-- vale off -->
 
-### Selector {#selector}
+### Selector \{#selector}
 
 <!-- vale on -->
 
@@ -8996,7 +8984,7 @@ An entity (for example, Kubernetes pod) might belong to multiple services.
 
 <!-- vale off -->
 
-### ServiceSelector {#service-selector}
+### ServiceSelector \{#service-selector}
 
 <!-- vale on -->
 
@@ -9076,7 +9064,7 @@ An entity (for example, Kubernetes pod) might belong to multiple services.
 
 <!-- vale off -->
 
-### SignalGenerator {#signal-generator}
+### SignalGenerator \{#signal-generator}
 
 <!-- vale on -->
 
@@ -9131,7 +9119,7 @@ Parameters for the _Signal Generator_ component.
 
 <!-- vale off -->
 
-### SignalGeneratorIns {#signal-generator-ins}
+### SignalGeneratorIns \{#signal-generator-ins}
 
 <!-- vale on -->
 
@@ -9180,7 +9168,7 @@ Whether to reset the _Signal Generator_ to the first step.
 
 <!-- vale off -->
 
-### SignalGeneratorOuts {#signal-generator-outs}
+### SignalGeneratorOuts \{#signal-generator-outs}
 
 <!-- vale on -->
 
@@ -9231,7 +9219,7 @@ The generated signal.
 
 <!-- vale off -->
 
-### SignalGeneratorParameters {#signal-generator-parameters}
+### SignalGeneratorParameters \{#signal-generator-parameters}
 
 <!-- vale on -->
 
@@ -9255,7 +9243,7 @@ Parameters for the _Signal Generator_ component.
 
 <!-- vale off -->
 
-### SignalGeneratorParametersStep {#signal-generator-parameters-step}
+### SignalGeneratorParametersStep \{#signal-generator-parameters-step}
 
 <!-- vale on -->
 
@@ -9290,7 +9278,7 @@ The value of the step.
 
 <!-- vale off -->
 
-### Switcher {#switcher}
+### Switcher \{#switcher}
 
 <!-- vale on -->
 
@@ -9331,7 +9319,7 @@ Output ports for the Switcher component.
 
 <!-- vale off -->
 
-### SwitcherIns {#switcher-ins}
+### SwitcherIns \{#switcher-ins}
 
 <!-- vale on -->
 
@@ -9380,7 +9368,7 @@ Decides whether to return `on_signal` or `off_signal`.
 
 <!-- vale off -->
 
-### SwitcherOuts {#switcher-outs}
+### SwitcherOuts \{#switcher-outs}
 
 <!-- vale on -->
 
@@ -9405,7 +9393,7 @@ Selected signal (`on_signal` or `off_signal`).
 
 <!-- vale off -->
 
-### UnaryOperator {#unary-operator}
+### UnaryOperator \{#unary-operator}
 
 <!-- vale on -->
 
@@ -9501,7 +9489,7 @@ Output ports for the UnaryOperator component.
 
 <!-- vale off -->
 
-### UnaryOperatorIns {#unary-operator-ins}
+### UnaryOperatorIns \{#unary-operator-ins}
 
 <!-- vale on -->
 
@@ -9526,7 +9514,7 @@ Input signal.
 
 <!-- vale off -->
 
-### UnaryOperatorOuts {#unary-operator-outs}
+### UnaryOperatorOuts \{#unary-operator-outs}
 
 <!-- vale on -->
 
@@ -9551,7 +9539,7 @@ Output signal.
 
 <!-- vale off -->
 
-### Variable {#variable}
+### Variable \{#variable}
 
 <!-- vale on -->
 
@@ -9601,7 +9589,7 @@ Output ports for the Variable component.
 
 <!-- vale off -->
 
-### VariableDynamicConfig {#variable-dynamic-config}
+### VariableDynamicConfig \{#variable-dynamic-config}
 
 <!-- vale on -->
 
@@ -9622,7 +9610,7 @@ Output ports for the Variable component.
 
 <!-- vale off -->
 
-### VariableOuts {#variable-outs}
+### VariableOuts \{#variable-outs}
 
 <!-- vale on -->
 

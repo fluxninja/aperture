@@ -1,5 +1,6 @@
 Kubernetes
 FluxNinja
+fluxninja.com
 [Ss]etpoint
 Alerter
 Combinator
@@ -71,3 +72,6 @@ setpoint
 ClusterRole
 ClusterRoleBinding
 CustomResourceDefinition
+ReplicaSet
+StatefulSet
+StatefulSets
