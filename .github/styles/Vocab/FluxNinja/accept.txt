@@ -76,3 +76,4 @@ ReplicaSet
 StatefulSet
 StatefulSets
 Netty
+OpenTelemetry
