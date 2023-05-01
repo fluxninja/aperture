@@ -114,9 +114,11 @@ definitions:
 
                     Below is example to overwrite `kubeletstats` custom metrics:
 
+                    ```yaml
                     otel:
                     custom_metrics:
                     kubeletstats: {}
+                    ```
                 type: object
                 x-go-name: CustomMetrics
                 x-go-tag-json: custom_metrics,omitempty

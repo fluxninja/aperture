@@ -834,9 +834,11 @@ By default `kubeletstats` custom metrics is added, which can be overwritten.
 
 Below is example to overwrite `kubeletstats` custom metrics:
 
+```yaml
 otel:
 custom_metrics:
 kubeletstats: {}
+```
 
 </dd>
 <dt>disable_kubernetes_scraper</dt>

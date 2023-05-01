@@ -70,9 +70,11 @@ type AgentOTelConfig struct {
 	//
 	// Below is example to overwrite `kubeletstats` custom metrics:
 	//
+	// ```yaml
 	//  otel:
 	//    custom_metrics:
 	//      kubeletstats: {}
+	// ```
 	//
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
