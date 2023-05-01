@@ -732,6 +732,7 @@ jobs:
           command: npm install --global yarn
       - run:
           name: << parameters.task-name >>
+          no_output_timeout: 20m
           command: |
             export LOGURU_LEVEL=TRACE
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes"
