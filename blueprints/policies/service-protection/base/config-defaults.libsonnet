@@ -66,4 +66,5 @@ local service_protection_core_defaults = {
     },
   },
   flow_selector: flow_selector_defaults,
+  overload_confirmation: overload_confirmation_defaults,
 }

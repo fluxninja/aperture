@@ -84,44 +84,92 @@
           "type": "string"
         },
         "service_protection_core": {
-          "description": "Core parameters for Service Protection policy.",
-          "default": {
-            "adaptive_load_scheduler": {
-              "alerter": {
-                "alert_name": "Load Shed Event"
-              },
-              "default_config": {
-                "dry_run": false
-              },
-              "flow_selector": {
-                "flow_matcher": {
-                  "control_point": "__REQUIRED_FIELD__"
-                },
-                "service_selector": {
-                  "service": "__REQUIRED_FIELD__"
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["adaptive_load_scheduler"],
+          "properties": {
+            "overload_confirmations": {
+              "description": "List of overload confirmation criteria. Load scheduler can shed flows when all of the specified criteria are met.",
+              "default": [
+                {
+                  "operator": "__REQUIRED_FIELD__",
+                  "query_string": "__REQUIRED_FIELD__",
+                  "threshold": "__REQUIRED_FIELD__"
                 }
-              },
-              "gradient": {
-                "max_gradient": 1,
-                "min_gradient": 0.1,
-                "slope": -1
-              },
-              "load_multiplier_linear_increment": 0.0025,
-              "max_load_multiplier": 2,
-              "scheduler": {
-                "auto_tokens": true
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/overload_confirmation"
               }
             },
-            "overload_confirmations": [
-              {
-                "operator": "__REQUIRED_FIELD__",
-                "query_string": "__REQUIRED_FIELD__",
-                "threshold": "__REQUIRED_FIELD__"
+            "adaptive_load_scheduler": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["flow_selector"],
+              "properties": {
+                "flow_selector": {
+                  "description": "Concurrency Limiter flow selector.",
+                  "default": {
+                    "flow_matcher": {
+                      "control_point": "__REQUIRED_FIELD__"
+                    },
+                    "service_selector": {
+                      "service": "__REQUIRED_FIELD__"
+                    }
+                  },
+                  "type": "object",
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+                },
+                "scheduler": {
+                  "description": "Scheduler schemaeters.",
+                  "default": {
+                    "auto_tokens": true
+                  },
+                  "type": "object",
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Schedulerschemaeters"
+                },
+                "gradient": {
+                  "description": "Gradient Controller schemaeters.",
+                  "default": {
+                    "max_gradient": 1,
+                    "min_gradient": 0.1,
+                    "slope": -1
+                  },
+                  "type": "object",
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/GradientControllerschemaeters"
+                },
+                "alerter": {
+                  "description": "Whether tokens for workloads are computed dynamically or set statically by the user.",
+                  "default": {
+                    "alert_name": "Load Shed Event"
+                  },
+                  "type": "object",
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Alerterschemaeters"
+                },
+                "max_load_multiplier": {
+                  "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.",
+                  "default": 2,
+                  "type": "number",
+                  "format": "double"
+                },
+                "load_multiplier_linear_increment": {
+                  "description": "Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.",
+                  "default": 0.0025,
+                  "type": "number",
+                  "format": "double"
+                },
+                "default_config": {
+                  "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the",
+                  "default": {
+                    "dry_run": false
+                  },
+                  "type": "object",
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
+                }
               }
-            ]
-          },
-          "type": "object",
-          "$ref": "../../../../policies/service-protection/base/gen/definitions.json#/$defs/service_protection_core"
+            }
+          }
         },
         "flux_meter": {
           "description": "Flux Meter.",
@@ -169,5 +217,29 @@
       }
     }
   },
-  "$defs": null
+  "$defs": {
+    "overload_confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["query_string"],
+      "properties": {
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "threshold": {
+          "description": "The threshold for the overload criteria.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        },
+        "operator": {
+          "description": "The operator for the overload criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        }
+      }
+    }
+  }
 }

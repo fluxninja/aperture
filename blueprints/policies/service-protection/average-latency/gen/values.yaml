@@ -38,9 +38,6 @@ policy:
   # The interval between successive evaluations of the Circuit.
   # Type: string
   evaluation_interval: "1s"
-  # Core parameters for Service Protection policy.
-  # Type: policies/service-protection/base:schema:service_protection_core
-  # Required: True
   service_protection_core:
     # List of overload confirmation criteria. Load scheduler can shed flows when all of the specified criteria are met.
     # Type: []overload_confirmation

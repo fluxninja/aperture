@@ -1,9 +1,9 @@
 ---
-title: Feature Rollout
+title: Service Protection
 keywords:
   - blueprints
-sidebar_position: 1
-sidebar_label: Feature Rollout
+sidebar_position: 2
+sidebar_label: Service Protection
 ---
 
 ```mdx-code-block

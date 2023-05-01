@@ -203,20 +203,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core'
-    description='Core parameters for Service Protection policy.'
-    type='Object (policies/service-protection/base:schema:service_protection_core)'
-    reference='../../../bundled-blueprints/policies/service-protection/base#service-protection-core'
-    value='{"adaptive_load_scheduler": {"alerter": {"alert_name": "Load Shed Event"}, "default_config": {"dry_run": false}, "flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.0025, "max_load_multiplier": 2, "scheduler": {"auto_tokens": true}}, "overload_confirmations": [{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-flux-meter"></a>
 
 <ParameterDescription
@@ -225,6 +211,130 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Object (aperture.spec.v1.FluxMeter)'
     reference='../../../spec#flux-meter'
     value='{"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.service_protection_core {#policy-service-protection-core}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-overload-confirmations"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.overload_confirmations'
+    description='List of overload confirmation criteria. Load scheduler can shed flows when all of the specified criteria are met.'
+    type='Array of Object (overload_confirmation)'
+    reference='#overload-confirmation'
+    value='[{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### policy.service_protection_core.adaptive_load_scheduler {#policy-service-protection-core-adaptive-load-scheduler}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-adaptive-load-scheduler-flow-selector"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.adaptive_load_scheduler.flow_selector'
+    description='Concurrency Limiter flow selector.'
+    type='Object (aperture.spec.v1.FlowSelector)'
+    reference='../../../spec#flow-selector'
+    value='{"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-adaptive-load-scheduler-scheduler"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.adaptive_load_scheduler.scheduler'
+    description='Scheduler schemaeters.'
+    type='Object (aperture.spec.v1.Schedulerschemaeters)'
+    reference='../../../spec#schedulerschemaeters'
+    value='{"auto_tokens": true}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-adaptive-load-scheduler-gradient"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.adaptive_load_scheduler.gradient'
+    description='Gradient Controller schemaeters.'
+    type='Object (aperture.spec.v1.GradientControllerschemaeters)'
+    reference='../../../spec#gradient-controllerschemaeters'
+    value='{"max_gradient": 1, "min_gradient": 0.1, "slope": -1}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-adaptive-load-scheduler-alerter"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.adaptive_load_scheduler.alerter'
+    description='Whether tokens for workloads are computed dynamically or set statically by the user.'
+    type='Object (aperture.spec.v1.Alerterschemaeters)'
+    reference='../../../spec#alerterschemaeters'
+    value='{"alert_name": "Load Shed Event"}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-adaptive-load-scheduler-max-load-multiplier"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.adaptive_load_scheduler.max_load_multiplier'
+    description='Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.'
+    type='Number (double)'
+    reference=''
+    value='2'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-adaptive-load-scheduler-load-multiplier-linear-increment"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.adaptive_load_scheduler.load_multiplier_linear_increment'
+    description='Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.'
+    type='Number (double)'
+    reference=''
+    value='0.0025'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-adaptive-load-scheduler-default-config"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.adaptive_load_scheduler.default_config'
+    description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the'
+    type='Object (aperture.spec.v1.LoadActuatorDynamicConfig)'
+    reference='../../../spec#load-actuator-dynamic-config'
+    value='{"dry_run": false}'
 />
 
 <!-- vale on -->
@@ -273,6 +383,58 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Number (double)'
     reference=''
     value='2'
+/>
+
+<!-- vale on -->
+
+---
+
+### Schemas
+
+<!-- vale off -->
+
+#### overload_confirmation {#overload-confirmation}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-query-string"></a>
+
+<ParameterDescription
+    name='query_string'
+    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the overload criteria.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the overload criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
