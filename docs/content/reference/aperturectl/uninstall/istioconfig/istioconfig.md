@@ -6,6 +6,8 @@ keywords:
   - aperturectl_uninstall_istioconfig
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl uninstall istioconfig
 
 Install example Istio EnvoyFilter

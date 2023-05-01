@@ -6,6 +6,8 @@ keywords:
   - aperturectl_flow-control_preview
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl flow-control preview
 
 Preview control points

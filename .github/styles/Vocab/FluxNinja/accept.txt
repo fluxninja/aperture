@@ -68,3 +68,6 @@ gRPC
 DaemonSet
 OLAP
 setpoint
+ClusterRole
+ClusterRoleBinding
+CustomResourceDefinition

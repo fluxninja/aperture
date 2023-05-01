@@ -6,6 +6,8 @@ keywords:
   - aperturectl_install_agent
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl install agent
 
 Install Aperture Agent

@@ -6,6 +6,8 @@ keywords:
   - aperturectl_apply
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl apply
 
 Apply Aperture Policies

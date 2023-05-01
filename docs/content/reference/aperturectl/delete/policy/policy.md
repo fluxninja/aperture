@@ -6,6 +6,8 @@ keywords:
   - aperturectl_delete_policy
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl delete policy
 
 Delete Aperture Policy from the cluster

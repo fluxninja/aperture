@@ -6,6 +6,8 @@ keywords:
   - aperturectl_blueprints_generate
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl blueprints generate
 
 Generate Aperture Policy related resources from Aperture Blueprints

@@ -6,6 +6,8 @@ keywords:
   - aperturectl_flow-control_control-points
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl flow-control control-points
 
 List Flow Control control points

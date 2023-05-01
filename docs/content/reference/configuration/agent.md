@@ -4,6 +4,7 @@ sidebar_position: 11
 sidebar_label: Agent
 ---
 
+<!-- markdownlint-disable -->
 <!-- vale off -->
 
 <head>
@@ -12,9 +13,8 @@ sidebar_label: Agent
 
 <!-- vale on -->
 
-:::info
-See also [Aperture Agent installation](/get-started/installation/agent/agent.md).
-:::
+:::info See also
+[Aperture Agent installation](/get-started/installation/agent/agent.md). :::
 
 List of all configuration parameters for Aperture Agent.
 
@@ -83,8 +83,8 @@ Generated File Starts
 <dt></dt>
 <dd>
 
-([AgentInfoConfig](#agent-info-config))
-Environment variable prefix: `APERTURE_AGENT_AGENT_INFO_`
+([AgentInfoConfig](#agent-info-config)) Environment variable prefix:
+`APERTURE_AGENT_AGENT_INFO_`
 
 </dd>
 
@@ -107,8 +107,8 @@ Environment variable prefix: `APERTURE_AGENT_AGENT_INFO_`
 <dt>kubernetes</dt>
 <dd>
 
-([AutoScaleKubernetesConfig](#auto-scale-kubernetes-config))
-Environment variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
+([AutoScaleKubernetesConfig](#auto-scale-kubernetes-config)) Environment
+variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 </dd>
 
@@ -131,8 +131,8 @@ Environment variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 <dt>proxy</dt>
 <dd>
 
-([ProxyConfig](#proxy-config))
-Environment variable prefix: `APERTURE_AGENT_CLIENT_PROXY_`
+([ProxyConfig](#proxy-config)) Environment variable prefix:
+`APERTURE_AGENT_CLIENT_PROXY_`
 
 </dd>
 
@@ -155,8 +155,8 @@ Environment variable prefix: `APERTURE_AGENT_CLIENT_PROXY_`
 <dt></dt>
 <dd>
 
-([DistCacheConfig](#dist-cache-config))
-Environment variable prefix: `APERTURE_AGENT_DIST_CACHE_`
+([DistCacheConfig](#dist-cache-config)) Environment variable prefix:
+`APERTURE_AGENT_DIST_CACHE_`
 
 </dd>
 
@@ -179,8 +179,7 @@ Environment variable prefix: `APERTURE_AGENT_DIST_CACHE_`
 <dt></dt>
 <dd>
 
-([EtcdConfig](#etcd-config))
-Environment variable prefix: `APERTURE_AGENT_ETCD_`
+([EtcdConfig](#etcd-config)) Environment variable prefix: `APERTURE_AGENT_ETCD_`
 
 </dd>
 
@@ -203,8 +202,8 @@ Environment variable prefix: `APERTURE_AGENT_ETCD_`
 <dt>preview_service</dt>
 <dd>
 
-([FlowPreviewConfig](#flow-preview-config))
-Environment variable prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
+([FlowPreviewConfig](#flow-preview-config)) Environment variable prefix:
+`APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
 
 </dd>
 
@@ -227,8 +226,8 @@ Environment variable prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
 <dt></dt>
 <dd>
 
-([FluxNinjaExtensionConfig](#flux-ninja-extension-config))
-Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
+([FluxNinjaExtensionConfig](#flux-ninja-extension-config)) Environment variable
+prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 </dd>
 
@@ -251,8 +250,8 @@ Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
 <dt></dt>
 <dd>
 
-([AgentFunctionsConfig](#agent-functions-config))
-Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
+([AgentFunctionsConfig](#agent-functions-config)) Environment variable prefix:
+`APERTURE_AGENT_AGENT_FUNCTIONS_`
 
 </dd>
 
@@ -275,8 +274,8 @@ Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
 <dt>http_client</dt>
 <dd>
 
-([HTTPClientConfig](#http-client-config))
-Environment variable prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_`
+([HTTPClientConfig](#http-client-config)) Environment variable prefix:
+`APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_`
 
 </dd>
 
@@ -299,8 +298,8 @@ Environment variable prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_`
 <dt>scheduler</dt>
 <dd>
 
-([JobGroupConfig](#job-group-config))
-Environment variable prefix: `APERTURE_AGENT_LIVENESS_SCHEDULER_`
+([JobGroupConfig](#job-group-config)) Environment variable prefix:
+`APERTURE_AGENT_LIVENESS_SCHEDULER_`
 
 </dd>
 
@@ -311,8 +310,8 @@ Environment variable prefix: `APERTURE_AGENT_LIVENESS_SCHEDULER_`
 <dt>service</dt>
 <dd>
 
-([JobConfig](#job-config))
-Environment variable prefix: `APERTURE_AGENT_LIVENESS_SERVICE_`
+([JobConfig](#job-config)) Environment variable prefix:
+`APERTURE_AGENT_LIVENESS_SERVICE_`
 
 </dd>
 
@@ -335,8 +334,7 @@ Environment variable prefix: `APERTURE_AGENT_LIVENESS_SERVICE_`
 <dt></dt>
 <dd>
 
-([LogConfig](#log-config))
-Environment variable prefix: `APERTURE_AGENT_LOG_`
+([LogConfig](#log-config)) Environment variable prefix: `APERTURE_AGENT_LOG_`
 
 </dd>
 
@@ -359,8 +357,8 @@ Environment variable prefix: `APERTURE_AGENT_LOG_`
 <dt></dt>
 <dd>
 
-([MetricsConfig](#metrics-config))
-Environment variable prefix: `APERTURE_AGENT_METRICS_`
+([MetricsConfig](#metrics-config)) Environment variable prefix:
+`APERTURE_AGENT_METRICS_`
 
 </dd>
 
@@ -383,8 +381,8 @@ Environment variable prefix: `APERTURE_AGENT_METRICS_`
 <dt></dt>
 <dd>
 
-([AgentOTelConfig](#agent-o-tel-config))
-Environment variable prefix: `APERTURE_AGENT_OTEL_`
+([AgentOTelConfig](#agent-o-tel-config)) Environment variable prefix:
+`APERTURE_AGENT_OTEL_`
 
 </dd>
 
@@ -407,8 +405,8 @@ Environment variable prefix: `APERTURE_AGENT_OTEL_`
 <dt></dt>
 <dd>
 
-([PeerDiscoveryConfig](#peer-discovery-config))
-Environment variable prefix: `APERTURE_AGENT_PEER_DISCOVERY_`
+([PeerDiscoveryConfig](#peer-discovery-config)) Environment variable prefix:
+`APERTURE_AGENT_PEER_DISCOVERY_`
 
 </dd>
 
@@ -431,8 +429,8 @@ Environment variable prefix: `APERTURE_AGENT_PEER_DISCOVERY_`
 <dt></dt>
 <dd>
 
-([ProfilersConfig](#profilers-config))
-Environment variable prefix: `APERTURE_AGENT_PROFILERS_`
+([ProfilersConfig](#profilers-config)) Environment variable prefix:
+`APERTURE_AGENT_PROFILERS_`
 
 </dd>
 
@@ -455,8 +453,8 @@ Environment variable prefix: `APERTURE_AGENT_PROFILERS_`
 <dt></dt>
 <dd>
 
-([PrometheusConfig](#prometheus-config))
-Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_`
+([PrometheusConfig](#prometheus-config)) Environment variable prefix:
+`APERTURE_AGENT_PROMETHEUS_`
 
 </dd>
 
@@ -467,8 +465,8 @@ Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_`
 <dt>http_client</dt>
 <dd>
 
-([HTTPClientConfig](#http-client-config))
-Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_HTTP_CLIENT_`
+([HTTPClientConfig](#http-client-config)) Environment variable prefix:
+`APERTURE_AGENT_PROMETHEUS_HTTP_CLIENT_`
 
 </dd>
 
@@ -491,8 +489,8 @@ Environment variable prefix: `APERTURE_AGENT_PROMETHEUS_HTTP_CLIENT_`
 <dt>scheduler</dt>
 <dd>
 
-([JobGroupConfig](#job-group-config))
-Environment variable prefix: `APERTURE_AGENT_READINESS_SCHEDULER_`
+([JobGroupConfig](#job-group-config)) Environment variable prefix:
+`APERTURE_AGENT_READINESS_SCHEDULER_`
 
 </dd>
 
@@ -503,8 +501,8 @@ Environment variable prefix: `APERTURE_AGENT_READINESS_SCHEDULER_`
 <dt>service</dt>
 <dd>
 
-([JobConfig](#job-config))
-Environment variable prefix: `APERTURE_AGENT_READINESS_SERVICE_`
+([JobConfig](#job-config)) Environment variable prefix:
+`APERTURE_AGENT_READINESS_SERVICE_`
 
 </dd>
 
@@ -527,8 +525,8 @@ Environment variable prefix: `APERTURE_AGENT_READINESS_SERVICE_`
 <dt></dt>
 <dd>
 
-([SentryConfig](#sentry-config))
-Environment variable prefix: `APERTURE_AGENT_SENTRY_`
+([SentryConfig](#sentry-config)) Environment variable prefix:
+`APERTURE_AGENT_SENTRY_`
 
 </dd>
 
@@ -551,8 +549,8 @@ Environment variable prefix: `APERTURE_AGENT_SENTRY_`
 <dt>grpc</dt>
 <dd>
 
-([GRPCServerConfig](#g-rpc-server-config))
-Environment variable prefix: `APERTURE_AGENT_SERVER_GRPC_`
+([GRPCServerConfig](#g-rpc-server-config)) Environment variable prefix:
+`APERTURE_AGENT_SERVER_GRPC_`
 
 </dd>
 
@@ -563,8 +561,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_GRPC_`
 <dt>grpc_gateway</dt>
 <dd>
 
-([GRPCGatewayConfig](#g-rpc-gateway-config))
-Environment variable prefix: `APERTURE_AGENT_SERVER_GRPC_GATEWAY_`
+([GRPCGatewayConfig](#g-rpc-gateway-config)) Environment variable prefix:
+`APERTURE_AGENT_SERVER_GRPC_GATEWAY_`
 
 </dd>
 
@@ -575,8 +573,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_GRPC_GATEWAY_`
 <dt>http</dt>
 <dd>
 
-([HTTPServerConfig](#http-server-config))
-Environment variable prefix: `APERTURE_AGENT_SERVER_HTTP_`
+([HTTPServerConfig](#http-server-config)) Environment variable prefix:
+`APERTURE_AGENT_SERVER_HTTP_`
 
 </dd>
 
@@ -587,8 +585,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_HTTP_`
 <dt>listener</dt>
 <dd>
 
-([ListenerConfig](#listener-config))
-Environment variable prefix: `APERTURE_AGENT_SERVER_LISTENER_`
+([ListenerConfig](#listener-config)) Environment variable prefix:
+`APERTURE_AGENT_SERVER_LISTENER_`
 
 </dd>
 
@@ -599,8 +597,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_LISTENER_`
 <dt>tls</dt>
 <dd>
 
-([ServerTLSConfig](#server-tls-config))
-Environment variable prefix: `APERTURE_AGENT_SERVER_TLS_`
+([ServerTLSConfig](#server-tls-config)) Environment variable prefix:
+`APERTURE_AGENT_SERVER_TLS_`
 
 </dd>
 
@@ -623,8 +621,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVER_TLS_`
 <dt>kubernetes</dt>
 <dd>
 
-([KubernetesDiscoveryConfig](#kubernetes-discovery-config))
-Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
+([KubernetesDiscoveryConfig](#kubernetes-discovery-config)) Environment variable
+prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 
 </dd>
 
@@ -635,8 +633,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 <dt>static</dt>
 <dd>
 
-([StaticDiscoveryConfig](#static-discovery-config))
-Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
+([StaticDiscoveryConfig](#static-discovery-config)) Environment variable prefix:
+`APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
 
 </dd>
 
@@ -659,8 +657,8 @@ Environment variable prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
 <dt>memory</dt>
 <dd>
 
-([WatchdogConfig](#watchdog-config))
-Environment variable prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_`
+([WatchdogConfig](#watchdog-config)) Environment variable prefix:
+`APERTURE_AGENT_WATCHDOG_MEMORY_`
 
 </dd>
 
@@ -680,7 +678,9 @@ Environment variable prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_`
 
 <!-- vale on -->
 
-AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
+AdaptivePolicy creates a policy that forces GC when the usage surpasses the
+configured factor of the available memory. This policy calculates next target as
+usage+(limit-usage)\*factor.
 
 <dl>
 <dt>enabled</dt>
@@ -754,7 +754,8 @@ Network client configuration
 
 <!-- vale on -->
 
-AgentInfoConfig is the configuration for the agent group and other agent attributes.
+AgentInfoConfig is the configuration for the agent group and other agent
+attributes.
 
 <dl>
 <dt>agent_group</dt>
@@ -766,7 +767,8 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 
 <!-- vale on -->
 
-All agents within an agent group receive the same data-plane configuration (for example, Flux Meters, Rate Limiters and so on).
+All agents within an agent group receive the same data-plane configuration (for
+example, Flux Meters, Rate Limiters and so on).
 
 [Read more about agent groups here](/concepts/flow-control/selector.md#agent-group).
 
@@ -827,10 +829,10 @@ Example configuration:
 <!-- vale on -->
 
 CustomMetrics configures custom metrics OTel pipelines, which will send data to
-the controller Prometheus.
-Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
-is optional, as all the components and pipeline names would be normalized.
-By default `kubeletstats` custom metrics is added, which can be overwritten.
+the controller Prometheus. Key in this map refers to OTel pipeline name.
+Prefixing pipeline name with `metrics/` is optional, as all the components and
+pipeline names would be normalized. By default `kubeletstats` custom metrics is
+added, which can be overwritten.
 
 Below is example to overwrite `kubeletstats` custom metrics:
 
@@ -1009,8 +1011,8 @@ BatchAlertsConfig defines configuration for OTel batch processor.
 
 <!-- vale on -->
 
-SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
+SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be
+split into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
@@ -1022,7 +1024,8 @@ into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+SendBatchSize is the size of a batch which after hit, will trigger it to be
+sent.
 
 </dd>
 <dt>timeout</dt>
@@ -1059,8 +1062,8 @@ BatchPostrollupConfig defines configuration for OTel batch processor.
 
 <!-- vale on -->
 
-SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
+SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be
+split into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
@@ -1072,7 +1075,8 @@ into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+SendBatchSize is the size of a batch which after hit, will trigger it to be
+sent.
 
 </dd>
 <dt>timeout</dt>
@@ -1109,8 +1113,8 @@ BatchPrerollupConfig defines configuration for OTel batch processor.
 
 <!-- vale on -->
 
-SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
+SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be
+split into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
@@ -1122,7 +1126,8 @@ into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+SendBatchSize is the size of a batch which after hit, will trigger it to be
+sent.
 
 </dd>
 <dt>timeout</dt>
@@ -1247,8 +1252,8 @@ ClientTLSConfig is the configuration for client TLS.
 
 <!-- vale on -->
 
-Components is an alias type for map[string]any. This needs to be used
-because of the CRD requirements for the operator.
+Components is an alias type for map[string]any. This needs to be used because of
+the CRD requirements for the operator.
 https://github.com/kubernetes-sigs/controller-tools/issues/636
 https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
@@ -1262,11 +1267,12 @@ https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
 <!-- vale on -->
 
-CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller Prometheus.
-Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
+CustomMetricsConfig defines receivers, processors, and single metrics pipeline
+which will be exported to the controller Prometheus. Environment variables can
+be used in the configuration using format `${ENV_VAR_NAME}`.
 
-:::info
-See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+:::info See also
+[Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
 :::
 
 <dl>
@@ -1279,8 +1285,8 @@ See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/
 
 <!-- vale on -->
 
-PerAgentGroup marks the pipeline to be instantiated only once per agent
-group. This is helpful for receivers that scrape for example, some cluster-wide
+PerAgentGroup marks the pipeline to be instantiated only once per agent group.
+This is helpful for receivers that scrape for example, some cluster-wide
 metrics. When not set, pipeline will be instantiated on every Agent.
 
 </dd>
@@ -1298,9 +1304,9 @@ and processors defined above. Exporter would be added automatically.
 
 If there are no processors defined or only one processor is defined, the
 pipeline definition can be omitted. In such cases, the pipeline will
-automatically use all given receivers and the defined processor (if
-any). However, if there are more than one processor, the pipeline must
-be defined explicitly.
+automatically use all given receivers and the defined processor (if any).
+However, if there are more than one processor, the pipeline must be defined
+explicitly.
 
 </dd>
 <dt>processors</dt>
@@ -1313,7 +1319,8 @@ be defined explicitly.
 <!-- vale on -->
 
 Processors define processors to be used in custom metrics pipelines. This should
-be in OTel format - https://opentelemetry.io/docs/collector/configuration/#processors.
+be in OTel format -
+https://opentelemetry.io/docs/collector/configuration/#processors.
 
 </dd>
 <dt>receivers</dt>
@@ -1326,7 +1333,8 @@ be in OTel format - https://opentelemetry.io/docs/collector/configuration/#proce
 <!-- vale on -->
 
 Receivers define receivers to be used in custom metrics pipelines. This should
-be in OTel format - https://opentelemetry.io/docs/collector/configuration/#receivers.
+be in OTel format -
+https://opentelemetry.io/docs/collector/configuration/#receivers.
 
 </dd>
 </dl>
@@ -1372,7 +1380,8 @@ CustomMetricsPipelineConfig defines a custom metrics pipeline.
 
 <!-- vale on -->
 
-DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
+DistCacheConfig configures distributed cache that holds per-label counters in
+distributed rate limiters.
 
 <dl>
 <dt>bind_addr</dt>
@@ -1384,7 +1393,8 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 
 <!-- vale on -->
 
-BindAddr denotes the address that DistCache will bind to for communication with other peer nodes.
+BindAddr denotes the address that DistCache will bind to for communication with
+other peer nodes.
 
 </dd>
 <dt>memberlist_advertise_addr</dt>
@@ -1396,7 +1406,8 @@ BindAddr denotes the address that DistCache will bind to for communication with 
 
 <!-- vale on -->
 
-Address of [`memberlist`](https://github.com/hashicorp/memberlist) to advertise to other cluster members. Used for NAT traversal if provided.
+Address of [`memberlist`](https://github.com/hashicorp/memberlist) to advertise
+to other cluster members. Used for NAT traversal if provided.
 
 </dd>
 <dt>memberlist_bind_addr</dt>
@@ -1408,7 +1419,8 @@ Address of [`memberlist`](https://github.com/hashicorp/memberlist) to advertise 
 
 <!-- vale on -->
 
-Address to bind [`memberlist`](https://github.com/hashicorp/memberlist) server to.
+Address to bind [`memberlist`](https://github.com/hashicorp/memberlist) server
+to.
 
 </dd>
 <dt>replica_count</dt>
@@ -1638,7 +1650,8 @@ API Key for this agent. If this key is not set, the extension won't be enabled.
 
 <!-- vale on -->
 
-Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
+Address to gRPC or HTTP(s) server listening in agent service. To use HTTP
+protocol, the address must start with `http(s)://`.
 
 </dd>
 <dt>heartbeat_interval</dt>
@@ -1658,11 +1671,13 @@ Interval between each heartbeat.
 
 <!-- vale off -->
 
-(string, one of: `KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL`, default: `"LINUX_BARE_METAL"`)
+(string, one of: `KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL`,
+default: `"LINUX_BARE_METAL"`)
 
 <!-- vale on -->
 
-Installation mode describes on which underlying platform the Agent or the Controller is being run.
+Installation mode describes on which underlying platform the Agent or the
+Controller is being run.
 
 </dd>
 <dt>client</dt>
@@ -1772,7 +1787,8 @@ GRPCGatewayConfig holds configuration for gRPC to HTTP gateway
 
 <!-- vale on -->
 
-gRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs gRPC and HTTP servers on the same port
+gRPC server address to connect to - By default it points to HTTP server port
+because FluxNinja stack runs gRPC and HTTP servers on the same port
 
 </dd>
 </dl>
@@ -2014,7 +2030,8 @@ TLS Handshake Timeout. 0 = no timeout
 
 <!-- vale on -->
 
-HTTP client timeout - Timeouts include connection time, redirects, reading the response and so on. 0 = no timeout.
+HTTP client timeout - Timeouts include connection time, redirects, reading the
+response and so on. 0 = no timeout.
 
 </dd>
 <dt>use_proxy</dt>
@@ -2174,8 +2191,7 @@ Write timeout
 
 A Header represents the key-value pairs in an HTTP header.
 
-The keys should be in canonical form, as returned by
-CanonicalHeaderKey.
+The keys should be in canonical form, as returned by CanonicalHeaderKey.
 
 [Header](#header)
 
@@ -2211,7 +2227,8 @@ Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 
 <!-- vale on -->
 
-Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid over scheduling.
+Minimum GoGC sets the minimum garbage collection target percentage for heap
+driven Watchdogs. This setting helps avoid over scheduling.
 
 </dd>
 <dt>adaptive_policy</dt>
@@ -2256,7 +2273,8 @@ JobConfig is configuration for a periodic job
 
 <!-- vale on -->
 
-Time between job executions. Zero or negative value means that the job will never execute periodically.
+Time between job executions. Zero or negative value means that the job will
+never execute periodically.
 
 </dd>
 <dt>execution_timeout</dt>
@@ -2305,10 +2323,9 @@ JobGroupConfig holds configuration for JobGroup.
 
 <!-- vale on -->
 
-When true, the scheduler will run jobs synchronously,
-waiting for each execution instance of the job to return
-before starting the next execution. Running with this
-option effectively serializes all job execution.
+When true, the scheduler will run jobs synchronously, waiting for each execution
+instance of the job to return before starting the next execution. Running with
+this option effectively serializes all job execution.
 
 </dd>
 <dt>worker_limit</dt>
@@ -2320,10 +2337,9 @@ option effectively serializes all job execution.
 
 <!-- vale on -->
 
-Limits how many jobs can be running at the same time. This is
-useful when running resource intensive jobs and a precise start time is
-not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
-is ignored.
+Limits how many jobs can be running at the same time. This is useful when
+running resource intensive jobs and a precise start time is not critical. 0 = no
+limit. If BlockingExecution is set, then WorkerLimit is ignored.
 
 </dd>
 </dl>
@@ -2383,7 +2399,8 @@ Address to bind to in the form of `[host%zone]:port`
 
 <!-- vale on -->
 
-Keep-alive period - 0 = enabled if supported by protocol or operating system. If negative, then keep-alive is disabled.
+Keep-alive period - 0 = enabled if supported by protocol or operating system. If
+negative, then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>
@@ -2416,7 +2433,9 @@ LogConfig holds configuration for a logger and log writers.
 
 <!-- vale off -->
 
-(string, one of: `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`, default: `"info"`)
+(string, one of:
+`debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`,
+default: `"info"`)
 
 <!-- vale on -->
 
@@ -2444,7 +2463,8 @@ Use non-blocking log writer (can lose logs at high throughput)
 
 <!-- vale on -->
 
-Additional log writer: pretty console (`stdout`) logging (not recommended for prod environments)
+Additional log writer: pretty console (`stdout`) logging (not recommended for
+prod environments)
 
 </dd>
 <dt>writers</dt>
@@ -2493,7 +2513,8 @@ Compress
 
 <!-- vale on -->
 
-Output file for logs. Keywords allowed - [`stderr`, `default`]. `default` maps to `/var/log/fluxninja/<service>.log`
+Output file for logs. Keywords allowed - [`stderr`, `default`]. `default` maps
+to `/var/log/fluxninja/<service>.log`
 
 </dd>
 <dt>max_age</dt>
@@ -2554,7 +2575,9 @@ MetricsConfig holds configuration for service metrics.
 
 <!-- vale on -->
 
-EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
+EnableGoCollector controls whether the go collector is registered on startup.
+See
+<https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
 
 </dd>
 <dt>enable_process_collector</dt>
@@ -2566,7 +2589,9 @@ EnableGoCollector controls whether the go collector is registered on startup. Se
 
 <!-- vale on -->
 
-EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
+EnableProcessCollector controls whether the process collector is registered on
+startup. See
+<https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
 
 </dd>
 <dt>pedantic</dt>
@@ -2578,7 +2603,8 @@ EnableProcessCollector controls whether the process collector is registered on s
 
 <!-- vale on -->
 
-Pedantic controls whether a pedantic registry is used. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+Pedantic controls whether a pedantic registry is used. See
+<https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
 
 </dd>
 </dl>
@@ -2603,9 +2629,8 @@ PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 
 <!-- vale on -->
 
-Network address of aperture server to advertise to peers - this address
-should be reachable from other agents. Used for NAT traversal when
-provided.
+Network address of aperture server to advertise to peers - this address should
+be reachable from other agents. Used for NAT traversal when provided.
 
 </dd>
 </dl>
@@ -2691,7 +2716,9 @@ ProfilersConfig holds configuration for profilers.
 
 <!-- vale on -->
 
-Flag to enable CPU profiling on process start and save it to a file. The Browser (HTTP) interface won't work if this is enabled, as the CPU profile will always be running.
+Flag to enable CPU profiling on process start and save it to a file. The Browser
+(HTTP) interface won't work if this is enabled, as the CPU profile will always
+be running.
 
 </dd>
 <dt>profiles_path</dt>
@@ -2703,7 +2730,8 @@ Flag to enable CPU profiling on process start and save it to a file. The Browser
 
 <!-- vale on -->
 
-Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
+Path to save performance profiles. "default" path is
+`/var/log/aperture/<service>/profiles`.
 
 </dd>
 <dt>register_http_routes</dt>
@@ -2715,7 +2743,8 @@ Path to save performance profiles. "default" path is `/var/log/aperture/<service
 
 <!-- vale on -->
 
-Register routes. Profile types `profile`, `symbol` and `cmdline` will be registered at `/debug/pprof/{profile,symbol,cmdline}`.
+Register routes. Profile types `profile`, `symbol` and `cmdline` will be
+registered at `/debug/pprof/{profile,symbol,cmdline}`.
 
 </dd>
 </dl>
@@ -2755,7 +2784,9 @@ Address of the Prometheus server
 
 ProxyConfig holds proxy configuration.
 
-This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
+This configuration has preference over environment variables HTTP_PROXY,
+HTTPS_PROXY or NO_PROXY. See
+<https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
 
 <dl>
 <dt>http</dt>
@@ -2842,13 +2873,13 @@ Sentry crash report disabled
 
 <!-- vale off -->
 
-(string, default: `"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`)
+(string, default:
+`"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`)
 
 <!-- vale on -->
 
-If DSN is not set, the client is effectively disabled
-You can set test project's DSN to send log events.
-oss-aperture project DSN is set as default.
+If DSN is not set, the client is effectively disabled You can set test project's
+DSN to send log events. oss-aperture project DSN is set as default.
 
 </dd>
 <dt>environment</dt>
@@ -2993,7 +3024,8 @@ StaticDiscoveryConfig for pre-determined list of services.
 
 <!-- vale on -->
 
-WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
+WatchdogConfig holds configuration for Watchdog Policy. For each policy, either
+watermark or adaptive should be configured.
 
 <dl>
 <dt>cgroup</dt>
@@ -3046,7 +3078,8 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 
 <!-- vale on -->
 
-WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
+WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both
+algorithms are configured then only watermark algorithm is used.
 
 <dl>
 <dt>adaptive_policy</dt>
@@ -3079,7 +3112,8 @@ WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algor
 
 <!-- vale on -->
 
-WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
+WatermarksPolicy creates a Watchdog policy that schedules GC at concrete
+watermarks.
 
 <dl>
 <dt>enabled</dt>
@@ -3103,7 +3137,9 @@ Flag to enable the policy
 
 <!-- vale on -->
 
-Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It's recommended to set an extreme watermark for the last element (for example, 0.99).
+Watermarks are increasing limits on which to trigger GC. Watchdog disarms when
+the last watermark is surpassed. It's recommended to set an extreme watermark
+for the last element (for example, 0.99).
 
 </dd>
 </dl>

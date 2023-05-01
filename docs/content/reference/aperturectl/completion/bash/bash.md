@@ -6,6 +6,8 @@ keywords:
   - aperturectl_completion_bash
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl completion bash
 
 Generate the autocompletion script for bash

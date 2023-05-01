@@ -4,6 +4,7 @@ sidebar_position: 2
 sidebar_label: Specification
 ---
 
+<!-- markdownlint-disable -->
 <!-- vale off -->
 
 <head>
@@ -12,7 +13,8 @@ sidebar_label: Specification
 
 <!-- vale on -->
 
-Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
+Reference for all objects used in
+[the Policy language](/concepts/policy/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).
 
@@ -30,7 +32,9 @@ Generated File Starts
 
 <!-- vale on -->
 
-High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+High level concurrency control component. Baselines a signal using exponential
+moving average and applies concurrency limits based on deviation of signal from
+the baseline. Internally implemented as a nested circuit.
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -78,8 +82,8 @@ Dynamic configuration key for load actuation.
 
 <!-- vale on -->
 
-Flow Selector decides the service and flows at which the concurrency limiter is applied.
-Deprecated 1.8.0: Use `selectors` instead.
+Flow Selector decides the service and flows at which the concurrency limiter is
+applied. Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -115,7 +119,8 @@ Input ports for the AIMDConcurrencyController component.
 
 <!-- vale on -->
 
-Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+Linear increment to load multiplier in each execution tick when the system is
+not in overloaded state.
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -127,7 +132,9 @@ Linear increment to load multiplier in each execution tick when the system is no
 
 <!-- vale on -->
 
-Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+Current accepted concurrency is multiplied with this number to dynamically
+calculate the upper concurrency limit of a Service during normal (non-overload)
+state. This protects the Service from sudden spikes.
 
 </dd>
 <dt>out_ports</dt>
@@ -188,7 +195,8 @@ Inputs for the AIMDConcurrencyController component.
 
 <!-- vale on -->
 
-The enabled port controls whether the _Adaptive Load Scheduler_ can load shed _Flows_. By default, the _Adaptive Load Scheduler_ is enabled.
+The enabled port controls whether the _Adaptive Load Scheduler_ can load shed
+_Flows_. By default, the _Adaptive Load Scheduler_ is enabled.
 
 </dd>
 <dt>setpoint</dt>
@@ -237,7 +245,8 @@ Outputs for the AIMDConcurrencyController component.
 
 <!-- vale on -->
 
-Accepted concurrency is the number of concurrent requests that are accepted by the service.
+Accepted concurrency is the number of concurrent requests that are accepted by
+the service.
 
 </dd>
 <dt>desired_load_multiplier</dt>
@@ -249,7 +258,8 @@ Accepted concurrency is the number of concurrent requests that are accepted by t
 
 <!-- vale on -->
 
-Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+Desired Load multiplier is the ratio of desired concurrency to the incoming
+concurrency.
 
 </dd>
 <dt>incoming_concurrency</dt>
@@ -261,7 +271,8 @@ Desired Load multiplier is the ratio of desired concurrency to the incoming conc
 
 <!-- vale on -->
 
-IncomingConcurrency is the number of concurrent requests that are received by the service.
+IncomingConcurrency is the number of concurrent requests that are received by
+the service.
 
 </dd>
 <dt>is_overload</dt>
@@ -273,8 +284,9 @@ IncomingConcurrency is the number of concurrent requests that are received by th
 
 <!-- vale on -->
 
-Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
-Deprecated: 1.6.0
+Is overload is a Boolean signal that indicates whether the service is overloaded
+based on the deviation of the signal from the setpoint taking into account some
+tolerance. Deprecated: 1.6.0
 
 </dd>
 <dt>observed_load_multiplier</dt>
@@ -286,7 +298,8 @@ Deprecated: 1.6.0
 
 <!-- vale on -->
 
-Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
+Observed Load multiplier is the ratio of accepted concurrency to the incoming
+concurrency.
 
 </dd>
 </dl>
@@ -299,7 +312,8 @@ Observed Load multiplier is the ratio of accepted concurrency to the incoming co
 
 <!-- vale on -->
 
-The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..
+The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
+deviation of the input signal from the setpoint..
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -347,8 +361,8 @@ Dynamic configuration key for load actuation.
 
 <!-- vale on -->
 
-_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
-Deprecated 1.8.0: Use `selectors` instead.
+_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load
+Scheduler_ is applied. Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -384,7 +398,8 @@ Collection of input ports for the _Adaptive Load Scheduler_ component.
 
 <!-- vale on -->
 
-Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+Linear increment to load multiplier in each execution tick when the system is
+not in overloaded state.
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -396,7 +411,9 @@ Linear increment to load multiplier in each execution tick when the system is no
 
 <!-- vale on -->
 
-The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
+The accepted token rate is multiplied by this value to dynamically calculate the
+upper concurrency limit of a Service during normal (non-overload) states,
+helping to protect the Service from sudden spikes in incoming token rate.
 
 </dd>
 <dt>out_ports</dt>
@@ -457,7 +474,8 @@ Input ports for the _Adaptive Load Scheduler_ component.
 
 <!-- vale on -->
 
-The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.
+The enabled port determines if the _Load Scheduler_ can shed _Flows_. By
+default, the Load Scheduler is enabled.
 
 </dd>
 <dt>setpoint</dt>
@@ -518,7 +536,8 @@ Accepted token rate is the number of tokens per second accepted by the service.
 
 <!-- vale on -->
 
-Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+Desired Load multiplier is the ratio of desired token rate to the incoming token
+rate.
 
 </dd>
 <dt>incoming_token_rate</dt>
@@ -530,7 +549,8 @@ Desired Load multiplier is the ratio of desired token rate to the incoming token
 
 <!-- vale on -->
 
-Incoming token rate is the number of tokens per second incoming to the service (including rejected ones).
+Incoming token rate is the number of tokens per second incoming to the service
+(including rejected ones).
 
 </dd>
 <dt>is_overload</dt>
@@ -542,7 +562,8 @@ Incoming token rate is the number of tokens per second incoming to the service (
 
 <!-- vale on -->
 
-A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
+A Boolean signal that indicates whether the service is overloaded based on the
+deviation of the signal from the setpoint, considering a certain tolerance.
 Deprecated: 1.6.0
 
 </dd>
@@ -555,7 +576,8 @@ Deprecated: 1.6.0
 
 <!-- vale on -->
 
-Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+Observed Load multiplier is the ratio of accepted token rate to the incoming
+token rate.
 
 </dd>
 </dl>
@@ -568,10 +590,11 @@ Observed Load multiplier is the ratio of accepted token rate to the incoming tok
 
 <!-- vale on -->
 
-Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`
+Display an [Address][ext-authz-address] as a single string, for example,
+`<ip>:<port>`
 
-IP addresses in attribute context are defined as objects with separate IP and port fields.
-This is a helper to display an address as a single string.
+IP addresses in attribute context are defined as objects with separate IP and
+port fields. This is a helper to display an address as a single string.
 
 :::caution
 
@@ -579,7 +602,8 @@ This might introduce high-cardinality flow label values.
 
 :::
 
-[ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
+[ext-authz-address]:
+  https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
 
 Example:
 
@@ -659,7 +683,8 @@ Inputs for the Alerter component.
 
 <!-- vale on -->
 
-Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
+Signal which Alerter is monitoring. If the signal greater than 0, Alerter
+generates an alert.
 
 </dd>
 </dl>
@@ -672,7 +697,8 @@ Signal which Alerter is monitoring. If the signal greater than 0, Alerter genera
 
 <!-- vale on -->
 
-Alerter Parameters configure parameters such as alert name, severity, resolve timeout, alert channels and labels.
+Alerter Parameters configure parameters such as alert name, severity, resolve
+timeout, alert channels and labels.
 
 <dl>
 <dt>alert_channels</dt>
@@ -755,10 +781,10 @@ Signals are mapped to Boolean values as follows:
 
   :::note
 
-  Treating invalid inputs as "unknowns" has a consequence that the result
-  might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
-  because the result would end up false no matter if
-  first signal was true or false. Conversely, `unknown && true == unknown`.
+  Treating invalid inputs as "unknowns" has a consequence that the result might
+  end up being valid even when some inputs are invalid. For example,
+  `unknown && false == false`, because the result would end up false no matter
+  if first signal was true or false. Conversely, `unknown && true == unknown`.
 
   :::
 
@@ -875,8 +901,9 @@ Input ports for the Arithmetic Combinator component.
 
 Operator of the arithmetic operation.
 
-The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
-In case of XOR and bit shifts, value of signals is cast to integers before performing the operation.
+The arithmetic operation can be addition, subtraction, multiplication, division,
+XOR, right bit shift or left bit shift. In case of XOR and bit shifts, value of
+signals is cast to integers before performing the operation.
 
 </dd>
 <dt>out_ports</dt>
@@ -987,7 +1014,8 @@ _AutoScaler_ provides auto-scaling functionality for any scalable resource.
 
 <!-- vale on -->
 
-_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes
+resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -999,7 +1027,8 @@ _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes reso
 
 <!-- vale on -->
 
-PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+PodScaler provides pod horizontal scaling functionality for scalable Kubernetes
+resources.
 
 </dd>
 </dl>
@@ -1012,7 +1041,10 @@ PodScaler provides pod horizontal scaling functionality for scalable Kubernetes 
 
 <!-- vale on -->
 
-_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+_AutoScaler_ provides auto-scaling functionality for any scalable resource.
+Multiple _Controllers_ can be defined on the _AutoScaler_ for performing
+scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs
+such as Kubernetes to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -1024,9 +1056,10 @@ _AutoScaler_ provides auto-scaling functionality for any scalable resource. Mult
 
 <!-- vale on -->
 
-Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
-For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+Cooldown override percentage defines a threshold change in scale-out beyond
+which previous cooldown is overridden. For example, if the cooldown is 5 minutes
+and the cooldown override percentage is 10%, then if the scale-increases by 10%
+or more, the previous cooldown is cancelled. Defaults to 50%.
 
 </dd>
 <dt>max_scale</dt>
@@ -1038,7 +1071,8 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 
 <!-- vale on -->
 
-The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+The maximum scale to which the _AutoScaler_ can scale-out. For example, in case
+of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
@@ -1050,7 +1084,9 @@ The maximum scale to which the _AutoScaler_ can scale-out. For example, in case 
 
 <!-- vale on -->
 
-The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+The maximum decrease of scale (for example, pods) at one time. Defined as
+percentage of current scale value. Can never go below one even if percentage
+computation is less than one. Defaults to 1% of current scale value.
 
 </dd>
 <dt>max_scale_out_percentage</dt>
@@ -1062,7 +1098,9 @@ The maximum decrease of scale (for example, pods) at one time. Defined as percen
 
 <!-- vale on -->
 
-The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+The maximum increase of scale (for example, pods) at one time. Defined as
+percentage of current scale value. Can never go below one even if percentage
+computation is less than one. Defaults to 10% of current scale value.
 
 </dd>
 <dt>min_scale</dt>
@@ -1074,7 +1112,8 @@ The maximum increase of scale (for example, pods) at one time. Defined as percen
 
 <!-- vale on -->
 
-The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+The minimum scale to which the _AutoScaler_ can scale-in. For example, in case
+of KubernetesReplicas Scaler, this is the minimum number of replicas.
 
 </dd>
 <dt>out_ports</dt>
@@ -1122,7 +1161,8 @@ List of _Controllers_ for scaling in.
 
 <!-- vale on -->
 
-The amount of time to wait after a scale-in operation for another scale-in operation.
+The amount of time to wait after a scale-in operation for another scale-in
+operation.
 
 </dd>
 <dt>scale_out_alerter_parameters</dt>
@@ -1158,7 +1198,8 @@ List of _Controllers_ for scaling out.
 
 <!-- vale on -->
 
-The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+The amount of time to wait after a scale-out operation for another scale-out or
+scale-in operation.
 
 </dd>
 <dt>scaler</dt>
@@ -1253,23 +1294,23 @@ See also [Circuit overview](/concepts/policy/circuit.md).
 
 :::
 
-Signals flow between components through ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).
-Circuit is evaluated periodically to respond to changes in signal readings.
+Signals flow between components through ports. As signals traverse the circuit,
+they get processed, stored within components or get acted upon (for example,
+load-shed, rate-limit, auto-scale and so on). Circuit is evaluated periodically
+to respond to changes in signal readings.
 
 :::info Signals
 
 Signals are floating point values.
 
 A signal can also have a special **Invalid** value. It's usually used to
-communicate that signal does not have a meaningful value at the moment, for example,
-[PromQL](#prom-q-l) emits such a value if it cannot execute a query.
-Components know when their input signals are invalid and can act
-accordingly. They can either propagate the invalid signal, by making their
-output itself invalid (for example,
-[ArithmeticCombinator](#arithmetic-combinator)) or use some different
-logic, for example, [Extrapolator](#extrapolator). Refer to a component's
-docs on how exactly it handles invalid inputs.
+communicate that signal does not have a meaningful value at the moment, for
+example, [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
+Components know when their input signals are invalid and can act accordingly.
+They can either propagate the invalid signal, by making their output itself
+invalid (for example, [ArithmeticCombinator](#arithmetic-combinator)) or use
+some different logic, for example, [Extrapolator](#extrapolator). Refer to a
+component's docs on how exactly it handles invalid inputs.
 
 :::
 
@@ -1295,8 +1336,9 @@ Defines a signal processing graph as a list of components.
 
 <!-- vale on -->
 
-Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
-This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+Evaluation interval (tick) is the time between consecutive runs of the policy
+circuit. This interval is typically aligned with how often the corrective action
+(actuation) needs to be taken.
 
 </dd>
 </dl>
@@ -1315,8 +1357,7 @@ Set of classification rules sharing a common selector
 
 See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
 
-:::
-Example
+::: Example
 
 ```yaml
 flow_selector:
@@ -1348,8 +1389,8 @@ rules:
 
 <!-- vale on -->
 
-Defines where to apply the flow classification rule.
-Deprecated 1.8.0: Use `selectors` instead.
+Defines where to apply the flow classification rule. Deprecated 1.8.0: Use
+`selectors` instead.
 
 </dd>
 <dt>rego</dt>
@@ -1363,9 +1404,11 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 Rego based classification
 
-Rego is a policy language used to express complex policies in a concise and declarative way.
-It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
-For simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.
+Rego is a policy language used to express complex policies in a concise and
+declarative way. It can be used to define flow classification rules by writing
+custom queries that extract values from request metadata. For simple cases, such
+as directly reading a value from header or a field from JSON body, declarative
+extractors are recommended.
 
 </dd>
 <dt>rules</dt>
@@ -1378,8 +1421,8 @@ For simple cases, such as directly reading a value from header or a field from J
 <!-- vale on -->
 
 A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to rules that define
-how to extract and propagate flow labels with that key.
+[flow label](/concepts/flow-control/flow-label.md) keys to rules that define how
+to extract and propagate flow labels with that key.
 
 </dd>
 <dt>selectors</dt>
@@ -1412,45 +1455,50 @@ See also [Components overview](/concepts/policy/circuit.md#components).
 
 :::
 
-Signals flow into the components from input ports and results are emitted on output ports.
-Components are wired to each other based on signal names forming an execution graph of the circuit.
+Signals flow into the components from input ports and results are emitted on
+output ports. Components are wired to each other based on signal names forming
+an execution graph of the circuit.
 
 :::note
 
-Loops are broken by the runtime at the earliest component index that is part of the loop.
-The looped signals are saved in the tick they're generated and served in the subsequent tick.
+Loops are broken by the runtime at the earliest component index that is part of
+the loop. The looped signals are saved in the tick they're generated and served
+in the subsequent tick.
 
 :::
 
 There are three categories of components:
 
-- "source" components: they take some sort of input from "the real world" and output
-  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
+- "source" components: they take some sort of input from "the real world" and
+  output a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
   they're represented by green color.
-- signal processor components: processing components that do not interact with the external systems.
-  Examples: [GradientController](#gradient-controller), [Max](#max).
+- signal processor components: processing components that do not interact with
+  the external systems. Examples: [GradientController](#gradient-controller),
+  [Max](#max).
 
   :::note
 
-  Signal processor components' output can depend on their internal state, in addition to the inputs.
-  Eg. see the [Exponential Moving Average filter](#e-m-a).
+  Signal processor components' output can depend on their internal state, in
+  addition to the inputs. Eg. see the
+  [Exponential Moving Average filter](#e-m-a).
 
   :::
 
 - "sink" components: they affect the real world.
-  [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
-  In the UI, represented by orange color. Sink components usually come in pairs with a
-  "sources" component which emits a feedback signal, like
-  `accepted_concurrency` emitted by _Concurrency Limiter_.
+  [_Concurrency Limiter_](#concurrency-limiter) and
+  [_Rate Limiter_](#rate-limiter). In the UI, represented by orange color. Sink
+  components usually come in pairs with a "sources" component which emits a
+  feedback signal, like `accepted_concurrency` emitted by _Concurrency Limiter_.
 
 :::tip
 
 Sometimes you might want to use a constant value as one of component's inputs.
-You can create an input port containing the constant value instead of being connected to a signal.
-To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
-You can also use it to provide special math values such as NaN and +- Inf.
-If You need to provide the same constant signal to multiple components,
-You can use the [Variable](#variable) component.
+You can create an input port containing the constant value instead of being
+connected to a signal. To do so, use the [InPort](#in_port)'s
+.withConstantSignal(constant_signal) method. You can also use it to provide
+special math values such as NaN and +- Inf. If You need to provide the same
+constant signal to multiple components, You can use the [Variable](#variable)
+component.
 
 :::
 
@@ -1550,7 +1598,9 @@ Exponential Moving Average filter.
 
 <!-- vale on -->
 
-Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
+Takes an input signal and emits the extrapolated value; either mirroring the
+input value or repeating the last known value up to the maximum extrapolation
+interval.
 
 </dd>
 <dt>first_valid</dt>
@@ -1586,8 +1636,10 @@ FlowControl components are used to regulate requests flow.
 
 <!-- vale on -->
 
-Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
-This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+Gradient controller calculates the ratio between the signal and the setpoint to
+determine the magnitude of the correction that need to be applied. This
+controller can be used to build AIMD (Additive Increase, Multiplicative
+Decrease) or MIMD style response.
 
 </dd>
 <dt>holder</dt>
@@ -1599,7 +1651,8 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 
 <!-- vale on -->
 
-Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+Holds the last valid signal value for the specified duration then waits for next
+valid value to hold.
 
 </dd>
 <dt>integrator</dt>
@@ -1659,7 +1712,8 @@ Emits the minimum of the input signals.
 
 <!-- vale on -->
 
-Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+Nested circuit defines a sub-circuit as a high-level component. It consists of a
+list of components and a map of input and output ports.
 
 </dd>
 <dt>nested_signal_egress</dt>
@@ -1671,7 +1725,8 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 
 <!-- vale on -->
 
-Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+Nested signal egress is a special type of component that allows to extract a
+signal from a nested circuit.
 
 </dd>
 <dt>nested_signal_ingress</dt>
@@ -1683,7 +1738,8 @@ Nested signal egress is a special type of component that allows to extract a sig
 
 <!-- vale on -->
 
-Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+Nested signal ingress is a special type of component that allows to inject a
+signal into a nested circuit.
 
 </dd>
 <dt>or</dt>
@@ -1755,7 +1811,8 @@ Simple Moving Average filter.
 
 <!-- vale on -->
 
-Switcher acts as a switch that emits one of the two signals based on third signal.
+Switcher acts as a switch that emits one of the two signals based on third
+signal.
 
 </dd>
 <dt>unary_operator</dt>
@@ -1792,15 +1849,16 @@ Emits a variable signal which can be set to invalid.
 
 <!-- vale on -->
 
-_Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection
+_Concurrency Limiter_ is an actuator component that regulates flows to provide
+active service protection
 
-It's based on the actuation strategy (for example, load actuator) and workload scheduling
-which is based on Weighted Fair Queuing principles.
-Concurrency is calculated in terms of total tokens per second, which can translate
-to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
+It's based on the actuation strategy (for example, load actuator) and workload
+scheduling which is based on Weighted Fair Queuing principles. Concurrency is
+calculated in terms of total tokens per second, which can translate to (avg.
+latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
-ConcurrencyLimiter configuration is split into two parts: An actuation
-strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+ConcurrencyLimiter configuration is split into two parts: An actuation strategy
+and a scheduler. At this time, only `load_actuator` strategy is available.
 
 <dl>
 <dt>flow_selector</dt>
@@ -1812,8 +1870,8 @@ strategy and a scheduler. At this time, only `load_actuator` strategy is availab
 
 <!-- vale on -->
 
-Flow Selector decides the service and flows at which the concurrency limiter is applied.
-Deprecated 1.8.0: Use `selectors` instead.
+Flow Selector decides the service and flows at which the concurrency limiter is
+applied. Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>load_actuator</dt>
@@ -1825,7 +1883,8 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 <!-- vale on -->
 
-Actuator based on limiting the accepted concurrency under incoming concurrency \* load multiplier.
+Actuator based on limiting the accepted concurrency under incoming
+concurrency \* load multiplier.
 
 Actuation strategy defines the input signal that will drive the scheduler.
 
@@ -1841,8 +1900,8 @@ Actuation strategy defines the input signal that will drive the scheduler.
 
 Configuration of Weighted Fair Queuing-based workload scheduler.
 
-Contains configuration of per-agent scheduler, and also defines some
-output signals.
+Contains configuration of per-agent scheduler, and also defines some output
+signals.
 
 </dd>
 <dt>selectors</dt>
@@ -1867,7 +1926,8 @@ Selectors for the component.
 
 <!-- vale on -->
 
-Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
+Special constant input for ports and Variable component. Can provide either a
+constant value or special Nan/+-Inf value.
 
 <dl>
 <dt>special_value</dt>
@@ -1906,13 +1966,13 @@ A constant value.
 
 Type of Combinator that computes the comparison operation on LHS and RHS signals
 
-The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
+The comparison operator can be greater-than, less-than, greater-than-or-equal,
+less-than-or-equal, equal, or not-equal.
 
-This component also supports time-based response (the output)
-transitions between 1.0 or 0.0 signal if the decider condition is
-true or false for at least `true_for` or `false_for` duration. If
-`true_for` and `false_for` durations are zero then the transitions are
-instantaneous.
+This component also supports time-based response (the output) transitions
+between 1.0 or 0.0 signal if the decider condition is true or false for at least
+`true_for` or `false_for` duration. If `true_for` and `false_for` durations are
+zero then the transitions are instantaneous.
 
 <dl>
 <dt>false_for</dt>
@@ -1924,8 +1984,8 @@ instantaneous.
 
 <!-- vale on -->
 
-Duration of time to wait before changing to false state.
-If the duration is zero, the change will happen instantaneously.
+Duration of time to wait before changing to false state. If the duration is
+zero, the change will happen instantaneously.
 
 </dd>
 <dt>in_ports</dt>
@@ -1973,8 +2033,8 @@ Output ports for the Decider component.
 
 <!-- vale on -->
 
-Duration of time to wait before changing to true state.
-If the duration is zero, the change will happen instantaneously.```
+Duration of time to wait before changing to true state. If the duration is zero,
+the change will happen instantaneously.```
 
 </dd>
 </dl>
@@ -2049,7 +2109,8 @@ Selected signal (1.0 or 0.0).
 
 <!-- vale on -->
 
-Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+Decreasing Gradient defines a controller for scaling in based on Gradient
+Controller.
 
 <dl>
 <dt>in_ports</dt>
@@ -2127,7 +2188,9 @@ The signal to use for scale-in.
 
 <!-- vale on -->
 
-This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+This allows subset of parameters with constrained values compared to a regular
+gradient controller. For full documentation of these parameters, refer to the
+[GradientControllerParameters](#gradient-controller-parameters).
 
 <dl>
 <dt>min_gradient</dt>
@@ -2255,12 +2318,15 @@ Outputs for the Differentiator component.
 
 <!-- vale on -->
 
-Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
+Exponential Moving Average (EMA) is a type of moving average that applies
+exponentially more weight to recent signal readings
 
 At any time EMA component operates in one of the following states:
 
-1. Warm up state: The first `warmup_window` samples are used to compute the initial EMA.
-   If an invalid reading is received during the `warmup_window`, the last good average is emitted and the state gets reset back to beginning of warm up state.
+1. Warm up state: The first `warmup_window` samples are used to compute the
+   initial EMA. If an invalid reading is received during the `warmup_window`,
+   the last good average is emitted and the state gets reset back to beginning
+   of warm up state.
 2. Normal state: The EMA is computed using following formula.
 
 The EMA for a series $Y$ is calculated recursively as:
@@ -2275,9 +2341,9 @@ $$
 \end{cases}
 $$
 
-The coefficient $\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.
-A higher $\alpha$ discounts older observations faster.
-The $\alpha$ is computed using ema_window:
+The coefficient $\alpha$ represents the degree of weighting decrease, a constant
+smoothing factor between 0 and 1. A higher $\alpha$ discounts older observations
+faster. The $\alpha$ is computed using ema_window:
 
 $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
@@ -2363,8 +2429,8 @@ When the signal exceeds `max_envelope` it is multiplied by
 
 :::note
 
-If the signal deviates from `max_envelope` faster than the correction
-faster, it might end up exceeding the envelope.
+If the signal deviates from `max_envelope` faster than the correction faster, it
+might end up exceeding the envelope.
 
 :::
 
@@ -2430,7 +2496,8 @@ Parameters for the EMA component.
 
 <!-- vale on -->
 
-Correction factor to apply on the output value if its in violation of the max envelope.
+Correction factor to apply on the output value if its in violation of the max
+envelope.
 
 </dd>
 <dt>correction_factor_on_min_envelope_violation</dt>
@@ -2442,7 +2509,8 @@ Correction factor to apply on the output value if its in violation of the max en
 
 <!-- vale on -->
 
-Correction factor to apply on the output value if its in violation of the min envelope.
+Correction factor to apply on the output value if its in violation of the min
+envelope.
 
 </dd>
 <dt>ema_window</dt>
@@ -2480,7 +2548,8 @@ Whether the output is valid during the warm-up stage.
 
 Duration of EMA warming up window.
 
-The initial value of the EMA is the average of signal readings received during the warm up window.
+The initial value of the EMA is the average of signal readings received during
+the warm up window.
 
 </dd>
 </dl>
@@ -2530,7 +2599,8 @@ Exact value that the label should be equal to.
 
 <!-- vale on -->
 
-Defines a high-level way to specify how to extract a flow label value given HTTP request metadata, without a need to write Rego code
+Defines a high-level way to specify how to extract a flow label value given HTTP
+request metadata, without a need to write Rego code
 
 There are multiple variants of extractor, specify exactly one.
 
@@ -2562,9 +2632,11 @@ Attribute path is a dot-separated path to attribute.
 
 Should be either:
 
-- one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or
-- a special `request.http.bearer` pseudo-attribute.
-  For example, `request.http.method` or `request.http.header.user-agent`
+- one of the fields of
+  [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto),
+  or
+- a special `request.http.bearer` pseudo-attribute. For example,
+  `request.http.method` or `request.http.header.user-agent`
 
 Note: The same attribute path syntax is shared by other extractor variants,
 wherever attribute path is needed in their "from" syntax.
@@ -2622,9 +2694,11 @@ Match HTTP Path to given path templates.
 
 <!-- vale on -->
 
-Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
+Extrapolates the input signal by repeating the last valid value during the
+period in which it is invalid
 
-It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
+It does so until `maximum_extrapolation_interval` is reached, beyond which it
+emits invalid signal unless input signal becomes valid again.
 
 <dl>
 <dt>in_ports</dt>
@@ -2748,7 +2822,8 @@ Maximum time interval to repeat the last valid value of input signal.
 
 <!-- vale on -->
 
-Picks the first valid input signal from the array of input signals and emits it as an output signal
+Picks the first valid input signal from the array of input signals and emits it
+as an output signal
 
 <dl>
 <dt>in_ports</dt>
@@ -2835,7 +2910,8 @@ First valid input signal as an output signal.
 
 <!-- vale on -->
 
-_Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
+_Flow Control_ encompasses components that manage the flow of requests or access
+to features within a service.
 
 <dl>
 <dt>adaptive_load_scheduler</dt>
@@ -2847,7 +2923,10 @@ _Flow Control_ encompasses components that manage the flow of requests or access
 
 <!-- vale on -->
 
-_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+_Adaptive Load Scheduler_ component is based on additive increase and
+multiplicative decrease of token rate. It takes a signal and setpoint as inputs
+and reduces token rate proportionally (or any arbitrary power) based on
+deviation of the signal from setpoint.
 
 </dd>
 <dt>aimd_concurrency_controller</dt>
@@ -2859,8 +2938,11 @@ _Adaptive Load Scheduler_ component is based on additive increase and multiplica
 
 <!-- vale on -->
 
-AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-Deprecated: 1.6.0
+AIMD Concurrency control component is based on Additive Increase and
+Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs
+and reduces concurrency limits proportionally (or any arbitrary power) based on
+deviation of the signal from setpoint. Internally implemented as a nested
+circuit. Deprecated: 1.6.0
 
 </dd>
 <dt>concurrency_limiter</dt>
@@ -2872,8 +2954,9 @@ Deprecated: 1.6.0
 
 <!-- vale on -->
 
-_Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
-Deprecated: 1.6.0
+_Concurrency Limiter_ provides service protection by applying prioritized load
+shedding of flows using a network scheduler (for example, Weighted Fair
+Queuing). Deprecated: 1.6.0
 
 </dd>
 <dt>flow_regulator</dt>
@@ -2885,7 +2968,8 @@ Deprecated: 1.6.0
 
 <!-- vale on -->
 
-Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+Flow Regulator is a component that regulates the flow of requests to the service
+by allowing only the specified percentage of requests or sticky sessions.
 Deprecated: 1.6.0
 
 </dd>
@@ -2910,7 +2994,8 @@ _Load Ramp_ smoothly regulates the flow of requests over specified steps.
 
 <!-- vale on -->
 
-_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
+_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one
+after another at same or different _Control Points_.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -2922,7 +3007,9 @@ _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one
 
 <!-- vale on -->
 
-_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+_Load Scheduler_ provides service protection by applying prioritized load
+shedding of flows using a network scheduler (for example, Weighted Fair
+Queuing).
 
 </dd>
 <dt>load_shaper</dt>
@@ -2947,8 +3034,8 @@ Deprecated: 1.6.0
 
 <!-- vale on -->
 
-_Load Shaper Series_ is a series of _Load Shaper_ components that can shape load one after another at same or different _Control Points_.
-Deprecated: 1.6.0
+_Load Shaper Series_ is a series of _Load Shaper_ components that can shape load
+one after another at same or different _Control Points_. Deprecated: 1.6.0
 
 </dd>
 <dt>rate_limiter</dt>
@@ -2972,7 +3059,8 @@ _Rate Limiter_ provides service protection by applying rate limits.
 
 <!-- vale on -->
 
-Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+Regulator is a component that regulates the flow of requests to the service by
+allowing only the specified percentage of requests or sticky sessions.
 
 </dd>
 </dl>
@@ -2997,9 +3085,11 @@ FlowControl Resources
 
 <!-- vale on -->
 
-Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+Classifiers are installed in the data-plane and are used to label the requests
+based on payload content.
 
-The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+The flow labels created by Classifiers can be matched by Flux Meters to create
+metrics for control purposes.
 
 </dd>
 <dt>flux_meters</dt>
@@ -3011,9 +3101,11 @@ The flow labels created by Classifiers can be matched by Flux Meters to create m
 
 <!-- vale on -->
 
-Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+Flux Meters are installed in the data-plane and form the observability leg of
+the feedback loop.
 
-Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
+Flux Meter created metrics can be consumed as input to the circuit through the
+PromQL component.
 
 </dd>
 </dl>
@@ -3026,16 +3118,15 @@ Flux Meter created metrics can be consumed as input to the circuit through the P
 
 <!-- vale on -->
 
-Describes which flows a [flow control
-component](/concepts/flow-control/flow-control.md#components) should apply
-to
+Describes which flows a
+[flow control component](/concepts/flow-control/flow-control.md#components)
+should apply to
 
 :::info
 
 See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
-:::
-Example:
+::: Example:
 
 ```yaml
 control_point: ingress
@@ -3066,10 +3157,11 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/selector.md#control-point)
-identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
-block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
-or filter chains.
+[Control Point](/concepts/flow-control/selector.md#control-point) identifies the
+location of a Flow within a Service. For an SDK based insertion, a Control Point
+can represent a particular feature or execution block within a Service. In case
+of Service Mesh or Middleware insertion, a Control Point can identify ingress or
+egress calls or distinct listeners or filter chains.
 
 </dd>
 <dt>label_matcher</dt>
@@ -3082,25 +3174,25 @@ or filter chains.
 <!-- vale on -->
 
 Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/flow-control/flow-label.md)
-must also be satisfied (in addition to service+control point matching)
+[flow labels](/concepts/flow-control/flow-label.md) must also be satisfied (in
+addition to service+control point matching)
 
 :::info
 
-See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+See also
+[Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
 
 :::
 
 :::note
 
 [Classifiers](#classifier) _can_ use flow labels created by some other
-classifier, but only if they were created at some previous control point
-(and propagated in baggage).
+classifier, but only if they were created at some previous control point (and
+propagated in baggage).
 
-This limitation does not apply to selectors of other entities, like
-Flux Meters or Actuators. It's valid to create a flow label on a control
-point using classifier, and immediately use it for matching on the same
-control point.
+This limitation does not apply to selectors of other entities, like Flux Meters
+or Actuators. It's valid to create a flow label on a control point using
+classifier, and immediately use it for matching on the same control point.
 
 :::
 
@@ -3115,7 +3207,9 @@ control point.
 
 <!-- vale on -->
 
-_Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+_Flow Regulator_ is a component that regulates the flow of requests to the
+service by allowing only the specified percentage of requests or sticky
+sessions.
 
 <dl>
 <dt>default_config</dt>
@@ -3188,7 +3282,8 @@ Dynamic Configuration for _Flow Regulator_
 
 <!-- vale on -->
 
-Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+Specify certain label values to be accepted by this flow filter regardless of
+accept percentage.
 
 </dd>
 </dl>
@@ -3249,9 +3344,9 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 The flow label key for identifying sessions.
 
-- When label key is specified, _Flow Regulator_ acts as a sticky filter.
-  The series of flows with the same value of label key get the same
-  decision provided that the `accept_percentage` is same or higher.
+- When label key is specified, _Flow Regulator_ acts as a sticky filter. The
+  series of flows with the same value of label key get the same decision
+  provided that the `accept_percentage` is same or higher.
 - When label key is not specified, _Flow Regulator_ acts as a stateless filter.
   Percentage of flows are selected randomly for rejection.
 
@@ -3278,8 +3373,10 @@ Selectors for the component.
 
 <!-- vale on -->
 
-Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control
-component](/concepts/flow-control/flow-control.md#components) operates on.
+Selects flows based on _Control Point_, flow labels, agent group and service
+that the
+[flow control component](/concepts/flow-control/flow-control.md#components)
+operates on.
 
 :::info
 
@@ -3324,15 +3421,14 @@ Match agent group and service
 
 <!-- vale on -->
 
-Flux Meter gathers metrics for the traffic that matches its selector.
-The histogram created by Flux Meter measures the workload latency by default.
+Flux Meter gathers metrics for the traffic that matches its selector. The
+histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
 See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
 
-:::
-Example:
+::: Example:
 
 ```yaml
 static_buckets:
@@ -3369,7 +3465,8 @@ attribute_key: response_duration_ms
 
 <!-- vale on -->
 
-Key of the attribute in access log or span from which the metric for this flux meter is read.
+Key of the attribute in access log or span from which the metric for this flux
+meter is read.
 
 :::info
 
@@ -3408,8 +3505,8 @@ For list of available attributes in Envoy access logs, refer
 
 <!-- vale on -->
 
-The selection criteria for the traffic that will be measured.
-Deprecated 1.8.0: Use `selectors` instead.
+The selection criteria for the traffic that will be measured. Deprecated 1.8.0:
+Use `selectors` instead.
 
 </dd>
 <dt>linear_buckets</dt>
@@ -3454,9 +3551,9 @@ Selectors for the component.
 
 <!-- vale on -->
 
-ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
-and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-bucket is not counted.
+ExponentialBuckets creates `count` number of buckets where the lowest bucket has
+an upper bound of `start` and each following bucket's upper bound is `factor`
+times the previous bucket's upper bound. The final +inf bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -3480,7 +3577,8 @@ Number of buckets.
 
 <!-- vale on -->
 
-Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+Factor to be multiplied to the previous bucket's upper bound to calculate the
+following bucket's upper bound.
 
 </dd>
 <dt>start</dt>
@@ -3505,8 +3603,9 @@ Upper bound of the lowest bucket.
 
 <!-- vale on -->
 
-ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-bucket is `max`. The final +inf bucket is not counted.
+ExponentialBucketsRange creates `count` number of buckets where the lowest
+bucket is `min` and the highest bucket is `max`. The final +inf bucket is not
+counted.
 
 <dl>
 <dt>count</dt>
@@ -3555,8 +3654,9 @@ Lowest bucket.
 
 <!-- vale on -->
 
-LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-upper bound of `start`. The final +inf bucket is not counted.
+LinearBuckets creates `count` number of buckets, each `width` wide, where the
+lowest bucket has an upper bound of `start`. The final +inf bucket is not
+counted.
 
 <dl>
 <dt>count</dt>
@@ -3605,7 +3705,8 @@ Width of each bucket.
 
 <!-- vale on -->
 
-StaticBuckets holds the static value of the buckets where latency histogram will be stored.
+StaticBuckets holds the static value of the buckets where latency histogram will
+be stored.
 
 <dl>
 <dt>buckets</dt>
@@ -3630,12 +3731,13 @@ The buckets in which latency histogram will be stored.
 
 <!-- vale on -->
 
-Gradient controller is a type of controller which tries to adjust the
-control variable proportionally to the relative difference between setpoint
-and actual value of the signal
+Gradient controller is a type of controller which tries to adjust the control
+variable proportionally to the relative difference between setpoint and actual
+value of the signal
 
 The `gradient` describes a corrective factor that should be applied to the
-control variable to get the signal closer to the setpoint. It's computed as follows:
+control variable to get the signal closer to the setpoint. It's computed as
+follows:
 
 $$
 \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
@@ -3652,8 +3754,8 @@ $$
 Note the additional `optimize` signal, that can be used to "nudge" the
 controller into desired idle state.
 
-The output can be _optionally_ clamped to desired range using `max` and
-`min` input.
+The output can be _optionally_ clamped to desired range using `max` and `min`
+input.
 
 <dl>
 <dt>default_config</dt>
@@ -3738,8 +3840,9 @@ Dynamic Configuration for a Controller
 
 <!-- vale on -->
 
-Decides whether the controller runs in `manual_mode`.
-In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
+Decides whether the controller runs in `manual_mode`. In manual mode, the
+controller does not adjust the control variable It emits the same output as the
+control variable input.
 
 </dd>
 </dl>
@@ -3876,7 +3979,8 @@ Gradient Parameters.
 
 <!-- vale on -->
 
-Maximum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
+Maximum gradient which clamps the computed gradient value to the range,
+`[min_gradient, max_gradient]`.
 
 </dd>
 <dt>min_gradient</dt>
@@ -3888,7 +3992,8 @@ Maximum gradient which clamps the computed gradient value to the range, `[min_gr
 
 <!-- vale on -->
 
-Minimum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
+Minimum gradient which clamps the computed gradient value to the range,
+`[min_gradient, max_gradient]`.
 
 </dd>
 <dt>slope</dt>
@@ -3902,46 +4007,46 @@ Minimum gradient which clamps the computed gradient value to the range, `[min_gr
 
 Slope controls the aggressiveness and direction of the Gradient Controller.
 
-Slope is used as exponent on the signal to setpoint ratio in computation
-of the gradient (see the [main description](#gradient-controller) for
-exact equation). This parameter decides how aggressive the controller
-responds to the deviation of signal from the setpoint.
-for example:
+Slope is used as exponent on the signal to setpoint ratio in computation of the
+gradient (see the [main description](#gradient-controller) for exact equation).
+This parameter decides how aggressive the controller responds to the deviation
+of signal from the setpoint. for example:
 
 - $\text{slope} = 1$: when signal is too high, increase control variable,
 - $\text{slope} = -1$: when signal is too high, decrease control variable,
-- $\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.
+- $\text{slope} = -0.5$: when signal is too high, decrease control variable
+  gradually.
 
-The sign of slope depends on correlation between the signal and control variable:
+The sign of slope depends on correlation between the signal and control
+variable:
 
-- Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
-  the control variable (for example, Per-pod CPU usage and total concurrency).
-- Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
-  the control variable (for example, Per-pod CPU usage and number of pods).
+- Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal
+  and the control variable (for example, Per-pod CPU usage and total
+  concurrency).
+- Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal
+  and the control variable (for example, Per-pod CPU usage and number of pods).
 
 :::note
 
 You need to set _negative_ slope for a _positive_ correlation, as you're
-describing the _action_ which controller should make when the signal
-increases.
+describing the _action_ which controller should make when the signal increases.
 
 :::
 
-The magnitude of slope describes how aggressively should the controller
-react to a deviation of signal.
-With $|\text{slope}| = 1$, the controller will aim to bring the signal to
-the setpoint in one tick (assuming linear correlation with signal and setpoint).
-Smaller magnitudes of slope will make the controller adjust the control
-variable gradually.
+The magnitude of slope describes how aggressively should the controller react to
+a deviation of signal. With $|\text{slope}| = 1$, the controller will aim to
+bring the signal to the setpoint in one tick (assuming linear correlation with
+signal and setpoint). Smaller magnitudes of slope will make the controller
+adjust the control variable gradually.
 
-Setting $|\text{slope}| < 1$ (for example, $\pm0.8$) is recommended.
-If you experience overshooting, consider lowering the magnitude even more.
-Values of $|\text{slope}| > 1$ aren't recommended.
+Setting $|\text{slope}| < 1$ (for example, $\pm0.8$) is recommended. If you
+experience overshooting, consider lowering the magnitude even more. Values of
+$|\text{slope}| > 1$ aren't recommended.
 
 :::note
 
-Remember that the gradient and output signal can be (optionally) clamped,
-so the _slope_ might not fully describe aggressiveness of the controller.
+Remember that the gradient and output signal can be (optionally) clamped, so the
+_slope_ might not fully describe aggressiveness of the controller.
 
 :::
 
@@ -3956,8 +4061,9 @@ so the _slope_ might not fully describe aggressiveness of the controller.
 
 <!-- vale on -->
 
-Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
+Holds the last valid signal value for the specified duration then waits for next
+valid value to hold. If it is holding a value that means it ignores both valid
+and invalid new signals until the `hold_for` duration is finished.
 
 <dl>
 <dt>hold_for</dt>
@@ -4030,7 +4136,8 @@ The input signal.
 
 <!-- vale on -->
 
-Resets the holder output to the current input signal when reset signal is valid and non-zero.
+Resets the holder output to the current input signal when reset signal is valid
+and non-zero.
 
 </dd>
 </dl>
@@ -4105,7 +4212,8 @@ Name of the incoming Signal on the InPort.
 
 <!-- vale on -->
 
-Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+Increasing Gradient defines a controller for scaling out based on Gradient
+Controller.
 
 <dl>
 <dt>in_ports</dt>
@@ -4183,7 +4291,9 @@ The signal to use for scale-out.
 
 <!-- vale on -->
 
-This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+This allows subset of parameters with constrained values compared to a regular
+gradient controller. For full documentation of these parameters, refer to the
+[GradientControllerParameters](#gradient-controller-parameters).
 
 <dl>
 <dt>max_gradient</dt>
@@ -4301,7 +4411,8 @@ The minimum output.
 
 <!-- vale on -->
 
-Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
+Resets the integrator output to zero when reset signal is valid and non-zero.
+Reset also resets the max and min constraints.
 
 </dd>
 </dl>
@@ -4459,10 +4570,12 @@ Attribute path pointing to some strings - for example, `request.http.body`.
 
 <!-- vale on -->
 
-JSON pointer represents a parsed JSON pointer which allows to select a specified field from the payload.
+JSON pointer represents a parsed JSON pointer which allows to select a specified
+field from the payload.
 
 Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
+for example, `/foo/bar`. If the pointer points into an object, it'd be converted
+to a string.
 
 </dd>
 </dl>
@@ -4499,7 +4612,8 @@ json_pointer: /user/email
 
 <!-- vale on -->
 
-JWT (JSON Web Token) can be extracted from any input attribute, but most likely you'd want to use `request.http.bearer`.
+JWT (JSON Web Token) can be extracted from any input attribute, but most likely
+you'd want to use `request.http.bearer`.
 
 </dd>
 <dt>json_pointer</dt>
@@ -4514,7 +4628,8 @@ JWT (JSON Web Token) can be extracted from any input attribute, but most likely 
 JSON pointer allowing to select a specified field from the payload.
 
 Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
+for example, `/foo/bar`. If the pointer points into an object, it'd be converted
+to a string.
 
 </dd>
 </dl>
@@ -4527,7 +4642,8 @@ for example, `/foo/bar`. If the pointer points into an object, it'd be converted
 
 <!-- vale on -->
 
-Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
+Label selector requirement which is a selector that contains values, a key, and
+an operator that relates the key and values.
 
 <dl>
 <dt>key</dt>
@@ -4551,8 +4667,8 @@ Label key that the selector applies to.
 
 <!-- vale on -->
 
-Logical operator which represents a key's relationship to a set of values.
-Valid operators are In, NotIn, Exists and DoesNotExist.
+Logical operator which represents a key's relationship to a set of values. Valid
+operators are In, NotIn, Exists and DoesNotExist.
 
 </dd>
 <dt>values</dt>
@@ -4564,9 +4680,9 @@ Valid operators are In, NotIn, Exists and DoesNotExist.
 
 <!-- vale on -->
 
-An array of string values that relates to the key by an operator.
-If the operator is In or NotIn, the values array must be non-empty.
-If the operator is Exists or DoesNotExist, the values array must be empty.
+An array of string values that relates to the key by an operator. If the
+operator is In or NotIn, the values array must be non-empty. If the operator is
+Exists or DoesNotExist, the values array must be empty.
 
 </dd>
 </dl>
@@ -4579,8 +4695,7 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 
 <!-- vale on -->
 
-Describes which pods a control or observability
-component should apply to.
+Describes which pods a control or observability component should apply to.
 
 <dl>
 <dt>agent_group</dt>
@@ -4704,8 +4819,8 @@ The Kubernetes object on which horizontal scaling is applied.
 <!-- vale on -->
 
 Allows to define rules whether a map of
-[labels](/concepts/flow-control/flow-label.md)
-should be considered a match or not
+[labels](/concepts/flow-control/flow-label.md) should be considered a match or
+not
 
 It provides three ways to define requirements:
 
@@ -4713,8 +4828,8 @@ It provides three ways to define requirements:
 - match expressions
 - arbitrary expression
 
-If multiple requirements are set, they're all combined using the logical AND operator.
-An empty label matcher always matches.
+If multiple requirements are set, they're all combined using the logical AND
+operator. An empty label matcher always matches.
 
 <dl>
 <dt>expression</dt>
@@ -4752,8 +4867,9 @@ Note: The requirements are combined using the logical AND operator.
 
 <!-- vale on -->
 
-A map of {key,value} pairs representing labels to be matched.
-A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
+A map of {key,value} pairs representing labels to be matched. A single
+{key,value} in the `match_labels` requires that the label `key` is present and
+equal to `value`.
 
 Note: The requirements are combined using the logical AND operator.
 
@@ -4768,7 +4884,8 @@ Note: The requirements are combined using the logical AND operator.
 
 <!-- vale on -->
 
-Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
+Takes the load multiplier input signal and publishes it to the schedulers in the
+data-plane
 
 <dl>
 <dt>default_config</dt>
@@ -4829,8 +4946,9 @@ Dynamic Configuration for LoadActuator
 
 <!-- vale on -->
 
-Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
-Useful for observing the behavior of Load Actuator without disrupting any real traffic.
+Decides whether to run the load actuator in dry-run mode. Dry run mode ensures
+that no traffic gets dropped by this load actuator. Useful for observing the
+behavior of Load Actuator without disrupting any real traffic.
 
 </dd>
 </dl>
@@ -4855,8 +4973,8 @@ Input for the Load Actuator component.
 
 <!-- vale on -->
 
-Load multiplier is proportion of [incoming
-token rate](#scheduler-outs) that needs to be accepted.
+Load multiplier is proportion of [incoming token rate](#scheduler-outs) that
+needs to be accepted.
 
 </dd>
 </dl>
@@ -4869,19 +4987,18 @@ token rate](#scheduler-outs) that needs to be accepted.
 
 <!-- vale on -->
 
-The _Load Ramp_ produces a smooth and continuous traffic load
-that changes progressively over time, based on the specified steps.
+The _Load Ramp_ produces a smooth and continuous traffic load that changes
+progressively over time, based on the specified steps.
 
 Each step is defined by two parameters:
 
 - The `target_accept_percentage`.
-- The `duration` for the signal to change from the
-  previous step's `target_accept_percentage` to the current step's
-  `target_accept_percentage`.
+- The `duration` for the signal to change from the previous step's
+  `target_accept_percentage` to the current step's `target_accept_percentage`.
 
 The percentage of requests accepted starts at the `target_accept_percentage`
-defined in the first step and gradually ramps up or down linearly from
-the previous step's `target_accept_percentage` to the next
+defined in the first step and gradually ramps up or down linearly from the
+previous step's `target_accept_percentage` to the next
 `target_accept_percentage`, over the `duration` specified for each step.
 
 <dl>
@@ -5022,7 +5139,8 @@ The percentage of flows being accepted by the _Load Ramp_.
 
 <!-- vale on -->
 
-A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation.
+A Boolean signal indicating whether the _Load Ramp_ is at the end of signal
+generation.
 
 </dd>
 <dt>at_start</dt>
@@ -5034,7 +5152,8 @@ A Boolean signal indicating whether the _Load Ramp_ is at the end of signal gene
 
 <!-- vale on -->
 
-A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation.
+A Boolean signal indicating whether the _Load Ramp_ is at the start of signal
+generation.
 
 </dd>
 </dl>
@@ -5240,7 +5359,8 @@ Parameters for the _LoadRampSeries_ component.
 
 <!-- vale off -->
 
-([[]LoadRampSeriesLoadRampInstance](#load-ramp-series-load-ramp-instance), **required**)
+([[]LoadRampSeriesLoadRampInstance](#load-ramp-series-load-ramp-instance),
+**required**)
 
 <!-- vale on -->
 
@@ -5257,21 +5377,23 @@ An ordered list of load ramps that get applied in order.
 
 <!-- vale on -->
 
-_Load Scheduler_ is an actuator component that regulates flows to provide active service protection
+_Load Scheduler_ is an actuator component that regulates flows to provide active
+service protection
 
 :::info
 
-See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+See also
+[_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
 
 :::
 
-It's based on the actuation strategy (for example, load actuator) and workload scheduling
-which is based on Weighted Fair Queuing principles.
-It measures and controls the incoming tokens per second, which can translate
-to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
+It's based on the actuation strategy (for example, load actuator) and workload
+scheduling which is based on Weighted Fair Queuing principles. It measures and
+controls the incoming tokens per second, which can translate to (avg. latency \*
+in-flight requests) (Little's Law) in concurrency limiting use-case.
 
-LoadScheduler configuration is split into two parts: An actuation
-strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+LoadScheduler configuration is split into two parts: An actuation strategy and a
+scheduler. At this time, only `load_actuator` strategy is available.
 
 <dl>
 <dt>actuator</dt>
@@ -5283,7 +5405,8 @@ strategy and a scheduler. At this time, only `load_actuator` strategy is availab
 
 <!-- vale on -->
 
-Actuator based on limiting the accepted token rate under incoming token rate \* load multiplier.
+Actuator based on limiting the accepted token rate under incoming token rate \*
+load multiplier.
 
 </dd>
 <dt>flow_selector</dt>
@@ -5295,8 +5418,8 @@ Actuator based on limiting the accepted token rate under incoming token rate \* 
 
 <!-- vale on -->
 
-Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-Deprecated 1.8.0: Use `selectors` instead.
+Flow Selector decides the service and flows at which the _Load Scheduler_ is
+applied. Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>scheduler</dt>
@@ -5310,8 +5433,8 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 Configuration of Weighted Fair Queuing-based workload scheduler.
 
-Contains configuration of per-agent scheduler, and also defines some
-output signals.
+Contains configuration of per-agent scheduler, and also defines some output
+signals.
 
 </dd>
 <dt>selectors</dt>
@@ -5336,7 +5459,8 @@ Selectors for the component.
 
 <!-- vale on -->
 
-Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
+Takes the load multiplier input signal and publishes it to the schedulers in the
+data-plane
 
 <dl>
 <dt>default_config</dt>
@@ -5397,8 +5521,9 @@ Dynamic Configuration for Actuator
 
 <!-- vale on -->
 
-Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
-Useful for observing the behavior of actuator without disrupting any real traffic.
+Decides whether to run the actuator in dry-run mode. Dry run mode ensures that
+no traffic gets dropped by this actuator. Useful for observing the behavior of
+actuator without disrupting any real traffic.
 
 </dd>
 </dl>
@@ -5423,8 +5548,8 @@ Input for the Actuator component.
 
 <!-- vale on -->
 
-Load multiplier is proportion of [incoming
-token rate](#scheduler-outs) that needs to be accepted.
+Load multiplier is proportion of [incoming token rate](#scheduler-outs) that
+needs to be accepted.
 
 </dd>
 </dl>
@@ -5484,8 +5609,8 @@ Output for the Scheduler component.
 
 <!-- vale on -->
 
-Accepted token rate is the tokens admitted per second by the scheduler.
-Value of this signal is aggregated from all the relevant schedulers.
+Accepted token rate is the tokens admitted per second by the scheduler. Value of
+this signal is aggregated from all the relevant schedulers.
 
 </dd>
 <dt>incoming_token_rate</dt>
@@ -5497,11 +5622,11 @@ Value of this signal is aggregated from all the relevant schedulers.
 
 <!-- vale on -->
 
-Incoming token rate is the incoming tokens per second for all the
-flows entering the scheduler including the rejected ones.
+Incoming token rate is the incoming tokens per second for all the flows entering
+the scheduler including the rejected ones.
 
-This is computed similar to `accepted_token_rate`,
-by summing up tokens from all the flows entering scheduler.
+This is computed similar to `accepted_token_rate`, by summing up tokens from all
+the flows entering scheduler.
 
 </dd>
 </dl>
@@ -5526,16 +5651,15 @@ Scheduler parameters
 
 <!-- vale on -->
 
-Automatically estimate the size of a flow in each workload, based on
-historical latency. Each workload's `tokens` will be set to average
-latency of flows in that workload during last few seconds (exact duration
-of this average can change).
-This setting is useful in concurrency limiting use-case, where the
+Automatically estimate the size of a flow in each workload, based on historical
+latency. Each workload's `tokens` will be set to average latency of flows in
+that workload during last few seconds (exact duration of this average can
+change). This setting is useful in concurrency limiting use-case, where the
 concurrency is calculated as (avg. latency \* in-flight flows).
 
-The value of tokens estimated by `auto_tokens` takes lower precedence
-than the value of `tokens` specified in the workload definition
-and `tokens` explicitly specified in the flow labels.
+The value of tokens estimated by `auto_tokens` takes lower precedence than the
+value of `tokens` specified in the workload definition and `tokens` explicitly
+specified in the flow labels.
 
 </dd>
 <dt>decision_deadline_margin</dt>
@@ -5547,18 +5671,16 @@ and `tokens` explicitly specified in the flow labels.
 
 <!-- vale on -->
 
-Decision deadline margin is the amount of time that the scheduler will
-subtract from the request deadline to determine the deadline for the
-decision. This is to ensure that the scheduler has enough time to
-make a decision before the request deadline happens, accounting for
-processing delays.
-The request deadline is based on the
-[gRPC deadline](https://grpc.io/blog/deadlines) or the
+Decision deadline margin is the amount of time that the scheduler will subtract
+from the request deadline to determine the deadline for the decision. This is to
+ensure that the scheduler has enough time to make a decision before the request
+deadline happens, accounting for processing delays. The request deadline is
+based on the [gRPC deadline](https://grpc.io/blog/deadlines) or the
 [`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
 
-Fail-open logic is use for flow control APIs, so if the gRPC deadline
-reaches, the flow will end up being unconditionally allowed while
-it is still waiting on the scheduler.
+Fail-open logic is use for flow control APIs, so if the gRPC deadline reaches,
+the flow will end up being unconditionally allowed while it is still waiting on
+the scheduler.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -5582,7 +5704,8 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 <!-- vale on -->
 
-Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is
+ignored.
 
 </dd>
 <dt>timeout_factor</dt>
@@ -5594,7 +5717,8 @@ Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored
 
 <!-- vale on -->
 
-Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.
+Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is
+ignored.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -5606,9 +5730,11 @@ Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored
 
 <!-- vale on -->
 
-- Key for a flow label that can be used to override the default number of tokens for this flow.
+- Key for a flow label that can be used to override the default number of tokens
+  for this flow.
 - The value associated with this key must be a valid uint64 number.
-- If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+- If this parameter is not provided, the number of tokens for the flow will be
+  determined by the matched workload's token count.
 
 </dd>
 <dt>workloads</dt>
@@ -5626,20 +5752,21 @@ Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "intelligent" compared to random rejections.
 There are two aspects of this "intelligence":
 
-- Scheduler can more precisely calculate concurrency if it understands
-  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
-- Setting different priorities to different workloads lets the scheduler
-  avoid dropping important traffic during overload.
+- Scheduler can more precisely calculate concurrency if it understands that
+  flows belonging to different classes have different weights (for example,
+  insert queries compared to select queries).
+- Setting different priorities to different workloads lets the scheduler avoid
+  dropping important traffic during overload.
 
-Each workload in this list specifies also a matcher that is used to
-determine which flow will be categorized into which workload.
-In case of multiple matching workloads, the first matching one will be used.
-If none of workloads match, `default_workload` will be used.
+Each workload in this list specifies also a matcher that is used to determine
+which flow will be categorized into which workload. In case of multiple matching
+workloads, the first matching one will be used. If none of workloads match,
+`default_workload` will be used.
 
 :::info
 
-See also [workload definition in the concepts
-section](/concepts/flow-control/components/load-scheduler.md#workload).
+See also
+[workload definition in the concepts section](/concepts/flow-control/components/load-scheduler.md#workload).
 
 :::
 
@@ -5654,7 +5781,8 @@ section](/concepts/flow-control/components/load-scheduler.md#workload).
 
 <!-- vale on -->
 
-Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
+Workload defines a class of flows that preferably have similar properties such
+as response latency and desired priority.
 
 <dl>
 <dt>label_matcher</dt>
@@ -5692,8 +5820,8 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale on -->
 
-Parameters such as priority, tokens and fairness key that
-are applicable to flows within a workload.
+Parameters such as priority, tokens and fairness key that are applicable to
+flows within a workload.
 
 <dl>
 <dt>fairness_key</dt>
@@ -5705,10 +5833,10 @@ are applicable to flows within a workload.
 
 <!-- vale on -->
 
-Fairness key is a label key that can be used to provide fairness within a workload.
-Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
-you have a classifier that sets `user` flow label, you might want to set
-`fairness_key = "user"`.
+Fairness key is a label key that can be used to provide fairness within a
+workload. Any [flow label](/concepts/flow-control/flow-label.md) can be used
+here. For example, if you have a classifier that sets `user` flow label, you
+might want to set `fairness_key = "user"`.
 
 </dd>
 <dt>priority</dt>
@@ -5720,10 +5848,10 @@ you have a classifier that sets `user` flow label, you might want to set
 
 <!-- vale on -->
 
-Describes priority level of the flows within the workload.
-Priority level ranges from 0 to 255.
-Higher numbers means higher priority level.
-Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+Describes priority level of the flows within the workload. Priority level ranges
+from 0 to 255. Higher numbers means higher priority level. Priority levels have
+non-linear effect on the workload scheduling. The following formula is used to
+determine the position of a flow in the queue based on virtual finish time:
 
 $$
 \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
@@ -5739,12 +5867,11 @@ $$
 
 <!-- vale on -->
 
-Tokens determines the cost of admitting a single flow in the workload,
-which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
-simply equal to 1 if the resource being accessed is constrained by the
-number of flows (3rd party rate limiters).
-This override is applicable only if tokens for the flow aren't specified
-in the flow labels.
+Tokens determines the cost of admitting a single flow in the workload, which is
+typically defined as milliseconds of flow latency (time to response or duration
+of a feature) or simply equal to 1 if the resource being accessed is constrained
+by the number of flows (3rd party rate limiters). This override is applicable
+only if tokens for the flow aren't specified in the flow labels.
 
 </dd>
 </dl>
@@ -5757,19 +5884,18 @@ in the flow labels.
 
 <!-- vale on -->
 
-The _Load Shaper_ produces a smooth and continuous traffic load
-that changes progressively over time, based on the specified steps.
+The _Load Shaper_ produces a smooth and continuous traffic load that changes
+progressively over time, based on the specified steps.
 
 Each step is defined by two parameters:
 
 - The `target_accept_percentage`.
-- The `duration` for the signal to change from the
-  previous step's `target_accept_percentage` to the current step's
-  `target_accept_percentage`.
+- The `duration` for the signal to change from the previous step's
+  `target_accept_percentage` to the current step's `target_accept_percentage`.
 
 The percentage of requests accepted starts at the `target_accept_percentage`
-defined in the first step and gradually ramps up or down linearly from
-the previous step's `target_accept_percentage` to the next
+defined in the first step and gradually ramps up or down linearly from the
+previous step's `target_accept_percentage` to the next
 `target_accept_percentage`, over the `duration` specified for each step.
 
 <dl>
@@ -5910,7 +6036,8 @@ The percentage of flows being accepted by the _Load Shaper_.
 
 <!-- vale on -->
 
-A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+A Boolean signal indicating whether the _Load Shaper_ is at the end of signal
+generation.
 
 </dd>
 <dt>at_start</dt>
@@ -5922,7 +6049,8 @@ A Boolean signal indicating whether the _Load Shaper_ is at the end of signal ge
 
 <!-- vale on -->
 
-A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
+A Boolean signal indicating whether the _Load Shaper_ is at the start of signal
+generation.
 
 </dd>
 </dl>
@@ -6005,7 +6133,8 @@ The value of the step.
 
 <!-- vale on -->
 
-_LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
+_LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in
+order.
 
 <dl>
 <dt>in_ports</dt>
@@ -6128,7 +6257,8 @@ Parameters for the _LoadShaperSeries_ component.
 
 <!-- vale off -->
 
-([[]LoadShaperSeriesLoadShaperInstance](#load-shaper-series-load-shaper-instance), **required**)
+([[]LoadShaperSeriesLoadShaperInstance](#load-shaper-series-load-shaper-instance),
+**required**)
 
 <!-- vale on -->
 
@@ -6145,7 +6275,7 @@ An ordered list of load shapers that get applied in order.
 
 <!-- vale on -->
 
-Defines a `[map<string, string> → bool]` expression to be evaluated on labels
+Defines a `[map<string, string> → bool]` expression to be evaluated on labels
 
 MatchExpression has multiple variants, exactly one should be set.
 
@@ -6292,8 +6422,8 @@ Name of the label to match the regular expression.
 
 <!-- vale on -->
 
-Regular expression that should match the label value.
-It uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+Regular expression that should match the label value. It uses
+[Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 
 </dd>
 </dl>
@@ -6395,8 +6525,8 @@ Signal with maximum value as an output signal.
 
 <!-- vale on -->
 
-Takes an array of input signals and emits the signal with the minimum value
-Min: output = min([]inputs).
+Takes an array of input signals and emits the signal with the minimum value Min:
+output = min([]inputs).
 
 <dl>
 <dt>in_ports</dt>
@@ -6483,7 +6613,8 @@ Signal with minimum value as an output signal.
 
 <!-- vale on -->
 
-Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+Nested circuit defines a sub-circuit as a high-level component. It consists of a
+list of components and a map of input and output ports.
 
 <dl>
 <dt>components</dt>
@@ -6519,7 +6650,8 @@ Maps input port names to input ports.
 
 <!-- vale on -->
 
-Name of the nested circuit component. This name is displayed by graph visualization tools.
+Name of the nested circuit component. This name is displayed by graph
+visualization tools.
 
 </dd>
 <dt>out_ports_map</dt>
@@ -6543,7 +6675,8 @@ Maps output port names to output ports.
 
 <!-- vale on -->
 
-Short description of the nested circuit component. This description is displayed by graph visualization tools.
+Short description of the nested circuit component. This description is displayed
+by graph visualization tools.
 
 </dd>
 </dl>
@@ -6556,7 +6689,8 @@ Short description of the nested circuit component. This description is displayed
 
 <!-- vale on -->
 
-Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+Nested signal egress is a special type of component that allows to extract a
+signal from a nested circuit.
 
 <dl>
 <dt>in_ports</dt>
@@ -6618,7 +6752,8 @@ Egress signal.
 
 <!-- vale on -->
 
-Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+Nested signal ingress is a special type of component that allows to inject a
+signal into a nested circuit.
 
 <dl>
 <dt>out_ports</dt>
@@ -6798,9 +6933,9 @@ Name of the outgoing Signal on the OutPort.
 
 Matches HTTP Path to given path templates
 
-HTTP path will be matched against given path templates.
-If a match occurs, the value associated with the path template will be treated as a result.
-In case of multiple path templates matching, the most specific one will be chosen.
+HTTP path will be matched against given path templates. If a match occurs, the
+value associated with the path template will be treated as a result. In case of
+multiple path templates matching, the most specific one will be chosen.
 
 <dl>
 <dt>template_values</dt>
@@ -6815,11 +6950,11 @@ In case of multiple path templates matching, the most specific one will be chose
 Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
-- `/{param}` matches arbitrary path segment.
-  (The parameter name is ignored and can be omitted (`{}`))
+- `/{param}` matches arbitrary path segment. (The parameter name is ignored and
+  can be omitted (`{}`))
 - The parameter must cover whole segment.
-- Additionally, path template can end with `/*` wildcard to match
-  arbitrary number of trailing segments (0 or more).
+- Additionally, path template can end with `/*` wildcard to match arbitrary
+  number of trailing segments (0 or more).
 - Multiple consecutive `/` are ignored, as well as trailing `/`.
 - Parametrized path segments must come after static segments.
 - `*`, if present, must come last.
@@ -6846,7 +6981,10 @@ Example:
 
 <!-- vale on -->
 
-_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes
+resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for
+performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes
+infrastructure APIs to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -6858,9 +6996,10 @@ _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes reso
 
 <!-- vale on -->
 
-Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
-For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+Cooldown override percentage defines a threshold change in scale-out beyond
+which previous cooldown is overridden. For example, if the cooldown is 5 minutes
+and the cooldown override percentage is 10%, then if the scale-increases by 10%
+or more, the previous cooldown is cancelled. Defaults to 50%.
 
 </dd>
 <dt>max_replicas</dt>
@@ -6884,7 +7023,9 @@ The maximum scale to which the _PodAutoScaler_ can scale-out.
 
 <!-- vale on -->
 
-The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+The maximum decrease of replicas (for example, pods) at one time. Defined as
+percentage of current scale value. Can never go below one even if percentage
+computation is less than one. Defaults to 1% of current scale value.
 
 </dd>
 <dt>max_scale_out_percentage</dt>
@@ -6896,7 +7037,9 @@ The maximum decrease of replicas (for example, pods) at one time. Defined as per
 
 <!-- vale on -->
 
-The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+The maximum increase of replicas (for example, pods) at one time. Defined as
+percentage of current scale value. Can never go below one even if percentage
+computation is less than one. Defaults to 10% of current scale value.
 
 </dd>
 <dt>min_replicas</dt>
@@ -6966,7 +7109,8 @@ List of _Controllers_ for scaling in.
 
 <!-- vale on -->
 
-The amount of time to wait after a scale-in operation for another scale-in operation.
+The amount of time to wait after a scale-in operation for another scale-in
+operation.
 
 </dd>
 <dt>scale_out_alerter_parameters</dt>
@@ -7002,7 +7146,8 @@ List of _Controllers_ for scaling out.
 
 <!-- vale on -->
 
-The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+The amount of time to wait after a scale-out operation for another scale-out or
+scale-in operation.
 
 </dd>
 </dl>
@@ -7168,8 +7313,9 @@ Dynamic Configuration for ScaleActuator
 
 <!-- vale on -->
 
-Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-Useful for observing the behavior of Scaler without disrupting any real traffic.
+Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that
+no scaling is invoked by this pod scaler. Useful for observing the behavior of
+Scaler without disrupting any real traffic.
 
 </dd>
 </dl>
@@ -7275,7 +7421,8 @@ See also [Policy overview](/concepts/policy/policy.md).
 
 :::
 
-Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
+Policy specification contains a circuit that defines the controller logic and
+resources that need to be setup.
 
 <dl>
 <dt>circuit</dt>
@@ -7312,7 +7459,8 @@ Resources (such as Flux Meters, Classifiers) to setup.
 
 <!-- vale on -->
 
-Component that runs a Prometheus query periodically and returns the result as an output signal
+Component that runs a Prometheus query periodically and returns the result as an
+output signal
 
 <dl>
 <dt>evaluation_interval</dt>
@@ -7348,26 +7496,32 @@ Output ports for the PromQL component.
 
 <!-- vale on -->
 
-Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.
+Describes the
+[PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to
+be run.
 
 :::note
 
-The query must return a single value either as a scalar or as a vector with a single element.
+The query must return a single value either as a scalar or as a vector with a
+single element.
 
 :::
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
-Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
-The particular Flux Meter can be identified with the `flux_meter_name` label.
-There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be
+queries using PromQL. Flux Meter defines histogram type of metrics in
+Prometheus. Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and
+`flux_meter_bucket`. The particular Flux Meter can be identified with the
+`flux_meter_name` label. There are additional labels available on a Flux Meter
+such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
 
 :::
 
 :::info Usage with OpenTelemetry Metrics
 
-Aperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.
+Aperture supports OpenTelemetry metrics. See
+[reference](/get-started/integrations/metrics/metrics.md) for more details.
 
 :::
 
@@ -7508,12 +7662,13 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+See also
+[_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
 
 :::
 
-RateLimiting is done on per-label-value basis. Use `label_key`
-to select which label should be used as key.
+RateLimiting is done on per-label-value basis. Use `label_key` to select which
+label should be used as key.
 
 <dl>
 <dt>default_config</dt>
@@ -7549,8 +7704,8 @@ Configuration key for DynamicConfig
 
 <!-- vale on -->
 
-Which control point to apply this rate limiter to.
-Deprecated 1.8.0: Use `selectors` instead.
+Which control point to apply this rate limiter to. Deprecated 1.8.0: Use
+`selectors` instead.
 
 </dd>
 <dt>in_ports</dt>
@@ -7636,13 +7791,13 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Number of flows allowed per `limit_reset_interval` per each label.
-Negative values disable the rate limiter.
+Number of flows allowed per `limit_reset_interval` per each label. Negative
+values disable the rate limiter.
 
 :::tip
 
-Negative limit can be useful to _conditionally_ enable the rate limiter
-under certain circumstances. [Decider](#decider) might be helpful.
+Negative limit can be useful to _conditionally_ enable the rate limiter under
+certain circumstances. [Decider](#decider) might be helpful.
 
 :::
 
@@ -7679,8 +7834,7 @@ Value of the label for which the override should be applied.
 
 <!-- vale on -->
 
-Amount by which the `in_ports.limit` should be multiplied for
-this label value.
+Amount by which the `in_ports.limit` should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -7706,10 +7860,9 @@ this label value.
 Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/flow-label.md) with given key.
-For example, to give each user a separate limit, assuming you
-have a _user_ flow
-label set up, set `label_key: "user"`.
+[label](/concepts/flow-control/flow-label.md) with given key. For example, to
+give each user a separate limit, assuming you have a _user_ flow label set up,
+set `label_key: "user"`.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -7745,11 +7898,9 @@ Time after which the limit for a given label value will be reset.
 
 <!-- vale on -->
 
-Flow label key that will be used to override the number of tokens
-for this request.
-This is an optional parameter and takes highest precedence
-when assigning tokens to a request.
-The label value must be a valid uint64 number.
+Flow label key that will be used to override the number of tokens for this
+request. This is an optional parameter and takes highest precedence when
+assigning tokens to a request. The label value must be a valid uint64 number.
 
 </dd>
 </dl>
@@ -7801,7 +7952,10 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 
 :::info
 
-You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+You can use the
+[live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
+feature to first preview the input to the classifier before writing the labeling
+logic.
 
 :::
 
@@ -7837,8 +7991,9 @@ rego:
 
 A map of {key, value} pairs mapping from
 [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
-how to extract and propagate flow labels with that key.
-The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
+how to extract and propagate flow labels with that key. The name of the label
+maps to a variable in the Rego module. It maps to `data.<package>.<label>`
+variable.
 
 </dd>
 <dt>module</dt>
@@ -7879,19 +8034,21 @@ Must include a "package" declaration.
 
 <!-- vale on -->
 
-Decides if the created flow label should be available as an attribute in OLAP telemetry and
-propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+Decides if the created flow label should be available as an attribute in OLAP
+telemetry and propagated in
+[baggage](/concepts/flow-control/flow-label.md#baggage)
 
 :::note
 
-The flow label is always accessible in Aperture Policies regardless of this setting.
+The flow label is always accessible in Aperture Policies regardless of this
+setting.
 
 :::
 
 :::caution
 
-When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
-labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled labels
+are sent to FluxNinja ARC for observability. Telemetry should be disabled for
 sensitive labels.
 
 :::
@@ -7908,12 +8065,13 @@ sensitive labels.
 <!-- vale on -->
 
 _Regulator_ is a component that regulates the load at a
-[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
-flows at random or by sticky sessions.
+[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing
+only a specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [\_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+See also
+[\_Load Regulator overview](/concepts/flow-control/components/regulator.md).
 
 :::
 
@@ -7988,7 +8146,8 @@ Dynamic Configuration for _Regulator_
 
 <!-- vale on -->
 
-Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+Specify certain label values to be accepted by this flow filter regardless of
+accept percentage.
 
 </dd>
 </dl>
@@ -8049,9 +8208,9 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 The flow label key for identifying sessions.
 
-- When label key is specified, _Regulator_ acts as a sticky filter.
-  The series of flows with the same value of label key get the same
-  decision provided that the `accept_percentage` is same or higher.
+- When label key is specified, _Regulator_ acts as a sticky filter. The series
+  of flows with the same value of label key get the same decision provided that
+  the `accept_percentage` is same or higher.
 - When label key is not specified, _Regulator_ acts as a stateless filter.
   Percentage of flows are selected randomly for rejection.
 
@@ -8096,7 +8255,8 @@ See also [Resources overview](/concepts/policy/resources.md).
 
 <!-- vale on -->
 
-FlowControlResources are resources that are provided by flow control integration.
+FlowControlResources are resources that are provided by flow control
+integration.
 
 </dd>
 </dl>
@@ -8142,19 +8302,21 @@ High-level declarative extractor.
 
 <!-- vale on -->
 
-Decides if the created flow label should be available as an attribute in OLAP telemetry and
-propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+Decides if the created flow label should be available as an attribute in OLAP
+telemetry and propagated in
+[baggage](/concepts/flow-control/flow-label.md#baggage)
 
 :::note
 
-The flow label is always accessible in Aperture Policies regardless of this setting.
+The flow label is always accessible in Aperture Policies regardless of this
+setting.
 
 :::
 
 :::caution
 
-When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
-labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled labels
+are sent to FluxNinja ARC for observability. Telemetry should be disabled for
 sensitive labels.
 
 :::
@@ -8170,7 +8332,8 @@ sensitive labels.
 
 <!-- vale on -->
 
-Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
+Simple Moving Average (SMA) is a type of moving average that computes the
+average of a fixed number of signal readings.
 
 <dl>
 <dt>in_ports</dt>
@@ -8416,8 +8579,8 @@ Weighted Fair Queuing-based workload scheduler
 
 :::note
 
-Each Agent instantiates an independent copy of the scheduler, but output
-signals for accepted and incoming token rate are aggregated across all agents.
+Each Agent instantiates an independent copy of the scheduler, but output signals
+for accepted and incoming token rate are aggregated across all agents.
 
 :::
 
@@ -8469,8 +8632,8 @@ Output for the Scheduler component.
 <!-- vale on -->
 
 Accepted concurrency is actual concurrency on a control point that this
-scheduler is applied on.
-Value of this signal is aggregated from all the relevant schedulers.
+scheduler is applied on. Value of this signal is aggregated from all the
+relevant schedulers.
 
 </dd>
 <dt>incoming_concurrency</dt>
@@ -8482,12 +8645,11 @@ Value of this signal is aggregated from all the relevant schedulers.
 
 <!-- vale on -->
 
-Incoming concurrency is concurrency that'd be needed to accept all the
-flows entering the scheduler.
+Incoming concurrency is concurrency that'd be needed to accept all the flows
+entering the scheduler.
 
-This is computed in the same way as `accepted_concurrency`,
-by summing up tokens from all the flows entering scheduler,
-including rejected ones.
+This is computed in the same way as `accepted_concurrency`, by summing up tokens
+from all the flows entering scheduler, including rejected ones.
 
 </dd>
 </dl>
@@ -8512,16 +8674,15 @@ Scheduler parameters
 
 <!-- vale on -->
 
-Automatically estimate the size of a flow in each workload, based on
-historical latency. Each workload's `tokens` will be set to average
-latency of flows in that workload during last few seconds (exact duration
-of this average can change).
-This setting is useful in concurrency limiting use-case, where the
+Automatically estimate the size of a flow in each workload, based on historical
+latency. Each workload's `tokens` will be set to average latency of flows in
+that workload during last few seconds (exact duration of this average can
+change). This setting is useful in concurrency limiting use-case, where the
 concurrency is calculated as (avg. latency \* in-flight flows).
 
-The value of tokens estimated by `auto_tokens` takes lower precedence
-than the value of `tokens` specified in the workload definition
-and `tokens` explicitly specified in the flow labels.
+The value of tokens estimated by `auto_tokens` takes lower precedence than the
+value of `tokens` specified in the workload definition and `tokens` explicitly
+specified in the flow labels.
 
 </dd>
 <dt>decision_deadline_margin</dt>
@@ -8533,18 +8694,16 @@ and `tokens` explicitly specified in the flow labels.
 
 <!-- vale on -->
 
-Decision deadline margin is the amount of time that the scheduler will
-subtract from the request deadline to determine the deadline for the
-decision. This is to ensure that the scheduler has enough time to
-make a decision before the request deadline happens, accounting for
-processing delays.
-The request deadline is based on the
-[gRPC deadline](https://grpc.io/blog/deadlines) or the
+Decision deadline margin is the amount of time that the scheduler will subtract
+from the request deadline to determine the deadline for the decision. This is to
+ensure that the scheduler has enough time to make a decision before the request
+deadline happens, accounting for processing delays. The request deadline is
+based on the [gRPC deadline](https://grpc.io/blog/deadlines) or the
 [`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
 
-Fail-open logic is use for flow control APIs, so if the gRPC deadline
-reaches, the flow will end up being unconditionally allowed while
-it is still waiting on the scheduler.
+Fail-open logic is use for flow control APIs, so if the gRPC deadline reaches,
+the flow will end up being unconditionally allowed while it is still waiting on
+the scheduler.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -8568,9 +8727,11 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 <!-- vale on -->
 
-- Key for a flow label that can be used to override the default number of tokens for this flow.
+- Key for a flow label that can be used to override the default number of tokens
+  for this flow.
 - The value associated with this key must be a valid uint64 number.
-- If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+- If this parameter is not provided, the number of tokens for the flow will be
+  determined by the matched workload's token count.
 
 </dd>
 <dt>workloads</dt>
@@ -8588,20 +8749,21 @@ Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "intelligent" compared to random rejections.
 There are two aspects of this "intelligence":
 
-- Scheduler can more precisely calculate concurrency if it understands
-  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
-- Setting different priorities to different workloads lets the scheduler
-  avoid dropping important traffic during overload.
+- Scheduler can more precisely calculate concurrency if it understands that
+  flows belonging to different classes have different weights (for example,
+  insert queries compared to select queries).
+- Setting different priorities to different workloads lets the scheduler avoid
+  dropping important traffic during overload.
 
-Each workload in this list specifies also a matcher that is used to
-determine which flow will be categorized into which workload.
-In case of multiple matching workloads, the first matching one will be used.
-If none of workloads match, `default_workload` will be used.
+Each workload in this list specifies also a matcher that is used to determine
+which flow will be categorized into which workload. In case of multiple matching
+workloads, the first matching one will be used. If none of workloads match,
+`default_workload` will be used.
 
 :::info
 
-See also [workload definition in the concepts
-section](/concepts/flow-control/components/load-scheduler.md#workload).
+See also
+[workload definition in the concepts section](/concepts/flow-control/components/load-scheduler.md#workload).
 
 :::
 
@@ -8616,7 +8778,8 @@ section](/concepts/flow-control/components/load-scheduler.md#workload).
 
 <!-- vale on -->
 
-Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
+Workload defines a class of flows that preferably have similar properties such
+as response latency and desired priority.
 
 <dl>
 <dt>label_matcher</dt>
@@ -8654,8 +8817,8 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale on -->
 
-Parameters such as priority, tokens and fairness key that
-are applicable to flows within a workload.
+Parameters such as priority, tokens and fairness key that are applicable to
+flows within a workload.
 
 <dl>
 <dt>fairness_key</dt>
@@ -8667,10 +8830,10 @@ are applicable to flows within a workload.
 
 <!-- vale on -->
 
-Fairness key is a label key that can be used to provide fairness within a workload.
-Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
-you have a classifier that sets `user` flow label, you might want to set
-`fairness_key = "user"`.
+Fairness key is a label key that can be used to provide fairness within a
+workload. Any [flow label](/concepts/flow-control/flow-label.md) can be used
+here. For example, if you have a classifier that sets `user` flow label, you
+might want to set `fairness_key = "user"`.
 
 </dd>
 <dt>priority</dt>
@@ -8682,10 +8845,10 @@ you have a classifier that sets `user` flow label, you might want to set
 
 <!-- vale on -->
 
-Describes priority level of the flows within the workload.
-Priority level ranges from 0 to 255.
-Higher numbers means higher priority level.
-Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+Describes priority level of the flows within the workload. Priority level ranges
+from 0 to 255. Higher numbers means higher priority level. Priority levels have
+non-linear effect on the workload scheduling. The following formula is used to
+determine the position of a flow in the queue based on virtual finish time:
 
 $$
 \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
@@ -8701,12 +8864,11 @@ $$
 
 <!-- vale on -->
 
-Tokens determines the cost of admitting a single flow in the workload,
-which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
-simply equal to 1 if the resource being accessed is constrained by the
-number of flows (3rd party rate limiters).
-This override is applicable only if tokens for the flow aren't specified
-in the flow labels.
+Tokens determines the cost of admitting a single flow in the workload, which is
+typically defined as milliseconds of flow latency (time to response or duration
+of a feature) or simply equal to 1 if the resource being accessed is constrained
+by the number of flows (3rd party rate limiters). This override is applicable
+only if tokens for the flow aren't specified in the flow labels.
 
 </dd>
 </dl>
@@ -8720,8 +8882,9 @@ in the flow labels.
 <!-- vale on -->
 
 Selects flows based on control point, flow labels, agent group and the service
-that the [flow control component](/concepts/flow-control/flow-control.md#components)
-will operate on.
+that the
+[flow control component](/concepts/flow-control/flow-control.md#components) will
+operate on.
 
 :::info
 
@@ -8758,14 +8921,14 @@ label_matcher:
 
 <!-- vale on -->
 
-[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
-selector applies to.
+[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this selector
+applies to.
 
 :::info
 
-Agent Groups are used to scope policies to a subset of agents connected to the same controller.
-The agents within an agent group receive exact same policy configuration and
-form a peer to peer cluster to constantly share state.
+Agent Groups are used to scope policies to a subset of agents connected to the
+same controller. The agents within an agent group receive exact same policy
+configuration and form a peer to peer cluster to constantly share state.
 
 :::
 
@@ -8779,13 +8942,12 @@ form a peer to peer cluster to constantly share state.
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/selector.md#control-point)
-identifies location within services where policies can act on flows.
-For an SDK based insertion,
-a _Control Point_ can represent a particular feature or execution
+[Control Point](/concepts/flow-control/selector.md#control-point) identifies
+location within services where policies can act on flows. For an SDK based
+insertion, a _Control Point_ can represent a particular feature or execution
 block within a service. In case of service mesh or middleware insertion, a
-_Control Point_ can identify ingress or egress calls or distinct listeners
-or filter chains.
+_Control Point_ can identify ingress or egress calls or distinct listeners or
+filter chains.
 
 </dd>
 <dt>label_matcher</dt>
@@ -8797,8 +8959,8 @@ or filter chains.
 
 <!-- vale on -->
 
-[Label Matcher](/concepts/flow-control/selector.md#label-matcher)
-can be used to match flows based on flow labels.
+[Label Matcher](/concepts/flow-control/selector.md#label-matcher) can be used to
+match flows based on flow labels.
 
 </dd>
 <dt>service</dt>
@@ -8838,9 +9000,9 @@ An entity (for example, Kubernetes pod) might belong to multiple services.
 
 <!-- vale on -->
 
-Describes which service a [flow control or observability
-component](/concepts/flow-control/flow-control.md#components) should apply
-to
+Describes which service a
+[flow control or observability component](/concepts/flow-control/flow-control.md#components)
+should apply to
 
 :::info
 
@@ -8865,9 +9027,10 @@ selector applies to.
 
 :::info
 
-Agent Groups are used to scope policies to a subset of agents connected to the same controller.
-This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
-The agents within an agent group form a peer to peer cluster and constantly share state.
+Agent Groups are used to scope policies to a subset of agents connected to the
+same controller. This is especially useful in the Kubernetes sidecar
+installation because service discovery is switched off in that mode. The agents
+within an agent group form a peer to peer cluster and constantly share state.
 
 :::
 
@@ -8894,8 +9057,9 @@ In Kubernetes, this is the FQDN of the Service object.
 
 :::info
 
-In the Kubernetes sidecar installation mode, service discovery is switched off by default.
-To scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
+In the Kubernetes sidecar installation mode, service discovery is switched off
+by default. To scope policies to services, the `service` should be set to `any`
+and instead, `agent_group` name should be used.
 
 :::
 
@@ -8916,17 +9080,17 @@ An entity (for example, Kubernetes pod) might belong to multiple services.
 
 <!-- vale on -->
 
-The _Signal Generator_ component generates a smooth and continuous signal
-by following a sequence of specified steps. Each step has two parameters:
+The _Signal Generator_ component generates a smooth and continuous signal by
+following a sequence of specified steps. Each step has two parameters:
 
 - `target_output`: The desired output value at the end of the step.
 - `duration`: The time it takes for the signal to change linearly from the
   previous step's `target_output` to the current step's `target_output`.
 
-The output signal starts at the `target_output` of the first step and
-changes linearly between steps based on their `duration`. The _Signal
-Generator_ can be controlled to move forwards, backwards, or reset to the
-beginning based on input signals.
+The output signal starts at the `target_output` of the first step and changes
+linearly between steps based on their `duration`. The _Signal Generator_ can be
+controlled to move forwards, backwards, or reset to the beginning based on input
+signals.
 
 <dl>
 <dt>in_ports</dt>
@@ -9032,7 +9196,8 @@ Outputs for the _Signal Generator_ component.
 
 <!-- vale on -->
 
-A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+A Boolean signal indicating whether the _Signal Generator_ is at the end of
+signal generation.
 
 </dd>
 <dt>at_start</dt>
@@ -9044,7 +9209,8 @@ A Boolean signal indicating whether the _Signal Generator_ is at the end of sign
 
 <!-- vale on -->
 
-A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
+A Boolean signal indicating whether the _Signal Generator_ is at the start of
+signal generation.
 
 </dd>
 <dt>output</dt>
@@ -9077,7 +9243,8 @@ Parameters for the _Signal Generator_ component.
 
 <!-- vale off -->
 
-([[]SignalGeneratorParametersStep](#signal-generator-parameters-step), **required**)
+([[]SignalGeneratorParametersStep](#signal-generator-parameters-step),
+**required**)
 
 <!-- vale on -->
 
@@ -9127,7 +9294,8 @@ The value of the step.
 
 <!-- vale on -->
 
-Type of Combinator that switches between `on_signal` and `off_signal` signals based on switch input
+Type of Combinator that switches between `on_signal` and `off_signal` signals
+based on switch input
 
 `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
 otherwise `off_signal` will be returned.
@@ -9241,7 +9409,8 @@ Selected signal (`on_signal` or `off_signal`).
 
 <!-- vale on -->
 
-Takes an input signal and emits the output after applying the specified unary operator
+Takes an input signal and emits the output after applying the specified unary
+operator
 
 $$
 \text{output} = \unary_operator{\text{input}}
@@ -9265,7 +9434,8 @@ Input ports for the UnaryOperator component.
 
 <!-- vale off -->
 
-(string, one of: `abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1`)
+(string, one of:
+`abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1`)
 
 <!-- vale on -->
 
@@ -9301,7 +9471,8 @@ The unary operator can be one of the following:
 - `log1p`: Natural logarithm of input signal plus 1.
 - `log2`: Base-2 logarithm of input signal.
 - `round`: Round to nearest integer.
-- `roundtoeven`: Round to nearest integer, with ties going to the nearest even integer.
+- `roundtoeven`: Round to nearest integer, with ties going to the nearest even
+  integer.
 - `sin`: `sine`, in radians.
 - `sinh`: Hyperbolic sine.
 - `sqrt`: Square root.
@@ -9384,7 +9555,8 @@ Output signal.
 
 <!-- vale on -->
 
-Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+Component that emits a variable value as an output signal, can be defined in
+dynamic configuration.
 
 <dl>
 <dt>default_config</dt>

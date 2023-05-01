@@ -6,6 +6,8 @@ keywords:
   - aperturectl_uninstall_controller
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl uninstall controller
 
 Uninstall Aperture Controller

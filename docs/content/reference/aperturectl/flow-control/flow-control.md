@@ -6,6 +6,8 @@ keywords:
   - aperturectl_flow-control
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl flow-control
 
 Flow Control integrations
