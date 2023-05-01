@@ -19,20 +19,18 @@ relevant fields highlighted in the aperturectl generated values file.
 :::
 
 <!-- Configuration Marker -->
-
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../../parameterComponents.js'
 ```
 
 ## Configuration
-
 <!-- vale off -->
 
-Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/ema-latency`}>policies/feature-rollout/ema-latency</a>
+Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/ema-latency`}>policies/feature-rollout/ema-latency</a>
 
 <!-- vale on -->
+
 
 ### Parameters
 
