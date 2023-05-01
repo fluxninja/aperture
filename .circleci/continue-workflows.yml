@@ -1290,7 +1290,6 @@ workflows:
           name: build-aperture-docs
           task-name: Build aperture documentation and verify changes
           dry-run: true
-          no_output_timeout: 15m
 
   push-blueprints-changes:
     when:
