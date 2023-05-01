@@ -11,7 +11,7 @@ keywords:
 
 :::info
 
-See also [saphanareceiver docs][receiver] in opentelemetry-collect-contrib
+See also [saphanareceiver docs][receiver] in `opentelemetry-collector-contrib`
 repository.
 
 :::

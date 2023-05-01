@@ -12,7 +12,7 @@ keywords:
 :::info
 
 See also [activedirectorydsreceiver docs][receiver] in
-opentelemetry-collect-contrib repository.
+`opentelemetry-collector-contrib` repository.
 
 :::
 
