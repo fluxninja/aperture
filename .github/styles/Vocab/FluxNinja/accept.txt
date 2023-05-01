@@ -75,3 +75,4 @@ CustomResourceDefinition
 ReplicaSet
 StatefulSet
 StatefulSets
+Netty
