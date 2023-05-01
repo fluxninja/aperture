@@ -11,8 +11,8 @@ and the Aperture Controller.
 
 Go & Process metrics can be exposed by enabling the `enable_go_metrics` flag and
 `enable_process_collector` in
-[Agent's MetricsConfig](reference/configuration/agent.md#metrics-config) and
-[Controller's MetricsConfig](reference/configuration/controller.md#metrics-config).
+[Agent's MetricsConfig](/reference/configuration/agent.md#metrics-config) and
+[Controller's MetricsConfig](/reference/configuration/controller.md#metrics-config).
 See
 
 <!-- vale off -->
