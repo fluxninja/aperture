@@ -4,13 +4,13 @@ deps:
   - remote: buf.build
     owner: cncf
     repository: xds
-    commit: ed1d3f62ca8047d7acf9f1dbaeee323a
-    digest: shake256:299925e9597e00754bde2e0802f4a7db5affd9036458e0394f7f3805f8ea334c8e62775945d24515293f60dae117cac3fa8263700156d3bc036082ed61c90001
+    commit: 197fca8a74c54bc888e0ccf2da3b9f65
+    digest: shake256:cc68ed395f3531a8fa3a053a2c6f013fee057945a39b934aecdb3a204af7ea512da3e366b24ef72a9123985aeacb000291354799d8ac7dcb30e9907f30158110
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: 3a03455f927d43be81e3fae970a58090
-    digest: shake256:b75bd31ced1d7a4db506242ebda517e49eb0d920b7c7e151fa3b633f948105523cc6a19af442f529eba42ad5bfc1e23eef4b3233cfbb02a728cb125841d3f7ac
+    commit: 1159583f31124e34a7396ccce9904840
+    digest: shake256:bd740207afc4611dec703b500650c06b1906b92206e8e1488210ee2c2d50e178903b8012ac7ebde318e1285470b3fe50d6abc4a5feaae1cf515e50febd20874d
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate

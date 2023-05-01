@@ -1,0 +1,173 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/service-protection/average-latency blueprint",
+  "additionalProperties": false,
+  "required": ["common", "policy"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "5s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "From time of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "To time of dashboard.",
+          "default": "now",
+          "type": "string"
+        },
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
+              "type": "string"
+            },
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "default": "",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["service_protection_core", "flux_meter"],
+      "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "resources": {
+          "description": "List of additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "1s",
+          "type": "string"
+        },
+        "service_protection_core": {
+          "description": "Core parameters for Service Protection policy.",
+          "default": {
+            "adaptive_load_scheduler": {
+              "alerter": {
+                "alert_name": "Load Shed Event"
+              },
+              "default_config": {
+                "dry_run": false
+              },
+              "flow_selector": {
+                "flow_matcher": {
+                  "control_point": "__REQUIRED_FIELD__"
+                },
+                "service_selector": {
+                  "service": "__REQUIRED_FIELD__"
+                }
+              },
+              "gradient": {
+                "max_gradient": 1,
+                "min_gradient": 0.1,
+                "slope": -1
+              },
+              "load_multiplier_linear_increment": 0.0025,
+              "max_load_multiplier": 2,
+              "scheduler": {
+                "auto_tokens": true
+              }
+            },
+            "overload_confirmations": [
+              {
+                "operator": "__REQUIRED_FIELD__",
+                "query_string": "__REQUIRED_FIELD__",
+                "threshold": "__REQUIRED_FIELD__"
+              }
+            ]
+          },
+          "type": "object",
+          "$ref": "../../../../policies/service-protection/base/gen/definitions.json#/$defs/service_protection_core"
+        },
+        "flux_meter": {
+          "description": "Flux Meter.",
+          "default": {
+            "flow_selector": {
+              "flow_matcher": {
+                "control_point": "__REQUIRED_FIELD__"
+              },
+              "service_selector": {
+                "service": "__REQUIRED_FIELD__"
+              }
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
+        },
+        "latency_baseliner": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ema": {
+              "description": "EMA parameters.",
+              "default": {
+                "correction_factor_on_max_envelope_violation": 0.95,
+                "ema_window": "1500s",
+                "warmup_window": "60s"
+              },
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/EMAParameters"
+            },
+            "latency_tolerance_multiplier": {
+              "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.",
+              "default": 1.1,
+              "type": "number",
+              "format": "double"
+            },
+            "latency_ema_limit_multiplier": {
+              "description": "Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.",
+              "default": 2,
+              "type": "number",
+              "format": "double"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": null
+}
