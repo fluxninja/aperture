@@ -59,9 +59,13 @@ linters:
     - misspell
     - stylecheck
     - promlinter
+    - nilerr
+    - wastedassign
   disable:
     # unmaintained
     - deadcode
+    - varcheck
+    - structcheck
     # - nilerr
     # - wastedassign
 issues:
