@@ -12,9 +12,7 @@
     classifiers: [],
     /**
     * @param (policy.rate_limiter.rate_limit: float64 required) Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
-    * @param (policy.rate_limiter.flow_selector: aperture.spec.v1.FlowSelector) A flow selector to match requests against
-    * @param (policy.rate_limiter.flow_selector.service_selector.service: string required) Service Name.
-    * @param (policy.rate_limiter.flow_selector.flow_matcher.control_point: string required) Control Point Name.
+    * @param (policy.rate_limiter.selectors: []aperture.spec.v1.Selector) Flow selectors to match requests against
     * @param (policy.rate_limiter.parameters: aperture.spec.v1.RateLimiterParameters) Parameters.
     * @param (policy.rate_limiter.parameters.limit_reset_interval: string required) Time after which the limit for a given label value will be reset.
     * @param (policy.rate_limiter.parameters.label_key: string required) Flow label to use for rate limiting.
@@ -23,14 +21,10 @@
     */
     rate_limiter: {
       rate_limit: '__REQUIRED_FIELD__',
-      flow_selector: {
-        service_selector: {
-          service: '__REQUIRED_FIELD__',
-        },
-        flow_matcher: {
-          control_point: '__REQUIRED_FIELD__',
-        },
-      },
+      selectors: [{
+        service: '__REQUIRED_FIELD__',
+        control_point: '__REQUIRED_FIELD__',
+      }],
       parameters: {
         limit_reset_interval: '__REQUIRED_FIELD__',
         label_key: '__REQUIRED_FIELD__',

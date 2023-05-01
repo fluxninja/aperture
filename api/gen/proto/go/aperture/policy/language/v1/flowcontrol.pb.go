@@ -55,7 +55,7 @@ type Selector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+	// [Control Point](/concepts/flow-control/selector.md#control-point)
 	// identifies location within services where policies can act on flows.
 	// For an SDK based insertion,
 	// a _Control Point_ can represent a particular feature or execution
@@ -63,7 +63,7 @@ type Selector struct {
 	// _Control Point_ can identify ingress or egress calls or distinct listeners
 	// or filter chains.
 	ControlPoint string `protobuf:"bytes,1,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
-	// [_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) this
+	// [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
 	// selector applies to.
 	//
 	// :::info
@@ -75,7 +75,7 @@ type Selector struct {
 	// :::
 	AgentGroup string `protobuf:"bytes,2,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// The Fully Qualified Domain Name of the
-	// [service](/concepts/flow-control/flow-selector.md) to select.
+	// [service](/concepts/flow-control/selector.md) to select.
 	//
 	// In Kubernetes, this is the FQDN of the Service object.
 	//
@@ -91,7 +91,7 @@ type Selector struct {
 	//
 	// :::
 	Service string `protobuf:"bytes,3,opt,name=service,proto3" json:"service,omitempty" default:"any"` // @gotags: default:"any"
-	// [Label Matcher](/concepts/flow-control/flow-selector.md#label-matcher)
+	// [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
 	// can be used to match flows based on flow labels.
 	LabelMatcher *LabelMatcher `protobuf:"bytes,4,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }
@@ -161,7 +161,7 @@ func (x *Selector) GetLabelMatcher() *LabelMatcher {
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/selector.md).
 //
 // :::
 //
@@ -229,7 +229,7 @@ func (x *FlowSelector) GetFlowMatcher() *FlowMatcher {
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/selector.md).
 //
 // :::
 //
@@ -239,7 +239,7 @@ type ServiceSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+	// Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
 	// selector applies to.
 	//
 	// :::info
@@ -251,7 +251,7 @@ type ServiceSelector struct {
 	// :::
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// The Fully Qualified Domain Name of the
-	// [service](/concepts/flow-control/flow-selector.md) to select.
+	// [service](/concepts/flow-control/selector.md) to select.
 	//
 	// In Kubernetes, this is the FQDN of the Service object.
 	//
@@ -328,7 +328,7 @@ func (x *ServiceSelector) GetService() string {
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/selector.md).
 //
 // :::
 // Example:
@@ -357,7 +357,7 @@ type FlowMatcher struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+	// [Control Point](/concepts/flow-control/selector.md#control-point)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 	// or filter chains.
@@ -368,7 +368,7 @@ type FlowMatcher struct {
 	//
 	// :::info
 	//
-	// See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+	// See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
 	//
 	// :::
 	//
@@ -2419,7 +2419,7 @@ func (x *FlowRegulator) GetDefaultConfig() *FlowRegulator_DynamicConfig {
 }
 
 // _Regulator_ is a component that regulates the load at a
-// [_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+// [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
 // flows at random or by sticky sessions.
 //
 // :::info

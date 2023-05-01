@@ -25,15 +25,13 @@
         "evaluation_interval": "1s",
         "load_ramp": {
           "regulator_parameters": {
-            "flow_selector": {
-              "flow_matcher": {
-                "control_point": "__REQUIRED_FIELD__"
-              },
-              "service_selector": {
+            "label_key": "",
+            "selectors": [
+              {
+                "control_point": "__REQUIRED_FIELD__",
                 "service": "__REQUIRED_FIELD__"
               }
-            },
-            "label_key": ""
+            ]
           },
           "steps": [
             {
@@ -162,20 +160,21 @@
     "average_latency_driver": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["flow_selector"],
+      "required": ["selectors"],
       "properties": {
-        "flow_selector": {
+        "selectors": {
           "description": "Identify the service and flows whose latency needs to be measured.",
-          "default": {
-            "flow_matcher": {
-              "control_point": "__REQUIRED_FIELD__"
-            },
-            "service_selector": {
+          "default": [
+            {
+              "control_point": "__REQUIRED_FIELD__",
               "service": "__REQUIRED_FIELD__"
             }
-          },
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+          ],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+          }
         },
         "criteria": {
           "type": "object",
@@ -229,14 +228,12 @@
         "flux_meter": {
           "description": "FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.",
           "default": {
-            "flow_selector": {
-              "flow_matcher": {
-                "control_point": "__REQUIRED_FIELD__"
-              },
-              "service_selector": {
+            "selector": [
+              {
+                "control_point": "__REQUIRED_FIELD__",
                 "service": "__REQUIRED_FIELD__"
               }
-            },
+            ],
             "static_buckets": {
               "buckets": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
             }
@@ -297,20 +294,21 @@
     "ema_latency_driver": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["flow_selector", "ema"],
+      "required": ["selectors", "ema"],
       "properties": {
-        "flow_selector": {
+        "selectors": {
           "description": "Identify the service and flows whose latency needs to be measured.",
-          "default": {
-            "flow_matcher": {
-              "control_point": "__REQUIRED_FIELD__"
-            },
-            "service_selector": {
+          "default": [
+            {
+              "control_point": "__REQUIRED_FIELD__",
               "service": "__REQUIRED_FIELD__"
             }
-          },
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+          ],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+          }
         },
         "criteria": {
           "type": "object",
@@ -374,15 +372,13 @@
           "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
           "default": {
             "regulator_parameters": {
-              "flow_selector": {
-                "flow_matcher": {
-                  "control_point": "__REQUIRED_FIELD__"
-                },
-                "service_selector": {
+              "label_key": "",
+              "selectors": [
+                {
+                  "control_point": "__REQUIRED_FIELD__",
                   "service": "__REQUIRED_FIELD__"
                 }
-              },
-              "label_key": ""
+              ]
             },
             "steps": [
               {
@@ -464,14 +460,12 @@
                       "threshold": "__REQUIRED_FIELD__"
                     }
                   },
-                  "flow_selector": {
-                    "flow_matcher": {
-                      "control_point": "__REQUIRED_FIELD__"
-                    },
-                    "service_selector": {
+                  "selectors": [
+                    {
+                      "control_point": "__REQUIRED_FIELD__",
                       "service": "__REQUIRED_FIELD__"
                     }
-                  }
+                  ]
                 }
               ],
               "type": "array",
@@ -496,14 +490,12 @@
                     }
                   },
                   "flux_meter": {
-                    "flow_selector": {
-                      "flow_matcher": {
-                        "control_point": "__REQUIRED_FIELD__"
-                      },
-                      "service_selector": {
+                    "selector": [
+                      {
+                        "control_point": "__REQUIRED_FIELD__",
                         "service": "__REQUIRED_FIELD__"
                       }
-                    },
+                    ],
                     "static_buckets": {
                       "buckets": [
                         5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000
@@ -538,14 +530,12 @@
                     "ema_window": "1500s",
                     "warmup_window": "60s"
                   },
-                  "flow_selector": {
-                    "flow_matcher": {
-                      "control_point": "__REQUIRED_FIELD__"
-                    },
-                    "service_selector": {
+                  "selectors": [
+                    {
+                      "control_point": "__REQUIRED_FIELD__",
                       "service": "__REQUIRED_FIELD__"
                     }
-                  }
+                  ]
                 }
               ],
               "type": "array",

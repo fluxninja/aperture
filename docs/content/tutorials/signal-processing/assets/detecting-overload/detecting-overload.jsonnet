@@ -3,9 +3,7 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet
 local policy = aperture.spec.v1.Policy;
 local component = aperture.spec.v1.Component;
 local query = aperture.spec.v1.Query;
-local flowSelector = aperture.spec.v1.FlowSelector;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
-local flowMatcher = aperture.spec.v1.FlowMatcher;
+local selector = aperture.spec.v1.Selector;
 local circuit = aperture.spec.v1.Circuit;
 local port = aperture.spec.v1.Port;
 local resources = aperture.spec.v1.Resources;
@@ -20,17 +18,12 @@ local alerter = aperture.spec.v1.Alerter;
 local alerterParameters = aperture.spec.v1.AlerterParameters;
 local constantSignal = aperture.spec.v1.ConstantSignal;
 
-local svcSelector =
-  flowSelector.new()
-  + flowSelector.withServiceSelector(
-    serviceSelector.new()
-    + serviceSelector.withAgentGroup('default')
-    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-  )
-  + flowSelector.withFlowMatcher(
-    flowMatcher.new()
-    + flowMatcher.withControlPoint('ingress')
-  );
+local svcSelectors = [
+  selector.new()
+  + selector.withControlPoint('ingress')
+  + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  + selector.withAgentGroup('default'),
+];
 
 local policyDef =
   policy.new()
@@ -38,7 +31,7 @@ local policyDef =
     resources.new()
     + resources.withFlowControl(flowControlResources.new()
                                 + flowControlResources.withFluxMetersMixin(
-                                  { test: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector) }
+                                  { test: fluxMeter.new() + fluxMeter.withSelectors(svcSelectors) }
                                 ))
   )
   + policy.withCircuit(

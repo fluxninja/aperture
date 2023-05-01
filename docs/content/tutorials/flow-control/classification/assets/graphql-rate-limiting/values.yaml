@@ -3,19 +3,15 @@ common:
 policy:
   rate_limiter:
     rate_limit: 10
-    flow_selector:
-      flow_matcher:
-        control_point: ingress
-      service_selector:
+    selectors:
+      - control_point: ingress
         service: service-graphql-demo-app.demoapp.svc.cluster.local
     parameters:
       label_key: user_id
       limit_reset_interval: 1s
   classifiers:
-    - flow_selector:
-        flow_matcher:
-          control_point: ingress
-        service_selector:
+    - selectors:
+        - control_point: ingress
           service: service-graphql-demo-app.demoapp.svc.cluster.local
       rego:
         labels:

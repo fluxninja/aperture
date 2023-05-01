@@ -1322,7 +1322,7 @@ Write Buffer Size. 0 = 4 KB.
 
 <!-- vale on -->
 
-Proxy Connect Header - map[string][]string
+Proxy Connect Header - `map[string][]string`
 
 </dd>
 <dt>tls</dt>

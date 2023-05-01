@@ -3032,7 +3032,7 @@ to
 
 :::info
 
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
 :::
 Example:
@@ -3066,7 +3066,7 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/flow-selector.md#control-point)
+[Control Point](/concepts/flow-control/selector.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 or filter chains.
@@ -3087,7 +3087,7 @@ must also be satisfied (in addition to service+control point matching)
 
 :::info
 
-See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
 
 :::
 
@@ -3283,7 +3283,7 @@ component](/concepts/flow-control/flow-control.md#components) operates on.
 
 :::info
 
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
 :::
 
@@ -4592,7 +4592,7 @@ component should apply to.
 
 <!-- vale on -->
 
-Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -7908,7 +7908,7 @@ sensitive labels.
 <!-- vale on -->
 
 _Regulator_ is a component that regulates the load at a
-[_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
 flows at random or by sticky sessions.
 
 :::info
@@ -8758,7 +8758,7 @@ label_matcher:
 
 <!-- vale on -->
 
-[_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) this
+[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
 selector applies to.
 
 :::info
@@ -8779,7 +8779,7 @@ form a peer to peer cluster to constantly share state.
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/flow-selector.md#control-point)
+[Control Point](/concepts/flow-control/selector.md#control-point)
 identifies location within services where policies can act on flows.
 For an SDK based insertion,
 a _Control Point_ can represent a particular feature or execution
@@ -8797,7 +8797,7 @@ or filter chains.
 
 <!-- vale on -->
 
-[Label Matcher](/concepts/flow-control/flow-selector.md#label-matcher)
+[Label Matcher](/concepts/flow-control/selector.md#label-matcher)
 can be used to match flows based on flow labels.
 
 </dd>
@@ -8811,7 +8811,7 @@ can be used to match flows based on flow labels.
 <!-- vale on -->
 
 The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/flow-selector.md) to select.
+[service](/concepts/flow-control/selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 
@@ -8844,7 +8844,7 @@ to
 
 :::info
 
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
 :::
 
@@ -8860,7 +8860,7 @@ Deprecated 1.8.0: Use `selectors` instead.
 
 <!-- vale on -->
 
-Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
 selector applies to.
 
 :::info
@@ -8882,7 +8882,7 @@ The agents within an agent group form a peer to peer cluster and constantly shar
 <!-- vale on -->
 
 The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/flow-selector.md) to select.
+[service](/concepts/flow-control/selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 

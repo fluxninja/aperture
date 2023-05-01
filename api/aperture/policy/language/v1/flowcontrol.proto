@@ -35,7 +35,7 @@ import "google/protobuf/duration.proto";
 //           regex: ^(?!.*Chrome).*Safari
 // ```
 message Selector {
-  // [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+  // [Control Point](/concepts/flow-control/selector.md#control-point)
   // identifies location within services where policies can act on flows.
   // For an SDK based insertion,
   // a _Control Point_ can represent a particular feature or execution
@@ -44,7 +44,7 @@ message Selector {
   // or filter chains.
   string control_point = 1; // @gotags: validate:"required"
 
-  // [_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) this
+  // [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
   // selector applies to.
   //
   // :::info
@@ -57,7 +57,7 @@ message Selector {
   string agent_group = 2; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
-  // [service](/concepts/flow-control/flow-selector.md) to select.
+  // [service](/concepts/flow-control/selector.md) to select.
   //
   // In Kubernetes, this is the FQDN of the Service object.
   //
@@ -74,7 +74,7 @@ message Selector {
   // :::
   string service = 3; // @gotags: default:"any"
 
-  // [Label Matcher](/concepts/flow-control/flow-selector.md#label-matcher)
+  // [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
   // can be used to match flows based on flow labels.
   LabelMatcher label_matcher = 4;
 }
@@ -84,7 +84,7 @@ message Selector {
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/selector.md).
 //
 // :::
 //
@@ -102,13 +102,13 @@ message FlowSelector {
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/selector.md).
 //
 // :::
 //
 // Deprecated 1.8.0: Use `selectors` instead.
 message ServiceSelector {
-  // Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+  // Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
   // selector applies to.
   //
   // :::info
@@ -121,7 +121,7 @@ message ServiceSelector {
   string agent_group = 1; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
-  // [service](/concepts/flow-control/flow-selector.md) to select.
+  // [service](/concepts/flow-control/selector.md) to select.
   //
   // In Kubernetes, this is the FQDN of the Service object.
   //
@@ -152,7 +152,7 @@ message ServiceSelector {
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/selector.md).
 //
 // :::
 // Example:
@@ -175,7 +175,7 @@ message ServiceSelector {
 //
 // Deprecated 1.8.0: Use `selectors` instead.
 message FlowMatcher {
-  // [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+  // [Control Point](/concepts/flow-control/selector.md#control-point)
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
   // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
   // or filter chains.
@@ -187,7 +187,7 @@ message FlowMatcher {
   //
   // :::info
   //
-  // See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+  // See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
   //
   // :::
   //
@@ -1263,7 +1263,7 @@ message FlowRegulator {
 }
 
 // _Regulator_ is a component that regulates the load at a
-// [_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+// [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
 // flows at random or by sticky sessions.
 //
 // :::info

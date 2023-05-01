@@ -1534,7 +1534,7 @@ definitions:
     description: |-
       :::info
 
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
       :::
       Example:
@@ -1566,7 +1566,7 @@ definitions:
     properties:
       control_point:
         description: |+
-          [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+          [Control Point](/concepts/flow-control/selector.md#control-point)
           identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
           block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
           or filter chains.
@@ -1577,7 +1577,7 @@ definitions:
         description: |-
           :::info
 
-          See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
 
           :::
 
@@ -1667,7 +1667,7 @@ definitions:
 
       :::info
 
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
       :::
 
@@ -2298,7 +2298,7 @@ definitions:
     properties:
       agent_group:
         description: |+
-          Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+          Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
           selector applies to.
 
         type: string
@@ -3764,7 +3764,7 @@ definitions:
   Regulator:
     description: |-
       _Regulator_ is a component that regulates the load at a
-      [_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+      [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
       flows at random or by sticky sessions.
 
       :::info
@@ -4170,7 +4170,7 @@ definitions:
     properties:
       agent_group:
         description: |+
-          [_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) this
+          [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
           selector applies to.
 
           :::info
@@ -4186,7 +4186,7 @@ definitions:
         x-go-tag-default: default
       control_point:
         description: |+
-          [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+          [Control Point](/concepts/flow-control/selector.md#control-point)
           identifies location within services where policies can act on flows.
           For an SDK based insertion,
           a _Control Point_ can represent a particular feature or execution
@@ -4198,13 +4198,13 @@ definitions:
         x-go-tag-validate: required
       label_matcher:
         description: |-
-          [Label Matcher](/concepts/flow-control/flow-selector.md#label-matcher)
+          [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
           can be used to match flows based on flow labels.
         $ref: '#/definitions/LabelMatcher'
       service:
         description: |+
           The Fully Qualified Domain Name of the
-          [service](/concepts/flow-control/flow-selector.md) to select.
+          [service](/concepts/flow-control/selector.md) to select.
 
           In Kubernetes, this is the FQDN of the Service object.
 
@@ -4227,7 +4227,7 @@ definitions:
     description: |-
       :::info
 
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
       :::
 
@@ -4240,7 +4240,7 @@ definitions:
     properties:
       agent_group:
         description: |+
-          Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+          Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
           selector applies to.
 
           :::info
@@ -4257,7 +4257,7 @@ definitions:
       service:
         description: |+
           The Fully Qualified Domain Name of the
-          [service](/concepts/flow-control/flow-selector.md) to select.
+          [service](/concepts/flow-control/selector.md) to select.
 
           In Kubernetes, this is the FQDN of the Service object.
 

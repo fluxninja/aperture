@@ -76,20 +76,21 @@
         "concurrency_controller": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["flow_selector"],
+          "required": ["selectors"],
           "properties": {
-            "flow_selector": {
-              "description": "Concurrency Limiter flow selector.",
-              "default": {
-                "flow_matcher": {
-                  "control_point": "__REQUIRED_FIELD__"
-                },
-                "service_selector": {
+            "selectors": {
+              "description": "Concurrency Limiter flow selectors.",
+              "default": [
+                {
+                  "control_point": "__REQUIRED_FIELD__",
                   "service": "__REQUIRED_FIELD__"
                 }
-              },
-              "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+              }
             },
             "scheduler": {
               "description": "Scheduler parameters.",

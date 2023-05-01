@@ -29,7 +29,7 @@ function(cfg) {
           + flowControl.withRateLimiter(
             rateLimiter.new()
             + rateLimiter.withInPorts({ limit: port.withConstantSignal(params.rate_limiter.rate_limit) })
-            + rateLimiter.withFlowSelector(params.rate_limiter.flow_selector)
+            + rateLimiter.withSelectors(params.rate_limiter.selectors)
             + rateLimiter.withParameters(params.rate_limiter.parameters)
             + rateLimiter.withDynamicConfigKey('rate_limiter')
             + rateLimiter.withDefaultConfig(params.rate_limiter.default_config)

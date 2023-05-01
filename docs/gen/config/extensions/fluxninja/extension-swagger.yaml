@@ -267,7 +267,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             proxy_connect_header:
                 $ref: '#/definitions/Header'
-                description: Proxy Connect Header - map[string][]string
+                description: Proxy Connect Header - `map[string][]string`
                 x-go-tag-json: proxy_connect_header,omitempty
                 x-go-tag-validate: omitempty
             read_buffer_size:

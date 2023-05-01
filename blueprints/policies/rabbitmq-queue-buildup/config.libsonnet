@@ -31,9 +31,7 @@
       latency_ema_limit_multiplier: 2.0,
     },
     /**
-    * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector) Concurrency Limiter flow selector.
-    * @param (policy.concurrency_controller.flow_selector.service_selector.service: string required) Service Name.
-    * @param (policy.concurrency_controller.flow_selector.flow_matcher.control_point: string required) Control Point Name.
+    * @param (policy.concurrency_controller.selectors: []aperture.spec.v1.Selector required) Concurrency Limiter flow selectors.
     * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
     * @param (policy.concurrency_controller.scheduler.auto_tokens: bool) Automatically estimate cost (tokens) for workload requests.
     * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
@@ -44,14 +42,10 @@
     * @param (policy.concurrency_controller.default_config: aperture.spec.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
     */
     concurrency_controller: {
-      flow_selector: {
-        service_selector: {
-          service: '__REQUIRED_FIELD__',
-        },
-        flow_matcher: {
-          control_point: '__REQUIRED_FIELD__',
-        },
-      },
+      selectors: [{
+        service: '__REQUIRED_FIELD__',
+        control_point: '__REQUIRED_FIELD__',
+      }],
       scheduler: {
         auto_tokens: true,
       },

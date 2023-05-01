@@ -14,17 +14,9 @@ policy:
     # Type: float64
     # Required: True
     rate_limit: 50
-    flow_selector:
-      service_selector:
-        # Service Name.
-        # Type: string
-        # Required: True
-        agent_group: default
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
-        # Control Point Name.
-        # Type: string
-        # Required: True
         control_point: ingress
     parameters:
       # Time after which the limit for a given label value will be reset.

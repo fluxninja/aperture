@@ -189,14 +189,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-concurrency-controller-flow-selector"></a>
+<a id="policy-concurrency-controller-selectors"></a>
 
 <ParameterDescription
-    name='policy.concurrency_controller.flow_selector'
-    description='Concurrency Limiter flow selector.'
-    type='Object (aperture.spec.v1.FlowSelector)'
-    reference='../../spec#flow-selector'
-    value='{"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}'
+    name='policy.concurrency_controller.selectors'
+    description='Concurrency Limiter flow selectors.'
+    type='Array of Object (aperture.spec.v1.Selector)'
+    reference='../../spec#selector'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->

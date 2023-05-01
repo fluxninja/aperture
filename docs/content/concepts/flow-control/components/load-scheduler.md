@@ -139,5 +139,5 @@ during overload scenarios.
 
 :::
 
-[label-matcher]: ../flow-selector.md#label-matcher
+[label-matcher]: ../selector.md#label-matcher
 [policies]: /concepts/policy/policy.md

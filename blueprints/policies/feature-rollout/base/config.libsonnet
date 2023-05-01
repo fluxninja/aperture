@@ -1,11 +1,7 @@
-local flow_selector_defaults = {
-  service_selector: {
-    service: '__REQUIRED_FIELD__',
-  },
-  flow_matcher: {
-    control_point: '__REQUIRED_FIELD__',
-  },
-};
+local selectors_defaults = [{
+  service: '__REQUIRED_FIELD__',
+  control_point: '__REQUIRED_FIELD__',
+}];
 
 local promql_driver_defaults = {
   query_string: '__REQUIRED_FIELD__',
@@ -26,7 +22,7 @@ local promql_driver_defaults = {
 };
 
 local average_latency_driver_defaults = {
-  flow_selector: flow_selector_defaults,
+  selectors: selectors_defaults,
   criteria: {
     forward: {
       threshold: '__REQUIRED_FIELD__',
@@ -42,7 +38,7 @@ local average_latency_driver_defaults = {
 
 local percentile_latency_driver_defaults = {
   flux_meter: {
-    flow_selector: flow_selector_defaults,
+    selector: selectors_defaults,
     static_buckets: {
       buckets: [5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0],
     },
@@ -62,7 +58,7 @@ local percentile_latency_driver_defaults = {
 };
 
 local ema_latency_driver_defaults = {
-  flow_selector: flow_selector_defaults,
+  selectors: selectors_defaults,
   ema: {
     ema_window: '1500s',
     warmup_window: '60s',
@@ -84,7 +80,7 @@ local rollout_policy_base_defaults = {
 
   load_ramp: {
     regulator_parameters: {
-      flow_selector: flow_selector_defaults,
+      selectors: selectors_defaults,
       label_key: '',
     },
     steps: [
@@ -150,7 +146,7 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   */
   promql_driver: promql_driver_defaults,
   /**
-  * @schema (average_latency_driver.flow_selector: aperture.spec.v1.FlowSelector required) Identify the service and flows whose latency needs to be measured.
+  * @schema (average_latency_driver.selectors: []aperture.spec.v1.Selector required) Identify the service and flows whose latency needs to be measured.
   * @schema (average_latency_driver.criteria.forward.threshold: float64) The threshold for the forward criteria.
   * @schema (average_latency_driver.criteria.backward.threshold: float64) The threshold for the backward criteria.
   * @schema (average_latency_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
@@ -165,7 +161,7 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   */
   percentile_latency_driver: percentile_latency_driver_defaults,
   /**
-  * @schema (ema_latency_driver.flow_selector: aperture.spec.v1.FlowSelector required) Identify the service and flows whose latency needs to be measured.
+  * @schema (ema_latency_driver.selectors: []aperture.spec.v1.Selector required) Identify the service and flows whose latency needs to be measured.
   * @schema (ema_latency_driver.criteria.forward.latency_tolerance_multiplier: float64) The threshold for the forward criteria.
   * @schema (ema_latency_driver.criteria.backward.latency_tolerance_multiplier: float64) The threshold for the backward criteria.
   * @schema (ema_latency_driver.criteria.reset.latency_tolerance_multiplier: float64) The threshold for the reset criteria.

@@ -35,7 +35,8 @@ func ParseNestedCircuit(
 	nestedCircuitProto := &policylangv1.NestedCircuit{}
 	err = config.UnmarshalJSON(jsonBytes, nestedCircuitProto)
 	if err != nil {
-		log.Error().Err(err).RawJSON("nestedCircuit", jsonBytes).Msg("failed to unmarshal nested circuit")
+		err = fmt.Errorf("failed to unmarshal nested circuit: %w", err)
+		log.Error().Err(err).RawJSON("nestedCircuit", jsonBytes).Msg("")
 		return retErr(err)
 	}
 

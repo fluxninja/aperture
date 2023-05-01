@@ -14,14 +14,38 @@ common:
 
 policy:
   concurrency_controller:
-    flow_selector:
-      service_selector:
-        # Service Name.
-        # Type: string
-        # Required: True
+    # Concurrency Limiter flow selectors.
+    # Type: []aperture.spec.v1.Selector
+    # Required: True
+    selectors:
+      - control_point: __REQUIRED_FIELD__
         service: __REQUIRED_FIELD__
-      flow_matcher:
-        # Control Point Name.
-        # Type: string
-        # Required: True
-        control_point: __REQUIRED_FIELD__
+    # Scheduler parameters.
+    # Type: aperture.spec.v1.SchedulerParameters
+    scheduler:
+      # Automatically estimate cost (tokens) for workload requests.
+      # Type: bool
+      auto_tokens: true
+    # Gradient Controller parameters.
+    # Type: aperture.spec.v1.GradientControllerParameters
+    gradient:
+      max_gradient: 1
+      min_gradient: 0.1
+      slope: -1
+    # Whether tokens for workloads are computed dynamically or set statically by the user.
+    # Type: aperture.spec.v1.AlerterParameters
+    alerter:
+      alert_name: "Load Shed Event"
+    # Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+    # Type: float64
+    max_load_multiplier: 2
+    # Queue buildup setpoint in number of messages.
+    # Type: float64
+    queue_buildup_setpoint: __REQUIRED_FIELD__
+    # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
+    # Type: float64
+    load_multiplier_linear_increment: 0.0025
+    # Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
+    # Type: aperture.spec.v1.LoadActuatorDynamicConfig
+    default_config:
+      dry_run: false
