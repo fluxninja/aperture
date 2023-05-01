@@ -17,18 +17,18 @@ import Zoom from 'react-medium-image-zoom';
 Load-based auto-scaling is a technique used to dynamically adjust the number of
 instances or resources allocated to a service based on workload demands. This
 policy builds upon the latency-based AIMD concurrency limiting
-[blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
+[blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
 to add an escalation for auto-scaling. While concurrency limiting can protect
 the service from sudden traffic spikes, it is necessary to scale the service in
 response to persistent changes in load.
 
 To achieve this, the policy makes use of an
-[_Auto Scaler_](concepts/auto-scale/components/auto-scaler.md) component that is
-configured using _Controllers_ to adjust the number of instances allocated to
+[_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component that
+is configured using _Controllers_ to adjust the number of instances allocated to
 the service. Load-based auto-scaling is achieved by defining a scale-out
 _Controller_ that acts on a load-shedding signal (load multiplier) signal from
 the blueprint. This signal measures the fraction of traffic that the
-[_Load Scheduler_](concepts/flow-control/components/load-scheduler.md) is
+[_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md) is
 shedding. The _Auto Scaler_ is configured to scale-out using a _Gradient
 Controller_ based on this signal and a setpoint of 1.0.
 
@@ -40,7 +40,7 @@ the workload efficiently.
 ## Policy
 
 This policy extends the _Latency based AIMD Concurrency Limiting_
-[blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
+[blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
 by adding auto-scaling to meet persistent changes in demand.
 
 At a high level, this policy consists of:

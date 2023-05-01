@@ -1532,9 +1532,9 @@ spec:
                             and single metrics pipeline which will be exported to
                             the controller Prometheus. Environment variables can be
                             used in the configuration using format `${ENV_VAR_NAME}`.
-                            \n :::info See also [Get Started / Setup Integrations
+                            \n :::info \n See also [Get Started / Setup Integrations
                             / Metrics](/get-started/integrations/metrics/metrics.md).
-                            :::"
+                            \n :::"
                           properties:
                             per_agent_group:
                               description: PerAgentGroup marks the pipeline to be

@@ -115,7 +115,7 @@ Returns:
 ```
 
 Alternatively, you can use the
-[Introspection API](reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
+[Introspection API](/reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
 directly on a `aperture-agent` local to the service instances (pods):
 
 ```sh

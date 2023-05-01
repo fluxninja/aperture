@@ -13,8 +13,11 @@ sidebar_label: Controller
 
 <!-- vale on -->
 
-:::info See also
+:::info
+
+See also
 [Aperture Controller installation](/get-started/installation/controller/controller.md).
+
 :::
 
 List of all configuration parameters for Aperture Controller.
