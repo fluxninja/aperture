@@ -106,7 +106,7 @@ function(cfg) {
                                                          output: spec.v1.Port.withSignalName(resetSignal),
                                                        })),
     local newFluxMeters = {
-      [flux_meter_name]: spec.v1.FluxMeter.withFlowSelector(driver.flow_selector),
+      [flux_meter_name]: spec.v1.FluxMeter.withSelectors(driver.selectors),
     },
 
     flux_meters: driverAccumulator.flux_meters + newFluxMeters,
@@ -268,7 +268,7 @@ function(cfg) {
                                                        })),
 
     local newFluxMeters = {
-      [flux_meter_name]: spec.v1.FluxMeter.withFlowSelector(driver.flow_selector),
+      [flux_meter_name]: spec.v1.FluxMeter.withSelectors(driver.selectors),
     },
 
     flux_meters: driverAccumulator.flux_meters + newFluxMeters,

@@ -768,7 +768,7 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 
 All agents within an agent group receive the same data-plane configuration (for example, Flux Meters, Rate Limiters and so on).
 
-[Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group).
+[Read more about agent groups here](/concepts/flow-control/selector.md#agent-group).
 
 </dd>
 </dl>
@@ -788,31 +788,31 @@ Example configuration:
 ```yaml
 
 	otel:
-		batch_alerts:
-			send_batch_max_size: 100
-			send_batch_size: 100
-			timeout: 1s
-		batch_prerollup:
-			send_batch_max_size: 10000
-			send_batch_size: 10000
-			timeout: 10s
-		batch_postrollup:
-			send_batch_max_size: 100
-			send_batch_size: 100
-			timeout: 1s
-		custom_metrics:
-			rabbitmq:
-				processors:
-					batch:
-						send_batch_size: 10
-		 				timeout: 10s
-				receivers:
-		 			rabbitmq:
-		 				collection_interval: 10s
-						endpoint: http://<rabbitmq-svc-fqdn>:15672
-						password: secretpassword
-						username: admin
-				per_agent_group: true
+	  batch_alerts:
+	    send_batch_max_size: 100
+	    send_batch_size: 100
+	    timeout: 1s
+	  batch_prerollup:
+	    send_batch_max_size: 10000
+	    send_batch_size: 10000
+	    timeout: 10s
+	  batch_postrollup:
+	    send_batch_max_size: 100
+	    send_batch_size: 100
+	    timeout: 1s
+	  custom_metrics:
+	    rabbitmq:
+	      processors:
+	        batch:
+	          send_batch_size: 10
+	          timeout: 10s
+	      receivers:
+	        rabbitmq:
+	          collection_interval: 10s
+	          endpoint: http://<rabbitmq-svc-fqdn>:15672
+	          password: secretpassword
+	          username: admin
+	      per_agent_group: true
 
 ```
 
@@ -834,9 +834,11 @@ By default `kubeletstats` custom metrics is added, which can be overwritten.
 
 Below is example to overwrite `kubeletstats` custom metrics:
 
-    otel:
-    	custom_metrics:
-    		kubeletstats: {}
+```yaml
+otel:
+custom_metrics:
+kubeletstats: {}
+```
 
 </dd>
 <dt>disable_kubernetes_scraper</dt>
@@ -2048,7 +2050,7 @@ Write Buffer Size. 0 = 4 KB.
 
 <!-- vale on -->
 
-Proxy Connect Header - map[string][]string
+Proxy Connect Header - `map[string][]string`
 
 </dd>
 <dt>tls</dt>

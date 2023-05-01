@@ -2,13 +2,13 @@ package classifier
 
 import (
 	"context"
-	"errors"
 	"path"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -29,28 +29,39 @@ func NewClassifierOptions(
 	classifierProto *policylangv1.Classifier,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
-	// Get Agent Group Name for Classifier.Selector.AgentGroup
+	// Deprecated 1.8.0
 	flowSelectorProto := classifierProto.GetFlowSelector()
-	if flowSelectorProto == nil {
-		return nil, errors.New("Classifier.Selector is nil")
-	}
-	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
-
-	etcdPath := path.Join(paths.ClassifiersPath,
-		paths.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), classifierIndex))
-	configSync := &classifierConfigSync{
-		classifierProto: classifierProto,
-		policyReadAPI:   policyBaseAPI,
-		agentGroupName:  agentGroup,
-		etcdPath:        etcdPath,
-		classifierIndex: classifierIndex,
+	if flowSelectorProto != nil {
+		selector := &policylangv1.Selector{
+			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
+			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
+			Service:      flowSelectorProto.ServiceSelector.Service,
+			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
+		}
+		classifierProto.Selectors = append(classifierProto.Selectors, selector)
+		classifierProto.FlowSelector = nil
 	}
 
-	return fx.Options(
-		fx.Invoke(
-			configSync.doSync,
-		),
-	), nil
+	var options []fx.Option
+
+	s := classifierProto.GetSelectors()
+
+	agentGroups := selectors.UniqueAgentGroups(s)
+
+	for _, agentGroup := range agentGroups {
+		etcdPath := path.Join(paths.ClassifiersPath,
+			paths.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), classifierIndex))
+		configSync := &classifierConfigSync{
+			classifierProto: classifierProto,
+			policyReadAPI:   policyBaseAPI,
+			agentGroupName:  agentGroup,
+			etcdPath:        etcdPath,
+			classifierIndex: classifierIndex,
+		}
+		options = append(options, fx.Invoke(configSync.doSync))
+	}
+
+	return fx.Options(options...), nil
 }
 
 func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {

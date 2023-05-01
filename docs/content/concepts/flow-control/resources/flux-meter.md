@@ -15,7 +15,7 @@ See also [_Flux Meter_ reference][reference]
 ## Purpose
 
 The _Flux Meter_ provides a way to translate a flux of flows matching a [Flow
-Selector][flow-selector] to a Prometheus [histogram][histogram-metric].
+Selector][flow-selectors] to a Prometheus [histogram][histogram-metric].
 
 ## Naming
 
@@ -26,8 +26,8 @@ Meter name with the policy name.
 :::caution warning
 
 _Flux Meters_ with repeated names within the same
-[_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) will fail
-to load at the agents.
+[_Agent Group_](/concepts/flow-control/selector.md#agent-group) will fail to
+load at the agents.
 
 :::
 
@@ -113,7 +113,7 @@ down to fine-grained APIs attributes such as endpoints, user types (subscriber
 user compared to guest user).
 
 [reference]: /reference/policies/spec.md#flux-meter
-[flow-selector]: /concepts/flow-control/flow-selector.md
+[flow-selectors]: /concepts/flow-control/selector.md
 [flow-control-insertion]: ../flow-control.md#insertion
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles

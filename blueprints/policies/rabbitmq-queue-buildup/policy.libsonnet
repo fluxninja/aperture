@@ -4,8 +4,6 @@ local config = import './config.libsonnet';
 local policy = spec.v1.Policy;
 local resources = spec.v1.Resources;
 local circuit = spec.v1.Circuit;
-local classifier = spec.v1.Classifier;
-local flowSelector = spec.v1.FlowSelector;
 local query = spec.v1.Query;
 local component = spec.v1.Component;
 local flowControl = spec.v1.FlowControl;
@@ -60,7 +58,7 @@ function(cfg) {
             + flowControl.withAimdConcurrencyController(
               local cc = params.concurrency_controller;
               aimdConcurrencyController.new()
-              + aimdConcurrencyController.withFlowSelector(cc.flow_selector)
+              + aimdConcurrencyController.withSelectors(cc.selectors)
               + aimdConcurrencyController.withSchedulerParameters(cc.scheduler)
               + aimdConcurrencyController.withGradientParameters(cc.gradient)
               + aimdConcurrencyController.withMaxLoadMultiplier(cc.max_load_multiplier)

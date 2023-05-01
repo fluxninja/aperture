@@ -173,6 +173,7 @@
   SchedulerParameters: import 'schedulerparameters.libsonnet',
   SchedulerWorkload: import 'schedulerworkload.libsonnet',
   SchedulerWorkloadParameters: import 'schedulerworkloadparameters.libsonnet',
+  Selector: import 'selector.libsonnet',
   ServiceSelector: import 'serviceselector.libsonnet',
   SignalGenerator: import 'signalgenerator.libsonnet',
   SignalGeneratorIns: import 'signalgeneratorins.libsonnet',

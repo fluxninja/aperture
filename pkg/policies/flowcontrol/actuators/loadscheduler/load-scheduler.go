@@ -309,7 +309,7 @@ func (conLimiterFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 
 	conLimiter := &loadScheduler{
 		Component:                    wrapperMessage.GetCommonAttributes(),
-		loadSchedulerMsg:             loadSchedulerMessage,
+		loadSchedulerProto:           loadSchedulerMessage,
 		registry:                     reg,
 		loadSchedulerFactory:         conLimiterFactory,
 		workloadMultiMatcher:         mm,
@@ -350,7 +350,7 @@ type loadScheduler struct {
 	registry                     status.Registry
 	incomingTokensCounter        prometheus.Counter
 	acceptedTokensCounter        prometheus.Counter
-	loadSchedulerMsg             *policylangv1.LoadScheduler
+	loadSchedulerProto           *policylangv1.LoadScheduler
 	loadSchedulerFactory         *loadSchedulerFactory
 	autoTokens                   *autoTokens
 	workloadMultiMatcher         *multiMatcher
@@ -373,7 +373,7 @@ func (conLimiter *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.ComponentIDLabel] = conLimiter.GetComponentId()
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	actuator, err := actuatorFactory.newActuator(conLimiter.loadSchedulerMsg.GetActuator(),
+	actuator, err := actuatorFactory.newActuator(conLimiter.loadSchedulerProto.GetActuator(),
 		conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
@@ -477,9 +477,9 @@ func (conLimiter *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	return nil
 }
 
-// GetFlowSelector returns selector.
-func (conLimiter *loadScheduler) GetFlowSelector() *policylangv1.FlowSelector {
-	return conLimiter.loadSchedulerMsg.GetFlowSelector()
+// GetSelectors returns selectors.
+func (conLimiter *loadScheduler) GetSelectors() []*policylangv1.Selector {
+	return conLimiter.loadSchedulerProto.GetSelectors()
 }
 
 // Decide processes a single flow by load scheduler in a blocking manner.

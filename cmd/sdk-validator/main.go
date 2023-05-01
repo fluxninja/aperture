@@ -13,6 +13,8 @@ import (
 	"time"
 
 	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
 
 	"google.golang.org/grpc/credentials"
@@ -115,17 +117,18 @@ func main() {
 
 	alerter := alerts.NewSimpleAlerter(100)
 	reg := status.NewRegistry(log.GetGlobalLogger(), alerter)
+	agentInfo := agentinfo.NewAgentInfo(metrics.DefaultAgentGroup)
 
 	// instantiate and register flowcontrolhttp handler
 	flowcontrolHTTPHandler := checkhttp.NewHandler(
-		classifier.NewClassificationEngine(reg),
+		classifier.NewClassificationEngine(agentInfo, reg),
 		servicegetter.NewEmpty(),
 		commonHandler,
 	)
 	flowcontrolhttpv1.RegisterFlowControlServiceHTTPServer(grpcServer, flowcontrolHTTPHandler)
 
 	authzHandler := envoy.NewHandler(
-		classifier.NewClassificationEngine(reg),
+		classifier.NewClassificationEngine(agentInfo, reg),
 		servicegetter.NewEmpty(),
 		commonHandler,
 	)

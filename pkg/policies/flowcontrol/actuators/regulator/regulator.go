@@ -342,9 +342,9 @@ func (fr *regulator) setEnableValues(labelValues map[string]bool) {
 	fr.enableLabelValues = labelValues
 }
 
-// GetFlowSelector returns the selector for the load regulator.
-func (fr *regulator) GetFlowSelector() *policylangv1.FlowSelector {
-	return fr.proto.Parameters.GetFlowSelector()
+// GetSelectors returns the selectors for the load regulator.
+func (fr *regulator) GetSelectors() []*policylangv1.Selector {
+	return fr.proto.Parameters.GetSelectors()
 }
 
 // Decide runs the limiter.

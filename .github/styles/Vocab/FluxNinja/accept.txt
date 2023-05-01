@@ -66,3 +66,5 @@ Tanveer
 [Rr]ebalancing
 gRPC
 DaemonSet
+OLAP
+setpoint

@@ -12,11 +12,6 @@ spec:
             default_config:
               overrides: []
             dynamic_config_key: rate_limiter
-            flow_selector:
-              flow_matcher:
-                control_point: ingress
-              service_selector:
-                service: service1-demo-app.demoapp.svc.cluster.local
             in_ports:
               limit:
                 constant_signal:
@@ -24,6 +19,10 @@ spec:
             parameters:
               label_key: http.request.header.user_id
               limit_reset_interval: 60s
+            selectors:
+              - agent_group: default
+                control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 1s
   resources:
     flow_control:

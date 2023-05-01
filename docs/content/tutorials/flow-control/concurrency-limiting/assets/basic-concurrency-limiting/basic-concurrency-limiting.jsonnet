@@ -2,29 +2,21 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet
 
 local latencyAIMDPolicy = aperture.policies.LatencyAIMDConcurrencyLimiting.policy;
 
-local flowSelector = aperture.spec.v1.FlowSelector;
+local selector = aperture.spec.v1.Selector;
 local fluxMeter = aperture.spec.v1.FluxMeter;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
-local flowMatcher = aperture.spec.v1.FlowMatcher;
-local controlPoint = aperture.spec.v1.ControlPoint;
 
-local svcSelector =
-  flowSelector.new()
-  + flowSelector.withServiceSelector(
-    serviceSelector.new()
-    + serviceSelector.withAgentGroup('default')
-    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-  )
-  + flowSelector.withFlowMatcher(
-    flowMatcher.new()
-    + flowMatcher.withControlPoint('ingress')
-  );
+local svcSelectors = [
+  selector.new()
+  + selector.withControlPoint('ingress')
+  + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  + selector.withAgentGroup('default'),
+];
 
 local policyResource = latencyAIMDPolicy({
   policy_name: 'service1-demo-app',
-  flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
+  flux_meter: fluxMeter.new() + fluxMeter.withSelectors(svcSelectors),
   concurrency_controller+: {
-    flow_selector: svcSelector,
+    selectors: svcSelectors,
   },
 }).policyResource;
 

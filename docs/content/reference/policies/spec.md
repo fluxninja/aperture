@@ -79,6 +79,7 @@ Dynamic configuration key for load actuation.
 <!-- vale on -->
 
 Flow Selector decides the service and flows at which the concurrency limiter is applied.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -151,6 +152,18 @@ Output ports for the AIMDConcurrencyController component.
 <!-- vale on -->
 
 Scheduler parameters.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 </dl>
@@ -335,6 +348,7 @@ Dynamic configuration key for load actuation.
 <!-- vale on -->
 
 _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -407,6 +421,18 @@ Collection of output ports for the _Adaptive Load Scheduler_ component.
 <!-- vale on -->
 
 Parameters for the _Load Scheduler_.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 </dl>
@@ -1323,6 +1349,7 @@ rules:
 <!-- vale on -->
 
 Defines where to apply the flow classification rule.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>rego</dt>
@@ -1353,6 +1380,18 @@ For simple cases, such as directly reading a value from header or a field from J
 A map of {key, value} pairs mapping from
 [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for flows that will be classified by this _Classifier_.
 
 </dd>
 </dl>
@@ -1774,6 +1813,7 @@ strategy and a scheduler. At this time, only `load_actuator` strategy is availab
 <!-- vale on -->
 
 Flow Selector decides the service and flows at which the concurrency limiter is applied.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>load_actuator</dt>
@@ -1803,6 +1843,18 @@ Configuration of Weighted Fair Queuing-based workload scheduler.
 
 Contains configuration of per-agent scheduler, and also defines some
 output signals.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 </dl>
@@ -2980,7 +3032,7 @@ to
 
 :::info
 
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
 :::
 Example:
@@ -3002,6 +3054,8 @@ label_matcher:
         regex: ^(?!.*Chrome).*Safari
 ```
 
+Deprecated 1.8.0: Use `selectors` instead.
+
 <dl>
 <dt>control_point</dt>
 <dd>
@@ -3012,7 +3066,7 @@ label_matcher:
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/flow-selector.md#control-point)
+[Control Point](/concepts/flow-control/selector.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 or filter chains.
@@ -3033,7 +3087,7 @@ must also be satisfied (in addition to service+control point matching)
 
 :::info
 
-See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
 
 :::
 
@@ -3181,6 +3235,7 @@ The percentage of requests to accept.
 <!-- vale on -->
 
 _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>label_key</dt>
@@ -3201,6 +3256,18 @@ The flow label key for identifying sessions.
   Percentage of flows are selected randomly for rejection.
 
 </dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
+
+</dd>
 </dl>
 
 ---
@@ -3216,9 +3283,11 @@ component](/concepts/flow-control/flow-control.md#components) operates on.
 
 :::info
 
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/selector.md).
 
 :::
+
+Deprecated 1.8.0: Use `selectors` instead.
 
 <dl>
 <dt>flow_matcher</dt>
@@ -3340,6 +3409,7 @@ For list of available attributes in Envoy access logs, refer
 <!-- vale on -->
 
 The selection criteria for the traffic that will be measured.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>linear_buckets</dt>
@@ -3350,6 +3420,18 @@ The selection criteria for the traffic that will be measured.
 ([FluxMeterLinearBuckets](#flux-meter-linear-buckets))
 
 <!-- vale on -->
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 <dt>static_buckets</dt>
@@ -4510,7 +4592,7 @@ component should apply to.
 
 <!-- vale on -->
 
-Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -5214,6 +5296,7 @@ Actuator based on limiting the accepted token rate under incoming token rate \* 
 <!-- vale on -->
 
 Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>scheduler</dt>
@@ -5229,6 +5312,18 @@ Configuration of Weighted Fair Queuing-based workload scheduler.
 
 Contains configuration of per-agent scheduler, and also defines some
 output signals.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 </dl>
@@ -7455,6 +7550,7 @@ Configuration key for DynamicConfig
 <!-- vale on -->
 
 Which control point to apply this rate limiter to.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>in_ports</dt>
@@ -7479,6 +7575,18 @@ Input ports for the RateLimiter component
 <!-- vale on -->
 
 Parameters for the RateLimiter component
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 </dl>
@@ -7613,7 +7721,7 @@ label set up, set `label_key: "user"`.
 
 <!-- vale on -->
 
-Configuration of lazy-syncing behaviour of rate limiter
+Configuration of lazy-syncing behavior of rate limiter
 
 </dd>
 <dt>limit_reset_interval</dt>
@@ -7800,7 +7908,7 @@ sensitive labels.
 <!-- vale on -->
 
 _Regulator_ is a component that regulates the load at a
-[_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of
+[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
 flows at random or by sticky sessions.
 
 :::info
@@ -7927,6 +8035,7 @@ The percentage of requests to accept.
 <!-- vale on -->
 
 _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>label_key</dt>
@@ -7945,6 +8054,18 @@ The flow label key for identifying sessions.
   decision provided that the `accept_percentage` is same or higher.
 - When label key is not specified, _Regulator_ acts as a stateless filter.
   Percentage of flows are selected randomly for rejection.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector))
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 </dl>
@@ -8594,19 +8715,38 @@ in the flow labels.
 
 <!-- vale off -->
 
-### ServiceSelector {#service-selector}
+### Selector {#selector}
 
 <!-- vale on -->
 
-Describes which service a [flow control or observability
-component](/concepts/flow-control/flow-control.md#components) should apply
-to
+Selects flows based on control point, flow labels, agent group and the service
+that the [flow control component](/concepts/flow-control/flow-control.md#components)
+will operate on.
 
 :::info
 
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [Selector overview](/concepts/flow-control/selector.md).
 
 :::
+
+Example:
+
+```yaml
+control_point: ingress
+label_matcher:
+  match_labels:
+    user_tier: gold
+  match_expressions:
+    - key: query
+      operator: In
+      values:
+        - insert
+        - delete
+  expression:
+    label_matches:
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
+```
 
 <dl>
 <dt>agent_group</dt>
@@ -8618,7 +8758,109 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
 <!-- vale on -->
 
-Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
+selector applies to.
+
+:::info
+
+Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+The agents within an agent group receive exact same policy configuration and
+form a peer to peer cluster to constantly share state.
+
+:::
+
+</dd>
+<dt>control_point</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+[Control Point](/concepts/flow-control/selector.md#control-point)
+identifies location within services where policies can act on flows.
+For an SDK based insertion,
+a _Control Point_ can represent a particular feature or execution
+block within a service. In case of service mesh or middleware insertion, a
+_Control Point_ can identify ingress or egress calls or distinct listeners
+or filter chains.
+
+</dd>
+<dt>label_matcher</dt>
+<dd>
+
+<!-- vale off -->
+
+([LabelMatcher](#label-matcher))
+
+<!-- vale on -->
+
+[Label Matcher](/concepts/flow-control/selector.md#label-matcher)
+can be used to match flows based on flow labels.
+
+</dd>
+<dt>service</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"any"`)
+
+<!-- vale on -->
+
+The Fully Qualified Domain Name of the
+[service](/concepts/flow-control/selector.md) to select.
+
+In Kubernetes, this is the FQDN of the Service object.
+
+:::info
+
+`any` matches all services.
+
+:::
+
+:::info
+
+An entity (for example, Kubernetes pod) might belong to multiple services.
+
+:::
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ServiceSelector {#service-selector}
+
+<!-- vale on -->
+
+Describes which service a [flow control or observability
+component](/concepts/flow-control/flow-control.md#components) should apply
+to
+
+:::info
+
+See also [FlowSelector overview](/concepts/flow-control/selector.md).
+
+:::
+
+Deprecated 1.8.0: Use `selectors` instead.
+
+<dl>
+<dt>agent_group</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
 selector applies to.
 
 :::info
@@ -8640,7 +8882,7 @@ The agents within an agent group form a peer to peer cluster and constantly shar
 <!-- vale on -->
 
 The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/flow-selector.md) to select.
+[service](/concepts/flow-control/selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 

@@ -13,14 +13,12 @@ policy:
   # Flux Meter.
   # Type: aperture.spec.v1.FluxMeter
   flux_meter:
-    flow_selector:
-      service_selector:
-        agent_group: default
+    selectors:
+      - agent_group: default
         # Service Name.
         # Type: string
         # Required: True
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
         # Control Point Name.
         # Type: string
         # Required: True
@@ -71,11 +69,7 @@ policy:
                     slope: 1.0
 
   concurrency_controller:
-    # Concurrency Limiter flow selector.
-    # Type: aperture.spec.v1.FlowSelector
-    flow_selector:
-      service_selector:
-        agent_group: default
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
         control_point: ingress

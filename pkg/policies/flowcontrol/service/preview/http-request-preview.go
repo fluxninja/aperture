@@ -17,7 +17,7 @@ import (
 // HTTPRequestsPreviewRequest holds the samples while the preview is being generated.
 type HTTPRequestsPreviewRequest struct {
 	mutex           sync.Mutex
-	flowSelector    *policylangv1.FlowSelector
+	selectors       []*policylangv1.Selector
 	previewResponse *flowpreviewv1.PreviewHTTPRequestsResponse
 	previewDoneCtx  context.Context
 	previewDone     context.CancelFunc
@@ -30,9 +30,9 @@ func (r *HTTPRequestsPreviewRequest) GetPreviewID() iface.PreviewID {
 	return r.previewID
 }
 
-// GetFlowSelector returns the flow selector.
-func (r *HTTPRequestsPreviewRequest) GetFlowSelector() *policylangv1.FlowSelector {
-	return r.flowSelector
+// GetSelectors returns the flow selector.
+func (r *HTTPRequestsPreviewRequest) GetSelectors() []*policylangv1.Selector {
+	return r.selectors
 }
 
 // AddHTTPRequestPreview adds a HTTP request preview to the response.
@@ -75,21 +75,19 @@ func (h *Handler) PreviewHTTPRequests(ctx context.Context, req *flowpreviewv1.Pr
 		RequestID: uuid.New().String(),
 	}
 
-	flowSelector := &policylangv1.FlowSelector{
-		ServiceSelector: &policylangv1.ServiceSelector{
-			AgentGroup: h.agentGroup,
-			Service:    req.Service,
-		},
-		FlowMatcher: &policylangv1.FlowMatcher{
+	selectors := []*policylangv1.Selector{
+		{
 			ControlPoint: req.ControlPoint,
 			LabelMatcher: req.LabelMatcher,
+			AgentGroup:   h.agentGroup,
+			Service:      req.Service,
 		},
 	}
 
 	// create a new request object
 	hr := &HTTPRequestsPreviewRequest{
 		previewID:       previewID,
-		flowSelector:    flowSelector,
+		selectors:       selectors,
 		previewResponse: &flowpreviewv1.PreviewHTTPRequestsResponse{},
 		samples:         req.Samples,
 	}

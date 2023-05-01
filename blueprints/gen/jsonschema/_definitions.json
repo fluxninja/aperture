@@ -20,8 +20,8 @@
         },
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 3
         },
         "gradient_parameters": {
@@ -60,6 +60,16 @@
           "description": "Scheduler parameters.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 9
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 10
         }
       },
       "type": "object",
@@ -139,8 +149,8 @@
         },
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 3
         },
         "gradient_parameters": {
@@ -179,6 +189,16 @@
           "description": "Parameters for the _Load Scheduler_.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 9
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 10
         }
       },
       "type": "object",
@@ -613,8 +633,8 @@
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "Defines where to apply the flow classification rule.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "Defines where to apply the flow classification rule.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 0
         },
         "rego": {
@@ -631,6 +651,16 @@
           "type": "object",
           "x-go-tag-validate": "dive,keys,required,endkeys,required",
           "x-order": 2
+        },
+        "selectors": {
+          "description": "Selectors for flows that will be classified by this _Classifier_.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 3
         }
       },
       "title": "Set of classification rules sharing a common selector",
@@ -785,8 +815,8 @@
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 0
         },
         "load_actuator": {
@@ -799,6 +829,16 @@
           "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler, and also defines some\noutput signals.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 2
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 3
         }
       },
       "title": "_Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection",
@@ -1351,17 +1391,17 @@
       "additionalProperties": false
     },
     "FlowMatcher": {
-      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/flow-control/flow-selector.md).\n\n:::\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```",
+      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/flow-control/selector.md).\n\n:::\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```\n\nDeprecated 1.8.0: Use `selectors` instead.",
       "properties": {
         "control_point": {
-          "description": "[Control Point](/concepts/flow-control/flow-selector.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",
+          "description": "[Control Point](/concepts/flow-control/selector.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 0
         },
         "label_matcher": {
           "$ref": "#/definitions/LabelMatcher",
-          "description": ":::info\n\nSee also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).\n\n:::\n\n:::note\n\n[Classifiers](#classifier) _can_ use flow labels created by some other\nclassifier, but only if they were created at some previous control point\n(and propagated in baggage).\n\nThis limitation does not apply to selectors of other entities, like\nFlux Meters or Actuators. It's valid to create a flow label on a control\npoint using classifier, and immediately use it for matching on the same\ncontrol point.\n\n:::",
+          "description": ":::info\n\nSee also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).\n\n:::\n\n:::note\n\n[Classifiers](#classifier) _can_ use flow labels created by some other\nclassifier, but only if they were created at some previous control point\n(and propagated in baggage).\n\nThis limitation does not apply to selectors of other entities, like\nFlux Meters or Actuators. It's valid to create a flow label on a control\npoint using classifier, and immediately use it for matching on the same\ncontrol point.\n\n:::",
           "title": "Label matcher allows to add _additional_ condition on\n[flow labels](/concepts/flow-control/flow-label.md)\nmust also be satisfied (in addition to service+control point matching)",
           "x-order": 1
         }
@@ -1428,21 +1468,31 @@
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "_Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "_Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 0
         },
         "label_key": {
           "description": "The flow label key for identifying sessions.\n- When label key is specified, _Flow Regulator_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Flow Regulator_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
           "type": "string",
           "x-order": 1
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 2
         }
       },
       "type": "object",
       "additionalProperties": false
     },
     "FlowSelector": {
-      "description": "Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control\ncomponent](/concepts/flow-control/flow-control.md#components) operates on.\n\n:::info\n\nSee also [FlowSelector overview](/concepts/flow-control/flow-selector.md).\n\n:::",
+      "description": "Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control\ncomponent](/concepts/flow-control/flow-control.md#components) operates on.\n\n:::info\n\nSee also [FlowSelector overview](/concepts/flow-control/selector.md).\n\n:::\n\nDeprecated 1.8.0: Use `selectors` instead.",
       "properties": {
         "flow_matcher": {
           "$ref": "#/definitions/FlowMatcher",
@@ -1480,16 +1530,27 @@
         },
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "The selection criteria for the traffic that will be measured.",
+          "description": "The selection criteria for the traffic that will be measured.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 3
         },
         "linear_buckets": {
           "$ref": "#/definitions/FluxMeterLinearBuckets",
           "x-order": 4
         },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 5
+        },
         "static_buckets": {
           "$ref": "#/definitions/FluxMeterStaticBuckets",
-          "x-order": 5
+          "x-order": 6
         }
       },
       "type": "object",
@@ -2023,7 +2084,7 @@
       "properties": {
         "agent_group": {
           "default": "default",
-          "description": "Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this\nselector applies to.\n\n",
+          "description": "Which [agent-group](/concepts/flow-control/selector.md#agent-group) this\nselector applies to.\n\n",
           "type": "string",
           "x-go-tag-default": "default",
           "x-order": 0
@@ -2357,8 +2418,8 @@
         },
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 1
         },
         "scheduler": {
@@ -2366,6 +2427,16 @@
           "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler, and also defines some\noutput signals.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 2
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 3
         }
       },
       "title": "_Load Scheduler_ is an actuator component that regulates flows to provide active service protection",
@@ -3436,8 +3507,8 @@
         },
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "Which control point to apply this rate limiter to.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "Which control point to apply this rate limiter to.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 2
         },
         "in_ports": {
@@ -3451,6 +3522,16 @@
           "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required",
           "x-order": 4
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 5
         }
       },
       "title": "Limits the traffic on a control point to specified rate",
@@ -3518,7 +3599,7 @@
         },
         "lazy_sync": {
           "$ref": "#/definitions/RateLimiterParametersLazySync",
-          "title": "Configuration of lazy-syncing behaviour of rate limiter",
+          "title": "Configuration of lazy-syncing behavior of rate limiter",
           "x-order": 1
         },
         "limit_reset_interval": {
@@ -3602,7 +3683,7 @@
       "additionalProperties": false
     },
     "Regulator": {
-      "description": "_Regulator_ is a component that regulates the load at a\n[_Control Point_][/concepts/flow-control/flow-selector.md/#control-point] by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).\n\n:::",
+      "description": "_Regulator_ is a component that regulates the load at a\n[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).\n\n:::",
       "properties": {
         "default_config": {
           "$ref": "#/definitions/RegulatorDynamicConfig",
@@ -3658,14 +3739,24 @@
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
-          "description": "_Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "_Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
+          "x-go-tag-validate": "required_without=Selectors",
           "x-order": 0
         },
         "label_key": {
           "description": "The flow label key for identifying sessions.\n- When label key is specified, _Regulator_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Regulator_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
           "type": "string",
           "x-order": 1
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "required_without=FlowSelector,dive",
+          "x-order": 2
         }
       },
       "type": "object",
@@ -3951,19 +4042,52 @@
       "type": "object",
       "additionalProperties": false
     },
-    "ServiceSelector": {
-      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/flow-control/flow-selector.md).\n\n:::",
+    "Selector": {
+      "description": "Selects flows based on control point, flow labels, agent group and the service\nthat the [flow control component](/concepts/flow-control/flow-control.md#components)\nwill operate on.\n\n:::info\n\nSee also [Selector overview](/concepts/flow-control/selector.md).\n\n:::\n\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```",
       "properties": {
         "agent_group": {
           "default": "default",
-          "description": "Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller.\nThis is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.\nThe agents within an agent group form a peer to peer cluster and constantly share state.\n\n:::\n\n",
+          "description": "[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller.\nThe agents within an agent group receive exact same policy configuration and\nform a peer to peer cluster to constantly share state.\n\n:::\n\n",
+          "type": "string",
+          "x-go-tag-default": "default",
+          "x-order": 0
+        },
+        "control_point": {
+          "description": "[Control Point](/concepts/flow-control/selector.md#control-point)\nidentifies location within services where policies can act on flows.\nFor an SDK based insertion,\na _Control Point_ can represent a particular feature or execution\nblock within a service. In case of service mesh or middleware insertion, a\n_Control Point_ can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
+        "label_matcher": {
+          "$ref": "#/definitions/LabelMatcher",
+          "description": "[Label Matcher](/concepts/flow-control/selector.md#label-matcher)\ncan be used to match flows based on flow labels.",
+          "x-order": 2
+        },
+        "service": {
+          "default": "any",
+          "description": "The Fully Qualified Domain Name of the\n[service](/concepts/flow-control/selector.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n:::info\n\n`any` matches all services.\n\n:::\n\n:::info\n\nAn entity (for example, Kubernetes pod) might belong to multiple services.\n\n:::\n\n",
+          "type": "string",
+          "x-go-tag-default": "any",
+          "x-order": 3
+        }
+      },
+      "required": ["control_point"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "ServiceSelector": {
+      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/flow-control/selector.md).\n\n:::\n\nDeprecated 1.8.0: Use `selectors` instead.",
+      "properties": {
+        "agent_group": {
+          "default": "default",
+          "description": "Which [agent-group](/concepts/flow-control/selector.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller.\nThis is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.\nThe agents within an agent group form a peer to peer cluster and constantly share state.\n\n:::\n\n",
           "type": "string",
           "x-go-tag-default": "default",
           "x-order": 0
         },
         "service": {
           "default": "any",
-          "description": "The Fully Qualified Domain Name of the\n[service](/concepts/flow-control/flow-selector.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n:::info\n\n`any` matches all services.\n\n:::\n\n:::info\n\nIn the Kubernetes sidecar installation mode, service discovery is switched off by default.\nTo scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.\n\n:::\n\n:::info\n\nAn entity (for example, Kubernetes pod) might belong to multiple services.\n\n:::\n\n",
+          "description": "The Fully Qualified Domain Name of the\n[service](/concepts/flow-control/selector.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n:::info\n\n`any` matches all services.\n\n:::\n\n:::info\n\nIn the Kubernetes sidecar installation mode, service discovery is switched off by default.\nTo scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.\n\n:::\n\n:::info\n\nAn entity (for example, Kubernetes pod) might belong to multiple services.\n\n:::\n\n",
           "type": "string",
           "x-go-tag-default": "any",
           "x-order": 1

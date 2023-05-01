@@ -17,9 +17,9 @@ key:value pair. If a flow is annotated with `user_tier:gold` label, then
 
 _Flow Labels_ are used in different ways in Aperture:
 
-- The [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_,
-  to narrow the scope of [_Classifiers_][classifier], [_Flux
-  Meters_][flux-meter] and so on.
+- The [_Selector_][selectors] can select flows based on _Flow Labels_, to narrow
+  the scope of [_Classifiers_][classifier], [_Flux Meters_][flux-meter] and so
+  on.
 - Map a flow to a [_Workload_][workload].
 - Fairness within [_Scheduler_][scheduler] and [_Rate Limiter_][ratelimiter]
   keys are also based on _Flow Labels_.
@@ -127,9 +127,10 @@ curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demo
 Telemetry data is extracted out of flows for further processing. This data is
 collected from the following sources:
 
+- Traces from [SDKs][aperture-sdks]
 - Stream of access logs from service mesh (refer to [Istio
   Configuration][istio])
-- Traces from [Aperture SDK][aperture-go]
+- Stream of access logs from [API Gateways][gateways]
 
 Aperture uses OpenTelemetry's robust pipelines for receiving the telemetry data
 and producing other streams of data from it.
@@ -153,8 +154,8 @@ values might be replaced with the `REDACTED_VIA_CARDINALITY_LIMIT` string.
 #### Default labels
 
 These are protocol-level labels (For example: HTTP, network) extracted by the
-configured service mesh/middleware and are available to be referenced in [Flow
-Matcher][flow-matcher], except for a few high-cardinality ones.
+configured service mesh/middleware and are available to be referenced in [Label
+Matcher][label-matcher], except for a few high-cardinality ones.
 
 #### Labels extracted from baggage
 
@@ -163,7 +164,7 @@ These are _Flow Labels_ mapped from [baggage](#baggage).
 #### Labels defined by user
 
 These are labels provided by _Classifiers_ in case of service mesh/middleware
-integration, or explicitly at flow creation in [Aperture SDK][aperture-go].
+integration, or explicitly at flow creation in [Aperture SDK][aperture-sdks].
 
 :::note
 
@@ -192,7 +193,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 
 :::
 
-[flow-selector]: ./flow-selector.md
+[selectors]: ./selector.md
 [classifier]: ./resources/classifier.md
 [workload]: ./components/load-scheduler.md#workload
 [ratelimiter]: ./components/rate-limiter.md
@@ -201,11 +202,12 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
-[control-point]: ./flow-selector.md#control-point
+[control-point]: ./selector.md#control-point
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
-[aperture-go]: https://github.com/FluxNinja/aperture-go
+[aperture-sdks]: /get-started/integrations/flow-control/sdk/sdk.md
+[gateways]: /get-started/integrations/flow-control/gateway/gateway.md
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [aperturectl]: /get-started/aperture-cli/aperture-cli.md
-[flow-matcher]: ./flow-selector.md#flow-matcher
+[label-matcher]: ./selector.md#label-matcher

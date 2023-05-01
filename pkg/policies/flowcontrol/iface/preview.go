@@ -16,8 +16,8 @@ func (id PreviewID) String() string {
 type PreviewBase interface {
 	// GetPreviewID returns the ID of the preview.
 	GetPreviewID() PreviewID
-	// GetFlowSelector returns the flow selector.
-	GetFlowSelector() *policylangv1.FlowSelector
+	// GetSelectors returns the selectors.
+	GetSelectors() []*policylangv1.Selector
 }
 
 // LabelPreview interface.

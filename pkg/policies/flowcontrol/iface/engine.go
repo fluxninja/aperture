@@ -4,6 +4,7 @@ import (
 	"context"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 )
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
@@ -21,6 +22,8 @@ type Engine interface {
 		ctx context.Context,
 		requestContext RequestContext,
 	) *flowcontrolv1.CheckResponse
+
+	GetAgentInfo() *agentinfo.AgentInfo
 
 	RegisterLoadScheduler(ls LoadScheduler) error
 	UnregisterLoadScheduler(ls LoadScheduler) error

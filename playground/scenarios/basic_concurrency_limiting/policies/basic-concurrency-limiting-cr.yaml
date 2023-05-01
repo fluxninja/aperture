@@ -57,12 +57,6 @@ spec:
           default_config:
             dry_run: false
           dynamic_config_key: concurrency_controller
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
           gradient_parameters:
             max_gradient: 1
             min_gradient: 0.1
@@ -85,15 +79,17 @@ spec:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           scheduler_parameters:
             auto_tokens: true
+          selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 0.5s
   resources:
     flow_control:
       classifiers: []
       flux_meters:
         basic-concurrency-limiting:
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
+          selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local

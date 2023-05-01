@@ -34,7 +34,7 @@
         "rate_limiter": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["rate_limit", "flow_selector", "parameters"],
+          "required": ["rate_limit", "parameters"],
           "properties": {
             "rate_limit": {
               "description": "Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept",
@@ -42,18 +42,19 @@
               "type": "number",
               "format": "double"
             },
-            "flow_selector": {
-              "description": "A flow selector to match requests against",
-              "default": {
-                "flow_matcher": {
-                  "control_point": "__REQUIRED_FIELD__"
-                },
-                "service_selector": {
+            "selectors": {
+              "description": "Flow selectors to match requests against",
+              "default": [
+                {
+                  "control_point": "__REQUIRED_FIELD__",
                   "service": "__REQUIRED_FIELD__"
                 }
-              },
-              "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+              }
             },
             "parameters": {
               "description": "Parameters.",

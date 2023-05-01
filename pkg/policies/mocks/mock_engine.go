@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	checkv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	agentinfo "github.com/fluxninja/aperture/pkg/agentinfo"
 	iface "github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -34,6 +35,20 @@ func NewMockEngine(ctrl *gomock.Controller) *MockEngine {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockEngine) EXPECT() *MockEngineMockRecorder {
 	return m.recorder
+}
+
+// GetAgentInfo mocks base method.
+func (m *MockEngine) GetAgentInfo() *agentinfo.AgentInfo {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAgentInfo")
+	ret0, _ := ret[0].(*agentinfo.AgentInfo)
+	return ret0
+}
+
+// GetAgentInfo indicates an expected call of GetAgentInfo.
+func (mr *MockEngineMockRecorder) GetAgentInfo() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAgentInfo", reflect.TypeOf((*MockEngine)(nil).GetAgentInfo))
 }
 
 // GetFluxMeter mocks base method.

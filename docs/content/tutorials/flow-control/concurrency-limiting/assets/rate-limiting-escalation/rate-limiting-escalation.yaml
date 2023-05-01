@@ -59,12 +59,6 @@ spec:
             default_config:
               dry_run: false
             dynamic_config_key: concurrency_controller
-            flow_selector:
-              flow_matcher:
-                control_point: ingress
-              service_selector:
-                agent_group: default
-                service: service1-demo-app.demoapp.svc.cluster.local
             gradient_parameters:
               max_gradient: 1
               min_gradient: 0.1
@@ -98,6 +92,10 @@ spec:
                       http.request.header.user_type: subscriber
                   parameters:
                     priority: 200
+            selectors:
+              - agent_group: default
+                control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
       - decider:
           in_ports:
             lhs:
@@ -126,40 +124,34 @@ spec:
       - flow_control:
           rate_limiter:
             dynamic_config_key: rate_limiter
-            flow_selector:
-              flow_matcher:
-                control_point: ingress
-                label_matcher:
-                  match_labels:
-                    http.request.header.user_type: bot
-              service_selector:
-                agent_group: default
-                service: service1-demo-app.demoapp.svc.cluster.local
             in_ports:
               limit:
                 signal_name: RATE_LIMIT
             parameters:
               label_key: http.request.header.user_id
               limit_reset_interval: 1s
+            selectors:
+              - agent_group: default
+                control_point: ingress
+                label_matcher:
+                  match_labels:
+                    http.request.header.user_type: bot
+                service: service1-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 0.5s
   resources:
     flow_control:
       classifiers:
-        - flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
-          rules:
+        - rules:
             user_type:
               extractor:
                 from: request.http.headers.user-type
+          selectors:
+            - agent_group: default
+              control_point: ingress
+              service: service1-demo-app.demoapp.svc.cluster.local
       flux_meters:
         service1-demo-app:
-          flow_selector:
-            flow_matcher:
+          selectors:
+            - agent_group: default
               control_point: ingress
-            service_selector:
-              agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local

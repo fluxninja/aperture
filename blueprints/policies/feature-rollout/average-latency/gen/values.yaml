@@ -22,20 +22,16 @@ policy:
             threshold: __REQUIRED_FIELD__
           reset:
             threshold: __REQUIRED_FIELD__
-        flow_selector:
-          flow_matcher:
-            control_point: __REQUIRED_FIELD__
-          service_selector:
+        selectors:
+          - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
   evaluation_interval: "1s"
   load_ramp:
     regulator_parameters:
-      flow_selector:
-        flow_matcher:
-          control_point: __REQUIRED_FIELD__
-        service_selector:
-          service: __REQUIRED_FIELD__
       label_key: ""
+      selectors:
+        - control_point: __REQUIRED_FIELD__
+          service: __REQUIRED_FIELD__
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__

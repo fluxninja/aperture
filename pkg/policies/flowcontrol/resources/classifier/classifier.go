@@ -14,10 +14,10 @@ type Classifier struct {
 	classifierID    iface.ClassifierID
 }
 
-// GetFlowSelector returns the flow selector.
-func (c *Classifier) GetFlowSelector() *policylangv1.FlowSelector {
+// GetSelectors returns the selectors.
+func (c *Classifier) GetSelectors() []*policylangv1.Selector {
 	if c.classifierProto != nil {
-		return c.classifierProto.GetFlowSelector()
+		return c.classifierProto.GetSelectors()
 	}
 	return nil
 }

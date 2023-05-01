@@ -952,7 +952,7 @@ spec:
                         description: "All agents within an agent group receive the
                           same data-plane configuration (for example, Flux Meters,
                           Rate Limiters and so on). \n [Read more about agent groups
-                          here](/concepts/flow-control/flow-selector.md#agent-group)."
+                          here](/concepts/flow-control/selector.md#agent-group)."
                         type: string
                     type: object
                   alertmanagers:
@@ -1011,7 +1011,7 @@ spec:
                                     items:
                                       type: string
                                     type: array
-                                  description: Proxy Connect Header - map[string][]string
+                                  description: Proxy Connect Header - `map[string][]string`
                                   type: object
                                 read_buffer_size:
                                   description: Read Buffer Size. 0 = 4 KB
@@ -1246,7 +1246,7 @@ spec:
                                   items:
                                     type: string
                                   type: array
-                                description: Proxy Connect Header - map[string][]string
+                                description: Proxy Connect Header - `map[string][]string`
                                 type: object
                               read_buffer_size:
                                 description: Read Buffer Size. 0 = 4 KB
@@ -1339,7 +1339,7 @@ spec:
                           items:
                             type: string
                           type: array
-                        description: Proxy Connect Header - map[string][]string
+                        description: Proxy Connect Header - `map[string][]string`
                         type: object
                       read_buffer_size:
                         description: Read Buffer Size. 0 = 4 KB
@@ -1581,7 +1581,7 @@ spec:
                           and pipeline names would be normalized. By default `kubeletstats`
                           custom metrics is added, which can be overwritten. \n Below
                           is example to overwrite `kubeletstats` custom metrics: \n
-                          otel: custom_metrics: kubeletstats: {}"
+                          ```yaml otel: custom_metrics: kubeletstats: {} ```"
                         type: object
                       disable_kubernetes_scraper:
                         description: DisableKubernetesScraper disables metrics collection

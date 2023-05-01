@@ -33,4 +33,13 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withParametersMixin(parameters):: {
     parameters+: parameters,
   },
+  withSelectors(selectors):: {
+    selectors:
+      if std.isArray(selectors)
+      then selectors
+      else [selectors],
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
 }

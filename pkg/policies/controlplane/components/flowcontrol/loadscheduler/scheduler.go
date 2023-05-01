@@ -33,20 +33,14 @@ var (
 
 // Scheduler is part of the LoadScheduler component stack.
 type Scheduler struct {
-	policyReadAPI iface.Policy
-	// Prometheus query for accepted token rate
-	acceptedQuery *promql.ScalarQuery
-	// Prometheus query for incoming token rate
-	incomingQuery *promql.ScalarQuery
-	// Prometheus query for tokens based on ms latency
-	tokensQuery *promql.TaggedQuery
-
-	// saves tokens value per workload read from prometheus
-	tokensByWorkload *policysyncv1.TokensDecision
-	writer           *etcdwriter.Writer
-	agentGroupName   string
-	etcdPath         string
-	componentID      string
+	policyReadAPI       iface.Policy
+	acceptedQuery       *promql.ScalarQuery
+	incomingQuery       *promql.ScalarQuery
+	tokensQuery         *promql.TaggedQuery
+	tokensByWorkload    *policysyncv1.TokensDecision
+	writer              *etcdwriter.Writer
+	componentID         string
+	autoTokensEtcdPaths []string
 }
 
 // Name implements runtime.Component.
@@ -56,7 +50,9 @@ func (*Scheduler) Name() string { return "Scheduler" }
 func (*Scheduler) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
 // ShortDescription implements runtime.Component.
-func (s *Scheduler) ShortDescription() string { return s.agentGroupName }
+func (s *Scheduler) ShortDescription() string {
+	return fmt.Sprintf("%d agent groups", len(s.autoTokensEtcdPaths))
+}
 
 // IsActuator implements runtime.Component.
 func (*Scheduler) IsActuator() bool { return false }
@@ -66,20 +62,26 @@ func NewSchedulerAndOptions(
 	schedulerProto *policylangv1.LoadScheduler_Scheduler,
 	componentID string,
 	policyReadAPI iface.Policy,
-	agentGroupName string,
+	agentGroups []string,
 ) (runtime.Component, fx.Option, error) {
-	etcdPath := path.Join(paths.AutoTokenResultsPath,
-		paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), componentID))
+	var options []fx.Option
+
+	var etcdPaths []string
+
+	for _, agentGroup := range agentGroups {
+		etcdPaths = append(etcdPaths, path.Join(paths.AutoTokenResultsPath,
+			paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)))
+	}
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
 		tokensByWorkload: &policysyncv1.TokensDecision{
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
-		agentGroupName: agentGroupName,
-		componentID:    componentID,
-		etcdPath:       etcdPath,
+		componentID:         componentID,
+		autoTokensEtcdPaths: etcdPaths,
 	}
+	options = append(options, fx.Invoke(scheduler.setupWriter))
 
 	// Prepare parameters for prometheus queries
 	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%s\"",
@@ -104,6 +106,7 @@ func NewSchedulerAndOptions(
 		return nil, fx.Options(), acceptedQueryErr
 	}
 	scheduler.acceptedQuery = acceptedQuery
+	options = append(options, acceptedQueryOptions)
 
 	incomingQuery, incomingQueryOptions, incomingQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
@@ -118,6 +121,7 @@ func NewSchedulerAndOptions(
 		return nil, nil, incomingQueryErr
 	}
 	scheduler.incomingQuery = incomingQuery
+	options = append(options, incomingQueryOptions)
 
 	if schedulerProto.Parameters == nil {
 		return nil, nil, fmt.Errorf("scheduler parameters are nil")
@@ -140,23 +144,10 @@ func NewSchedulerAndOptions(
 			return nil, nil, tokensQueryErr
 		}
 		scheduler.tokensQuery = tokensQuery
-		return scheduler,
-			fx.Options(
-				acceptedQueryOptions,
-				incomingQueryOptions,
-				tokensQueryOptions,
-				fx.Invoke(scheduler.setupWriter),
-			),
-			nil
-	} else {
-		return scheduler,
-			fx.Options(
-				acceptedQueryOptions,
-				incomingQueryOptions,
-				fx.Invoke(scheduler.setupWriter),
-			),
-			nil
+		options = append(options, tokensQueryOptions)
 	}
+
+	return scheduler, fx.Options(options...), nil
 }
 
 func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
@@ -167,13 +158,16 @@ func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), s.etcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to delete tokens decision config")
-				return err
+			var merr error
+			for _, etcdPath := range s.autoTokensEtcdPaths {
+				_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to delete tokens decision config")
+					merr = multierr.Append(merr, err)
+				}
 			}
 			s.writer.Close()
-			return nil
+			return merr
 		},
 	})
 	return nil
@@ -277,6 +271,8 @@ func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) erro
 		logger.Error().Err(err).Msg("Failed to marshal tokens")
 		return err
 	}
-	s.writer.Write(s.etcdPath, dat)
+	for _, etcdPath := range s.autoTokensEtcdPaths {
+		s.writer.Write(etcdPath, dat)
+	}
 	return nil
 }

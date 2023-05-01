@@ -367,9 +367,9 @@ func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.
 	rateLimiter.rateLimitChecker.SetOverrides(overrides)
 }
 
-// GetFlowSelector returns the selector for the rate limiter.
-func (rateLimiter *rateLimiter) GetFlowSelector() *policylangv1.FlowSelector {
-	return rateLimiter.rateLimiterProto.GetFlowSelector()
+// GetSelectors returns the selectors for the rate limiter.
+func (rateLimiter *rateLimiter) GetSelectors() []*policylangv1.Selector {
+	return rateLimiter.rateLimiterProto.GetSelectors()
 }
 
 // Decide runs the limiter.

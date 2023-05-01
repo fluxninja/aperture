@@ -2,29 +2,23 @@ common:
   policy_name: "service1-demo-app"
 policy:
   flux_meter:
-    flow_selector:
-      service_selector:
-        agent_group: default
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
         control_point: ingress
   classifiers:
-    - flow_selector:
-        service_selector:
-          agent_group: default
+    - selectors:
+        - agent_group: default
           service: service1-demo-app.demoapp.svc.cluster.local
-        flow_matcher:
           control_point: ingress
       rules:
         user_type:
           extractor:
             from: request.http.headers.user-type
   concurrency_controller:
-    flow_selector:
-      service_selector:
-        agent_group: default
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
         control_point: ingress
     scheduler:
       workloads:
@@ -67,13 +61,11 @@ policy:
     - flow_control:
         rate_limiter:
           dynamic_config_key: rate_limiter
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
+          selectors:
+            - control_point: ingress
               label_matcher:
                 match_labels:
                   http.request.header.user_type: bot
-            service_selector:
               agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local
           in_ports:
