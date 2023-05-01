@@ -11,7 +11,7 @@ keywords:
 
 :::info
 
-See also [influxdbreceiver docs][receiver] in opentelemetry-collect-contrib
+See also [influxdbreceiver docs][receiver] in `opentelemetry-collector-contrib`
 repository.
 
 :::
