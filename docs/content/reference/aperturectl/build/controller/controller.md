@@ -6,6 +6,8 @@ keywords:
   - aperturectl_build_controller
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl build controller
 
 Build controller binary for Aperture

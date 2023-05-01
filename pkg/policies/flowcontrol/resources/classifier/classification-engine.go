@@ -12,6 +12,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
@@ -24,7 +25,7 @@ import (
 )
 
 type multiMatcherResult struct {
-	labelers []*compiler.LabelerWithSelector
+	labelers []*compiler.LabelerWithAttributes
 	previews []iface.HTTPRequestPreview
 }
 
@@ -43,6 +44,7 @@ type rules struct {
 // ClassificationEngine receives classification policies and provides Classify method.
 type ClassificationEngine struct {
 	rulesMutex         sync.Mutex
+	agentInfo          *agentinfo.AgentInfo
 	activeRules        atomic.Value
 	classifierMapMutex sync.RWMutex
 	registry           status.Registry
@@ -56,7 +58,7 @@ type ClassificationEngine struct {
 type rulesetID = uint64
 
 // NewClassificationEngine creates a new Classifier.
-func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
+func NewClassificationEngine(agentInfo *agentinfo.AgentInfo, registry status.Registry) *ClassificationEngine {
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.ClassifierCounterMetricName,
 		Help: "A counter measuring the number of times classifier was triggered",
@@ -67,6 +69,7 @@ func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
 	})
 
 	return &ClassificationEngine{
+		agentInfo:      agentInfo,
 		activeRulesets: make(map[rulesetID]compiler.CompiledRuleset),
 		registry:       registry,
 		classifierMap:  make(map[iface.ClassifierID]iface.Classifier),
@@ -89,11 +92,11 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	input ast.Value,
 ) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
 	logger := c.registry.GetLogger()
-	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
+	appendNewClassifier := func(labelerWithAttributes *compiler.LabelerWithAttributes, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
-			PolicyName:      labelerWithSelector.ClassifierAttributes.PolicyName,
-			PolicyHash:      labelerWithSelector.ClassifierAttributes.PolicyHash,
-			ClassifierIndex: labelerWithSelector.ClassifierAttributes.ClassifierIndex,
+			PolicyName:      labelerWithAttributes.ClassifierAttributes.PolicyName,
+			PolicyHash:      labelerWithAttributes.ClassifierAttributes.PolicyHash,
+			ClassifierIndex: labelerWithAttributes.ClassifierAttributes.ClassifierIndex,
 			Error:           error,
 		})
 	}
@@ -193,7 +196,7 @@ func (c *ClassificationEngine) Classify(
 	var classifierMsgs []*flowcontrolv1.ClassifierInfo
 
 	// Catch all Service
-	cpID := selectors.NewControlPointID(consts.AnyService, ctrlPt)
+	cpID := selectors.NewControlPointID(ctrlPt, consts.AnyService)
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
 		classifierInfos := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
@@ -204,7 +207,7 @@ func (c *ClassificationEngine) Classify(
 
 	// Specific Service
 	for _, svc := range svcs {
-		cpID := selectors.NewControlPointID(svc, ctrlPt)
+		cpID := selectors.NewControlPointID(ctrlPt, svc)
 		mm, ok := r.MultiMatcherByControlPointID[cpID]
 		if !ok {
 			c.registry.GetLogger().Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
@@ -306,34 +309,43 @@ func (c *ClassificationEngine) combineRulesets() rules {
 
 	for _, ruleset := range c.activeRulesets {
 		combined.ReportedRules = append(combined.ReportedRules, ruleset.ReportedRules...)
-		for i := range ruleset.Labelers {
-			labelerWithSelector := &ruleset.Labelers[i]
-			err := addToMatcher(ruleset.ControlPointID, labelerWithSelector.LabelSelector, func(mmr multiMatcherResult) multiMatcherResult {
-				mmr.labelers = append(mmr.labelers, labelerWithSelector)
-				return mmr
-			})
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to add entry to multimatcher")
-				return rules{}
+		s, err := selectors.FromSelectors(ruleset.Selectors, c.agentInfo.GetAgentGroup())
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse selector")
+			continue
+		}
+		for _, selector := range s {
+			for i := range ruleset.Labelers {
+				labelerWithAttributes := &ruleset.Labelers[i]
+				err := addToMatcher(selector.ControlPointID(), selector.LabelMatcher(), func(mmr multiMatcherResult) multiMatcherResult {
+					mmr.labelers = append(mmr.labelers, labelerWithAttributes)
+					return mmr
+				})
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to add entry to multimatcher")
+					return rules{}
+				}
 			}
 		}
 	}
 
 	// add activePreviews
 	for _, preview := range c.activePreviews {
-		selector, err := selectors.FromProto(preview.GetFlowSelector())
+		s, err := selectors.FromSelectors(preview.GetSelectors(), c.agentInfo.GetAgentGroup())
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to parse selector")
 			continue
 		}
-		controlPointID := selector.ControlPointID()
-		err = addToMatcher(controlPointID, selector.LabelMatcher(), func(mmr multiMatcherResult) multiMatcherResult {
-			mmr.previews = append(mmr.previews, preview)
-			return mmr
-		})
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to add preview entry to multimatcher")
-			continue
+		for _, selector := range s {
+			controlPointID := selector.ControlPointID()
+			err = addToMatcher(controlPointID, selector.LabelMatcher(), func(mmr multiMatcherResult) multiMatcherResult {
+				mmr.previews = append(mmr.previews, preview)
+				return mmr
+			})
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to add preview entry to multimatcher")
+				continue
+			}
 		}
 	}
 	return combined

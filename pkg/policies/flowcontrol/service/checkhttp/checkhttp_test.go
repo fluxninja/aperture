@@ -14,6 +14,7 @@ import (
 	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -60,6 +61,7 @@ var _ = Describe("CheckHTTP handler", func() {
 		BeforeEach(func() {
 			alerter := alerts.NewSimpleAlerter(100)
 			classifier := classification.NewClassificationEngine(
+				agentinfo.NewAgentInfo("testGroup"),
 				status.NewRegistry(log.GetGlobalLogger(), alerter),
 			)
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
@@ -67,7 +69,7 @@ var _ = Describe("CheckHTTP handler", func() {
 			entities := entities.NewEntities()
 			entities.Put(&entitiesv1.Entity{
 				IpAddress: "1.2.3.4",
-				Services:  []string{service1FlowSelector.ServiceSelector.Service},
+				Services:  []string{service1Selector.Service},
 			})
 			handler = checkhttp.NewHandler(
 				classifier,
@@ -99,18 +101,17 @@ var _ = Describe("CheckHTTP handler", func() {
 	})
 })
 
-var service1FlowSelector = policylangv1.FlowSelector{
-	ServiceSelector: &policylangv1.ServiceSelector{
-		Service: "service1-demo-app.demoapp.svc.cluster.local",
-	},
-	FlowMatcher: &policylangv1.FlowMatcher{
-		ControlPoint: "ingress",
-	},
+var service1Selector = &policylangv1.Selector{
+	ControlPoint: "ingress",
+	Service:      "service1-demo-app.demoapp.svc.cluster.local",
+	AgentGroup:   "testGroup",
 }
 
 var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 	Classifier: &policylangv1.Classifier{
-		FlowSelector: &service1FlowSelector,
+		Selectors: []*policylangv1.Selector{
+			service1Selector,
+		},
 		Rego: &policylangv1.Rego{
 			Labels: map[string]*policylangv1.Rego_LabelProperties{
 				"destination": {

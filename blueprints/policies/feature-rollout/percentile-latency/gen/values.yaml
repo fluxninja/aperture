@@ -23,10 +23,8 @@ policy:
           reset:
             threshold: __REQUIRED_FIELD__
         flux_meter:
-          flow_selector:
-            flow_matcher:
-              control_point: __REQUIRED_FIELD__
-            service_selector:
+          selector:
+            - control_point: __REQUIRED_FIELD__
               service: __REQUIRED_FIELD__
           static_buckets:
             buckets:
@@ -45,12 +43,10 @@ policy:
   evaluation_interval: "1s"
   load_ramp:
     regulator_parameters:
-      flow_selector:
-        flow_matcher:
-          control_point: __REQUIRED_FIELD__
-        service_selector:
-          service: __REQUIRED_FIELD__
       label_key: ""
+      selectors:
+        - control_point: __REQUIRED_FIELD__
+          service: __REQUIRED_FIELD__
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__

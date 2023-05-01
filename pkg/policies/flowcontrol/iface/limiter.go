@@ -27,7 +27,7 @@ func (limiterID LimiterID) String() string {
 // Lifetime of this interface is per policy/component.
 type Limiter interface {
 	GetPolicyName() string
-	GetFlowSelector() *policylangv1.FlowSelector
+	GetSelectors() []*policylangv1.Selector
 	Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
 	Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision)
 	GetLimiterID() LimiterID

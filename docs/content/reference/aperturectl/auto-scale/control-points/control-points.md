@@ -6,6 +6,8 @@ keywords:
   - aperturectl_auto-scale_control-points
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl auto-scale control-points
 
 List AutoScale control points

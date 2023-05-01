@@ -67,13 +67,14 @@ type ClassificationEngineIn struct {
 	Lifecycle    fx.Lifecycle
 	Registry     status.Registry
 	PromRegistry *prometheus.Registry
+	AgentInfo    *agentinfo.AgentInfo
 }
 
 // ProvideClassificationEngine provides a classifier that loads the rules from config file.
 func ProvideClassificationEngine(in ClassificationEngineIn) (iface.ClassificationEngine, *ClassificationEngine) {
 	reg := in.Registry.Child("resource", "classifiers")
 
-	classificationEngine := NewClassificationEngine(reg)
+	classificationEngine := NewClassificationEngine(in.AgentInfo, reg)
 
 	fxDriver, err := notifiers.NewFxDriver(reg, in.PromRegistry,
 		config.NewProtobufUnmarshaller,

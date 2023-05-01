@@ -9,6 +9,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -33,7 +34,9 @@ var _ = Describe("Classifier", func() {
 		log.SetGlobalLevel(log.WarnLevel)
 
 		alerter := alerts.NewSimpleAlerter(100)
-		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger(), alerter))
+		classifier = NewClassificationEngine(
+			agentinfo.NewAgentInfo("testGroup"),
+			status.NewRegistry(log.GetGlobalLogger(), alerter))
 	})
 
 	It("returns empty slice, when no rules configured", func() {
@@ -43,12 +46,11 @@ var _ = Describe("Classifier", func() {
 	Context("configured with some classification rules", func() {
 		// Classifier with a simple extractor-based rule
 		rs1 := &policylangv1.Classifier{
-			FlowSelector: &policylangv1.FlowSelector{
-				ServiceSelector: &policylangv1.ServiceSelector{
-					Service: "my-service.default.svc.cluster.local",
-				},
-				FlowMatcher: &policylangv1.FlowMatcher{
+			Selectors: []*policylangv1.Selector{
+				{
 					ControlPoint: "ingress",
+					Service:      "my-service.default.svc.cluster.local",
+					AgentGroup:   "testGroup",
 				},
 			},
 			Rules: map[string]*policylangv1.Rule{
@@ -61,15 +63,14 @@ var _ = Describe("Classifier", func() {
 
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
 		rs2 := &policylangv1.Classifier{
-			FlowSelector: &policylangv1.FlowSelector{
-				ServiceSelector: &policylangv1.ServiceSelector{
-					Service: "my-service.default.svc.cluster.local",
-				},
-				FlowMatcher: &policylangv1.FlowMatcher{
+			Selectors: []*policylangv1.Selector{
+				{
+					ControlPoint: "ingress",
+					Service:      "my-service.default.svc.cluster.local",
+					AgentGroup:   "testGroup",
 					LabelMatcher: &policylangv1.LabelMatcher{
 						MatchLabels: map[string]string{"version": "one"},
 					},
-					ControlPoint: "ingress",
 				},
 			},
 			Rego: &policylangv1.Rego{
@@ -87,12 +88,11 @@ var _ = Describe("Classifier", func() {
 
 		// Classifier with a no service populated
 		rs3 := &policylangv1.Classifier{
-			FlowSelector: &policylangv1.FlowSelector{
-				ServiceSelector: &policylangv1.ServiceSelector{
-					Service: "any",
-				},
-				FlowMatcher: &policylangv1.FlowMatcher{
+			Selectors: []*policylangv1.Selector{
+				{
 					ControlPoint: "ingress",
+					Service:      "any",
+					AgentGroup:   "testGroup",
 				},
 			},
 			Rules: map[string]*policylangv1.Rule{
@@ -126,16 +126,14 @@ var _ = Describe("Classifier", func() {
 		It("returns active rules", func() {
 			Expect(classifier.ActiveRules()).To(ConsistOf(
 				compiler.ReportedRule{
-					RulesetName:  "one",
-					LabelName:    "foo",
-					Rule:         rs1.Rules["foo"],
-					FlowSelector: rs1.FlowSelector,
+					RulesetName: "one",
+					LabelName:   "foo",
+					Rule:        rs1.Rules["foo"],
 				},
 				compiler.ReportedRule{
-					RulesetName:  "three",
-					LabelName:    "fuu",
-					Rule:         rs3.Rules["fuu"],
-					FlowSelector: rs3.FlowSelector,
+					RulesetName: "three",
+					LabelName:   "fuu",
+					Rule:        rs3.Rules["fuu"],
 				},
 			))
 		})
@@ -224,12 +222,11 @@ var _ = Describe("Classifier", func() {
 	setRulesForMyService := func(labelRules map[string]*policylangv1.Rule, rego *policylangv1.Rego) error {
 		_, err := classifier.AddRules(context.TODO(), "test", &policysyncv1.ClassifierWrapper{
 			Classifier: &policylangv1.Classifier{
-				FlowSelector: &policylangv1.FlowSelector{
-					ServiceSelector: &policylangv1.ServiceSelector{
-						Service: "my-service.default.svc.cluster.local",
-					},
-					FlowMatcher: &policylangv1.FlowMatcher{
+				Selectors: []*policylangv1.Selector{
+					{
 						ControlPoint: "ingress",
+						Service:      "my-service.default.svc.cluster.local",
+						AgentGroup:   "testGroup",
 					},
 				},
 				Rules: labelRules,
@@ -433,12 +430,11 @@ var _ = Describe("Classifier", func() {
 	Context("configured with invalid label name", func() {
 		// Classifier with a simple extractor-based rule
 		rs := &policylangv1.Classifier{
-			FlowSelector: &policylangv1.FlowSelector{
-				ServiceSelector: &policylangv1.ServiceSelector{
-					Service: "my-service.default.svc.cluster.local",
-				},
-				FlowMatcher: &policylangv1.FlowMatcher{
+			Selectors: []*policylangv1.Selector{
+				{
 					ControlPoint: "ingress",
+					Service:      "my-service.default.svc.cluster.local",
+					AgentGroup:   "testGroup",
 				},
 			},
 			Rules: map[string]*policylangv1.Rule{

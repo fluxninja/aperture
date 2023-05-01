@@ -50,20 +50,6 @@ func (mr *MockFluxMeterMockRecorder) GetAttributeKey() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttributeKey", reflect.TypeOf((*MockFluxMeter)(nil).GetAttributeKey))
 }
 
-// GetFlowSelector mocks base method.
-func (m *MockFluxMeter) GetFlowSelector() *languagev1.FlowSelector {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFlowSelector")
-	ret0, _ := ret[0].(*languagev1.FlowSelector)
-	return ret0
-}
-
-// GetFlowSelector indicates an expected call of GetFlowSelector.
-func (mr *MockFluxMeterMockRecorder) GetFlowSelector() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockFluxMeter)(nil).GetFlowSelector))
-}
-
 // GetFluxMeterID mocks base method.
 func (m *MockFluxMeter) GetFluxMeterID() iface.FluxMeterID {
 	m.ctrl.T.Helper()
@@ -119,4 +105,18 @@ func (m *MockFluxMeter) GetInvalidFluxMeterTotal(labels map[string]string) (prom
 func (mr *MockFluxMeterMockRecorder) GetInvalidFluxMeterTotal(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInvalidFluxMeterTotal", reflect.TypeOf((*MockFluxMeter)(nil).GetInvalidFluxMeterTotal), labels)
+}
+
+// GetSelectors mocks base method.
+func (m *MockFluxMeter) GetSelectors() []*languagev1.Selector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSelectors")
+	ret0, _ := ret[0].([]*languagev1.Selector)
+	return ret0
+}
+
+// GetSelectors indicates an expected call of GetSelectors.
+func (mr *MockFluxMeterMockRecorder) GetSelectors() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelectors", reflect.TypeOf((*MockFluxMeter)(nil).GetSelectors))
 }

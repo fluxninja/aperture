@@ -1,30 +1,25 @@
+# yaml-language-server: $schema=../../../../blueprints/policies/latency-aimd-concurrency-limiting/gen/definitions.json
 common:
   policy_name: "workload-prioritization"
 policy:
   flux_meter:
-    flow_selector:
-      service_selector:
-        agent_group: default
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
         control_point: ingress
   classifiers:
-    - flow_selector:
-        service_selector:
-          agent_group: default
+    - selectors:
+        - agent_group: default
           service: service1-demo-app.demoapp.svc.cluster.local
-        flow_matcher:
           control_point: ingress
       rules:
         user_type:
           extractor:
             from: request.http.headers.user-type
   concurrency_controller:
-    flow_selector:
-      service_selector:
-        agent_group: default
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
         control_point: ingress
     scheduler:
       workloads:

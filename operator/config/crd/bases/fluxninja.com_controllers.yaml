@@ -944,7 +944,7 @@ spec:
                                     items:
                                       type: string
                                     type: array
-                                  description: Proxy Connect Header - map[string][]string
+                                  description: Proxy Connect Header - `map[string][]string`
                                   type: object
                                 read_buffer_size:
                                   description: Read Buffer Size. 0 = 4 KB
@@ -1134,7 +1134,7 @@ spec:
                                   items:
                                     type: string
                                   type: array
-                                description: Proxy Connect Header - map[string][]string
+                                description: Proxy Connect Header - `map[string][]string`
                                 type: object
                               read_buffer_size:
                                 description: Read Buffer Size. 0 = 4 KB

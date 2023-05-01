@@ -153,7 +153,14 @@ func (mm *MultiMatcher[Key, _]) removeEntryUnsafe(key Key) error {
 // which matches given labels, and returns resulting ResultCollection.
 func (mm *MultiMatcher[_, ResultCollection]) Match(labels Labels) ResultCollection {
 	var resultCollection ResultCollection
+	return mm.MatchWithResultCollection(labels, resultCollection)
+}
 
+// MatchWithResultCollection runs matching against labels and returns a collection of results.
+//
+// Starting with empty ResultCollection, calls MatchCallback for every entry
+// which matches given labels, and returns resulting ResultCollection.
+func (mm *MultiMatcher[_, ResultCollection]) MatchWithResultCollection(labels Labels, resultCollection ResultCollection) ResultCollection {
 	mm.mutex.RLock()
 	defer mm.mutex.RUnlock()
 

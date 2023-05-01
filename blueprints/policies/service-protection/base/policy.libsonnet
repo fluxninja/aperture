@@ -78,7 +78,7 @@ function(cfg) {
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
       local adaptiveLoadScheduler = params.service_protection_core.adaptive_load_scheduler;
       spec.v1.AdaptiveLoadScheduler.new()
-      + spec.v1.AdaptiveLoadScheduler.withFlowSelector(adaptiveLoadScheduler.flow_selector)
+      + spec.v1.AdaptiveLoadScheduler.withSelectors(adaptiveLoadScheduler.selectors)
       + spec.v1.AdaptiveLoadScheduler.withSchedulerParameters(adaptiveLoadScheduler.scheduler)
       + spec.v1.AdaptiveLoadScheduler.withGradientParameters(adaptiveLoadScheduler.gradient)
       + spec.v1.AdaptiveLoadScheduler.withMaxLoadMultiplier(adaptiveLoadScheduler.max_load_multiplier)

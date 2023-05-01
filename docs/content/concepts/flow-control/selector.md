@@ -1,6 +1,6 @@
 ---
-title: Flow Selector
-sidebar_label: Flow Selector
+title: Selector
+sidebar_label: Selector
 sidebar_position: 2
 keywords:
   - flows
@@ -17,37 +17,23 @@ import Zoom from 'react-medium-image-zoom';
 
 :::info
 
-See also [_Flow Selector_ reference](/reference/policies/spec.md#flow-selector)
+See also [_Selector_ reference](/reference/policies/spec.md#selector)
 
 :::
 
-_Flow Selectors_ are used by flow control and observability components
-instantiated by Aperture Agents like [_Classifiers_][classifier], [_Flux
-Meters_][flux-meter] and [_Load Scheduler_][load-scheduler]. _Flow Selectors_
-define scoping rules that decide how these components should select flows for
-their operations.
+_Selectors_ are used by flow control and observability components instantiated
+by Aperture Agents like [_Classifiers_][classifier], [_Flux Meters_][flux-meter]
+and [_Load Scheduler_][load-scheduler]. _Selectors_ define scoping rules that
+decide how these components should select flows for their operations.
 
-A _Flow Selector_ consists of:
+A _Selector_ consists of:
 
-- _Flow Matcher_, containing
+- [_Control Point_](#control-point) (required)
+- [_Label Matcher_](#label-matcher) (optional)
+- [_Agent Group_](#agent-group) (optional)
+- [_Service_](#service) (optional)
 
-  - [_Control Point_](#control-point) (required)
-  - [_Flow Matcher_](#label-matcher) (optional)
-
-- _Service Selector_, containing
-
-  - [_Agent Group_](#agent-group) (optional)
-  - [_Service_](#service) (optional)
-
-## Flow Matcher {#flow-matcher}
-
-:::info
-
-See also [_Flow Matcher_ reference](/reference/policies/spec.md#flow-matcher)
-
-:::
-
-### Control Point {#control-point}
+## Control Point {#control-point}
 
 Control points are similar to
 [feature flags](https://en.wikipedia.org/wiki/Feature_toggle). They identify the
@@ -105,10 +91,10 @@ list active control points.
 
 :::
 
-### Label Matcher {#label-matcher}
+## Label Matcher {#label-matcher}
 
 The _Label Matcher_ optionally narrows down the selected flow based on
-conditions on [Flow Labels][label].
+conditions on [Labels][label].
 
 There are multiple ways to define a label matcher. The simplest way is to
 provide a map of labels for exact-match:
@@ -126,28 +112,19 @@ reference][label-matcher] for further details.
 ## Example
 
 ```yaml
-service_selector:
-  service: checkout.myns.svc.cluster.local
-  agent_group: default
-flow_selector:
-  control_point: ingress
-  label_matcher:
-    match_labels:
-      user_tier: gold
+service: checkout.myns.svc.cluster.local
+agent_group: default
+control_point: ingress
+label_matcher:
+  match_labels:
+    user_tier: gold
 ```
 
-## Service Selector {#service-selector}
-
-:::info
-
-See also
-[_Service Selector_ reference](/reference/policies/spec.md#service-selector)
-
-:::
+### Agent Group {#agent-group}
 
 :::note
 
-The _Service Selector_ is an optional construct that helps scale Aperture
+The _Agent Group_ and _Service_ are optional constructs that help scale Aperture
 configuration in complex environments, such as Kubernetes, or in multi-cluster
 installations.
 
@@ -157,8 +134,6 @@ deployment can be used as a feature flag decision service serving remote flow
 control requests.
 
 :::
-
-### Agent Group {#agent-group}
 
 _Agent Group_ is a flexible label that defines a collection of agents that
 operate as peers. For example, an Agent Group can be a Kubernetes cluster name
@@ -278,24 +253,22 @@ with /health, /live, or /ready, and User Agent starting with `kube-probe/1.23`
 are filtered out.
 
 ```yaml
-service_selector:
-  service: checkout.myns.svc.cluster.local
-  agent_group: default
-flow_selector:
-  control_point: ingress
-  label_matcher:
-    match_expressions:
-      - key: http.target
-        operator: NotIn
-        values:
-          - /health
-          - /live
-          - /ready
-          - /metrics
-      - key: http.user_agent
-        operator: NotIn
-        values:
-          - kube-probe/1.23
+service: checkout.myns.svc.cluster.local
+agent_group: default
+control_point: ingress
+label_matcher:
+  match_expressions:
+    - key: http.target
+      operator: NotIn
+      values:
+        - /health
+        - /live
+        - /ready
+        - /metrics
+    - key: http.user_agent
+      operator: NotIn
+      values:
+        - kube-probe/1.23
 ```
 
 Filtering out traffic to these endpoints can prevent unnecessary pod restarts

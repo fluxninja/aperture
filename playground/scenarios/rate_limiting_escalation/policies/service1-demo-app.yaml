@@ -13,24 +13,14 @@ policy:
   # Flux Meter.
   # Type: aperture.spec.v1.FluxMeter
   flux_meter:
-    flow_selector:
-      service_selector:
-        # Service Name.
-        # Type: string
-        # Required: True
-        service: service3-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
-        # Control Point Name.
-        # Type: string
-        # Required: True
+    selectors:
+      - service: service3-demo-app.demoapp.svc.cluster.local
         control_point: ingress
   # List of classification rules.
   # Type: []aperture.spec.v1.Classifier
   classifiers:
-    - flow_selector: &concurrency_flow_selector
-        service_selector:
-          service: service1-demo-app.demoapp.svc.cluster.local
-        flow_matcher:
+    - selectors: &concurrency_flow_selector
+        - service: service1-demo-app.demoapp.svc.cluster.local
           control_point: ingress
       rules:
         user_type:
@@ -66,10 +56,8 @@ policy:
             signal_name: RATE_LIMIT
     - flow_control:
         rate_limiter:
-          flow_selector:
-            service_selector:
-              service: service1-demo-app.demoapp.svc.cluster.local
-            flow_matcher:
+          selectors:
+            - service: service1-demo-app.demoapp.svc.cluster.local
               label_matcher:
                 match_labels:
                   "http.request.header.user_type": "bot"
@@ -82,9 +70,7 @@ policy:
             label_key: http.request.header.user_id
           dynamic_config_key: rate_limiter
   concurrency_controller:
-    # Concurrency Limiter flow selector.
-    # Type: aperture.spec.v1.FlowSelector
-    flow_selector: *concurrency_flow_selector
+    selectors: *concurrency_flow_selector
     # Scheduler parameters.
     # Type: aperture.spec.v1.SchedulerParameters
     scheduler:

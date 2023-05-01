@@ -52,17 +52,15 @@ Labels_ aren't isolated in any way and are shared across policies.
 
 :::
 
-## Selector {#selector}
+## Selectors {#selectors}
 
 Each _Classifier_ needs to specify which control point it will be run at. For
 instance, the following selector is for the "ingress" control point at a
 service:
 
 ```yaml
-selector:
-  service_selector:
-    service: service1.default.svc.cluster.local
-  flow_selector:
+selectors:
+  - service: service1.default.svc.cluster.local
     control_point: ingress
 ```
 
@@ -153,8 +151,8 @@ curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-a
 
 ## Rules ([reference][rule]) {#rules}
 
-In addition to the selector, a Classifier needs to specify classification rules.
-Each classification rule consists of:
+In addition to the selectors, a Classifier needs to specify classification
+rules. Each classification rule consists of:
 
 - _Flow Label_ key,
 - A rule how to extract the flow label value based on request metadata.
@@ -230,11 +228,11 @@ See [full example in reference][reference]
 [extractor]: /reference/policies/spec.md#extractor
 [rego-rule]: /reference/policies/spec.md#rule-rego
 [arc]: /arc/extension.md
-[label-matcher]: ../flow-selector.md#label-matcher
+[label-matcher]: ../selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ../flow-selector.md#control-point
+[control-point]: ../selector.md#control-point
 [install-istio]: /get-started/integrations/flow-control/envoy/istio.md
 [aperturectl]: /get-started/aperture-cli/aperture-cli.md
