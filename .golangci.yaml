@@ -43,12 +43,6 @@ linters-settings:
       - github.com/onsi/ginkgo/v2
       - github.com/onsi/gomega
 linters:
-  custom:
-    zerologlint:
-      path: ${GOPATH}/bin/zerologlint
-      description: "Linter for zerolog library"
-      original-url: https://github.com/ykadowak/zerologlint
-
   enable:
     - gocritic
     - gofumpt
@@ -59,13 +53,14 @@ linters:
     - misspell
     - stylecheck
     - promlinter
+    - importas
   disable:
     # unmaintained
     - deadcode
     - varcheck
     - structcheck
-    # - nilerr
-    # - wastedassign
+    - nilerr
+    - wastedassign
 issues:
   include:
     - EXC0012
