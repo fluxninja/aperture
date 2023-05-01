@@ -21,7 +21,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     public ApertureServerHandler(ApertureSDK sdk) {
         this.apertureSDK = sdk;
-        this.controlPointName = "ingress";
+        this.controlPointName = "";
     }
 
     public ApertureServerHandler(ApertureSDK sdk, String controlPointName) {

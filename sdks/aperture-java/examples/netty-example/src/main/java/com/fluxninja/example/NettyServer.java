@@ -12,6 +12,7 @@ public class NettyServer {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
@@ -27,6 +28,10 @@ public class NettyServer {
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
+        }
+        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
+        if (controlPointName == null) {
+            controlPointName = DEFAULT_CONTROL_POINT_NAME;
         }
         String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
         if (insecureGrpcString == null) {
@@ -50,7 +55,12 @@ public class NettyServer {
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(
-                            new ServerInitializer(agentHost, agentPort, insecureGrpc, rootCertFile))
+                            new ServerInitializer(
+                                    agentHost,
+                                    agentPort,
+                                    controlPointName,
+                                    insecureGrpc,
+                                    rootCertFile))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
