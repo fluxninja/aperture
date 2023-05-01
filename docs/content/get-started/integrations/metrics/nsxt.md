@@ -11,7 +11,7 @@ keywords:
 
 :::info
 
-See also [nsxtreceiver docs][receiver] in opentelemetry-collect-contrib
+See also [nsxtreceiver docs][receiver] in `opentelemetry-collector-contrib`
 repository.
 
 :::
