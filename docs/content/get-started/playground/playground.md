@@ -177,7 +177,7 @@ To install the required tools, you have two options:
 - Or, manually install the tools
   [mentioned here](#tools-required-for-kubernetes-deployment).
 
-### Install using `asdf` \{#install-using-asdf}
+### Install using `asdf` {#install-using-asdf}
 
 First,
 [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and

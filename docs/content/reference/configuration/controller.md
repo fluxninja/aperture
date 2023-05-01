@@ -69,7 +69,7 @@ Generated File Starts
 
 <!-- vale off -->
 
-### _client_ \{#client}
+### _client_ {#client}
 
 <!-- vale on -->
 
@@ -93,7 +93,7 @@ Generated File Starts
 
 <!-- vale off -->
 
-### _etcd_ \{#etcd}
+### _etcd_ {#etcd}
 
 <!-- vale on -->
 
@@ -117,7 +117,7 @@ Generated File Starts
 
 <!-- vale off -->
 
-### _fluxninja_ \{#flux-ninja-extension}
+### _fluxninja_ {#flux-ninja-extension}
 
 <!-- vale on -->
 
@@ -141,7 +141,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _liveness_ \{#liveness}
+### _liveness_ {#liveness}
 
 <!-- vale on -->
 
@@ -177,7 +177,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _log_ \{#log}
+### _log_ {#log}
 
 <!-- vale on -->
 
@@ -201,7 +201,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _metrics_ \{#metrics}
+### _metrics_ {#metrics}
 
 <!-- vale on -->
 
@@ -225,7 +225,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _otel_ \{#o-tel}
+### _otel_ {#o-tel}
 
 <!-- vale on -->
 
@@ -249,7 +249,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _policies_ \{#policies-config}
+### _policies_ {#policies-config}
 
 <!-- vale on -->
 
@@ -285,7 +285,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _profilers_ \{#profilers}
+### _profilers_ {#profilers}
 
 <!-- vale on -->
 
@@ -309,7 +309,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _prometheus_ \{#prometheus}
+### _prometheus_ {#prometheus}
 
 <!-- vale on -->
 
@@ -345,7 +345,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _readiness_ \{#readiness}
+### _readiness_ {#readiness}
 
 <!-- vale on -->
 
@@ -381,7 +381,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _sentry_ \{#sentry-extension}
+### _sentry_ {#sentry-extension}
 
 <!-- vale on -->
 
@@ -405,7 +405,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _server_ \{#server}
+### _server_ {#server}
 
 <!-- vale on -->
 
@@ -477,7 +477,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _watchdog_ \{#watchdog}
+### _watchdog_ {#watchdog}
 
 <!-- vale on -->
 
@@ -505,7 +505,7 @@ prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 <!-- vale off -->
 
-### AdaptivePolicy \{#adaptive-policy}
+### AdaptivePolicy {#adaptive-policy}
 
 <!-- vale on -->
 
@@ -544,7 +544,7 @@ Factor sets user-configured limit of available memory
 
 <!-- vale off -->
 
-### BackoffConfig \{#backoff-config}
+### BackoffConfig {#backoff-config}
 
 <!-- vale on -->
 
@@ -605,7 +605,7 @@ Backoff multiplier
 
 <!-- vale off -->
 
-### BatchAlertsConfig \{#batch-alerts-config}
+### BatchAlertsConfig {#batch-alerts-config}
 
 <!-- vale on -->
 
@@ -656,7 +656,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale off -->
 
-### CRWatcherConfig \{#c-r-watcher-config}
+### CRWatcherConfig {#c-r-watcher-config}
 
 <!-- vale on -->
 
@@ -682,7 +682,7 @@ Enabled indicates whether the Kubernetes watcher is enabled.
 
 <!-- vale off -->
 
-### ClientConfig \{#client-config}
+### ClientConfig {#client-config}
 
 <!-- vale on -->
 
@@ -719,7 +719,7 @@ HTTP client settings.
 
 <!-- vale off -->
 
-### ClientTLSConfig \{#client-tls-config}
+### ClientTLSConfig {#client-tls-config}
 
 <!-- vale on -->
 
@@ -782,7 +782,7 @@ ClientTLSConfig is the configuration for client TLS.
 
 <!-- vale off -->
 
-### ControllerOTelConfig \{#controller-o-tel-config}
+### ControllerOTelConfig {#controller-o-tel-config}
 
 <!-- vale on -->
 
@@ -819,7 +819,7 @@ Ports configures debug, health and extension ports values.
 
 <!-- vale off -->
 
-### EtcdConfig \{#etcd-config}
+### EtcdConfig {#etcd-config}
 
 <!-- vale on -->
 
@@ -890,7 +890,7 @@ Client TLS configuration
 
 <!-- vale off -->
 
-### FluxNinjaExtensionConfig \{#flux-ninja-extension-config}
+### FluxNinjaExtensionConfig {#flux-ninja-extension-config}
 
 <!-- vale on -->
 
@@ -966,7 +966,7 @@ Client configuration.
 
 <!-- vale off -->
 
-### GRPCClientConfig \{#g-rpc-client-config}
+### GRPCClientConfig {#g-rpc-client-config}
 
 <!-- vale on -->
 
@@ -1039,7 +1039,7 @@ Client TLS configuration
 
 <!-- vale off -->
 
-### GRPCGatewayConfig \{#g-rpc-gateway-config}
+### GRPCGatewayConfig {#g-rpc-gateway-config}
 
 <!-- vale on -->
 
@@ -1065,7 +1065,7 @@ because FluxNinja stack runs gRPC and HTTP servers on the same port
 
 <!-- vale off -->
 
-### GRPCServerConfig \{#g-rpc-server-config}
+### GRPCServerConfig {#g-rpc-server-config}
 
 <!-- vale on -->
 
@@ -1114,7 +1114,7 @@ Buckets specification in latency histogram
 
 <!-- vale off -->
 
-### HTTPClientConfig \{#http-client-config}
+### HTTPClientConfig {#http-client-config}
 
 <!-- vale on -->
 
@@ -1356,7 +1356,7 @@ Client TLS configuration
 
 <!-- vale off -->
 
-### HTTPServerConfig \{#http-server-config}
+### HTTPServerConfig {#http-server-config}
 
 <!-- vale on -->
 
@@ -1453,7 +1453,7 @@ Write timeout
 
 <!-- vale off -->
 
-### Header \{#header}
+### Header {#header}
 
 <!-- vale on -->
 
@@ -1467,7 +1467,7 @@ The keys should be in canonical form, as returned by CanonicalHeaderKey.
 
 <!-- vale off -->
 
-### HeapConfig \{#heap-config}
+### HeapConfig {#heap-config}
 
 <!-- vale on -->
 
@@ -1525,7 +1525,7 @@ driven Watchdogs. This setting helps avoid over scheduling.
 
 <!-- vale off -->
 
-### JobConfig \{#job-config}
+### JobConfig {#job-config}
 
 <!-- vale on -->
 
@@ -1575,7 +1575,7 @@ Sets whether the job is initially healthy
 
 <!-- vale off -->
 
-### JobGroupConfig \{#job-group-config}
+### JobGroupConfig {#job-group-config}
 
 <!-- vale on -->
 
@@ -1616,7 +1616,7 @@ limit. If BlockingExecution is set, then WorkerLimit is ignored.
 
 <!-- vale off -->
 
-### ListenerConfig \{#listener-config}
+### ListenerConfig {#listener-config}
 
 <!-- vale on -->
 
@@ -1666,7 +1666,7 @@ TCP networks - `tcp`, `tcp4` (IPv4-only), `tcp6` (IPv6-only)
 
 <!-- vale off -->
 
-### LogConfig \{#log-config}
+### LogConfig {#log-config}
 
 <!-- vale on -->
 
@@ -1730,7 +1730,7 @@ Log writers
 
 <!-- vale off -->
 
-### LogWriterConfig \{#log-writer-config}
+### LogWriterConfig {#log-writer-config}
 
 <!-- vale on -->
 
@@ -1804,7 +1804,7 @@ Log file max size in MB
 
 <!-- vale off -->
 
-### MetricsConfig \{#metrics-config}
+### MetricsConfig {#metrics-config}
 
 <!-- vale on -->
 
@@ -1858,7 +1858,7 @@ Pedantic controls whether a pedantic registry is used. See
 
 <!-- vale off -->
 
-### PortsConfig \{#ports-config}
+### PortsConfig {#ports-config}
 
 <!-- vale on -->
 
@@ -1919,7 +1919,7 @@ Port on which `zpages` extension in exposed.
 
 <!-- vale off -->
 
-### ProfilersConfig \{#profilers-config}
+### ProfilersConfig {#profilers-config}
 
 <!-- vale on -->
 
@@ -1972,7 +1972,7 @@ registered at `/debug/pprof/{profile,symbol,cmdline}`.
 
 <!-- vale off -->
 
-### PrometheusConfig \{#prometheus-config}
+### PrometheusConfig {#prometheus-config}
 
 <!-- vale on -->
 
@@ -1997,7 +1997,7 @@ Address of the Prometheus server
 
 <!-- vale off -->
 
-### ProxyConfig \{#proxy-config}
+### ProxyConfig {#proxy-config}
 
 <!-- vale on -->
 
@@ -2044,7 +2044,7 @@ HTTPS_PROXY or NO_PROXY. See
 
 <!-- vale off -->
 
-### SentryConfig \{#sentry-config}
+### SentryConfig {#sentry-config}
 
 <!-- vale on -->
 
@@ -2143,7 +2143,7 @@ Sample rate for sampling traces
 
 <!-- vale off -->
 
-### ServerTLSConfig \{#server-tls-config}
+### ServerTLSConfig {#server-tls-config}
 
 <!-- vale on -->
 
@@ -2216,7 +2216,7 @@ Server Key file path
 
 <!-- vale off -->
 
-### WatchdogConfig \{#watchdog-config}
+### WatchdogConfig {#watchdog-config}
 
 <!-- vale on -->
 
@@ -2270,7 +2270,7 @@ watermark or adaptive should be configured.
 
 <!-- vale off -->
 
-### WatchdogPolicyType \{#watchdog-policy-type}
+### WatchdogPolicyType {#watchdog-policy-type}
 
 <!-- vale on -->
 
@@ -2304,7 +2304,7 @@ algorithms are configured then only watermark algorithm is used.
 
 <!-- vale off -->
 
-### WatermarksPolicy \{#watermarks-policy}
+### WatermarksPolicy {#watermarks-policy}
 
 <!-- vale on -->
 

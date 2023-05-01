@@ -76,7 +76,7 @@ Generated File Starts
 
 <!-- vale off -->
 
-### _agent_info_ \{#agent-info}
+### _agent_info_ {#agent-info}
 
 <!-- vale on -->
 
@@ -100,7 +100,7 @@ Generated File Starts
 
 <!-- vale off -->
 
-### _auto_scale_ \{#auto-scale-config}
+### _auto_scale_ {#auto-scale-config}
 
 <!-- vale on -->
 
@@ -124,7 +124,7 @@ variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 <!-- vale off -->
 
-### _client_ \{#client}
+### _client_ {#client}
 
 <!-- vale on -->
 
@@ -148,7 +148,7 @@ variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 <!-- vale off -->
 
-### _dist_cache_ \{#dist-cache}
+### _dist_cache_ {#dist-cache}
 
 <!-- vale on -->
 
@@ -172,7 +172,7 @@ variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 <!-- vale off -->
 
-### _etcd_ \{#etcd}
+### _etcd_ {#etcd}
 
 <!-- vale on -->
 
@@ -195,7 +195,7 @@ variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 <!-- vale off -->
 
-### _flow_control_ \{#flow-control}
+### _flow_control_ {#flow-control}
 
 <!-- vale on -->
 
@@ -219,7 +219,7 @@ variable prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 <!-- vale off -->
 
-### _fluxninja_ \{#flux-ninja-extension}
+### _fluxninja_ {#flux-ninja-extension}
 
 <!-- vale on -->
 
@@ -243,7 +243,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _agent_functions_ \{#functions}
+### _agent_functions_ {#functions}
 
 <!-- vale on -->
 
@@ -267,7 +267,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _kubernetes_client_ \{#kubernetes-client}
+### _kubernetes_client_ {#kubernetes-client}
 
 <!-- vale on -->
 
@@ -291,7 +291,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _liveness_ \{#liveness}
+### _liveness_ {#liveness}
 
 <!-- vale on -->
 
@@ -327,7 +327,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _log_ \{#log}
+### _log_ {#log}
 
 <!-- vale on -->
 
@@ -350,7 +350,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _metrics_ \{#metrics}
+### _metrics_ {#metrics}
 
 <!-- vale on -->
 
@@ -374,7 +374,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _otel_ \{#o-tel}
+### _otel_ {#o-tel}
 
 <!-- vale on -->
 
@@ -398,7 +398,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _peer_discovery_ \{#peer-discovery}
+### _peer_discovery_ {#peer-discovery}
 
 <!-- vale on -->
 
@@ -422,7 +422,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _profilers_ \{#profilers}
+### _profilers_ {#profilers}
 
 <!-- vale on -->
 
@@ -446,7 +446,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _prometheus_ \{#prometheus}
+### _prometheus_ {#prometheus}
 
 <!-- vale on -->
 
@@ -482,7 +482,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _readiness_ \{#readiness}
+### _readiness_ {#readiness}
 
 <!-- vale on -->
 
@@ -518,7 +518,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _sentry_ \{#sentry-extension}
+### _sentry_ {#sentry-extension}
 
 <!-- vale on -->
 
@@ -542,7 +542,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _server_ \{#server}
+### _server_ {#server}
 
 <!-- vale on -->
 
@@ -614,7 +614,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 <!-- vale off -->
 
-### _service_discovery_ \{#service-discovery}
+### _service_discovery_ {#service-discovery}
 
 <!-- vale on -->
 
@@ -650,7 +650,7 @@ prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 
 <!-- vale off -->
 
-### _watchdog_ \{#watchdog}
+### _watchdog_ {#watchdog}
 
 <!-- vale on -->
 
@@ -678,7 +678,7 @@ prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 
 <!-- vale off -->
 
-### AdaptivePolicy \{#adaptive-policy}
+### AdaptivePolicy {#adaptive-policy}
 
 <!-- vale on -->
 
@@ -717,7 +717,7 @@ Factor sets user-configured limit of available memory
 
 <!-- vale off -->
 
-### AgentFunctionsConfig \{#agent-functions-config}
+### AgentFunctionsConfig {#agent-functions-config}
 
 <!-- vale on -->
 
@@ -754,7 +754,7 @@ Network client configuration
 
 <!-- vale off -->
 
-### AgentInfoConfig \{#agent-info-config}
+### AgentInfoConfig {#agent-info-config}
 
 <!-- vale on -->
 
@@ -783,7 +783,7 @@ example, Flux Meters, Rate Limiters and so on).
 
 <!-- vale off -->
 
-### AgentOTelConfig \{#agent-o-tel-config}
+### AgentOTelConfig {#agent-o-tel-config}
 
 <!-- vale on -->
 
@@ -913,7 +913,7 @@ Ports configures debug, health and extension ports values.
 
 <!-- vale off -->
 
-### AutoScaleKubernetesConfig \{#auto-scale-kubernetes-config}
+### AutoScaleKubernetesConfig {#auto-scale-kubernetes-config}
 
 <!-- vale on -->
 
@@ -938,7 +938,7 @@ Enables the Kubernetes auto-scale capability.
 
 <!-- vale off -->
 
-### BackoffConfig \{#backoff-config}
+### BackoffConfig {#backoff-config}
 
 <!-- vale on -->
 
@@ -999,7 +999,7 @@ Backoff multiplier
 
 <!-- vale off -->
 
-### BatchAlertsConfig \{#batch-alerts-config}
+### BatchAlertsConfig {#batch-alerts-config}
 
 <!-- vale on -->
 
@@ -1050,7 +1050,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale off -->
 
-### BatchPostrollupConfig \{#batch-postrollup-config}
+### BatchPostrollupConfig {#batch-postrollup-config}
 
 <!-- vale on -->
 
@@ -1101,7 +1101,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale off -->
 
-### BatchPrerollupConfig \{#batch-prerollup-config}
+### BatchPrerollupConfig {#batch-prerollup-config}
 
 <!-- vale on -->
 
@@ -1152,7 +1152,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale off -->
 
-### ClientConfig \{#client-config}
+### ClientConfig {#client-config}
 
 <!-- vale on -->
 
@@ -1189,7 +1189,7 @@ HTTP client settings.
 
 <!-- vale off -->
 
-### ClientTLSConfig \{#client-tls-config}
+### ClientTLSConfig {#client-tls-config}
 
 <!-- vale on -->
 
@@ -1252,7 +1252,7 @@ ClientTLSConfig is the configuration for client TLS.
 
 <!-- vale off -->
 
-### Components \{#components}
+### Components {#components}
 
 <!-- vale on -->
 
@@ -1267,7 +1267,7 @@ https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
 <!-- vale off -->
 
-### CustomMetricsConfig \{#custom-metrics-config}
+### CustomMetricsConfig {#custom-metrics-config}
 
 <!-- vale on -->
 
@@ -1350,7 +1350,7 @@ https://opentelemetry.io/docs/collector/configuration/#receivers.
 
 <!-- vale off -->
 
-### CustomMetricsPipelineConfig \{#custom-metrics-pipeline-config}
+### CustomMetricsPipelineConfig {#custom-metrics-pipeline-config}
 
 <!-- vale on -->
 
@@ -1383,7 +1383,7 @@ CustomMetricsPipelineConfig defines a custom metrics pipeline.
 
 <!-- vale off -->
 
-### DistCacheConfig \{#dist-cache-config}
+### DistCacheConfig {#dist-cache-config}
 
 <!-- vale on -->
 
@@ -1448,7 +1448,7 @@ ReplicaCount is 1 by default.
 
 <!-- vale off -->
 
-### Entity \{#entity}
+### Entity {#entity}
 
 <!-- vale on -->
 
@@ -1533,7 +1533,7 @@ Unique identifier of the entity.
 
 <!-- vale off -->
 
-### EtcdConfig \{#etcd-config}
+### EtcdConfig {#etcd-config}
 
 <!-- vale on -->
 
@@ -1604,7 +1604,7 @@ Client TLS configuration
 
 <!-- vale off -->
 
-### FlowPreviewConfig \{#flow-preview-config}
+### FlowPreviewConfig {#flow-preview-config}
 
 <!-- vale on -->
 
@@ -1629,7 +1629,7 @@ Enables the flow preview service.
 
 <!-- vale off -->
 
-### FluxNinjaExtensionConfig \{#flux-ninja-extension-config}
+### FluxNinjaExtensionConfig {#flux-ninja-extension-config}
 
 <!-- vale on -->
 
@@ -1705,7 +1705,7 @@ Client configuration.
 
 <!-- vale off -->
 
-### GRPCClientConfig \{#g-rpc-client-config}
+### GRPCClientConfig {#g-rpc-client-config}
 
 <!-- vale on -->
 
@@ -1778,7 +1778,7 @@ Client TLS configuration
 
 <!-- vale off -->
 
-### GRPCGatewayConfig \{#g-rpc-gateway-config}
+### GRPCGatewayConfig {#g-rpc-gateway-config}
 
 <!-- vale on -->
 
@@ -1804,7 +1804,7 @@ because FluxNinja stack runs gRPC and HTTP servers on the same port
 
 <!-- vale off -->
 
-### GRPCServerConfig \{#g-rpc-server-config}
+### GRPCServerConfig {#g-rpc-server-config}
 
 <!-- vale on -->
 
@@ -1853,7 +1853,7 @@ Buckets specification in latency histogram
 
 <!-- vale off -->
 
-### HTTPClientConfig \{#http-client-config}
+### HTTPClientConfig {#http-client-config}
 
 <!-- vale on -->
 
@@ -2095,7 +2095,7 @@ Client TLS configuration
 
 <!-- vale off -->
 
-### HTTPServerConfig \{#http-server-config}
+### HTTPServerConfig {#http-server-config}
 
 <!-- vale on -->
 
@@ -2192,7 +2192,7 @@ Write timeout
 
 <!-- vale off -->
 
-### Header \{#header}
+### Header {#header}
 
 <!-- vale on -->
 
@@ -2206,7 +2206,7 @@ The keys should be in canonical form, as returned by CanonicalHeaderKey.
 
 <!-- vale off -->
 
-### HeapConfig \{#heap-config}
+### HeapConfig {#heap-config}
 
 <!-- vale on -->
 
@@ -2264,7 +2264,7 @@ driven Watchdogs. This setting helps avoid over scheduling.
 
 <!-- vale off -->
 
-### JobConfig \{#job-config}
+### JobConfig {#job-config}
 
 <!-- vale on -->
 
@@ -2314,7 +2314,7 @@ Sets whether the job is initially healthy
 
 <!-- vale off -->
 
-### JobGroupConfig \{#job-group-config}
+### JobGroupConfig {#job-group-config}
 
 <!-- vale on -->
 
@@ -2355,7 +2355,7 @@ limit. If BlockingExecution is set, then WorkerLimit is ignored.
 
 <!-- vale off -->
 
-### KubernetesDiscoveryConfig \{#kubernetes-discovery-config}
+### KubernetesDiscoveryConfig {#kubernetes-discovery-config}
 
 <!-- vale on -->
 
@@ -2378,7 +2378,7 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 
 <!-- vale off -->
 
-### ListenerConfig \{#listener-config}
+### ListenerConfig {#listener-config}
 
 <!-- vale on -->
 
@@ -2428,7 +2428,7 @@ TCP networks - `tcp`, `tcp4` (IPv4-only), `tcp6` (IPv6-only)
 
 <!-- vale off -->
 
-### LogConfig \{#log-config}
+### LogConfig {#log-config}
 
 <!-- vale on -->
 
@@ -2492,7 +2492,7 @@ Log writers
 
 <!-- vale off -->
 
-### LogWriterConfig \{#log-writer-config}
+### LogWriterConfig {#log-writer-config}
 
 <!-- vale on -->
 
@@ -2566,7 +2566,7 @@ Log file max size in MB
 
 <!-- vale off -->
 
-### MetricsConfig \{#metrics-config}
+### MetricsConfig {#metrics-config}
 
 <!-- vale on -->
 
@@ -2620,7 +2620,7 @@ Pedantic controls whether a pedantic registry is used. See
 
 <!-- vale off -->
 
-### PeerDiscoveryConfig \{#peer-discovery-config}
+### PeerDiscoveryConfig {#peer-discovery-config}
 
 <!-- vale on -->
 
@@ -2646,7 +2646,7 @@ be reachable from other agents. Used for NAT traversal when provided.
 
 <!-- vale off -->
 
-### PortsConfig \{#ports-config}
+### PortsConfig {#ports-config}
 
 <!-- vale on -->
 
@@ -2707,7 +2707,7 @@ Port on which `zpages` extension in exposed.
 
 <!-- vale off -->
 
-### ProfilersConfig \{#profilers-config}
+### ProfilersConfig {#profilers-config}
 
 <!-- vale on -->
 
@@ -2760,7 +2760,7 @@ registered at `/debug/pprof/{profile,symbol,cmdline}`.
 
 <!-- vale off -->
 
-### PrometheusConfig \{#prometheus-config}
+### PrometheusConfig {#prometheus-config}
 
 <!-- vale on -->
 
@@ -2785,7 +2785,7 @@ Address of the Prometheus server
 
 <!-- vale off -->
 
-### ProxyConfig \{#proxy-config}
+### ProxyConfig {#proxy-config}
 
 <!-- vale on -->
 
@@ -2832,7 +2832,7 @@ HTTPS_PROXY or NO_PROXY. See
 
 <!-- vale off -->
 
-### SentryConfig \{#sentry-config}
+### SentryConfig {#sentry-config}
 
 <!-- vale on -->
 
@@ -2931,7 +2931,7 @@ Sample rate for sampling traces
 
 <!-- vale off -->
 
-### ServerTLSConfig \{#server-tls-config}
+### ServerTLSConfig {#server-tls-config}
 
 <!-- vale on -->
 
@@ -3004,7 +3004,7 @@ Server Key file path
 
 <!-- vale off -->
 
-### StaticDiscoveryConfig \{#static-discovery-config}
+### StaticDiscoveryConfig {#static-discovery-config}
 
 <!-- vale on -->
 
@@ -3027,7 +3027,7 @@ StaticDiscoveryConfig for pre-determined list of services.
 
 <!-- vale off -->
 
-### WatchdogConfig \{#watchdog-config}
+### WatchdogConfig {#watchdog-config}
 
 <!-- vale on -->
 
@@ -3081,7 +3081,7 @@ watermark or adaptive should be configured.
 
 <!-- vale off -->
 
-### WatchdogPolicyType \{#watchdog-policy-type}
+### WatchdogPolicyType {#watchdog-policy-type}
 
 <!-- vale on -->
 
@@ -3115,7 +3115,7 @@ algorithms are configured then only watermark algorithm is used.
 
 <!-- vale off -->
 
-### WatermarksPolicy \{#watermarks-policy}
+### WatermarksPolicy {#watermarks-policy}
 
 <!-- vale on -->
 
