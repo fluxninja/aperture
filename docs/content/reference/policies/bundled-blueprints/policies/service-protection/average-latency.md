@@ -71,90 +71,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-#### dashboard {#dashboard}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="dashboard-refresh-interval"></a>
-
-<ParameterDescription
-    name='dashboard.refresh_interval'
-    description='Refresh interval for dashboard panels.'
-    type='string'
-    reference=''
-    value='"5s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="dashboard-time-from"></a>
-
-<ParameterDescription
-    name='dashboard.time_from'
-    description='From time of dashboard.'
-    type='string'
-    reference=''
-    value='"now-15m"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="dashboard-time-to"></a>
-
-<ParameterDescription
-    name='dashboard.time_to'
-    description='To time of dashboard.'
-    type='string'
-    reference=''
-    value='"now"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### dashboard.datasource {#dashboard-datasource}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="dashboard-datasource-name"></a>
-
-<ParameterDescription
-    name='dashboard.datasource.name'
-    description='Datasource name.'
-    type='string'
-    reference=''
-    value='"$datasource"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="dashboard-datasource-filter-regex"></a>
-
-<ParameterDescription
-    name='dashboard.datasource.filter_regex'
-    description='Datasource filter regex.'
-    type='string'
-    reference=''
-    value='""'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
 #### policy {#policy}
 
 <!-- vale on -->
@@ -179,7 +95,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.resources'
-    description='List of additional resources.'
+    description='Additional resources.'
     type='Object (aperture.spec.v1.Resources)'
     reference='../../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
@@ -203,20 +119,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-flux-meter"></a>
-
-<ParameterDescription
-    name='policy.flux_meter'
-    description='Flux Meter.'
-    type='Object (aperture.spec.v1.FluxMeter)'
-    reference='../../../spec#flux-meter'
-    value='{"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ##### policy.service_protection_core {#policy-service-protection-core}
 
 <!-- vale on -->
@@ -227,7 +129,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.service_protection_core.overload_confirmations'
-    description='List of overload confirmation criteria. Load scheduler can shed flows when all of the specified criteria are met.'
+    description='List of overload confirmation criteria. Load scheduler can shed flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
     value='[{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]'
@@ -347,6 +249,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+<a id="policy-latency-baseliner-flux-meter"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.flux_meter'
+    description='Flux Meter defines the scope of latency measurements.'
+    type='Object (aperture.spec.v1.FluxMeter)'
+    reference='../../../spec#flux-meter'
+    value='{"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-latency-baseliner-ema"></a>
 
 <ParameterDescription
@@ -389,6 +305,90 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 ---
 
+<!-- vale off -->
+
+#### dashboard {#dashboard}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-refresh-interval"></a>
+
+<ParameterDescription
+    name='dashboard.refresh_interval'
+    description='Refresh interval for dashboard panels.'
+    type='string'
+    reference=''
+    value='"5s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-from"></a>
+
+<ParameterDescription
+    name='dashboard.time_from'
+    description='From time of dashboard.'
+    type='string'
+    reference=''
+    value='"now-15m"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-to"></a>
+
+<ParameterDescription
+    name='dashboard.time_to'
+    description='To time of dashboard.'
+    type='string'
+    reference=''
+    value='"now"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### dashboard.datasource {#dashboard-datasource}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-filter-regex"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.filter_regex'
+    description='Datasource filter regex.'
+    type='string'
+    reference=''
+    value='""'
+/>
+
+<!-- vale on -->
+
+---
+
 ### Schemas
 
 <!-- vale off -->
@@ -417,7 +417,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='threshold'
-    description='The threshold for the overload criteria.'
+    description='The threshold for the overload confirmation criteria.'
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -431,7 +431,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='operator'
-    description='The operator for the overload criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'

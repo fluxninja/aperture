@@ -14,7 +14,7 @@ function(cfg) {
     circuit+: {
       resources+: {
         flow_control+: {
-          flux_meters+: { [params.policy_name]: params.flux_meter },
+          flux_meters+: { [params.policy_name]: params.latency_baseliner.flux_meter },
         },
       },
       components+: [
