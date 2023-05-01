@@ -66,6 +66,5 @@ Tanveer
 [Rr]ebalancing
 gRPC
 DaemonSet
-OpenTelemetry
 OLAP
 setpoint
