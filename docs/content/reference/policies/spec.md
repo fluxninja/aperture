@@ -1490,18 +1490,6 @@ There are three categories of components:
   components usually come in pairs with a "sources" component which emits a
   feedback signal, like `accepted_concurrency` emitted by _Concurrency Limiter_.
 
-:::tip
-
-Sometimes you might want to use a constant value as one of component's inputs.
-You can create an input port containing the constant value instead of being
-connected to a signal. To do so, use the [InPort](#in_port)'s
-.withConstantSignal(constant_signal) method. You can also use it to provide
-special math values such as NaN and +- Inf. If You need to provide the same
-constant signal to multiple components, You can use the [Variable](#variable)
-component.
-
-:::
-
 See also [Policy](#policy) for a higher-level explanation of circuits.
 
 <dl>
@@ -8047,9 +8035,9 @@ setting.
 
 :::caution
 
-When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled labels
-are sent to FluxNinja ARC for observability. Telemetry should be disabled for
-sensitive labels.
+When using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled
+labels are sent to FluxNinja ARC for observability. Telemetry should be disabled
+for sensitive labels.
 
 :::
 
@@ -8315,9 +8303,9 @@ setting.
 
 :::caution
 
-When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled labels
-are sent to FluxNinja ARC for observability. Telemetry should be disabled for
-sensitive labels.
+When using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled
+labels are sent to FluxNinja ARC for observability. Telemetry should be disabled
+for sensitive labels.
 
 :::
 

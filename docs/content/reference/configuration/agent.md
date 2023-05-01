@@ -13,8 +13,12 @@ sidebar_label: Agent
 
 <!-- vale on -->
 
-:::info See also
-[Aperture Agent installation](/get-started/installation/agent/agent.md). :::
+:::info
+
+See also
+[Aperture Agent installation](/get-started/installation/agent/agent.md).
+
+:::
 
 List of all configuration parameters for Aperture Agent.
 
@@ -1271,8 +1275,11 @@ CustomMetricsConfig defines receivers, processors, and single metrics pipeline
 which will be exported to the controller Prometheus. Environment variables can
 be used in the configuration using format `${ENV_VAR_NAME}`.
 
-:::info See also
+:::info
+
+See also
 [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+
 :::
 
 <dl>
