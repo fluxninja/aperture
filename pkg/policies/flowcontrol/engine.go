@@ -12,6 +12,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
@@ -28,7 +29,7 @@ type multiMatchResult struct {
 	labelPreviews  map[iface.LabelPreview]struct{}
 }
 
-// multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
+// newMultiMatchResult returns a new multiMatchResult.
 func newMultiMatchResult() *multiMatchResult {
 	return &multiMatchResult{
 		loadSchedulers: make(map[iface.Limiter]struct{}),
@@ -43,8 +44,9 @@ func newMultiMatchResult() *multiMatchResult {
 type multiMatcher = multimatcher.MultiMatcher[string, *multiMatchResult]
 
 // NewEngine Main fx app.
-func NewEngine() iface.Engine {
+func NewEngine(agentInfo *agentinfo.AgentInfo) iface.Engine {
 	e := &Engine{
+		agentInfo:      agentInfo,
 		multiMatchers:  make(map[selectors.ControlPointID]*multiMatcher),
 		fluxMeters:     make(map[iface.FluxMeterID]iface.FluxMeter),
 		loadSchedulers: make(map[iface.LimiterID]iface.LoadScheduler),
@@ -55,11 +57,17 @@ func NewEngine() iface.Engine {
 	return e
 }
 
+// GetAgentInfo returns the agent info.
+func (e *Engine) GetAgentInfo() *agentinfo.AgentInfo {
+	return e.agentInfo
+}
+
 // Engine APIs to
 // (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
 	mutex          sync.RWMutex
+	agentInfo      *agentinfo.AgentInfo
 	fluxMeters     map[iface.FluxMeterID]iface.FluxMeter
 	loadSchedulers map[iface.LimiterID]iface.LoadScheduler
 	rateLimiters   map[iface.LimiterID]iface.RateLimiter
@@ -402,7 +410,7 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 func (e *Engine) register(key string, selectorsProto []*policylangv1.Selector,
 	matchedCB multimatcher.MatchCallback[*multiMatchResult],
 ) error {
-	s, err := selectors.FromSelectors(selectorsProto)
+	s, err := selectors.FromSelectors(selectorsProto, e.agentInfo.GetAgentGroup())
 	if err != nil {
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}
@@ -425,7 +433,7 @@ func (e *Engine) register(key string, selectorsProto []*policylangv1.Selector,
 
 // Lock must be held by caller.
 func (e *Engine) unregister(key string, selectorsProto []*policylangv1.Selector) error {
-	s, err := selectors.FromSelectors(selectorsProto)
+	s, err := selectors.FromSelectors(selectorsProto, e.agentInfo.GetAgentGroup())
 	if err != nil {
 		return fmt.Errorf("failed to parse selector: %v", err)
 	}

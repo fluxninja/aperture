@@ -24,6 +24,19 @@ const (
 func ParseAdaptiveLoadScheduler(
 	adaptiveLoadScheduler *policylangv1.AdaptiveLoadScheduler,
 ) (*policylangv1.NestedCircuit, error) {
+	// Deprecated 1.8.0
+	flowSelectorProto := adaptiveLoadScheduler.GetFlowSelector()
+	if flowSelectorProto != nil {
+		selector := &policylangv1.Selector{
+			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
+			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
+			Service:      flowSelectorProto.ServiceSelector.Service,
+			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
+		}
+		adaptiveLoadScheduler.Selectors = append(adaptiveLoadScheduler.Selectors, selector)
+		adaptiveLoadScheduler.FlowSelector = nil
+	}
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := adaptiveLoadScheduler.InPorts
 	if inPorts != nil {
@@ -77,13 +90,11 @@ func ParseAdaptiveLoadScheduler(
 		alerterLabels = make(map[string]string)
 	}
 	alerterLabels["type"] = "load_scheduler"
-	alerterLabels["agent_group"] = adaptiveLoadScheduler.FlowSelector.ServiceSelector.GetAgentGroup()
-	alerterLabels["service"] = adaptiveLoadScheduler.FlowSelector.ServiceSelector.GetService()
 	adaptiveLoadScheduler.AlerterParameters.Labels = alerterLabels
 
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "AdaptiveLoadScheduler",
-		ShortDescription: iface.GetServiceShortDescription(adaptiveLoadScheduler.FlowSelector.ServiceSelector),
+		ShortDescription: iface.GetSelectorsShortDescription(adaptiveLoadScheduler.GetSelectors()),
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
@@ -241,7 +252,7 @@ func ParseAdaptiveLoadScheduler(
 					FlowControl: &policylangv1.FlowControl{
 						Component: &policylangv1.FlowControl_LoadScheduler{
 							LoadScheduler: &policylangv1.LoadScheduler{
-								FlowSelector: adaptiveLoadScheduler.FlowSelector,
+								Selectors: adaptiveLoadScheduler.Selectors,
 								Scheduler: &policylangv1.LoadScheduler_Scheduler{
 									Parameters: adaptiveLoadScheduler.SchedulerParameters,
 									OutPorts: &policylangv1.LoadScheduler_Scheduler_Outs{

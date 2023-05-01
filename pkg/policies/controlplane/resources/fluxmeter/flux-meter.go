@@ -2,7 +2,6 @@ package fluxmeter
 
 import (
 	"context"
-	"errors"
 	"path"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -13,6 +12,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
@@ -30,28 +30,39 @@ func NewFluxMeterOptions(
 	fluxMeterProto *policylangv1.FluxMeter,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
-	// Get Agent Group Name from FluxMeter.Selector.AgentGroup
+	// Deprecated 1.8.0
 	flowSelectorProto := fluxMeterProto.GetFlowSelector()
-	if flowSelectorProto == nil {
-		return nil, errors.New("FluxMeter.Selector is nil")
-	}
-	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
-
-	etcdPath := path.Join(paths.FluxMeterConfigPath,
-		paths.FluxMeterKey(agentGroup, name))
-	configSync := &fluxMeterConfigSync{
-		fluxMeterProto: fluxMeterProto,
-		policyReadAPI:  policyBaseAPI,
-		agentGroupName: agentGroup,
-		etcdPath:       etcdPath,
-		fluxMeterName:  name,
+	if flowSelectorProto != nil {
+		selector := &policylangv1.Selector{
+			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
+			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
+			Service:      flowSelectorProto.ServiceSelector.Service,
+			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
+		}
+		fluxMeterProto.Selectors = append(fluxMeterProto.Selectors, selector)
+		fluxMeterProto.FlowSelector = nil
 	}
 
-	return fx.Options(
-		fx.Invoke(
-			configSync.doSync,
-		),
-	), nil
+	var options []fx.Option
+
+	s := fluxMeterProto.GetSelectors()
+
+	agentGroups := selectors.UniqueAgentGroups(s)
+
+	for _, agentGroup := range agentGroups {
+		etcdPath := path.Join(paths.FluxMeterConfigPath,
+			paths.FluxMeterKey(agentGroup, name))
+		configSync := &fluxMeterConfigSync{
+			fluxMeterProto: fluxMeterProto,
+			policyReadAPI:  policyBaseAPI,
+			agentGroupName: agentGroup,
+			etcdPath:       etcdPath,
+			fluxMeterName:  name,
+		}
+		options = append(options, fx.Invoke(configSync.doSync))
+	}
+
+	return fx.Options(options...), nil
 }
 
 // doSync is a method of fluxMeterConfigSync struct that syncs the flux meter configuration to etcd.

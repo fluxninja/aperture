@@ -286,7 +286,7 @@ message FluxMeter {
   }
 
   // The selection criteria for the traffic that will be measured.
-  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  // Deprecated 1.8.0: Use `selectors` instead.
   FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // Latency histogram buckets (in ms) for this Flux Meter.
@@ -341,7 +341,7 @@ message FluxMeter {
 // ```
 message Classifier {
   // Defines where to apply the flow classification rule.
-  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  // Deprecated 1.8.0: Use `selectors` instead.
   FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // A map of {key, value} pairs mapping from
@@ -706,7 +706,7 @@ message RateLimiter {
   Ins in_ports = 1; // @gotags: validate:"required"
 
   // Which control point to apply this rate limiter to.
-  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  // Deprecated 1.8.0: Use `selectors` instead.
   FlowSelector flow_selector = 2; // @gotags: validate:"required_without=Selectors"
 
   // Parameters for the RateLimiter component
@@ -734,7 +734,7 @@ message RateLimiter {
 // strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 message ConcurrencyLimiter {
   // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  // Deprecated 1.8.0: Use `selectors` instead.
   FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // Configuration of Weighted Fair Queuing-based workload scheduler.
@@ -922,7 +922,7 @@ message LoadScheduler {
   }
 
   // Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  // Deprecated 1.8.0: Use `selectors` instead.
   FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
   // Configuration of Weighted Fair Queuing-based workload scheduler.
@@ -1129,7 +1129,7 @@ message AdaptiveLoadScheduler {
   Outs out_ports = 2;
 
   // _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
-  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  // Deprecated 1.8.0: Use `selectors` instead.
   FlowSelector flow_selector = 3; // @gotags: validate:"required_without=Selectors"
 
   // Parameters for the _Load Scheduler_.
@@ -1191,7 +1191,7 @@ message AIMDConcurrencyController {
   Outs out_ports = 2;
 
   // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+  // Deprecated 1.8.0: Use `selectors` instead.
   FlowSelector flow_selector = 3; // @gotags: validate:"required_without=Selectors"
 
   // Scheduler parameters.
@@ -1229,7 +1229,7 @@ message FlowRegulator {
 
   message Parameters {
     // _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
-    // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+    // Deprecated 1.8.0: Use `selectors` instead.
     FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
     // The flow label key for identifying sessions.
@@ -1280,7 +1280,7 @@ message Regulator {
 
   message Parameters {
     // _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
-    // Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+    // Deprecated 1.8.0: Use `selectors` instead.
     FlowSelector flow_selector = 1; // @gotags: validate:"required_without=Selectors"
 
     // The flow label key for identifying sessions.

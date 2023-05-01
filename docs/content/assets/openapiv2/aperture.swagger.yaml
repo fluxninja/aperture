@@ -17,7 +17,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     Flow Selector decides the service and flows at which the concurrency limiter is applied.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             gradient_parameters:
@@ -111,7 +111,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             gradient_parameters:
@@ -730,7 +730,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     Defines where to apply the flow classification rule.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             rego:
@@ -955,7 +955,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     Flow Selector decides the service and flows at which the concurrency limiter is applied.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             load_actuator:
@@ -1699,7 +1699,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             label_key:
@@ -1788,7 +1788,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     The selection criteria for the traffic that will be measured.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             linear_buckets:
@@ -2770,7 +2770,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             scheduler:
@@ -3879,7 +3879,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     Which control point to apply this rate limiter to.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             in_ports:
@@ -4137,7 +4137,7 @@ definitions:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
                     _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
-                    Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+                    Deprecated 1.8.0: Use `selectors` instead.
 
                 x-go-tag-validate: required_without=Selectors
             label_key:

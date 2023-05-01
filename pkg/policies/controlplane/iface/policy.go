@@ -31,23 +31,7 @@ type Policy interface {
 	GetStatusRegistry() status.Registry
 }
 
-// GetServiceShortDescription returns a short description of the service selector.
-func GetServiceShortDescription(serviceSelector *policylangv1.ServiceSelector) string {
-	var service string
-	var prefix string
-	if serviceSelector.AgentGroup == "default" {
-		prefix = ""
-	} else {
-		prefix = fmt.Sprintf("%s/", serviceSelector.AgentGroup)
-	}
-
-	if serviceSelector == nil {
-		return ""
-	}
-	if serviceSelector.Service == "" {
-		service = "*"
-	} else {
-		service = serviceSelector.Service
-	}
-	return fmt.Sprintf("%s%s", prefix, service)
+// GetSelectorsShortDescription returns a short description of the selectors.
+func GetSelectorsShortDescription(selectors []*policylangv1.Selector) string {
+	return fmt.Sprintf("%d selectors", len(selectors))
 }

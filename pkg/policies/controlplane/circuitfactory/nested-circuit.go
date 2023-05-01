@@ -9,6 +9,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -34,6 +35,7 @@ func ParseNestedCircuit(
 	nestedCircuitProto := &policylangv1.NestedCircuit{}
 	err = config.UnmarshalJSON(jsonBytes, nestedCircuitProto)
 	if err != nil {
+		log.Error().Err(err).RawJSON("nestedCircuit", jsonBytes).Msg("failed to unmarshal nested circuit")
 		return retErr(err)
 	}
 

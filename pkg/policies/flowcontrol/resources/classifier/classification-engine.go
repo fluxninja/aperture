@@ -12,6 +12,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
@@ -43,6 +44,7 @@ type rules struct {
 // ClassificationEngine receives classification policies and provides Classify method.
 type ClassificationEngine struct {
 	rulesMutex         sync.Mutex
+	agentInfo          *agentinfo.AgentInfo
 	activeRules        atomic.Value
 	classifierMapMutex sync.RWMutex
 	registry           status.Registry
@@ -56,7 +58,7 @@ type ClassificationEngine struct {
 type rulesetID = uint64
 
 // NewClassificationEngine creates a new Classifier.
-func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
+func NewClassificationEngine(agentInfo *agentinfo.AgentInfo, registry status.Registry) *ClassificationEngine {
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.ClassifierCounterMetricName,
 		Help: "A counter measuring the number of times classifier was triggered",
@@ -67,6 +69,7 @@ func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
 	})
 
 	return &ClassificationEngine{
+		agentInfo:      agentInfo,
 		activeRulesets: make(map[rulesetID]compiler.CompiledRuleset),
 		registry:       registry,
 		classifierMap:  make(map[iface.ClassifierID]iface.Classifier),
@@ -306,7 +309,7 @@ func (c *ClassificationEngine) combineRulesets() rules {
 
 	for _, ruleset := range c.activeRulesets {
 		combined.ReportedRules = append(combined.ReportedRules, ruleset.ReportedRules...)
-		s, err := selectors.FromSelectors(ruleset.Selectors)
+		s, err := selectors.FromSelectors(ruleset.Selectors, c.agentInfo.GetAgentGroup())
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to parse selector")
 			continue
@@ -328,7 +331,7 @@ func (c *ClassificationEngine) combineRulesets() rules {
 
 	// add activePreviews
 	for _, preview := range c.activePreviews {
-		s, err := selectors.FromSelectors(preview.GetSelectors())
+		s, err := selectors.FromSelectors(preview.GetSelectors(), c.agentInfo.GetAgentGroup())
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to parse selector")
 			continue

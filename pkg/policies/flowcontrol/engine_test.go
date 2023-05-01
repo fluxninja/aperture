@@ -8,6 +8,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
@@ -34,7 +35,7 @@ var _ = Describe("Dataplane Engine", func() {
 		mockConLimiter = mocks.NewMockLoadScheduler(mockCtrl)
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
-		engine = NewEngine()
+		engine = NewEngine(agentinfo.NewAgentInfo(metrics.DefaultAgentGroup))
 		selectors = []*policylangv1.Selector{
 			{
 				ControlPoint: "ingress",

@@ -91,17 +91,13 @@ spec:
     flow_control:
       flux_meters:
         "service_latency":
-          flow_selector:
-            service_selector:
+          selectors:
+            - control_point: "ingress"
               service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_matcher:
-              control_point: "ingress"
       classifiers:
-        - flow_selector:
-            service_selector:
-              service: service1-demo-app.demoapp.svc.cluster.local
-            flow_matcher:
-              control_point: ingress
+        - selectors:
+            - control_point: "ingress"
+              service: "service1-demo-app.demoapp.svc.cluster.local"
           rego:
             labels:
               also_ua:
@@ -207,11 +203,9 @@ spec:
               signal_name: "LOAD_MULTIPLIER"
       - flow_control:
           concurrency_limiter:
-            flow_selector:
-              service_selector:
+            selectors:
+              - control_point: "ingress"
                 service: "service1-demo-app.demoapp.svc.cluster.local"
-              flow_matcher:
-                control_point: "ingress"
             scheduler:
               parameters:
                 workloads:
@@ -350,11 +344,9 @@ spec:
   resources:
     flow_control:
       classifiers:
-        - flow_selector:
-            service_selector:
+        - selectors:
+            - control_point: ingress
               service: productpage.bookinfo.svc.cluster.local
-            flow_matcher:
-              control_point: ingress
           rego:
             labels:
               user:
@@ -400,11 +392,9 @@ spec:
             in_ports:
               limit:
                 signal_name: "RATE_LIMIT"
-            flow_selector:
-              service_selector:
+            selectors:
+              - control_point: "ingress"
                 service: "service1-demo-app.demoapp.svc.cluster.local"
-              flow_matcher:
-                control_point: "ingress"
             parameters:
               label_key: "http.request.header.user_type"
               limit_reset_interval: "1s"

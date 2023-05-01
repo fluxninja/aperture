@@ -525,7 +525,7 @@ type FluxMeter struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The selection criteria for the traffic that will be measured.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// Latency histogram buckets (in ms) for this Flux Meter.
 	//
@@ -702,7 +702,7 @@ type Classifier struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Defines where to apply the flow classification rule.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// A map of {key, value} pairs mapping from
 	// [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
@@ -1640,7 +1640,7 @@ type RateLimiter struct {
 	// Input ports for the RateLimiter component
 	InPorts *RateLimiter_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Which control point to apply this rate limiter to.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,2,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// Parameters for the RateLimiter component
 	Parameters *RateLimiter_Parameters `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -1741,7 +1741,7 @@ type ConcurrencyLimiter struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Flow Selector decides the service and flows at which the concurrency limiter is applied.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// Configuration of Weighted Fair Queuing-based workload scheduler.
 	//
@@ -1857,7 +1857,7 @@ type LoadScheduler struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// Configuration of Weighted Fair Queuing-based workload scheduler.
 	//
@@ -2073,7 +2073,7 @@ type AdaptiveLoadScheduler struct {
 	// Collection of output ports for the _Adaptive Load Scheduler_ component.
 	OutPorts *AdaptiveLoadScheduler_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,3,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// Parameters for the _Load Scheduler_.
 	SchedulerParameters *LoadScheduler_Scheduler_Parameters `protobuf:"bytes,4,opt,name=scheduler_parameters,json=schedulerParameters,proto3" json:"scheduler_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -2213,7 +2213,7 @@ type AIMDConcurrencyController struct {
 	// Output ports for the AIMDConcurrencyController component.
 	OutPorts *AIMDConcurrencyController_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Flow Selector decides the service and flows at which the concurrency limiter is applied.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,3,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// Scheduler parameters.
 	SchedulerParameters *Scheduler_Parameters `protobuf:"bytes,4,opt,name=scheduler_parameters,json=schedulerParameters,proto3" json:"scheduler_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -4794,7 +4794,7 @@ type FlowRegulator_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// The flow label key for identifying sessions.
 	//   - When label key is specified, _Flow Regulator_ acts as a sticky filter.
@@ -4963,7 +4963,7 @@ type Regulator_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
-	// Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+	// Deprecated 1.8.0: Use `selectors` instead.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required_without=Selectors"` // @gotags: validate:"required_without=Selectors"
 	// The flow label key for identifying sessions.
 	//   - When label key is specified, _Regulator_ acts as a sticky filter.

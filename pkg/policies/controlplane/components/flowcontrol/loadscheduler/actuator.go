@@ -2,6 +2,7 @@ package loadscheduler
 
 import (
 	"context"
+	"fmt"
 	"path"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -22,13 +23,12 @@ import (
 
 // Actuator struct.
 type Actuator struct {
-	policyReadAPI     iface.Policy
-	decisionWriter    *etcdwriter.Writer
-	actuatorProto     *policylangv1.LoadScheduler_Actuator
-	decisionsEtcdPath string
-	agentGroupName    string
-	componentID       string
-	dryRun            bool
+	policyReadAPI  iface.Policy
+	decisionWriter *etcdwriter.Writer
+	actuatorProto  *policylangv1.LoadScheduler_Actuator
+	componentID    string
+	etcdPaths      []string
+	dryRun         bool
 }
 
 // Name implements runtime.Component.
@@ -38,7 +38,9 @@ func (*Actuator) Name() string { return "Actuator" }
 func (*Actuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
 
 // ShortDescription implements runtime.Component.
-func (la *Actuator) ShortDescription() string { return la.agentGroupName }
+func (la *Actuator) ShortDescription() string {
+	return fmt.Sprintf("%d agent groups", len(la.etcdPaths))
+}
 
 // IsActuator implements runtime.Component.
 func (*Actuator) IsActuator() bool { return true }
@@ -48,21 +50,26 @@ func NewActuatorAndOptions(
 	actuatorProto *policylangv1.LoadScheduler_Actuator,
 	componentID string,
 	policyReadAPI iface.Policy,
-	agentGroup string,
+	agentGroups []string,
 ) (runtime.Component, fx.Option, error) {
-	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
-	decisionsEtcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
+	var etcdPaths []string
+	for _, agentGroup := range agentGroups {
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+		etcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
+		etcdPaths = append(etcdPaths, etcdPath)
+	}
+
 	dryRun := false
 	if actuatorProto.GetDefaultConfig() != nil {
 		dryRun = actuatorProto.GetDefaultConfig().GetDryRun()
 	}
+
 	lsa := &Actuator{
-		policyReadAPI:     policyReadAPI,
-		agentGroupName:    agentGroup,
-		componentID:       componentID,
-		decisionsEtcdPath: decisionsEtcdPath,
-		actuatorProto:     actuatorProto,
-		dryRun:            dryRun,
+		policyReadAPI: policyReadAPI,
+		componentID:   componentID,
+		etcdPaths:     etcdPaths,
+		actuatorProto: actuatorProto,
+		dryRun:        dryRun,
 	}
 
 	return lsa, fx.Options(
@@ -80,10 +87,12 @@ func (la *Actuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
 			la.decisionWriter.Close()
-			_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), la.decisionsEtcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to delete load decisions")
-				merr = multierr.Append(merr, err)
+			for _, etcdPath := range la.etcdPaths {
+				_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to delete load decisions")
+					merr = multierr.Append(merr, err)
+				}
 			}
 			return merr
 		},
@@ -176,6 +185,8 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 		logger.Error().Err(err).Msg("Failed to marshal policy decision")
 		return err
 	}
-	la.decisionWriter.Write(la.decisionsEtcdPath, dat)
+	for _, etcdPath := range la.etcdPaths {
+		la.decisionWriter.Write(etcdPath, dat)
+	}
 	return nil
 }

@@ -79,7 +79,7 @@ Dynamic configuration key for load actuation.
 <!-- vale on -->
 
 Flow Selector decides the service and flows at which the concurrency limiter is applied.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -348,7 +348,7 @@ Dynamic configuration key for load actuation.
 <!-- vale on -->
 
 _Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -1349,7 +1349,7 @@ rules:
 <!-- vale on -->
 
 Defines where to apply the flow classification rule.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>rego</dt>
@@ -1813,7 +1813,7 @@ strategy and a scheduler. At this time, only `load_actuator` strategy is availab
 <!-- vale on -->
 
 Flow Selector decides the service and flows at which the concurrency limiter is applied.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>load_actuator</dt>
@@ -3235,7 +3235,7 @@ The percentage of requests to accept.
 <!-- vale on -->
 
 _Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>label_key</dt>
@@ -3409,7 +3409,7 @@ For list of available attributes in Envoy access logs, refer
 <!-- vale on -->
 
 The selection criteria for the traffic that will be measured.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>linear_buckets</dt>
@@ -5296,7 +5296,7 @@ Actuator based on limiting the accepted token rate under incoming token rate \* 
 <!-- vale on -->
 
 Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>scheduler</dt>
@@ -7550,7 +7550,7 @@ Configuration key for DynamicConfig
 <!-- vale on -->
 
 Which control point to apply this rate limiter to.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>in_ports</dt>
@@ -8035,7 +8035,7 @@ The percentage of requests to accept.
 <!-- vale on -->
 
 _Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
-Deprecated 1.8.0: Use `selectors` instead. The `selectors` will be ignored if `flow_selector` is set.
+Deprecated 1.8.0: Use `selectors` instead.
 
 </dd>
 <dt>label_key</dt>
