@@ -39,6 +39,9 @@ kind: EnvoyFilter
 metadata:
   name: {{ .Values.name }}
 spec:
+  {{- if .Values.envoyFilter.workloadSelector }}
+  workloadSelector: {{ .Values.envoyFilter.workloadSelector | toYaml | nindent 4 }}
+  {{- end }}
   configPatches:
 
   - applyTo: NETWORK_FILTER # http connection manager is a filter in Envoy
@@ -149,7 +152,7 @@ spec:
               # Note: If there's more than one header in this list, make sure
               # to update the OUTBOUND filter also.
               - key: control-point
-                value: ingress
+                value: {{ .Values.envoyFilter.inboundRequestControlPoint | default "ingress" }}
 
   - applyTo: HTTP_FILTER
     match:
@@ -186,4 +189,4 @@ spec:
             timeout: {{ .Values.envoyFilter.authzGrpcTimeout }}
             initial_metadata:
               - key: control-point
-                value: egress
+                value: {{ .Values.envoyFilter.outboundRequestControlPoint | default "egress" }}

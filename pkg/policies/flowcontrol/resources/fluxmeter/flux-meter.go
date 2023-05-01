@@ -97,9 +97,9 @@ func setupFluxMeterModule(
 // FluxMeter describes single fluxmeter.
 type FluxMeter struct {
 	registry              status.Registry
-	flowSelector          *policylangv1.FlowSelector
+	fluxMeterProto        *policylangv1.FluxMeter
 	histMetricVec         *prometheus.HistogramVec
-	invalidFluxMeterTotal *prometheus.GaugeVec
+	invalidFluxMeterTotal *prometheus.CounterVec
 	fluxMeterName         string
 	attributeKey          string
 	buckets               []float64
@@ -149,11 +149,11 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	}
 
 	fluxMeter := &FluxMeter{
-		fluxMeterName: wrapperMessage.FluxMeterName,
-		attributeKey:  fluxMeterProto.AttributeKey,
-		flowSelector:  fluxMeterProto.GetFlowSelector(),
-		buckets:       buckets,
-		registry:      reg,
+		fluxMeterName:  wrapperMessage.FluxMeterName,
+		attributeKey:   fluxMeterProto.AttributeKey,
+		fluxMeterProto: fluxMeterProto,
+		buckets:        buckets,
+		registry:       reg,
 	}
 
 	return fx.Options(
@@ -175,11 +175,11 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				Buckets:     fluxMeter.buckets,
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})
-			fluxMeter.invalidFluxMeterTotal = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			fluxMeter.invalidFluxMeterTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 				Name:        metrics.InvalidFluxMeterTotal,
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 				Help:        "The number of invalid readings from a Flux Meter",
-			}, nil)
+			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})
 			// Register metric with Prometheus
 			fmMetrics := []prometheus.Collector{fluxMeter.histMetricVec, fluxMeter.invalidFluxMeterTotal}
 			for _, metric := range fmMetrics {
@@ -221,9 +221,9 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 	})
 }
 
-// GetFlowSelector returns the selector.
-func (fluxMeter *FluxMeter) GetFlowSelector() *policylangv1.FlowSelector {
-	return fluxMeter.flowSelector
+// GetSelectors returns the selectors.
+func (fluxMeter *FluxMeter) GetSelectors() []*policylangv1.Selector {
+	return fluxMeter.fluxMeterProto.GetSelectors()
 }
 
 // GetFluxMeterName returns the metric name.
@@ -254,12 +254,7 @@ func (fluxMeter *FluxMeter) GetHistogram(labels map[string]string) prometheus.Ob
 	return fluxMeterHistogram
 }
 
-// DeleteFromHistogram deletes the histogram.
-func (fluxMeter *FluxMeter) DeleteFromHistogram(labels map[string]string) {
-	fluxMeter.histMetricVec.Delete(labels)
-}
-
 // GetInvalidFluxMeterTotal returns the gauge for invalid flux meters.
-func (fluxMeter *FluxMeter) GetInvalidFluxMeterTotal(labels map[string]string) (prometheus.Gauge, error) {
+func (fluxMeter *FluxMeter) GetInvalidFluxMeterTotal(labels map[string]string) (prometheus.Counter, error) {
 	return fluxMeter.invalidFluxMeterTotal.GetMetricWith(labels)
 }

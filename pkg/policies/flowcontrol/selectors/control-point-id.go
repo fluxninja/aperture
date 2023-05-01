@@ -3,8 +3,6 @@ package selectors
 import (
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
 )
 
 // ControlPointID is the struct that represents a ControlPoint.
@@ -12,8 +10,8 @@ import (
 // Agent group is implied.
 // Type is ignored.
 type ControlPointID struct {
-	Service      string
 	ControlPoint string
+	Service      string
 }
 
 // TypedControlPointID is the struct that represents a FlowControlPoint.
@@ -45,10 +43,10 @@ type GlobalControlPointID struct {
 }
 
 // NewControlPointID returns a controlPointID.
-func NewControlPointID(service string, controlPoint string) ControlPointID {
+func NewControlPointID(controlPoint, service string) ControlPointID {
 	return ControlPointID{
-		Service:      service,
 		ControlPoint: controlPoint,
+		Service:      service,
 	}
 }
 
@@ -60,10 +58,15 @@ func (cp ControlPointID) WithType(controlPointType string) TypedControlPointID {
 	}
 }
 
+// String returns the string representation of the control point.
+func (cp ControlPointID) String() string {
+	return cp.Service + "/" + cp.ControlPoint
+}
+
 // NewTypedControlPointID returns a typedControlPointID.
-func NewTypedControlPointID(service string, controlPoint string, controlPointType string) TypedControlPointID {
+func NewTypedControlPointID(controlPoint, controlPointType, service string) TypedControlPointID {
 	return TypedControlPointID{
-		ControlPointID: NewControlPointID(service, controlPoint),
+		ControlPointID: NewControlPointID(controlPoint, service),
 		Type:           controlPointType,
 	}
 }
@@ -71,9 +74,9 @@ func NewTypedControlPointID(service string, controlPoint string, controlPointTyp
 // ToProto returns protobuf representation of control point.
 func (cp *TypedControlPointID) ToProto() *flowcontrolpointsv1.FlowControlPoint {
 	return &flowcontrolpointsv1.FlowControlPoint{
-		Service:      cp.Service,
 		ControlPoint: cp.ControlPoint,
 		Type:         cp.Type,
+		Service:      cp.Service,
 	}
 }
 
@@ -100,9 +103,9 @@ func TypedControlPointIDFromProto(protoCP *flowcontrolpointsv1.FlowControlPoint)
 func (cp *TypedGlobalControlPointID) ToProto() *cmdv1.GlobalFlowControlPoint {
 	return &cmdv1.GlobalFlowControlPoint{
 		FlowControlPoint: &flowcontrolpointsv1.FlowControlPoint{
-			Service:      cp.Service,
 			ControlPoint: cp.ControlPoint,
 			Type:         cp.Type,
+			Service:      cp.Service,
 		},
 		AgentGroup: cp.AgentGroup,
 	}
@@ -113,25 +116,11 @@ func TypedGlobalControlPointIDFromProto(protoCP *cmdv1.GlobalFlowControlPoint) T
 	return TypedGlobalControlPointID{
 		TypedControlPointID: TypedControlPointID{
 			ControlPointID: ControlPointID{
-				Service:      protoCP.FlowControlPoint.GetService(),
 				ControlPoint: protoCP.FlowControlPoint.GetControlPoint(),
+				Service:      protoCP.FlowControlPoint.GetService(),
 			},
 			Type: protoCP.FlowControlPoint.GetType(),
 		},
 		AgentGroup: protoCP.GetAgentGroup(),
 	}
-}
-
-func controlPointIDFromSelectorProto(flowSelectorMsg *policylangv1.FlowSelector) (ControlPointID, error) {
-	ctrlPt := flowSelectorMsg.FlowMatcher.GetControlPoint()
-	service := flowSelectorMsg.ServiceSelector.GetService()
-	// map all to catch-all service for backward compatibility
-	// Deprecated: v1.5.0
-	if service == "all" {
-		service = consts.AnyService
-	}
-	return ControlPointID{
-		Service:      service,
-		ControlPoint: ctrlPt,
-	}, nil
 }

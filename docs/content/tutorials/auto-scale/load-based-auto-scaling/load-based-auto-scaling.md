@@ -28,8 +28,8 @@ configured using _Controllers_ to adjust the number of instances allocated to
 the service. Load-based auto-scaling is achieved by defining a scale-out
 _Controller_ that acts on a load-shedding signal (load multiplier) signal from
 the blueprint. This signal measures the fraction of traffic that the
-[_Concurrency Limiter_](concepts/flow-control/components/concurrency-limiter.md)
-is shedding. The _Auto Scaler_ is configured to scale-out using a _Gradient
+[_Load Scheduler_](concepts/flow-control/components/load-scheduler.md) is
+shedding. The _Auto Scaler_ is configured to scale-out using a _Gradient
 Controller_ based on this signal and a setpoint of 1.0.
 
 In addition to load-based scaling, the policy includes a scale-in _Controller_

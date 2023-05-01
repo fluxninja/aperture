@@ -23,31 +23,31 @@ import (
 // ```yaml
 //
 //	otel:
-//		batch_alerts:
-//			send_batch_max_size: 100
-//			send_batch_size: 100
-//			timeout: 1s
-//		batch_prerollup:
-//			send_batch_max_size: 10000
-//			send_batch_size: 10000
-//			timeout: 10s
-//		batch_postrollup:
-//			send_batch_max_size: 100
-//			send_batch_size: 100
-//			timeout: 1s
-//		custom_metrics:
-//			rabbitmq:
-//				processors:
-//					batch:
-//						send_batch_size: 10
-//		 				timeout: 10s
-//				receivers:
-//		 			rabbitmq:
-//		 				collection_interval: 10s
-//						endpoint: http://<rabbitmq-svc-fqdn>:15672
-//						password: secretpassword
-//						username: admin
-//				per_agent_group: true
+//	  batch_alerts:
+//	    send_batch_max_size: 100
+//	    send_batch_size: 100
+//	    timeout: 1s
+//	  batch_prerollup:
+//	    send_batch_max_size: 10000
+//	    send_batch_size: 10000
+//	    timeout: 10s
+//	  batch_postrollup:
+//	    send_batch_max_size: 100
+//	    send_batch_size: 100
+//	    timeout: 1s
+//	  custom_metrics:
+//	    rabbitmq:
+//	      processors:
+//	        batch:
+//	          send_batch_size: 10
+//	          timeout: 10s
+//	      receivers:
+//	        rabbitmq:
+//	          collection_interval: 10s
+//	          endpoint: http://<rabbitmq-svc-fqdn>:15672
+//	          password: secretpassword
+//	          username: admin
+//	      per_agent_group: true
 //
 // ```
 //
@@ -58,9 +58,9 @@ type AgentOTelConfig struct {
 	otelconfig.CommonOTelConfig `json:",inline"`
 	// DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 	DisableKubernetesScraper bool `json:"disable_kubernetes_scraper" default:"false"`
-	// BatchPrerollup configures batch prerollup processor.
+	// BatchPrerollup configures the OTel batch pre-processor.
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
-	// BatchPostrollup configures batch postrollup processor.
+	// BatchPostrollup configures the OTel batch post-processor.
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
 	// CustomMetrics configures custom metrics OTel pipelines, which will send data to
 	// the controller Prometheus.
@@ -70,14 +70,16 @@ type AgentOTelConfig struct {
 	//
 	// Below is example to overwrite `kubeletstats` custom metrics:
 	//
-	//	otel:
-	//		custom_metrics:
-	//			kubeletstats: {}
+	// ```yaml
+	//  otel:
+	//    custom_metrics:
+	//      kubeletstats: {}
+	// ```
 	//
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
 
-// BatchPrerol[.*?]upConfig defines configuration for OTel batch processor.
+// BatchPrerollupConfig defines configuration for OTel batch processor.
 // +kubebuilder:object:generate=true
 //
 //swagger:model

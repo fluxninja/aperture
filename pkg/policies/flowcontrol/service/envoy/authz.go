@@ -219,7 +219,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 					},
 				},
 			}
-		case flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED:
+		case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
 			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
 				DeniedResponse: &authv3.DeniedHttpResponse{
 					Status: &typev3.HttpStatus{
@@ -227,7 +227,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 					},
 				},
 			}
-		case flowcontrolv1.CheckResponse_REJECT_REASON_FLOW_REGULATED:
+		case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
 			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
 				DeniedResponse: &authv3.DeniedHttpResponse{
 					Status: &typev3.HttpStatus{

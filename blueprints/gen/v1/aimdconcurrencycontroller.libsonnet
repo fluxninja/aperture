@@ -65,4 +65,13 @@ local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.li
   withSchedulerParametersMixin(scheduler_parameters):: {
     scheduler_parameters+: scheduler_parameters,
   },
+  withSelectors(selectors):: {
+    selectors:
+      if std.isArray(selectors)
+      then selectors
+      else [selectors],
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
 }

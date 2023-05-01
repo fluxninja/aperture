@@ -4,11 +4,10 @@ common:
 policy:
   rate_limiter:
     rate_limit: 120
-    flow_selector:
-      service_selector:
-        service: "service1-demo-app.demoapp.svc.cluster.local"
-      flow_matcher:
+    selectors:
+      - service: "service1-demo-app.demoapp.svc.cluster.local"
         control_point: "ingress"
+        agent_group: "default"
     parameters:
       label_key: "http.request.header.user_id"
       limit_reset_interval: 60s

@@ -27,6 +27,7 @@ definitions:
         properties:
             client:
                 $ref: '#/definitions/ClientConfig'
+                description: Network client configuration
                 x-go-tag-json: client
             endpoints:
                 description: RPC servers to connect to (which will be able to call agent functions)
@@ -46,7 +47,7 @@ definitions:
                 description: |-
                     All agents within an agent group receive the same data-plane configuration (for example, Flux Meters, Rate Limiters and so on).
 
-                    [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group).
+                    [Read more about agent groups here](/concepts/flow-control/selector.md#agent-group).
                 type: string
                 x-go-name: AgentGroup
                 x-go-tag-default: default
@@ -61,42 +62,45 @@ definitions:
             ```yaml
 
             	otel:
-            		batch_alerts:
-            			send_batch_max_size: 100
-            			send_batch_size: 100
-            			timeout: 1s
-            		batch_prerollup:
-            			send_batch_max_size: 10000
-            			send_batch_size: 10000
-            			timeout: 10s
-            		batch_postrollup:
-            			send_batch_max_size: 100
-            			send_batch_size: 100
-            			timeout: 1s
-            		custom_metrics:
-            			rabbitmq:
-            				processors:
-            					batch:
-            						send_batch_size: 10
-            		 				timeout: 10s
-            				receivers:
-            		 			rabbitmq:
-            		 				collection_interval: 10s
-            						endpoint: http://<rabbitmq-svc-fqdn>:15672
-            						password: secretpassword
-            						username: admin
-            				per_agent_group: true
+            	  batch_alerts:
+            	    send_batch_max_size: 100
+            	    send_batch_size: 100
+            	    timeout: 1s
+            	  batch_prerollup:
+            	    send_batch_max_size: 10000
+            	    send_batch_size: 10000
+            	    timeout: 10s
+            	  batch_postrollup:
+            	    send_batch_max_size: 100
+            	    send_batch_size: 100
+            	    timeout: 1s
+            	  custom_metrics:
+            	    rabbitmq:
+            	      processors:
+            	        batch:
+            	          send_batch_size: 10
+            	          timeout: 10s
+            	      receivers:
+            	        rabbitmq:
+            	          collection_interval: 10s
+            	          endpoint: http://<rabbitmq-svc-fqdn>:15672
+            	          password: secretpassword
+            	          username: admin
+            	      per_agent_group: true
 
             ```
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
+                description: BatchAlerts configures batch alerts processor.
                 x-go-tag-json: batch_alerts
             batch_postrollup:
                 $ref: '#/definitions/BatchPostrollupConfig'
+                description: BatchPostrollup configures the OTel batch post-processor.
                 x-go-tag-json: batch_postrollup
             batch_prerollup:
                 $ref: '#/definitions/BatchPrerollupConfig'
+                description: BatchPrerollup configures the OTel batch pre-processor.
                 x-go-tag-json: batch_prerollup
             custom_metrics:
                 additionalProperties:
@@ -110,9 +114,11 @@ definitions:
 
                     Below is example to overwrite `kubeletstats` custom metrics:
 
-                    	otel:
-                    		custom_metrics:
-                    			kubeletstats: {}
+                    ```yaml
+                    otel:
+                    custom_metrics:
+                    kubeletstats: {}
+                    ```
                 type: object
                 x-go-name: CustomMetrics
                 x-go-tag-json: custom_metrics,omitempty
@@ -125,6 +131,7 @@ definitions:
                 x-go-tag-json: disable_kubernetes_scraper
             ports:
                 $ref: '#/definitions/PortsConfig'
+                description: Ports configures debug, health and extension ports values.
                 x-go-tag-json: ports
         title: AgentOTelConfig is the configuration for Agent's OTel collector.
         type: object
@@ -345,13 +352,14 @@ definitions:
                 x-go-tag-default: 10s
                 x-go-tag-json: timeout
                 x-go-tag-validate: gt=0
-        title: BatchPrerol[.*?]upConfig defines configuration for OTel batch processor.
+        title: BatchPrerollupConfig defines configuration for OTel batch processor.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
     ClientConfig:
         properties:
             grpc:
                 $ref: '#/definitions/GRPCClientConfig'
+                description: gRPC client settings.
                 x-go-tag-json: grpc
         title: ClientConfig is configuration for network clients used by agent-functions.
         type: object
@@ -385,9 +393,11 @@ definitions:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
+                description: BatchAlerts configures batch alerts processor.
                 x-go-tag-json: batch_alerts
             ports:
                 $ref: '#/definitions/PortsConfig'
+                description: Ports configures debug, health and extension ports values.
                 x-go-tag-json: ports
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
@@ -418,12 +428,27 @@ definitions:
                 x-go-tag-json: per_agent_group
             pipeline:
                 $ref: '#/definitions/CustomMetricsPipelineConfig'
+                description: |-
+                    Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
+                    and processors defined above. Exporter would be added automatically.
+
+                    If there are no processors defined or only one processor is defined, the
+                    pipeline definition can be omitted. In such cases, the pipeline will
+                    automatically use all given receivers and the defined processor (if
+                    any).  However, if there are more than one processor, the pipeline must
+                    be defined explicitly.
                 x-go-tag-json: pipeline
             processors:
                 $ref: '#/definitions/Components'
+                description: |-
+                    Processors define processors to be used in custom metrics pipelines. This should
+                    be in OTel format - https://opentelemetry.io/docs/collector/configuration/#processors.
                 x-go-tag-json: processors,omitempty
             receivers:
                 $ref: '#/definitions/Components'
+                description: |-
+                    Receivers define receivers to be used in custom metrics pipelines. This should
+                    be in OTel format - https://opentelemetry.io/docs/collector/configuration/#receivers.
                 x-go-tag-json: receivers
         title: |-
             CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller Prometheus.
@@ -571,6 +596,7 @@ definitions:
                 x-go-tag-json: password
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             username:
                 description: Authentication
@@ -598,6 +624,7 @@ definitions:
         properties:
             backoff:
                 $ref: '#/definitions/BackoffConfig'
+                description: Backoff configuration
                 x-go-tag-json: backoff
             insecure:
                 default: false
@@ -618,6 +645,7 @@ definitions:
                 x-go-tag-validate: gte=0
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             use_proxy:
                 default: false
@@ -633,15 +661,13 @@ definitions:
         description: GRPCGatewayConfig holds configuration for gRPC to HTTP gateway
         properties:
             grpc_server_address:
-                default: 0.0.0.0:1
                 description: gRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs gRPC and HTTP servers on the same port
-                pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
+                pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: GRPCAddr
-                x-go-tag-default: 0.0.0.0:1
                 x-go-tag-json: grpc_server_address
-                x-go-tag-validate: hostname_port
-                x-pattern-rules: hostname_port
+                x-go-tag-validate: omitempty,hostname_port
+                x-pattern-rules: empty | hostname_port
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpcgateway
     GRPCServerConfig:
@@ -781,6 +807,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             proxy_connect_header:
                 $ref: '#/definitions/Header'
+                description: Proxy Connect Header - `map[string][]string`
                 x-go-tag-json: proxy_connect_header,omitempty
                 x-go-tag-validate: omitempty
             read_buffer_size:
@@ -813,6 +840,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             tls:
                 $ref: '#/definitions/ClientTLSConfig'
+                description: Client TLS configuration
                 x-go-tag-json: tls
             tls_handshake_timeout:
                 default: 10s

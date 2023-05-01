@@ -14,6 +14,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -45,7 +46,7 @@ type AcceptingHandler struct{}
 
 func (s *AcceptingHandler) CheckRequest(
 	context.Context,
-  iface.RequestContext,
+	iface.RequestContext,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
@@ -60,6 +61,7 @@ var _ = Describe("Authorization handler", func() {
 		BeforeEach(func() {
 			alerter := alerts.NewSimpleAlerter(100)
 			classifier := classification.NewClassificationEngine(
+				agentinfo.NewAgentInfo("testGroup"),
 				status.NewRegistry(log.GetGlobalLogger(), alerter),
 			)
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
@@ -67,7 +69,7 @@ var _ = Describe("Authorization handler", func() {
 			entities := entities.NewEntities()
 			entities.Put(&entitiesv1.Entity{
 				IpAddress: "1.2.3.4",
-				Services:  []string{service1FlowSelector.ServiceSelector.Service},
+				Services:  []string{service1Selector.Service},
 			})
 			handler = envoy.NewHandler(
 				classifier,
@@ -99,45 +101,35 @@ var _ = Describe("Authorization handler", func() {
 	})
 })
 
-var service1FlowSelector = policylangv1.FlowSelector{
-	ServiceSelector: &policylangv1.ServiceSelector{
-		Service: "service1-demo-app.demoapp.svc.cluster.local",
-	},
-	FlowMatcher: &policylangv1.FlowMatcher{
-		ControlPoint: "ingress",
-	},
+var service1Selector = &policylangv1.Selector{
+	ControlPoint: "ingress",
+	Service:      "service1-demo-app.demoapp.svc.cluster.local",
+	AgentGroup:   "testGroup",
 }
 
 var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 	Classifier: &policylangv1.Classifier{
-		FlowSelector: &service1FlowSelector,
-		Rules: map[string]*policylangv1.Rule{
-			"destination": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package envoy.authz
-						destination := v {
-							v := input.attributes.destination.address.socketAddress.address
-						}
-					`,
-						Query: "data.envoy.authz.destination",
-					},
+		Selectors: []*policylangv1.Selector{
+			service1Selector,
+		},
+		Rego: &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"destination": {
+					Telemetry: true,
+				},
+				"source": {
+					Telemetry: true,
 				},
 			},
-			"source": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package envoy.authz
-						source := v {
-							v := input.attributes.destination.address.socketAddress.address
-						}
-					`,
-						Query: "data.envoy.authz.source",
-					},
-				},
-			},
+			Module: `
+				package envoy.authz
+				destination := v {
+					v := input.attributes.destination.address.socketAddress.address
+				}
+				source := v {
+					v := input.attributes.source.address.socketAddress.address
+				}
+			`,
 		},
 	},
 	ClassifierAttributes: &policysyncv1.ClassifierAttributes{

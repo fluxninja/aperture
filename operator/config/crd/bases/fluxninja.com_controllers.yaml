@@ -944,7 +944,7 @@ spec:
                                     items:
                                       type: string
                                     type: array
-                                  description: Proxy Connect Header - map[string][]string
+                                  description: Proxy Connect Header - `map[string][]string`
                                   type: object
                                 read_buffer_size:
                                   description: Read Buffer Size. 0 = 4 KB
@@ -1052,7 +1052,7 @@ spec:
                             description: gRPC client settings.
                             properties:
                               backoff:
-                                description: Backoff config
+                                description: Backoff configuration
                                 properties:
                                   base_delay:
                                     description: Base Delay
@@ -1134,7 +1134,7 @@ spec:
                                   items:
                                     type: string
                                   type: array
-                                description: Proxy Connect Header - map[string][]string
+                                description: Proxy Connect Header - `map[string][]string`
                                 type: object
                               read_buffer_size:
                                 description: Read Buffer Size. 0 = 4 KB

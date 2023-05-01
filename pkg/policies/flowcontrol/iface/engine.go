@@ -4,6 +4,7 @@ import (
 	"context"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 )
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
@@ -22,9 +23,11 @@ type Engine interface {
 		requestContext RequestContext,
 	) *flowcontrolv1.CheckResponse
 
-	RegisterConcurrencyLimiter(sa ConcurrencyLimiter) error
-	UnregisterConcurrencyLimiter(sa ConcurrencyLimiter) error
-	GetConcurrencyLimiter(limiterID LimiterID) ConcurrencyLimiter
+	GetAgentInfo() *agentinfo.AgentInfo
+
+	RegisterLoadScheduler(ls LoadScheduler) error
+	UnregisterLoadScheduler(ls LoadScheduler) error
+	GetLoadScheduler(limiterID LimiterID) LoadScheduler
 
 	RegisterFluxMeter(fm FluxMeter) error
 	UnregisterFluxMeter(fm FluxMeter) error
@@ -34,9 +37,9 @@ type Engine interface {
 	UnregisterRateLimiter(l RateLimiter) error
 	GetRateLimiter(limiterID LimiterID) RateLimiter
 
-	RegisterFlowRegulator(l Limiter) error
-	UnregisterFlowRegulator(l Limiter) error
-	GetFlowRegulator(limiterID LimiterID) Limiter
+	RegisterRegulator(l Limiter) error
+	UnregisterRegulator(l Limiter) error
+	GetRegulator(limiterID LimiterID) Limiter
 
 	RegisterLabelPreview(l LabelPreview) error
 	UnregisterLabelPreview(l LabelPreview) error

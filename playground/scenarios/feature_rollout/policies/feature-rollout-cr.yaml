@@ -107,8 +107,8 @@ spec:
           output:
             signal_name: BACKWARD
     - flow_control:
-        load_shaper:
-          dynamic_config_key: load_shaper
+        load_ramp:
+          dynamic_config_key: regulator
           in_ports:
             backward:
               signal_name: BACKWARD
@@ -117,13 +117,11 @@ spec:
             reset:
               signal_name: RESET
           parameters:
-            flow_regulator_parameters:
-              flow_selector:
-                flow_matcher:
-                  control_point: ingress
-                service_selector:
-                  service: service1-demo-app.demoapp.svc.cluster.local
+            regulator_parameters:
               label_key: ""
+              selectors:
+              - control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
             steps:
             - duration: 0s
               target_accept_percentage: 1
@@ -135,8 +133,6 @@ spec:
       classifiers: []
       flux_meters:
         feature-rollout/average_latency/0:
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              service: service1-demo-app.demoapp.svc.cluster.local
+          selectors:
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local

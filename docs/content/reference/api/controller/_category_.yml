@@ -2,7 +2,3 @@ label: Aperture Controller
 position: 1
 collapsible: true
 collapsed: true
-link:
-  type: "generated-index"
-  title: "Aperture Controller"
-  keywords: ["api"]

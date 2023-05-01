@@ -156,8 +156,8 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 				ComponentID: decision.ComponentId,
 			}
 
-			// Update concurrency limiter metrics.
-			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
+			// Update load scheduler metrics.
+			if cl := decision.GetLoadSchedulerInfo(); cl != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:    decision.PolicyName,
 					metrics.PolicyHashLabel:    decision.PolicyHash,
@@ -179,13 +179,13 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 			}
 
 			// Update flow regulator metrics.
-			if fr := decision.GetFlowRegulatorInfo(); fr != nil {
+			if fr := decision.GetRegulatorInfo(); fr != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:  decision.PolicyName,
 					metrics.PolicyHashLabel:  decision.PolicyHash,
 					metrics.ComponentIDLabel: decision.ComponentId,
 				}
-				p.updateMetricsForFlowRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+				p.updateMetricsForRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
 		}
 	}
@@ -193,27 +193,14 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 	if len(checkResponse.FluxMeterInfos) > 0 {
 		// Update flux meter metrics
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
-		invalidCount := make(map[string]int)
 		for _, fluxMeter := range checkResponse.FluxMeterInfos {
-			valid := p.updateMetricsForFluxMeters(
+			p.updateMetricsForFluxMeters(
 				fluxMeter,
 				checkResponse.DecisionType,
 				statusCode, flowStatus,
 				attributes,
 				treatAsMissing)
-			if !valid {
-				invalidCount[fluxMeter.FluxMeterName]++
-			}
 		}
-		for fluxMeterName, count := range invalidCount {
-			fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterName)
-			metric, err := fluxMeter.GetInvalidFluxMeterTotal(nil)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
-			}
-			metric.Set(float64(count))
-		}
-
 	}
 
 	if len(checkResponse.ClassifierInfos) > 0 {
@@ -230,18 +217,18 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 }
 
 func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
-	concurrencyLimiter := p.cfg.engine.GetConcurrencyLimiter(limiterID)
-	if concurrencyLimiter == nil {
-		log.Sample(noConcurrencyLimiterSampler).Warn().
+	loadScheduler := p.cfg.engine.GetLoadScheduler(limiterID)
+	if loadScheduler == nil {
+		log.Sample(noLoadSchedulerSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
-			Msg("ConcurrencyLimiter not found")
+			Msg("LoadScheduler not found")
 		return
 	}
-	// Observe latency only if the latency is found I.E. the request was allowed and response was received
-	if latencyFound {
-		latencyObserver := concurrencyLimiter.GetLatencyObserver(labels)
+	// Observe latency only if the request was allowed by Aperture and response was received from the server (I.E. latency is found)
+	if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED && latencyFound {
+		latencyObserver := loadScheduler.GetLatencyObserver(labels)
 		if latencyObserver != nil {
 			latencyObserver.Observe(latency)
 		}
@@ -249,7 +236,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 	// Add decision type label to the request counter metric
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.LimiterDroppedLabel] = strconv.FormatBool(dropped)
-	requestCounter := concurrencyLimiter.GetRequestCounter(labels)
+	requestCounter := loadScheduler.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
 	}
@@ -274,20 +261,20 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForFlowRegulator(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
-	flowRegulator := p.cfg.engine.GetFlowRegulator(limiterID)
-	if flowRegulator == nil {
-		log.Sample(noFlowRegulatorSampler).Warn().
+func (p *metricsProcessor) updateMetricsForRegulator(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
+	regulator := p.cfg.engine.GetRegulator(limiterID)
+	if regulator == nil {
+		log.Sample(noRegulatorSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
-			Msg("FlowRegulator not found")
+			Msg("Regulator not found")
 		return
 	}
 	// Add decision type label to the request counter metric
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
 	labels[metrics.RegulatorDroppedLabel] = strconv.FormatBool(dropped)
-	requestCounter := flowRegulator.GetRequestCounter(labels)
+	requestCounter := regulator.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
 	}
@@ -317,7 +304,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	flowStatus string,
 	attributes pcommon.Map,
 	treatAsMissing []string,
-) (valid bool) {
+) {
 	fluxMeter := p.cfg.engine.GetFluxMeter(fluxMeterMessage.FluxMeterName)
 	if fluxMeter == nil {
 		log.Sample(noFluxMeterSampler).Warn().Str(metrics.FluxMeterNameLabel, fluxMeterMessage.GetFluxMeterName()).
@@ -325,7 +312,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 			Str(metrics.StatusCodeLabel, statusCode).
 			Str(metrics.FlowStatusLabel, flowStatus).
 			Msg("FluxMeter not found")
-		return true
+		return
 	}
 
 	labels := internal.StatusLabelsForMetrics(decisionType, statusCode, flowStatus)
@@ -334,27 +321,30 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	metricValue, found := otelcollector.GetFloat64(attributes, fluxMeter.GetAttributeKey(), treatAsMissing)
 
 	// Add attribute found label to the flux meter metric
-	if !found {
-		fluxMeter.DeleteFromHistogram(labels)
-		return false
+	if found {
+		fluxMeterHistogram := fluxMeter.GetHistogram(labels)
+		if fluxMeterHistogram != nil {
+			fluxMeterHistogram.Observe(metricValue)
+		}
+	} else {
+		metric, err := fluxMeter.GetInvalidFluxMeterTotal(labels)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
+		}
+		metric.Inc()
 	}
-	fluxMeterHistogram := fluxMeter.GetHistogram(labels)
-	if fluxMeterHistogram != nil {
-		fluxMeterHistogram.Observe(metricValue)
-	}
-	return true
 }
 
 func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse, controlPointType string) {
 	for _, service := range checkResponse.GetServices() {
-		p.cfg.controlPointCache.Put(selectors.NewTypedControlPointID(service, checkResponse.GetControlPoint(), controlPointType))
+		p.cfg.controlPointCache.Put(selectors.NewTypedControlPointID(checkResponse.GetControlPoint(), controlPointType, service))
 	}
 }
 
 var (
-	noConcurrencyLimiterSampler = log.NewRatelimitingSampler()
-	noRateLimiterSampler        = log.NewRatelimitingSampler()
-	noFlowRegulatorSampler      = log.NewRatelimitingSampler()
-	noClassifierSampler         = log.NewRatelimitingSampler()
-	noFluxMeterSampler          = log.NewRatelimitingSampler()
+	noLoadSchedulerSampler = log.NewRatelimitingSampler()
+	noRateLimiterSampler   = log.NewRatelimitingSampler()
+	noRegulatorSampler     = log.NewRatelimitingSampler()
+	noClassifierSampler    = log.NewRatelimitingSampler()
+	noFluxMeterSampler     = log.NewRatelimitingSampler()
 )

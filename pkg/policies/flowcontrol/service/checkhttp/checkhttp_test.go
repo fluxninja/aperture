@@ -3,7 +3,6 @@ package checkhttp_test
 import (
 	"context"
 
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
@@ -12,8 +11,10 @@ import (
 
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -60,6 +61,7 @@ var _ = Describe("CheckHTTP handler", func() {
 		BeforeEach(func() {
 			alerter := alerts.NewSimpleAlerter(100)
 			classifier := classification.NewClassificationEngine(
+				agentinfo.NewAgentInfo("testGroup"),
 				status.NewRegistry(log.GetGlobalLogger(), alerter),
 			)
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
@@ -67,7 +69,7 @@ var _ = Describe("CheckHTTP handler", func() {
 			entities := entities.NewEntities()
 			entities.Put(&entitiesv1.Entity{
 				IpAddress: "1.2.3.4",
-				Services:  []string{service1FlowSelector.ServiceSelector.Service},
+				Services:  []string{service1Selector.Service},
 			})
 			handler = checkhttp.NewHandler(
 				classifier,
@@ -99,45 +101,35 @@ var _ = Describe("CheckHTTP handler", func() {
 	})
 })
 
-var service1FlowSelector = policylangv1.FlowSelector{
-	ServiceSelector: &policylangv1.ServiceSelector{
-		Service: "service1-demo-app.demoapp.svc.cluster.local",
-	},
-	FlowMatcher: &policylangv1.FlowMatcher{
-		ControlPoint: "ingress",
-	},
+var service1Selector = &policylangv1.Selector{
+	ControlPoint: "ingress",
+	Service:      "service1-demo-app.demoapp.svc.cluster.local",
+	AgentGroup:   "testGroup",
 }
 
 var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 	Classifier: &policylangv1.Classifier{
-		FlowSelector: &service1FlowSelector,
-		Rules: map[string]*policylangv1.Rule{
-			"destination": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package flowcontrol.checkhttp
-						destination := v {
-							v := input.destination.address
-						}
-					`,
-						Query: "data.flowcontrol.checkhttp.destination",
-					},
+		Selectors: []*policylangv1.Selector{
+			service1Selector,
+		},
+		Rego: &policylangv1.Rego{
+			Labels: map[string]*policylangv1.Rego_LabelProperties{
+				"destination": {
+					Telemetry: true,
+				},
+				"source": {
+					Telemetry: true,
 				},
 			},
-			"source": {
-				Source: &policylangv1.Rule_Rego_{
-					Rego: &policylangv1.Rule_Rego{
-						Source: `
-						package flowcontrol.checkhttp
-						source := v {
-							v := input.source.address
-						}
-					`,
-						Query: "data.flowcontrol.checkhttp.source",
-					},
-				},
-			},
+			Module: `
+				package flowcontrol.checkhttp
+				destination := v {
+					v := input.attributes.destination.address.socketAddress.address
+				}
+				source := v {
+					v := input.attributes.source.address.socketAddress.address
+				}
+			`,
 		},
 	},
 	ClassifierAttributes: &policysyncv1.ClassifierAttributes{

@@ -6,6 +6,8 @@ keywords:
   - aperturectl_blueprints_values
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl blueprints values
 
 Provide values file for a given Aperture Blueprint

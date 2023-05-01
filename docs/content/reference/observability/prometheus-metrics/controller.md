@@ -13,9 +13,10 @@ Controller.
 
 <!-- vale off -->
 
-| Name           | Type    | Labels                                                | Unit    | Description               |
-| -------------- | ------- | ----------------------------------------------------- | ------- | ------------------------- |
-| signal_reading | Summary | instance, job, process_uuid, signal_name, policy_name | various | The reading from a signal |
+| Name                   | Type    | Labels                                                                | Unit            | Description                      |
+| ---------------------- | ------- | --------------------------------------------------------------------- | --------------- | -------------------------------- |
+| signal_reading         | Summary | instance, job, process_uuid, signal_name, policy_name, sub_circuit_id | various         | The reading from a signal        |
+| invalid_signal_reading | Counter | instance, job, process_uuid, signal_name, policy_name, sub_circuit_id | count (no unit) | Count of invalid signal readings |
 
 <!-- vale on -->
 
@@ -23,14 +24,13 @@ Controller.
 
 <!-- vale off -->
 
-| Name           | Example                              | Description                                                                                      |
-| -------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| instance       | aperture-controller-58d48d5d8d-6ksl5 | Host instance of the Aperture Agent                                                              |
-| job            | aperture-controller-self             | The configured job name that the target belongs to                                               |
-| process_uuid   | c4f019c8-b1b1-4e52-885b-1c73778994ab | Host instance's UUID                                                                             |
-| signal_name    | LATENCY_EMA, IS_OVERLOAD             | Name of the signal provided in policy.                                                           |
-| sub_circuit_id | root                                 | Sub-circuit ID within the policy.                                                                |
-| policy_name    | service1-demo-app                    | Name of the policy.                                                                              |
-| valid          | true, false                          | Label for specifying if metric is valid. A metric may be invalid if a signal reading is invalid. |
+| Name           | Example                              | Description                                        |
+| -------------- | ------------------------------------ | -------------------------------------------------- |
+| instance       | aperture-controller-58d48d5d8d-6ksl5 | Host instance of the Aperture Agent                |
+| job            | aperture-controller-self             | The configured job name that the target belongs to |
+| process_uuid   | c4f019c8-b1b1-4e52-885b-1c73778994ab | Host instance's UUID                               |
+| signal_name    | LATENCY_EMA, IS_OVERLOAD             | Name of the signal provided in policy.             |
+| sub_circuit_id | root                                 | Sub-circuit ID within the policy.                  |
+| policy_name    | service1-demo-app                    | Name of the policy.                                |
 
 <!-- vale on -->

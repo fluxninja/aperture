@@ -90,14 +90,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-flow-selector"></a>
+<a id="policy-rate-limiter-selectors"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.flow_selector'
-    description='A flow selector to match requests against'
-    type='Object (aperture.spec.v1.FlowSelector)'
-    reference='../../spec#flow-selector'
-    value='{"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}'
+    name='policy.rate_limiter.selectors'
+    description='Flow selectors to match requests against'
+    type='Array of Object (aperture.spec.v1.Selector)'
+    reference='../../spec#selector'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->

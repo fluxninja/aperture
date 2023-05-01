@@ -9,8 +9,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/regulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -99,7 +99,16 @@ func NewComponentAndOptions(
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
 		case *policylangv1.FlowControl_FlowRegulator:
-			ctor = mkCtor(flowControlConfig.FlowRegulator, flowregulator.NewFlowRegulatorAndOptions)
+			// Convert from *policylangv1.FlowControl_FlowRegulator to *policylangv1.FlowControl_Regulator
+			flowRegulatorProto := flowControl.GetFlowRegulator()
+			regulatorProto := &policylangv1.Regulator{}
+			err := convertOldComponentToNew(flowRegulatorProto, regulatorProto, nil)
+			if err != nil {
+				return Tree{}, nil, nil, err
+			}
+			ctor = mkCtor(regulatorProto, regulator.NewRegulatorAndOptions)
+		case *policylangv1.FlowControl_Regulator:
+			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
 		default:
 			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
 		}

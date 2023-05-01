@@ -6,6 +6,8 @@ keywords:
   - aperturectl_completion_powershell
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl completion powershell
 
 Generate the autocompletion script for powershell

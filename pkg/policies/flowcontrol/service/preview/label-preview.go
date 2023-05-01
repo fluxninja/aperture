@@ -14,11 +14,11 @@ import (
 
 type labelPreviewRequest struct {
 	mutex           sync.Mutex
-	flowSelector    *policylangv1.FlowSelector
-	previewResponse *flowpreviewv1.PreviewFlowLabelsResponse
 	previewDoneCtx  context.Context
+	previewResponse *flowpreviewv1.PreviewFlowLabelsResponse
 	previewDone     context.CancelFunc
 	previewID       iface.PreviewID
+	selectors       []*policylangv1.Selector
 	samples         int64
 }
 
@@ -27,9 +27,9 @@ func (r *labelPreviewRequest) GetPreviewID() iface.PreviewID {
 	return r.previewID
 }
 
-// GetFlowSelector returns the flow selector for this request.
-func (r *labelPreviewRequest) GetFlowSelector() *policylangv1.FlowSelector {
-	return r.flowSelector
+// GetSelectors returns the selectors for this request.
+func (r *labelPreviewRequest) GetSelectors() []*policylangv1.Selector {
+	return r.selectors
 }
 
 // AddLabelPreview adds a label preview to the response.
@@ -55,20 +55,18 @@ func (h *Handler) PreviewFlowLabels(ctx context.Context, req *flowpreviewv1.Prev
 		RequestID: uuid.New().String(),
 	}
 
-	flowSelector := &policylangv1.FlowSelector{
-		ServiceSelector: &policylangv1.ServiceSelector{
-			AgentGroup: h.agentGroup,
-			Service:    req.Service,
-		},
-		FlowMatcher: &policylangv1.FlowMatcher{
+	selectors := []*policylangv1.Selector{
+		{
 			ControlPoint: req.ControlPoint,
 			LabelMatcher: req.LabelMatcher,
+			AgentGroup:   h.agentGroup,
+			Service:      req.Service,
 		},
 	}
 
 	lr := &labelPreviewRequest{
 		previewID:       previewID,
-		flowSelector:    flowSelector,
+		selectors:       selectors,
 		previewResponse: &flowpreviewv1.PreviewFlowLabelsResponse{},
 		samples:         req.Samples,
 	}

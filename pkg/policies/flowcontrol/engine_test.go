@@ -8,6 +8,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
@@ -19,31 +20,30 @@ var _ = Describe("Dataplane Engine", func() {
 
 		t              GinkgoTestReporter
 		mockCtrl       *gomock.Controller
-		mockConLimiter *mocks.MockConcurrencyLimiter
+		mockConLimiter *mocks.MockLoadScheduler
 		mockFluxmeter  *mocks.MockFluxMeter
 
-		flowSelector *policylangv1.FlowSelector
-		histogram    goprom.Histogram
-		fluxMeterID  iface.FluxMeterID
-		limiterID    iface.LimiterID
+		selectors   []*policylangv1.Selector
+		histogram   goprom.Histogram
+		fluxMeterID iface.FluxMeterID
+		limiterID   iface.LimiterID
 	)
 
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
 		mockCtrl = gomock.NewController(t)
-		mockConLimiter = mocks.NewMockConcurrencyLimiter(mockCtrl)
+		mockConLimiter = mocks.NewMockLoadScheduler(mockCtrl)
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
-		engine = NewEngine()
-		flowSelector = &policylangv1.FlowSelector{
-			ServiceSelector: &policylangv1.ServiceSelector{
-				AgentGroup: metrics.DefaultAgentGroup,
-				Service:    "testService.testNamespace.svc.cluster.local",
-			},
-			FlowMatcher: &policylangv1.FlowMatcher{
+		engine = NewEngine(agentinfo.NewAgentInfo(metrics.DefaultAgentGroup))
+		selectors = []*policylangv1.Selector{
+			{
 				ControlPoint: "ingress",
+				Service:      "testService.testNamespace.svc.cluster.local",
+				AgentGroup:   metrics.DefaultAgentGroup,
 			},
 		}
+
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
 			Name: metrics.FluxMeterMetricName,
 			ConstLabels: goprom.Labels{
@@ -63,33 +63,33 @@ var _ = Describe("Dataplane Engine", func() {
 		}
 	})
 
-	Context("Scheduler actuator", func() {
+	Context("Load Scheduler", func() {
 		BeforeEach(func() {
 			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockConLimiter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockConLimiter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 		})
 
-		It("Registers scheduler actuator", func() {
-			err := engine.RegisterConcurrencyLimiter(mockConLimiter)
+		It("Registers Load Scheduler", func() {
+			err := engine.RegisterLoadScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("Registers scheduler actuator second time", func() {
-			err := engine.RegisterConcurrencyLimiter(mockConLimiter)
-			err2 := engine.RegisterConcurrencyLimiter(mockConLimiter)
+		It("Registers Load Scheduler second time", func() {
+			err := engine.RegisterLoadScheduler(mockConLimiter)
+			err2 := engine.RegisterLoadScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(err2).To(HaveOccurred())
 		})
 
-		It("Unregisters not registered scheduler actuator", func() {
-			err := engine.UnregisterConcurrencyLimiter(mockConLimiter)
+		It("Unregisters not registered Load Scheduler", func() {
+			err := engine.UnregisterLoadScheduler(mockConLimiter)
 			Expect(err).To(HaveOccurred())
 		})
 
-		It("Unregisters existing scheduler actuator", func() {
-			err := engine.RegisterConcurrencyLimiter(mockConLimiter)
-			err2 := engine.UnregisterConcurrencyLimiter(mockConLimiter)
+		It("Unregisters existing Load Scheduler", func() {
+			err := engine.RegisterLoadScheduler(mockConLimiter)
+			err2 := engine.UnregisterLoadScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(err2).NotTo(HaveOccurred())
 		})
@@ -100,7 +100,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		BeforeEach(func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
-			mockFluxmeter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockFluxmeter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			labels = map[string]string{
 				metrics.FlowStatusLabel:   metrics.FlowStatusOK,
 				metrics.StatusCodeLabel:   "200",
@@ -151,17 +151,17 @@ var _ = Describe("Dataplane Engine", func() {
 	Context("Multimatch", func() {
 		BeforeEach(func() {
 			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockConLimiter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockConLimiter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
-			mockFluxmeter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockFluxmeter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 
 		It("Return nothing for not compatible service", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
-			_ = engine.RegisterConcurrencyLimiter(mockConLimiter)
+			_ = engine.RegisterLoadScheduler(mockConLimiter)
 
 			controlPoint := "ingress"
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
@@ -169,12 +169,12 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).To(BeEmpty())
-			Expect(mmr.concurrencyLimiters).To(BeEmpty())
+			Expect(mmr.loadSchedulers).To(BeEmpty())
 		})
 
-		It("Return matched schedulers and fluxmeters", func() {
+		It("Return matched Load Schedulers and Flux Meters", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
-			_ = engine.RegisterConcurrencyLimiter(mockConLimiter)
+			_ = engine.RegisterLoadScheduler(mockConLimiter)
 
 			controlPoint := "ingress"
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
@@ -182,7 +182,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).NotTo(BeEmpty())
-			Expect(mmr.concurrencyLimiters).NotTo(BeEmpty())
+			Expect(mmr.loadSchedulers).NotTo(BeEmpty())
 		})
 	})
 })

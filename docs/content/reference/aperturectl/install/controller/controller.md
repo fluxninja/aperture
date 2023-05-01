@@ -6,6 +6,8 @@ keywords:
   - aperturectl_install_controller
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl install controller
 
 Install Aperture Controller

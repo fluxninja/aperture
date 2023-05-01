@@ -55,10 +55,14 @@ const (
 	ApertureRateLimitersLabel = "aperture.rate_limiters"
 	// ApertureDroppingRateLimitersLabel describes rate limiters dropping the traffic.
 	ApertureDroppingRateLimitersLabel = "aperture.dropping_rate_limiters"
-	// ApertureConcurrencyLimitersLabel describes concurrency limiters matched to the traffic.
-	ApertureConcurrencyLimitersLabel = "aperture.concurrency_limiters"
-	// ApertureDroppingConcurrencyLimitersLabel describes concurrency limiters dropping the traffic.
-	ApertureDroppingConcurrencyLimitersLabel = "aperture.dropping_concurrency_limiters"
+	// ApertureLoadSchedulersLabel describes load schedulers matched to the traffic.
+	ApertureLoadSchedulersLabel = "aperture.load_schedulers"
+	// ApertureDroppingLoadSchedulersLabel describes load schedulers dropping the traffic.
+	ApertureDroppingLoadSchedulersLabel = "aperture.dropping_load_schedulers"
+	// ApertureLoadRegulatorsLabel describes load regulators matched to the traffic.
+	ApertureLoadRegulatorsLabel = "aperture.load_regulators"
+	// ApertureDroppingLoadRegulatorsLabel describes load regulators dropping the traffic.
+	ApertureDroppingLoadRegulatorsLabel = "aperture.dropping_load_regulators"
 	// ApertureWorkloadsLabel describes workloads matched to the traffic.
 	ApertureWorkloadsLabel = "aperture.workloads"
 	// ApertureDroppingWorkloadsLabel describes workloads dropping the traffic.
@@ -161,9 +165,6 @@ const (
 	ProcessorCustomMetrics = "resource/custom_metrics"
 	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
 	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
-	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
-	// log exporter.
-	ProcessorTracesToLogs = "tracestologs"
 	// ProcessorAlertsNamespace adds host info as `namespace` attribute.
 	ProcessorAlertsNamespace = "attributes/alerts"
 	// ProcessorFilterKubeletStats filters in only metrics of interest.
@@ -175,11 +176,11 @@ const (
 	ExporterLogging = "logging"
 	// ExporterPrometheusRemoteWrite exports metrics to local prometheus instance.
 	ExporterPrometheusRemoteWrite = "prometheusremotewrite"
-	// ExporterOTLPLoopback exports OTLP data to local OTLP receiver. To be used only
-	// with ProcessorSpanToLog.
-	ExporterOTLPLoopback = "otlp/loopback"
 	// ExporterAlerts exports alerts via alertmanager clients.
 	ExporterAlerts = "alerts"
+
+	// ConnectorAdapter adapts OTEL signals between pipelines.
+	ConnectorAdapter = "adapter"
 
 	/* Specific to alerts pipeline. */
 

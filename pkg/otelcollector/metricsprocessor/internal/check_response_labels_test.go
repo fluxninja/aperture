@@ -66,7 +66,7 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 		},
 	),
 
-	Entry("Sets concurrency limiters",
+	Entry("Sets load schedulers",
 		&flowcontrolv1.CheckResponse{
 			LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 				{
@@ -74,8 +74,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 					PolicyHash:  "foo-hash",
 					ComponentId: "1",
 					Dropped:     true,
-					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
-						ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
+					Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
+						LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 							WorkloadIndex: "0",
 						},
 					},
@@ -83,8 +83,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			},
 		},
 		map[string]interface{}{
-			otelconsts.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
-			otelconsts.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			otelconsts.ApertureLoadSchedulersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			otelconsts.ApertureDroppingLoadSchedulersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
 		},
 	),
 

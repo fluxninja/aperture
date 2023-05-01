@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"go.uber.org/fx"
+
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/alerts"
@@ -14,7 +16,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
-	"go.uber.org/fx"
 )
 
 // FxOut is the output of the controlplane module.
@@ -97,10 +98,6 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 
 	if policy.GetResources() != nil {
 		classifiers := policy.GetResources().GetFlowControl().GetClassifiers()
-		// Deprecated: v1.5.0
-		if classifiers == nil {
-			classifiers = policy.GetResources().GetClassifiers()
-		}
 		for _, c := range classifiers {
 			_, err = compiler.CompileRuleset(ctx, name, &policysyncv1.ClassifierWrapper{
 				Classifier: c,

@@ -174,10 +174,10 @@ function(cfg) {
     },
 
   local IncomingConcurrency =
-    newTimeSeriesPanel('Incoming Concurrency', dsName, 'sum(rate(incoming_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
+    newTimeSeriesPanel('Incoming Token Rate', dsName, 'sum(rate(incoming_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
 
   local AcceptedConcurrency =
-    newTimeSeriesPanel('Accepted Concurrency', dsName, 'sum(rate(accepted_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
+    newTimeSeriesPanel('Accepted Token Rate', dsName, 'sum(rate(accepted_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
 
   local WorkloadDecisionsAccepted =
     newTimeSeriesPanel('Workload Decisions (accepted)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_ACCEPTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),

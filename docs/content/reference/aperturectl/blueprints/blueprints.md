@@ -6,6 +6,8 @@ keywords:
   - aperturectl_blueprints
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl blueprints
 
 Aperture Blueprints

@@ -6,6 +6,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/collector/connector"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/loggingexporter"
 	"go.opentelemetry.io/collector/exporter/otlpexporter"
@@ -39,13 +40,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/adapterconnector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/otelcollector/leaderonlyreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
-	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
@@ -137,11 +138,16 @@ func AgentOTelComponents(
 	pf := []processor.Factory{
 		rollupprocessor.NewFactory(promRegistry),
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
-		tracestologsprocessor.NewFactory(),
 	}
 	// processorsFactory = append(processorsFactory, otelContribProcessors()...)
 	pf = append(pf, processorFactories...)
 	processors, err := processor.MakeFactoryMap(pf...)
+	errs = multierr.Append(errs, err)
+
+	cf := []connector.Factory{
+		adapterconnector.NewFactory(),
+	}
+	connectors, err := connector.MakeFactoryMap(cf...)
 	errs = multierr.Append(errs, err)
 
 	factories := otelcol.Factories{
@@ -149,6 +155,7 @@ func AgentOTelComponents(
 		Receivers:  receivers,
 		Processors: processors,
 		Exporters:  exporters,
+		Connectors: connectors,
 	}
 
 	return factories, errs

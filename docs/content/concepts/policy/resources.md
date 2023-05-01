@@ -26,4 +26,4 @@ Examples:
 [flux-meter]: /concepts/flow-control/resources/flux-meter.md
 [classifier]: /concepts/flow-control/resources/classifier.md
 [promql-reference]: /reference/policies/spec.md#prom-q-l
-[selector-reference]: /reference/policies/spec.md#flow-selector
+[selector-reference]: /reference/policies/spec.md#flow-selectors

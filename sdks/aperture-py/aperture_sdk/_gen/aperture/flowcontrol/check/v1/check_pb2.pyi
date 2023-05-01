@@ -28,12 +28,12 @@ class CheckResponse(_message.Message):
         __slots__ = []
         REJECT_REASON_NONE: _ClassVar[CheckResponse.RejectReason]
         REJECT_REASON_RATE_LIMITED: _ClassVar[CheckResponse.RejectReason]
-        REJECT_REASON_CONCURRENCY_LIMITED: _ClassVar[CheckResponse.RejectReason]
-        REJECT_REASON_FLOW_REGULATED: _ClassVar[CheckResponse.RejectReason]
+        REJECT_REASON_NO_TOKENS: _ClassVar[CheckResponse.RejectReason]
+        REJECT_REASON_REGULATED: _ClassVar[CheckResponse.RejectReason]
     REJECT_REASON_NONE: CheckResponse.RejectReason
     REJECT_REASON_RATE_LIMITED: CheckResponse.RejectReason
-    REJECT_REASON_CONCURRENCY_LIMITED: CheckResponse.RejectReason
-    REJECT_REASON_FLOW_REGULATED: CheckResponse.RejectReason
+    REJECT_REASON_NO_TOKENS: CheckResponse.RejectReason
+    REJECT_REASON_REGULATED: CheckResponse.RejectReason
     class DecisionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DECISION_TYPE_ACCEPTED: _ClassVar[CheckResponse.DecisionType]
@@ -98,7 +98,7 @@ class ClassifierInfo(_message.Message):
     def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., classifier_index: _Optional[int] = ..., error: _Optional[_Union[ClassifierInfo.Error, str]] = ...) -> None: ...
 
 class LimiterDecision(_message.Message):
-    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "rate_limiter_info", "concurrency_limiter_info", "flow_regulator_info"]
+    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "rate_limiter_info", "load_scheduler_info", "regulator_info"]
     class LimiterReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         LIMITER_REASON_UNSPECIFIED: _ClassVar[LimiterDecision.LimiterReason]
@@ -116,14 +116,14 @@ class LimiterDecision(_message.Message):
         label: str
         tokens_consumed: int
         def __init__(self, remaining: _Optional[int] = ..., current: _Optional[int] = ..., label: _Optional[str] = ..., tokens_consumed: _Optional[int] = ...) -> None: ...
-    class ConcurrencyLimiterInfo(_message.Message):
+    class LoadSchedulerInfo(_message.Message):
         __slots__ = ["workload_index", "tokens_consumed"]
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
         TOKENS_CONSUMED_FIELD_NUMBER: _ClassVar[int]
         workload_index: str
         tokens_consumed: int
         def __init__(self, workload_index: _Optional[str] = ..., tokens_consumed: _Optional[int] = ...) -> None: ...
-    class FlowRegulatorInfo(_message.Message):
+    class RegulatorInfo(_message.Message):
         __slots__ = ["label"]
         LABEL_FIELD_NUMBER: _ClassVar[int]
         label: str
@@ -134,17 +134,17 @@ class LimiterDecision(_message.Message):
     DROPPED_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
     RATE_LIMITER_INFO_FIELD_NUMBER: _ClassVar[int]
-    CONCURRENCY_LIMITER_INFO_FIELD_NUMBER: _ClassVar[int]
-    FLOW_REGULATOR_INFO_FIELD_NUMBER: _ClassVar[int]
+    LOAD_SCHEDULER_INFO_FIELD_NUMBER: _ClassVar[int]
+    REGULATOR_INFO_FIELD_NUMBER: _ClassVar[int]
     policy_name: str
     policy_hash: str
     component_id: str
     dropped: bool
     reason: LimiterDecision.LimiterReason
     rate_limiter_info: LimiterDecision.RateLimiterInfo
-    concurrency_limiter_info: LimiterDecision.ConcurrencyLimiterInfo
-    flow_regulator_info: LimiterDecision.FlowRegulatorInfo
-    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., concurrency_limiter_info: _Optional[_Union[LimiterDecision.ConcurrencyLimiterInfo, _Mapping]] = ..., flow_regulator_info: _Optional[_Union[LimiterDecision.FlowRegulatorInfo, _Mapping]] = ...) -> None: ...
+    load_scheduler_info: LimiterDecision.LoadSchedulerInfo
+    regulator_info: LimiterDecision.RegulatorInfo
+    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., load_scheduler_info: _Optional[_Union[LimiterDecision.LoadSchedulerInfo, _Mapping]] = ..., regulator_info: _Optional[_Union[LimiterDecision.RegulatorInfo, _Mapping]] = ...) -> None: ...
 
 class FluxMeterInfo(_message.Message):
     __slots__ = ["flux_meter_name"]

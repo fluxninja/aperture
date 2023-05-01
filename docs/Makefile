@@ -20,7 +20,7 @@ generate-mermaid:
 generate-aperturectl-docs:
 	@echo generating aperturectl
 	@go run tools/aperturectl/generate-docs/generate-docs.go
-	@npx prettier --prose-wrap="preserve" ./content/reference/aperturectl/ --write
+	@npx prettier@latest --prose-wrap="preserve" ./content/reference/aperturectl/ --write
 	@git add ./content/reference/aperturectl/
 
 .PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs

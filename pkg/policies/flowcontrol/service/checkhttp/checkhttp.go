@@ -208,10 +208,16 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 					Status: http.StatusTooManyRequests,
 				},
 			}
-		case flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED:
+		case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
 			resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
 				DeniedResponse: &flowcontrolhttpv1.DeniedHttpResponse{
 					Status: http.StatusServiceUnavailable,
+				},
+			}
+		case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
+			resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
+				DeniedResponse: &flowcontrolhttpv1.DeniedHttpResponse{
+					Status: http.StatusForbidden,
 				},
 			}
 		default:

@@ -15,25 +15,24 @@ policy:
   components: []
   drivers:
     promql_drivers:
-      - backward:
-          operator: __REQUIRED_FIELD__
-          threshold: __REQUIRED_FIELD__
-        forward:
-          operator: __REQUIRED_FIELD__
-          threshold: __REQUIRED_FIELD__
+      - criteria:
+          backward:
+            operator: __REQUIRED_FIELD__
+            threshold: __REQUIRED_FIELD__
+          forward:
+            operator: __REQUIRED_FIELD__
+            threshold: __REQUIRED_FIELD__
+          reset:
+            operator: __REQUIRED_FIELD__
+            threshold: __REQUIRED_FIELD__
         query_string: __REQUIRED_FIELD__
-        reset:
-          operator: __REQUIRED_FIELD__
-          threshold: __REQUIRED_FIELD__
   evaluation_interval: "1s"
-  load_shaper:
-    flow_regulator_parameters:
-      flow_selector:
-        flow_matcher:
-          control_point: __REQUIRED_FIELD__
-        service_selector:
-          service: __REQUIRED_FIELD__
+  load_ramp:
+    regulator_parameters:
       label_key: ""
+      selectors:
+        - control_point: __REQUIRED_FIELD__
+          service: __REQUIRED_FIELD__
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__

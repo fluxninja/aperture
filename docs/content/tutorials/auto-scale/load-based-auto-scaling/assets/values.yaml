@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/latency-aimd-concurrency-limiting/gen/definitions.json
+# yaml-language-server: $schema=../../../../../../blueprints/policies/latency-aimd-concurrency-limiting/gen/definitions.json
 # Generated values file for policies/latency-aimd-concurrency-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
@@ -13,17 +13,9 @@ policy:
   # Flux Meter.
   # Type: aperture.spec.v1.FluxMeter
   flux_meter:
-    flow_selector:
-      service_selector:
-        agent_group: default
-        # Service Name.
-        # Type: string
-        # Required: True
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
-        # Control Point Name.
-        # Type: string
-        # Required: True
         control_point: ingress
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
@@ -74,9 +66,7 @@ policy:
   concurrency_controller:
     # Concurrency Limiter flow selector.
     # Type: aperture.spec.v1.FlowSelector
-    flow_selector:
-      service_selector:
-        agent_group: default
+    selectors:
+      - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
         control_point: ingress

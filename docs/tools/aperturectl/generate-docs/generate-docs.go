@@ -115,6 +115,7 @@ keywords:
 - aperturectl
 - %s
 ---
+<!-- markdownlint-disable -->
 
 `, sidebarLabel, name)
 }

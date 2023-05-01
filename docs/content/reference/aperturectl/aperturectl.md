@@ -6,6 +6,8 @@ keywords:
   - aperturectl
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl
 
 aperturectl - CLI tool to interact with Aperture

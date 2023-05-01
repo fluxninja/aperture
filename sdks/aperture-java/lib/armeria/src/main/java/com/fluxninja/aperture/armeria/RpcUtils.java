@@ -11,23 +11,25 @@ import java.util.Map;
 
 class RpcUtils {
     protected static HttpStatus handleRejectedFlow(Flow flow) {
-        CheckResponse.RejectReason reason = null;
-        if (flow.checkResponse() != null) {
-            flow.checkResponse().getRejectReason();
-        }
         try {
             flow.end(FlowStatus.Unset);
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
-        switch (reason) {
-            case REJECT_REASON_RATE_LIMITED:
-                return HttpStatus.TOO_MANY_REQUESTS;
-            case REJECT_REASON_CONCURRENCY_LIMITED:
-                return HttpStatus.SERVICE_UNAVAILABLE;
-            default:
-                return HttpStatus.FORBIDDEN;
+        if (flow.checkResponse() != null) {
+            CheckResponse.RejectReason reason = flow.checkResponse().getRejectReason();
+            switch (reason) {
+                case REJECT_REASON_RATE_LIMITED:
+                    return HttpStatus.TOO_MANY_REQUESTS;
+                case REJECT_REASON_NO_TOKENS:
+                    return HttpStatus.SERVICE_UNAVAILABLE;
+                case REJECT_REASON_REGULATED:
+                    return HttpStatus.FORBIDDEN;
+                case REJECT_REASON_NONE:
+                case UNRECOGNIZED:
+            }
         }
+        return HttpStatus.FORBIDDEN;
     }
 
     protected static Map<String, String> labelsFromRequest(RpcRequest req) {

@@ -6,6 +6,8 @@ keywords:
   - aperturectl_discovery
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl discovery
 
 Discovery integrations

@@ -2,7 +2,6 @@ local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
-local annotation = grafana.annotation;
 local prometheus = grafana.prometheus;
 local graphPanel = grafana.graphPanel;
 

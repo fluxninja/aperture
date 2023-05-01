@@ -2,7 +2,3 @@ label: Reference
 position: 5
 collapsible: true
 collapsed: true
-link:
-  type: "generated-index"
-  title: "Reference"
-  keywords: ["reference"]

@@ -11,8 +11,8 @@ keywords:
 
 :::info
 
-See also [opencensusreceiver docs][receiver] in opentelemetry-collect-contrib
-repository.
+See also [opencensusreceiver docs][receiver] in
+`opentelemetry-collector-contrib` repository.
 
 :::
 

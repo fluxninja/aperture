@@ -6,6 +6,8 @@ keywords:
   - aperturectl_agents
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl agents
 
 List connected agents

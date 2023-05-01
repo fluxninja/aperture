@@ -6,6 +6,8 @@ keywords:
   - aperturectl_completion_fish
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl completion fish
 
 Generate the autocompletion script for fish

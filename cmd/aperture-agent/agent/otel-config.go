@@ -20,7 +20,6 @@ import (
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/leaderonlyreceiver"
-	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
 )
 
 func provideAgent(
@@ -81,41 +80,17 @@ func addLogsPipeline(
 	}
 
 	config.Service.AddPipeline("logs", otelconfig.Pipeline{
-		Receivers:  []string{otelconsts.ReceiverOTLP},
+		Receivers:  []string{otelconsts.ReceiverOTLP, otelconsts.ConnectorAdapter},
 		Processors: processors,
 		Exporters:  []string{otelconsts.ExporterLogging},
 	})
 }
 
 func addTracesPipeline(config *otelconfig.OTelConfig, lis *listener.Listener) {
-	config.AddExporter(otelconsts.ExporterOTLPLoopback, map[string]any{
-		"endpoint": lis.GetAddr(),
-		"tls": map[string]any{
-			"insecure": true,
-		},
-	})
-	config.AddProcessor(otelconsts.ProcessorTracesToLogs, tracestologsprocessor.Config{
-		LogsExporter: otelconsts.ExporterOTLPLoopback,
-	})
-
+	config.AddConnector(otelconsts.ConnectorAdapter, map[string]any{})
 	config.Service.AddPipeline("traces", otelconfig.Pipeline{
-		Receivers:  []string{otelconsts.ReceiverOTLP},
-		Processors: []string{otelconsts.ProcessorTracesToLogs},
-		// We need some exporter configured to make this pipeline correct. Actual
-		// Log exporting is done inside the processor.
-		Exporters: []string{otelconsts.ExporterLogging},
-	})
-
-	// TODO This receiver should be replaced with some receiver which really does nothing.
-	config.AddReceiver("filelog", map[string]any{
-		"include":       []string{"/var/log/myservice/*.json"},
-		"poll_interval": "1000h",
-	})
-	// We need a fake log pipeline which will initialize the ExporterOTLPLoopback
-	// for logs type.
-	config.Service.AddPipeline("logs/fake", otelconfig.Pipeline{
-		Receivers: []string{"filelog"},
-		Exporters: []string{otelconsts.ExporterOTLPLoopback},
+		Receivers: []string{otelconsts.ReceiverOTLP},
+		Exporters: []string{otelconsts.ConnectorAdapter},
 	})
 }
 

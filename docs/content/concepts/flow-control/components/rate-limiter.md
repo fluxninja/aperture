@@ -57,6 +57,6 @@ Please refer to the [reference][reference] for more details on how to use this
 feature.
 
 [reference]: /reference/policies/spec.md#rate-limiter
-[agent-group]: /concepts/flow-control/flow-selector.md#agent-group
+[agent-group]: /concepts/flow-control/selector.md#agent-group
 [policies]: /concepts/policy/policy.md
 [flow-label]: /concepts/flow-control/flow-label.md
