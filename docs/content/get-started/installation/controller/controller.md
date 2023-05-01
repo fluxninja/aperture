@@ -38,8 +38,11 @@ Install the tool of your choice using the following links:
 1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
    :::info Refer
+
    [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
    to see all the available command line arguments.
+
+   :::
 
 2. [Helm](https://helm.sh/docs/intro/install/)
 

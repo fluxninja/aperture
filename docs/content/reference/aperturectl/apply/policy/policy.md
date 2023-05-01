@@ -6,6 +6,8 @@ keywords:
   - aperturectl_apply_policy
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl apply policy
 
 Apply Aperture Policy to the cluster

@@ -228,6 +228,11 @@ repos:
         description: Check if extensions.go has changed
         language: script
         pass_filenames: false
+      - id: markdownlint
+        name: "Lint Markdown files"
+        entry: markdownlint
+        language: system
+        files: '^docs/content/.*\.md$'
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4
     hooks:

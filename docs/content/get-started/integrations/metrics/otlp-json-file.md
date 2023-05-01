@@ -11,8 +11,8 @@ keywords:
 
 :::info
 
-See also [otlpjsonfilereceiver docs][receiver] in opentelemetry-collect-contrib
-repository.
+See also [otlpjsonfilereceiver docs][receiver] in
+`opentelemetry-collector-contrib` repository.
 
 :::
 

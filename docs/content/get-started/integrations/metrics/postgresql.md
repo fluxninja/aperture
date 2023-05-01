@@ -11,8 +11,8 @@ keywords:
 
 :::info
 
-See also [postgresqlreceiver docs][receiver] in opentelemetry-collect-contrib
-repository.
+See also [postgresqlreceiver docs][receiver] in
+`opentelemetry-collector-contrib` repository.
 
 :::
 

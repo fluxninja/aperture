@@ -1,5 +1,6 @@
 Kubernetes
 FluxNinja
+fluxninja.com
 [Ss]etpoint
 Alerter
 Combinator
@@ -68,3 +69,9 @@ gRPC
 DaemonSet
 OLAP
 setpoint
+ClusterRole
+ClusterRoleBinding
+CustomResourceDefinition
+ReplicaSet
+StatefulSet
+StatefulSets

@@ -12,7 +12,7 @@ keywords:
 
 :::info
 
-See also [bigipreceiver docs][receiver] in opentelemetry-collect-contrib
+See also [bigipreceiver docs][receiver] in `opentelemetry-collector-contrib`
 repository.
 
 :::

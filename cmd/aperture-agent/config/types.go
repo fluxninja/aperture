@@ -116,7 +116,9 @@ type BatchPostrollupConfig struct {
 // +kubebuilder:object:generate=true
 //
 // :::info
+//
 // See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+//
 // :::
 //
 //swagger:model

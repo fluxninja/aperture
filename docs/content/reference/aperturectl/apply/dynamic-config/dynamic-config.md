@@ -6,6 +6,8 @@ keywords:
   - aperturectl_apply_dynamic-config
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl apply dynamic-config
 
 Apply Aperture DynamicConfig to a Policy

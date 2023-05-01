@@ -6,6 +6,8 @@ keywords:
   - aperturectl_build
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl build
 
 Builds the agent and controller binaries

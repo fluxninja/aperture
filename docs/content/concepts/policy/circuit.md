@@ -37,7 +37,7 @@ To receive a named signal at a component, it must be defined exactly once as an
 output at some component in the circuit. Once defined, a signal can be received
 at other components that have an input port with the same name.
 
-## Circuit Runtime
+## Circuit Runtime {#runtime}
 
 The _Circuit_ evaluates at a constant _tick_ frequency. Each round of evaluation
 is called a tick. The `evaluation_interval` parameter in the [policy
@@ -71,7 +71,7 @@ unlinked signal from the previous tick.
 ## Example Components {#components}
 
 The exhaustive list of the built-in components can be found in the
-[policy reference](reference/policies/spec.md#component).
+[policy reference](/reference/policies/spec.md#component).
 
 Examples of built-in components include:
 

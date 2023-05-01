@@ -415,7 +415,9 @@ definitions:
     CustomMetricsConfig:
         description: |-
             :::info
+
             See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+
             :::
         properties:
             per_agent_group:
