@@ -79,3 +79,4 @@ Netty
 OpenTelemetry
 EnvoyFilter
 [Gg]oodput
+[iI]nterdependencies
