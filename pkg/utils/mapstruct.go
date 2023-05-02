@@ -5,23 +5,23 @@
 // mapstructure, resulting map wouldn't necessary match json representation of
 // said object, especially if custom UnmarshalJSON are present. Object created
 // by EncodeObject avoids such mismatch.
-package mapstruct
+package utils
 
 import "encoding/json"
 
-// Object is an in-memory representation of JSON object.
-type Object map[string]any
+// MapStruct is an in-memory representation of JSON object.
+type MapStruct map[string]any
 
-// EncodeObject encodes any json-serializable struct as Object
+// ToMapStruct encodes any json-serializable struct as Object
 //
 // json.Unmarshal(obj) and json.Unmarshal(returnedObject) should be equivalent.
-func EncodeObject(obj any) (Object, error) {
+func ToMapStruct(obj any) (MapStruct, error) {
 	b, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
 	}
 
-	var mapStruct Object
+	var mapStruct MapStruct
 	err = json.Unmarshal(b, &mapStruct)
 	if err != nil {
 		return nil, err

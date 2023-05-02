@@ -6,7 +6,6 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
@@ -14,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // FactoryModule for component factory run via the main app.
@@ -168,7 +168,7 @@ func prepareComponentInCircuit(
 	subCircuitID runtime.ComponentID,
 	doParsePortMapping bool,
 ) (*runtime.ConfiguredComponent, error) {
-	mapStruct, err := mapstruct.EncodeObject(config)
+	mapStruct, err := utils.ToMapStruct(config)
 	if err != nil {
 		return nil, err
 	}

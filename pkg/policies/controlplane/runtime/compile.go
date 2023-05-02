@@ -7,7 +7,7 @@ import (
 	"github.com/looplab/tarjan"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/mapstruct"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // ConfiguredComponent consists of a Component and its PortMapping.
@@ -19,7 +19,7 @@ type ConfiguredComponent struct {
 	// component.  This Config is used only for observability purposes.
 	//
 	// Note: PortMapping is also part of Config.
-	Config mapstruct.Object
+	Config utils.MapStruct
 	// ComponentID is the unique ID of this component within the circuit.
 	ComponentID ComponentID
 }
