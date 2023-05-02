@@ -941,6 +941,10 @@ jobs:
       COMPONENT: <<parameters.component>>
     steps:
       - checkout
+      - run:
+          name: "Install Python pre-requisites"
+          command: |
+            sudo apt-get update && sudo apt install libedit-dev zlib1g zlib1g-dev libssl-dev libbz2-dev libsqlite3-dev
       - asdf_install: # We need to install python before gcloud
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
           tools: |-
