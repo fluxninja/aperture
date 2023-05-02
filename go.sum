@@ -1306,8 +1306,8 @@ github.com/open-telemetry/opentelemetry-collector-contrib/internal/docker v0.75.
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/docker v0.75.0/go.mod h1:WfhdFzMe34KsSeMUF6Lm6c/HREbEMefySCSYgd6kAB8=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/filter v0.75.0 h1:m4D7vVJ4vtAx4SoF4CCrCV8kWNSUH2/LMr0ZLAzWEVk=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/filter v0.75.0/go.mod h1:+12cGDck+xZDZ/shrsirLnwJqlGeRvLXOlvYLZD4mqQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig v0.75.0 h1:XPHikmry+Gn3PG/rMaXt7vP9M3qFxwv/SCghrf1WWzE=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig v0.75.0/go.mod h1:rD9sOU7Kdl0WIncJgQsZboL0IvtaiJLf6RTh/tUxoaI=
+github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig v0.76.3 h1:9f0utyH6Iv00iP64fVdKeuwcB2cUH6sHCHqrPPLtpSs=
+github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig v0.76.3/go.mod h1:Jw5brYtBV95ktVbvwh9SOxR5FQ7kXeqJcvLfJ0RBr5A=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/kubelet v0.75.0 h1:s9GP+HRl7X9aR9RgOdcOiw8kZ3rkT6BaVvu3+y/VlvI=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/kubelet v0.75.0/go.mod h1:bpyrFHICUrgbYQNzaaQxzjIF9LJAKmIZy6ZgGkWLejM=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/metadataproviders v0.75.0 h1:peK5M8GKA4h40ovnmogeQN/g4y+ILBLKV0B2s8VMwyM=
@@ -1450,8 +1450,8 @@ github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterrec
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterreceiver v0.75.0/go.mod h1:YQaQYZNfSD7sj3eFrbHPhP2LCunnG4I21NUdv92HaSw=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8seventsreceiver v0.75.0 h1:v7rsWCTaYqtedU9tslaVXHMejz0zeUA6KBNW9bFJio4=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8seventsreceiver v0.75.0/go.mod h1:oD3cptvJIFk6QxOVfV+t2n9ZjWpvr63dz5Ngytj3oWk=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sobjectsreceiver v0.75.0 h1:yAFpdUa7M6iT3pmjk8N8ED6gQ8p/BtdIrb4uhlDU/mE=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sobjectsreceiver v0.75.0/go.mod h1:Zuuk0H7kL8yhnsbulmosn5BAGjxtBtOkhnJQPlxjzYE=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sobjectsreceiver v0.76.3 h1:EBSy45JVGZz8MGlxWlzJBjg2UNkFO5NY617E+BmywFA=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sobjectsreceiver v0.76.3/go.mod h1:2xNpGpGs3xkYYSbj3TRQS1re+Rumh9CPmnQRaLfto/k=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkametricsreceiver v0.75.0 h1:ZFY5rc5Ox4SFLjZoGJOzVl+JRGtWaDwzraeYn84ze8Q=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkametricsreceiver v0.75.0/go.mod h1:4fspdyEhe30m9pzjN5N9uIGrrm2BWB+v6/jTWaARrJ4=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver v0.75.0 h1:eva/a4T8mYc3b4v3uZ6iB6pexKwK0wbVFhKkgDRMmcI=
@@ -2117,8 +2117,8 @@ golang.org/x/oauth2 v0.0.0-20210805134026-6f1e6394065a/go.mod h1:KelEdhl1UZF7XfJ
 golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f/go.mod h1:KelEdhl1UZF7XfJ4dDtk6s++YSgaE7mD/BuKKDLBl4A=
 golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8/go.mod h1:KelEdhl1UZF7XfJ4dDtk6s++YSgaE7mD/BuKKDLBl4A=
 golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b/go.mod h1:DAh4E804XQdzx2j+YRIaUnCqCV2RuMz24cGBJ5QYIrc=
-golang.org/x/oauth2 v0.6.0 h1:Lh8GPgSKBfWSwFvtuWOfeI3aAAnbXTSutYxJiOJFgIw=
-golang.org/x/oauth2 v0.6.0/go.mod h1:ycmewcwgD4Rpr3eZJLSB4Kyyljb3qDh40vJ8STE5HKw=
+golang.org/x/oauth2 v0.7.0 h1:qe6s0zUXlPX80/dITx3440hWZ7GwMwgDDyrSGTPJG/g=
+golang.org/x/oauth2 v0.7.0/go.mod h1:hPLQkd9LyjfXTiRohC/41GhcFqxisoUQ99sCUOHO9x4=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
