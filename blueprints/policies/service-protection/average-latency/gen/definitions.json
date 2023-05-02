@@ -69,46 +69,47 @@
             "adaptive_load_scheduler": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["flow_selector"],
+              "required": ["selectors"],
               "properties": {
-                "flow_selector": {
-                  "description": "Concurrency Limiter flow selector.",
-                  "default": {
-                    "flow_matcher": {
-                      "control_point": "__REQUIRED_FIELD__"
-                    },
-                    "service_selector": {
+                "selectors": {
+                  "description": "The selectors determine the flows that are protected by this policy.",
+                  "default": [
+                    {
+                      "control_point": "__REQUIRED_FIELD__",
                       "service": "__REQUIRED_FIELD__"
                     }
-                  },
-                  "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+                  ],
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+                  }
                 },
                 "scheduler": {
-                  "description": "Scheduler schemaeters.",
+                  "description": "Scheduler parameters.",
                   "default": {
                     "auto_tokens": true
                   },
                   "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Schedulerschemaeters"
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
                 },
                 "gradient": {
-                  "description": "Gradient Controller schemaeters.",
+                  "description": "Gradient Controller parameters.",
                   "default": {
                     "max_gradient": 1,
                     "min_gradient": 0.1,
                     "slope": -1
                   },
                   "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/GradientControllerschemaeters"
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/GradientControllerParameters"
                 },
                 "alerter": {
-                  "description": "Whether tokens for workloads are computed dynamically or set statically by the user.",
+                  "description": "Parameters for the Alerter that detects load throttling.",
                   "default": {
-                    "alert_name": "Load Shed Event"
+                    "alert_name": "Load Throttling Event"
                   },
                   "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Alerterschemaeters"
+                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
                 },
                 "max_load_multiplier": {
                   "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.",
@@ -142,14 +143,12 @@
             "flux_meter": {
               "description": "Flux Meter defines the scope of latency measurements.",
               "default": {
-                "flow_selector": {
-                  "flow_matcher": {
-                    "control_point": "__REQUIRED_FIELD__"
-                  },
-                  "service_selector": {
+                "selectors": [
+                  {
+                    "control_point": "__REQUIRED_FIELD__",
                     "service": "__REQUIRED_FIELD__"
                   }
-                }
+                ]
               },
               "type": "object",
               "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"

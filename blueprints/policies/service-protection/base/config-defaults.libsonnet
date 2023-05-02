@@ -1,11 +1,7 @@
-local flow_selector_defaults = {
-  service_selector: {
-    service: '__REQUIRED_FIELD__',
-  },
-  flow_matcher: {
-    control_point: '__REQUIRED_FIELD__',
-  },
-};
+local selectors_defaults = [{
+  service: '__REQUIRED_FIELD__',
+  control_point: '__REQUIRED_FIELD__',
+}];
 
 local overload_confirmation_defaults = {
   query_string: '__REQUIRED_FIELD__',
@@ -18,7 +14,7 @@ local service_protection_core_defaults = {
   overload_confirmations: [overload_confirmation_defaults],
 
   adaptive_load_scheduler: {
-    flow_selector: flow_selector_defaults,
+    selectors: selectors_defaults,
     scheduler: {
       auto_tokens: true,
     },
@@ -28,7 +24,7 @@ local service_protection_core_defaults = {
       max_gradient: 1.0,
     },
     alerter: {
-      alert_name: 'Load Shed Event',
+      alert_name: 'Load Throttling Event',
     },
     max_load_multiplier: 2.0,
     load_multiplier_linear_increment: 0.0025,
@@ -65,6 +61,6 @@ local service_protection_core_defaults = {
       filter_regex: '',
     },
   },
-  flow_selector: flow_selector_defaults,
+  selectors: selectors_defaults,
   overload_confirmation: overload_confirmation_defaults,
 }

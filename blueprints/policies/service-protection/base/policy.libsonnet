@@ -74,7 +74,7 @@ function(cfg) {
   ),
 
   local isConfirmationCriteria = std.length(confirmationAccumulator.enabled_signals) > 0,
-  local adaptiveLoadScheduler = spec.v1.Component.withFlowControl(
+  local adaptiveLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
       local adaptiveLoadScheduler = params.service_protection_core.adaptive_load_scheduler;
       spec.v1.AdaptiveLoadScheduler.new()
@@ -110,7 +110,7 @@ function(cfg) {
         confirmationAccumulator.components
         + (if isConfirmationCriteria then [enabledAnd] else [])
         + [
-          adaptiveLoadScheduler,
+          adaptiveLoadSchedulerComponent,
         ]
         + params.components,
       ),

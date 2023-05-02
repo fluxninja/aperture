@@ -20,24 +20,26 @@ component that is used within this blueprint.
 :::info
 
 See the tutorial on
-[Feature Rollout with Average Latency Feedback](/tutorials/flow-control/feature-rollout/with-average-latency-feedback.md)
+[Feature Rollout with Average Latency Feedback](/applying-policies/feature-rollout/with-average-latency-feedback.md)
 to see this blueprint in use.
 
 :::
 
 <!-- Configuration Marker -->
+
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../../parameterComponents.js'
 ```
 
 ## Configuration
+
 <!-- vale off -->
 
-Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/base`}>policies/feature-rollout/base</a>
+Blueprint name: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/base`}>policies/feature-rollout/base</a>
 
 <!-- vale on -->
-
 
 ### Parameters
 
@@ -715,15 +717,13 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 ## Dynamic Configuration
 
-
-
 :::note
 
-The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.
+The following configuration parameters can be
+[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+at runtime, without reloading the policy.
 
 :::
-
-
 
 ### Parameters
 

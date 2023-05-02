@@ -24,26 +24,28 @@ component that is used within this blueprint.
 :::info
 
 See tutorials on
-[Basic Concurrency Limiting](/tutorials/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
+[Basic Concurrency Limiting](/applying-policies/service-protection/basic-service-protection.md)
 and
-[Workload Prioritization](/tutorials/flow-control/concurrency-limiting/workload-prioritization.md)
+[Workload Prioritization](/applying-policies/service-protection/workload-prioritization.md)
 to see this blueprint in use.
 
 :::
 
 <!-- Configuration Marker -->
+
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration
+
 <!-- vale off -->
 
-Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/latency-aimd-concurrency-limiting`}>policies/latency-aimd-concurrency-limiting</a>
+Blueprint name: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/latency-aimd-concurrency-limiting`}>policies/latency-aimd-concurrency-limiting</a>
 
 <!-- vale on -->
-
 
 ### Parameters
 
@@ -357,15 +359,13 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 ## Dynamic Configuration
 
-
-
 :::note
 
-The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.
+The following configuration parameters can be
+[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+at runtime, without reloading the policy.
 
 :::
-
-
 
 ### Parameters
 

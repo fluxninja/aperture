@@ -9,10 +9,10 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 * @schema (overload_confirmation.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
 * @schema (overload_confirmation.threshold: float64) The threshold for the overload confirmation criteria.
 * @schema (overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`
-* @param (policy.service_protection_core.adaptive_load_scheduler.flow_selector: aperture.spec.v1.FlowSelector required) Concurrency Limiter flow selector.
-* @param (policy.service_protection_core.adaptive_load_scheduler.scheduler: aperture.spec.v1.Schedulerschemaeters) Scheduler schemaeters.
-* @param (policy.service_protection_core.adaptive_load_scheduler.gradient: aperture.spec.v1.GradientControllerschemaeters) Gradient Controller schemaeters.
-* @param (policy.service_protection_core.adaptive_load_scheduler.alerter: aperture.spec.v1.Alerterschemaeters) Whether tokens for workloads are computed dynamically or set statically by the user.
+* @param (policy.service_protection_core.adaptive_load_scheduler.selectors: []aperture.spec.v1.Selector required) The selectors determine the flows that are protected by this policy.
+* @param (policy.service_protection_core.adaptive_load_scheduler.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
+* @param (policy.service_protection_core.adaptive_load_scheduler.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
+* @param (policy.service_protection_core.adaptive_load_scheduler.alerter: aperture.spec.v1.AlerterParameters) Parameters for the Alerter that detects load throttling.
 * @param (policy.service_protection_core.adaptive_load_scheduler.max_load_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
 * @param (policy.service_protection_core.adaptive_load_scheduler.load_multiplier_linear_increment: float64) Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
 * @param (policy.service_protection_core.adaptive_load_scheduler.default_config: aperture.spec.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the
@@ -24,7 +24,7 @@ serviceProtectionDefaults {
       * @param (policy.latency_baseliner.flux_meter: aperture.spec.v1.FluxMeter required) Flux Meter defines the scope of latency measurements.
       */
       flux_meter: {
-        flow_selector: serviceProtectionDefaults.flow_selector,
+        selectors: serviceProtectionDefaults.selectors,
       },
       /**
       * @param (policy.latency_baseliner.ema: aperture.spec.v1.EMAParameters) EMA parameters.

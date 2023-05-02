@@ -9,18 +9,20 @@ dashboard that visualizes Signals flowing through the
 [Circuit](/concepts/policy/circuit.md).
 
 <!-- Configuration Marker -->
+
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration
+
 <!-- vale off -->
 
-Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+Blueprint name: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
 
 <!-- vale on -->
-
 
 ### Parameters
 

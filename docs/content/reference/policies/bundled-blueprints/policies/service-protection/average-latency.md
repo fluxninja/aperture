@@ -11,6 +11,32 @@ concurrency is reduced by a multiplicative factor when the service is
 overloaded, and increased by an additive factor while the service is no longer
 overloaded.
 
+At a high level, this policy works as follows:
+
+- Latency EMA-based overload detection: A Flux Meter is used to gather latency
+  metrics from a [service control point](/concepts/flow-control/selector.md).
+  The latency signal gets fed into an Exponential Moving Average (EMA) component
+  to establish a long-term trend that can be compared to the current latency to
+  detect overloads.
+- Gradient Controller: Set point latency and current latency signals are fed to
+  the gradient controller that calculates the proportional response to adjust
+  the accepted concurrency (Control Variable).
+- Integral Optimizer: When the service is detected to be in the normal state, an
+  integral optimizer is used to additively increase the concurrency of the
+  service in each execution cycle of the circuit. This design allows warming-up
+  a service from an initial inactive state. This also protects applications from
+  sudden spikes in traffic, as it sets an upper bound to the concurrency allowed
+  on a service in each execution cycle of the circuit based on the observed
+  incoming concurrency.
+- Load Scheduler and Actuator: The Accepted Concurrency at the service is
+  throttled by a
+  [weighted-fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md).
+  The output of the adjustments to accepted concurrency made by gradient
+  controller and optimizer logic are translated to a load multiplier that is
+  synchronized with Aperture Agents through etcd. The load multiplier adjusts
+  (increases or decreases) the token bucket fill rates based on the incoming
+  concurrency observed at each agent.
+
 :::info
 
 Please see reference for the
@@ -22,26 +48,28 @@ component that is used within this blueprint.
 :::info
 
 See tutorials on
-[Basic Concurrency Limiting](/tutorials/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
+[Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
 and
-[Workload Prioritization](/tutorials/flow-control/concurrency-limiting/workload-prioritization.md)
+[Workload Prioritization](/applying-policies/service-protection/workload-prioritization.md)
 to see this blueprint in use.
 
 :::
 
 <!-- Configuration Marker -->
+
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../../parameterComponents.js'
 ```
 
 ## Configuration
+
 <!-- vale off -->
 
-Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/service-protection/average-latency`}>policies/service-protection/average-latency</a>
+Blueprint name: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/service-protection/average-latency`}>policies/service-protection/average-latency</a>
 
 <!-- vale on -->
-
 
 ### Parameters
 
@@ -143,14 +171,14 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-adaptive-load-scheduler-flow-selector"></a>
+<a id="policy-service-protection-core-adaptive-load-scheduler-selectors"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.flow_selector'
-    description='Concurrency Limiter flow selector.'
-    type='Object (aperture.spec.v1.FlowSelector)'
-    reference='../../../spec#flow-selector'
-    value='{"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}'
+    name='policy.service_protection_core.adaptive_load_scheduler.selectors'
+    description='The selectors determine the flows that are protected by this policy.'
+    type='Array of Object (aperture.spec.v1.Selector)'
+    reference='../../../spec#selector'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->
@@ -161,9 +189,9 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 <ParameterDescription
     name='policy.service_protection_core.adaptive_load_scheduler.scheduler'
-    description='Scheduler schemaeters.'
-    type='Object (aperture.spec.v1.Schedulerschemaeters)'
-    reference='../../../spec#schedulerschemaeters'
+    description='Scheduler parameters.'
+    type='Object (aperture.spec.v1.SchedulerParameters)'
+    reference='../../../spec#scheduler-parameters'
     value='{"auto_tokens": true}'
 />
 
@@ -175,9 +203,9 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 <ParameterDescription
     name='policy.service_protection_core.adaptive_load_scheduler.gradient'
-    description='Gradient Controller schemaeters.'
-    type='Object (aperture.spec.v1.GradientControllerschemaeters)'
-    reference='../../../spec#gradient-controllerschemaeters'
+    description='Gradient Controller parameters.'
+    type='Object (aperture.spec.v1.GradientControllerParameters)'
+    reference='../../../spec#gradient-controller-parameters'
     value='{"max_gradient": 1, "min_gradient": 0.1, "slope": -1}'
 />
 
@@ -189,10 +217,10 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 <ParameterDescription
     name='policy.service_protection_core.adaptive_load_scheduler.alerter'
-    description='Whether tokens for workloads are computed dynamically or set statically by the user.'
-    type='Object (aperture.spec.v1.Alerterschemaeters)'
-    reference='../../../spec#alerterschemaeters'
-    value='{"alert_name": "Load Shed Event"}'
+    description='Parameters for the Alerter that detects load throttling.'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../../spec#alerter-parameters'
+    value='{"alert_name": "Load Throttling Event"}'
 />
 
 <!-- vale on -->
@@ -254,7 +282,7 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
     description='Flux Meter defines the scope of latency measurements.'
     type='Object (aperture.spec.v1.FluxMeter)'
     reference='../../../spec#flux-meter'
-    value='{"flow_selector": {"flow_matcher": {"control_point": "__REQUIRED_FIELD__"}, "service_selector": {"service": "__REQUIRED_FIELD__"}}}'
+    value='{"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}'
 />
 
 <!-- vale on -->

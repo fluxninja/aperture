@@ -22,7 +22,7 @@ import Zoom from 'react-medium-image-zoom';
 The easiest way to get started with policies in Aperture is to use the built-in
 blueprint system. Advanced users can learn about designing new policies by
 following the
-[signal processing](/tutorials/signal-processing/signal-processing.md)
+[signal processing](/applying-policies/signal-processing/signal-processing.md)
 tutorials.
 
 The Aperture repository contains several [blueprints][blueprints] that can be

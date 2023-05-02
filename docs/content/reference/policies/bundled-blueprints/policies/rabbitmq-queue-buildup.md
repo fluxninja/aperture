@@ -46,18 +46,20 @@ otel:
 ```
 
 <!-- Configuration Marker -->
+
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration
+
 <!-- vale off -->
 
-Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/rabbitmq-queue-buildup`}>policies/rabbitmq-queue-buildup</a>
+Blueprint name: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/rabbitmq-queue-buildup`}>policies/rabbitmq-queue-buildup</a>
 
 <!-- vale on -->
-
 
 ### Parameters
 
@@ -337,15 +339,13 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 ## Dynamic Configuration
 
-
-
 :::note
 
-The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.
+The following configuration parameters can be
+[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+at runtime, without reloading the policy.
 
 :::
-
-
 
 ### Parameters
 

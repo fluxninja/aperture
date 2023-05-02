@@ -67,7 +67,7 @@ with Aperture. There is an instance of Grafana running on the cluster as well
 for viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
-[Latency Gradient Policy](/tutorials/flow-control/concurrency-limiting/basic-concurrency-limiting.md),
+[Latency Gradient Policy](/applying-policies/service-protection/basic-service-protection.md),
 which protects the demo application against sudden surges in traffic load. You
 can verify it using the following command:
 
@@ -138,7 +138,7 @@ folder to a bunch of useful panels.
 
 <Zoom>
 
-![Grafana Dashboard](../../tutorials//flow-control/concurrency-limiting/assets/rate-limiting-escalation/rate-limiting-escalation-playground.png)
+![Grafana Dashboard](../../applying-policies/service-protection/assets/workload-prioritization/dashboard.png)
 
 </Zoom>
 

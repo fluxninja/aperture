@@ -7,16 +7,11 @@ function(cfg) {
 
   local policyName = params.policy_name,
 
-  local basePolicy = basePolicyFn(cfg),
+  local basePolicy = basePolicyFn(cfg).policyDef,
 
   // Add new components to basePolicy
   local policyDef = basePolicy {
     circuit+: {
-      resources+: {
-        flow_control+: {
-          flux_meters+: { [params.policy_name]: params.latency_baseliner.flux_meter },
-        },
-      },
       components+: [
         spec.v1.Component.withQuery(
           spec.v1.Query.new()
@@ -47,6 +42,11 @@ function(cfg) {
           + spec.v1.EMA.withOutPortsMixin(spec.v1.EMA.outPorts.withOutput(spec.v1.Port.withSignalName('SIGNAL_EMA')))
         ),
       ],
+    },
+    resources+: {
+      flow_control+: {
+        flux_meters+: { [params.policy_name]: params.latency_baseliner.flux_meter },
+      },
     },
   },
 

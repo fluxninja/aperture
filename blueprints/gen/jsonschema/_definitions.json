@@ -268,9 +268,7 @@
           "x-order": 0
         }
       },
-      "required": [
-        "from"
-      ],
+      "required": ["from"],
       "title": "Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`",
       "type": "object",
       "additionalProperties": false
@@ -340,11 +338,7 @@
         "severity": {
           "default": "info",
           "description": "Severity of the alert, one of 'info', 'warn' or 'crit'.\n\n",
-          "enum": [
-            "info",
-            "warn",
-            "crit"
-          ],
+          "enum": ["info", "warn", "crit"],
           "type": "string",
           "x-go-tag-default": "info",
           "x-go-tag-validate": "oneof=info warn crit",
@@ -352,9 +346,7 @@
           "x-order": 4
         }
       },
-      "required": [
-        "alert_name"
-      ],
+      "required": ["alert_name"],
       "type": "object",
       "additionalProperties": false
     },
@@ -413,15 +405,7 @@
         },
         "operator": {
           "description": "Operator of the arithmetic operation.\n\nThe arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.\nIn case of XOR and bit shifts, value of signals is cast to integers before performing the operation.\n\n",
-          "enum": [
-            "add",
-            "sub",
-            "mul",
-            "div",
-            "xor",
-            "lshift",
-            "rshift"
-          ],
+          "enum": ["add", "sub", "mul", "div", "xor", "lshift", "rshift"],
           "type": "string",
           "x-go-tag-validate": "oneof=add sub mul div xor lshift rshift",
           "x-oneof": "add | sub | mul | div | xor | lshift | rshift",
@@ -866,11 +850,7 @@
       "properties": {
         "special_value": {
           "description": "A special value such as NaN, +Inf, -Inf.\n\n",
-          "enum": [
-            "NaN",
-            "+Inf",
-            "-Inf"
-          ],
+          "enum": ["NaN", "+Inf", "-Inf"],
           "type": "string",
           "x-go-tag-validate": "oneof=NaN +Inf -Inf",
           "x-oneof": "NaN | +Inf | -Inf",
@@ -903,14 +883,7 @@
         },
         "operator": {
           "description": "Comparison operator that computes operation on LHS and RHS input signals.\n\n",
-          "enum": [
-            "gt",
-            "lt",
-            "gte",
-            "lte",
-            "eq",
-            "neq"
-          ],
+          "enum": ["gt", "lt", "gte", "lte", "eq", "neq"],
           "type": "string",
           "x-go-tag-validate": "oneof=gt lt gte lte eq neq",
           "x-oneof": "gt | lt | gte | lte | eq | neq",
@@ -1000,7 +973,7 @@
       "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
       "properties": {
         "min_gradient": {
-          "default": -1.7976931348623157e+308,
+          "default": -1.7976931348623157e308,
           "format": "double",
           "type": "number",
           "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308",
@@ -1164,10 +1137,7 @@
           "x-order": 4
         }
       },
-      "required": [
-        "ema_window",
-        "warmup_window"
-      ],
+      "required": ["ema_window", "warmup_window"],
       "type": "object",
       "additionalProperties": false
     },
@@ -1186,9 +1156,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "label"
-      ],
+      "required": ["label"],
       "type": "object",
       "additionalProperties": false
     },
@@ -1284,9 +1252,7 @@
           "x-order": 0
         }
       },
-      "required": [
-        "max_extrapolation_interval"
-      ],
+      "required": ["max_extrapolation_interval"],
       "type": "object",
       "additionalProperties": false
     },
@@ -1440,9 +1406,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "control_point"
-      ],
+      "required": ["control_point"],
       "title": "Describes which flows a [flow control\ncomponent](/concepts/flow-control/flow-control.md#components) should apply\nto",
       "type": "object",
       "additionalProperties": false
@@ -1680,19 +1644,7 @@
       "description": "StaticBuckets holds the static value of the buckets where latency histogram will be stored.",
       "properties": {
         "buckets": {
-          "default": [
-            5,
-            10,
-            25,
-            50,
-            100,
-            250,
-            500,
-            1000,
-            2500,
-            5000,
-            10000
-          ],
+          "default": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
           "description": "The buckets in which latency histogram will be stored.\n\n",
           "items": {
             "format": "double",
@@ -1807,7 +1759,7 @@
       "description": "Gradient Parameters.",
       "properties": {
         "max_gradient": {
-          "default": 1.7976931348623157e+308,
+          "default": 1.7976931348623157e308,
           "description": "Maximum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.\n\n",
           "format": "double",
           "type": "number",
@@ -1815,7 +1767,7 @@
           "x-order": 0
         },
         "min_gradient": {
-          "default": -1.7976931348623157e+308,
+          "default": -1.7976931348623157e308,
           "description": "Minimum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.\n\n",
           "format": "double",
           "type": "number",
@@ -1830,9 +1782,7 @@
           "x-order": 2
         }
       },
-      "required": [
-        "slope"
-      ],
+      "required": ["slope"],
       "type": "object",
       "additionalProperties": false
     },
@@ -1944,7 +1894,7 @@
       "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
       "properties": {
         "max_gradient": {
-          "default": 1.7976931348623157e+308,
+          "default": 1.7976931348623157e308,
           "format": "double",
           "type": "number",
           "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308",
@@ -2074,9 +2024,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "from"
-      ],
+      "required": ["from"],
       "title": "Parse JSON, and extract one of the fields",
       "type": "object",
       "additionalProperties": false
@@ -2096,9 +2044,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "from"
-      ],
+      "required": ["from"],
       "title": "Parse the attribute as JWT and read the payload",
       "type": "object",
       "additionalProperties": false
@@ -2114,12 +2060,7 @@
         },
         "operator": {
           "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n",
-          "enum": [
-            "In",
-            "NotIn",
-            "Exists",
-            "DoesNotExists"
-          ],
+          "enum": ["In", "NotIn", "Exists", "DoesNotExists"],
           "type": "string",
           "x-go-tag-validate": "oneof=In NotIn Exists DoesNotExists",
           "x-oneof": "In | NotIn | Exists | DoesNotExists",
@@ -2134,9 +2075,7 @@
           "x-order": 2
         }
       },
-      "required": [
-        "key"
-      ],
+      "required": ["key"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2175,12 +2114,7 @@
           "x-order": 4
         }
       },
-      "required": [
-        "api_version",
-        "kind",
-        "name",
-        "namespace"
-      ],
+      "required": ["api_version", "kind", "name", "namespace"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2376,9 +2310,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "steps"
-      ],
+      "required": ["steps"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2400,9 +2332,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "duration"
-      ],
+      "required": ["duration"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2474,9 +2404,7 @@
           "x-order": 0
         }
       },
-      "required": [
-        "load_ramps"
-      ],
+      "required": ["load_ramps"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2796,9 +2724,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "steps"
-      ],
+      "required": ["steps"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2820,9 +2746,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "duration"
-      ],
+      "required": ["duration"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2894,9 +2818,7 @@
           "x-order": 0
         }
       },
-      "required": [
-        "load_shapers"
-      ],
+      "required": ["load_shapers"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2935,9 +2857,7 @@
           "x-order": 5
         }
       },
-      "required": [
-        "label_exists"
-      ],
+      "required": ["label_exists"],
       "title": "Defines a `[map<string, string> \u2192\u00a0bool]` expression to be evaluated on labels",
       "type": "object",
       "additionalProperties": false
@@ -2975,10 +2895,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "label",
-        "regex"
-      ],
+      "required": ["label", "regex"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3668,9 +3585,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "label_value"
-      ],
+      "required": ["label_value"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3702,9 +3617,7 @@
           "x-order": 3
         }
       },
-      "required": [
-        "label_key"
-      ],
+      "required": ["label_key"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3751,10 +3664,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "labels",
-        "module"
-      ],
+      "required": ["labels", "module"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3947,9 +3857,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "sma_window"
-      ],
+      "required": ["sma_window"],
       "type": "object",
       "additionalProperties": false
     },
@@ -4268,9 +4176,7 @@
           "x-order": 0
         }
       },
-      "required": [
-        "steps"
-      ],
+      "required": ["steps"],
       "type": "object",
       "additionalProperties": false
     },
@@ -4288,9 +4194,7 @@
           "x-order": 1
         }
       },
-      "required": [
-        "duration"
-      ],
+      "required": ["duration"],
       "type": "object",
       "additionalProperties": false
     },
@@ -4489,24 +4393,14 @@
         "apiVersion": {
           "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
           "x-order": 0,
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "fluxninja.com/v1alpha1"
-          ]
+          "type": ["string", "null"],
+          "enum": ["fluxninja.com/v1alpha1"]
         },
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
           "x-order": 1,
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "Policy"
-          ]
+          "type": ["string", "null"],
+          "enum": ["Policy"]
         },
         "metadata": {
           "x-order": 2,
@@ -4520,10 +4414,7 @@
         "dynamicConfig": {
           "description": "DynamicConfig provides dynamic configuration for the policy.",
           "x-order": 4,
-          "type": [
-            "object",
-            "null"
-          ]
+          "type": ["object", "null"]
         },
         "status": {
           "description": "Status indicates the actual state of the CustomResourceDefinition",
