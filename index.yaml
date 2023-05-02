@@ -2,6 +2,20 @@ apiVersion: v1
 entries:
   aperture-agent:
   - apiVersion: v2
+    appVersion: v1.6.0
+    created: "2023-05-02T12:01:09.441403392Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: =1.17.1
+    description: A Helm chart to deploy Aperture Agent
+    digest: 24a93178b5e915974555ffedbf71561a0fd72fce6df48e24c72f84ff4323332e
+    icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--main--logo--ICON.svg
+    name: aperture-agent
+    urls:
+    - https://fluxninja.github.io/aperture/aperture-agent-v1.6.0.tgz
+    version: v1.6.0
+  - apiVersion: v2
     appVersion: v1.6.0-rc.2
     created: "2023-05-02T10:29:20.797349458Z"
     dependencies:
@@ -6149,4 +6163,4 @@ entries:
     urls:
     - https://fluxninja.github.io/aperture/istioconfig-v0.2.0.tgz
     version: v0.2.0
-generated: "2023-05-02T10:29:57.233050062Z"
+generated: "2023-05-02T12:01:09.435204862Z"
