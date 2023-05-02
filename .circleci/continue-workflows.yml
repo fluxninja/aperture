@@ -703,6 +703,7 @@ jobs:
 
   publish-aperture-docs:
     executor: python-cimg-executor
+    resource_class: xlarge
     parameters:
       release-ref:
         type: string
