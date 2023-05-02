@@ -51,7 +51,7 @@ Aperture splits the process of flow control into two layers:
 - Governing the flow control process and making high-level decisions. This is
   done by the Aperture Controller through [_Policies_][policies].
 - Actual execution of flow control is performed by Aperture Agent through [_Load
-  Regulators_][regulators], [_Load Schedulers_][load-schedulers] and [_Rate
+  Regulators_][regulator], [_Load Schedulers_][load-scheduler] and [_Rate
   Limiters_][rate-limiter]. Additionally, the Agent handles other flow-control
   related tasks, like gathering metrics through [_Flux Meters_][flux-meter] and
   classifying traffic through [_Classifiers_][classifier]. This chapter
@@ -91,7 +91,7 @@ you need to install integrations that will communicate with the Aperture Agent.
   to the _Agent_ as telemetry.
 
 [policies]: /concepts/policy/policy.md
-[control-point]: ./flow-selector.md#control-point
+[control-point]: ./selector.md#control-point
 [load-scheduler]: ./components/load-scheduler.md
 [regulator]: ./components/regulator.md
 [rate-limiter]: ./components/rate-limiter.md

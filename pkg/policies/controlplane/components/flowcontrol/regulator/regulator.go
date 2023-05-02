@@ -17,19 +17,20 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
 type regulatorSync struct {
-	policyReadAPI         iface.Policy
-	RegulatorProto        *policylangv1.Regulator
-	decision              *policysyncv1.RegulatorDecision
-	decisionWriter        *etcdwriter.Writer
-	dynamicConfigWriter   *etcdwriter.Writer
-	configEtcdPath        string
-	decisionsEtcdPath     string
-	dynamicConfigEtcdPath string
-	componentID           string
+	policyReadAPI          iface.Policy
+	RegulatorProto         *policylangv1.Regulator
+	decision               *policysyncv1.RegulatorDecision
+	decisionWriter         *etcdwriter.Writer
+	dynamicConfigWriter    *etcdwriter.Writer
+	configEtcdPaths        []string
+	decisionEtcdPaths      []string
+	dynamicConfigEtcdPaths []string
+	componentID            string
 }
 
 // Name implements runtime.Component.
@@ -40,7 +41,7 @@ func (*regulatorSync) Type() runtime.ComponentType { return runtime.ComponentTyp
 
 // ShortDescription implements runtime.Component.
 func (regulatorSync *regulatorSync) ShortDescription() string {
-	return iface.GetServiceShortDescription(regulatorSync.RegulatorProto.Parameters.FlowSelector.ServiceSelector)
+	return iface.GetSelectorsShortDescription(regulatorSync.RegulatorProto.Parameters.GetSelectors())
 }
 
 // IsActuator implements runtime.Component.
@@ -48,24 +49,47 @@ func (*regulatorSync) IsActuator() bool { return true }
 
 // NewRegulatorAndOptions creates fx options for Regulator and also returns agent group name associated with it.
 func NewRegulatorAndOptions(
-	RegulatorProto *policylangv1.Regulator,
+	regulatorProto *policylangv1.Regulator,
 	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	agentGroup := RegulatorProto.Parameters.FlowSelector.ServiceSelector.AgentGroup
-	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
-	configEtcdPath := path.Join(paths.RegulatorConfigPath, etcdKey)
-	decisionsEtcdPath := path.Join(paths.RegulatorDecisionsPath, etcdKey)
-	dynamicConfigEtcdPath := path.Join(paths.RegulatorDynamicConfigPath, etcdKey)
+	// Deprecated 1.8.0
+	flowSelectorProto := regulatorProto.Parameters.GetFlowSelector()
+	if flowSelectorProto != nil {
+		selector := &policylangv1.Selector{
+			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
+			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
+			Service:      flowSelectorProto.ServiceSelector.Service,
+			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
+		}
+		regulatorProto.Parameters.Selectors = append(regulatorProto.Parameters.Selectors, selector)
+		regulatorProto.Parameters.FlowSelector = nil
+	}
+
+	s := regulatorProto.Parameters.GetSelectors()
+
+	agentGroups := selectors.UniqueAgentGroups(s)
+
+	var configEtcdPaths, decisionEtcdPaths, dynamicConfigEtcdPaths []string
+
+	for _, agentGroup := range agentGroups {
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+		configEtcdPath := path.Join(paths.RegulatorConfigPath, etcdKey)
+		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
+		decisionEtcdPath := path.Join(paths.RegulatorDecisionsPath, etcdKey)
+		decisionEtcdPaths = append(decisionEtcdPaths, decisionEtcdPath)
+		dynamicConfigEtcdPath := path.Join(paths.RegulatorDynamicConfigPath, etcdKey)
+		dynamicConfigEtcdPaths = append(dynamicConfigEtcdPaths, dynamicConfigEtcdPath)
+	}
 
 	regulatorSync := &regulatorSync{
-		RegulatorProto:        RegulatorProto,
-		decision:              &policysyncv1.RegulatorDecision{},
-		policyReadAPI:         policyReadAPI,
-		configEtcdPath:        configEtcdPath,
-		decisionsEtcdPath:     decisionsEtcdPath,
-		dynamicConfigEtcdPath: dynamicConfigEtcdPath,
-		componentID:           componentID,
+		RegulatorProto:         regulatorProto,
+		decision:               &policysyncv1.RegulatorDecision{},
+		policyReadAPI:          policyReadAPI,
+		configEtcdPaths:        configEtcdPaths,
+		decisionEtcdPaths:      decisionEtcdPaths,
+		dynamicConfigEtcdPaths: dynamicConfigEtcdPaths,
+		componentID:            componentID,
 	}
 	return regulatorSync, fx.Options(
 		fx.Invoke(
@@ -91,35 +115,37 @@ func (regulatorSync *regulatorSync) setupSync(etcdClient *etcdclient.Client, lif
 				logger.Error().Err(err).Msg("failed to marshal  regulator config")
 				return err
 			}
-			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-				regulatorSync.configEtcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
-			if err != nil {
-				logger.Error().Err(err).Msg("failed to put  regulator config")
-				return err
+			var merr error
+			for _, configEtcdPath := range regulatorSync.configEtcdPaths {
+				_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
+					configEtcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
+				if err != nil {
+					logger.Error().Err(err).Msg("failed to put regulator config")
+					merr = multierr.Append(merr, err)
+				}
 			}
 			regulatorSync.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
 			regulatorSync.dynamicConfigWriter = etcdwriter.NewWriter(etcdClient, true)
-			return nil
+			return merr
 		},
 		OnStop: func(ctx context.Context) error {
-			var merr, err error
 			regulatorSync.dynamicConfigWriter.Close()
 			regulatorSync.decisionWriter.Close()
-			_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), regulatorSync.configEtcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("failed to delete  regulator config")
-				merr = multierr.Append(merr, err)
+			deleteEtcdPath := func(paths []string) error {
+				var merr error
+				for _, path := range paths {
+					_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), path)
+					if err != nil {
+						logger.Error().Err(err).Msgf("failed to delete etcd path %s", path)
+						merr = multierr.Append(merr, err)
+					}
+				}
+				return merr
 			}
-			_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), regulatorSync.decisionsEtcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("failed to delete  regulator decisions")
-				merr = multierr.Append(merr, err)
-			}
-			_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), regulatorSync.dynamicConfigEtcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("failed to delete  regulator dynamic config")
-				merr = multierr.Append(merr, err)
-			}
+
+			merr := deleteEtcdPath(regulatorSync.configEtcdPaths)
+			merr = multierr.Append(merr, deleteEtcdPath(regulatorSync.decisionEtcdPaths))
+			merr = multierr.Append(merr, deleteEtcdPath(regulatorSync.dynamicConfigEtcdPaths))
 			return merr
 		},
 	})
@@ -169,7 +195,9 @@ func (regulatorSync *regulatorSync) publishAcceptPercentage(acceptPercentageValu
 	if regulatorSync.decisionWriter == nil {
 		logger.Panic().Msg("decision writer is nil")
 	}
-	regulatorSync.decisionWriter.Write(regulatorSync.decisionsEtcdPath, dat)
+	for _, decisionEtcdPath := range regulatorSync.decisionEtcdPaths {
+		regulatorSync.decisionWriter.Write(decisionEtcdPath, dat)
+	}
 
 	return nil
 }
@@ -194,7 +222,9 @@ func (regulatorSync *regulatorSync) DynamicConfigUpdate(event notifiers.Event, u
 		if regulatorSync.dynamicConfigWriter == nil {
 			logger.Panic().Msg("dynamic config writer is nil")
 		}
-		regulatorSync.dynamicConfigWriter.Write(regulatorSync.dynamicConfigEtcdPath, dat)
+		for _, dynamicConfigEtcdPath := range regulatorSync.dynamicConfigEtcdPaths {
+			regulatorSync.dynamicConfigWriter.Write(dynamicConfigEtcdPath, dat)
+		}
 		logger.Info().Msg("regulator dynamic config updated")
 	}
 	dynamicConfig := &policylangv1.Regulator_DynamicConfig{}

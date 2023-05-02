@@ -12,12 +12,6 @@ spec:
           default_config:
             overrides: []
           dynamic_config_key: rate_limiter
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service-graphql-demo-app.demoapp.svc.cluster.local
           in_ports:
             limit:
               constant_signal:
@@ -28,17 +22,15 @@ spec:
               enabled: true
               num_sync: 5
             limit_reset_interval: 1s
+          selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service-graphql-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 1s
   resources:
     flow_control:
       classifiers:
-      - flow_selector:
-          flow_matcher:
-            control_point: ingress
-          service_selector:
-            agent_group: default
-            service: service-graphql-demo-app.demoapp.svc.cluster.local
-        rego:
+      - rego:
           labels:
             user_id:
               telemetry: true
@@ -68,3 +60,7 @@ spec:
               queryIsCreateTodo
               u := claims.userID
             }
+        selectors:
+        - agent_group: default
+          control_point: ingress
+          service: service-graphql-demo-app.demoapp.svc.cluster.local

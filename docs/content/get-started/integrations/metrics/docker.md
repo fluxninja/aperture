@@ -11,8 +11,8 @@ keywords:
 
 :::info
 
-See also [dockerstatsreceiver docs][receiver] in opentelemetry-collect-contrib
-repository.
+See also [dockerstatsreceiver docs][receiver] in
+`opentelemetry-collector-contrib` repository.
 
 :::
 

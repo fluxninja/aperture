@@ -36,8 +36,8 @@ components, and edges, which represent the flow of signals between the nodes.
 Observability-driven control is an important aspect of Aperture's policy
 language. By monitoring signals such as request latency, error rate, and
 saturation, Aperture's circuits can detect deviations from service-level
-objectives (SLOs) and trigger appropriate actions to restore system stability
-and reliability. The circuit is the heart of the policy specification and is
+objectives and trigger appropriate actions to restore system stability and
+reliability. The circuit is the heart of the policy specification and is
 responsible for the logic of the control system.
 
 ## Resources

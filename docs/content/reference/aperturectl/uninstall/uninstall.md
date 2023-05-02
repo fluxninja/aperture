@@ -6,6 +6,8 @@ keywords:
   - aperturectl_uninstall
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl uninstall
 
 Uninstall Aperture components

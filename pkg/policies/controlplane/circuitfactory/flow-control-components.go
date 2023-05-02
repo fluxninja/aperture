@@ -88,7 +88,7 @@ func newFlowControlCompositeAndOptions(
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		loadSchedulerOptions, agentGroupName, loadSchedulerErr := loadscheduler.NewLoadSchedulerOptions(loadSchedulerProto, componentID.String(), policyReadAPI)
+		loadSchedulerOptions, agentGroups, loadSchedulerErr := loadscheduler.NewLoadSchedulerOptions(loadSchedulerProto, componentID.String(), policyReadAPI)
 		if loadSchedulerErr != nil {
 			return retErr(loadSchedulerErr)
 		}
@@ -97,7 +97,7 @@ func newFlowControlCompositeAndOptions(
 		// Scheduler
 		if schedulerProto := loadSchedulerProto.GetScheduler(); schedulerProto != nil {
 			// Use the same id as the component stack since agent sees only the component stack and generates metrics tagged with the component stack id
-			scheduler, schedulerOptions, err := loadscheduler.NewSchedulerAndOptions(schedulerProto, componentID.String(), policyReadAPI, agentGroupName)
+			scheduler, schedulerOptions, err := loadscheduler.NewSchedulerAndOptions(schedulerProto, componentID.String(), policyReadAPI, agentGroups)
 			if err != nil {
 				return retErr(err)
 			}
@@ -122,7 +122,7 @@ func newFlowControlCompositeAndOptions(
 
 		// Actuation Strategy
 		if actuatorProto := loadSchedulerProto.GetActuator(); actuatorProto != nil {
-			actuator, actuatorOptions, err := loadscheduler.NewActuatorAndOptions(actuatorProto, componentID.String(), policyReadAPI, agentGroupName)
+			actuator, actuatorOptions, err := loadscheduler.NewActuatorAndOptions(actuatorProto, componentID.String(), policyReadAPI, agentGroups)
 			if err != nil {
 				return retErr(err)
 			}
@@ -145,7 +145,7 @@ func newFlowControlCompositeAndOptions(
 
 		loadSchedulerConfComp, err := prepareComponent(
 			runtime.NewDummyComponent("LoadScheduler",
-				iface.GetServiceShortDescription(loadSchedulerProto.FlowSelector.ServiceSelector),
+				iface.GetSelectorsShortDescription(loadSchedulerProto.GetSelectors()),
 				runtime.ComponentTypeSignalProcessor),
 			loadSchedulerProto,
 			componentID,

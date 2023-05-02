@@ -6,6 +6,8 @@ keywords:
   - aperturectl_discovery_entities
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl discovery entities
 
 List AutoScale control points

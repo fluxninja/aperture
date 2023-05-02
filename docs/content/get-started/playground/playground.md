@@ -173,11 +173,11 @@ configuration management tools, which must be installed beforehand.
 
 To install the required tools, you have two options:
 
-- Use [`asdf`](#install-via-asdf)
+- Use [`asdf`](#install-using-asdf)
 - Or, manually install the tools
   [mentioned here](#tools-required-for-kubernetes-deployment).
 
-### Install using `asdf`
+### Install using `asdf` {#install-using-asdf}
 
 First,
 [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
@@ -194,7 +194,7 @@ all the required tools.
 :::note
 
 Please skip this section in case you already installed the required tools using
-[`asdf`](#install-via-asdf).
+[`asdf`](#install-using-asdf).
 
 :::
 
@@ -221,8 +221,8 @@ achieve this.
 
 ### Tilt installation
 
-Tilt can be installed using [`asdf`](#install-via-asdf) or manually by following
-instructions [here](https://docs.tilt.dev/install.html).
+Tilt can be installed using [`asdf`](#install-using-asdf) or manually by
+following instructions [here](https://docs.tilt.dev/install.html).
 
 ### Prerequisites - Kubernetes cluster bootstrap {#prerequisites-k8s}
 

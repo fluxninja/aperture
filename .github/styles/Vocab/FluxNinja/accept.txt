@@ -1,5 +1,6 @@
 Kubernetes
 FluxNinja
+fluxninja.com
 [Ss]etpoint
 Alerter
 Combinator
@@ -66,3 +67,16 @@ Tanveer
 [Rr]ebalancing
 gRPC
 DaemonSet
+OLAP
+setpoint
+ClusterRole
+ClusterRoleBinding
+CustomResourceDefinition
+ReplicaSet
+StatefulSet
+StatefulSets
+Netty
+OpenTelemetry
+EnvoyFilter
+[Gg]oodput
+[iI]nterdependencies

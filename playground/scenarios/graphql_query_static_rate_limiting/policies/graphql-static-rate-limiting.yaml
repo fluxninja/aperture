@@ -13,10 +13,8 @@ policy:
   # List of classification rules.
   # Type: []aperture.spec.v1.Classifier
   classifiers:
-    - flow_selector:
-        flow_matcher:
-          control_point: ingress
-        service_selector:
+    - selectors:
+        - control_point: ingress
           agent_group: default
           service: service-graphql-demo-app.demoapp.svc.cluster.local
       rego:
@@ -54,19 +52,9 @@ policy:
     # Type: float64
     # Required: True
     rate_limit: 10
-    # A flow selector to match requests against
-    # Type: aperture.spec.v1.FlowSelector
-    flow_selector:
-      service_selector:
-        agent_group: default
-        # Service Name.
-        # Type: string
-        # Required: True
+    selectors:
+      - agent_group: default
         service: service-graphql-demo-app.demoapp.svc.cluster.local
-      flow_matcher:
-        # Control Point Name.
-        # Type: string
-        # Required: True
         control_point: ingress
     # Parameters.
     # Type: aperture.spec.v1.RateLimiterParameters

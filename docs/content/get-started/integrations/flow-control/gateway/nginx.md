@@ -126,6 +126,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
 
    The format for the `Timeout` parameter can be found at the following
    [link](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+
    :::
 
    ```bash

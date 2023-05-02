@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/utils"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -16,27 +17,46 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
+// UniqueAgentGroups returns the unique agent groups of selectors.
+func UniqueAgentGroups(selectorProto []*policylangv1.Selector) []string {
+	agentGroups := []string{}
+	for _, selector := range selectorProto {
+		agentGroup := selector.GetAgentGroup()
+		if !utils.SliceContains(agentGroups, agentGroup) {
+			agentGroups = append(agentGroups, agentGroup)
+		}
+	}
+	return agentGroups
+}
+
 type selector struct {
 	labelMatcher mm.Expr
 	ctrlPtID     ControlPointID
 }
 
-// FromProto creates a Selector from a "raw" proto-based Selector
-//
-// The selector is assumed to be already validated and non-nil.
-func FromProto(selectorMsg *policylangv1.FlowSelector) (selector, error) {
-	labelMatcher, err := MMExprFromLabelMatcher(selectorMsg.FlowMatcher.GetLabelMatcher())
-	if err != nil {
-		return selector{}, fmt.Errorf("invalid label matcher: %w", err)
+// FromSelectors creates a Selector from a "raw" proto-based Selector.
+func FromSelectors(selectorsProto []*policylangv1.Selector, agentGroup string) ([]selector, error) {
+	s := []selector{}
+	for _, selectorProto := range selectorsProto {
+		if selectorProto.GetAgentGroup() != agentGroup {
+			continue
+		}
+		labelMatcher, err := MMExprFromLabelMatcher(selectorProto.GetLabelMatcher())
+		if err != nil {
+			return []selector{}, fmt.Errorf("invalid label matcher: %w", err)
+		}
+		ctrlPtID := ControlPointID{
+			ControlPoint: selectorProto.GetControlPoint(),
+			Service:      selectorProto.GetService(),
+		}
+		sel := selector{
+			ctrlPtID:     ctrlPtID,
+			labelMatcher: labelMatcher,
+		}
+
+		s = append(s, sel)
 	}
-	ctrlPtID, err := controlPointIDFromSelectorProto(selectorMsg)
-	if err != nil {
-		return selector{}, fmt.Errorf("invalid control point: %w", err)
-	}
-	return selector{
-		ctrlPtID:     ctrlPtID,
-		labelMatcher: labelMatcher,
-	}, nil
+	return s, nil
 }
 
 // LabelMatcher returns the label matcher of the selector.

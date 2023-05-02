@@ -2,7 +2,6 @@ package loadscheduler
 
 import (
 	"context"
-	"errors"
 	"path"
 
 	"go.uber.org/fx"
@@ -12,6 +11,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -28,27 +28,39 @@ func NewLoadSchedulerOptions(
 	loadSchedulerProto *policylangv1.LoadScheduler,
 	componentStackID string,
 	policyReadAPI iface.Policy,
-) (fx.Option, string, error) {
-	// Get Agent Group Name from LoadScheduler.FlowSelector.ServiceSelector.AgentGroup
+) (fx.Option, []string, error) {
+	// Deprecated 1.8.0
 	flowSelectorProto := loadSchedulerProto.GetFlowSelector()
-	if flowSelectorProto == nil {
-		return fx.Options(), "", errors.New("loadScheduler.Selector is nil")
-	}
-	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
-	etcdPath := path.Join(paths.LoadSchedulerConfigPath,
-		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
-	configSync := &loadSchedulerConfigSync{
-		loadSchedulerProto: loadSchedulerProto,
-		policyBaseAPI:      policyReadAPI,
-		etcdPath:           etcdPath,
-		componentID:        componentStackID,
+	if flowSelectorProto != nil {
+		selector := &policylangv1.Selector{
+			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
+			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
+			Service:      flowSelectorProto.ServiceSelector.Service,
+			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
+		}
+		loadSchedulerProto.Selectors = append(loadSchedulerProto.Selectors, selector)
+		loadSchedulerProto.FlowSelector = nil
 	}
 
-	return fx.Options(
-		fx.Invoke(
-			configSync.doSync,
-		),
-	), agentGroup, nil
+	options := []fx.Option{}
+
+	s := loadSchedulerProto.GetSelectors()
+
+	agentGroups := selectors.UniqueAgentGroups(s)
+
+	for _, agentGroup := range agentGroups {
+		etcdPath := path.Join(paths.LoadSchedulerConfigPath,
+			paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
+		configSync := &loadSchedulerConfigSync{
+			loadSchedulerProto: loadSchedulerProto,
+			policyBaseAPI:      policyReadAPI,
+			etcdPath:           etcdPath,
+			componentID:        componentStackID,
+		}
+		options = append(options, fx.Invoke(configSync.doSync))
+	}
+
+	return fx.Options(options...), agentGroups, nil
 }
 
 func (configSync *loadSchedulerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {

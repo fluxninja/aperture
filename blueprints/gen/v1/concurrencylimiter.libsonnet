@@ -19,4 +19,13 @@
   withSchedulerMixin(scheduler):: {
     scheduler+: scheduler,
   },
+  withSelectors(selectors):: {
+    selectors:
+      if std.isArray(selectors)
+      then selectors
+      else [selectors],
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
 }

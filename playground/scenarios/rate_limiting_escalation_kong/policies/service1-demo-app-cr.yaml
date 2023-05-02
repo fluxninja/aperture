@@ -57,11 +57,6 @@ spec:
           default_config:
             dry_run: false
           dynamic_config_key: concurrency_controller
-          flow_selector:
-            flow_matcher:
-              control_point: service1-demo-app
-            service_selector:
-              service: any
           gradient_parameters:
             max_gradient: 1
             min_gradient: 0.1
@@ -95,6 +90,9 @@ spec:
                   http.request.header.user_type: subscriber
               parameters:
                 priority: 200
+          selectors:
+          - control_point: service1-demo-app
+            service: any
     - decider:
         in_ports:
           lhs:
@@ -123,37 +121,31 @@ spec:
     - flow_control:
         rate_limiter:
           dynamic_config_key: rate_limiter
-          flow_selector:
-            flow_matcher:
-              control_point: service1-demo-app
-              label_matcher:
-                match_labels:
-                  http.request.header.user_type: bot
-            service_selector:
-              service: any
           in_ports:
             limit:
               signal_name: RATE_LIMIT
           parameters:
             label_key: http.request.header.user_id
             limit_reset_interval: 1s
+          selectors:
+          - control_point: service1-demo-app
+            label_matcher:
+              match_labels:
+                http.request.header.user_type: bot
+            service: any
     evaluation_interval: 0.5s
   resources:
     flow_control:
       classifiers:
-      - flow_selector:
-          flow_matcher:
-            control_point: service1-demo-app
-          service_selector:
-            service: any
-        rules:
+      - rules:
           user_type:
             extractor:
               from: request.http.headers.user-type
+        selectors:
+        - control_point: service1-demo-app
+          service: any
       flux_meters:
         service1-demo-app:
-          flow_selector:
-            flow_matcher:
-              control_point: service3-demo-app
-            service_selector:
-              service: any
+          selectors:
+          - control_point: service3-demo-app
+            service: any

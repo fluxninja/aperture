@@ -8,6 +8,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
@@ -22,10 +23,10 @@ var _ = Describe("Dataplane Engine", func() {
 		mockConLimiter *mocks.MockLoadScheduler
 		mockFluxmeter  *mocks.MockFluxMeter
 
-		flowSelector *policylangv1.FlowSelector
-		histogram    goprom.Histogram
-		fluxMeterID  iface.FluxMeterID
-		limiterID    iface.LimiterID
+		selectors   []*policylangv1.Selector
+		histogram   goprom.Histogram
+		fluxMeterID iface.FluxMeterID
+		limiterID   iface.LimiterID
 	)
 
 	BeforeEach(func() {
@@ -34,16 +35,15 @@ var _ = Describe("Dataplane Engine", func() {
 		mockConLimiter = mocks.NewMockLoadScheduler(mockCtrl)
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
-		engine = NewEngine()
-		flowSelector = &policylangv1.FlowSelector{
-			ServiceSelector: &policylangv1.ServiceSelector{
-				AgentGroup: metrics.DefaultAgentGroup,
-				Service:    "testService.testNamespace.svc.cluster.local",
-			},
-			FlowMatcher: &policylangv1.FlowMatcher{
+		engine = NewEngine(agentinfo.NewAgentInfo(metrics.DefaultAgentGroup))
+		selectors = []*policylangv1.Selector{
+			{
 				ControlPoint: "ingress",
+				Service:      "testService.testNamespace.svc.cluster.local",
+				AgentGroup:   metrics.DefaultAgentGroup,
 			},
 		}
+
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
 			Name: metrics.FluxMeterMetricName,
 			ConstLabels: goprom.Labels{
@@ -66,7 +66,7 @@ var _ = Describe("Dataplane Engine", func() {
 	Context("Load Scheduler", func() {
 		BeforeEach(func() {
 			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockConLimiter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockConLimiter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 		})
 
@@ -100,7 +100,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		BeforeEach(func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
-			mockFluxmeter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockFluxmeter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			labels = map[string]string{
 				metrics.FlowStatusLabel:   metrics.FlowStatusOK,
 				metrics.StatusCodeLabel:   "200",
@@ -151,11 +151,11 @@ var _ = Describe("Dataplane Engine", func() {
 	Context("Multimatch", func() {
 		BeforeEach(func() {
 			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockConLimiter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockConLimiter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
-			mockFluxmeter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
+			mockFluxmeter.EXPECT().GetSelectors().Return(selectors).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 

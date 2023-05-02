@@ -6,6 +6,8 @@ keywords:
   - aperturectl_compile
 ---
 
+<!-- markdownlint-disable -->
+
 ## aperturectl compile
 
 Compile circuit from Aperture Policy file

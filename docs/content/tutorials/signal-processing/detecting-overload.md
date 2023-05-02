@@ -27,23 +27,23 @@ service and trigger load-shedding at a downstream service.
 
 One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be reported using
-a [Flux Meter](/concepts/flow-control/resources/flux-meter.md).
+a [_Flux Meter_](/concepts/flow-control/resources/flux-meter.md).
 
 :::tip
 
-It's recommended to apply the Flux Meter to a single type of workload to avoid
+It's recommended to apply the _Flux Meter_ to a single type of workload to avoid
 mixing the latency measurements across distinct workloads. For example, if there
 are Select and Insert API calls on the same service, it is recommended to
-measure the latency of only one of those workloads using a Flux Meter. Refer
-[FlowSelector](/concepts/flow-control/flow-selector.md#flowselector) on how to
-apply the Flux Meter to a subset of API calls for a service.
+measure the latency of only one of those workloads using a _Flux Meter_. Refer
+to the [_Selector_](/concepts/flow-control/selector.md) on how to apply the
+_Flux Meter_ to a subset of API calls for a service.
 
 :::
 
 In this example, the exponential moving average (EMA) of latency is computed,
 which is gathered periodically from a
 [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query on
-Flux Meter reported metrics. Further, EMA of latency will be multiplied with a
+_Flux Meter_ reported metrics. Further, EMA of latency will be multiplied with a
 tolerance factor to calculate setpoint latency, which is a threshold to detect
 overloaded state. That's, if the real-time latency of the service is more than
 this setpoint (which is based on long-term EMA), then the service is considered
@@ -91,7 +91,7 @@ collected from the execution of the policy can be visualized:
 <Zoom>
 
 ![LATENCY](./assets/detecting-overload/latency.png) `LATENCY`: Signal gathered
-from the periodic execution of PromQL query on Flux Meter metrics.
+from the periodic execution of PromQL query on _Flux Meter_ metrics.
 
 </Zoom>
 

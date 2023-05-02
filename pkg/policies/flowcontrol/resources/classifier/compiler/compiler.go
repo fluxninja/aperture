@@ -11,32 +11,25 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/extractors"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 const defaultPackageName = "fluxninja.classification.extractors"
 
 // CompiledRuleset is compiled form of Classifier proto.
 type CompiledRuleset struct {
-	ControlPointID selectors.ControlPointID
-	Labelers       []LabelerWithSelector
-	ReportedRules  []ReportedRule
+	Selectors     []*policylangv1.Selector
+	Labelers      []LabelerWithAttributes
+	ReportedRules []ReportedRule
 }
 
-// LabelerWithSelector is a labeler with its selector.
-type LabelerWithSelector struct {
+// LabelerWithAttributes is a labeler with its attributes.
+type LabelerWithAttributes struct {
 	Labeler              *Labeler
-	LabelSelector        multimatcher.Expr
 	ClassifierAttributes *policysyncv1.ClassifierAttributes
 }
 
-// Labeler is used to create flow labels
-//
-// label can create either:
-// * a single label – LabelName is non-empty or
-// * multiple labels – LabelName is empty.
+// Labeler is used to create flow labels.
 type Labeler struct {
 	// rego query that is prepared to take envoy authz request as an input.
 	// Result expression should be a single value (if LabelName is set) or a
@@ -53,20 +46,18 @@ type LabelProperties struct {
 
 // ReportedRule is a rule along with its selector and label name.
 type ReportedRule struct {
-	FlowSelector *policylangv1.FlowSelector
-	Rule         *policylangv1.Rule
-	RulesetName  string
-	LabelName    string
+	Rule        *policylangv1.Rule
+	RulesetName string
+	LabelName   string
 }
 
 func rulesetToReportedRules(rs *policylangv1.Classifier, rulesetName string) []ReportedRule {
 	out := make([]ReportedRule, 0, len(rs.Rules))
 	for label, rule := range rs.Rules {
 		out = append(out, ReportedRule{
-			RulesetName:  rulesetName,
-			LabelName:    label,
-			Rule:         rule,
-			FlowSelector: rs.FlowSelector,
+			RulesetName: rulesetName,
+			LabelName:   label,
+			Rule:        rule,
 		})
 	}
 	return out
@@ -95,24 +86,16 @@ var BadLabelName = extractors.BadLabelName
 // CompileRuleset parses ruleset's selector and compiles its rules.
 func CompileRuleset(ctx context.Context, name string, classifierWrapper *policysyncv1.ClassifierWrapper) (CompiledRuleset, error) {
 	classifierMsg := classifierWrapper.GetClassifier()
-	if classifierMsg.FlowSelector == nil {
-		return CompiledRuleset{}, fmt.Errorf("%w: missing selector", BadSelector)
-	}
 
-	selector, err := selectors.FromProto(classifierMsg.FlowSelector)
+	labelers, err := compileRules(ctx, classifierWrapper)
 	if err != nil {
-		return CompiledRuleset{}, fmt.Errorf("%w: %v", BadSelector, err)
-	}
-
-	labelers, err := compileRules(ctx, selector.LabelMatcher(), classifierWrapper)
-	if err != nil {
-		return CompiledRuleset{}, fmt.Errorf("failed to compile %q rules for %v: %w", name, selector, err)
+		return CompiledRuleset{}, fmt.Errorf("failed to compile %q rules: %w", name, err)
 	}
 
 	cr := CompiledRuleset{
-		ControlPointID: selector.ControlPointID(),
-		Labelers:       labelers,
-		ReportedRules:  rulesetToReportedRules(classifierMsg, name),
+		Selectors:     classifierMsg.GetSelectors(),
+		Labelers:      labelers,
+		ReportedRules: rulesetToReportedRules(classifierMsg, name),
 	}
 
 	return cr, nil
@@ -122,7 +105,7 @@ func CompileRuleset(ctx context.Context, name string, classifierWrapper *policys
 //
 // Raw rego rules are compiled 1:1 to rego queries. High-level extractor-based
 // rules are compiled into a single rego query.
-func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifierWrapper *policysyncv1.ClassifierWrapper) ([]LabelerWithSelector, error) {
+func compileRules(ctx context.Context, classifierWrapper *policysyncv1.ClassifierWrapper) ([]LabelerWithAttributes, error) {
 	log.Trace().Msg("Classifier.compileRules starting")
 
 	classifierAttributes := classifierWrapper.GetClassifierAttributes()
@@ -130,7 +113,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 		return nil, fmt.Errorf("commonAttributes is nil")
 	}
 
-	var labelers []LabelerWithSelector
+	var labelers []LabelerWithAttributes
 
 	labelRules := classifierWrapper.GetClassifier().GetRules()
 
@@ -178,8 +161,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 				return nil, fmt.Errorf("(bug) failed to compile classification rules: %w", err)
 			}
 
-			labelers = append(labelers, LabelerWithSelector{
-				LabelSelector: labelSelector,
+			labelers = append(labelers, LabelerWithAttributes{
 				Labeler: &Labeler{
 					Query:  query,
 					Labels: labelsProperties,
@@ -231,8 +213,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 			)
 		}
 		// add to labelers
-		labelers = append(labelers, LabelerWithSelector{
-			LabelSelector: labelSelector,
+		labelers = append(labelers, LabelerWithAttributes{
 			Labeler: &Labeler{
 				Query:  query,
 				Labels: labelsProperties,

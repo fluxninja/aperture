@@ -36,7 +36,7 @@ type HTTPClientConfig struct {
 	NetworkTimeout config.Duration `json:"network_timeout" validate:"gte=0s" default:"30s"`
 	// HTTP client timeout - Timeouts include connection time, redirects, reading the response and so on. 0 = no timeout.
 	Timeout config.Duration `json:"timeout" validate:"gte=0s" default:"60s"`
-	// Proxy Connect Header - map[string][]string
+	// Proxy Connect Header - `map[string][]string`
 	ProxyConnectHeader http.Header `json:"proxy_connect_header,omitempty" validate:"omitempty"`
 	// TLS Handshake Timeout. 0 = no timeout
 	TLSHandshakeTimeout config.Duration `json:"tls_handshake_timeout" validate:"gte=0s" default:"10s"`

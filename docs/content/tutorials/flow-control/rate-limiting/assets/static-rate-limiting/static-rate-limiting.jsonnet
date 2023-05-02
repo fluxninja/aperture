@@ -2,25 +2,19 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet
 
 
 local StaticRateLimiting = aperture.policies.StaticRateLimiting.policy;
-local flowSelector = aperture.spec.v1.FlowSelector;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
-local flowMatcher = aperture.spec.v1.FlowMatcher;
+local selector = aperture.spec.v1.Selector;
 
-local svcSelector =
-  flowSelector.new()
-  + flowSelector.withServiceSelector(
-    serviceSelector.new()
-    + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-  )
-  + flowSelector.withFlowMatcher(
-    flowMatcher.new()
-    + flowMatcher.withControlPoint('ingress')
-  );
+local svcSelectors = [
+  selector.new()
+  + selector.withControlPoint('ingress')
+  + selector.withService('service1-demo-app.demoapp.svc.cluster.local')
+  + selector.withAgentGroup('default'),
+];
 
 local policyResource = StaticRateLimiting({
   policy_name: 'static-rate-limiting',
   rate_limiter+: {
-    flow_selector: svcSelector,
+    selectors: svcSelectors,
     rate_limit: 120.0,
     parameters+: {
       label_key: 'http.request.header.user_id',

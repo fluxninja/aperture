@@ -11,8 +11,8 @@ keywords:
 
 :::info
 
-See also [kubeletstatsreceiver docs][receiver] in opentelemetry-collect-contrib
-repository.
+See also [kubeletstatsreceiver docs][receiver] in
+`opentelemetry-collector-contrib` repository.
 
 :::
 
