@@ -228,11 +228,6 @@ repos:
         description: Check if extensions.go has changed
         language: script
         pass_filenames: false
-      - id: markdownlint
-        name: "Lint Markdown files"
-        entry: markdownlint
-        language: system
-        files: '^docs/content/.*\.md$'
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4
     hooks:
@@ -241,3 +236,8 @@ repos:
           - "-L inport,atleast,iteraction"
           - "--ignore-words=./.github/styles/Vocab/FluxNinja/accept.txt"
         exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|playground/resources/nginx/.*|\.github/.*)$
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.7.1
+    hooks:
+      - id: markdownlint-cli2
+        files: '^docs/content/.*\.md$'

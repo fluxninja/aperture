@@ -75,3 +75,7 @@ CustomResourceDefinition
 ReplicaSet
 StatefulSet
 StatefulSets
+Netty
+OpenTelemetry
+EnvoyFilter
+[Gg]oodput
