@@ -4,7 +4,7 @@ fluxninja.com
 [Ss]etpoint
 Alerter
 Combinator
-APIs
+APIs?\b
 [Cc]ooldown
 Rego
 [Mm]iddleware
@@ -60,23 +60,19 @@ performant
 Zalando
 Hotstar
 Linkerd
-multithreaded
-look at
+[Mm]ultithreaded
 AIMD
 Tanveer
 [Rr]ebalancing
 gRPC
 DaemonSet
 OLAP
-setpoint
 ClusterRole
 ClusterRoleBinding
 CustomResourceDefinition
 ReplicaSet
 StatefulSet
-StatefulSets
 Netty
 OpenTelemetry
 EnvoyFilter
 [Gg]oodput
-[iI]nterdependencies
