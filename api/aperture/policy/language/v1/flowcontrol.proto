@@ -1095,7 +1095,7 @@ message LoadActuator {
   DynamicConfig default_config = 3;
 }
 
-// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..
+// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
 message AdaptiveLoadScheduler {
   // Input ports for the _Adaptive Load Scheduler_ component.
   message Ins {
@@ -1103,14 +1103,13 @@ message AdaptiveLoadScheduler {
     InPort signal = 1;
     // The setpoint input to the controller.
     InPort setpoint = 2;
-    // The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.
-    InPort enabled = 3;
+    // The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+    InPort overload_confirmation = 3;
   }
 
   // Output ports for the _Adaptive Load Scheduler_ component.
   message Outs {
-    // A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
-    // Deprecated: 1.6.0
+    // A Boolean signal that indicates whether the service is in overload state.
     OutPort is_overload = 1;
     // Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
     OutPort desired_load_multiplier = 2;
