@@ -17,7 +17,7 @@ cp tmp/policies/basic-service-protection-cr.yaml policy.yaml
 cp tmp/graphs/basic-service-protection-cr.mmd graph.mmd
 
 # git add the generated policy and graph
-git add policy.yaml graph.mmd
+"$git_root"/scripts/git_add_safely.sh policy.yaml graph.mmd
 
 # remove the tmp directory
 rm -rf tmp
