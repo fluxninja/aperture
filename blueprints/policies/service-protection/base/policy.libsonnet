@@ -10,7 +10,7 @@ function(cfg) {
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
     local evaluationInterval = params.evaluation_interval,
-    local promQLSignalName = 'PROMQL_' + std.toString(confirmationAccumulator.enabled_signals_count),
+    local promQLSignalName = 'PROMQL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(
       spec.v1.PromQL.withQueryString(confirmation.query_string)
       + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
@@ -18,7 +18,7 @@ function(cfg) {
         output: spec.v1.Port.withSignalName(promQLSignalName),
       })
     )),
-    local confirmationSignal = 'CONFIRMATION_SIGNAL_' + std.toString(confirmationAccumulator.enabled_signals_count),
+    local confirmationSignal = 'CONFIRMATION_SIGNAL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
     local confirmationDecider = spec.v1.Component.withDecider(
       spec.v1.Decider.withOperator(confirmation.operator)
       + spec.v1.Decider.withInPorts({
@@ -30,7 +30,7 @@ function(cfg) {
       })
     ),
 
-    local enabledSignal = 'ENABLED_' + std.toString(confirmationAccumulator.enabled_signals_count),
+    local overloadConfirmationSignal = 'OVERLOAD_CONFIRMATION_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
     local firstValidComponent = spec.v1.Component.withFirstValid(
       spec.v1.FirstValid.withInPorts({
         inputs: [
@@ -39,19 +39,19 @@ function(cfg) {
         ],
       })
       + spec.v1.FirstValid.withOutPorts({
-        output: spec.v1.Port.withSignalName(enabledSignal),
+        output: spec.v1.Port.withSignalName(overloadConfirmationSignal),
       }),
     ),
 
 
-    enabled_signals: confirmationAccumulator.enabled_signals + [enabledSignal],
-    enabled_signals_count: confirmationAccumulator.enabled_signals_count + 1,
+    overload_confirmation_signals: confirmationAccumulator.overload_confirmation_signals + [overloadConfirmationSignal],
+    overload_confirmation_signals_count: confirmationAccumulator.overload_confirmation_signals_count + 1,
     components: confirmationAccumulator.components + [promQLComponent, confirmationDecider, firstValidComponent],
   },
 
   local confirmationAccumulatorInitial = {
-    enabled_signals: [],
-    enabled_signals_count: 0,
+    overload_confirmation_signals: [],
+    overload_confirmation_signals_count: 0,
     components: [],
   },
 
@@ -61,19 +61,19 @@ function(cfg) {
     confirmationAccumulatorInitial
   ),
 
-  local enabledAnd = spec.v1.Component.withAnd(
+  local overloadConfirmationAnd = spec.v1.Component.withAnd(
     spec.v1.And.withInPorts({
       inputs: [
         spec.v1.Port.withSignalName(signal)
-        for signal in confirmationAccumulator.enabled_signals
+        for signal in confirmationAccumulator.overload_confirmation_signals
       ],
     })
-    + spec.v1.Or.withOutPorts({
-      output: spec.v1.Port.withSignalName('ENABLED'),
+    + spec.v1.And.withOutPorts({
+      output: spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION'),
     }),
   ),
 
-  local isConfirmationCriteria = std.length(confirmationAccumulator.enabled_signals) > 0,
+  local isConfirmationCriteria = std.length(confirmationAccumulator.overload_confirmation_signals) > 0,
   local adaptiveLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
       local adaptiveLoadScheduler = params.service_protection_core.adaptive_load_scheduler;
@@ -87,7 +87,7 @@ function(cfg) {
       + spec.v1.AdaptiveLoadScheduler.withDynamicConfigKey('load_scheduler')
       + spec.v1.AdaptiveLoadScheduler.withDefaultConfig(adaptiveLoadScheduler.default_config)
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
-        enabled: (if isConfirmationCriteria then spec.v1.Port.withSignalName('ENABLED') else spec.v1.Port.withConstantSignal(1)),
+        overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
         signal: spec.v1.Port.withSignalName('SIGNAL'),
         setpoint: spec.v1.Port.withSignalName('SETPOINT'),
       })
@@ -108,7 +108,7 @@ function(cfg) {
       + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.evaluation_interval)
       + spec.v1.Circuit.withComponents(
         confirmationAccumulator.components
-        + (if isConfirmationCriteria then [enabledAnd] else [])
+        + (if isConfirmationCriteria then [overloadConfirmationAnd] else [])
         + [
           adaptiveLoadSchedulerComponent,
         ]

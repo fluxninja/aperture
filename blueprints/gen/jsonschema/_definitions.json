@@ -130,7 +130,7 @@
       "additionalProperties": false
     },
     "AdaptiveLoadScheduler": {
-      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..",
+      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.",
       "properties": {
         "alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
@@ -207,9 +207,9 @@
     "AdaptiveLoadSchedulerIns": {
       "description": "Input ports for the _Adaptive Load Scheduler_ component.",
       "properties": {
-        "enabled": {
+        "overload_confirmation": {
           "$ref": "#/definitions/InPort",
-          "description": "The enabled port determines if the _Load Scheduler_ can shed _Flows_. By default, the Load Scheduler is enabled.",
+          "description": "The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.",
           "x-order": 0
         },
         "setpoint": {
@@ -246,7 +246,7 @@
         },
         "is_overload": {
           "$ref": "#/definitions/OutPort",
-          "title": "A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.\nDeprecated: 1.6.0",
+          "description": "A Boolean signal that indicates whether the service is in overload state.",
           "x-order": 3
         },
         "observed_load_multiplier": {
