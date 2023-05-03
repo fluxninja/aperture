@@ -1,35 +1,51 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/latency-aimd-concurrency-limiting/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
 common:
-  policy_name: "workload-prioritization"
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: workload-prioritization
+
 policy:
-  flux_meter:
-    selectors:
-      - agent_group: default
-        service: service1-demo-app.demoapp.svc.cluster.local
-        control_point: ingress
-  classifiers:
-    - selectors:
-        - agent_group: default
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers:
+        - selectors:
+            - service: service1-demo-app.demoapp.svc.cluster.local
+              control_point: ingress
+          rules:
+            user_type:
+              extractor:
+                from: request.http.headers.user-type
+  service_protection_core:
+    adaptive_load_scheduler:
+      # The selectors determine the flows that are protected by this policy.
+      # Type: []aperture.spec.v1.Selector
+      # Required: True
+      selectors:
+        - control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
-          control_point: ingress
-      rules:
-        user_type:
-          extractor:
-            from: request.http.headers.user-type
-  concurrency_controller:
-    selectors:
-      - agent_group: default
-        service: service1-demo-app.demoapp.svc.cluster.local
-        control_point: ingress
-    scheduler:
-      workloads:
-        - label_matcher:
-            match_labels:
-              user_type: "guest"
-          parameters:
-            priority: 50
-        - label_matcher:
-            match_labels:
-              http.request.header.user_type: subscriber
-          parameters:
-            priority: 200
+      scheduler:
+        workloads:
+          - label_matcher:
+              match_labels:
+                user_type: "guest"
+            parameters:
+              priority: 50
+          - label_matcher:
+              match_labels:
+                http.request.header.user_type: subscriber
+            parameters:
+              priority: 200
+  latency_baseliner:
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local

@@ -1,28 +1,15 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/latency-aimd-concurrency-limiting/gen/definitions.json
-# Generated values file for policies/latency-aimd-concurrency-limiting blueprint
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
 
 common:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "load-based-auto-scale"
+  policy_name: load-based-auto-scale
 
 policy:
-  # Flux Meter.
-  # Type: aperture.spec.v1.FluxMeter
-  flux_meter:
-    selectors:
-      - agent_group: default
-        # Service Name.
-        # Type: string
-        # Required: True
-        service: service1-demo-app.demoapp.svc.cluster.local
-        # Control Point Name.
-        # Type: string
-        # Required: True
-        control_point: ingress
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components:
@@ -34,15 +21,16 @@ policy:
             output:
               signal_name: AVERAGE_CPU
     - auto_scale:
-        pod_auto_scaler:
-          pod_scaler:
-            kubernetes_object_selector:
-              namespace: demoapp
-              api_version: apps/v1
-              kind: Deployment
-              name: service1-demo-app
-          min_replicas: "1"
-          max_replicas: "10"
+        auto_scaler:
+          scaler:
+            kubernetes_replicas:
+              kubernetes_object_selector:
+                namespace: demoapp
+                api_version: apps/v1
+                kind: Deployment
+                name: service1-demo-app
+          min_scale: "1"
+          max_scale: "10"
           scale_in_cooldown: "40s"
           scale_out_cooldown: "30s"
           scale_out_controllers:
@@ -67,9 +55,19 @@ policy:
                         value: 0.5
                   parameters:
                     slope: 1.0
-
-  concurrency_controller:
-    selectors:
-      - agent_group: default
-        service: service1-demo-app.demoapp.svc.cluster.local
-        control_point: ingress
+  service_protection_core:
+    adaptive_load_scheduler:
+      # The selectors determine the flows that are protected by this policy.
+      # Type: []aperture.spec.v1.Selector
+      # Required: True
+      selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local
+  latency_baseliner:
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local

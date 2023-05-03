@@ -4,6 +4,6 @@ set -euo pipefail
 # find git root
 pushd "$(git rev-parse --show-toplevel)" >/dev/null
 
-cp docs/content/tutorials/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml operator/config/samples/fluxninja.com_v1alpha1_policy.yaml
+cp docs/content/applying-policies/service-protection/assets/basic-service-protection/policy.yaml operator/config/samples/fluxninja.com_v1alpha1_policy.yaml
 
 popd >/dev/null

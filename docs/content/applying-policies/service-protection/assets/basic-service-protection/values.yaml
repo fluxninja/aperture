@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: basic-service-protection
+
+policy:
+  service_protection_core:
+    adaptive_load_scheduler:
+      # The selectors determine the flows that are protected by this policy.
+      # Type: []aperture.spec.v1.Selector
+      # Required: True
+      selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local
+  latency_baseliner:
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local

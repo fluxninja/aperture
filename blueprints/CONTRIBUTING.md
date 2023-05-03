@@ -15,10 +15,10 @@ blueprint: Latency AIMD Concurrency Limiting Policy
 sources:
   Dashboard:
     prefix: dashboard
-    path: policies/latency-aimd-concurrency-limiting/dashboard.libsonnet
+    path: policies/service-protection/average-latency/dashboard.libsonnet
   Policy:
     prefix: policy
-    path: policies/latency-aimd-concurrency-limiting/policy.libsonnet
+    path: policies/service-protection/average-latency/policy.libsonnet
 ```
 
 - `blueprint` key is currently unused, but it names this specific bundle
@@ -41,7 +41,7 @@ which policy or dashboard configuration is available in `config.libsonnet` and
 An example:
 
 ```yaml
-local blueprint = import 'policies/latency-aimd-concurrency-limiting.libsonnet';
+local blueprint = import 'policies/service-protection/average-latency.libsonnet';
 
 local policy = blueprint.policy;
 local dashboard = blueprint.dashboard;
@@ -145,7 +145,7 @@ To update README.md from blueprint configuration, use
 `scripts/blueprint-assets-generator.py`:
 
 ```sh
-$ ./scripts/blueprint-assets-generator.py policies/latency-aimd-concurrency-limiting
+$ ./scripts/blueprint-assets-generator.py policies/service-protection/average-latency
 $
 ```
 
@@ -160,8 +160,8 @@ Blueprints can be visualized. A blueprint is saved as a
 into an image with GraphViz:
 
 ```sh
-aperturectl compile --cr blueprints/examples/latency-aimd-concurrency-limiting/gen/policies/example.yaml --dot blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot
-dot -Tsvg  blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot > blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.svg
+aperturectl compile --cr blueprints/examples/service-protection/average-latency/gen/policies/example.yaml --dot blueprints/examples/service-protection/average-latency/gen/graph/graph.dot
+dot -Tsvg  blueprints/examples/service-protection/average-latency/gen/graph/graph.dot > blueprints/examples/service-protection/average-latency/gen/graph/graph.svg
 ```
 
 Before doing so make sure that generated yamls are up-to-date.
