@@ -20,7 +20,7 @@ component that is used within this blueprint.
 :::info
 
 See the tutorial on
-[Feature Rollout with Average Latency Feedback](/tutorials/flow-control/feature-rollout/with-average-latency-feedback.md)
+[Feature Rollout with Average Latency Feedback](/applying-policies/feature-rollout/with-average-latency-feedback.md)
 to see this blueprint in use.
 
 :::

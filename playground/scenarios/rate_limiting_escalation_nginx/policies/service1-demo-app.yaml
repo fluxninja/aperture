@@ -1,31 +1,14 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/latency-aimd-concurrency-limiting/gen/definitions.json
-# Generated values file for policies/latency-aimd-concurrency-limiting blueprint
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
-
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
 common:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "service1-demo-app"
+  policy_name: service1-demo-app
 
 policy:
-  # Flux Meter.
-  # Type: aperture.spec.v1.FluxMeter
-  flux_meter:
-    selectors:
-      - service: any
-        control_point: service3-demo-app
-  # List of classification rules.
-  # Type: []aperture.spec.v1.Classifier
-  classifiers:
-    - selectors: &concurrency_flow_selector
-        - service: any
-          control_point: service1-demo-app
-      rules:
-        user_type:
-          extractor:
-            from: request.http.headers.user-type
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components:
@@ -57,11 +40,10 @@ policy:
     - flow_control:
         rate_limiter:
           selectors:
-            - service: any
+            - control_point: service1-demo-app
               label_matcher:
                 match_labels:
                   "http.request.header.user_type": "bot"
-              control_point: service1-demo-app
           in_ports:
             limit:
               signal_name: RATE_LIMIT
@@ -69,22 +51,47 @@ policy:
             limit_reset_interval: 1s
             label_key: http.request.header.user_id
           dynamic_config_key: rate_limiter
-  concurrency_controller:
-    selectors: *concurrency_flow_selector
-    # Scheduler parameters.
-    # Type: aperture.spec.v1.SchedulerParameters
-    scheduler:
-      workloads:
-        - parameters:
-            priority: 50
-          label_matcher:
-            match_labels:
-              user_type: guest
-        - parameters:
-            priority: 200
-          label_matcher:
-            match_labels:
-              http.request.header.user_type: subscriber
-    # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
-    # Type: float64
-    load_multiplier_linear_increment: 0.0025
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers:
+        - selectors:
+            - control_point: service1-demo-app
+          rules:
+            user_type:
+              extractor:
+                from: request.http.headers.user-type
+
+  service_protection_core:
+    adaptive_load_scheduler:
+      # The selectors determine the flows that are protected by this policy.
+      # Type: []aperture.spec.v1.Selector
+      # Required: True
+      selectors:
+        - control_point: service1-demo-app
+      # Scheduler parameters.
+      # Type: aperture.spec.v1.SchedulerParameters
+      scheduler:
+        workloads:
+          - parameters:
+              priority: 50
+            label_matcher:
+              match_labels:
+                user_type: guest
+          - parameters:
+              priority: 200
+            label_matcher:
+              match_labels:
+                http.request.header.user_type: subscriber
+      # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
+      # Type: float64
+      load_multiplier_linear_increment: 0.0025
+
+  latency_baseliner:
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - control_point: service3-demo-app

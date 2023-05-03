@@ -135,54 +135,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-##### policy.latency_baseliner {#policy-latency-baseliner}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-ema"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.ema'
-    description='EMA parameters.'
-    type='Object (aperture.spec.v1.EMAParameters)'
-    reference='../../spec#e-m-a-parameters'
-    value='{"correction_factor_on_max_envelope_violation": 0.95, "ema_window": "1500s", "warmup_window": "60s"}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-latency-tolerance-multiplier"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.latency_tolerance_multiplier'
-    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.'
-    type='Number (double)'
-    reference=''
-    value='1.1'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-latency-ema-limit-multiplier"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.latency_ema_limit_multiplier'
-    description='Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.'
-    type='Number (double)'
-    reference=''
-    value='2'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ##### policy.concurrency_controller {#policy-concurrency-controller}
 
 <!-- vale on -->

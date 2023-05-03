@@ -17,20 +17,6 @@
     */
     components: [],
     /**
-    * @param (policy.latency_baseliner.ema: aperture.spec.v1.EMAParameters) EMA parameters.
-    * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
-    * @param (policy.latency_baseliner.latency_ema_limit_multiplier: float64) Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
-    */
-    latency_baseliner: {
-      ema: {
-        ema_window: '1500s',
-        warmup_window: '60s',
-        correction_factor_on_max_envelope_violation: 0.95,
-      },
-      latency_tolerance_multiplier: 1.1,
-      latency_ema_limit_multiplier: 2.0,
-    },
-    /**
     * @param (policy.concurrency_controller.selectors: []aperture.spec.v1.Selector required) Concurrency Limiter flow selectors.
     * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
     * @param (policy.concurrency_controller.scheduler.auto_tokens: bool) Automatically estimate cost (tokens) for workload requests.
