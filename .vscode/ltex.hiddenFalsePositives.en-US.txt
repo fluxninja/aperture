@@ -1,2 +1,3 @@
 {"rule":"EN_COMPOUND_ADJECTIVE_INTERNAL","sentence":"[Oo]pen source"}
 {"rule":"MISSING_GENITIVE","sentence":"Prometheus metrics"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qkubectl: It's the command-line tool to interact with Kubernetes clusters.\\E$"}
