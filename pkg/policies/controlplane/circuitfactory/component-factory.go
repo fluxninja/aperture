@@ -98,19 +98,10 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
-		case *policylangv1.FlowControl_FlowRegulator:
-			// Convert from *policylangv1.FlowControl_FlowRegulator to *policylangv1.FlowControl_Regulator
-			flowRegulatorProto := flowControl.GetFlowRegulator()
-			regulatorProto := &policylangv1.Regulator{}
-			err := convertOldComponentToNew(flowRegulatorProto, regulatorProto, nil)
-			if err != nil {
-				return Tree{}, nil, nil, err
-			}
-			ctor = mkCtor(regulatorProto, regulator.NewRegulatorAndOptions)
 		case *policylangv1.FlowControl_Regulator:
 			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
 		default:
-			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
+			return newFlowControlNestedAndOptions(flowControl, componentID, policyReadAPI)
 		}
 	case *policylangv1.Component_AutoScale:
 		autoScale := componentProto.GetAutoScale()

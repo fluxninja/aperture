@@ -3,6 +3,7 @@ package loadscheduler
 import (
 	"context"
 	"fmt"
+	"math"
 	"path"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -11,21 +12,26 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
+	prometheusmodel "github.com/prometheus/common/model"
 )
 
 // Actuator struct.
 type Actuator struct {
 	policyReadAPI  iface.Policy
 	decisionWriter *etcdwriter.Writer
-	actuatorProto  *policylangv1.LoadScheduler_Actuator
+	actuatorProto  *policyprivatev1.LoadActuator
+	tokensQuery    *promql.TaggedQuery
 	componentID    string
 	etcdPaths      []string
 	dryRun         bool
@@ -47,12 +53,15 @@ func (*Actuator) IsActuator() bool { return true }
 
 // NewActuatorAndOptions creates load actuator and its fx options.
 func NewActuatorAndOptions(
-	actuatorProto *policylangv1.LoadScheduler_Actuator,
+	actuatorProto *policyprivatev1.LoadActuator,
 	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroups []string,
 ) (runtime.Component, fx.Option, error) {
-	var etcdPaths []string
+	var (
+		etcdPaths []string
+		options   []fx.Option
+	)
 	for _, agentGroup := range agentGroups {
 		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
 		etcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
@@ -72,9 +81,39 @@ func NewActuatorAndOptions(
 		dryRun:        dryRun,
 	}
 
-	return lsa, fx.Options(
-		fx.Invoke(lsa.setupWriter),
-	), nil
+	// Prepare parameters for prometheus queries
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%s\"",
+		metrics.PolicyNameLabel,
+		policyReadAPI.GetPolicyName(),
+		metrics.PolicyHashLabel,
+		policyReadAPI.GetPolicyHash(),
+		metrics.ComponentIDLabel,
+		componentID,
+	)
+	if actuatorProto.WorkloadLatencyBasedTokens {
+		tokensQuery, tokensQueryOptions, tokensQueryErr := promql.NewTaggedQueryAndOptions(
+			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
+				metrics.WorkloadIndexLabel,
+				metrics.WorkloadLatencySumMetricName,
+				policyParams,
+				metrics.WorkloadIndexLabel,
+				metrics.WorkloadLatencyCountMetricName,
+				policyParams),
+			10*policyReadAPI.GetEvaluationInterval(),
+			componentID,
+			policyReadAPI,
+			"Tokens",
+		)
+		if tokensQueryErr != nil {
+			return nil, nil, tokensQueryErr
+		}
+		lsa.tokensQuery = tokensQuery
+		options = append(options, tokensQueryOptions)
+	}
+
+	options = append(options, fx.Invoke(lsa.setupWriter))
+
+	return lsa, fx.Options(options...), nil
 }
 
 func (la *Actuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
@@ -103,31 +142,67 @@ func (la *Actuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 
 // Execute implements runtime.Component.Execute.
 func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
+	retErr := func(err error) (runtime.PortToReading, error) {
+		var errMulti error
+		publishErr := la.publishDefaultDecision(tickInfo)
+		if publishErr != nil {
+			errMulti = multierr.Append(err, publishErr)
+		}
+		return nil, errMulti
+	}
+
+	tokensByWorkload := make(map[string]uint64)
+
+	if la.tokensQuery != nil {
+		taggedResult, err := la.tokensQuery.ExecuteTaggedQuery(tickInfo)
+		if err != nil {
+			if err != promql.ErrNoQueriesReturned {
+				return retErr(err)
+			}
+		}
+		promValue := taggedResult.Value
+		if promValue != nil {
+			vector, ok := promValue.(prometheusmodel.Vector)
+			if !ok {
+				err = fmt.Errorf("tokens query returned a non-vector value")
+				return retErr(err)
+			}
+			for _, sample := range vector {
+				for k, v := range sample.Metric {
+					if k == metrics.WorkloadIndexLabel {
+						// if sample.Value is NaN, continue
+						if math.IsNaN(float64(sample.Value)) {
+							continue
+						}
+						workloadIndex := string(v)
+						sampleValue := uint64(sample.Value)
+						tokensByWorkload[workloadIndex] = sampleValue
+						break
+					}
+				}
+			}
+		}
+	}
+
 	// Get the decision from the port
 	lm, ok := inPortReadings["load_multiplier"]
-	if ok {
-		if len(lm) > 0 {
-			lmReading := lm[0]
-			var lmValue float64
-			if lmReading.Valid() {
-				if lmReading.Value() <= 0 {
-					lmValue = 0
-				} else {
-					lmValue = lmReading.Value()
-				}
-
-				return nil, la.publishDecision(tickInfo, lmValue, false)
-			} else {
-				logger.Autosample().Info().Msg("Invalid load multiplier data")
-			}
-		} else {
-			logger.Autosample().Info().Msg("load_multiplier port has no reading")
-		}
-	} else {
-		logger.Autosample().Info().Msg("load_multiplier port not found")
+	if !ok {
+		return retErr(fmt.Errorf("load_multiplier port not found"))
 	}
-	return nil, la.publishDefaultDecision(tickInfo)
+	if len(lm) == 0 {
+		return retErr(fmt.Errorf("load_multiplier port has no reading"))
+	}
+	lmReading := lm[0]
+	var lmValue float64
+	if !lmReading.Valid() {
+		return retErr(fmt.Errorf("invalid load_multiplier reading"))
+	}
+	if lmReading.Value() <= 0 {
+		lmValue = 0
+	} else {
+		lmValue = lmReading.Value()
+	}
+	return nil, la.publishDecision(tickInfo, lmValue, false, tokensByWorkload)
 }
 
 // DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
@@ -136,7 +211,7 @@ func (la *Actuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller conf
 	key := la.actuatorProto.GetDynamicConfigKey()
 	// read dynamic config
 	if unmarshaller.IsSet(key) {
-		dynamicConfig := &policylangv1.LoadScheduler_Actuator_DynamicConfig{}
+		dynamicConfig := &policylangv1.LoadScheduler_DynamicConfig{}
 		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
 			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
 			return
@@ -147,7 +222,7 @@ func (la *Actuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller conf
 	}
 }
 
-func (la *Actuator) setConfig(config *policylangv1.LoadScheduler_Actuator_DynamicConfig) {
+func (la *Actuator) setConfig(config *policylangv1.LoadScheduler_DynamicConfig) {
 	if config != nil {
 		la.dryRun = config.GetDryRun()
 	} else {
@@ -156,19 +231,20 @@ func (la *Actuator) setConfig(config *policylangv1.LoadScheduler_Actuator_Dynami
 }
 
 func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
-	return la.publishDecision(tickInfo, 1.0, true)
+	return la.publishDecision(tickInfo, 1.0, true, nil)
 }
 
-func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool) error {
+func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool, tokensByWorkload map[string]uint64) error {
 	if la.dryRun {
 		passThrough = true
 	}
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Save load multiplier in decision message
 	decision := &policysyncv1.LoadDecision{
-		LoadMultiplier: loadMultiplier,
-		PassThrough:    passThrough,
-		TickInfo:       tickInfo.Serialize(),
+		LoadMultiplier:        loadMultiplier,
+		PassThrough:           passThrough,
+		TickInfo:              tickInfo.Serialize(),
+		TokensByWorkloadIndex: tokensByWorkload,
 	}
 	// Publish decision
 	logger.Autosample().Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package aperture.policy.private.v1;
+
+import "aperture/policy/language/v1/flowcontrol.proto";
+import "aperture/policy/language/v1/ports.proto";
+
+message LoadActuator {
+  message Ins {
+    // Load multiplier is proportion of [incoming
+    // token rate](#scheduler-outs) that needs to be accepted.
+    aperture.policy.language.v1.InPort load_multiplier = 1;
+  }
+
+  Ins in_ports = 1;
+  string component_id = 2;
+
+  aperture.policy.language.v1.LoadScheduler.DynamicConfig default_config = 3;
+
+  string dynamic_config_key = 4;
+
+  bool workload_latency_based_tokens = 5;
+}

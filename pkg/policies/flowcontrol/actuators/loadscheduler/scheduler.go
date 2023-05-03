@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"path"
 	"strconv"
 	"time"
 
@@ -17,10 +16,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
@@ -28,59 +24,14 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-var (
-	// FxNameTag is Load Scheduler Watcher's Fx Tag.
-	fxNameTag = config.NameTag("load_scheduler_watcher")
+// Array of Label Keys for WFQ and Token Bucket Metrics.
+var metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 
-	// Array of Label Keys for WFQ and Token Bucket Metrics.
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
-)
-
-// loadSchedulerModule returns the fx options for flowcontrol side pieces of load scheduler in the main fx app.
-func loadSchedulerModule() fx.Option {
-	return fx.Options(
-		// Tag the watcher so that other modules can find it.
-		fx.Provide(
-			fx.Annotate(
-				provideWatcher,
-				fx.ResultTags(fxNameTag),
-			),
-		),
-		fx.Invoke(
-			fx.Annotate(
-				setupLoadSchedulerFactory,
-				fx.ParamTags(fxNameTag),
-			),
-		),
-	)
-}
-
-// provideWatcher provides pointer to load scheduler watcher.
-func provideWatcher(
-	etcdClient *etcdclient.Client,
-	ai *agentinfo.AgentInfo,
-) (notifiers.Watcher, error) {
-	// Get Agent Group from host info gatherer
-	agentGroupName := ai.GetAgentGroup()
-	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.LoadSchedulerConfigPath,
-		paths.AgentGroupPrefix(agentGroupName))
-	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
-	if err != nil {
-		return nil, err
-	}
-	return watcher, nil
-}
-
-type loadSchedulerFactory struct {
-	engineAPI iface.Engine
-	registry  status.Registry
-
-	actuatorFactory *actuatorFactory
+type workloadSchedulerFactory struct {
+	registry status.Registry
 
 	// WFQ Metrics.
 	wfqFlowsGaugeVec    *prometheus.GaugeVec
@@ -93,60 +44,40 @@ type loadSchedulerFactory struct {
 	workloadCounterVec        *prometheus.CounterVec
 }
 
-// setupLoadSchedulerFactory sets up the load scheduler module in the main fx app.
-func setupLoadSchedulerFactory(
-	watcher notifiers.Watcher,
+// newWorkloadSchedulerFactory sets up the load scheduler module in the main fx app.
+func newWorkloadSchedulerFactory(
 	lifecycle fx.Lifecycle,
-	e iface.Engine,
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
-	etcdClient *etcdclient.Client,
-	ai *agentinfo.AgentInfo,
-) error {
-	agentGroup := ai.GetAgentGroup()
+) (*workloadSchedulerFactory, error) {
+	reg := statusRegistry.Child("component", "scheduler")
 
-	// Create factories
-	actuatorFactory, err := newActuatorFactory(lifecycle, etcdClient, agentGroup, prometheusRegistry)
-	if err != nil {
-		return err
+	wsFactory := &workloadSchedulerFactory{
+		registry: reg,
 	}
 
-	autoTokensFactory, err := newAutoTokensFactory(lifecycle, etcdClient, agentGroup)
-	if err != nil {
-		return err
-	}
-
-	reg := statusRegistry.Child("component", "load_scheduler")
-
-	lsFactory := &loadSchedulerFactory{
-		engineAPI:         e,
-		autoTokensFactory: autoTokensFactory,
-		actuatorFactory:   actuatorFactory,
-		registry:          reg,
-	}
-
-	lsFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
+	wsFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.WFQFlowsMetricName,
 			Help: "A gauge that tracks the number of flows in the WFQScheduler",
 		},
 		metricLabelKeys,
 	)
-	lsFactory.wfqRequestsGaugeVec = prometheus.NewGaugeVec(
+	wsFactory.wfqRequestsGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.WFQRequestsMetricName,
 			Help: "A gauge that tracks the number of queued requests in the WFQScheduler",
 		},
 		metricLabelKeys,
 	)
-	lsFactory.incomingTokensCounterVec = prometheus.NewCounterVec(
+	wsFactory.incomingTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: metrics.IncomingTokensMetricName,
 			Help: "A counter measuring work incoming into Scheduler",
 		},
 		metricLabelKeys,
 	)
-	lsFactory.acceptedTokensCounterVec = prometheus.NewCounterVec(
+	wsFactory.acceptedTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: metrics.AcceptedTokensMetricName,
 			Help: "A counter measuring work admitted by Scheduler",
@@ -154,7 +85,7 @@ func setupLoadSchedulerFactory(
 		metricLabelKeys,
 	)
 
-	lsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
 		Help: "Latency summary of workload",
 	}, []string{
@@ -164,7 +95,7 @@ func setupLoadSchedulerFactory(
 		metrics.WorkloadIndexLabel,
 	})
 
-	lsFactory.workloadCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+	wsFactory.workloadCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.WorkloadCounterMetricName,
 		Help: "Counter of workload requests",
 	}, []string{
@@ -175,39 +106,32 @@ func setupLoadSchedulerFactory(
 		metrics.WorkloadIndexLabel,
 		metrics.LimiterDroppedLabel,
 	})
-	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
-		config.NewProtobufUnmarshaller,
-		[]notifiers.FxOptionsFunc{lsFactory.newLoadSchedulerOptions},
-	)
-	if err != nil {
-		return err
-	}
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			var merr error
 
-			err := prometheusRegistry.Register(lsFactory.wfqFlowsGaugeVec)
+			err := prometheusRegistry.Register(wsFactory.wfqFlowsGaugeVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(lsFactory.wfqRequestsGaugeVec)
+			err = prometheusRegistry.Register(wsFactory.wfqRequestsGaugeVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(lsFactory.incomingTokensCounterVec)
+			err = prometheusRegistry.Register(wsFactory.incomingTokensCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(lsFactory.acceptedTokensCounterVec)
+			err = prometheusRegistry.Register(wsFactory.acceptedTokensCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(lsFactory.workloadLatencySummaryVec)
+			err = prometheusRegistry.Register(wsFactory.workloadLatencySummaryVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(lsFactory.workloadCounterVec)
+			err = prometheusRegistry.Register(wsFactory.workloadCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -217,27 +141,27 @@ func setupLoadSchedulerFactory(
 		OnStop: func(_ context.Context) error {
 			var merr error
 
-			if !prometheusRegistry.Unregister(lsFactory.wfqFlowsGaugeVec) {
+			if !prometheusRegistry.Unregister(wsFactory.wfqFlowsGaugeVec) {
 				err := fmt.Errorf("failed to unregister wfq_flows metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(lsFactory.wfqRequestsGaugeVec) {
+			if !prometheusRegistry.Unregister(wsFactory.wfqRequestsGaugeVec) {
 				err := fmt.Errorf("failed to unregister wfq_requests metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(lsFactory.incomingTokensCounterVec) {
+			if !prometheusRegistry.Unregister(wsFactory.incomingTokensCounterVec) {
 				err := fmt.Errorf("failed to unregister incoming_tokens_total metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(lsFactory.acceptedTokensCounterVec) {
+			if !prometheusRegistry.Unregister(wsFactory.acceptedTokensCounterVec) {
 				err := fmt.Errorf("failed to unregister accepted_tokens_total metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(lsFactory.workloadLatencySummaryVec) {
+			if !prometheusRegistry.Unregister(wsFactory.workloadLatencySummaryVec) {
 				err := fmt.Errorf("failed to unregister workload_latency_ms metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(lsFactory.workloadCounterVec) {
+			if !prometheusRegistry.Unregister(wsFactory.workloadCounterVec) {
 				err := fmt.Errorf("failed to unregister workload_counter metric")
 				merr = multierr.Append(merr, err)
 			}
@@ -246,9 +170,7 @@ func setupLoadSchedulerFactory(
 		},
 	})
 
-	notifiers.WatcherLifecycle(lifecycle, watcher, []notifiers.PrefixNotifier{fxDriver})
-
-	return nil
+	return wsFactory, nil
 }
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
@@ -260,7 +182,7 @@ type multiMatchResult struct {
 type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 
 // newLoadSchedulerOptions returns fx options for the load scheduler fx app.
-func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
+func (lsFactory *workloadSchedulerFactory) newLoadSchedulerOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
@@ -268,15 +190,15 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 	logger := lsFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.LoadSchedulerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	loadSchedulerProto := wrapperMessage.LoadScheduler
-	if err != nil || loadSchedulerProto == nil {
+	workloadSchedulerProto := wrapperMessage.LoadScheduler
+	if err != nil || workloadSchedulerProto == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
 		logger.Warn().Err(err).Msg("Failed to unmarshal load scheduler config wrapper")
 		return fx.Options(), err
 	}
 
 	// Scheduler config
-	schedulerProto := loadSchedulerProto.Parameters.Scheduler
+	schedulerProto := workloadSchedulerProto.Parameters.Scheduler
 	if schedulerProto == nil {
 		err = fmt.Errorf("no scheduler specified")
 		reg.SetStatus(status.NewStatus(nil, err))
@@ -299,18 +221,18 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 		}
 	}
 
-	ls := &loadScheduler{
-		Component:            wrapperMessage.GetCommonAttributes(),
-		loadSchedulerProto:   loadSchedulerProto,
-		registry:             reg,
-		loadSchedulerFactory: lsFactory,
-		workloadMultiMatcher: mm,
+	ls := &workloadScheduler{
+		Component:                wrapperMessage.GetCommonAttributes(),
+		workloadSchedulerProto:   workloadSchedulerProto,
+		registry:                 reg,
+		workloadSchedulerFactory: lsFactory,
+		workloadMultiMatcher:     mm,
 	}
 	// default workload params is not a required param so it can be nil
-	if ls.loadSchedulerProto.Parameters.Scheduler.DefaultWorkloadParameters == nil {
+	if ls.workloadSchedulerProto.Parameters.Scheduler.DefaultWorkloadParameters == nil {
 		p := &policylangv1.Scheduler_Workload_Parameters{}
 		config.SetDefaults(p)
-		ls.loadSchedulerProto.Parameters.Scheduler.DefaultWorkloadParameters = p
+		ls.workloadSchedulerProto.Parameters.Scheduler.DefaultWorkloadParameters = p
 	}
 
 	return fx.Options(
@@ -334,25 +256,25 @@ func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult 
 	return mmr
 }
 
-// loadScheduler implements load scheduler on the flowcontrol side.
-type loadScheduler struct {
+// workloadScheduler implements load scheduler on the flowcontrol side.
+type workloadScheduler struct {
 	iface.Component
-	scheduler             scheduler.Scheduler
-	registry              status.Registry
-	incomingTokensCounter prometheus.Counter
-	acceptedTokensCounter prometheus.Counter
-	loadSchedulerProto    *policylangv1.LoadScheduler
-	loadSchedulerFactory  *loadSchedulerFactory
-	autoTokens            *autoTokens
-	workloadMultiMatcher  *multiMatcher
+	scheduler                scheduler.Scheduler
+	registry                 status.Registry
+	incomingTokensCounter    prometheus.Counter
+	acceptedTokensCounter    prometheus.Counter
+	workloadSchedulerProto   *policylangv1.LoadScheduler
+	workloadSchedulerFactory *workloadSchedulerFactory
+	autoTokens               *autoTokens
+	workloadMultiMatcher     *multiMatcher
 }
 
 // Make sure LoadScheduler implements the iface.LoadScheduler.
-var _ iface.Limiter = &loadScheduler{}
+var _ iface.Limiter = &workloadScheduler{}
 
-func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
+func (ls *workloadScheduler) setup(lifecycle fx.Lifecycle) error {
 	// Factories
-	lsFactory := ls.loadSchedulerFactory
+	lsFactory := ls.workloadSchedulerFactory
 	actuatorFactory := lsFactory.actuatorFactory
 	autoTokensFactory := lsFactory.autoTokensFactory
 	// Form metric labels
@@ -362,12 +284,12 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.ComponentIDLabel] = ls.GetComponentId()
 	// Create sub components.
 	clock := clockwork.NewRealClock()
-	actuator, err := actuatorFactory.newActuator(ls.loadSchedulerProto.GetActuator(),
+	actuator, err := actuatorFactory.newActuator(ls.workloadSchedulerProto.GetActuator(),
 		ls, ls.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
 	}
-	if ls.loadSchedulerProto.GetActuator().WorkloadLatencyBasedTokens {
+	if ls.workloadSchedulerProto.GetActuator().WorkloadLatencyBasedTokens {
 		autoTokens, err := autoTokensFactory.newAutoTokens(
 			ls.GetPolicyName(), ls.GetPolicyHash(),
 			lifecycle, ls.GetComponentId(), ls.registry)
@@ -449,11 +371,11 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_tokens_total counter from its metric vector"))
 			}
-			deletedCount := ls.loadSchedulerFactory.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
+			deletedCount := ls.workloadSchedulerFactory.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {
 				log.Warn().Msg("Could not delete workload_latency_ms summary from its metric vector. No traffic to generate metrics?")
 			}
-			deletedCount = ls.loadSchedulerFactory.workloadCounterVec.DeletePartialMatch(metricLabels)
+			deletedCount = ls.workloadSchedulerFactory.workloadCounterVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {
 				log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
 			}
@@ -467,14 +389,14 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 }
 
 // GetSelectors returns selectors.
-func (ls *loadScheduler) GetSelectors() []*policylangv1.Selector {
-	return ls.loadSchedulerProto.GetSelectors()
+func (ls *workloadScheduler) GetSelectors() []*policylangv1.Selector {
+	return ls.workloadSchedulerProto.GetSelectors()
 }
 
 // Decide processes a single flow by load scheduler in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (ls *loadScheduler) Decide(ctx context.Context,
+func (ls *workloadScheduler) Decide(ctx context.Context,
 	labels map[string]string,
 ) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
@@ -509,7 +431,7 @@ func (ls *loadScheduler) Decide(ctx context.Context,
 	// 1. AutoTokens
 	// 2. Workload tokens
 	// 3. Label tokens
-	if ls.loadSchedulerProto.GetActuator().WorkloadLatencyBasedTokens {
+	if ls.workloadSchedulerProto.GetActuator().WorkloadLatencyBasedTokens {
 		if tokensAuto, ok := ls.autoTokens.GetTokensForWorkload(matchedWorkloadIndex); ok {
 			tokens = tokensAuto
 		}
@@ -583,7 +505,7 @@ func (ls *loadScheduler) Decide(ctx context.Context,
 }
 
 // Revert reverts the decision made by the limiter.
-func (ls *loadScheduler) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (ls *workloadScheduler) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo_); ok {
 		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
 		if tokens > 0 {
@@ -593,7 +515,7 @@ func (ls *loadScheduler) Revert(labels map[string]string, decision *flowcontrolv
 }
 
 // GetLimiterID returns the limiter ID.
-func (ls *loadScheduler) GetLimiterID() iface.LimiterID {
+func (ls *workloadScheduler) GetLimiterID() iface.LimiterID {
 	// TODO: move this to limiter base.
 	return iface.LimiterID{
 		PolicyName:  ls.GetPolicyName(),
@@ -603,8 +525,8 @@ func (ls *loadScheduler) GetLimiterID() iface.LimiterID {
 }
 
 // GetLatencyObserver returns histogram for specific workload.
-func (ls *loadScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
-	latencySummary, err := ls.loadSchedulerFactory.workloadLatencySummaryVec.GetMetricWith(labels)
+func (ls *workloadScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+	latencySummary, err := ls.workloadSchedulerFactory.workloadLatencySummaryVec.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting latency histogram")
 		return nil
@@ -614,8 +536,8 @@ func (ls *loadScheduler) GetLatencyObserver(labels map[string]string) prometheus
 }
 
 // GetRequestCounter returns request counter for specific workload.
-func (ls *loadScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
-	counter, err := ls.loadSchedulerFactory.workloadCounterVec.GetMetricWith(labels)
+func (ls *workloadScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	counter, err := ls.workloadSchedulerFactory.workloadCounterVec.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Getting counter")
 		return nil
