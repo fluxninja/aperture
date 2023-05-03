@@ -54,6 +54,7 @@ system properties or environment variables:
 | aperture.javaagent.config.file         | APERTURE_JAVAAGENT_CONFIG_FILE         |               | Path to a file containing configuration properties                                                  |
 | aperture.agent.hostname                | APERTURE_AGENT_HOSTNAME                | localhost     | Hostname of Aperture Agent to connect to                                                            |
 | aperture.agent.port                    | APERTURE_AGENT_PORT                    | 8089          | Port of Aperture Agent to connect to                                                                |
+| aperture.control.point.name            | APERTURE_CONTROL_POINT_NAME            |               | (Required) Name of the control point this agent represents                                          |
 | aperture.javaagent.insecure.grpc       | APERTURE_JAVAAGENT_INSECURE_GRPC       | true          | Whether gRPC connection to Aperture Agent should be over plaintext                                  |
 | aperture.javaagent.root.certificate    | APERTURE_JAVAAGENT_ROOT_CERTIFICATE    |               | Path to a file containing root certificate to be used <br /> (insecure connection must be disabled) |
 | aperture.connection.timeout.millis     | APERTURE_CONNECTION_TIMEOUT_MILLIS     | 1000          | Aperture Agent connection timeout in milliseconds                                                   |
@@ -68,6 +69,7 @@ Example invocation with commandline-set properties:
 java -javaagent:path/to/javaagent.jar \
 -Daperture.agent.hostname="some_host" \
 -Daperture.agent.port=12345 \
+-Daperture.control.point.name="awesomeFeature" \
 -Daperture.javaagent.ignored.paths="/healthz,/connected" \
 -jar path/to/application.jar
 ```
@@ -85,5 +87,6 @@ The `/config.properties` file:
 ```properties
 aperture.agent.hostname=some_host
 aperture.agent.port=12345
+aperture.control.point.name=awesomeFeature
 aperture.javaagent.ignored.paths=/healthz,/connected
 ```

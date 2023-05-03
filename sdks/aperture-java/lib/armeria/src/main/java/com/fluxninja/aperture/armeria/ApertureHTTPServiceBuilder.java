@@ -6,7 +6,7 @@ import com.linecorp.armeria.server.HttpService;
 /** A builder for configuring an {@link ApertureHTTPService}. */
 public class ApertureHTTPServiceBuilder {
     private ApertureSDK apertureSDK;
-    private String controlPointName = "ingress";
+    private String controlPointName = "";
 
     public ApertureHTTPServiceBuilder setApertureSDK(ApertureSDK apertureSDK) {
         this.apertureSDK = apertureSDK;
@@ -14,8 +14,7 @@ public class ApertureHTTPServiceBuilder {
     }
 
     /**
-     * Sets the control point name for traffic handled by this service. If not set, defaults to
-     * "ingress".
+     * Sets the control point name for traffic handled by this service.
      *
      * @param controlPointName control point name to be used
      * @return the builder object.

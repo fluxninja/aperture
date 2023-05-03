@@ -16,23 +16,25 @@ import java.util.function.Function;
 /** Decorates an {@link RpcClient} to enable flow control using provided {@link ApertureSDK} */
 public class ApertureRPCClient extends SimpleDecoratingRpcClient {
     private final ApertureSDK apertureSDK;
+    private final String controlPointName;
 
     public static Function<? super RpcClient, ApertureRPCClient> newDecorator(
-            ApertureSDK apertureSDK) {
+            ApertureSDK apertureSDK, String controlPointName) {
         ApertureRPCClientBuilder builder = new ApertureRPCClientBuilder();
-        builder.setApertureSDK(apertureSDK);
+        builder.setApertureSDK(apertureSDK).setControlPointName(controlPointName);
         return builder::build;
     }
 
-    public ApertureRPCClient(RpcClient delegate, ApertureSDK apertureSDK) {
+    public ApertureRPCClient(RpcClient delegate, ApertureSDK apertureSDK, String controlPointName) {
         super(delegate);
         this.apertureSDK = apertureSDK;
+        this.controlPointName = controlPointName;
     }
 
     @Override
     public RpcResponse execute(ClientRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow("egress", labels);
+        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels);
 
         if (flow.accepted()) {
             RpcResponse res;

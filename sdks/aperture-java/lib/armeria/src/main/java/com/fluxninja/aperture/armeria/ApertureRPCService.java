@@ -16,23 +16,26 @@ import java.util.function.Function;
 /** Decorates an {@link RpcService} to enable flow control using provided {@link ApertureSDK} */
 public class ApertureRPCService extends SimpleDecoratingRpcService {
     private final ApertureSDK apertureSDK;
+    private final String controlPointName;
 
     public static Function<? super RpcService, ApertureRPCService> newDecorator(
-            ApertureSDK apertureSDK) {
+            ApertureSDK apertureSDK, String controlPointName) {
         ApertureRPCServiceBuilder builder = new ApertureRPCServiceBuilder();
-        builder.setApertureSDK(apertureSDK);
+        builder.setApertureSDK(apertureSDK).setControlPointName(controlPointName);
         return builder::build;
     }
 
-    public ApertureRPCService(RpcService delegate, ApertureSDK apertureSDK) {
+    public ApertureRPCService(
+            RpcService delegate, ApertureSDK apertureSDK, String controlPointName) {
         super(delegate);
         this.apertureSDK = apertureSDK;
+        this.controlPointName = controlPointName;
     }
 
     @Override
     public RpcResponse serve(ServiceRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow("ingress", labels);
+        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels);
 
         if (flow.accepted()) {
             RpcResponse res;
