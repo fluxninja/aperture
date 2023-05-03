@@ -58,6 +58,12 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
+    /**
+     * Set timeout for connection to Aperture Agent. Set to 0 to block until response is received.
+     *
+     * @param timeout timeout for connection to Aperture Agent.
+     * @return the builder object.
+     */
     public ApertureSDKBuilder setDuration(Duration timeout) {
         this.timeout = timeout;
         return this;
