@@ -25,10 +25,10 @@ export let options = {
       stages: vuStages,
       env: { USER_TYPE: "subscriber" },
     },
-    bots: {
+    crawlers: {
       executor: "ramping-vus",
       stages: vuStages,
-      env: { USER_TYPE: "bot" },
+      env: { USER_TYPE: "crawler" },
     },
   },
 };
