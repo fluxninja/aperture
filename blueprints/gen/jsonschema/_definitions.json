@@ -209,7 +209,7 @@
       "properties": {
         "overload_confirmation": {
           "$ref": "#/definitions/InPort",
-          "description": "Overload confirmation port provides additional criteria to determine overload state which results in Flow throttling at the service.",
+          "description": "Overload confirmation port provides additional criteria to determine overload state which results in flow throttling at the service.",
           "x-order": 0
         },
         "setpoint": {

@@ -222,7 +222,7 @@ definitions:
     properties:
       overload_confirmation:
         description: Overload confirmation port provides additional criteria to determine
-          overload state which results in Flow throttling at the service.
+          overload state which results in flow throttling at the service.
         x-order: 0
         $ref: '#/definitions/InPort'
       setpoint:
