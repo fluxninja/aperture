@@ -21,13 +21,13 @@ policy:
               value: 1.0
         out_ports:
           output:
-            signal_name: IS_BOT_ESCALATION
+            signal_name: IS_CRAWLER_ESCALATION
         operator: lt
         true_for: 30s
     - switcher:
         in_ports:
           switch:
-            signal_name: IS_BOT_ESCALATION
+            signal_name: IS_CRAWLER_ESCALATION
           on_signal:
             constant_signal:
               value: 0.0
@@ -44,7 +44,7 @@ policy:
               control_point: ingress
               label_matcher:
                 match_labels:
-                  "http.request.header.user_type": "bot"
+                  "http.request.header.user_type": "crawler"
           in_ports:
             limit:
               signal_name: RATE_LIMIT

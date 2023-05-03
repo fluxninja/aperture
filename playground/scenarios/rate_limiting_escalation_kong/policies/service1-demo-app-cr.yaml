@@ -62,7 +62,7 @@ spec:
         operator: lt
         out_ports:
           output:
-            signal_name: IS_BOT_ESCALATION
+            signal_name: IS_CRAWLER_ESCALATION
         true_for: 30s
     - switcher:
         in_ports:
@@ -73,7 +73,7 @@ spec:
             constant_signal:
               value: 0
           switch:
-            signal_name: IS_BOT_ESCALATION
+            signal_name: IS_CRAWLER_ESCALATION
         out_ports:
           output:
             signal_name: RATE_LIMIT
@@ -90,7 +90,7 @@ spec:
           - control_point: service1-demo-app
             label_matcher:
               match_labels:
-                http.request.header.user_type: bot
+                http.request.header.user_type: crawler
     - query:
         promql:
           evaluation_interval: 1s

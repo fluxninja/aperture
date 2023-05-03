@@ -122,7 +122,7 @@ designed to overload the demo application to showcase the capabilities of
 Aperture.
 
 The load generator is configured to generate the following traffic pattern for
-`subscriber`, `guest` and `bot` traffic types:
+`subscriber`, `guest` and `crawler` traffic types:
 
 - Ramp up to `5` concurrent users in `10s`.
 - Hold at `5` concurrent users for `2m`.

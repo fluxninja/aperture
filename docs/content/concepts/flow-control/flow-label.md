@@ -101,13 +101,13 @@ Returns:
         "http.request.header.cookie": "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
         "http.request.header.user_agent": "k6/0.42.0 (https://k6.io/)",
         "http.request.header.user_id": "14",
-        "http.request.header.user_type": "bot",
+        "http.request.header.user_type": "guest",
         "http.request.header.x_forwarded_proto": "http",
         "http.request.header.x_request_id": "3958dad8-eb71-47f0-a9f6-500cccb097d2",
         "http.request_content_length": "0",
         "http.scheme": "http",
         "http.target": "/request",
-        "user_type": "bot"
+        "user_type": "guest"
       }
     }
   ]
