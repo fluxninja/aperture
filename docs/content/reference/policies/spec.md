@@ -474,8 +474,8 @@ Input ports for the _Adaptive Load Scheduler_ component.
 
 <!-- vale on -->
 
-The overload*confirmation port provides additional criteria to determine
-overload state which results in \_Flow* throttling at the service.
+Overload confirmation port provides additional criteria to determine overload
+state which results in _Flow_ throttling at the service.
 
 </dd>
 <dt>setpoint</dt>
@@ -487,7 +487,7 @@ overload state which results in \_Flow* throttling at the service.
 
 <!-- vale on -->
 
-The setpoint input to the controller.
+Setpoint input to the controller.
 
 </dd>
 <dt>signal</dt>
@@ -499,7 +499,7 @@ The setpoint input to the controller.
 
 <!-- vale on -->
 
-The input signal to the controller.
+Input signal to the controller.
 
 </dd>
 </dl>

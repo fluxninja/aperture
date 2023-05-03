@@ -160,13 +160,13 @@ definitions:
         properties:
             overload_confirmation:
                 $ref: '#/definitions/InPort'
-                description: The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+                description: Overload confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
             setpoint:
                 $ref: '#/definitions/InPort'
-                description: The setpoint input to the controller.
+                description: Setpoint input to the controller.
             signal:
                 $ref: '#/definitions/InPort'
-                description: The input signal to the controller.
+                description: Input signal to the controller.
         type: object
     AdaptiveLoadSchedulerOuts:
         description: Output ports for the _Adaptive Load Scheduler_ component.
