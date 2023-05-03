@@ -30,8 +30,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
     public static Function<? super HttpService, ApertureHTTPService> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
         ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
-        builder.setApertureSDK(apertureSDK);
-        builder.setControlPointName(controlPointName);
+        builder.setApertureSDK(apertureSDK).setControlPointName(controlPointName);
         return builder::build;
     }
 

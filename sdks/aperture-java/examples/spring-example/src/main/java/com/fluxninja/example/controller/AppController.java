@@ -45,6 +45,8 @@ public class AppController {
         registrationBean.addInitParameter("agent_host", agentHost);
         String agentPort = env.getProperty("FN_AGENT_PORT");
         registrationBean.addInitParameter("agent_port", agentPort);
+        String controlPointName = env.getProperty("FN_CONTROL_POINT_NAME");
+        registrationBean.addInitParameter("control_point_name", controlPointName);
         String grpcTimeoutMs = env.getProperty("FN_GRPC_TIMEOUT_MS");
         registrationBean.addInitParameter("timeout_ms", grpcTimeoutMs);
         String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
