@@ -160,7 +160,7 @@ definitions:
         properties:
             overload_confirmation:
                 $ref: '#/definitions/InPort'
-                description: Overload confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+                description: Overload confirmation port provides additional criteria to determine overload state which results in Flow throttling at the service.
             setpoint:
                 $ref: '#/definitions/InPort'
                 description: Setpoint input to the controller.
@@ -3143,8 +3143,8 @@ definitions:
               of:
                 - label_exists: foo
                 - label_equals:
-                     label: app
-                     value: frobnicator
+                    label: app
+                    value: frobnicator
             ```
         properties:
             all:

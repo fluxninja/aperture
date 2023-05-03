@@ -54,8 +54,8 @@ message K8sLabelMatcherRequirement {
 //   of:
 //     - label_exists: foo
 //     - label_equals:
-//          label: app
-//          value: frobnicator
+//         label: app
+//         value: frobnicator
 // ```
 message MatchExpression {
   // List of MatchExpressions that is used for all or any matching

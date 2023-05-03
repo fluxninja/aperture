@@ -1103,7 +1103,7 @@ message AdaptiveLoadScheduler {
     InPort signal = 1;
     // Setpoint input to the controller.
     InPort setpoint = 2;
-    // Overload confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+    // Overload confirmation port provides additional criteria to determine overload state which results in Flow throttling at the service.
     InPort overload_confirmation = 3;
   }
 

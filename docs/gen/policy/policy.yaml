@@ -222,7 +222,7 @@ definitions:
     properties:
       overload_confirmation:
         description: Overload confirmation port provides additional criteria to determine
-          overload state which results in _Flow_ throttling at the service.
+          overload state which results in Flow throttling at the service.
         x-order: 0
         $ref: '#/definitions/InPort'
       setpoint:
@@ -3061,8 +3061,8 @@ definitions:
         of:
           - label_exists: foo
           - label_equals:
-               label: app
-               value: frobnicator
+              label: app
+              value: frobnicator
       ```
     type: object
     title: Defines a `[map<string, string> → bool]` expression to be evaluated on
