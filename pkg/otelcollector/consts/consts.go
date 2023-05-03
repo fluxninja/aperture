@@ -40,10 +40,10 @@ const (
 	FlowDurationLabel = "flow_duration_ms"
 	// ApertureProcessingDurationLabel describes Aperture's processing duration in milliseconds.
 	ApertureProcessingDurationLabel = "aperture_processing_duration_ms"
-	// ApertureSourceServiceLabel describes the source service of the flow.
-	ApertureSourceServiceLabel = "aperture.source_service"
-	// ApertureDestinationServiceLabel describes the destination service of the flow.
-	ApertureDestinationServiceLabel = "aperture.destination_service"
+	// ApertureSourceServiceLabel describes the source service FQDNs of the flow.
+	ApertureSourceServiceLabel = "aperture.source_fqdns"
+	// ApertureDestinationServiceLabel describes the destination service FQDNs of the flow.
+	ApertureDestinationServiceLabel = "aperture.destination_fqdns"
 
 	/* The following are derived labels that are applied based on contents of check response. */
 
