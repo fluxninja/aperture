@@ -100,10 +100,14 @@ public final class ApertureSDK {
 
         CheckResponse res = null;
         try {
-            res =
-                    this.flowControlClient
-                            .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-                            .check(req);
+            if (timeout.isZero()) {
+                res = this.flowControlClient.check(req);
+            } else {
+                res =
+                        this.flowControlClient
+                                .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .check(req);
+            }
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
         }
@@ -138,10 +142,14 @@ public final class ApertureSDK {
 
         CheckHTTPResponse res = null;
         try {
-            res =
-                    this.httpFlowControlClient
-                            .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-                            .checkHTTP(req);
+            if (timeout.isZero()) {
+                res = this.httpFlowControlClient.checkHTTP(req);
+            } else {
+                res =
+                        this.httpFlowControlClient
+                                .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .checkHTTP(req);
+            }
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
         }
