@@ -20,7 +20,7 @@ for a GraphQL query.
 
 ## Policy
 
-This tutorial will demonstrate how to implement a policy that uses
+This tutorial will demonstrate how to implement a policy that uses a
 [_Classifier_][classifier] to extract the `userID` claim from a JWT token in the
 request's Authorization header and then rate limit unique users based on that
 `user_id` [_Flow Label_][flow-label].

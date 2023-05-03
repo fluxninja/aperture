@@ -2062,7 +2062,7 @@ func (x *LoadActuator) GetDefaultConfig() *LoadActuator_DynamicConfig {
 	return nil
 }
 
-// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint..
+// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
 type AdaptiveLoadScheduler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4443,7 +4443,7 @@ type AdaptiveLoadScheduler_Ins struct {
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
 	// The setpoint input to the controller.
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
-	// The overload_confirmation port provides additional criteria (in addition to signal/setpoint) to determine overload state which results in _Flow_ throttling.
+	// The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
 	OverloadConfirmation *InPort `protobuf:"bytes,3,opt,name=overload_confirmation,json=overloadConfirmation,proto3" json:"overload_confirmation,omitempty"`
 }
 
@@ -4506,7 +4506,7 @@ type AdaptiveLoadScheduler_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance. And overload confirmation signal is not false.
+	// A Boolean signal that indicates whether the service is in overload state.
 	IsOverload *OutPort `protobuf:"bytes,1,opt,name=is_overload,json=isOverload,proto3" json:"is_overload,omitempty"`
 	// Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
 	DesiredLoadMultiplier *OutPort `protobuf:"bytes,2,opt,name=desired_load_multiplier,json=desiredLoadMultiplier,proto3" json:"desired_load_multiplier,omitempty"`

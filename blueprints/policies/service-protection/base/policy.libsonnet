@@ -68,7 +68,7 @@ function(cfg) {
         for signal in confirmationAccumulator.overload_confirmation_signals
       ],
     })
-    + spec.v1.Or.withOutPorts({
+    + spec.v1.And.withOutPorts({
       output: spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION'),
     }),
   ),
