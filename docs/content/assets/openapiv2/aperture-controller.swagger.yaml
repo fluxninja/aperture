@@ -398,9 +398,10 @@ definitions:
     description: Input ports for the _Adaptive Load Scheduler_ component.
     type: object
     properties:
-      enabled:
-        description: The enabled port determines if the _Load Scheduler_ can shed
-          _Flows_. By default, the Load Scheduler is enabled.
+      overload_confirmation:
+        description: The overload_confirmation port provides additional criteria (in
+          addition to signal/setpoint) to determine overload state which results in
+          _Flow_ throttling.
         $ref: '#/definitions/InPort'
       setpoint:
         description: The setpoint input to the controller.
@@ -425,9 +426,9 @@ definitions:
           to the service (including rejected ones).
         $ref: '#/definitions/OutPort'
       is_overload:
-        title: |-
-          A Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint, considering a certain tolerance.
-          Deprecated: 1.6.0
+        description: A Boolean signal that indicates whether the service is overloaded
+          based on the deviation of the signal from the setpoint, considering a certain
+          tolerance. And overload confirmation signal is not false.
         $ref: '#/definitions/OutPort'
       observed_load_multiplier:
         description: Observed Load multiplier is the ratio of accepted token rate

@@ -19,7 +19,7 @@ spec:
             min_gradient: 0.1
             slope: -1
           in_ports:
-            enabled:
+            overload_confirmation:
               constant_signal:
                 value: 1
             setpoint:

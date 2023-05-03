@@ -2,7 +2,7 @@ flowchart LR
 subgraph root.0[<center>AdaptiveLoadScheduler<br/>1 selectors</center>]
 subgraph root.0_inports[ ]
 style root.0_inports fill:none,stroke:none
-root.0enabled[enabled]
+root.0overload_confirmation[overload_confirmation]
 root.0setpoint[setpoint]
 root.0signal[signal]
 end
@@ -11,7 +11,7 @@ style root.0_outports fill:none,stroke:none
 root.0observed_load_multiplier[observed_load_multiplier]
 end
 end
-root.0_enabled_FakeConstantout((1.00))
+root.0_overload_confirmation_FakeConstantout((1.00))
 subgraph root.1[<center>PromQL<br/>every 10s</center>]
 subgraph root.1_outports[ ]
 style root.1_outports fill:none,stroke:none
@@ -70,8 +70,8 @@ style root.6_outports fill:none,stroke:none
 root.6output[output]
 end
 end
-root.0_enabled_FakeConstantout --> root.0enabled
 root.0observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.2scale_out_signal_0
+root.0_overload_confirmation_FakeConstantout --> root.0overload_confirmation
 root.1output --> |AVERAGE_CPU| root.2scale_in_signal_0
 root.2_scale_in_setpoint_0_FakeConstantout --> root.2scale_in_setpoint_0
 root.2_scale_out_setpoint_0_FakeConstantout --> root.2scale_out_setpoint_0

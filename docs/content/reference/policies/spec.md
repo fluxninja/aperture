@@ -465,7 +465,7 @@ Selectors for the component.
 Input ports for the _Adaptive Load Scheduler_ component.
 
 <dl>
-<dt>enabled</dt>
+<dt>overload_confirmation</dt>
 <dd>
 
 <!-- vale off -->
@@ -474,8 +474,9 @@ Input ports for the _Adaptive Load Scheduler_ component.
 
 <!-- vale on -->
 
-The enabled port determines if the _Load Scheduler_ can shed _Flows_. By
-default, the Load Scheduler is enabled.
+The overload*confirmation port provides additional criteria (in addition to
+signal/setpoint) to determine overload state which results in \_Flow*
+throttling.
 
 </dd>
 <dt>setpoint</dt>
@@ -563,8 +564,8 @@ Incoming token rate is the number of tokens per second incoming to the service
 <!-- vale on -->
 
 A Boolean signal that indicates whether the service is overloaded based on the
-deviation of the signal from the setpoint, considering a certain tolerance.
-Deprecated: 1.6.0
+deviation of the signal from the setpoint, considering a certain tolerance. And
+overload confirmation signal is not false.
 
 </dd>
 <dt>observed_load_multiplier</dt>
