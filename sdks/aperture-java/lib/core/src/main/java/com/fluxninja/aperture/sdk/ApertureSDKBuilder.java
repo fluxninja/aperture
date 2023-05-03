@@ -26,6 +26,7 @@ public final class ApertureSDKBuilder {
     private Duration timeout;
     private String host;
     private int port;
+    private String defaultControlPointName;
     private boolean useHttpsInOtlpExporter = false;
     private boolean insecureGrpc = true;
     private String certFile;
@@ -43,6 +44,17 @@ public final class ApertureSDKBuilder {
 
     public ApertureSDKBuilder setPort(int port) {
         this.port = port;
+        return this;
+    }
+
+    /**
+     * Set control point name to be used if not overridden on flow creation.
+     *
+     * @param controlPointName control point name to be used
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder setControlPointName(String controlPointName) {
+        this.defaultControlPointName = controlPointName;
         return this;
     }
 
@@ -225,6 +237,7 @@ public final class ApertureSDKBuilder {
                 httpFlowControlClient,
                 tracer,
                 timeout,
+                defaultControlPointName,
                 ignoredPaths,
                 ignoredPathsMatchRegex);
     }

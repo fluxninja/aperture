@@ -34,6 +34,8 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel ch) {
+        String controlPointName = "someFeature";
+
         try {
             sdk = ApertureSDK.builder().setHost(this.agentHost).setPort(this.agentPort).build();
         } catch (ApertureSDKException ex) {
@@ -45,7 +47,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
         // ApertureServerHandler must be added before the response-generating HelloWorldHandler,
         //    but after the codec handler.
-        pipeline.addLast(new ApertureServerHandler(sdk));
+        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName));
         pipeline.addLast(new HelloWorldHandler());
     }
 }

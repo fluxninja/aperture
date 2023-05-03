@@ -14,6 +14,7 @@ public class ArmeriaServer {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
@@ -57,6 +58,10 @@ public class ArmeriaServer {
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }
+        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
+        if (controlPointName == null) {
+            controlPointName = DEFAULT_CONTROL_POINT_NAME;
+        }
         String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
@@ -89,7 +94,8 @@ public class ArmeriaServer {
         serverBuilder.service("/connected", createConnectedHTTPService());
 
         ApertureHTTPService decoratedService =
-                createHelloHTTPService().decorate(ApertureHTTPService.newDecorator(apertureSDK));
+                createHelloHTTPService()
+                        .decorate(ApertureHTTPService.newDecorator(apertureSDK, controlPointName));
         serverBuilder.service("/super", decoratedService);
 
         Server server = serverBuilder.build();

@@ -6,7 +6,7 @@ import com.linecorp.armeria.client.HttpClient;
 /** A builder for configuring an {@link ApertureHTTPClient}. */
 public class ApertureHTTPClientBuilder {
     private ApertureSDK apertureSDK;
-    private String controlPointName = "egress";
+    private String controlPointName = "";
 
     public ApertureHTTPClientBuilder setApertureSDK(ApertureSDK apertureSDK) {
         this.apertureSDK = apertureSDK;
@@ -14,8 +14,7 @@ public class ApertureHTTPClientBuilder {
     }
 
     /**
-     * Sets the control point name for traffic produced by this client. If not set, defaults to
-     * "egress".
+     * Sets the control point name for traffic produced by this client.
      *
      * @param controlPointName control point name to be used
      * @return the builder object.
