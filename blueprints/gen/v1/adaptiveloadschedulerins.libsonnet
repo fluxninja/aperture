@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withEnabled(enabled):: {
-    enabled: enabled,
+  withOverloadConfirmation(overload_confirmation):: {
+    overload_confirmation: overload_confirmation,
   },
-  withEnabledMixin(enabled):: {
-    enabled+: enabled,
+  withOverloadConfirmationMixin(overload_confirmation):: {
+    overload_confirmation+: overload_confirmation,
   },
   withSetpoint(setpoint):: {
     setpoint: setpoint,

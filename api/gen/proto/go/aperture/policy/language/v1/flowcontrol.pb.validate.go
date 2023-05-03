@@ -9040,11 +9040,11 @@ func (m *AdaptiveLoadScheduler_Ins) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetEnabled()).(type) {
+		switch v := interface{}(m.GetOverloadConfirmation()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, AdaptiveLoadScheduler_InsValidationError{
-					field:  "Enabled",
+					field:  "OverloadConfirmation",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -9052,16 +9052,16 @@ func (m *AdaptiveLoadScheduler_Ins) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, AdaptiveLoadScheduler_InsValidationError{
-					field:  "Enabled",
+					field:  "OverloadConfirmation",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetOverloadConfirmation()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AdaptiveLoadScheduler_InsValidationError{
-				field:  "Enabled",
+				field:  "OverloadConfirmation",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

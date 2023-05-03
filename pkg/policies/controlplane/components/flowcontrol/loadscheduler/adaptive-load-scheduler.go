@@ -12,7 +12,7 @@ import (
 const (
 	alsSignalPortName                 = "signal"
 	alsSetpointPortName               = "setpoint"
-	alsEnabledPortName                = "enabled"
+	alsOverloadConfirmationPortName   = "overload_confirmation"
 	alsIsOverloadPortName             = "is_overload"
 	alsDesiredLoadMultiplierPortName  = "desired_load_multiplier"
 	alsObservedLoadMultiplierPortName = "observed_load_multiplier"
@@ -48,9 +48,9 @@ func ParseAdaptiveLoadScheduler(
 		if setpointPort != nil {
 			nestedInPortsMap[alsSetpointPortName] = setpointPort
 		}
-		enabled := inPorts.Enabled
-		if enabled != nil {
-			nestedInPortsMap[alsEnabledPortName] = enabled
+		overloadConfirmation := inPorts.OverloadConfirmation
+		if overloadConfirmation != nil {
+			nestedInPortsMap[alsOverloadConfirmationPortName] = overloadConfirmation
 		}
 	}
 
@@ -180,7 +180,7 @@ func ParseAdaptiveLoadScheduler(
 						},
 						OutPorts: &policylangv1.Extrapolator_Outs{
 							Output: &policylangv1.OutPort{
-								SignalName: "EXTRAPOLATED_LOAD_MULTIPLIER",
+								SignalName: "DESIRED_LOAD_MULTIPLIER",
 							},
 						},
 					},
@@ -193,14 +193,14 @@ func ParseAdaptiveLoadScheduler(
 							Inputs: []*policylangv1.InPort{
 								{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ENABLED",
+										SignalName: "OVERLOAD_CONFIRMATION",
 									},
 								},
 								{
 									Value: &policylangv1.InPort_ConstantSignal{
 										ConstantSignal: &policylangv1.ConstantSignal{
 											Const: &policylangv1.ConstantSignal_Value{
-												Value: 1, // enabled by default
+												Value: 1, // OVERLOAD_CONFIRMATION is true by default
 											},
 										},
 									},
@@ -209,39 +209,7 @@ func ParseAdaptiveLoadScheduler(
 						},
 						OutPorts: &policylangv1.FirstValid_Outs{
 							Output: &policylangv1.OutPort{
-								SignalName: "IS_ENABLED",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Switcher{
-					Switcher: &policylangv1.Switcher{
-						InPorts: &policylangv1.Switcher_Ins{
-							Switch: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "IS_ENABLED",
-								},
-							},
-							OnSignal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "EXTRAPOLATED_LOAD_MULTIPLIER",
-								},
-							},
-							OffSignal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_SpecialValue{
-											SpecialValue: "NaN",
-										},
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.Switcher_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "DESIRED_LOAD_MULTIPLIER",
+								SignalName: "OVERLOAD_CONFIRMATION_WITH_DEFAULT",
 							},
 						},
 					},
@@ -342,6 +310,31 @@ func ParseAdaptiveLoadScheduler(
 						},
 						OutPorts: &policylangv1.Decider_Outs{
 							Output: &policylangv1.OutPort{
+								SignalName: "OVERLOAD_BASED_ON_SIGNAL",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_And{
+					And: &policylangv1.And{
+						InPorts: &policylangv1.And_Ins{
+							Inputs: []*policylangv1.InPort{
+								{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "OVERLOAD_BASED_ON_SIGNAL",
+									},
+								},
+								{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "OVERLOAD_CONFIRMATION_WITH_DEFAULT",
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.And_Outs{
+							Output: &policylangv1.OutPort{
 								SignalName: "IS_OVERLOAD",
 							},
 						},
@@ -389,7 +382,7 @@ func ParseAdaptiveLoadScheduler(
 
 	components.AddNestedIngress(nestedCircuit, alsSignalPortName, "SIGNAL")
 	components.AddNestedIngress(nestedCircuit, alsSetpointPortName, "SETPOINT")
-	components.AddNestedIngress(nestedCircuit, alsEnabledPortName, "ENABLED")
+	components.AddNestedIngress(nestedCircuit, alsOverloadConfirmationPortName, "OVERLOAD_CONFIRMATION")
 	components.AddNestedEgress(nestedCircuit, alsIsOverloadPortName, "IS_OVERLOAD")
 	components.AddNestedEgress(nestedCircuit, alsDesiredLoadMultiplierPortName, "DESIRED_LOAD_MULTIPLIER")
 	components.AddNestedEgress(nestedCircuit, alsObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
