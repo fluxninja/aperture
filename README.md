@@ -82,12 +82,12 @@ To try Aperture in a local Kubernetes environment, refer to
 ### 🏎️ Installation
 
 To install Aperture system, please follow the
-[Installation](https://docs.fluxninja.com/category/install-aperture) guide.
+[Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
 ### 📖 Tutorials
 
 To learn how to write Aperture policies, please read the
-[Tutorials](https://docs.fluxninja.com/category/tutorials).
+[Tutorials](https://docs.fluxninja.com/tutorials).
 
 ## 🎥 Videos
 
