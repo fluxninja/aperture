@@ -7,73 +7,33 @@ metadata:
 spec:
   circuit:
     components:
-    - query:
-        promql:
-          evaluation_interval: 1s
-          out_ports:
-            output:
-              signal_name: LATENCY
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="service1-demo-app"}[5s]))
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: LATENCY
-          rhs:
-            constant_signal:
-              value: 2
-        operator: mul
-        out_ports:
-          output:
-            signal_name: MAX_EMA
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: LATENCY_EMA
-          rhs:
-            constant_signal:
-              value: 1.1
-        operator: mul
-        out_ports:
-          output:
-            signal_name: LATENCY_SETPOINT
-    - ema:
-        in_ports:
-          input:
-            signal_name: LATENCY
-          max_envelope:
-            signal_name: MAX_EMA
-        out_ports:
-          output:
-            signal_name: LATENCY_EMA
-        parameters:
-          correction_factor_on_max_envelope_violation: 0.95
-          ema_window: 1500s
-          warmup_window: 60s
     - flow_control:
-        aimd_concurrency_controller:
+        adaptive_load_scheduler:
           alerter_parameters:
-            alert_name: Load Shed Event
+            alert_name: Load Throttling Event
           default_config:
             dry_run: false
-          dynamic_config_key: concurrency_controller
+          dynamic_config_key: load_scheduler
           gradient_parameters:
             max_gradient: 1
             min_gradient: 0.1
             slope: -1
           in_ports:
+            enabled:
+              constant_signal:
+                value: 1
             setpoint:
-              signal_name: LATENCY_SETPOINT
+              signal_name: SETPOINT
             signal:
-              signal_name: LATENCY
+              signal_name: SIGNAL
           load_multiplier_linear_increment: 0.0025
           max_load_multiplier: 2
           out_ports:
-            accepted_concurrency:
+            accepted_token_rate:
               signal_name: ACCEPTED_CONCURRENCY
             desired_load_multiplier:
               signal_name: DESIRED_LOAD_MULTIPLIER
-            incoming_concurrency:
+            incoming_token_rate:
               signal_name: INCOMING_CONCURRENCY
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
@@ -133,7 +93,50 @@ spec:
               match_labels:
                 http.request.header.user_type: bot
             service: service1-demo-app.demoapp.svc.cluster.local
-    evaluation_interval: 0.5s
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app"}[5s]))
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL
+          rhs:
+            constant_signal:
+              value: 2
+        operator: mul
+        out_ports:
+          output:
+            signal_name: MAX_EMA
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_EMA
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    - ema:
+        in_ports:
+          input:
+            signal_name: SIGNAL
+          max_envelope:
+            signal_name: MAX_EMA
+        out_ports:
+          output:
+            signal_name: SIGNAL_EMA
+        parameters:
+          correction_factor_on_max_envelope_violation: 0.95
+          ema_window: 1500s
+          warmup_window: 60s
+    evaluation_interval: 1s
   resources:
     flow_control:
       classifiers:

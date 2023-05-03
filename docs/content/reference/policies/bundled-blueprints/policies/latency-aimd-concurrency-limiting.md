@@ -24,9 +24,9 @@ component that is used within this blueprint.
 :::info
 
 See tutorials on
-[Basic Concurrency Limiting](/tutorials/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
+[Basic Concurrency Limiting](/applying-policies/service-protection/basic-service-protection.md)
 and
-[Workload Prioritization](/tutorials/flow-control/concurrency-limiting/workload-prioritization.md)
+[Workload Prioritization](/applying-policies/service-protection/workload-prioritization.md)
 to see this blueprint in use.
 
 :::
