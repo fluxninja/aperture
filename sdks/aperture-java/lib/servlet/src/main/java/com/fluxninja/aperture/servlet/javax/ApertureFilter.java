@@ -91,7 +91,7 @@ public class ApertureFilter implements Filter {
         if (initControlPointName != null) {
             controlPointName = initControlPointName;
         } else {
-            controlPointName = "ingress";
+            controlPointName = "";
         }
         try {
             ApertureSDKBuilder builder = ApertureSDK.builder();

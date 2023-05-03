@@ -50,6 +50,10 @@
             <param-name>agent_port</param-name>
             <param-value>8089</param-value>
         </init-param>
+        <init-param>
+            <param-name>control_point_name</param-name>
+            <param-value>awesome_feature</param-value>
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>ApertureFeatureFilter</filter-name>

@@ -17,6 +17,7 @@ public class Config {
     public static final String AGENT_PORT_PROPERTY = "aperture.agent.port";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY =
             "aperture.connection.timeout.millis";
+    public static final String CONTROL_POINT_NAME_PROPERTY = "aperture.control.point.name";
     public static final String IGNORED_PATHS_PROPERTY = "aperture.javaagent.ignored.paths";
     public static final String IGNORED_PATHS_REGEX_PROPERTY =
             "aperture.javaagent.ignored.paths.regex";
@@ -38,8 +39,11 @@ public class Config {
                     add(AGENT_HOST_PROPERTY);
                     add(AGENT_PORT_PROPERTY);
                     add(CONNECTION_TIMEOUT_MILLIS_PROPERTY);
+                    add(CONTROL_POINT_NAME_PROPERTY);
                     add(IGNORED_PATHS_PROPERTY);
                     add(IGNORED_PATHS_REGEX_PROPERTY);
+                    add(INSECURE_GRPC_PROPERTY);
+                    add(ROOT_CERTIFICATE_FILE_PROPERTY);
                 }
             };
 
@@ -83,6 +87,10 @@ public class Config {
         Properties config = loadProperties();
         ApertureSDK sdk;
         try {
+            if (config.getProperty(CONTROL_POINT_NAME_PROPERTY) == null
+                    || config.getProperty(CONTROL_POINT_NAME_PROPERTY).trim().isEmpty()) {
+                throw new IllegalArgumentException("Control Point name must be set");
+            }
             ApertureSDKBuilder sdkBuilder =
                     builder.setHost(
                                     config.getProperty(
@@ -104,7 +112,8 @@ public class Config {
                                     Boolean.parseBoolean(
                                             config.getProperty(
                                                     IGNORED_PATHS_REGEX_PROPERTY,
-                                                    IGNORED_PATHS_REGEX_DEFAULT_VALUE)));
+                                                    IGNORED_PATHS_REGEX_DEFAULT_VALUE)))
+                            .setControlPointName(config.getProperty(CONTROL_POINT_NAME_PROPERTY));
 
             boolean insecureGrpc =
                     Boolean.parseBoolean(

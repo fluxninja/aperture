@@ -122,7 +122,7 @@ designed to overload the demo application to showcase the capabilities of
 Aperture.
 
 The load generator is configured to generate the following traffic pattern for
-`subscriber`, `guest` and `bot` traffic types:
+`subscriber`, `guest` and `crawler` traffic types:
 
 - Ramp up to `5` concurrent users in `10s`.
 - Hold at `5` concurrent users for `2m`.
@@ -331,9 +331,9 @@ When the entire deployment turns green, the load generator can be started with
 the "Start Wavepool Generator" button in the Tilt UI. It will run a 2-minute
 test in a loop, until the "Stop Wavepool Generator" button is not clicked.
 
-There are other playground scenarios under the `playground/scenarios/` directory
-and they can be loaded during `Tilt` setup by passing a relative path to the
-scenario, e.g. `tilt up -- --scenario scenarios/demo-app`
+There are other playground scenarios under the `playground/scenarios/`
+directory, and they can be loaded during `Tilt` setup by passing a relative path
+to the scenario, e.g. `tilt up -- --scenario scenarios/demo-app`
 
 :::note
 

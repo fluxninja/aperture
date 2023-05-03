@@ -34,7 +34,7 @@ traffic control points for decorated services:
     }
 
     ApertureHTTPService decoratedService = createHelloHTTPService()
-        .decorate(ApertureHTTPService.newDecorator(apertureSDK));
+        .decorate(ApertureHTTPService.newDecorator(apertureSDK, controlPointName));
     serverBuilder.service("/somePath", decoratedService);
 ```
 
