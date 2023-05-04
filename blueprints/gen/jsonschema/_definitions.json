@@ -559,7 +559,7 @@
       "additionalProperties": false
     },
     "Component": {
-      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components from input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nThere are three categories of components:\n* \"source\" components: they take some sort of input from \"the real world\" and output\n  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI\n  they're represented by green color.\n* signal processor components: processing components that do not interact with the external systems.\n  Examples: [GradientController](#gradient-controller), [Max](#max).\n\n  :::note\n\n  Signal processor components' output can depend on their internal state, in addition to the inputs.\n  Eg. see the [Exponential Moving Average filter](#e-m-a).\n\n  :::\n\n* \"sink\" components:\u00a0they affect the real world.\n  [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).\n  In the UI, represented by orange color.  Sink components usually come in pairs with a\n  \"sources\" component which emits a feedback signal, like\n  `accepted_concurrency` emitted by _Concurrency Limiter_.\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
+      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components from input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
       "properties": {
         "alerter": {
           "$ref": "#/definitions/Alerter",
@@ -2102,7 +2102,7 @@
       "properties": {
         "load_multiplier": {
           "$ref": "#/definitions/InPort",
-          "description": "Load multiplier is proportion of [incoming\ntoken rate](#scheduler-outs) that needs to be accepted.",
+          "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted.",
           "x-order": 0
         }
       },

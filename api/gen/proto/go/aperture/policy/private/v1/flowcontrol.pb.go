@@ -113,8 +113,8 @@ type LoadActuator_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Load multiplier is proportion of [incoming
-	// token rate](#scheduler-outs) that needs to be accepted.
+	// Load multiplier is proportion of incoming
+	// token rate that needs to be accepted.
 	LoadMultiplier *v1.InPort `protobuf:"bytes,1,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
 }
 
