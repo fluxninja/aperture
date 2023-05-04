@@ -6,6 +6,7 @@ permissions:
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - "main"
   pull_request_review_comment:
