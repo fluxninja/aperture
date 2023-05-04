@@ -14,7 +14,7 @@ message LoadActuator {
 
   Ins in_ports = 1;
 
-  string component_id = 2;
+  string load_scheduler_component_id = 2;
 
   repeated aperture.policy.language.v1.Selector selectors = 3;
 

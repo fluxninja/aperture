@@ -2566,7 +2566,7 @@ func (m *FlowControl) validate(all bool) error {
 			}
 		}
 
-	case *FlowControl_Internal:
+	case *FlowControl_Private:
 		if v == nil {
 			err := FlowControlValidationError{
 				field:  "Component",
@@ -2579,11 +2579,11 @@ func (m *FlowControl) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetInternal()).(type) {
+			switch v := interface{}(m.GetPrivate()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "Internal",
+						field:  "Private",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -2591,16 +2591,16 @@ func (m *FlowControl) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "Internal",
+						field:  "Private",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetInternal()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetPrivate()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FlowControlValidationError{
-					field:  "Internal",
+					field:  "Private",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

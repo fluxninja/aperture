@@ -41,3 +41,8 @@ func GetIntValue(unmarshaller Unmarshaller, key string, defaultVal int) int {
 func GetBoolValue(unmarshaller Unmarshaller, key string, defaultVal bool) bool {
 	return cast.ToBool(GetValue(unmarshaller, key, defaultVal))
 }
+
+// GetStringSlice returns the string slice value for the given key.
+func GetStringSlice(unmarshaller Unmarshaller, key string, defaultVal []string) []string {
+	return cast.ToStringSlice(GetValue(unmarshaller, key, defaultVal))
+}

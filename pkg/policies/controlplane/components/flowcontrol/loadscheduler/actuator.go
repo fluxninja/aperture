@@ -62,7 +62,7 @@ func NewActuatorAndOptions(
 		etcdPaths []string
 		options   []fx.Option
 	)
-	loadSchedulerComponentID := actuatorProto.ComponentId
+	loadSchedulerComponentID := actuatorProto.LoadSchedulerComponentId
 
 	s := actuatorProto.GetSelectors()
 

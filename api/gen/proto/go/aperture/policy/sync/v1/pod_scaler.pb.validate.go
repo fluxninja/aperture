@@ -244,34 +244,7 @@ func (m *PodScalerDynamicConfigWrapper) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetPodScalerDynamicConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, PodScalerDynamicConfigWrapperValidationError{
-					field:  "PodScalerDynamicConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, PodScalerDynamicConfigWrapperValidationError{
-					field:  "PodScalerDynamicConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetPodScalerDynamicConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return PodScalerDynamicConfigWrapperValidationError{
-				field:  "PodScalerDynamicConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for DryRun
 
 	if len(errors) > 0 {
 		return PodScalerDynamicConfigWrapperMultiError(errors)

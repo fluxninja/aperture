@@ -86,7 +86,7 @@ func (m *LoadActuator) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for ComponentId
+	// no validation rules for LoadSchedulerComponentId
 
 	for idx, item := range m.GetSelectors() {
 		_, _ = idx, item

@@ -519,19 +519,37 @@ definitions:
         description: _AutoScaler_ provides auto-scaling functionality for any scalable
           resource.
         $ref: '#/definitions/AutoScaler'
-      pod_auto_scaler:
-        description: _PodAutoScaler_ provides auto-scaling functionality for scalable
-          Kubernetes resource.
-        $ref: '#/definitions/PodAutoScaler'
       pod_scaler:
         description: PodScaler provides pod horizontal scaling functionality for scalable
           Kubernetes resources.
         $ref: '#/definitions/PodScaler'
+      private:
+        description: Extends auto scale with private components.
+        $ref: '#/definitions/googleprotobufAny'
   AutoScaler:
     description: _AutoScaler_ provides auto-scaling functionality for any scalable
       resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing
       scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs
       such as Kubernetes to perform auto-scale.
+    type: object
+    properties:
+      out_ports:
+        description: Output ports for the _AutoScaler_.
+        $ref: '#/definitions/AutoScalerOuts'
+      parameters:
+        description: Parameters for the _AutoScaler_.
+        $ref: '#/definitions/AutoScalerParameters'
+  AutoScalerOuts:
+    description: Outputs for _AutoScaler_.
+    type: object
+    properties:
+      actual_scale:
+        $ref: '#/definitions/OutPort'
+      configured_scale:
+        $ref: '#/definitions/OutPort'
+      desired_scale:
+        $ref: '#/definitions/OutPort'
+  AutoScalerParameters:
     type: object
     properties:
       cooldown_override_percentage:
@@ -580,9 +598,6 @@ definitions:
         minLength: 0
         x-go-tag-default: "0"
         x-go-tag-validate: gte=0
-      out_ports:
-        description: Output ports for the _AutoScaler_.
-        $ref: '#/definitions/AutoScalerOuts'
       scale_in_alerter_parameters:
         description: Configuration for scale-in Alerter.
         $ref: '#/definitions/AlerterParameters'
@@ -617,22 +632,31 @@ definitions:
         x-go-tag-default: 30s
       scaler:
         x-go-tag-validate: required
-        $ref: '#/definitions/AutoScalerScaler'
-  AutoScalerOuts:
-    description: Outputs for _AutoScaler_.
-    type: object
-    properties:
-      actual_scale:
-        $ref: '#/definitions/OutPort'
-      configured_scale:
-        $ref: '#/definitions/OutPort'
-      desired_scale:
-        $ref: '#/definitions/OutPort'
-  AutoScalerScaler:
+        $ref: '#/definitions/AutoScalerParametersScaler'
+  AutoScalerParametersScaler:
     type: object
     properties:
       kubernetes_replicas:
-        $ref: '#/definitions/KubernetesReplicas'
+        $ref: '#/definitions/AutoScalerParametersScalerKubernetesReplicas'
+  AutoScalerParametersScalerKubernetesReplicas:
+    description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+    type: object
+    properties:
+      dry_run:
+        description: |-
+          Dry run mode ensures that no scaling is invoked by this auto scaler.
+          This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+          This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.
+        type: boolean
+      dry_run_config_key:
+        type: string
+        title: Config key for overriding dry_run setting via dynamic config
+      kubernetes_object_selector:
+        description: |+
+          The Kubernetes object on which horizontal scaling is applied.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/KubernetesObjectSelector'
   Circuit:
     description: |-
       Circuit is graph of inter-connected signal processing components.
@@ -1297,9 +1321,6 @@ definitions:
           as inputs and reduces token rate proportionally (or any arbitrary power)
           based on deviation of the signal from setpoint.
         $ref: '#/definitions/AdaptiveLoadScheduler'
-      internal:
-        description: Extends the flow control with internal components.
-        $ref: '#/definitions/googleprotobufAny'
       load_ramp:
         description: _Load Ramp_ smoothly regulates the flow of requests over specified
           steps.
@@ -1313,6 +1334,9 @@ definitions:
           load shedding of flows using a network scheduler (for example, Weighted
           Fair Queuing).
         $ref: '#/definitions/LoadScheduler'
+      private:
+        description: Extends flow control with private components.
+        $ref: '#/definitions/googleprotobufAny'
       rate_limiter:
         description: _Rate Limiter_ provides service protection by applying rate limits.
         $ref: '#/definitions/RateLimiter'
@@ -2080,22 +2104,6 @@ definitions:
 
         type: string
         x-go-tag-validate: required
-  KubernetesReplicas:
-    description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-    type: object
-    properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-      kubernetes_object_selector:
-        description: |+
-          The Kubernetes object on which horizontal scaling is applied.
-
-        x-go-tag-validate: required
-        $ref: '#/definitions/KubernetesObjectSelector'
   LabelMatcher:
     description: |-
       It provides three ways to define requirements:
@@ -2654,162 +2662,39 @@ definitions:
         additionalProperties:
           type: string
         x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
-  PodAutoScaler:
-    description: _PodAutoScaler_ provides auto-scaling functionality for scalable
-      Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_
-      for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes
-      infrastructure APIs to perform auto-scale.
-    type: object
-    properties:
-      cooldown_override_percentage:
-        description: |+
-          Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
-          For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-          scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
-
-        type: number
-        format: double
-        default: 50
-        x-go-tag-default: "50"
-      max_replicas:
-        description: |+
-          The maximum scale to which the _PodAutoScaler_ can scale-out.
-
-        type: string
-        format: int64
-        default: "9223372036854775807"
-        minLength: 1
-        x-go-tag-default: "9223372036854775807"
-        x-go-tag-validate: gt=0
-      max_scale_in_percentage:
-        description: |+
-          The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
-
-        type: number
-        format: double
-        default: 1
-        x-go-tag-default: "1"
-      max_scale_out_percentage:
-        description: |+
-          The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
-
-        type: number
-        format: double
-        default: 10
-        x-go-tag-default: "10"
-      min_replicas:
-        description: |+
-          The minimum replicas to which the _PodAutoScaler_ can scale-in.
-
-        type: string
-        format: int64
-        default: "0"
-        minLength: 0
-        x-go-tag-default: "0"
-        x-go-tag-validate: gte=0
-      out_ports:
-        description: Output ports for the _PodAutoScaler_.
-        $ref: '#/definitions/PodAutoScalerOuts'
-      pod_scaler:
-        x-go-tag-validate: required
-        $ref: '#/definitions/KubernetesReplicas'
-      scale_in_alerter_parameters:
-        description: Configuration for scale-in Alerter.
-        $ref: '#/definitions/AlerterParameters'
-      scale_in_controllers:
-        description: List of _Controllers_ for scaling in.
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/ScaleInController'
-      scale_in_cooldown:
-        description: |+
-          The amount of time to wait after a scale-in operation for another scale-in operation.
-
-        type: string
-        default: 120s
-        x-go-tag-default: 120s
-      scale_out_alerter_parameters:
-        description: Configuration for scale-out Alerter.
-        $ref: '#/definitions/AlerterParameters'
-      scale_out_controllers:
-        description: List of _Controllers_ for scaling out.
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/ScaleOutController'
-      scale_out_cooldown:
-        description: |+
-          The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
-
-        type: string
-        default: 30s
-        x-go-tag-default: 30s
-  PodAutoScalerOuts:
-    description: Outputs for _PodAutoScaler_.
-    type: object
-    properties:
-      actual_replicas:
-        $ref: '#/definitions/OutPort'
-      configured_replicas:
-        $ref: '#/definitions/OutPort'
-      desired_replicas:
-        $ref: '#/definitions/OutPort'
   PodScaler:
     description: Component for scaling pods based on a signal.
     type: object
     properties:
+      dry_run:
+        description: |-
+          Dry run mode ensures that no scaling is invoked by this pod scaler.
+          This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
+          This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.
+        type: boolean
+      dry_run_config_key:
+        type: string
+        title: Config key for overriding dry run setting via dynamic config
+      in_ports:
+        description: Input ports for the PodScaler component.
+        $ref: '#/definitions/PodScalerIns'
       kubernetes_object_selector:
         description: |+
-          The Kubernetes object on which horizontal scaling is applied.
+          The Kubernetes object to which this pod scaler applies.
 
         x-go-tag-validate: required
         $ref: '#/definitions/KubernetesObjectSelector'
-      scale_actuator:
-        description: Actuates scaling of pods based on a signal.
-        $ref: '#/definitions/PodScalerScaleActuator'
-      scale_reporter:
-        description: Reports actual and configured number of replicas.
-        $ref: '#/definitions/PodScalerScaleReporter'
-  PodScalerScaleActuator:
-    description: Actuates scaling of pods based on a signal.
-    type: object
-    properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-      in_ports:
-        description: Input ports for the PodScaler component.
-        $ref: '#/definitions/PodScalerScaleActuatorIns'
-  PodScalerScaleActuatorDynamicConfig:
-    type: object
-    title: Dynamic Configuration for ScaleActuator
-    properties:
-      dry_run:
-        description: |+
-          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-          Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-        type: boolean
-        default: false
-        x-go-tag-default: "false"
-  PodScalerScaleActuatorIns:
+      out_ports:
+        description: Output ports for the PodScaler component.
+        $ref: '#/definitions/PodScalerOuts'
+  PodScalerIns:
     description: Inputs for the PodScaler component.
     type: object
     properties:
-      desired_replicas:
+      replicas:
+        title: The number of replicas to configure for the Kubernetes resource
         $ref: '#/definitions/InPort'
-  PodScalerScaleReporter:
-    description: Reports actual and configured number of replicas.
-    type: object
-    properties:
-      out_ports:
-        description: Output ports for the PodScaler component.
-        $ref: '#/definitions/PodScalerScaleReporterOuts'
-  PodScalerScaleReporterOuts:
+  PodScalerOuts:
     description: Outputs for the PodScaler component.
     type: object
     properties:

@@ -319,14 +319,14 @@
           "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource.",
           "x-order": 0
         },
-        "pod_auto_scaler": {
-          "$ref": "#/definitions/PodAutoScaler",
-          "description": "_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.",
-          "x-order": 1
-        },
         "pod_scaler": {
           "$ref": "#/definitions/PodScaler",
           "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.",
+          "x-order": 1
+        },
+        "private": {
+          "$ref": "#/definitions/googleprotobufAny",
+          "description": "Extends auto scale with private components.",
           "x-order": 2
         }
       },
@@ -335,6 +335,41 @@
     },
     "AutoScaler": {
       "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
+      "properties": {
+        "out_ports": {
+          "$ref": "#/definitions/AutoScalerOuts",
+          "description": "Output ports for the _AutoScaler_.",
+          "x-order": 0
+        },
+        "parameters": {
+          "$ref": "#/definitions/AutoScalerParameters",
+          "description": "Parameters for the _AutoScaler_.",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerOuts": {
+      "description": "Outputs for _AutoScaler_.",
+      "properties": {
+        "actual_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
+        },
+        "configured_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 1
+        },
+        "desired_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerParameters": {
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -380,15 +415,10 @@
           "x-go-tag-validate": "gte=0",
           "x-order": 4
         },
-        "out_ports": {
-          "$ref": "#/definitions/AutoScalerOuts",
-          "description": "Output ports for the _AutoScaler_.",
-          "x-order": 5
-        },
         "scale_in_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-in Alerter.",
-          "x-order": 6
+          "x-order": 5
         },
         "scale_in_controllers": {
           "description": "List of _Controllers_ for scaling in.",
@@ -397,19 +427,19 @@
             "type": "object"
           },
           "type": "array",
-          "x-order": 7
+          "x-order": 6
         },
         "scale_in_cooldown": {
           "default": "120s",
           "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "120s",
-          "x-order": 8
+          "x-order": 7
         },
         "scale_out_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-out Alerter.",
-          "x-order": 9
+          "x-order": 8
         },
         "scale_out_controllers": {
           "description": "List of _Controllers_ for scaling out.",
@@ -418,48 +448,52 @@
             "type": "object"
           },
           "type": "array",
-          "x-order": 10
+          "x-order": 9
         },
         "scale_out_cooldown": {
           "default": "30s",
           "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "30s",
-          "x-order": 11
+          "x-order": 10
         },
         "scaler": {
-          "$ref": "#/definitions/AutoScalerScaler",
+          "$ref": "#/definitions/AutoScalerParametersScaler",
           "x-go-tag-validate": "required",
-          "x-order": 12
+          "x-order": 11
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "AutoScalerOuts": {
-      "description": "Outputs for _AutoScaler_.",
-      "properties": {
-        "actual_scale": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
-        },
-        "configured_scale": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 1
-        },
-        "desired_scale": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AutoScalerScaler": {
+    "AutoScalerParametersScaler": {
       "properties": {
         "kubernetes_replicas": {
-          "$ref": "#/definitions/KubernetesReplicas",
+          "$ref": "#/definitions/AutoScalerParametersScalerKubernetesReplicas",
           "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerParametersScalerKubernetesReplicas": {
+      "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
+      "properties": {
+        "dry_run": {
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.",
+          "type": "boolean",
+          "x-order": 0
+        },
+        "dry_run_config_key": {
+          "title": "Config key for overriding dry_run setting via dynamic config",
+          "type": "string",
+          "x-order": 1
+        },
+        "kubernetes_object_selector": {
+          "$ref": "#/definitions/KubernetesObjectSelector",
+          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 2
         }
       },
       "type": "object",
@@ -1136,24 +1170,24 @@
           "description": "_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.",
           "x-order": 0
         },
-        "internal": {
-          "$ref": "#/definitions/googleprotobufAny",
-          "description": "Extends the flow control with internal components.",
-          "x-order": 1
-        },
         "load_ramp": {
           "$ref": "#/definitions/LoadRamp",
           "description": "_Load Ramp_ smoothly regulates the flow of requests over specified steps.",
-          "x-order": 2
+          "x-order": 1
         },
         "load_ramp_series": {
           "$ref": "#/definitions/LoadRampSeries",
           "description": "_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.",
-          "x-order": 3
+          "x-order": 2
         },
         "load_scheduler": {
           "$ref": "#/definitions/LoadScheduler",
           "description": "_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
+          "x-order": 3
+        },
+        "private": {
+          "$ref": "#/definitions/googleprotobufAny",
+          "description": "Extends flow control with private components.",
           "x-order": 4
         },
         "rate_limiter": {
@@ -1844,29 +1878,6 @@
       "type": "object",
       "additionalProperties": false
     },
-    "KubernetesReplicas": {
-      "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
-      "properties": {
-        "default_config": {
-          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
-          "type": "string",
-          "x-order": 1
-        },
-        "kubernetes_object_selector": {
-          "$ref": "#/definitions/KubernetesObjectSelector",
-          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
     "LabelMatcher": {
       "description": "It provides three ways to define requirements:\n- match labels\n- match expressions\n- arbitrary expression\n\nIf multiple requirements are set, they're all combined using the logical AND operator.\nAn empty label matcher always matches.",
       "properties": {
@@ -2534,211 +2545,52 @@
       "type": "object",
       "additionalProperties": false
     },
-    "PodAutoScaler": {
-      "description": "_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.",
-      "properties": {
-        "cooldown_override_percentage": {
-          "default": 50,
-          "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "50",
-          "x-order": 0
-        },
-        "max_replicas": {
-          "default": "9223372036854775807",
-          "description": "The maximum scale to which the _PodAutoScaler_ can scale-out.\n\n",
-          "format": "int64",
-          "minLength": 1,
-          "type": "string",
-          "x-go-tag-default": "9223372036854775807",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 1
-        },
-        "max_scale_in_percentage": {
-          "default": 1,
-          "description": "The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "1",
-          "x-order": 2
-        },
-        "max_scale_out_percentage": {
-          "default": 10,
-          "description": "The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "10",
-          "x-order": 3
-        },
-        "min_replicas": {
-          "default": "0",
-          "description": "The minimum replicas to which the _PodAutoScaler_ can scale-in.\n\n",
-          "format": "int64",
-          "minLength": 0,
-          "type": "string",
-          "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0",
-          "x-order": 4
-        },
-        "out_ports": {
-          "$ref": "#/definitions/PodAutoScalerOuts",
-          "description": "Output ports for the _PodAutoScaler_.",
-          "x-order": 5
-        },
-        "pod_scaler": {
-          "$ref": "#/definitions/KubernetesReplicas",
-          "x-go-tag-validate": "required",
-          "x-order": 6
-        },
-        "scale_in_alerter_parameters": {
-          "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-in Alerter.",
-          "x-order": 7
-        },
-        "scale_in_controllers": {
-          "description": "List of _Controllers_ for scaling in.",
-          "items": {
-            "$ref": "#/definitions/ScaleInController",
-            "type": "object"
-          },
-          "type": "array",
-          "x-order": 8
-        },
-        "scale_in_cooldown": {
-          "default": "120s",
-          "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
-          "type": "string",
-          "x-go-tag-default": "120s",
-          "x-order": 9
-        },
-        "scale_out_alerter_parameters": {
-          "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-out Alerter.",
-          "x-order": 10
-        },
-        "scale_out_controllers": {
-          "description": "List of _Controllers_ for scaling out.",
-          "items": {
-            "$ref": "#/definitions/ScaleOutController",
-            "type": "object"
-          },
-          "type": "array",
-          "x-order": 11
-        },
-        "scale_out_cooldown": {
-          "default": "30s",
-          "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
-          "type": "string",
-          "x-go-tag-default": "30s",
-          "x-order": 12
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodAutoScalerOuts": {
-      "description": "Outputs for _PodAutoScaler_.",
-      "properties": {
-        "actual_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
-        },
-        "configured_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 1
-        },
-        "desired_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
     "PodScaler": {
       "description": "Component for scaling pods based on a signal.",
       "properties": {
-        "kubernetes_object_selector": {
-          "$ref": "#/definitions/KubernetesObjectSelector",
-          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
-          "x-go-tag-validate": "required",
+        "dry_run": {
+          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.",
+          "type": "boolean",
           "x-order": 0
         },
-        "scale_actuator": {
-          "$ref": "#/definitions/PodScalerScaleActuator",
-          "description": "Actuates scaling of pods based on a signal.",
-          "x-order": 1
-        },
-        "scale_reporter": {
-          "$ref": "#/definitions/PodScalerScaleReporter",
-          "description": "Reports actual and configured number of replicas.",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodScalerScaleActuator": {
-      "description": "Actuates scaling of pods based on a signal.",
-      "properties": {
-        "default_config": {
-          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
+        "dry_run_config_key": {
+          "title": "Config key for overriding dry run setting via dynamic config",
           "type": "string",
           "x-order": 1
         },
         "in_ports": {
-          "$ref": "#/definitions/PodScalerScaleActuatorIns",
+          "$ref": "#/definitions/PodScalerIns",
           "description": "Input ports for the PodScaler component.",
           "x-order": 2
+        },
+        "kubernetes_object_selector": {
+          "$ref": "#/definitions/KubernetesObjectSelector",
+          "description": "The Kubernetes object to which this pod scaler applies.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 3
+        },
+        "out_ports": {
+          "$ref": "#/definitions/PodScalerOuts",
+          "description": "Output ports for the PodScaler component.",
+          "x-order": 4
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "PodScalerScaleActuatorDynamicConfig": {
-      "properties": {
-        "dry_run": {
-          "default": false,
-          "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n",
-          "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for ScaleActuator",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodScalerScaleActuatorIns": {
+    "PodScalerIns": {
       "description": "Inputs for the PodScaler component.",
       "properties": {
-        "desired_replicas": {
+        "replicas": {
           "$ref": "#/definitions/InPort",
+          "title": "The number of replicas to configure for the Kubernetes resource",
           "x-order": 0
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "PodScalerScaleReporter": {
-      "description": "Reports actual and configured number of replicas.",
-      "properties": {
-        "out_ports": {
-          "$ref": "#/definitions/PodScalerScaleReporterOuts",
-          "description": "Output ports for the PodScaler component.",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodScalerScaleReporterOuts": {
+    "PodScalerOuts": {
       "description": "Outputs for the PodScaler component.",
       "properties": {
         "actual_replicas": {

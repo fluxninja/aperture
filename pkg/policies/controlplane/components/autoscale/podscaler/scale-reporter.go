@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -87,11 +87,11 @@ func (*ScaleReporter) IsActuator() bool { return false }
 
 // NewScaleReporterAndOptions returns a new ScaleReporter and its fx options.
 func NewScaleReporterAndOptions(
-	_ *policylangv1.PodScaler_ScaleReporter,
+	podScaleReporterProto *policyprivatev1.PodScaleReporter,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
+	agentGroup := podScaleReporterProto.GetAgentGroup()
 	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
 	sr := &ScaleReporter{
 		policyReadAPI: policyReadAPI,

@@ -698,19 +698,6 @@ AutoScale components are used to scale a service.
 _AutoScaler_ provides auto-scaling functionality for any scalable resource.
 
 </dd>
-<dt>pod_auto_scaler</dt>
-<dd>
-
-<!-- vale off -->
-
-([PodAutoScaler](#pod-auto-scaler))
-
-<!-- vale on -->
-
-_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes
-resource.
-
-</dd>
 <dt>pod_scaler</dt>
 <dd>
 
@@ -722,6 +709,18 @@ resource.
 
 PodScaler provides pod horizontal scaling functionality for scalable Kubernetes
 resources.
+
+</dd>
+<dt>private</dt>
+<dd>
+
+<!-- vale off -->
+
+([GoogleprotobufAny](#googleprotobuf-any))
+
+<!-- vale on -->
+
+Extends auto scale with private components.
 
 </dd>
 </dl>
@@ -738,6 +737,84 @@ _AutoScaler_ provides auto-scaling functionality for any scalable resource.
 Multiple _Controllers_ can be defined on the _AutoScaler_ for performing
 scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs
 such as Kubernetes to perform auto-scale.
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AutoScalerOuts](#auto-scaler-outs))
+
+<!-- vale on -->
+
+Output ports for the _AutoScaler_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([AutoScalerParameters](#auto-scaler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _AutoScaler_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AutoScalerOuts {#auto-scaler-outs}
+
+<!-- vale on -->
+
+Outputs for _AutoScaler_.
+
+<dl>
+<dt>actual_scale</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+</dd>
+<dt>configured_scale</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+</dd>
+<dt>desired_scale</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AutoScalerParameters {#auto-scaler-parameters}
+
+<!-- vale on -->
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -807,18 +884,6 @@ computation is less than one. Defaults to 10% of current scale value.
 
 The minimum scale to which the _AutoScaler_ can scale-in. For example, in case
 of KubernetesReplicas Scaler, this is the minimum number of replicas.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([AutoScalerOuts](#auto-scaler-outs))
-
-<!-- vale on -->
-
-Output ports for the _AutoScaler_.
 
 </dd>
 <dt>scale_in_alerter_parameters</dt>
@@ -900,7 +965,7 @@ scale-in operation.
 
 <!-- vale off -->
 
-([AutoScalerScaler](#auto-scaler-scaler))
+([AutoScalerParametersScaler](#auto-scaler-parameters-scaler))
 
 <!-- vale on -->
 
@@ -911,50 +976,7 @@ scale-in operation.
 
 <!-- vale off -->
 
-### AutoScalerOuts {#auto-scaler-outs}
-
-<!-- vale on -->
-
-Outputs for _AutoScaler_.
-
-<dl>
-<dt>actual_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-<dt>configured_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-<dt>desired_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AutoScalerScaler {#auto-scaler-scaler}
+### AutoScalerParametersScaler {#auto-scaler-parameters-scaler}
 
 <!-- vale on -->
 
@@ -964,9 +986,61 @@ Outputs for _AutoScaler_.
 
 <!-- vale off -->
 
-([KubernetesReplicas](#kubernetes-replicas))
+([AutoScalerParametersScalerKubernetesReplicas](#auto-scaler-parameters-scaler-kubernetes-replicas))
 
 <!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AutoScalerParametersScalerKubernetesReplicas {#auto-scaler-parameters-scaler-kubernetes-replicas}
+
+<!-- vale on -->
+
+KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Dry run mode ensures that no scaling is invoked by this auto scaler. This is
+Useful for observing the behavior of auto scaler without disrupting any real
+traffic. This parameter sets the default value of dry run setting which may be
+overridden at runtime using dynamic config.
+
+</dd>
+<dt>dry_run_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Config key for overriding dry_run setting via dynamic config
+
+</dd>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+<!-- vale off -->
+
+([KubernetesObjectSelector](#kubernetes-object-selector))
+
+<!-- vale on -->
+
+The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 </dl>
@@ -2533,18 +2607,6 @@ and reduces token rate proportionally (or any arbitrary power) based on
 deviation of the signal from setpoint.
 
 </dd>
-<dt>internal</dt>
-<dd>
-
-<!-- vale off -->
-
-([GoogleprotobufAny](#googleprotobuf-any))
-
-<!-- vale on -->
-
-Extends the flow control with internal components.
-
-</dd>
 <dt>load_ramp</dt>
 <dd>
 
@@ -2582,6 +2644,18 @@ after another at same or different _Control Points_.
 _Load Scheduler_ provides service protection by applying prioritized load
 shedding of flows using a network scheduler (for example, Weighted Fair
 Queuing).
+
+</dd>
+<dt>private</dt>
+<dd>
+
+<!-- vale off -->
+
+([GoogleprotobufAny](#googleprotobuf-any))
+
+<!-- vale on -->
+
+Extends flow control with private components.
 
 </dd>
 <dt>rate_limiter</dt>
@@ -4145,55 +4219,6 @@ Kubernetes namespace that the resource belongs to.
 
 <!-- vale off -->
 
-### KubernetesReplicas {#kubernetes-replicas}
-
-<!-- vale on -->
-
-KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-
-<dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig
-
-</dd>
-<dt>kubernetes_object_selector</dt>
-<dd>
-
-<!-- vale off -->
-
-([KubernetesObjectSelector](#kubernetes-object-selector))
-
-<!-- vale on -->
-
-The Kubernetes object on which horizontal scaling is applied.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### LabelMatcher {#label-matcher}
 
 <!-- vale on -->
@@ -5581,228 +5606,6 @@ Example:
 
 <!-- vale off -->
 
-### PodAutoScaler {#pod-auto-scaler}
-
-<!-- vale on -->
-
-_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes
-resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for
-performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes
-infrastructure APIs to perform auto-scale.
-
-<dl>
-<dt>cooldown_override_percentage</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `50`)
-
-<!-- vale on -->
-
-Cooldown override percentage defines a threshold change in scale-out beyond
-which previous cooldown is overridden. For example, if the cooldown is 5 minutes
-and the cooldown override percentage is 10%, then if the scale-increases by 10%
-or more, the previous cooldown is cancelled. Defaults to 50%.
-
-</dd>
-<dt>max_replicas</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"9223372036854775807"`)
-
-<!-- vale on -->
-
-The maximum scale to which the _PodAutoScaler_ can scale-out.
-
-</dd>
-<dt>max_scale_in_percentage</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `1`)
-
-<!-- vale on -->
-
-The maximum decrease of replicas (for example, pods) at one time. Defined as
-percentage of current scale value. Can never go below one even if percentage
-computation is less than one. Defaults to 1% of current scale value.
-
-</dd>
-<dt>max_scale_out_percentage</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `10`)
-
-<!-- vale on -->
-
-The maximum increase of replicas (for example, pods) at one time. Defined as
-percentage of current scale value. Can never go below one even if percentage
-computation is less than one. Defaults to 10% of current scale value.
-
-</dd>
-<dt>min_replicas</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"0"`)
-
-<!-- vale on -->
-
-The minimum replicas to which the _PodAutoScaler_ can scale-in.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([PodAutoScalerOuts](#pod-auto-scaler-outs))
-
-<!-- vale on -->
-
-Output ports for the _PodAutoScaler_.
-
-</dd>
-<dt>pod_scaler</dt>
-<dd>
-
-<!-- vale off -->
-
-([KubernetesReplicas](#kubernetes-replicas))
-
-<!-- vale on -->
-
-</dd>
-<dt>scale_in_alerter_parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([AlerterParameters](#alerter-parameters))
-
-<!-- vale on -->
-
-Configuration for scale-in Alerter.
-
-</dd>
-<dt>scale_in_controllers</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]ScaleInController](#scale-in-controller))
-
-<!-- vale on -->
-
-List of _Controllers_ for scaling in.
-
-</dd>
-<dt>scale_in_cooldown</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"120s"`)
-
-<!-- vale on -->
-
-The amount of time to wait after a scale-in operation for another scale-in
-operation.
-
-</dd>
-<dt>scale_out_alerter_parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([AlerterParameters](#alerter-parameters))
-
-<!-- vale on -->
-
-Configuration for scale-out Alerter.
-
-</dd>
-<dt>scale_out_controllers</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]ScaleOutController](#scale-out-controller))
-
-<!-- vale on -->
-
-List of _Controllers_ for scaling out.
-
-</dd>
-<dt>scale_out_cooldown</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"30s"`)
-
-<!-- vale on -->
-
-The amount of time to wait after a scale-out operation for another scale-out or
-scale-in operation.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### PodAutoScalerOuts {#pod-auto-scaler-outs}
-
-<!-- vale on -->
-
-Outputs for _PodAutoScaler_.
-
-<dl>
-<dt>actual_replicas</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-<dt>configured_replicas</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-<dt>desired_replicas</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### PodScaler {#pod-scaler}
 
 <!-- vale on -->
@@ -5810,6 +5613,45 @@ Outputs for _PodAutoScaler_.
 Component for scaling pods based on a signal.
 
 <dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Dry run mode ensures that no scaling is invoked by this pod scaler. This is
+Useful for observing the behavior of pod scaler without disrupting any real
+traffic. This parameter sets the default value of dry run setting which may be
+overridden at runtime using dynamic config.
+
+</dd>
+<dt>dry_run_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Config key for overriding dry run setting via dynamic config
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PodScalerIns](#pod-scaler-ins))
+
+<!-- vale on -->
+
+Input ports for the PodScaler component.
+
+</dd>
 <dt>kubernetes_object_selector</dt>
 <dd>
 
@@ -5819,151 +5661,15 @@ Component for scaling pods based on a signal.
 
 <!-- vale on -->
 
-The Kubernetes object on which horizontal scaling is applied.
+The Kubernetes object to which this pod scaler applies.
 
 </dd>
-<dt>scale_actuator</dt>
-<dd>
-
-<!-- vale off -->
-
-([PodScalerScaleActuator](#pod-scaler-scale-actuator))
-
-<!-- vale on -->
-
-Actuates scaling of pods based on a signal.
-
-</dd>
-<dt>scale_reporter</dt>
-<dd>
-
-<!-- vale off -->
-
-([PodScalerScaleReporter](#pod-scaler-scale-reporter))
-
-<!-- vale on -->
-
-Reports actual and configured number of replicas.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### PodScalerScaleActuator {#pod-scaler-scale-actuator}
-
-<!-- vale on -->
-
-Actuates scaling of pods based on a signal.
-
-<dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig
-
-</dd>
-<dt>in_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins))
-
-<!-- vale on -->
-
-Input ports for the PodScaler component.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### PodScalerScaleActuatorDynamicConfig {#pod-scaler-scale-actuator-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for ScaleActuator
-
-<dl>
-<dt>dry_run</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool, default: `false`)
-
-<!-- vale on -->
-
-Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that
-no scaling is invoked by this pod scaler. Useful for observing the behavior of
-Scaler without disrupting any real traffic.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### PodScalerScaleActuatorIns {#pod-scaler-scale-actuator-ins}
-
-<!-- vale on -->
-
-Inputs for the PodScaler component.
-
-<dl>
-<dt>desired_replicas</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### PodScalerScaleReporter {#pod-scaler-scale-reporter}
-
-<!-- vale on -->
-
-Reports actual and configured number of replicas.
-
-<dl>
 <dt>out_ports</dt>
 <dd>
 
 <!-- vale off -->
 
-([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs))
+([PodScalerOuts](#pod-scaler-outs))
 
 <!-- vale on -->
 
@@ -5976,7 +5682,32 @@ Output ports for the PodScaler component.
 
 <!-- vale off -->
 
-### PodScalerScaleReporterOuts {#pod-scaler-scale-reporter-outs}
+### PodScalerIns {#pod-scaler-ins}
+
+<!-- vale on -->
+
+Inputs for the PodScaler component.
+
+<dl>
+<dt>replicas</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The number of replicas to configure for the Kubernetes resource
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PodScalerOuts {#pod-scaler-outs}
 
 <!-- vale on -->
 
