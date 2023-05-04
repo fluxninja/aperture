@@ -5,8 +5,6 @@ local config = import './config.libsonnet';
 function(cfg) {
   local params = config.common + config.policy + cfg,
 
-  local policyName = params.policy_name,
-
   local basePolicy = basePolicyFn(cfg).policyDef,
 
   // Add new components to basePolicy
@@ -63,6 +61,6 @@ function(cfg) {
   },
 
   policyResource: policyResource,
-  policyDef: policyDef,
 
+  policyDef: policyDef,
 }

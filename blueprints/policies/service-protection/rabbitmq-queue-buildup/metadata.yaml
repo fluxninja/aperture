@@ -1,0 +1,4 @@
+blueprint: Service Protection Policy based on feedback of RabbitMQ queue buildup.
+sources:
+  dashboard: policies/service-protection/base/dashboard.libsonnet
+  policy: policies/service-protection/rabbitmq-queue-buildup/policy.libsonnet
