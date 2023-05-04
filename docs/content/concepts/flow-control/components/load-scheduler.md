@@ -100,7 +100,9 @@ Tokens are determined in the following order of precedence:
 
 - Specified in the flow labels
 - Specified in the `Workload.tokens` setting.
-- Estimated using the `auto_tokens` feature.
+- Estimated tokens (see
+  [`workload_latency_based_tokens`](/reference/policies/spec.md#load-scheduler)
+  setting).
 
 ### Token rate {#token-rate}
 
