@@ -41,7 +41,7 @@ func NewIntegrator() runtime.Component {
 }
 
 // NewIntegratorAndOptions creates an integrator component and its fx options.
-func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	return NewIntegrator(), fx.Options(), nil
 }
 

@@ -51,7 +51,7 @@ func (*ArithmeticCombinator) IsActuator() bool { return false }
 var _ runtime.Component = (*ArithmeticCombinator)(nil)
 
 // NewArithmeticCombinatorAndOptions returns a new ArithmeticCombinator and its Fx options.
-func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.ArithmeticCombinator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.ArithmeticCombinator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	operator, err := ArithmeticOperatorString(arithmeticCombinatorProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err

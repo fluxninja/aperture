@@ -41,7 +41,7 @@ func NewConstantSignal(value float64) runtime.Component {
 }
 
 // NewVariableAndOptions creates a variable components and its fx options.
-func NewVariableAndOptions(variableProto *policylangv1.Variable, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewVariableAndOptions(variableProto *policylangv1.Variable, _ runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	variable := &Variable{
 		policyReadAPI: policyReadAPI,
 		variableProto: variableProto,

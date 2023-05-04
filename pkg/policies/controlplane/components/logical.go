@@ -52,7 +52,7 @@ func (*logicalCombinator) DynamicConfigUpdate(notifiers.Event, config.Unmarshall
 // NewAndAndOptions creates a new And Component.
 func NewAndAndOptions(
 	_ *policylangv1.And,
-	_ string,
+	_ runtime.ComponentID,
 	_ iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	return &logicalCombinator{
@@ -65,7 +65,7 @@ func NewAndAndOptions(
 // NewOrAndOptions creates a new Or Component.
 func NewOrAndOptions(
 	_ *policylangv1.Or,
-	_ string,
+	_ runtime.ComponentID,
 	_ iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	return &logicalCombinator{
@@ -106,7 +106,7 @@ func (*inverter) DynamicConfigUpdate(notifiers.Event, config.Unmarshaller) {}
 // NewInverterAndOptions creates a new Inverter Component.
 func NewInverterAndOptions(
 	_ *policylangv1.Inverter,
-	_ string,
+	_ runtime.ComponentID,
 	_ iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	return &inverter{}, fx.Options(), nil

@@ -41,7 +41,7 @@ func (*Extrapolator) IsActuator() bool { return false }
 var _ runtime.Component = (*Extrapolator)(nil)
 
 // NewExtrapolatorAndOptions creates a new Extrapolator Component.
-func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	exp := Extrapolator{
 		maxExtrapolationInterval: extrapolatorProto.Parameters.MaxExtrapolationInterval.AsDuration(),
 		lastOutput:               runtime.InvalidReading(),

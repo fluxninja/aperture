@@ -81,7 +81,7 @@ func (*UnaryOperator) IsActuator() bool { return false }
 var _ runtime.Component = (*UnaryOperator)(nil)
 
 // NewUnaryOperatorAndOptions creates a new UnaryOperator Component.
-func NewUnaryOperatorAndOptions(unaryOperatorProto *policylangv1.UnaryOperator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewUnaryOperatorAndOptions(unaryOperatorProto *policylangv1.UnaryOperator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	operator, err := UnaryOpString(unaryOperatorProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err

@@ -48,7 +48,7 @@ func newFlowControlNestedAndOptions(
 		var options []fx.Option
 		// sync config
 		configSyncOptions, err := loadscheduler.NewConfigSyncOptions(loadSchedulerProto,
-			componentID.String(),
+			componentID,
 			policyReadAPI)
 		if err != nil {
 			return retErr(err)

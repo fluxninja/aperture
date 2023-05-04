@@ -379,13 +379,13 @@ var _ jobRegistererIfc = (*PromQL)(nil)
 // NewPromQLAndOptions creates PromQL and its fx options.
 func NewPromQLAndOptions(
 	promQLProto *policylangv1.PromQL,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (*PromQL, fx.Option, error) {
 	promQL := &PromQL{
 		evaluationInterval: promQLProto.EvaluationInterval.AsDuration(),
 		policyReadAPI:      policyReadAPI,
-		componentID:        componentID,
+		componentID:        componentID.String(),
 		// Set err to make sure the initial runs of Execute return Invalid readings.
 		err: ErrNoQueriesReturned,
 	}
@@ -479,7 +479,7 @@ type ScalarQuery struct {
 func NewScalarQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 	jobPostFix string,
 ) (*ScalarQuery, fx.Option, error) {
@@ -528,7 +528,7 @@ var _ jobRegistererIfc = (*TaggedQuery)(nil)
 func NewTaggedQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 	jobPostFix string,
 ) (*TaggedQuery, fx.Option, error) {

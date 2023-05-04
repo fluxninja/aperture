@@ -73,9 +73,8 @@ type loadSchedulerFactory struct {
 	tokenBucketFillRateGaugeVec        *prometheus.GaugeVec
 	tokenBucketBucketCapacityGaugeVec  *prometheus.GaugeVec
 	tokenBucketAvailableTokensGaugeVec *prometheus.GaugeVec
+	wsFactory                          *SchedulerFactory
 	agentGroupName                     string
-
-	wsFactory *SchedulerFactory
 }
 
 // setupLoadSchedulerFactory sets up the load scheduler module in the main fx app.
@@ -110,9 +109,10 @@ func setupLoadSchedulerFactory(
 	}
 
 	lsFactory := &loadSchedulerFactory{
-		engineAPI: e,
-		registry:  reg,
-		wsFactory: wsFactory,
+		engineAPI:           e,
+		registry:            reg,
+		wsFactory:           wsFactory,
+		loadDecisionWatcher: loadDecisionWatcher,
 	}
 
 	// Initialize and register the WFQ and Token Bucket Metric Vectors
@@ -174,7 +174,7 @@ func setupLoadSchedulerFactory(
 				return err
 			}
 
-			err = loadDecisionWatcher.Start()
+			err = lsFactory.loadDecisionWatcher.Start()
 			if err != nil {
 				return err
 			}
@@ -184,7 +184,7 @@ func setupLoadSchedulerFactory(
 		OnStop: func(_ context.Context) error {
 			var merr error
 
-			err := loadDecisionWatcher.Stop()
+			err := lsFactory.loadDecisionWatcher.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -218,14 +218,14 @@ func setupLoadSchedulerFactory(
 func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
-	reg status.Registry,
+	registry status.Registry,
 ) (fx.Option, error) {
 	logger := lsFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.LoadSchedulerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	loadSchedulerProto := wrapperMessage.LoadScheduler
 	if err != nil || loadSchedulerProto == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		registry.SetStatus(status.NewStatus(nil, err))
 		logger.Warn().Err(err).Msg("Failed to unmarshal load scheduler config wrapper")
 		return fx.Options(), err
 	}
@@ -234,14 +234,14 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 	schedulerProto := loadSchedulerProto.Parameters.Scheduler
 	if schedulerProto == nil {
 		err = fmt.Errorf("no scheduler specified")
-		reg.SetStatus(status.NewStatus(nil, err))
+		registry.SetStatus(status.NewStatus(nil, err))
 		return fx.Options(), err
 	}
 
 	ls := &loadScheduler{
 		Component:            wrapperMessage.GetCommonAttributes(),
 		proto:                loadSchedulerProto,
-		registry:             reg,
+		registry:             registry,
 		loadSchedulerFactory: lsFactory,
 		clock:                clockwork.NewRealClock(),
 	}
@@ -296,9 +296,6 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 		return err
 	}
 
-	// Scheduler, err := wsFactory.newWorkloadScheduler(
-	//   ls.loadSchedulerProto.Parameters.Scheduler,
-
 	engineAPI := lsFactory.engineAPI
 
 	lifecycle.Append(fx.Hook{
@@ -346,10 +343,10 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			ls.Scheduler, err = wsFactory.NewScheduler(
 				ls.registry,
 				ls.proto.Parameters.Scheduler,
-				ls.Component,
+				ls,
 				ls.tokenBucketLoadMultiplier,
 				ls.clock,
-				ls.metricLabels,
+				metricLabels,
 			)
 			if err != nil {
 				return retErr(err)
@@ -381,7 +378,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// Stop the scheduler
-			err = ls.Scheduler.Close()
+			err = ls.Close()
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
@@ -468,5 +465,5 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 		ls.tokenBucketLoadMultiplier.SetPassThrough(false)
 	}
 
-	ls.Scheduler.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
+	ls.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
 }

@@ -9,6 +9,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -32,7 +33,7 @@ type podScalerConfigSync struct {
 // NewPodScalerOptions creates fx options for HorizontalPodScaler and also returns the agent group name associated with it.
 func NewPodScalerOptions(
 	podScalerProto *policylangv1.PodScaler,
-	componentStackID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
 	// Get Agent Group Name from HorizontalPodScaler.KubernetesObjectSelector.AgentGroup
@@ -42,12 +43,12 @@ func NewPodScalerOptions(
 	}
 	agentGroup := k8sObjectSelectorProto.GetAgentGroup()
 	etcdPath := path.Join(paths.PodScalerConfigPath,
-		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
+		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String()))
 	configSync := &podScalerConfigSync{
 		podScalerProto: podScalerProto,
 		policyReadAPI:  policyReadAPI,
 		etcdPath:       etcdPath,
-		componentID:    componentStackID,
+		componentID:    componentID.String(),
 	}
 
 	return fx.Options(

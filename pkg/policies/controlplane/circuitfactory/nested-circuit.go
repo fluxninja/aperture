@@ -104,8 +104,6 @@ func ParseNestedCircuit(
 			}
 		} else if nestedSignalEgress, ok := component.(*components.NestedSignalEgress); ok {
 			portName := nestedSignalEgress.PortName()
-			// log nestedCircuit.Name and egress port name for debugging
-			log.Info().Msgf("nestedCircuit.Name: %s, egress port name: %s", nestedCircuit.Name, portName)
 			// tracking the port names in the nested circuit
 			if _, ok := egressPorts[portName]; ok {
 				return retErr(fmt.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name))

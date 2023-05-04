@@ -9,6 +9,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -17,6 +18,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
@@ -29,13 +31,13 @@ import (
 
 // Actuator struct.
 type Actuator struct {
-	policyReadAPI  iface.Policy
-	decisionWriter *etcdwriter.Writer
-	actuatorProto  *policyprivatev1.LoadActuator
-	tokensQuery    *promql.TaggedQuery
-	componentID    string
-	etcdPaths      []string
-	dryRun         bool
+	policyReadAPI            iface.Policy
+	decisionWriter           *etcdwriter.Writer
+	actuatorProto            *policyprivatev1.LoadActuator
+	tokensQuery              *promql.TaggedQuery
+	loadSchedulerComponentID string
+	etcdPaths                []string
+	dryRun                   bool
 }
 
 // Name implements runtime.Component.
@@ -55,7 +57,7 @@ func (*Actuator) IsActuator() bool { return true }
 // NewActuatorAndOptions creates load actuator and its fx options.
 func NewActuatorAndOptions(
 	actuatorProto *policyprivatev1.LoadActuator,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	var (
@@ -67,7 +69,7 @@ func NewActuatorAndOptions(
 	agentGroups := selectors.UniqueAgentGroups(s)
 
 	for _, agentGroup := range agentGroups {
-		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
 		etcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
 		etcdPaths = append(etcdPaths, etcdPath)
 	}
@@ -77,12 +79,18 @@ func NewActuatorAndOptions(
 		dryRun = actuatorProto.GetDefaultConfig().GetDryRun()
 	}
 
+	parentComponentID, found := componentID.ParentID()
+	if !found {
+		// not expected to happen
+		log.Fatal().Msgf("componentID %s is not a child of a load scheduler", componentID)
+	}
+
 	lsa := &Actuator{
-		policyReadAPI: policyReadAPI,
-		componentID:   componentID,
-		etcdPaths:     etcdPaths,
-		actuatorProto: actuatorProto,
-		dryRun:        dryRun,
+		policyReadAPI:            policyReadAPI,
+		loadSchedulerComponentID: parentComponentID.String(),
+		etcdPaths:                etcdPaths,
+		actuatorProto:            actuatorProto,
+		dryRun:                   dryRun,
 	}
 
 	// Prepare parameters for prometheus queries
@@ -148,9 +156,9 @@ func (la *Actuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	retErr := func(err error) (runtime.PortToReading, error) {
 		var errMulti error
-		publishErr := la.publishDefaultDecision(tickInfo)
-		if publishErr != nil {
-			errMulti = multierr.Append(err, publishErr)
+		pErr := la.publishDefaultDecision(tickInfo)
+		if pErr != nil {
+			errMulti = multierr.Append(err, pErr)
 		}
 		return nil, errMulti
 	}
@@ -257,7 +265,7 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName:  la.policyReadAPI.GetPolicyName(),
 			PolicyHash:  la.policyReadAPI.GetPolicyHash(),
-			ComponentId: la.componentID,
+			ComponentId: la.loadSchedulerComponentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)
@@ -266,7 +274,12 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 		return err
 	}
 	for _, etcdPath := range la.etcdPaths {
+		// log the json string for decision
+		// and etcd path
+		j, _ := protojson.Marshal(wrapper)
+		logger.Info().Str("etcdPath", etcdPath).RawJSON("decision", j).Msg("Publishing decision")
 		la.decisionWriter.Write(etcdPath, dat)
 	}
+
 	return nil
 }
