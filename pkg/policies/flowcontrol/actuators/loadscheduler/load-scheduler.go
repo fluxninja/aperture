@@ -113,6 +113,7 @@ func setupLoadSchedulerFactory(
 		registry:            reg,
 		wsFactory:           wsFactory,
 		loadDecisionWatcher: loadDecisionWatcher,
+		agentGroupName:      ai.GetAgentGroup(),
 	}
 
 	// Initialize and register the WFQ and Token Bucket Metric Vectors

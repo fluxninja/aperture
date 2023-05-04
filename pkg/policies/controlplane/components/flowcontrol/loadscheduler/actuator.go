@@ -9,7 +9,6 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -64,12 +63,18 @@ func NewActuatorAndOptions(
 		etcdPaths []string
 		options   []fx.Option
 	)
+	parentComponentID, found := componentID.ParentID()
+	if !found {
+		// not expected to happen
+		log.Fatal().Msgf("componentID %s is not a child of a load scheduler", componentID)
+	}
+
 	s := actuatorProto.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)
 
 	for _, agentGroup := range agentGroups {
-		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), parentComponentID.String())
 		etcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
 		etcdPaths = append(etcdPaths, etcdPath)
 	}
@@ -77,12 +82,6 @@ func NewActuatorAndOptions(
 	dryRun := false
 	if actuatorProto.GetDefaultConfig() != nil {
 		dryRun = actuatorProto.GetDefaultConfig().GetDryRun()
-	}
-
-	parentComponentID, found := componentID.ParentID()
-	if !found {
-		// not expected to happen
-		log.Fatal().Msgf("componentID %s is not a child of a load scheduler", componentID)
 	}
 
 	lsa := &Actuator{
@@ -100,7 +99,7 @@ func NewActuatorAndOptions(
 		metrics.PolicyHashLabel,
 		policyReadAPI.GetPolicyHash(),
 		metrics.ComponentIDLabel,
-		componentID,
+		lsa.loadSchedulerComponentID,
 	)
 	if actuatorProto.WorkloadLatencyBasedTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := promql.NewTaggedQueryAndOptions(
@@ -112,7 +111,7 @@ func NewActuatorAndOptions(
 				metrics.WorkloadLatencyCountMetricName,
 				policyParams),
 			10*policyReadAPI.GetEvaluationInterval(),
-			componentID,
+			parentComponentID,
 			policyReadAPI,
 			"Tokens",
 		)
@@ -274,10 +273,6 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 		return err
 	}
 	for _, etcdPath := range la.etcdPaths {
-		// log the json string for decision
-		// and etcd path
-		j, _ := protojson.Marshal(wrapper)
-		logger.Info().Str("etcdPath", etcdPath).RawJSON("decision", j).Msg("Publishing decision")
 		la.decisionWriter.Write(etcdPath, dat)
 	}
 
