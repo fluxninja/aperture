@@ -181,7 +181,7 @@ DEP_TREE = {
                 {
                     "workload": "controller-prometheus-server",
                     "new_name": "controller-prometheus",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
+                    "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         ("^controller-prometheus", None),
                     ],
@@ -1068,6 +1068,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
         for child in child_resources:
             extra_objects = []
             ignored_objects = []
+            if child.get("workload", "") == "controller-prometheus-server" and scenario and "prometheus_workload_prioritization" in scenario:
+                child["resource_deps"] = child.get("resource_deps", []) + ["istiod"]
 
             if "extra_objects" in child:
                 extra_objects = child.pop("extra_objects")
