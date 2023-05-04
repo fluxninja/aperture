@@ -209,17 +209,17 @@
       "properties": {
         "overload_confirmation": {
           "$ref": "#/definitions/InPort",
-          "description": "The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.",
+          "description": "Overload confirmation port provides additional criteria to determine overload state which results in flow throttling at the service.",
           "x-order": 0
         },
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint input to the controller.",
+          "description": "Setpoint input to the controller.",
           "x-order": 1
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The input signal to the controller.",
+          "description": "Input signal to the controller.",
           "x-order": 2
         }
       },
@@ -2823,7 +2823,7 @@
       "additionalProperties": false
     },
     "MatchExpression": {
-      "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals: { label = app, value = frobnicator }\n```",
+      "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals:\n        label: app\n        value: frobnicator\n```",
       "properties": {
         "all": {
           "$ref": "#/definitions/MatchExpressionList",
@@ -2841,9 +2841,8 @@
           "x-order": 2
         },
         "label_exists": {
-          "description": "The expression is true when label with given name exists.\n\n",
+          "description": "The expression is true when label with given name exists.",
           "type": "string",
-          "x-go-tag-validate": "required",
           "x-order": 3
         },
         "label_matches": {
@@ -2857,7 +2856,6 @@
           "x-order": 5
         }
       },
-      "required": ["label_exists"],
       "title": "Defines a `[map<string, string> \u2192\u00a0bool]` expression to be evaluated on labels",
       "type": "object",
       "additionalProperties": false

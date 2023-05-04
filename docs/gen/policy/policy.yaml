@@ -221,16 +221,16 @@ definitions:
     type: object
     properties:
       overload_confirmation:
-        description: The overload_confirmation port provides additional criteria to
-          determine overload state which results in _Flow_ throttling at the service.
+        description: Overload confirmation port provides additional criteria to determine
+          overload state which results in flow throttling at the service.
         x-order: 0
         $ref: '#/definitions/InPort'
       setpoint:
-        description: The setpoint input to the controller.
+        description: Setpoint input to the controller.
         x-order: 1
         $ref: '#/definitions/InPort'
       signal:
-        description: The input signal to the controller.
+        description: Input signal to the controller.
         x-order: 2
         $ref: '#/definitions/InPort'
   AdaptiveLoadSchedulerOuts:
@@ -3060,13 +3060,13 @@ definitions:
       all:
         of:
           - label_exists: foo
-          - label_equals: { label = app, value = frobnicator }
+          - label_equals:
+              label: app
+              value: frobnicator
       ```
     type: object
     title: Defines a `[map<string, string> → bool]` expression to be evaluated on
       labels
-    required:
-    - label_exists
     properties:
       all:
         description: The expression is true when all sub expressions are true.
@@ -3081,11 +3081,8 @@ definitions:
         x-order: 2
         $ref: '#/definitions/EqualsMatchExpression'
       label_exists:
-        description: |+
-          The expression is true when label with given name exists.
-
+        description: The expression is true when label with given name exists.
         type: string
-        x-go-tag-validate: required
         x-order: 3
       label_matches:
         description: The expression is true when label matches given regular expression.
