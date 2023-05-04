@@ -45,11 +45,11 @@ spec:
                   all:
                     of:
                     - label_matches:
-                        label: source_fqdns
+                        label: aperture.source_fqdns
                         regex: service1-demo-app.demoapp.svc.cluster.local
-                    - label_equals:
-                        label: user_type
-                        value: guest
+                    - label_matches:
+                        label: aperture.destination_fqdns
+                        regex: service3-demo-app.demoapp.svc.cluster.local
               parameters:
                 priority: 200
             - label_matcher:
@@ -57,11 +57,11 @@ spec:
                   all:
                     of:
                     - label_matches:
-                        label: destination_fqdns
+                        label: aperture.source_fqdns
                         regex: service2-demo-app.demoapp.svc.cluster.local
-                    - label_equals:
-                        label: user_type
-                        value: guest
+                    - label_matches:
+                        label: aperture.destination_fqdns
+                        regex: service3-demo-app.demoapp.svc.cluster.local
               parameters:
                 priority: 50
           selectors:
@@ -115,16 +115,7 @@ spec:
     evaluation_interval: 1s
   resources:
     flow_control:
-      classifiers:
-      - rules:
-          user_type:
-            extractor:
-              from: request.http.headers.user-type
-        selectors:
-        - control_point: egress
-          service: service1-demo-app.demoapp.svc.cluster.local
-        - control_point: egress
-          service: service2-demo-app.demoapp.svc.cluster.local
+      classifiers: []
       flux_meters:
         weighted-service-protection:
           selectors:

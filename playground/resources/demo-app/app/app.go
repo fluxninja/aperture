@@ -201,7 +201,7 @@ func consumeFromQueue(q amqp.Queue, cCh *amqp.Channel, handler *RequestHandler) 
 				log.Error().Err(parseErr).Msg("Invalid destination")
 				break
 			}
-			code, err = handler.processChain(ctx, chain)
+			code, err = handler.processChain(ctx, chain, nil)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to process chain")
 				break
@@ -301,6 +301,8 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	headers := r.Header.Clone()
+
 	code := http.StatusOK
 	for _, chain := range p.Chains {
 		if len(chain.subrequests) == 0 {
@@ -318,7 +320,7 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid message destination", http.StatusBadRequest)
 			return
 		}
-		code, err = h.processChain(ctx, chain)
+		code, err = h.processChain(ctx, chain, headers)
 		if err != nil {
 			log.Autosample().Warn().Err(err).Msg("Failed to process chain")
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -335,7 +337,7 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain) (int, error) {
+func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain, headers http.Header) (int, error) {
 	if len(chain.subrequests) == 1 {
 		return h.processRequest()
 	}
@@ -346,7 +348,7 @@ func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain)
 	trimmedRequest := Request{
 		Chains: []SubrequestChain{trimmedSubrequestChain},
 	}
-	return h.forwardRequest(ctx, forwardingDestination, trimmedRequest)
+	return h.forwardRequest(ctx, forwardingDestination, trimmedRequest, headers)
 }
 
 func busyWait(duration time.Duration) {
@@ -404,7 +406,7 @@ func (h RequestHandler) processRequest() (int, error) {
 	return http.StatusOK, nil
 }
 
-func (h RequestHandler) forwardRequest(ctx context.Context, destination string, requestBody Request) (int, error) {
+func (h RequestHandler) forwardRequest(ctx context.Context, destination string, requestBody Request, headers http.Header) (int, error) {
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {
 		log.Bug().Err(err).Msg("bug: Failed to marshal request")
@@ -441,6 +443,9 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destination string, 
 	request = request.WithContext(ctx)
 	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(request.Header))
 
+	if headers != nil {
+		request.Header = headers
+	}
 	request.Header.Set("Content-Type", "application/json")
 
 	response, err := h.httpClient.Do(request)

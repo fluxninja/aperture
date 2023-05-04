@@ -7,20 +7,6 @@ common:
   policy_name: weighted-service-protection
 
 policy:
-  # Additional resources.
-  # Type: aperture.spec.v1.Resources
-  resources:
-    flow_control:
-      classifiers:
-        - selectors:
-            - service: service1-demo-app.demoapp.svc.cluster.local
-              control_point: egress
-            - service: service2-demo-app.demoapp.svc.cluster.local
-              control_point: egress
-          rules:
-            user_type:
-              extractor:
-                from: request.http.headers.user-type
   service_protection_core:
     adaptive_load_scheduler:
       # The selectors determine the flows that are protected by this policy.
@@ -38,11 +24,11 @@ policy:
                 all:
                   of:
                     - label_matches:
-                        label: source_fqdns
+                        label: aperture.source_fqdns
                         regex: service1-demo-app.demoapp.svc.cluster.local
-                    - label_equals:
-                        label: user_type
-                        value: "guest"
+                    - label_matches:
+                        label: aperture.destination_fqdns
+                        regex: service3-demo-app.demoapp.svc.cluster.local
             parameters:
               priority: 200
           - label_matcher:
@@ -50,11 +36,11 @@ policy:
                 all:
                   of:
                     - label_matches:
-                        label: destination_fqdns
+                        label: aperture.source_fqdns
                         regex: service2-demo-app.demoapp.svc.cluster.local
-                    - label_equals:
-                        label: user_type
-                        value: "guest"
+                    - label_matches:
+                        label: aperture.destination_fqdns
+                        regex: service3-demo-app.demoapp.svc.cluster.local
             parameters:
               priority: 50
   latency_baseliner:

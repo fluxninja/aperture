@@ -15,20 +15,10 @@ export let vuStages = [
 export let options = {
     discardResponseBodies: true,
     scenarios: {
-        guests: {
+        user: {
             executor: "ramping-vus",
             stages: vuStages,
-            env: { USER_TYPE: "guest" },
-        },
-        subscribers: {
-            executor: "ramping-vus",
-            stages: vuStages,
-            env: { USER_TYPE: "subscriber" },
-        },
-        crawlers: {
-            executor: "ramping-vus",
-            stages: vuStages,
-            env: { USER_TYPE: "crawlers" },
+            env: { USER_TYPE: "user" },
         },
     },
 };
@@ -38,11 +28,10 @@ export default function () {
     let userId = vu.idInTest;
 
     const headers = {
-        "Content-Type": "application/json",
-        Cookie:
-            "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
-        "User-Type": userType,
-        "User-Id": userId,
+        'Content-Type': 'application/json',
+        'Cookie': 'session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo',
+        'User-Type': userType,
+        'User-Id': userId,
     };
 
 
@@ -58,7 +47,7 @@ export default function () {
             ],
         ],
     };
-    let svc1 = {
+    const svc1 = {
         method: 'POST',
         url: 'http://service1-demo-app.demoapp.svc.cluster.local/request',
         body: JSON.stringify(svc1Body),
@@ -79,7 +68,7 @@ export default function () {
             ],
         ],
     };
-    let svc2 = {
+    const svc2 = {
         method: 'POST',
         url: 'http://service2-demo-app.demoapp.svc.cluster.local/request',
         body: JSON.stringify(svc2Body),
@@ -99,6 +88,6 @@ export default function () {
 
     if (!svc1ret && !svc2ret) {
         // sleep for 10ms to 25ms
-        sleep(randomIntBetween(0.01, 0.025));
+        sleep(randomIntBetween(10, 25) / 1000);
     };
 }
