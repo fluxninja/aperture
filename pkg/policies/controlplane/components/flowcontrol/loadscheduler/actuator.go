@@ -17,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
@@ -56,25 +55,21 @@ func (*Actuator) IsActuator() bool { return true }
 // NewActuatorAndOptions creates load actuator and its fx options.
 func NewActuatorAndOptions(
 	actuatorProto *policyprivatev1.LoadActuator,
-	componentID runtime.ComponentID,
+	_ runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	var (
 		etcdPaths []string
 		options   []fx.Option
 	)
-	parentComponentID, found := componentID.ParentID()
-	if !found {
-		// not expected to happen
-		log.Fatal().Msgf("componentID %s is not a child of a load scheduler", componentID)
-	}
+	loadSchedulerComponentID := actuatorProto.ComponentId
 
 	s := actuatorProto.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)
 
 	for _, agentGroup := range agentGroups {
-		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), parentComponentID.String())
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), loadSchedulerComponentID)
 		etcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
 		etcdPaths = append(etcdPaths, etcdPath)
 	}
@@ -86,7 +81,7 @@ func NewActuatorAndOptions(
 
 	lsa := &Actuator{
 		policyReadAPI:            policyReadAPI,
-		loadSchedulerComponentID: parentComponentID.String(),
+		loadSchedulerComponentID: loadSchedulerComponentID,
 		etcdPaths:                etcdPaths,
 		actuatorProto:            actuatorProto,
 		dryRun:                   dryRun,
@@ -111,7 +106,7 @@ func NewActuatorAndOptions(
 				metrics.WorkloadLatencyCountMetricName,
 				policyParams),
 			10*policyReadAPI.GetEvaluationInterval(),
-			parentComponentID,
+			runtime.NewComponentID(loadSchedulerComponentID),
 			policyReadAPI,
 			"Tokens",
 		)
