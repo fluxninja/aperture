@@ -35,4 +35,21 @@ serviceProtectionDefaults {
       queue_buildup_setpoint: '__REQUIRED_FIELD__',
     },
   },
+
+  /**
+  * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+  */
+  dashboard: {
+    refresh_interval: '15s',
+    time_from: 'now-15m',
+    time_to: 'now',
+    /**
+    * @param (dashboard.datasource.name: string) Datasource name.
+    * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
+    */
+    datasource: {
+      name: '$datasource',
+      filter_regex: '',
+    },
+  },
 }

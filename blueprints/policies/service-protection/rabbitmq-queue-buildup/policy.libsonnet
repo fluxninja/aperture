@@ -43,6 +43,6 @@ function(cfg) {
   },
 
   policyResource: policyResource,
-  policyDef: policyDef,
 
+  policyDef: policyDef,
 }
