@@ -30,19 +30,6 @@ func NewFluxMeterOptions(
 	fluxMeterProto *policylangv1.FluxMeter,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := fluxMeterProto.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
-		}
-		fluxMeterProto.Selectors = append(fluxMeterProto.Selectors, selector)
-		fluxMeterProto.FlowSelector = nil
-	}
-
 	var options []fx.Option
 
 	s := fluxMeterProto.GetSelectors()

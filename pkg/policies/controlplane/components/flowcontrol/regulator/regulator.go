@@ -53,19 +53,6 @@ func NewRegulatorAndOptions(
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := regulatorProto.Parameters.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
-		}
-		regulatorProto.Parameters.Selectors = append(regulatorProto.Parameters.Selectors, selector)
-		regulatorProto.Parameters.FlowSelector = nil
-	}
-
 	s := regulatorProto.Parameters.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)

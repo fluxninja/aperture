@@ -17,19 +17,6 @@ const (
 
 // ParseLoadRamp parses a LoadRamp from the given proto and returns its nested circuit representation.
 func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := loadRamp.Parameters.RegulatorParameters.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
-		}
-		loadRamp.Parameters.RegulatorParameters.Selectors = append(loadRamp.Parameters.RegulatorParameters.Selectors, selector)
-		loadRamp.Parameters.RegulatorParameters.FlowSelector = nil
-	}
-
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := loadRamp.InPorts
 	if inPorts != nil {

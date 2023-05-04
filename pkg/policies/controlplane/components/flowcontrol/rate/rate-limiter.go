@@ -53,19 +53,6 @@ func NewRateLimiterAndOptions(
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := rateLimiterProto.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
-		}
-		rateLimiterProto.Selectors = append(rateLimiterProto.Selectors, selector)
-		rateLimiterProto.FlowSelector = nil
-	}
-
 	s := rateLimiterProto.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)

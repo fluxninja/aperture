@@ -1127,11 +1127,9 @@ See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
 ::: Example
 
 ```yaml
-flow_selector:
-  service_selector:
-    agent_group: demoapp
+selectors:
+  - agent_group: demoapp
     service: service1-demo-app.demoapp.svc.cluster.local
-  flow_matcher:
     control_point: ingress
     label_matcher:
       match_labels:
@@ -1147,19 +1145,6 @@ rules:
 ```
 
 <dl>
-<dt>flow_selector</dt>
-<dd>
-
-<!-- vale off -->
-
-([FlowSelector](#flow-selector))
-
-<!-- vale on -->
-
-Defines where to apply the flow classification rule. Deprecated: v1.8.0: Use
-`selectors` instead.
-
-</dd>
 <dt>rego</dt>
 <dd>
 
@@ -1197,7 +1182,7 @@ to extract and propagate flow labels with that key.
 
 <!-- vale off -->
 
-([[]Selector](#selector))
+([[]Selector](#selector), **required**)
 
 <!-- vale on -->
 
@@ -2734,143 +2719,6 @@ PromQL component.
 
 <!-- vale off -->
 
-### FlowMatcher {#flow-matcher}
-
-<!-- vale on -->
-
-Describes which flows a
-[flow control component](/concepts/flow-control/flow-control.md#components)
-should apply to
-
-:::info
-
-See also [FlowSelector overview](/concepts/flow-control/selector.md).
-
-::: Example:
-
-```yaml
-control_point: ingress
-label_matcher:
-  match_labels:
-    user_tier: gold
-  match_expressions:
-    - key: query
-      operator: In
-      values:
-        - insert
-        - delete
-  expression:
-    label_matches:
-      - label: user_agent
-        regex: ^(?!.*Chrome).*Safari
-```
-
-Deprecated: v1.8.0: Use `selectors` instead.
-
-<dl>
-<dt>control_point</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-[Control Point](/concepts/flow-control/selector.md#control-point) identifies the
-location of a Flow within a Service. For an SDK based insertion, a Control Point
-can represent a particular feature or execution block within a Service. In case
-of Service Mesh or Middleware insertion, a Control Point can identify ingress or
-egress calls or distinct listeners or filter chains.
-
-</dd>
-<dt>label_matcher</dt>
-<dd>
-
-<!-- vale off -->
-
-([LabelMatcher](#label-matcher))
-
-<!-- vale on -->
-
-Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/flow-control/flow-label.md) must also be satisfied (in
-addition to service+control point matching)
-
-:::info
-
-See also
-[Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
-
-:::
-
-:::note
-
-[Classifiers](#classifier) _can_ use flow labels created by some other
-classifier, but only if they were created at some previous control point (and
-propagated in baggage).
-
-This limitation does not apply to selectors of other entities, like Flux Meters
-or Actuators. It's valid to create a flow label on a control point using
-classifier, and immediately use it for matching on the same control point.
-
-:::
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### FlowSelector {#flow-selector}
-
-<!-- vale on -->
-
-Selects flows based on _Control Point_, flow labels, agent group and service
-that the
-[flow control component](/concepts/flow-control/flow-control.md#components)
-operates on.
-
-:::info
-
-See also [FlowSelector overview](/concepts/flow-control/selector.md).
-
-:::
-
-Deprecated: v1.8.0: Use `selectors` instead.
-
-<dl>
-<dt>flow_matcher</dt>
-<dd>
-
-<!-- vale off -->
-
-([FlowMatcher](#flow-matcher))
-
-<!-- vale on -->
-
-Match control points and labels
-
-</dd>
-<dt>service_selector</dt>
-<dd>
-
-<!-- vale off -->
-
-([ServiceSelector](#service-selector))
-
-<!-- vale on -->
-
-Match agent group and service
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### FluxMeter {#flux-meter}
 
 <!-- vale on -->
@@ -2900,11 +2748,9 @@ static_buckets:
       5000.0,
       10000.0,
     ]
-flow_selector:
-  service_selector:
-    agent_group: demoapp
+selectors:
+  - agent_group: demoapp
     service: service1-demo-app.demoapp.svc.cluster.local
-  flow_matcher:
     control_point: ingress
 attribute_key: response_duration_ms
 ```
@@ -2950,19 +2796,6 @@ For list of available attributes in Envoy access logs, refer
 <!-- vale on -->
 
 </dd>
-<dt>flow_selector</dt>
-<dd>
-
-<!-- vale off -->
-
-([FlowSelector](#flow-selector))
-
-<!-- vale on -->
-
-The selection criteria for the traffic that will be measured. Deprecated:
-v1.8.0: Use `selectors` instead.
-
-</dd>
 <dt>linear_buckets</dt>
 <dd>
 
@@ -2978,7 +2811,7 @@ v1.8.0: Use `selectors` instead.
 
 <!-- vale off -->
 
-([[]Selector](#selector))
+([[]Selector](#selector), **required**)
 
 <!-- vale on -->
 
@@ -4867,7 +4700,7 @@ Contains configuration of per-agent scheduler
 
 <!-- vale off -->
 
-([[]Selector](#selector))
+([[]Selector](#selector), **required**)
 
 <!-- vale on -->
 
@@ -6030,19 +5863,6 @@ Default configuration
 Configuration key for DynamicConfig
 
 </dd>
-<dt>flow_selector</dt>
-<dd>
-
-<!-- vale off -->
-
-([FlowSelector](#flow-selector))
-
-<!-- vale on -->
-
-Which control point to apply this rate limiter to. Deprecated: v1.8.0: Use
-`selectors` instead.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -6072,7 +5892,7 @@ Parameters for the RateLimiter component
 
 <!-- vale off -->
 
-([[]Selector](#selector))
+([[]Selector](#selector), **required**)
 
 <!-- vale on -->
 
@@ -6519,19 +6339,6 @@ The percentage of requests to accept.
 <!-- vale on -->
 
 <dl>
-<dt>flow_selector</dt>
-<dd>
-
-<!-- vale off -->
-
-([FlowSelector](#flow-selector))
-
-<!-- vale on -->
-
-_Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.
-Deprecated: v1.8.0: Use `selectors` instead.
-
-</dd>
 <dt>label_key</dt>
 <dd>
 
@@ -6555,7 +6362,7 @@ The flow label key for identifying sessions.
 
 <!-- vale off -->
 
-([[]Selector](#selector))
+([[]Selector](#selector), **required**)
 
 <!-- vale on -->
 
@@ -7215,86 +7022,6 @@ In Kubernetes, this is the FQDN of the Service object.
 :::info
 
 `any` matches all services.
-
-:::
-
-:::info
-
-An entity (for example, Kubernetes pod) might belong to multiple services.
-
-:::
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### ServiceSelector {#service-selector}
-
-<!-- vale on -->
-
-Describes which service a
-[flow control or observability component](/concepts/flow-control/flow-control.md#components)
-should apply to
-
-:::info
-
-See also [FlowSelector overview](/concepts/flow-control/selector.md).
-
-:::
-
-Deprecated: v1.8.0: Use `selectors` instead.
-
-<dl>
-<dt>agent_group</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"default"`)
-
-<!-- vale on -->
-
-Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
-selector applies to.
-
-:::info
-
-Agent Groups are used to scope policies to a subset of agents connected to the
-same controller. This is especially useful in the Kubernetes sidecar
-installation because service discovery is switched off in that mode. The agents
-within an agent group form a peer to peer cluster and constantly share state.
-
-:::
-
-</dd>
-<dt>service</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"any"`)
-
-<!-- vale on -->
-
-The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/selector.md) to select.
-
-In Kubernetes, this is the FQDN of the Service object.
-
-:::info
-
-`any` matches all services.
-
-:::
-
-:::info
-
-In the Kubernetes sidecar installation mode, service discovery is switched off
-by default. To scope policies to services, the `service` should be set to `any`
-and instead, `agent_group` name should be used.
 
 :::
 
