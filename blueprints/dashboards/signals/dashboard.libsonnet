@@ -14,41 +14,43 @@ function(cfg) {
   local time_from = params.time_from,
   local time_to = params.time_to,
 
-  local signalAveragePanel = graphPanel.new(
-    title='Signal Average',
-    datasource=dsName,
-  )
-                             .addTarget(
-    prometheus.target(
-      expr=(
-        'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])' +
-        '/' +
-        'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])'
+  local signalAveragePanel =
+    graphPanel.new(
+      title='Signal Average',
+      datasource=dsName,
+    )
+    .addTarget(
+      prometheus.target(
+        expr=(
+          'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])' +
+          '/' +
+          'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])'
+        ),
+        intervalFactor=1,
       ),
-      intervalFactor=1,
     ),
-  ),
 
-  local InvalidFrequencyPanel = graphPanel.new(
-    title='Signal Validity (Frequency)',
-    datasource=dsName,
-    stack=true,
-    bars=true,
-  )
-                                .addTarget(
-    prometheus.target(
-      expr='avg(rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
-      intervalFactor=1,
-      legendFormat='Valid',
+  local InvalidFrequencyPanel =
+    graphPanel.new(
+      title='Signal Validity (Frequency)',
+      datasource=dsName,
+      stack=true,
+      bars=true,
+    )
+    .addTarget(
+      prometheus.target(
+        expr='avg(rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
+        intervalFactor=1,
+        legendFormat='Valid',
+      ),
+    )
+    .addTarget(
+      prometheus.target(
+        expr='sum(rate(invalid_signal_readings_total{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
+        intervalFactor=1,
+        legendFormat='Invalid',
+      ),
     ),
-  )
-                                .addTarget(
-    prometheus.target(
-      expr='sum(rate(invalid_signal_readings_total{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
-      intervalFactor=1,
-      legendFormat='Invalid',
-    ),
-  ),
 
   local dashboardDef =
     dashboard.new(

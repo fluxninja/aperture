@@ -12,6 +12,15 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 * @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters required) Parameters for Adaptive Load Scheduler.
 * @param (policy.service_protection_core.dry_run: bool) Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
 */
+
+/**
+* @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+* @param (dashboard.time_from: string) From time of dashboard.
+* @param (dashboard.time_to: string) To time of dashboard.
+* @param (dashboard.datasource.name: string) Datasource name.
+* @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
+*/
+
 serviceProtectionDefaults {
   policy+: {
     latency_baseliner: {
@@ -36,10 +45,3 @@ serviceProtectionDefaults {
     },
   },
 }
-/**
-* @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
-* @param (dashboard.time_from: string) From time of dashboard.
-* @param (dashboard.time_to: string) To time of dashboard.
-* @param (dashboard.datasource.name: string) Datasource name.
-* @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
-*/

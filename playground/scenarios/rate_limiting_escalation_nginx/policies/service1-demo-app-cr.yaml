@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: workload-prioritization
+  name: service1-demo-app
 spec:
   circuit:
     components:
@@ -47,17 +47,55 @@ spec:
                   parameters:
                     priority: 200
               selectors:
-              - control_point: ingress
-                service: service1-demo-app.demoapp.svc.cluster.local
+              - control_point: service1-demo-app
             max_load_multiplier: 2
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: OBSERVED_LOAD_MULTIPLIER
+          rhs:
+            constant_signal:
+              value: 1
+        operator: lt
+        out_ports:
+          output:
+            signal_name: IS_CRAWLER_ESCALATION
+        true_for: 30s
+    - switcher:
+        in_ports:
+          off_signal:
+            constant_signal:
+              value: 10
+          on_signal:
+            constant_signal:
+              value: 0
+          switch:
+            signal_name: IS_CRAWLER_ESCALATION
+        out_ports:
+          output:
+            signal_name: RATE_LIMIT
+    - flow_control:
+        rate_limiter:
+          dynamic_config_key: rate_limiter
+          in_ports:
+            limit:
+              signal_name: RATE_LIMIT
+          parameters:
+            label_key: http.request.header.user_id
+            limit_reset_interval: 1s
+          selectors:
+          - control_point: service1-demo-app
+            label_matcher:
+              match_labels:
+                http.request.header.user_type: crawler
     - query:
         promql:
           evaluation_interval: 1s
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="workload-prioritization"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app"}[5s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -102,10 +140,8 @@ spec:
             extractor:
               from: request.http.headers.user-type
         selectors:
-        - control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+        - control_point: service1-demo-app
       flux_meters:
-        workload-prioritization:
+        service1-demo-app:
           selectors:
-          - control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+          - control_point: service3-demo-app
