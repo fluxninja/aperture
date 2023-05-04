@@ -20,6 +20,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	workloadscheduler "github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/workload-scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
@@ -73,7 +74,7 @@ type loadSchedulerFactory struct {
 	tokenBucketFillRateGaugeVec        *prometheus.GaugeVec
 	tokenBucketBucketCapacityGaugeVec  *prometheus.GaugeVec
 	tokenBucketAvailableTokensGaugeVec *prometheus.GaugeVec
-	wsFactory                          *SchedulerFactory
+	wsFactory                          *workloadscheduler.Factory
 	agentGroupName                     string
 }
 
@@ -99,7 +100,7 @@ func setupLoadSchedulerFactory(
 		return err
 	}
 
-	wsFactory, err := NewSchedulerFactory(
+	wsFactory, err := workloadscheduler.NewFactory(
 		lifecycle,
 		reg,
 		prometheusRegistry,
@@ -113,6 +114,7 @@ func setupLoadSchedulerFactory(
 		registry:            reg,
 		wsFactory:           wsFactory,
 		loadDecisionWatcher: loadDecisionWatcher,
+		agentGroupName:      ai.GetAgentGroup(),
 	}
 
 	// Initialize and register the WFQ and Token Bucket Metric Vectors
@@ -121,28 +123,28 @@ func setupLoadSchedulerFactory(
 			Name: metrics.TokenBucketLMMetricName,
 			Help: "A gauge that tracks the load multiplier",
 		},
-		metricLabelKeys,
+		workloadscheduler.MetricLabelKeys,
 	)
 	lsFactory.tokenBucketFillRateGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.TokenBucketFillRateMetricName,
 			Help: "A gauge that tracks the fill rate of token bucket in tokens/sec",
 		},
-		metricLabelKeys,
+		workloadscheduler.MetricLabelKeys,
 	)
 	lsFactory.tokenBucketBucketCapacityGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.TokenBucketCapacityMetricName,
 			Help: "A gauge that tracks the capacity of token bucket",
 		},
-		metricLabelKeys,
+		workloadscheduler.MetricLabelKeys,
 	)
 	lsFactory.tokenBucketAvailableTokensGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.TokenBucketAvailableMetricName,
 			Help: "A gauge that tracks the number of tokens available in token bucket",
 		},
-		metricLabelKeys,
+		workloadscheduler.MetricLabelKeys,
 	)
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
@@ -255,7 +257,7 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 
 // loadScheduler implements load scheduler on the flowcontrol side.
 type loadScheduler struct {
-	*Scheduler
+	*workloadscheduler.Scheduler
 	iface.Component
 	registry                  status.Registry
 	proto                     *policylangv1.LoadScheduler

@@ -52,7 +52,7 @@ func ParseAutoScaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(autoscaler.MaxScaleInPercentage) / 100.0,
+										Value: float64(autoscaler.Parameters.MaxScaleInPercentage) / 100.0,
 									},
 								},
 							},
@@ -157,7 +157,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.MinScale),
+											Value: float64(autoscaler.Parameters.MinScale),
 										},
 									},
 								},
@@ -186,7 +186,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.MaxScale),
+											Value: float64(autoscaler.Parameters.MaxScale),
 										},
 									},
 								},
@@ -213,7 +213,7 @@ func ParseAutoScaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(autoscaler.MaxScaleOutPercentage) / 100.0,
+										Value: float64(autoscaler.Parameters.MaxScaleOutPercentage) / 100.0,
 									},
 								},
 							},
@@ -318,7 +318,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.MaxScale),
+											Value: float64(autoscaler.Parameters.MaxScale),
 										},
 									},
 								},
@@ -347,7 +347,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.MinScale),
+											Value: float64(autoscaler.Parameters.MinScale),
 										},
 									},
 								},
@@ -369,7 +369,7 @@ func ParseAutoScaler(
 		componentsScaleOut, componentsScaleIn []*policylangv1.Component
 	)
 
-	for scaleOutIndex, scaleOutController := range autoscaler.ScaleOutControllers {
+	for scaleOutIndex, scaleOutController := range autoscaler.Parameters.ScaleOutControllers {
 		signalPortName := fmt.Sprintf(autoscalerScaleOutSignalPortNameTemplate, scaleOutIndex)
 		setpointPortName := fmt.Sprintf(autoscalerScaleOutSetpointPortNameTemplate, scaleOutIndex)
 
@@ -553,7 +553,7 @@ func ParseAutoScaler(
 		}
 	}
 
-	for scaleInIndex, scaleInController := range autoscaler.ScaleInControllers {
+	for scaleInIndex, scaleInController := range autoscaler.Parameters.ScaleInControllers {
 		signalPortName := fmt.Sprintf(autoscalerScaleInSignalPortNameTemplate, scaleInIndex)
 		setpointPortName := fmt.Sprintf(autoscalerScaleInSetpointPortNameTemplate, scaleInIndex)
 
@@ -772,7 +772,7 @@ func ParseAutoScaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: autoscaler.ScaleOutCooldown,
+					HoldFor: autoscaler.Parameters.ScaleOutCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -796,7 +796,7 @@ func ParseAutoScaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: autoscaler.ScaleInCooldown,
+					HoldFor: autoscaler.Parameters.ScaleInCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -831,7 +831,7 @@ func ParseAutoScaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: (float64(autoscaler.CooldownOverridePercentage) / 100.0) + 1.0,
+										Value: (float64(autoscaler.Parameters.CooldownOverridePercentage) / 100.0) + 1.0,
 									},
 								},
 							},
@@ -872,7 +872,7 @@ func ParseAutoScaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: autoscaler.ScaleInCooldown,
+					HoldFor: autoscaler.Parameters.ScaleInCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -969,7 +969,7 @@ func ParseAutoScaler(
 		componentsScaler []*policylangv1.Component
 		shortDescription string
 	)
-	scaler := autoscaler.Scaler
+	scaler := autoscaler.Parameters.Scaler
 	if scaler == nil {
 		return nil, fmt.Errorf("no scaler specified")
 	}
@@ -982,27 +982,23 @@ func ParseAutoScaler(
 						Component: &policylangv1.AutoScale_PodScaler{
 							PodScaler: &policylangv1.PodScaler{
 								KubernetesObjectSelector: kubernetesReplicas.KubernetesObjectSelector,
-								ScaleActuator: &policylangv1.PodScaler_ScaleActuator{
-									DynamicConfigKey: kubernetesReplicas.DynamicConfigKey,
-									DefaultConfig:    kubernetesReplicas.DefaultConfig,
-									InPorts: &policylangv1.PodScaler_ScaleActuator_Ins{
-										DesiredReplicas: &policylangv1.InPort{
-											Value: &policylangv1.InPort_SignalName{
-												SignalName: "DESIRED_SCALE",
-											},
+								InPorts: &policylangv1.PodScaler_Ins{
+									Replicas: &policylangv1.InPort{
+										Value: &policylangv1.InPort_SignalName{
+											SignalName: "DESIRED_SCALE",
 										},
 									},
 								},
-								ScaleReporter: &policylangv1.PodScaler_ScaleReporter{
-									OutPorts: &policylangv1.PodScaler_ScaleReporter_Outs{
-										ActualReplicas: &policylangv1.OutPort{
-											SignalName: "ACTUAL_SCALE",
-										},
-										ConfiguredReplicas: &policylangv1.OutPort{
-											SignalName: "CONFIGURED_SCALE",
-										},
+								OutPorts: &policylangv1.PodScaler_Outs{
+									ActualReplicas: &policylangv1.OutPort{
+										SignalName: "ACTUAL_SCALE",
+									},
+									ConfiguredReplicas: &policylangv1.OutPort{
+										SignalName: "CONFIGURED_SCALE",
 									},
 								},
+								DryRunConfigKey: kubernetesReplicas.DryRunConfigKey,
+								DryRun:          kubernetesReplicas.DryRun,
 							},
 						},
 					},

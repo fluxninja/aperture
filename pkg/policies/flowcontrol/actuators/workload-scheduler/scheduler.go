@@ -1,4 +1,4 @@
-package loadscheduler
+package workloadscheduler
 
 import (
 	"context"
@@ -26,11 +26,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-// Array of Label Keys for WFQ and Token Bucket Metrics.
-var metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
+// MetricLabelKeys is an array of Label Keys for WFQ and Token Bucket Metrics.
+var MetricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 
-// SchedulerFactory is a factory for creating load schedulers.
-type SchedulerFactory struct {
+// Factory is a factory for creating load schedulers.
+type Factory struct {
 	registry status.Registry
 
 	// WFQ Metrics.
@@ -44,15 +44,15 @@ type SchedulerFactory struct {
 	workloadCounterVec        *prometheus.CounterVec
 }
 
-// NewSchedulerFactory sets up the load scheduler module in the main fx app.
-func NewSchedulerFactory(
+// NewFactory sets up the load scheduler module in the main fx app.
+func NewFactory(
 	lifecycle fx.Lifecycle,
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
-) (*SchedulerFactory, error) {
+) (*Factory, error) {
 	reg := statusRegistry.Child("component", "scheduler")
 
-	wsFactory := &SchedulerFactory{
+	wsFactory := &Factory{
 		registry: reg,
 	}
 
@@ -61,28 +61,28 @@ func NewSchedulerFactory(
 			Name: metrics.WFQFlowsMetricName,
 			Help: "A gauge that tracks the number of flows in the WFQScheduler",
 		},
-		metricLabelKeys,
+		MetricLabelKeys,
 	)
 	wsFactory.wfqRequestsGaugeVec = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: metrics.WFQRequestsMetricName,
 			Help: "A gauge that tracks the number of queued requests in the WFQScheduler",
 		},
-		metricLabelKeys,
+		MetricLabelKeys,
 	)
 	wsFactory.incomingTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: metrics.IncomingTokensMetricName,
 			Help: "A counter measuring work incoming into Scheduler",
 		},
-		metricLabelKeys,
+		MetricLabelKeys,
 	)
 	wsFactory.acceptedTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: metrics.AcceptedTokensMetricName,
 			Help: "A counter measuring work admitted by Scheduler",
 		},
-		metricLabelKeys,
+		MetricLabelKeys,
 	)
 
 	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
@@ -204,14 +204,14 @@ type Scheduler struct {
 	incomingTokensCounter prometheus.Counter
 	acceptedTokensCounter prometheus.Counter
 	proto                 *policylangv1.Scheduler
-	wsFactory             *SchedulerFactory
+	wsFactory             *Factory
 	workloadMultiMatcher  *multiMatcher
 	tokensByWorkloadIndex map[string]uint64
 	metricLabels          prometheus.Labels
 }
 
 // NewScheduler returns fx options for the load scheduler fx app.
-func (wsFactory *SchedulerFactory) NewScheduler(
+func (wsFactory *Factory) NewScheduler(
 	registry status.Registry,
 	proto *policylangv1.Scheduler,
 	component iface.Component,

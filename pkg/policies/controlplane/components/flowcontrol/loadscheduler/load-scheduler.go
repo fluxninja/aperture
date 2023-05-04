@@ -70,7 +70,7 @@ func ParseLoadScheduler(
 					},
 				},
 			},
-			ComponentId:                componentID.String(),
+			LoadSchedulerComponentId:   componentID.String(),
 			DefaultConfig:              loadScheduler.GetDefaultConfig(),
 			DynamicConfigKey:           loadScheduler.GetDynamicConfigKey(),
 			WorkloadLatencyBasedTokens: loadScheduler.Parameters.GetWorkloadLatencyBasedTokens(),
@@ -89,8 +89,8 @@ func ParseLoadScheduler(
 			{
 				Component: &policylangv1.Component_FlowControl{
 					FlowControl: &policylangv1.FlowControl{
-						Component: &policylangv1.FlowControl_Internal{
-							Internal: loadActuatorAnyProto,
+						Component: &policylangv1.FlowControl_Private{
+							Private: loadActuatorAnyProto,
 						},
 					},
 				},

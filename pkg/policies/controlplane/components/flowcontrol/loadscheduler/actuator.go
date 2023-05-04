@@ -9,7 +9,6 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -18,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
@@ -57,19 +55,21 @@ func (*Actuator) IsActuator() bool { return true }
 // NewActuatorAndOptions creates load actuator and its fx options.
 func NewActuatorAndOptions(
 	actuatorProto *policyprivatev1.LoadActuator,
-	componentID runtime.ComponentID,
+	_ runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	var (
 		etcdPaths []string
 		options   []fx.Option
 	)
+	loadSchedulerComponentID := actuatorProto.LoadSchedulerComponentId
+
 	s := actuatorProto.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)
 
 	for _, agentGroup := range agentGroups {
-		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), loadSchedulerComponentID)
 		etcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)
 		etcdPaths = append(etcdPaths, etcdPath)
 	}
@@ -79,15 +79,9 @@ func NewActuatorAndOptions(
 		dryRun = actuatorProto.GetDefaultConfig().GetDryRun()
 	}
 
-	parentComponentID, found := componentID.ParentID()
-	if !found {
-		// not expected to happen
-		log.Fatal().Msgf("componentID %s is not a child of a load scheduler", componentID)
-	}
-
 	lsa := &Actuator{
 		policyReadAPI:            policyReadAPI,
-		loadSchedulerComponentID: parentComponentID.String(),
+		loadSchedulerComponentID: loadSchedulerComponentID,
 		etcdPaths:                etcdPaths,
 		actuatorProto:            actuatorProto,
 		dryRun:                   dryRun,
@@ -100,7 +94,7 @@ func NewActuatorAndOptions(
 		metrics.PolicyHashLabel,
 		policyReadAPI.GetPolicyHash(),
 		metrics.ComponentIDLabel,
-		componentID,
+		lsa.loadSchedulerComponentID,
 	)
 	if actuatorProto.WorkloadLatencyBasedTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := promql.NewTaggedQueryAndOptions(
@@ -112,7 +106,7 @@ func NewActuatorAndOptions(
 				metrics.WorkloadLatencyCountMetricName,
 				policyParams),
 			10*policyReadAPI.GetEvaluationInterval(),
-			componentID,
+			runtime.NewComponentID(loadSchedulerComponentID),
 			policyReadAPI,
 			"Tokens",
 		)
@@ -274,10 +268,6 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 		return err
 	}
 	for _, etcdPath := range la.etcdPaths {
-		// log the json string for decision
-		// and etcd path
-		j, _ := protojson.Marshal(wrapper)
-		logger.Info().Str("etcdPath", etcdPath).RawJSON("decision", j).Msg("Publishing decision")
 		la.decisionWriter.Write(etcdPath, dat)
 	}
 

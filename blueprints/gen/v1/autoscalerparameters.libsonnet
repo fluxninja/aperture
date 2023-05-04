@@ -1,19 +1,17 @@
-local podautoscalerouts = import './podautoscalerouts.libsonnet';
 {
   new():: {
   },
-  outPorts:: podautoscalerouts,
   withCooldownOverridePercentage(cooldown_override_percentage):: {
     cooldown_override_percentage: cooldown_override_percentage,
   },
   withCooldownOverridePercentageMixin(cooldown_override_percentage):: {
     cooldown_override_percentage+: cooldown_override_percentage,
   },
-  withMaxReplicas(max_replicas):: {
-    max_replicas: max_replicas,
+  withMaxScale(max_scale):: {
+    max_scale: max_scale,
   },
-  withMaxReplicasMixin(max_replicas):: {
-    max_replicas+: max_replicas,
+  withMaxScaleMixin(max_scale):: {
+    max_scale+: max_scale,
   },
   withMaxScaleInPercentage(max_scale_in_percentage):: {
     max_scale_in_percentage: max_scale_in_percentage,
@@ -27,23 +25,11 @@ local podautoscalerouts = import './podautoscalerouts.libsonnet';
   withMaxScaleOutPercentageMixin(max_scale_out_percentage):: {
     max_scale_out_percentage+: max_scale_out_percentage,
   },
-  withMinReplicas(min_replicas):: {
-    min_replicas: min_replicas,
+  withMinScale(min_scale):: {
+    min_scale: min_scale,
   },
-  withMinReplicasMixin(min_replicas):: {
-    min_replicas+: min_replicas,
-  },
-  withOutPorts(out_ports):: {
-    out_ports: out_ports,
-  },
-  withOutPortsMixin(out_ports):: {
-    out_ports+: out_ports,
-  },
-  withPodScaler(pod_scaler):: {
-    pod_scaler: pod_scaler,
-  },
-  withPodScalerMixin(pod_scaler):: {
-    pod_scaler+: pod_scaler,
+  withMinScaleMixin(min_scale):: {
+    min_scale+: min_scale,
   },
   withScaleInAlerterParameters(scale_in_alerter_parameters):: {
     scale_in_alerter_parameters: scale_in_alerter_parameters,
@@ -86,5 +72,11 @@ local podautoscalerouts = import './podautoscalerouts.libsonnet';
   },
   withScaleOutCooldownMixin(scale_out_cooldown):: {
     scale_out_cooldown+: scale_out_cooldown,
+  },
+  withScaler(scaler):: {
+    scaler: scaler,
+  },
+  withScalerMixin(scaler):: {
+    scaler+: scaler,
   },
 }

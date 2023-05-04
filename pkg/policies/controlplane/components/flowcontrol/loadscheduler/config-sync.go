@@ -24,7 +24,7 @@ type loadSchedulerConfigSync struct {
 	componentID        string
 }
 
-// NewConfigSyncOptions creates fx options for LoadScheduler and also returns the agent group name associated with it.
+// NewConfigSyncOptions creates fx options for syncing LoadScheduler objects with agent groups.
 func NewConfigSyncOptions(
 	loadSchedulerProto *policylangv1.LoadScheduler,
 	componentID runtime.ComponentID,
