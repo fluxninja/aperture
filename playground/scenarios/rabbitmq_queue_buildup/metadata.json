@@ -2,9 +2,6 @@
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/demo-app",
   "needs": ["istio", "rabbitmq"],
-  "env_vars": {
-    "ENABLE_DEMO_APP_RABBITMQ": "true"
-  },
   "aperture_policies": [
     {
       "blueprint_name": "policies/service-protection/promql",

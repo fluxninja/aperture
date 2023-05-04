@@ -1,0 +1,8 @@
+demoapp:
+  common:
+    rabbitmq:
+      enabled: true
+      host: 'rabbitmq.rabbitmq.svc.cluster.local'
+      port: 5672
+      username: 'admin'
+      password: 'secretpassword'

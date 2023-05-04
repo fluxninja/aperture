@@ -1,10 +1,13 @@
 local apertureAgentApp = import 'apps/aperture-agent/main.libsonnet';
 
 local extensionEnv = std.extVar('ENABLE_CLOUD_EXTENSION');
+local valuesStr = std.extVar('VALUES');
+local values = if valuesStr != '' then std.parseYaml(valuesStr) else {};
+local agentValues = if std.objectHas(values, 'agent') then values.agent else {};
 
 local apertureAgentMixin =
   apertureAgentApp {
-    values+:: {
+    values+:: std.mergePatch({
       operator+: {
         image: {
           registry: 'docker.io/fluxninja',
@@ -66,7 +69,7 @@ local apertureAgentMixin =
           enabled: false,
         },
       },
-    },
+    }, agentValues),
   };
 
 {

@@ -1,9 +1,6 @@
 {
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/demo-app",
-  "env_vars": {
-    "ENABLE_DEMO_APP_NGINX": "true"
-  },
   "aperture_policies": [
     {
       "blueprint_name": "policies/service-protection/average-latency",
