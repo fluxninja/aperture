@@ -9,12 +9,14 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/castai/promwrite"
 	backoff "github.com/cenkalti/backoff/v4"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
@@ -27,6 +29,12 @@ import (
 const (
 	// Identifies the piece of code for purposes of otel's tracing.
 	libraryName = "demo-app/app"
+)
+
+var (
+	counter          = map[string]*Counter{}
+	prometheusClient = &promwrite.Client{}
+	mutex            = sync.RWMutex{}
 )
 
 // HTTPClient interface for making http calls that can be mocked in tests.
@@ -154,12 +162,97 @@ func (ss SimpleService) Run() error {
 		handler.httpClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
 	}
 
+	prometheusAddress := os.Getenv("PROMETHEUS_ADDRESS")
+	if prometheusAddress != "" {
+
+		if prometheusAddress[len(prometheusAddress)-1] == '/' {
+			prometheusAddress = prometheusAddress[:len(prometheusAddress)-1]
+		}
+
+		prometheusClient = promwrite.NewClient(fmt.Sprintf("%s/api/v1/write", prometheusAddress))
+		http.HandleFunc("/prometheus", prometheusHandler)
+	}
+
 	http.Handle("/request", handlerFunc(handler))
+
 	address := fmt.Sprintf(":%d", ss.port)
 
 	server := &http.Server{Addr: address}
 
 	return server.ListenAndServe()
+}
+
+func prometheusHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	// Increment the counter
+	mutex.Lock()
+	c := counter[fmt.Sprintf("%s-%s", r.Header.Get("User-Id"), r.Header.Get("User-Type"))]
+	if c == nil {
+		c = &Counter{}
+		counter[fmt.Sprintf("%s-%s", r.Header.Get("User-Id"), r.Header.Get("User-Type"))] = c
+	}
+	mutex.Unlock()
+	c.Increment()
+
+	prometheusClient.Write(context.Background(), &promwrite.WriteRequest{
+		TimeSeries: []promwrite.TimeSeries{
+			{
+				Labels: []promwrite.Label{
+					{
+						Name:  "__name__",
+						Value: "demo_app_requests_total",
+					},
+					{
+						Name:  "request_uri",
+						Value: r.RequestURI,
+					},
+					{
+						Name:  "request_user_id",
+						Value: r.Header.Get("User-Id"),
+					},
+					{
+						Name:  "request_user_type",
+						Value: r.Header.Get("User-Type"),
+					},
+				},
+				Sample: promwrite.Sample{
+					Time:  time.Now(),
+					Value: float64(c.Value()),
+				},
+			},
+		},
+	})
+	end := time.Now()
+	prometheusClient.Write(context.Background(), &promwrite.WriteRequest{
+		TimeSeries: []promwrite.TimeSeries{
+			{
+				Labels: []promwrite.Label{
+					{
+						Name:  "__name__",
+						Value: "demo_app_request_duration_micro_seconds",
+					},
+					{
+						Name:  "request_uri",
+						Value: r.RequestURI,
+					},
+					{
+						Name:  "request_user_id",
+						Value: r.Header.Get("User-Id"),
+					},
+					{
+						Name:  "request_user_type",
+						Value: r.Header.Get("User-Type"),
+					},
+				},
+				Sample: promwrite.Sample{
+					Time:  time.Now(),
+					Value: float64(end.Sub(start).Milliseconds()),
+				},
+			},
+		},
+	})
+	// Send a response
+	w.Write([]byte("OK"))
 }
 
 func consumeFromQueue(q amqp.Queue, cCh *amqp.Channel, handler *RequestHandler) {

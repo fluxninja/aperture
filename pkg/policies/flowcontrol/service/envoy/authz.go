@@ -143,6 +143,9 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		Telemetry: true,
 	}
 
+	if req.GetAttributes().GetRequest().Http.GetBody() == "" && len(req.GetAttributes().GetRequest().GetHttp().GetRawBody()) != 0 {
+		req.GetAttributes().GetRequest().GetHttp().Body = string(req.GetAttributes().GetRequest().GetHttp().GetRawBody())
+	}
 	checkHTTPReq := authzRequestToCheckHTTPRequest(req, ctrlPt)
 	input := checkhttp.RequestToInputWithServices(checkHTTPReq, sourceSvcs, destinationSvcs)
 

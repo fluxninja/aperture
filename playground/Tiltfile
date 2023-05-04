@@ -181,7 +181,7 @@ DEP_TREE = {
                 {
                     "workload": "controller-prometheus-server",
                     "new_name": "controller-prometheus",
-                    "resource_deps": ["cluster-bootstrap"],
+                    "resource_deps": ["cluster-bootstrap", "istiod"],
                     "extra_objects": [
                         ("^controller-prometheus", None),
                     ],

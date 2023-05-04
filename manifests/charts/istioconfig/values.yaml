@@ -16,6 +16,8 @@ envoyFilter:
   enableAuthzRequestBodyBuffering: true
   ## @param envoyFilter.maxRequestBytes Maximum size of request that is sent over external authorization API
   maxRequestBytes: 8192
+  ## @param envoyFilter.packAsBytes If true, the body sent to the external authorization service is set with raw bytes.
+  packAsBytes: false
   ## @param envoyFilter.sidecarMode Aperture Agent installed using the Sidecar mode
   sidecarMode: false
   ## @param envoyFilter.workloadSelector Workload selector for Istio EnvoyFilter. Refer https://istio.io/latest/docs/reference/config/type/workload-selector/ for more details.
