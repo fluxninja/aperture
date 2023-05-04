@@ -78,14 +78,13 @@ function(cfg) {
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
       local adaptiveLoadScheduler = params.service_protection_core.adaptive_load_scheduler;
       spec.v1.AdaptiveLoadScheduler.new()
-      + spec.v1.AdaptiveLoadScheduler.withSelectors(adaptiveLoadScheduler.selectors)
-      + spec.v1.AdaptiveLoadScheduler.withSchedulerParameters(adaptiveLoadScheduler.scheduler)
-      + spec.v1.AdaptiveLoadScheduler.withGradientParameters(adaptiveLoadScheduler.gradient)
-      + spec.v1.AdaptiveLoadScheduler.withMaxLoadMultiplier(adaptiveLoadScheduler.max_load_multiplier)
-      + spec.v1.AdaptiveLoadScheduler.withLoadMultiplierLinearIncrement(adaptiveLoadScheduler.load_multiplier_linear_increment)
-      + spec.v1.AdaptiveLoadScheduler.withAlerterParameters(adaptiveLoadScheduler.alerter)
+      + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
       + spec.v1.AdaptiveLoadScheduler.withDynamicConfigKey('load_scheduler')
-      + spec.v1.AdaptiveLoadScheduler.withDefaultConfig(adaptiveLoadScheduler.default_config)
+      + spec.v1.AdaptiveLoadScheduler.withDefaultConfig(
+        {
+          dry_run: params.service_protection_core.dry_run,
+        },
+      )
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
         overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
         signal: spec.v1.Port.withSignalName('SIGNAL'),
@@ -94,8 +93,6 @@ function(cfg) {
       + spec.v1.AdaptiveLoadScheduler.withOutPorts({
         desired_load_multiplier: spec.v1.Port.withSignalName('DESIRED_LOAD_MULTIPLIER'),
         observed_load_multiplier: spec.v1.Port.withSignalName('OBSERVED_LOAD_MULTIPLIER'),
-        accepted_token_rate: spec.v1.Port.withSignalName('ACCEPTED_CONCURRENCY'),
-        incoming_token_rate: spec.v1.Port.withSignalName('INCOMING_CONCURRENCY'),
       }),
     ),
   ),

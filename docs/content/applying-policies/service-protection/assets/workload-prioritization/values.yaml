@@ -29,27 +29,27 @@ policy:
   evaluation_interval: "1s"
   service_protection_core:
     adaptive_load_scheduler:
-      # The selectors determine the flows that are protected by this policy.
-      # Type: []aperture.spec.v1.Selector
-      # Required: True
-      selectors:
-        - control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
-      # Scheduler parameters.
-      # Type: aperture.spec.v1.SchedulerParameters
-      scheduler:
-        auto_tokens: true
-        workloads:
-          - label_matcher:
-              match_labels:
-                user_type: "guest"
-            parameters:
-              priority: 50
-          - label_matcher:
-              match_labels:
-                http.request.header.user_type: subscriber
-            parameters:
-              priority: 200
+      load_scheduler:
+        # The selectors determine the flows that are protected by this policy.
+        # Type: []aperture.spec.v1.Selector
+        # Required: True
+        selectors:
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+        # Scheduler parameters.
+        # Type: aperture.spec.v1.SchedulerParameters
+        scheduler:
+          workloads:
+            - label_matcher:
+                match_labels:
+                  user_type: "guest"
+              parameters:
+                priority: 50
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: subscriber
+              parameters:
+                priority: 200
   latency_baseliner:
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter

@@ -282,17 +282,9 @@ definitions:
     description: Output ports for the _Adaptive Load Scheduler_ component.
     type: object
     properties:
-      accepted_token_rate:
-        description: Accepted token rate is the number of tokens per second accepted
-          by the service.
-        $ref: '#/definitions/OutPort'
       desired_load_multiplier:
         description: Desired Load multiplier is the ratio of desired token rate to
           the incoming token rate.
-        $ref: '#/definitions/OutPort'
-      incoming_token_rate:
-        description: Incoming token rate is the number of tokens per second incoming
-          to the service (including rejected ones).
         $ref: '#/definitions/OutPort'
       is_overload:
         description: A Boolean signal that indicates whether the service is in overload
@@ -2352,13 +2344,10 @@ definitions:
     title: Parameters for _Load Scheduler_ component
     properties:
       scheduler:
-        description: |+
+        description: |-
           Configuration of Weighted Fair Queuing-based workload scheduler.
 
-          Contains configuration of per-agent scheduler, and also defines some
-          output signals.
-
-        x-go-tag-validate: required
+          Contains configuration of per-agent scheduler
         $ref: '#/definitions/Scheduler'
       selectors:
         description: |+

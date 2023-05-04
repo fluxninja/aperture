@@ -1,18 +1,6 @@
 {
   new():: {
   },
-  withFlowSelector(flow_selector):: {
-    flow_selector: flow_selector,
-  },
-  withFlowSelectorMixin(flow_selector):: {
-    flow_selector+: flow_selector,
-  },
-  withLoadActuator(load_actuator):: {
-    load_actuator: load_actuator,
-  },
-  withLoadActuatorMixin(load_actuator):: {
-    load_actuator+: load_actuator,
-  },
   withScheduler(scheduler):: {
     scheduler: scheduler,
   },
@@ -27,5 +15,11 @@
   },
   withSelectorsMixin(selectors):: {
     selectors+: selectors,
+  },
+  withWorkloadLatencyBasedTokens(workload_latency_based_tokens):: {
+    workload_latency_based_tokens: workload_latency_based_tokens,
+  },
+  withWorkloadLatencyBasedTokensMixin(workload_latency_based_tokens):: {
+    workload_latency_based_tokens+: workload_latency_based_tokens,
   },
 }

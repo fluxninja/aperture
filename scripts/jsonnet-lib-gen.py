@@ -264,7 +264,7 @@ def get_jinja2_environment() -> jinja2.Environment:
 
 PROTOBUF_IGNORED_DEFS = [
     "googlerpcStatus",
-    "protobufAny",
+    "googleprotobufAny",
 ]
 
 
@@ -295,17 +295,25 @@ class ApertureJsonnetGenerator:
             if definition.type_ != JsonnetType.OBJECT:
                 continue
 
+            # make a list of props to delete
+            to_delete = []
             for prop in definition.properties.values():
                 if not prop.deferred:
                     continue
                 assert prop.definition_ref
                 definition_ref_name = prop.definition_ref.split("/")[2]
+                if definition_ref_name in PROTOBUF_IGNORED_DEFS:
+                    # delete this prop
+                    to_delete.append(prop.name)
+                    continue
                 definition_resolved_ref = self.definitions.get(definition_ref_name)
                 if not definition_resolved_ref:
                     raise ValueError(f"Unknown Definition: {definition_ref_name}")
                 prop.definition = definition_resolved_ref
                 prop.type_ = JsonnetType.OBJECT
                 prop.deferred = False
+            for prop_name in to_delete:
+                del definition.properties[prop_name]
 
     def parse(self):
         self._first_pass()

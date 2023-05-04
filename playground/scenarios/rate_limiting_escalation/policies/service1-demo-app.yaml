@@ -67,26 +67,27 @@ policy:
 
   service_protection_core:
     adaptive_load_scheduler:
-      # The selectors determine the flows that are protected by this policy.
-      # Type: []aperture.spec.v1.Selector
-      # Required: True
-      selectors:
-        - service: service1-demo-app.demoapp.svc.cluster.local
-          control_point: ingress
-      # Scheduler parameters.
-      # Type: aperture.spec.v1.SchedulerParameters
-      scheduler:
-        workloads:
-          - parameters:
-              priority: 50
-            label_matcher:
-              match_labels:
-                user_type: guest
-          - parameters:
-              priority: 200
-            label_matcher:
-              match_labels:
-                http.request.header.user_type: subscriber
+      load_scheduler:
+        # The selectors determine the flows that are protected by this policy.
+        # Type: []aperture.spec.v1.Selector
+        # Required: True
+        selectors:
+          - service: service1-demo-app.demoapp.svc.cluster.local
+            control_point: ingress
+        # Scheduler parameters.
+        # Type: aperture.spec.v1.SchedulerParameters
+        scheduler:
+          workloads:
+            - parameters:
+                priority: 50
+              label_matcher:
+                match_labels:
+                  user_type: guest
+            - parameters:
+                priority: 200
+              label_matcher:
+                match_labels:
+                  http.request.header.user_type: subscriber
       # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
       # Type: float64
       load_multiplier_linear_increment: 0.0025

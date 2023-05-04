@@ -4,10 +4,15 @@ import (
 	"fmt"
 
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/regulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
@@ -100,6 +105,20 @@ func NewComponentAndOptions(
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
 		case *policylangv1.FlowControl_Regulator:
 			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
+		case *policylangv1.FlowControl_Internal:
+			switch flowControlConfig.Internal.TypeUrl {
+			case "type.googleapis.com/aperture.policy.private.v1.LoadActuator":
+				loadActuator := &policyprivatev1.LoadActuator{}
+				if err := anypb.UnmarshalTo(flowControlConfig.Internal, loadActuator, proto.UnmarshalOptions{}); err != nil {
+					return Tree{}, nil, nil, err
+				}
+				ctor = mkCtor(loadActuator, loadscheduler.NewActuatorAndOptions)
+			default:
+				err := fmt.Errorf("unknown flow control type: %s", flowControlConfig.Internal.TypeUrl)
+				log.Error().Err(err).Msg("unknown flow control type")
+				return Tree{}, nil, nil, err
+			}
+
 		default:
 			return newFlowControlNestedAndOptions(flowControl, componentID, policyReadAPI)
 		}

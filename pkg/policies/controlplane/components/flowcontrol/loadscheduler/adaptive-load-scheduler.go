@@ -16,8 +16,6 @@ const (
 	alsIsOverloadPortName             = "is_overload"
 	alsDesiredLoadMultiplierPortName  = "desired_load_multiplier"
 	alsObservedLoadMultiplierPortName = "observed_load_multiplier"
-	alsAcceptedTokenRatePortName      = "accepted_token_rate"
-	alsIncomingTokenRatePortName      = "incoming_token_rate"
 )
 
 // ParseAdaptiveLoadScheduler parses and returns nested circuit representation of AdaptiveLoadScheduler.
@@ -56,14 +54,6 @@ func ParseAdaptiveLoadScheduler(
 		if observedLoadMultiplierPort != nil {
 			nestedOutPortsMap[alsObservedLoadMultiplierPortName] = observedLoadMultiplierPort
 		}
-		acceptedTokenRatePort := outPorts.AcceptedTokenRate
-		if acceptedTokenRatePort != nil {
-			nestedOutPortsMap[alsAcceptedTokenRatePortName] = acceptedTokenRatePort
-		}
-		incomingTokenRatePort := outPorts.IncomingTokenRate
-		if incomingTokenRatePort != nil {
-			nestedOutPortsMap[alsIncomingTokenRatePortName] = incomingTokenRatePort
-		}
 	}
 
 	isOverloadDeciderOperator := "gt"
@@ -85,30 +75,6 @@ func ParseAdaptiveLoadScheduler(
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
-			{
-				Component: &policylangv1.Component_ArithmeticCombinator{
-					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: "div",
-						InPorts: &policylangv1.ArithmeticCombinator_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_TOKEN_RATE",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "INCOMING_TOKEN_RATE",
-								},
-							},
-						},
-						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "OBSERVED_LOAD_MULTIPLIER",
-							},
-						},
-					},
-				},
-			},
 			{
 				Component: &policylangv1.Component_GradientController{
 					GradientController: &policylangv1.GradientController{
@@ -365,8 +331,6 @@ func ParseAdaptiveLoadScheduler(
 	components.AddNestedEgress(nestedCircuit, alsIsOverloadPortName, "IS_OVERLOAD")
 	components.AddNestedEgress(nestedCircuit, alsDesiredLoadMultiplierPortName, "DESIRED_LOAD_MULTIPLIER")
 	components.AddNestedEgress(nestedCircuit, alsObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
-	components.AddNestedEgress(nestedCircuit, alsAcceptedTokenRatePortName, "ACCEPTED_TOKEN_RATE")
-	components.AddNestedEgress(nestedCircuit, alsIncomingTokenRatePortName, "INCOMING_TOKEN_RATE")
 
 	return nestedCircuit, nil
 }

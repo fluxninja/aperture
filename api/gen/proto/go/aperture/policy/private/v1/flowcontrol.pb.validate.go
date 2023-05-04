@@ -88,6 +88,40 @@ func (m *LoadActuator) validate(all bool) error {
 
 	// no validation rules for ComponentId
 
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LoadActuatorValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LoadActuatorValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LoadActuatorValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if all {
 		switch v := interface{}(m.GetDefaultConfig()).(type) {
 		case interface{ ValidateAll() error }:

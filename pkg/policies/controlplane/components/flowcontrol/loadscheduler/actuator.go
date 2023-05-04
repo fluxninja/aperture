@@ -22,6 +22,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	prometheusmodel "github.com/prometheus/common/model"
 )
@@ -56,12 +57,15 @@ func NewActuatorAndOptions(
 	actuatorProto *policyprivatev1.LoadActuator,
 	componentID string,
 	policyReadAPI iface.Policy,
-	agentGroups []string,
 ) (runtime.Component, fx.Option, error) {
 	var (
 		etcdPaths []string
 		options   []fx.Option
 	)
+	s := actuatorProto.GetSelectors()
+
+	agentGroups := selectors.UniqueAgentGroups(s)
+
 	for _, agentGroup := range agentGroups {
 		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
 		etcdPath := path.Join(paths.LoadSchedulerDecisionsPath, etcdKey)

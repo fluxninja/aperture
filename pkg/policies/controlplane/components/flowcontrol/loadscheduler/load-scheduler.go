@@ -74,6 +74,7 @@ func ParseLoadScheduler(
 			DefaultConfig:              loadScheduler.GetDefaultConfig(),
 			DynamicConfigKey:           loadScheduler.GetDynamicConfigKey(),
 			WorkloadLatencyBasedTokens: loadScheduler.Parameters.GetWorkloadLatencyBasedTokens(),
+			Selectors:                  loadScheduler.Parameters.GetSelectors(),
 		})
 	if err != nil {
 		return nil, err

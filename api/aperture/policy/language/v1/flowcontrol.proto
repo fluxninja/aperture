@@ -738,9 +738,8 @@ message LoadScheduler {
 
     // Configuration of Weighted Fair Queuing-based workload scheduler.
     //
-    // Contains configuration of per-agent scheduler, and also defines some
-    // output signals.
-    Scheduler scheduler = 2; // @gotags: validate:"required"
+    // Contains configuration of per-agent scheduler
+    Scheduler scheduler = 2;
 
     // Selectors for the component.
     repeated Selector selectors = 3; // @gotags: validate:"required_without=FlowSelector,dive"
@@ -913,10 +912,6 @@ message AdaptiveLoadScheduler {
     OutPort desired_load_multiplier = 2;
     // Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
     OutPort observed_load_multiplier = 3;
-    // Accepted token rate is the number of tokens per second accepted by the service.
-    OutPort accepted_token_rate = 4;
-    // Incoming token rate is the number of tokens per second incoming to the service (including rejected ones).
-    OutPort incoming_token_rate = 5;
   }
 
   // Collection of input ports for the _Adaptive Load Scheduler_ component.

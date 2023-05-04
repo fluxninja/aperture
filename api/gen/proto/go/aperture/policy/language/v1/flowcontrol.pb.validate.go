@@ -6606,64 +6606,6 @@ func (m *AdaptiveLoadScheduler_Outs) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetAcceptedTokenRate()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_OutsValidationError{
-					field:  "AcceptedTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_OutsValidationError{
-					field:  "AcceptedTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetAcceptedTokenRate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_OutsValidationError{
-				field:  "AcceptedTokenRate",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetIncomingTokenRate()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_OutsValidationError{
-					field:  "IncomingTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_OutsValidationError{
-					field:  "IncomingTokenRate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetIncomingTokenRate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_OutsValidationError{
-				field:  "IncomingTokenRate",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
 		return AdaptiveLoadScheduler_OutsMultiError(errors)
 	}

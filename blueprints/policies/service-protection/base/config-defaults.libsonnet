@@ -14,9 +14,8 @@ local service_protection_core_defaults = {
   overload_confirmations: [overload_confirmation_defaults],
 
   adaptive_load_scheduler: {
-    selectors: selectors_defaults,
-    scheduler: {
-      auto_tokens: true,
+    load_scheduler: {
+      selectors: selectors_defaults,
     },
     gradient: {
       slope: -1,
@@ -28,10 +27,8 @@ local service_protection_core_defaults = {
     },
     max_load_multiplier: 2.0,
     load_multiplier_linear_increment: 0.0025,
-    default_config: {
-      dry_run: false,
-    },
   },
+  dry_run: false,
 };
 
 {
