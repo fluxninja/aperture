@@ -1099,11 +1099,11 @@ message LoadActuator {
 message AdaptiveLoadScheduler {
   // Input ports for the _Adaptive Load Scheduler_ component.
   message Ins {
-    // The input signal to the controller.
+    // Input signal to the controller.
     InPort signal = 1;
-    // The setpoint input to the controller.
+    // Setpoint input to the controller.
     InPort setpoint = 2;
-    // The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+    // Overload confirmation port provides additional criteria to determine overload state which results in flow throttling at the service.
     InPort overload_confirmation = 3;
   }
 

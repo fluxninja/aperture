@@ -160,13 +160,13 @@ definitions:
         properties:
             overload_confirmation:
                 $ref: '#/definitions/InPort'
-                description: The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+                description: Overload confirmation port provides additional criteria to determine overload state which results in flow throttling at the service.
             setpoint:
                 $ref: '#/definitions/InPort'
-                description: The setpoint input to the controller.
+                description: Setpoint input to the controller.
             signal:
                 $ref: '#/definitions/InPort'
-                description: The input signal to the controller.
+                description: Input signal to the controller.
         type: object
     AdaptiveLoadSchedulerOuts:
         description: Output ports for the _Adaptive Load Scheduler_ component.
@@ -3142,7 +3142,9 @@ definitions:
             all:
               of:
                 - label_exists: foo
-                - label_equals: { label = app, value = frobnicator }
+                - label_equals:
+                    label: app
+                    value: frobnicator
             ```
         properties:
             all:
@@ -3155,19 +3157,14 @@ definitions:
                 $ref: '#/definitions/EqualsMatchExpression'
                 description: The expression is true when label value equals given value.
             label_exists:
-                description: |+
-                    The expression is true when label with given name exists.
-
+                description: The expression is true when label with given name exists.
                 type: string
-                x-go-tag-validate: required
             label_matches:
                 $ref: '#/definitions/MatchesMatchExpression'
                 description: The expression is true when label matches given regular expression.
             not:
                 $ref: '#/definitions/MatchExpression'
                 description: The expression negates the result of sub expression.
-        required:
-            - label_exists
         title: Defines a `[map<string, string> → bool]` expression to be evaluated on labels
         type: object
     MatchExpressionList:

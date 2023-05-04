@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection/average-latency blueprint.
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: weighted-service-protection
+
+policy:
+  service_protection_core:
+    adaptive_load_scheduler:
+      # The selectors determine the flows that are protected by this policy.
+      # Type: []aperture.spec.v1.Selector
+      # Required: True
+      selectors:
+        - control_point: egress
+          service: service1-demo-app.demoapp.svc.cluster.local
+        - control_point: egress
+          service: service2-demo-app.demoapp.svc.cluster.local
+      scheduler:
+        workloads:
+          - label_matcher:
+              expression:
+                all:
+                  of:
+                    - label_matches:
+                        label: aperture.source_fqdns
+                        regex: service1-demo-app.demoapp.svc.cluster.local
+                    - label_matches:
+                        label: aperture.destination_fqdns
+                        regex: service3-demo-app.demoapp.svc.cluster.local
+            parameters:
+              priority: 200
+          - label_matcher:
+              expression:
+                all:
+                  of:
+                    - label_matches:
+                        label: aperture.source_fqdns
+                        regex: service2-demo-app.demoapp.svc.cluster.local
+                    - label_matches:
+                        label: aperture.destination_fqdns
+                        regex: service3-demo-app.demoapp.svc.cluster.local
+            parameters:
+              priority: 50
+  latency_baseliner:
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - control_point: ingress
+          service: service3-demo-app.demoapp.svc.cluster.local

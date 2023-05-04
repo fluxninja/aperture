@@ -15,6 +15,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/util"
+	"google.golang.org/genproto/googleapis/rpc/code"
+	"google.golang.org/genproto/googleapis/rpc/status"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -26,14 +35,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	checkhttp_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp/baggage"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
-	"github.com/open-policy-agent/opa/ast"
-	"github.com/open-policy-agent/opa/util"
-	"google.golang.org/genproto/googleapis/rpc/code"
-	"google.golang.org/genproto/googleapis/rpc/status"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/structpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
@@ -135,7 +136,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 		Telemetry: true,
 	}
 
-	input := RequestToInput(req)
+	input := RequestToInputWithServices(req, sourceSvcs, destinationSvcs)
 
 	// Default flow labels from request
 	requestFlowLabels := CheckHTTPRequestToFlowLabels(req.GetRequest())
@@ -277,7 +278,7 @@ func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceS
 		for _, svc := range sourceSvcs {
 			srcServicesArray = append(srcServicesArray, ast.StringTerm(svc))
 		}
-		source.Insert(ast.StringTerm("services"), ast.NewTerm(ast.NewArray(srcServicesArray...)))
+		source.Insert(ast.StringTerm("source_fqdns"), ast.NewTerm(ast.NewArray(srcServicesArray...)))
 	}
 
 	destination := ast.NewObject()
@@ -287,7 +288,7 @@ func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceS
 		for _, svc := range destinationSvcs {
 			dstServicesArray = append(dstServicesArray, ast.StringTerm(svc))
 		}
-		destination.Insert(ast.StringTerm("services"), ast.NewTerm(ast.NewArray(dstServicesArray...)))
+		destination.Insert(ast.StringTerm("destination_fqdns"), ast.NewTerm(ast.NewArray(dstServicesArray...)))
 	}
 
 	requestMap := ast.NewObject()
