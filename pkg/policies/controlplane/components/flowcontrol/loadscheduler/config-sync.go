@@ -11,6 +11,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -26,7 +27,7 @@ type loadSchedulerConfigSync struct {
 // NewConfigSyncOptions creates fx options for LoadScheduler and also returns the agent group name associated with it.
 func NewConfigSyncOptions(
 	loadSchedulerProto *policylangv1.LoadScheduler,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (fx.Option, error) {
 	options := []fx.Option{}
@@ -37,12 +38,12 @@ func NewConfigSyncOptions(
 
 	for _, agentGroup := range agentGroups {
 		etcdPath := path.Join(paths.LoadSchedulerConfigPath,
-			paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID))
+			paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String()))
 		configSync := &loadSchedulerConfigSync{
 			loadSchedulerProto: loadSchedulerProto,
 			policyBaseAPI:      policyReadAPI,
 			etcdPath:           etcdPath,
-			componentID:        componentID,
+			componentID:        componentID.String(),
 		}
 		options = append(options, fx.Invoke(configSync.doSync))
 	}

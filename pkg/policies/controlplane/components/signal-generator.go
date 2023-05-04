@@ -40,7 +40,7 @@ func (sg *SignalGenerator) ShortDescription() string {
 func (*SignalGenerator) IsActuator() bool { return false }
 
 // NewSignalGeneratorAndOptions creates a signal generator component and its fx options.
-func NewSignalGeneratorAndOptions(generatorProto *policylangv1.SignalGenerator, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewSignalGeneratorAndOptions(generatorProto *policylangv1.SignalGenerator, _ runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 
 	signalGenerator := &SignalGenerator{

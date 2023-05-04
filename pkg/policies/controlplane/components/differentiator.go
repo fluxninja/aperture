@@ -52,7 +52,7 @@ func NewDifferentiator(diffProto *policylangv1.Differentiator) runtime.Component
 }
 
 // NewDifferentiatorAndOptions creates a differentiator component and its fx options.
-func NewDifferentiatorAndOptions(diffProto *policylangv1.Differentiator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewDifferentiatorAndOptions(diffProto *policylangv1.Differentiator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	return NewDifferentiator(diffProto), fx.Options(), nil
 }
 

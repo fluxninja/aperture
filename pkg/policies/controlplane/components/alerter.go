@@ -44,7 +44,7 @@ func (*Alerter) IsActuator() bool { return false }
 var _ runtime.Component = (*Alerter)(nil)
 
 // NewAlerterAndOptions creates alerter and its fx options.
-func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, componentID string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, componentID runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	parameters := alerterProto.Parameters
 	alerter := &Alerter{
 		name:           parameters.AlertName,
@@ -52,7 +52,7 @@ func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, componentID string
 		resolveTimeout: parameters.ResolveTimeout.AsDuration(),
 		alertChannels:  make([]string, 0),
 		policyReadAPI:  policyReadAPI,
-		componentID:    componentID,
+		componentID:    componentID.String(),
 		labels:         make(map[string]string),
 	}
 	alerter.alertChannels = append(alerter.alertChannels, parameters.AlertChannels...)

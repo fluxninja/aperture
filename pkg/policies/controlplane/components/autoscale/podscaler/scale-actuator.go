@@ -46,11 +46,11 @@ func (*ScaleActuator) IsActuator() bool { return true }
 // NewScaleActuatorAndOptions creates scale actuator and its fx options.
 func NewScaleActuatorAndOptions(
 	scaleActuatorProto *policylangv1.PodScaler_ScaleActuator,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
 	decisionsEtcdPath := path.Join(paths.PodScalerDecisionsPath, etcdKey)
 	dryRun := false
 	if scaleActuatorProto.GetDefaultConfig() != nil {
@@ -59,7 +59,7 @@ func NewScaleActuatorAndOptions(
 	sa := &ScaleActuator{
 		policyReadAPI:      policyReadAPI,
 		agentGroupName:     agentGroup,
-		componentID:        componentID,
+		componentID:        componentID.String(),
 		decisionsEtcdPath:  decisionsEtcdPath,
 		scaleActuatorProto: scaleActuatorProto,
 		dryRun:             dryRun,

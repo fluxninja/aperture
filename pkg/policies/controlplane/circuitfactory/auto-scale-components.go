@@ -40,7 +40,7 @@ func newAutoScaleCompositeAndOptions(
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		podScalerOptions, agentGroupName, podScalerErr := podscaler.NewPodScalerOptions(podScalerProto, componentID.String(), policyReadAPI)
+		podScalerOptions, agentGroupName, podScalerErr := podscaler.NewPodScalerOptions(podScalerProto, componentID, policyReadAPI)
 		if podScalerErr != nil {
 			return retErr(podScalerErr)
 		}
@@ -48,7 +48,7 @@ func newAutoScaleCompositeAndOptions(
 
 		// Scale Reporter
 		if scaleReporterProto := podScalerProto.GetScaleReporter(); scaleReporterProto != nil {
-			scaleReporter, scaleReporterOptions, err := podscaler.NewScaleReporterAndOptions(scaleReporterProto, componentID.String(), policyReadAPI, agentGroupName)
+			scaleReporter, scaleReporterOptions, err := podscaler.NewScaleReporterAndOptions(scaleReporterProto, componentID, policyReadAPI, agentGroupName)
 			if err != nil {
 				return retErr(err)
 			}
@@ -72,7 +72,7 @@ func newAutoScaleCompositeAndOptions(
 
 		// Scale Actuator
 		if scaleActuatorProto := podScalerProto.GetScaleActuator(); scaleActuatorProto != nil {
-			scaleActuator, scaleActuatorOptions, err := podscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
+			scaleActuator, scaleActuatorOptions, err := podscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentID, policyReadAPI, agentGroupName)
 			if err != nil {
 				return retErr(err)
 			}

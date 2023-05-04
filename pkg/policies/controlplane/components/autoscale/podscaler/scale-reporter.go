@@ -88,11 +88,11 @@ func (*ScaleReporter) IsActuator() bool { return false }
 // NewScaleReporterAndOptions returns a new ScaleReporter and its fx options.
 func NewScaleReporterAndOptions(
 	_ *policylangv1.PodScaler_ScaleReporter,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
 	sr := &ScaleReporter{
 		policyReadAPI: policyReadAPI,
 		etcdKey:       etcdKey,

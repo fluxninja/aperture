@@ -236,6 +236,19 @@ func (wsFactory *SchedulerFactory) NewScheduler(
 		}
 	}
 
+	if proto == nil {
+		p := &policylangv1.Scheduler{}
+		config.SetDefaults(p)
+		proto = p
+	}
+
+	// default workload params is not a required param so it can be nil
+	if proto.DefaultWorkloadParameters == nil {
+		p := &policylangv1.Scheduler_Workload_Parameters{}
+		config.SetDefaults(p)
+		proto.DefaultWorkloadParameters = p
+	}
+
 	ws := &Scheduler{
 		proto:                proto,
 		registry:             registry,
@@ -243,12 +256,6 @@ func (wsFactory *SchedulerFactory) NewScheduler(
 		workloadMultiMatcher: mm,
 		metricLabels:         metricLabels,
 		component:            component,
-	}
-	// default workload params is not a required param so it can be nil
-	if ws.proto.DefaultWorkloadParameters == nil {
-		p := &policylangv1.Scheduler_Workload_Parameters{}
-		config.SetDefaults(p)
-		ws.proto.DefaultWorkloadParameters = p
 	}
 
 	wfqFlowsGauge, err := wsFactory.wfqFlowsGaugeVec.GetMetricWith(metricLabels)

@@ -50,7 +50,7 @@ func (*rateLimiterSync) IsActuator() bool { return true }
 // NewRateLimiterAndOptions creates fx options for RateLimiter and also returns agent group name associated with it.
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	// Deprecated 1.8.0
@@ -74,7 +74,7 @@ func NewRateLimiterAndOptions(
 
 	for _, agentGroup := range agentGroups {
 
-		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
 		configEtcdPath := path.Join(paths.RateLimiterConfigPath, etcdKey)
 		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
 		decisionEtcdPath := path.Join(paths.RateLimiterDecisionsPath, etcdKey)
@@ -90,7 +90,7 @@ func NewRateLimiterAndOptions(
 		configEtcdPaths:        configEtcdPaths,
 		decisionEtcdPaths:      decisionEtcdPaths,
 		dynamicConfigEtcdPaths: dynamicConfigEtcdPaths,
-		componentID:            componentID,
+		componentID:            componentID.String(),
 	}
 	return limiterSync, fx.Options(
 		fx.Invoke(

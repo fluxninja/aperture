@@ -27,7 +27,7 @@ type SMA struct {
 var _ runtime.Component = (*SMA)(nil)
 
 // NewSMAAndOptions returns a new SMA filter and its Fx options.
-func NewSMAAndOptions(smaProto *policylangv1.SMA, _ string, policyReadAPI iface.Policy) (*SMA, fx.Option, error) {
+func NewSMAAndOptions(smaProto *policylangv1.SMA, _ runtime.ComponentID, policyReadAPI iface.Policy) (*SMA, fx.Option, error) {
 	params := smaProto.GetParameters()
 
 	sma := &SMA{

@@ -129,7 +129,7 @@ func NewComponentAndOptions(
 		return Tree{}, nil, nil, fmt.Errorf("unknown component type: %T", config)
 	}
 
-	component, config, option, err := ctor(componentID.String(), policyReadAPI)
+	component, config, option, err := ctor(componentID, policyReadAPI)
 	if err != nil {
 		return Tree{}, nil, nil, err
 	}
@@ -143,15 +143,15 @@ func NewComponentAndOptions(
 }
 
 type componentConstructor func(
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, any, fx.Option, error)
 
 func mkCtor[Config any, Comp runtime.Component](
 	config *Config,
-	origCtor func(*Config, string, iface.Policy) (Comp, fx.Option, error),
+	origCtor func(*Config, runtime.ComponentID, iface.Policy) (Comp, fx.Option, error),
 ) componentConstructor {
-	return func(componentID string, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
+	return func(componentID runtime.ComponentID, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
 		comp, opt, err := origCtor(config, componentID, policy)
 		return comp, config, opt, err
 	}
