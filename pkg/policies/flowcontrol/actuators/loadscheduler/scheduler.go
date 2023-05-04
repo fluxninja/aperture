@@ -29,6 +29,7 @@ import (
 // Array of Label Keys for WFQ and Token Bucket Metrics.
 var metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 
+// SchedulerFactory is a factory for creating load schedulers.
 type SchedulerFactory struct {
 	registry status.Registry
 
@@ -280,6 +281,7 @@ func (wsFactory *SchedulerFactory) NewScheduler(
 	return ws, nil
 }
 
+// Close closes the scheduler.
 func (ws *Scheduler) Close() error {
 	var merr error
 
@@ -454,6 +456,7 @@ func (ws *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Coun
 	return counter
 }
 
+// GetEstimatedTokens returns estimated tokens for specific workload.
 func (ws *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
 	ws.mutex.RLock()
 	defer ws.mutex.RUnlock()
@@ -461,6 +464,7 @@ func (ws *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
 	return val, ok
 }
 
+// SetEstimatedTokens sets estimated tokens for specific workload.
 func (ws *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]uint64) {
 	ws.mutex.Lock()
 	defer ws.mutex.Unlock()

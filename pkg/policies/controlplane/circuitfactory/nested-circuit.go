@@ -79,6 +79,16 @@ func ParseNestedCircuit(
 	// Set in and out ports at signal ingress and egress components based on the port mapping
 	for i, configuredComponent := range leafComponents {
 		component := configuredComponent.Component
+		parentComponentID, found := configuredComponent.ComponentID.ParentID()
+		if !found {
+			// not expected to happen
+			log.Fatal().Msgf("parent component id not found for component %s", configuredComponent.ComponentID)
+		}
+		if parentComponentID.String() != nestedCircuitID.String() {
+			// this will be handled by the child component, skip
+			continue
+		}
+
 		// dynamic cast to signal ingress or egress
 		if nestedSignalIngress, ok := component.(*components.NestedSignalIngress); ok {
 			portName := nestedSignalIngress.PortName()
@@ -94,6 +104,8 @@ func ParseNestedCircuit(
 			}
 		} else if nestedSignalEgress, ok := component.(*components.NestedSignalEgress); ok {
 			portName := nestedSignalEgress.PortName()
+			// log nestedCircuit.Name and egress port name for debugging
+			log.Info().Msgf("nestedCircuit.Name: %s, egress port name: %s", nestedCircuit.Name, portName)
 			// tracking the port names in the nested circuit
 			if _, ok := egressPorts[portName]; ok {
 				return retErr(fmt.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name))

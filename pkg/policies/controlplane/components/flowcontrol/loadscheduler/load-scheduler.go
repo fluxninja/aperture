@@ -119,23 +119,6 @@ func ParseLoadScheduler(
 							Promql: &policylangv1.PromQL{
 								OutPorts: &policylangv1.PromQL_Outs{
 									Output: &policylangv1.OutPort{
-										SignalName: "ACCEPTED_TOKEN_RATE",
-									},
-								},
-								QueryString:        acceptedTokensQuery,
-								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Query{
-					Query: &policylangv1.Query{
-						Component: &policylangv1.Query_Promql{
-							Promql: &policylangv1.PromQL{
-								OutPorts: &policylangv1.PromQL_Outs{
-									Output: &policylangv1.OutPort{
 										SignalName: "INCOMING_TOKEN_RATE",
 									},
 								},
