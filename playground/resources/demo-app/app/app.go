@@ -182,16 +182,27 @@ func (ss SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
+func getOrCreateCounter(userID, userType string) *Counter {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	key := fmt.Sprintf("%s-%s", userID, userType)
+	c := counter[key]
+	if c == nil {
+		c = &Counter{}
+		counter[key] = c
+	}
+	return c
+}
+
 func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	// Increment the counter
-	mutex.Lock()
-	c := counter[fmt.Sprintf("%s-%s", r.Header.Get("User-Id"), r.Header.Get("User-Type"))]
-	if c == nil {
-		c = &Counter{}
-		counter[fmt.Sprintf("%s-%s", r.Header.Get("User-Id"), r.Header.Get("User-Type"))] = c
-	}
-	mutex.Unlock()
+	userID := r.Header.Get("User-Id")
+	userType := r.Header.Get("User-Type")
+
+	// Increment the counter
+	c := getOrCreateCounter(userID, userType)
 	c.Increment()
 
 	prometheusClient.Write(context.Background(), &promwrite.WriteRequest{
@@ -208,11 +219,11 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 					},
 					{
 						Name:  "request_user_id",
-						Value: r.Header.Get("User-Id"),
+						Value: userID,
 					},
 					{
 						Name:  "request_user_type",
-						Value: r.Header.Get("User-Type"),
+						Value: userType,
 					},
 				},
 				Sample: promwrite.Sample{
@@ -237,11 +248,11 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 					},
 					{
 						Name:  "request_user_id",
-						Value: r.Header.Get("User-Id"),
+						Value: userID,
 					},
 					{
 						Name:  "request_user_type",
-						Value: r.Header.Get("User-Type"),
+						Value: userType,
 					},
 				},
 				Sample: promwrite.Sample{
