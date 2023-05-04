@@ -45,7 +45,7 @@ spec:
                   all:
                     of:
                     - label_matches:
-                        label: service_fqdns
+                        label: source_fqdns
                         regex: service1-demo-app.demoapp.svc.cluster.local
                     - label_equals:
                         label: user_type
@@ -57,7 +57,7 @@ spec:
                   all:
                     of:
                     - label_matches:
-                        label: service_fqdns
+                        label: destination_fqdns
                         regex: service2-demo-app.demoapp.svc.cluster.local
                     - label_equals:
                         label: user_type

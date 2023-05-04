@@ -45,48 +45,50 @@ export default function () {
         "User-Id": userId,
     };
 
-    const requests = {
-        'svc1': {
-            method: 'POST',
-            url: 'http://service1-demo-app.demoapp.svc.cluster.local/request',
-            body: {
-                request: [
-                    [
-                        {
-                            destination: "service1-demo-app.demoapp.svc.cluster.local/request",
-                        },
-                        {
-                            destination: "service3-demo-app.demoapp.svc.cluster.local/request",
-                        },
-                    ],
-                ],
-            },
-            params: {
-                headers: headers,
-            }
-        },
-        'svc2': {
-            method: 'POST',
-            url: 'http://service2-demo-app.demoapp.svc.cluster.local/request',
-            body: {
-                request: [
-                    [
-                        {
-                            destination: "service2-demo-app.demoapp.svc.cluster.local/request",
-                        },
-                        {
-                            destination: "service3-demo-app.demoapp.svc.cluster.local/request",
-                        },
-                    ],
-                ],
-            },
-            params: {
-                headers: headers,
-            }
+
+    const svc1Body = {
+        request: [
+            [
+                {
+                    destination: "service1-demo-app.demoapp.svc.cluster.local/request",
+                },
+                {
+                    destination: "service3-demo-app.demoapp.svc.cluster.local/request",
+                },
+            ],
+        ],
+    };
+    let svc1 = {
+        method: 'POST',
+        url: 'http://service1-demo-app.demoapp.svc.cluster.local/request',
+        body: JSON.stringify(svc1Body),
+        params: {
+            headers: headers,
         },
     };
 
-    const responses = http.batch(requests);
+    const svc2Body = {
+        request: [
+            [
+                {
+                    destination: "service2-demo-app.demoapp.svc.cluster.local/request",
+                },
+                {
+                    destination: "service3-demo-app.demoapp.svc.cluster.local/request",
+                },
+            ],
+        ],
+    };
+    let svc2 = {
+        method: 'POST',
+        url: 'http://service2-demo-app.demoapp.svc.cluster.local/request',
+        body: JSON.stringify(svc2Body),
+        params: {
+            headers: headers,
+        },
+    };
+
+    const responses = http.batch([svc1, svc2]);
 
     const svc1ret = check(responses[0], {
         "http status was 200": responses[0].status === 200,
@@ -98,5 +100,5 @@ export default function () {
     if (!svc1ret && !svc2ret) {
         // sleep for 10ms to 25ms
         sleep(randomIntBetween(0.01, 0.025));
-    }
+    };
 }
