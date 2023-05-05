@@ -19,6 +19,7 @@ public class ApertureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
     private String controlPointName;
+    private boolean failOpen;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -36,7 +37,12 @@ public class ApertureFilter implements Filter {
             return;
         }
 
-        if (flow.accepted()) {
+        FlowResult flowResult = flow.result();
+        boolean flowAccepted =
+                (flowResult == FlowResult.Accepted
+                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+
+        if (flowAccepted) {
             try {
                 Map<String, String> newHeaders = new HashMap<>();
                 if (flow.checkResponse() != null) {
@@ -84,6 +90,9 @@ public class ApertureFilter implements Filter {
             ignoredPathsRegex =
                     Boolean.parseBoolean(
                             filterConfig.getInitParameter("ignored_paths_match_regex"));
+
+            this.failOpen = Boolean.parseBoolean(filterConfig.getInitParameter("enable_fail_open"));
+
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }

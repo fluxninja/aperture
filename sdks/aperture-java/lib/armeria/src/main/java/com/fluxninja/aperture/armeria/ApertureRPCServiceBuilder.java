@@ -7,6 +7,7 @@ import com.linecorp.armeria.server.RpcService;
 public class ApertureRPCServiceBuilder {
     private ApertureSDK apertureSDK;
     private String controlPointName;
+    private boolean enableFailOpen = true;
 
     /**
      * Sets the Aperture SDK used by this service.
@@ -19,8 +20,27 @@ public class ApertureRPCServiceBuilder {
         return this;
     }
 
+    /**
+     * Sets the control point name for traffic handled by this service.
+     *
+     * @param controlPointName control point name to be used
+     * @return the builder object.
+     */
     public ApertureRPCServiceBuilder setControlPointName(String controlPointName) {
         this.controlPointName = controlPointName;
+        return this;
+    }
+
+    /**
+     * Defines service behavior when Aperture Agent is unreachable. true - pass all traffic through
+     * false - block all traffic
+     *
+     * @param enableFailOpen whether all traffic should be accepted when Aperture Agent is
+     *     unreachable
+     * @return the builder object.
+     */
+    public ApertureRPCServiceBuilder setEnableFailOpen(boolean enableFailOpen) {
+        this.enableFailOpen = enableFailOpen;
         return this;
     }
 
@@ -31,6 +51,6 @@ public class ApertureRPCServiceBuilder {
         if (this.apertureSDK == null) {
             throw new IllegalArgumentException("Aperture SDK must be set");
         }
-        return new ApertureRPCService(delegate, apertureSDK, controlPointName);
+        return new ApertureRPCService(delegate, apertureSDK, controlPointName, enableFailOpen);
     }
 }

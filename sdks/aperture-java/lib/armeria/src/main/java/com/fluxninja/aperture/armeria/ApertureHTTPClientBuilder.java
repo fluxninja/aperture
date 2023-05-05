@@ -7,6 +7,7 @@ import com.linecorp.armeria.client.HttpClient;
 public class ApertureHTTPClientBuilder {
     private ApertureSDK apertureSDK;
     private String controlPointName;
+    private boolean enableFailOpen = true;
 
     /**
      * Sets the Aperture SDK used by this service.
@@ -30,6 +31,19 @@ public class ApertureHTTPClientBuilder {
         return this;
     }
 
+    /**
+     * Defines client behavior when Aperture Agent is unreachable. true - pass all traffic through
+     * false - block all traffic
+     *
+     * @param enableFailOpen whether all traffic should be accepted when Aperture Agent is
+     *     unreachable
+     * @return the builder object.
+     */
+    public ApertureHTTPClientBuilder setEnableFailOpen(boolean enableFailOpen) {
+        this.enableFailOpen = enableFailOpen;
+        return this;
+    }
+
     public ApertureHTTPClient build(HttpClient delegate) {
         if (this.controlPointName == null || this.controlPointName.trim().isEmpty()) {
             throw new IllegalArgumentException("Control Point name must be set");
@@ -37,6 +51,6 @@ public class ApertureHTTPClientBuilder {
         if (this.apertureSDK == null) {
             throw new IllegalArgumentException("Aperture SDK must be set");
         }
-        return new ApertureHTTPClient(delegate, apertureSDK, controlPointName);
+        return new ApertureHTTPClient(delegate, apertureSDK, controlPointName, enableFailOpen);
     }
 }

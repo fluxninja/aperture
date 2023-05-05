@@ -15,6 +15,7 @@ public class Config {
 
     public static final String AGENT_HOST_PROPERTY = "aperture.agent.hostname";
     public static final String AGENT_PORT_PROPERTY = "aperture.agent.port";
+    public static final String FAIL_OPEN_PROPERTY = "aperture.javaagent.enable.fail.open";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY =
             "aperture.connection.timeout.millis";
     public static final String CONTROL_POINT_NAME_PROPERTY = "aperture.control.point.name";
@@ -27,6 +28,7 @@ public class Config {
 
     private static final String AGENT_HOST_DEFAULT_VALUE = "localhost";
     private static final String AGENT_PORT_DEFAULT_VALUE = "8089";
+    private static final String FAIL_OPEN_PROPERTY_DEFAULT_VALUE = "true";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";
     private static final String IGNORED_PATHS_DEFAULT_VALUE = "";
     private static final String IGNORED_PATHS_REGEX_DEFAULT_VALUE = "false";
@@ -38,6 +40,7 @@ public class Config {
                 {
                     add(AGENT_HOST_PROPERTY);
                     add(AGENT_PORT_PROPERTY);
+                    add(FAIL_OPEN_PROPERTY);
                     add(CONNECTION_TIMEOUT_MILLIS_PROPERTY);
                     add(CONTROL_POINT_NAME_PROPERTY);
                     add(IGNORED_PATHS_PROPERTY);
@@ -87,8 +90,13 @@ public class Config {
         Properties config = loadProperties();
         ApertureSDK sdk;
         String controlPointName;
+        boolean failOpen;
         try {
             controlPointName = config.getProperty(CONTROL_POINT_NAME_PROPERTY);
+            failOpen =
+                    Boolean.parseBoolean(
+                            config.getProperty(
+                                    FAIL_OPEN_PROPERTY, FAIL_OPEN_PROPERTY_DEFAULT_VALUE));
 
             ApertureSDKBuilder sdkBuilder =
                     builder.setHost(
@@ -135,7 +143,7 @@ public class Config {
             throw new IllegalArgumentException("Control Point name must be set");
         }
 
-        return new ApertureSDKWrapper(sdk, controlPointName);
+        return new ApertureSDKWrapper(sdk, controlPointName, failOpen);
     }
 
     private static String envNameFromPropertyName(String propertyName) {
