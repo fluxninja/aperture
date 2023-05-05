@@ -219,6 +219,19 @@ func (wsFactory *Factory) NewScheduler(
 	clock clockwork.Clock,
 	metricLabels prometheus.Labels,
 ) (*Scheduler, error) {
+	if proto == nil {
+		p := &policylangv1.Scheduler{}
+		config.SetDefaults(p)
+		proto = p
+	}
+
+	// default workload params is not a required param so it can be nil
+	if proto.DefaultWorkloadParameters == nil {
+		p := &policylangv1.Scheduler_Workload_Parameters{}
+		config.SetDefaults(p)
+		proto.DefaultWorkloadParameters = p
+	}
+
 	mm := multimatcher.New[int, multiMatchResult]()
 	// Loop through the workloads
 	for workloadIndex, workloadProto := range proto.Workloads {
@@ -234,19 +247,6 @@ func (wsFactory *Factory) NewScheduler(
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	if proto == nil {
-		p := &policylangv1.Scheduler{}
-		config.SetDefaults(p)
-		proto = p
-	}
-
-	// default workload params is not a required param so it can be nil
-	if proto.DefaultWorkloadParameters == nil {
-		p := &policylangv1.Scheduler_Workload_Parameters{}
-		config.SetDefaults(p)
-		proto.DefaultWorkloadParameters = p
 	}
 
 	ws := &Scheduler{
