@@ -307,6 +307,16 @@ jobs:
           name: Restore go cache
           keys:
             - aperture-v7-go-cache-{{ checksum "~/day" }}
+      - run: &install_opsninja
+          name: Install opsninja and its dependencies
+          command: |
+            # We need R/O access to cloud repository to be able to fetch opsninja library
+            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
+            # to limit exposure.
+            export CLOUD_RO_KEY_FINGERPRINT="10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - run:
           name: Install Go tools
           command: scripts/install_go_tools.sh
@@ -324,17 +334,6 @@ jobs:
               libgtk-3-0 \
               libgbm1 \
               libasound2
-      - run: &install_opsninja
-          name: Install opsninja and its dependencies
-          command: |
-            # We need R/O access to cloud repository to be able to fetch opsninja library
-            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
-            # to limit exposure.
-            export CLOUD_RO_KEY_FINGERPRINT="10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"
-            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
-            export SSH_AUTH_SOCK=""
-            pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
-            asdf reshim python
       - run:
           name: Cache golangci-lint run
           command: |
