@@ -15,12 +15,6 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withDynamicConfigKeyMixin(dynamic_config_key):: {
     dynamic_config_key+: dynamic_config_key,
   },
-  withFlowSelector(flow_selector):: {
-    flow_selector: flow_selector,
-  },
-  withFlowSelectorMixin(flow_selector):: {
-    flow_selector+: flow_selector,
-  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

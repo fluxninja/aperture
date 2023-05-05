@@ -232,14 +232,6 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 		return fx.Options(), err
 	}
 
-	// Scheduler config
-	schedulerProto := loadSchedulerProto.Parameters.Scheduler
-	if schedulerProto == nil {
-		err = fmt.Errorf("no scheduler specified")
-		registry.SetStatus(status.NewStatus(nil, err))
-		return fx.Options(), err
-	}
-
 	ls := &loadScheduler{
 		Component:            wrapperMessage.GetCommonAttributes(),
 		proto:                loadSchedulerProto,

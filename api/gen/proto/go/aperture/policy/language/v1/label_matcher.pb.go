@@ -182,7 +182,9 @@ func (x *K8SLabelMatcherRequirement) GetValues() []string {
 //
 //	of:
 //	  - label_exists: foo
-//	  - label_equals: { label = app, value = frobnicator }
+//	  - label_equals:
+//	      label: app
+//	      value: frobnicator
 //
 // ```
 type MatchExpression struct {
@@ -305,7 +307,7 @@ type MatchExpression_Any struct {
 
 type MatchExpression_LabelExists struct {
 	// The expression is true when label with given name exists.
-	LabelExists string `protobuf:"bytes,4,opt,name=label_exists,json=labelExists,proto3,oneof" validate:"required"` // @gotags: validate:"required"
+	LabelExists string `protobuf:"bytes,4,opt,name=label_exists,json=labelExists,proto3,oneof"`
 }
 
 type MatchExpression_LabelEquals struct {

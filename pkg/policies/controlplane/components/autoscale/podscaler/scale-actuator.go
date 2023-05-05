@@ -92,7 +92,7 @@ func (sa *ScaleActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx
 // Execute implements runtime.Component.Execute.
 func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	// Get the decision from the port
-	replicasReading := inPortReadings.ReadSingleReadingPort("desired_replicas")
+	replicasReading := inPortReadings.ReadSingleReadingPort("replicas")
 	var replicasValue float64
 	if replicasReading.Valid() {
 		if replicasReading.Value() <= 0 {

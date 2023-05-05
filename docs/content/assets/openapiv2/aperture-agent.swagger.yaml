@@ -716,13 +716,13 @@ definitions:
       all:
         of:
           - label_exists: foo
-          - label_equals: { label = app, value = frobnicator }
+          - label_equals:
+              label: app
+              value: frobnicator
       ```
     type: object
     title: Defines a `[map<string, string> → bool]` expression to be evaluated on
       labels
-    required:
-    - label_exists
     properties:
       all:
         description: The expression is true when all sub expressions are true.
@@ -734,11 +734,8 @@ definitions:
         description: The expression is true when label value equals given value.
         $ref: '#/definitions/EqualsMatchExpression'
       label_exists:
-        description: |+
-          The expression is true when label with given name exists.
-
+        description: The expression is true when label with given name exists.
         type: string
-        x-go-tag-validate: required
       label_matches:
         description: The expression is true when label matches given regular expression.
         $ref: '#/definitions/MatchesMatchExpression'

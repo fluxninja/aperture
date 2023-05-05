@@ -29,19 +29,6 @@ func NewClassifierOptions(
 	classifierProto *policylangv1.Classifier,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := classifierProto.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
-		}
-		classifierProto.Selectors = append(classifierProto.Selectors, selector)
-		classifierProto.FlowSelector = nil
-	}
-
 	var options []fx.Option
 
 	s := classifierProto.GetSelectors()

@@ -612,28 +612,6 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //
 // :::
 //
-// There are three categories of components:
-//
-//   - "source" components: they take some sort of input from "the real world" and output
-//     a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
-//     they're represented by green color.
-//
-//   - signal processor components: processing components that do not interact with the external systems.
-//     Examples: [GradientController](#gradient-controller), [Max](#max).
-//
-//     :::note
-//
-//     Signal processor components' output can depend on their internal state, in addition to the inputs.
-//     Eg. see the [Exponential Moving Average filter](#e-m-a).
-//
-//     :::
-//
-//   - "sink" components: they affect the real world.
-//     [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).
-//     In the UI, represented by orange color.  Sink components usually come in pairs with a
-//     "sources" component which emits a feedback signal, like
-//     `accepted_concurrency` emitted by _Concurrency Limiter_.
-//
 // See also [Policy](#policy) for a higher-level explanation of circuits.
 type Component struct {
 	state         protoimpl.MessageState

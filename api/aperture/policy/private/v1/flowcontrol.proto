@@ -7,8 +7,8 @@ import "aperture/policy/language/v1/ports.proto";
 
 message LoadActuator {
   message Ins {
-    // Load multiplier is proportion of [incoming
-    // token rate](#scheduler-outs) that needs to be accepted.
+    // Load multiplier is proportion of incoming
+    // token rate that needs to be accepted.
     aperture.policy.language.v1.InPort load_multiplier = 1;
   }
 
