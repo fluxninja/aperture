@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.3
+      - image: cimg/go:1.20.4
         user: root
   python-cimg-executor:
     docker:
@@ -278,6 +278,7 @@ jobs:
     resource_class: xlarge
     environment:
       GOMAXPROCS: 8
+      SKIP: install-tools
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -305,21 +306,7 @@ jobs:
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-v5-go-cache-{{ checksum "~/day" }}
-      - run:
-          name: Install Go tools
-          command: scripts/manage_go_tools.sh
-      - run:
-          name: Install Python tools
-          command: scripts/manage_python_tools.sh
-      - run:
-          name: Install additional system dependencies for pre-commit
-          command: |
-            sudo apt-get update
-            sudo apt-get install \
-              libgtk-3-0 \
-              libgbm1 \
-              libasound2
+            - aperture-v7-go-cache-{{ checksum "~/day" }}
       - run: &install_opsninja
           name: Install opsninja and its dependencies
           command: |
@@ -330,6 +317,23 @@ jobs:
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+      - run:
+          name: Install Go tools
+          command: scripts/install_go_tools.sh
+      - run:
+          name: Install Python tools
+          command: scripts/install_python_tools.sh
+      - run:
+          name: Install Node tools
+          command: scripts/install_node_tools.sh
+      - run:
+          name: Install additional system dependencies for pre-commit
+          command: |
+            sudo apt-get update
+            sudo apt-get install \
+              libgtk-3-0 \
+              libgbm1 \
+              libasound2
       - run:
           name: Cache golangci-lint run
           command: |
@@ -373,7 +377,7 @@ jobs:
             fi
       - save_cache:
           name: Save go cache
-          key: aperture-v5-go-cache-{{ checksum "~/day" }}
+          key: aperture-v7-go-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/golangci-lint
             - ../.cache/go-build
@@ -1376,10 +1380,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -1397,7 +1401,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:

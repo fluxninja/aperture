@@ -42,10 +42,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "go.mod" }}
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -62,7 +62,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "go.mod" }}
           paths:

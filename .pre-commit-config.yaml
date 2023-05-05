@@ -6,7 +6,7 @@ default_stages:
 repos:
   - repo: local
     hooks:
-      - id: tools
+      - id: install-tools
         name: "Install tools"
         entry: "./scripts/precommit/install_tools.sh"
         language: script
@@ -46,10 +46,10 @@ repos:
     hooks:
       - id: shellcheck
         exclude: ^(sdks/aperture-java/gradlew)$
-  # - repo: https://github.com/fluxninja/pre-commit-hooks.git
-  #   rev: v0.0.4
-  #   hooks:
-  #     - id: circleci-validate
+  - repo: https://github.com/fluxninja/pre-commit-hooks.git
+    rev: v0.0.4
+    hooks:
+      - id: circleci-validate
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:

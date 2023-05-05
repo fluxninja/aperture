@@ -6,8 +6,8 @@ generate-helm-readme:
 		for dir in $${dirs}; do \
 			chart=$$(basename $${dir}); \
 			echo "Generating README for $${chart}"; \
-			npx @bitnami/readme-generator-for-helm -v $$dir/values.yaml -r $$dir/README.md; \
-			npx prettier@latest --write $$dir/README.md; \
+			readme-generator -v $$dir/values.yaml -r $$dir/README.md; \
+			prettier --write $$dir/README.md; \
 		done; \
 		\
 	}
