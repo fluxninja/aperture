@@ -9,7 +9,10 @@ make install-go-tools
 make install-python-tools
 
 if asdf current golang >/dev/null 2>/dev/null; then
-  asdf reshim golang
+	asdf reshim golang
 fi
+
+# force build aperturectl
+"$gitroot"/scripts/build_aperturectl.sh --force-build
 
 popd >/dev/null
