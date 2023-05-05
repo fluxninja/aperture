@@ -62,10 +62,6 @@ func ParseAdaptiveLoadScheduler(
 		isOverloadDeciderOperator = "lt"
 	}
 
-	adaptiveLoadScheduler.Parameters.Alerter = &policylangv1.Alerter_Parameters{
-		AlertName: "Load Throttling Event",
-	}
-
 	alerterLabels := adaptiveLoadScheduler.Parameters.Alerter.Labels
 	if alerterLabels == nil {
 		alerterLabels = make(map[string]string)
