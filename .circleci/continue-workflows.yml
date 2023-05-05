@@ -217,7 +217,7 @@ jobs:
     executor: go-cimg-executor
     resource_class: xlarge
     environment:
-      GOMAXPROCS: 4
+      GOMAXPROCS: 8
     steps:
       - checkout
       - run:
