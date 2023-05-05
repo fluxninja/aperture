@@ -375,6 +375,9 @@ jobs:
               base_ref="$(git merge-base main $CIRCLE_SHA1)"
               pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
             fi
+            asdf reshim golang
+            asdf reshim python
+            asdf reshim nodejs
       - save_cache:
           name: Save go cache
           key: aperture-v7-go-cache-{{ checksum "~/day" }}
