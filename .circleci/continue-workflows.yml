@@ -382,9 +382,9 @@ jobs:
           name: Save go cache
           key: aperture-v7-go-cache-{{ checksum "~/day" }}
           paths:
-            - ../.cache/golangci-lint
-            - ../.cache/go-build
-            - ../.cache/buf
+            - ../.cache
+            - ../.local
+            - ../.pyenv
             - ../.aperturectl
             - ./blueprints/vendor
           when: on_success
