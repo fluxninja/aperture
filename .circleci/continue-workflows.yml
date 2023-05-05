@@ -309,10 +309,13 @@ jobs:
             - aperture-v6-go-cache-{{ checksum "~/day" }}
       - run:
           name: Install Go tools
-          command: scripts/manage_go_tools.sh
+          command: scripts/install_go_tools.sh
       - run:
           name: Install Python tools
-          command: scripts/manage_python_tools.sh
+          command: scripts/install_python_tools.sh
+      - run:
+          name: Install Node tools
+          command: scripts/install_node_tools.sh
       - run:
           name: Install additional system dependencies for pre-commit
           command: |

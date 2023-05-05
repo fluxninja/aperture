@@ -42,16 +42,16 @@ go-build-plugins:
 	@./scripts/go_build_plugins.sh
 
 install-asdf-tools:
-	@echo Installing Asdf tools
-	@./scripts/manage_asdf_tools.sh setup
+	@./scripts/install_asdf_tools.sh setup
 
 install-go-tools:
-	@echo Installing tools from tools.go
 	@./scripts/install_go_tools.sh
 
+install-node-tools:
+	@./scripts/install_node_tools.sh
+
 install-python-tools:
-	@echo Installing tools from requirements.txt
-	@pip3 install -r requirements.txt
+	@./scripts/install_python_tools.sh
 
 go-generate-swagger:
 	@echo Generating swagger code

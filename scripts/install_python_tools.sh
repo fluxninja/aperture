@@ -2,18 +2,17 @@
 
 set -euo pipefail
 
-git_root="$(git rev-parse --show-toplevel)"
-readonly git_root="${git_root}"
+gitroot="$(git rev-parse --show-toplevel)"
 
-pushd "${git_root}" >/dev/null
+pushd "${gitroot}" >/dev/null
 
 if ! command -v python &>/dev/null; then
 	printf 'Installing Python\n'
-	./scripts/manage_asdf_tools.sh setup python
+	./scripts/install_asdf_tools.sh setup python
 fi
 
 printf 'Installing Python tools\n'
-make install-python-tools
+pip3 install -r requirements.txt
 
 if asdf where python &>/dev/null; then
 	asdf reshim python
