@@ -98,7 +98,7 @@ time window.
 
 Tokens are determined in the following order of precedence:
 
-- Specified in the flow labels
+- Specified in the flow labels.
 - Specified in the `Workload.tokens` setting.
 - Estimated tokens (see
   [`workload_latency_based_tokens`](/reference/policies/spec.md#load-scheduler)
