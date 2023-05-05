@@ -375,14 +375,23 @@ jobs:
               base_ref="$(git merge-base main $CIRCLE_SHA1)"
               pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
             fi
+            if asdf where golang &> /dev/null; then
+              asdf reshim golang
+            fi
+            if asdf where python &> /dev/null; then
+              asdf reshim python
+            fi
+            if asdf where nodejs &> /dev/null; then
+              asdf reshim nodejs
+            fi
       - save_cache:
           name: Save go cache
           key: aperture-v7-go-cache-{{ checksum "~/day" }}
           paths:
-            - ../.cache/golangci-lint
-            - ../.cache/go-build
-            - ../.cache/buf
-            - ~/.aperturectl
+            - ../.cache
+            - ../.local
+            - ../.pyenv
+            - ../.aperturectl
             - ./blueprints/vendor
           when: on_success
       - save_cache:
