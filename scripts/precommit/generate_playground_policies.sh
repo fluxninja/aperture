@@ -27,9 +27,8 @@ function generate_policies() {
 		blueprint_name=$(jq --raw-output '.blueprint_name' <<<"$policy")
 		values_file=$(jq --raw-output '.values_file' <<<"$policy")
 		echo "Generating policies: $policy_name"
-		cr_file="$scenario_dir"/"$policy_name"-cr.yaml
-		"$gitroot"/playground/scripts/render-policy.sh "$scenario_dir" "$aperturectl" "$gitroot/blueprints" "$blueprint_name" "$policy_name" "$scenario_dir"/"$values_file" >"$cr_file"
-		"$gitroot"/scripts/git_add_safely.sh "$cr_file"
+		"$gitroot"/playground/scripts/render-policy.sh "$scenario_dir" "$aperturectl" "$gitroot/blueprints" "$blueprint_name" "$policy_name" "$scenario_dir"/"$values_file" >/dev/null
+		"$gitroot"/scripts/git_add_safely.sh "$scenario_dir"
 	done
 }
 
