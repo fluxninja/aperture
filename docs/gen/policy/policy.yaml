@@ -103,11 +103,17 @@ definitions:
     type: object
     properties:
       alerter:
-        description: Configuration parameters for the embedded Alerter.
+        description: |+
+          Configuration parameters for the embedded Alerter.
+
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/AlerterParameters'
       gradient:
-        description: Parameters for the _Gradient Controller_.
+        description: |+
+          Parameters for the _Gradient Controller_.
+
+        x-go-tag-validate: required
         x-order: 1
         $ref: '#/definitions/GradientControllerParameters'
       load_multiplier_linear_increment:

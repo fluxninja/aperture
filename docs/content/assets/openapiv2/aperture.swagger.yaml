@@ -65,10 +65,16 @@ definitions:
         properties:
             alerter:
                 $ref: '#/definitions/AlerterParameters'
-                description: Configuration parameters for the embedded Alerter.
+                description: |+
+                    Configuration parameters for the embedded Alerter.
+
+                x-go-tag-validate: required
             gradient:
                 $ref: '#/definitions/GradientControllerParameters'
-                description: Parameters for the _Gradient Controller_.
+                description: |+
+                    Parameters for the _Gradient Controller_.
+
+                x-go-tag-validate: required
             load_multiplier_linear_increment:
                 default: 0.0025
                 description: |+
