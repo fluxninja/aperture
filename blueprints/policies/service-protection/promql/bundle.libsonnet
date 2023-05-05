@@ -1,4 +1,4 @@
-local blueprint = import './service-protection.libsonnet';
+local blueprint = import './promql.libsonnet';
 
 local policy = blueprint.policy;
 local dashboard = blueprint.dashboard;

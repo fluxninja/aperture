@@ -14,18 +14,25 @@ function(cfg) {
         spec.v1.Component.withQuery(
           spec.v1.Query.new()
           + spec.v1.Query.withPromql(
-            local q = 'sum(rabbitmq_message_current{rabbitmq_queue_name="%(queue_name)s",state="ready"})' % { queue_name: params.queue_name };
+            local q = params.promql_query;
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
-            + spec.v1.PromQL.withEvaluationInterval('1s')
+            + spec.v1.PromQL.withEvaluationInterval(params.evaluation_interval)
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),
-        spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.mul(
-          spec.v1.Port.withConstantSignal(1),
-          spec.v1.Port.withConstantSignal(params.latency_baseliner.queue_buildup_setpoint),
-          output=spec.v1.Port.withSignalName('SETPOINT')
-        )),
+        spec.v1.Component.withVariable(
+          spec.v1.Variable.new()
+          + spec.v1.Variable.withDefaultConfig(
+            spec.v1.VariableDynamicConfig.new()
+            + spec.v1.VariableDynamicConfig.withConstantSignal(
+              local s = params.latency_baseliner.setpoint;
+              spec.v1.ConstantSignal.new()
+              + spec.v1.ConstantSignal.withValue(s)
+            )
+          )
+          + spec.v1.Variable.withOutPorts({ output: spec.v1.Port.withSignalName('SETPOINT') }),
+        ),
       ],
     },
   },

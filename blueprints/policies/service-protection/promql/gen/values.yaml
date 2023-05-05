@@ -1,16 +1,16 @@
-# Generated values file for policies/service-protection/rabbitmq-queue-buildup blueprint
+# Generated values file for policies/service-protection/promql blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/rabbitmq-queue-buildup
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/promql
 
 common:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  # Name of the queue to watch for buildup.
+  # PromQL query.
   # Type: string
   # Required: True
-  queue_name: __REQUIRED_FIELD__
+  promql_query: __REQUIRED_FIELD__
 
 policy:
   # List of additional circuit components.
@@ -51,10 +51,10 @@ policy:
     # Type: bool
     dry_run: false
   latency_baseliner:
-    # Queue buildup setpoint in number of messages.
-    # Type: int32
+    # Setpoint.
+    # Type: float64
     # Required: True
-    queue_buildup_setpoint: __REQUIRED_FIELD__
+    setpoint: __REQUIRED_FIELD__
 
 dashboard:
   # Refresh interval for dashboard panels.

@@ -1,22 +1,22 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "policies/service-protection/rabbitmq-queue-buildup blueprint",
+  "title": "policies/service-protection/promql blueprint",
   "additionalProperties": false,
   "required": ["common", "policy"],
   "properties": {
     "common": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_name", "queue_name"],
+      "required": ["policy_name", "promql_query"],
       "properties": {
         "policy_name": {
           "description": "Name of the policy.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
-        "queue_name": {
-          "description": "Name of the queue to watch for buildup.",
+        "promql_query": {
+          "description": "PromQL query.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
         }
@@ -106,13 +106,13 @@
         "latency_baseliner": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["queue_buildup_setpoint"],
+          "required": ["setpoint"],
           "properties": {
-            "queue_buildup_setpoint": {
-              "description": "Queue buildup setpoint in number of messages.",
+            "setpoint": {
+              "description": "Setpoint.",
               "default": "__REQUIRED_FIELD__",
-              "type": "integer",
-              "format": "int32"
+              "type": "number",
+              "format": "double"
             }
           }
         }

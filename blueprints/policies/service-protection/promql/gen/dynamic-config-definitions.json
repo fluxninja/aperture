@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "policies/service-protection/rabbitmq-queue-buildup blueprint",
+  "title": "policies/service-protection/promql blueprint",
   "additionalProperties": false,
   "properties": null,
   "$defs": null

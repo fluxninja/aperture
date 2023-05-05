@@ -2,7 +2,7 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 
 /**
 * @param (common.policy_name: string required) Name of the policy.
-* @param (common.queue_name: string required) Name of the queue to watch for buildup.
+* @param (common.promql_query: string required) PromQL query.
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
@@ -24,20 +24,22 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 
 serviceProtectionDefaults {
   common+: {
-    queue_name: '__REQUIRED_FIELD__',
+    promql_query: '__REQUIRED_FIELD__',
   },
 
   policy+: {
     latency_baseliner: {
       /**
-      * @param (policy.latency_baseliner.queue_buildup_setpoint: int32 required) Queue buildup setpoint in number of messages.
+      * @param (policy.latency_baseliner.setpoint: float64 required) Setpoint.
       */
-      queue_buildup_setpoint: '__REQUIRED_FIELD__',
+      setpoint: '__REQUIRED_FIELD__',
     },
   },
 
   /**
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+  * @param (dashboard.time_from: string) Time from of dashboard.
+  * @param (dashboard.time_to: string) Time to of dashboard.
   */
   dashboard: {
     refresh_interval: '15s',

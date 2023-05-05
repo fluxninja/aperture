@@ -1,9 +1,9 @@
 ---
-title: Service Protection Using RabbitMQ Queue Buildup
+title: Service Protection Based on PromQL Query
 keywords:
   - blueprints
 sidebar_position: 3
-sidebar_label: RabbitMQ Queue Buildup
+sidebar_label: Service Protection Based on PromQL Query
 ---
 
 <!-- Configuration Marker -->
@@ -18,7 +18,7 @@ import {ParameterDescription} from '../../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/service-protection/rabbitmq-queue-buildup`}>policies/service-protection/rabbitmq-queue-buildup</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/service-protection/promql`}>policies/service-protection/promql</a>
 
 <!-- vale on -->
 
@@ -46,11 +46,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="common-queue-name"></a>
+<a id="common-promql-query"></a>
 
 <ParameterDescription
-    name='common.queue_name'
-    description='Name of the queue to watch for buildup.'
+    name='common.promql_query'
+    description='PromQL query.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -164,12 +164,12 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-latency-baseliner-queue-buildup-setpoint"></a>
+<a id="policy-latency-baseliner-setpoint"></a>
 
 <ParameterDescription
-    name='policy.latency_baseliner.queue_buildup_setpoint'
-    description='Queue buildup setpoint in number of messages.'
-    type='Integer (int32)'
+    name='policy.latency_baseliner.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
 />
