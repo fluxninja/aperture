@@ -85,12 +85,14 @@
       "properties": {
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration parameters for the embedded Alerter.",
+          "description": "Configuration parameters for the embedded Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "gradient": {
           "$ref": "#/definitions/GradientControllerParameters",
-          "description": "Parameters for the _Gradient Controller_.",
+          "description": "Parameters for the _Gradient Controller_.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 1
         },
         "load_multiplier_linear_increment": {
