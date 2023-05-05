@@ -6,7 +6,9 @@ gitroot=$(git rev-parse --show-toplevel)
 
 pushd "${gitroot}" >/dev/null
 
-./scripts/build_aperturectl.sh --force-build >/dev/null
+aperturectl="$("$gitroot"/scripts/build_aperturectl.sh --force-build)"
+# download jsonnet dependencies as well
+"$aperturectl" blueprints list --uri="$gitroot"/blueprints >/dev/null
 
 if ! command -v go &>/dev/null; then
 	printf 'Installing Go\n'

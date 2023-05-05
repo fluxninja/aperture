@@ -304,9 +304,9 @@ jobs:
             tanka
             yq
       - restore_cache:
-          name: Restore go cache
+          name: Restore daily cache
           keys:
-            - aperture-v7-go-cache-{{ checksum "~/day" }}
+            - aperture-v7-daily-cache-{{ checksum "~/day" }}
       - run: &install_opsninja
           name: Install opsninja and its dependencies
           command: |
@@ -344,6 +344,7 @@ jobs:
             cp .pre-commit-config.yaml /tmp/pre-commit-cache-key.txt
             python --version --version >> /tmp/pre-commit-cache-key.txt
             pre-commit --version >> /tmp/pre-commit-cache-key.txt
+            cat requirements.txt >> /tmp/pre-commit-cache-key.txt
       - restore_cache:
           name: Restore pre-commit cache
           keys:
@@ -385,12 +386,11 @@ jobs:
               asdf reshim nodejs
             fi
       - save_cache:
-          name: Save go cache
-          key: aperture-v7-go-cache-{{ checksum "~/day" }}
+          name: Save daily cache
+          key: aperture-v7-daily-cache-{{ checksum "~/day" }}
           paths:
-            - ../.cache
-            - ../.local
-            - ../.pyenv
+            - ../.cache/go-build
+            - ../.cache/golangci-lint
             - ../.aperturectl
             - ./blueprints/vendor
           when: on_success
@@ -399,7 +399,11 @@ jobs:
           key:
             aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
-            - ~/.cache/pre-commit
+            - ../.cache/pre-commit
+            - ../.cache/pre-commit-zipapp
+            - ../.cache/pip
+            - ../.pyenv
+            - ../.local
       - asdf_save_cache:
           cache_name: pre-commit
       - run:
@@ -1415,6 +1419,7 @@ commands:
             "tools/go/go.mod" }}
           paths:
             - ~/.asdf
+            - ../.cache/helm
 
   aperture_docker_build:
     description: |
