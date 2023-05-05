@@ -82,15 +82,14 @@ public class Config {
         return System.getenv(envVariableName);
     }
 
-    public static ApertureSDK newSDKFromConfig() {
+    public static ApertureSDKWrapper newSDKWrapperFromConfig() {
         ApertureSDKBuilder builder = ApertureSDK.builder();
         Properties config = loadProperties();
         ApertureSDK sdk;
+        String controlPointName;
         try {
-            if (config.getProperty(CONTROL_POINT_NAME_PROPERTY) == null
-                    || config.getProperty(CONTROL_POINT_NAME_PROPERTY).trim().isEmpty()) {
-                throw new IllegalArgumentException("Control Point name must be set");
-            }
+            controlPointName = config.getProperty(CONTROL_POINT_NAME_PROPERTY);
+
             ApertureSDKBuilder sdkBuilder =
                     builder.setHost(
                                     config.getProperty(
@@ -112,8 +111,7 @@ public class Config {
                                     Boolean.parseBoolean(
                                             config.getProperty(
                                                     IGNORED_PATHS_REGEX_PROPERTY,
-                                                    IGNORED_PATHS_REGEX_DEFAULT_VALUE)))
-                            .setControlPointName(config.getProperty(CONTROL_POINT_NAME_PROPERTY));
+                                                    IGNORED_PATHS_REGEX_DEFAULT_VALUE)));
 
             boolean insecureGrpc =
                     Boolean.parseBoolean(
@@ -132,7 +130,12 @@ public class Config {
         } catch (Exception e) {
             throw new RuntimeException("failed to create Aperture SDK from config", e);
         }
-        return sdk;
+
+        if (controlPointName == null || controlPointName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Control Point name must be set");
+        }
+
+        return new ApertureSDKWrapper(sdk, controlPointName);
     }
 
     private static String envNameFromPropertyName(String propertyName) {

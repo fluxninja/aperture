@@ -19,12 +19,13 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
 
-    public ApertureServerHandler(ApertureSDK sdk) {
-        this.apertureSDK = sdk;
-        this.controlPointName = "";
-    }
-
     public ApertureServerHandler(ApertureSDK sdk, String controlPointName) {
+        if (controlPointName == null || controlPointName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Control Point name must not be null or empty");
+        }
+        if (sdk == null) {
+            throw new IllegalArgumentException("Aperture SDK must not be null");
+        }
         this.apertureSDK = sdk;
         this.controlPointName = controlPointName;
     }

@@ -21,13 +21,6 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     private final String controlPointName;
 
     public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
-            ApertureSDK apertureSDK) {
-        ApertureHTTPClientBuilder builder = new ApertureHTTPClientBuilder();
-        builder.setApertureSDK(apertureSDK);
-        return builder::build;
-    }
-
-    public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
         ApertureHTTPClientBuilder builder = new ApertureHTTPClientBuilder();
         builder.setApertureSDK(apertureSDK).setControlPointName(controlPointName);

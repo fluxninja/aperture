@@ -6,8 +6,14 @@ import com.linecorp.armeria.server.HttpService;
 /** A builder for configuring an {@link ApertureHTTPService}. */
 public class ApertureHTTPServiceBuilder {
     private ApertureSDK apertureSDK;
-    private String controlPointName = "";
+    private String controlPointName;
 
+    /**
+     * Sets the Aperture SDK used by this service.
+     *
+     * @param apertureSDK instance of Aperture SDK to be used
+     * @return the builder object.
+     */
     public ApertureHTTPServiceBuilder setApertureSDK(ApertureSDK apertureSDK) {
         this.apertureSDK = apertureSDK;
         return this;
@@ -25,6 +31,12 @@ public class ApertureHTTPServiceBuilder {
     }
 
     public ApertureHTTPService build(HttpService delegate) {
+        if (this.controlPointName == null || this.controlPointName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Control Point name must be set");
+        }
+        if (this.apertureSDK == null) {
+            throw new IllegalArgumentException("Aperture SDK must be set");
+        }
         return new ApertureHTTPService(delegate, apertureSDK, controlPointName);
     }
 }

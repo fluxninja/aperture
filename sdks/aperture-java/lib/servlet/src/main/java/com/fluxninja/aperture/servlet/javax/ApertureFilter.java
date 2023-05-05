@@ -88,11 +88,11 @@ public class ApertureFilter implements Filter {
             throw new ServletException("Could not read config parameters", e);
         }
 
-        if (initControlPointName != null) {
-            controlPointName = initControlPointName;
-        } else {
-            controlPointName = "";
+        if (initControlPointName == null || initControlPointName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Control Point name must be set");
         }
+        controlPointName = initControlPointName;
+
         try {
             ApertureSDKBuilder builder = ApertureSDK.builder();
             builder.setHost(agentHost);
