@@ -41,10 +41,6 @@ go-build-plugins:
 	@echo Building go plugins
 	@./scripts/go_build_plugins.sh
 
-install-tools:
-	@echo Installing tools
-	@./scripts/manage_tools.sh
-
 install-asdf-tools:
 	@echo Installing Asdf tools
 	@./scripts/manage_asdf_tools.sh setup
