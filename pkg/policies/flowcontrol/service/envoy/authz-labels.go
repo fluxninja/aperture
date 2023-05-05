@@ -39,6 +39,10 @@ func AuthzRequestToFlowLabels(request *authv3.AttributeContext_Request) flowlabe
 				Value:     http.Scheme,
 				Telemetry: true,
 			}
+			flowLabels[requestLabelPrefix+"path"] = flowlabel.FlowLabelValue{
+				Value:     http.Path,
+				Telemetry: true,
+			}
 			flowLabels[requestLabelPrefix+"request_content_length"] = flowlabel.FlowLabelValue{
 				Value:     strconv.FormatInt(http.Size, 10),
 				Telemetry: false,

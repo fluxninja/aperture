@@ -1,10 +1,13 @@
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
 local extensionEnv = std.extVar('ENABLE_CLOUD_EXTENSION');
+local valuesStr = std.extVar('VALUES');
+local values = if valuesStr != '' then std.parseYaml(valuesStr) else {};
+local controllerValues = if std.objectHas(values, 'controller') then values.controller else {};
 
 local apertureControllerMixin =
   apertureControllerApp {
-    values+:: {
+    values+:: std.mergePatch({
       operator+: {
         image: {
           registry: 'docker.io/fluxninja',
@@ -56,7 +59,7 @@ local apertureControllerMixin =
           tag: 'latest',
         },
       },
-    },
+    }, controllerValues),
   };
 
 {

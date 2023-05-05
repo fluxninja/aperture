@@ -137,6 +137,7 @@ spec:
           with_request_body:
             max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
             allow_partial_message: true
+            pack_as_bytes: {{ .Values.envoyFilter.packAsBytes }}
           {{- end }}
           failure_mode_allow: true
           grpc_service:
@@ -176,6 +177,7 @@ spec:
           with_request_body:
             max_request_bytes: {{ .Values.envoyFilter.maxRequestBytes }}
             allow_partial_message: true
+            pack_as_bytes: {{ .Values.envoyFilter.packAsBytes }}
           {{- end }}
           failure_mode_allow: true
           grpc_service:

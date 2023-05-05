@@ -486,7 +486,7 @@ def wrapped_k8s_yaml(yaml, allow_duplicates=False):
     k8s_yaml(yaml, allow_duplicates)
 
 
-def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extension):
+def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extension, values):
     print(
         "Rendering tanka environment",
         environment,
@@ -518,10 +518,7 @@ def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extens
             TANKA,
             "--ext-str=projectRoot=" + base_dir,
             "--ext-str=ENABLE_CLOUD_EXTENSION=" + enable_cloud_extension,
-            "--ext-str=ENABLE_DEMO_APP_RABBITMQ=" + env_vars.get("ENABLE_DEMO_APP_RABBITMQ", "false"),
-            "--ext-str=ENABLE_DEMO_APP_NGINX=" + env_vars.get("ENABLE_DEMO_APP_NGINX", "false"),
-            "--ext-str=ENABLE_DEMO_APP_KONG=" + env_vars.get("ENABLE_DEMO_APP_KONG", "false"),
-            "--ext-str=SIMPLE_SERVICE_CPU_LOAD=" + env_vars.get("SIMPLE_SERVICE_CPU_LOAD", "0"),
+            "--ext-str=VALUES=" + values,
             "show",
             # Allow dumping the templates to stdout,
             # instead of using tk export to generate files
@@ -837,10 +834,6 @@ def render_jsonnet(manifests_path, jsonnet_args, namespace):
 
 
 def process_aperture_scenario(scenario_path):
-    # If this is a relative path, it's relative to Tiltfile (PLAYGROUND_ROOT_PATH)
-    if scenario_path[0] != "/":
-        scenario_path = PLAYGROUND_ROOT + "/" + scenario_path
-
     scenario_metadata = read_json(scenario_path + "/metadata.json", default='')
     if scenario_metadata == '':
         fail("Unable to find or parse metadata.json, will not continue.")
@@ -955,11 +948,14 @@ def forward_port_delayed(workload, labels, resource_deps, namespace, service, lo
     )
 
 
-def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_extension):
+def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_extension, scenario):
     """
     Declares resource-specific actions (images, ports, etc)
     Generating manifests with tanka is done separately, in order to speed up builds
     """
+    values = ""
+    if scenario and os.path.exists(os.path.join(scenario, "values.yaml")):
+        values = str(read_file(os.path.join(scenario, "values.yaml")))
     for resource in resources:
         resource_info = inv_dep_tree[resource]
         labels = resource_info.get("labels", [])
@@ -1030,7 +1026,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_ex
             namespace = app_config.get("namespace", None)
             if tkenv:
                 base_dir = app_config.get("base_dir")
-                render_tanka(tkenv, env_vars, base_dir, namespace, enable_cloud_extension)
+                render_tanka(tkenv, env_vars, base_dir, namespace, enable_cloud_extension, values)
             elif renderer == "yaml":
                 render_yaml(manifests_path, env_vars)
             elif renderer == "jsonnet":
@@ -1072,6 +1068,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_ex
         for child in child_resources:
             extra_objects = []
             ignored_objects = []
+            if child.get("workload", "") == "controller-prometheus-server" and scenario and "prometheus_workload_prioritization" in scenario:
+                child["resource_deps"] = child.get("resource_deps", []) + ["istiod"]
 
             if "extra_objects" in child:
                 extra_objects = child.pop("extra_objects")
@@ -1190,6 +1188,9 @@ to_run = cfg.get("to-run", ["agent"])
 
 scenario = cfg.get("scenario", DEFAULT_TEST_SCENARIO if not run_only_listed else None)
 if scenario:
+    # If this is a relative path, it's relative to Tiltfile (PLAYGROUND_ROOT_PATH)
+    if scenario[0] != "/":
+        scenario = PLAYGROUND_ROOT + "/" + scenario
     process_aperture_scenario(scenario)
     to_run += ["scenario-app", "scenario-wavepool"]
     # Not all scenarios have policies, so only load policies if they were generated based on the scenario.
@@ -1278,4 +1279,4 @@ cmd_button('aperture-java-trigger',
         icon_name='ads_click',
         text='Trigger library example',
 )
-declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race, enable_cloud_extension)
+declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race, enable_cloud_extension, scenario)

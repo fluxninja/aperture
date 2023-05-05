@@ -1,0 +1,141 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: prometheus-workload-prioritization
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          default_config:
+            dry_run: false
+          dynamic_config_key: load_scheduler
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.0025
+            load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    match_labels:
+                      is_demo_app_requests_total: "true"
+                  parameters:
+                    priority: 50
+                - label_matcher:
+                    match_labels:
+                      is_demo_app_request_duration_micro_seconds: "true"
+                  parameters:
+                    priority: 200
+              selectors:
+              - control_point: ingress
+                label_matcher:
+                  match_labels:
+                    http.path: /api/v1/write
+                    is_demo_app: "true"
+                service: controller-prometheus-server.aperture-controller.svc.cluster.local
+            max_load_multiplier: 2
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="prometheus-workload-prioritization"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="prometheus-workload-prioritization"}[5s]))
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL
+          rhs:
+            constant_signal:
+              value: 2
+        operator: mul
+        out_ports:
+          output:
+            signal_name: MAX_EMA
+    - ema:
+        in_ports:
+          input:
+            signal_name: SIGNAL
+          max_envelope:
+            signal_name: MAX_EMA
+        out_ports:
+          output:
+            signal_name: SIGNAL_EMA
+        parameters:
+          correction_factor_on_max_envelope_violation: 0.95
+          ema_window: 1500s
+          warmup_window: 60s
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_EMA
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers:
+      - rego:
+          labels:
+            is_demo_app:
+              telemetry: true
+            is_demo_app_request_duration_micro_seconds:
+              telemetry: true
+            is_demo_app_requests_total:
+              telemetry: true
+          module: |
+            package prometheus_label
+
+            default is_demo_app = false
+
+            body := input.attributes.request.http.body
+
+            is_demo_app_requests_total := contains(body, "demo_app_requests_total")
+
+            is_demo_app_request_duration_micro_seconds := contains(body, "demo_app_request_duration_micro_seconds")
+
+            is_demo_app {
+              is_demo_app_requests_total
+            }
+
+            is_demo_app {
+              is_demo_app_request_duration_micro_seconds
+            }
+        selectors:
+        - agent_group: default
+          control_point: ingress
+          label_matcher:
+            match_labels:
+              http.path: /api/v1/write
+          service: controller-prometheus-server.aperture-controller.svc.cluster.local
+      flux_meters:
+        prometheus-workload-prioritization:
+          selectors:
+          - control_point: ingress
+            service: controller-prometheus-server.aperture-controller.svc.cluster.local

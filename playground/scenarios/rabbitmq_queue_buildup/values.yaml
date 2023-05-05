@@ -1,0 +1,30 @@
+agent:
+  agent:
+    config:
+      otel:
+        custom_metrics:
+          rabbitmq:
+            per_agent_group: true
+            pipeline:
+              processors:
+                - batch
+              receivers:
+                - rabbitmq
+            processors:
+              batch:
+                send_batch_size: 10
+                timeout: 10s
+            receivers:
+              rabbitmq:
+                endpoint: http://rabbitmq.rabbitmq.svc.cluster.local:15672
+                username: admin
+                password: secretpassword
+                collection_interval: 1s
+demoapp:
+  common:
+    rabbitmq:
+      enabled: true
+      host: 'rabbitmq.rabbitmq.svc.cluster.local'
+      port: 5672
+      username: 'admin'
+      password: 'secretpassword'

@@ -5,8 +5,8 @@
   "aperture_policies": [
     {
       "blueprint_name": "policies/service-protection/average-latency",
-      "policy_name": "load-based-auto-scale",
-      "values_file": "policies/load-based-auto-scale.yaml",
+      "policy_name": "prometheus-workload-prioritization",
+      "values_file": "policies/prometheus-workload-prioritization.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

@@ -66,6 +66,10 @@ spec:
               {{- else }}
               value: "{{ include "demo-app.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
               {{- end }}
+            {{- if .Values.prometheus.address }}
+            - name: PROMETHEUS_ADDRESS
+              value: "{{ .Values.prometheus.address }}"
+            {{- end }}
             - name: SIMPLE_SERVICE_REJECT_RATIO
               value: "{{ .Values.simplesrv.rejectRatio }}"
             - name: SIMPLE_SERVICE_RABBITMQ_ENABLED
