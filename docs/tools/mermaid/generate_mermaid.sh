@@ -59,4 +59,4 @@ function generate_mermaid_images() {
 
 export -f generate_mermaid_images
 
-parallel -j4 --halt-on-error now,fail,1 --no-notice --bar --eta generate_mermaid_images ::: "$($FIND "$docsdir"/content -type f -name "*.mmd")"
+parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_mermaid_images ::: "$($FIND "$docsdir"/content -type f -name "*.mmd")"
