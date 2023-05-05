@@ -10,7 +10,6 @@ local overload_confirmation_defaults = {
 };
 
 local service_protection_core_defaults = {
-
   overload_confirmations: [overload_confirmation_defaults],
 
   adaptive_load_scheduler: {
@@ -28,6 +27,7 @@ local service_protection_core_defaults = {
     max_load_multiplier: 2.0,
     load_multiplier_linear_increment: 0.0025,
   },
+
   dry_run: false,
 };
 
@@ -35,20 +35,20 @@ local service_protection_core_defaults = {
   common: {
     policy_name: '__REQUIRED_FIELD__',
   },
+
   policy: {
     components: [],
-
     resources: {
       flow_control: {
         classifiers: [],
       },
     },
-
     evaluation_interval: '1s',
-
     service_protection_core: service_protection_core_defaults,
   },
+
   service_protection_core: service_protection_core_defaults,
+
   dashboard: {
     refresh_interval: '5s',
     time_from: 'now-15m',
@@ -58,6 +58,8 @@ local service_protection_core_defaults = {
       filter_regex: '',
     },
   },
+
   selectors: selectors_defaults,
+
   overload_confirmation: overload_confirmation_defaults,
 }

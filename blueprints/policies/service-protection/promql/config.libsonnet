@@ -2,6 +2,7 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 
 /**
 * @param (common.policy_name: string required) Name of the policy.
+* @param (common.promql_query: string required) PromQL query.
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
@@ -22,26 +23,35 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 */
 
 serviceProtectionDefaults {
+  common+: {
+    promql_query: '__REQUIRED_FIELD__',
+  },
+
   policy+: {
     latency_baseliner: {
       /**
-      * @param (policy.latency_baseliner.flux_meter: aperture.spec.v1.FluxMeter required) Flux Meter defines the scope of latency measurements.
+      * @param (policy.latency_baseliner.setpoint: float64 required) Setpoint.
       */
-      flux_meter: {
-        selectors: serviceProtectionDefaults.selectors,
-      },
-      /**
-      * @param (policy.latency_baseliner.ema: aperture.spec.v1.EMAParameters) EMA parameters.
-      * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
-      * @param (policy.latency_baseliner.latency_ema_limit_multiplier: float64) Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
-      */
-      ema: {
-        ema_window: '1500s',
-        warmup_window: '60s',
-        correction_factor_on_max_envelope_violation: 0.95,
-      },
-      latency_tolerance_multiplier: 1.1,
-      latency_ema_limit_multiplier: 2.0,
+      setpoint: '__REQUIRED_FIELD__',
+    },
+  },
+
+  /**
+  * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+  * @param (dashboard.time_from: string) Time from of dashboard.
+  * @param (dashboard.time_to: string) Time to of dashboard.
+  */
+  dashboard: {
+    refresh_interval: '15s',
+    time_from: 'now-15m',
+    time_to: 'now',
+    /**
+    * @param (dashboard.datasource.name: string) Datasource name.
+    * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
+    */
+    datasource: {
+      name: '$datasource',
+      filter_regex: '',
     },
   },
 }

@@ -47,29 +47,29 @@ root.4output[output]
 end
 end
 root.4_rhs_FakeConstantout((2.00))
-subgraph root.5[<center>ArithmeticCombinator<br/>Mul</center>]
+subgraph root.5[<center>EMA<br/>win: 1500</center>]
 subgraph root.5_inports[ ]
 style root.5_inports fill:none,stroke:none
-root.5lhs[lhs]
-root.5rhs[rhs]
+root.5input[input]
+root.5max_envelope[max_envelope]
 end
 subgraph root.5_outports[ ]
 style root.5_outports fill:none,stroke:none
 root.5output[output]
 end
 end
-root.5_rhs_FakeConstantout((1.10))
-subgraph root.6[<center>EMA<br/>win: 1500</center>]
+subgraph root.6[<center>ArithmeticCombinator<br/>Mul</center>]
 subgraph root.6_inports[ ]
 style root.6_inports fill:none,stroke:none
-root.6input[input]
-root.6max_envelope[max_envelope]
+root.6lhs[lhs]
+root.6rhs[rhs]
 end
 subgraph root.6_outports[ ]
 style root.6_outports fill:none,stroke:none
 root.6output[output]
 end
 end
+root.6_rhs_FakeConstantout((1.10))
 root.0observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.2scale_out_signal_0
 root.0_overload_confirmation_FakeConstantout --> root.0overload_confirmation
 root.1output --> |AVERAGE_CPU| root.2scale_in_signal_0
@@ -77,9 +77,9 @@ root.2_scale_in_setpoint_0_FakeConstantout --> root.2scale_in_setpoint_0
 root.2_scale_out_setpoint_0_FakeConstantout --> root.2scale_out_setpoint_0
 root.3output --> |SIGNAL| root.0signal
 root.3output --> |SIGNAL| root.4lhs
-root.3output --> |SIGNAL| root.6input
-root.4output --> |MAX_EMA| root.6max_envelope
+root.3output --> |SIGNAL| root.5input
+root.4output --> |MAX_EMA| root.5max_envelope
 root.4_rhs_FakeConstantout --> root.4rhs
-root.5output --> |SETPOINT| root.0setpoint
-root.5_rhs_FakeConstantout --> root.5rhs
-root.6output --> |SIGNAL_EMA| root.5lhs
+root.5output --> |SIGNAL_EMA| root.6lhs
+root.6output --> |SETPOINT| root.0setpoint
+root.6_rhs_FakeConstantout --> root.6rhs

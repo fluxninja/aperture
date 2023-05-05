@@ -85,17 +85,6 @@ spec:
         out_ports:
           output:
             signal_name: MAX_EMA
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL_EMA
-          rhs:
-            constant_signal:
-              value: 1.1
-        operator: mul
-        out_ports:
-          output:
-            signal_name: SETPOINT
     - ema:
         in_ports:
           input:
@@ -109,6 +98,17 @@ spec:
           correction_factor_on_max_envelope_violation: 0.95
           ema_window: 1500s
           warmup_window: 60s
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_EMA
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
     evaluation_interval: 1s
   resources:
     flow_control:

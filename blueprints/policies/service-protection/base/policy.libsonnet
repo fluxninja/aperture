@@ -4,13 +4,11 @@ local config = import './config-defaults.libsonnet';
 function(cfg) {
   local params = config.common + config.policy + cfg,
 
-  local policyName = params.policy_name,
-
-  local flux_meters = params.flux_meters,
-
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
     local evaluationInterval = params.evaluation_interval,
+
     local promQLSignalName = 'PROMQL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
+
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(
       spec.v1.PromQL.withQueryString(confirmation.query_string)
       + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
@@ -18,7 +16,9 @@ function(cfg) {
         output: spec.v1.Port.withSignalName(promQLSignalName),
       })
     )),
+
     local confirmationSignal = 'CONFIRMATION_SIGNAL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
+
     local confirmationDecider = spec.v1.Component.withDecider(
       spec.v1.Decider.withOperator(confirmation.operator)
       + spec.v1.Decider.withInPorts({
@@ -31,6 +31,7 @@ function(cfg) {
     ),
 
     local overloadConfirmationSignal = 'OVERLOAD_CONFIRMATION_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
+
     local firstValidComponent = spec.v1.Component.withFirstValid(
       spec.v1.FirstValid.withInPorts({
         inputs: [
@@ -74,6 +75,7 @@ function(cfg) {
   ),
 
   local isConfirmationCriteria = std.length(confirmationAccumulator.overload_confirmation_signals) > 0,
+
   local adaptiveLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
       local adaptiveLoadScheduler = params.service_protection_core.adaptive_load_scheduler;
