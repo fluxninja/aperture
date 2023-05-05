@@ -2883,13 +2883,13 @@ type AdaptiveLoadScheduler_Parameters struct {
 	// Parameters for the _Load Scheduler_.
 	LoadScheduler *LoadScheduler_Parameters `protobuf:"bytes,1,opt,name=load_scheduler,json=loadScheduler,proto3" json:"load_scheduler,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Parameters for the _Gradient Controller_.
-	Gradient *GradientController_Parameters `protobuf:"bytes,2,opt,name=gradient,proto3" json:"gradient,omitempty"`
+	Gradient *GradientController_Parameters `protobuf:"bytes,2,opt,name=gradient,proto3" json:"gradient,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,3,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,4,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.0025"` // @gotags: default:"0.0025"
 	// Configuration parameters for the embedded Alerter.
-	Alerter *Alerter_Parameters `protobuf:"bytes,5,opt,name=alerter,proto3" json:"alerter,omitempty"`
+	Alerter *Alerter_Parameters `protobuf:"bytes,5,opt,name=alerter,proto3" json:"alerter,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *AdaptiveLoadScheduler_Parameters) Reset() {

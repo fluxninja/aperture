@@ -739,7 +739,7 @@ message AdaptiveLoadScheduler {
     LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
 
     // Parameters for the _Gradient Controller_.
-    GradientController.Parameters gradient = 2;
+    GradientController.Parameters gradient = 2; // @gotags: validate:"required"
 
     // The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
     double max_load_multiplier = 3; // @gotags: default:"2.0"
@@ -748,7 +748,7 @@ message AdaptiveLoadScheduler {
     double load_multiplier_linear_increment = 4; // @gotags: default:"0.0025"
 
     // Configuration parameters for the embedded Alerter.
-    Alerter.Parameters alerter = 5;
+    Alerter.Parameters alerter = 5; // @gotags: validate:"required"
   }
 
   // Input ports for the _Adaptive Load Scheduler_ component.
