@@ -302,10 +302,8 @@ func (pa *podScaler) setup(
 			var err error
 			pa.statusWriter = etcdwriter.NewWriter(pa.etcdClient, true)
 			pa.ctx, pa.cancel = context.WithCancel(context.Background())
-			scaleActuatorProto := pa.podScalerProto.GetScaleActuator()
-			if scaleActuatorProto != nil {
-				pa.updateDynamicConfig(scaleActuatorProto.GetDefaultConfig())
-			}
+			pa.setDefaultDryRun()
+
 			// add election notifier
 			err = pa.podScalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
 			if err != nil {
@@ -389,16 +387,13 @@ func (pa *podScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarsha
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Dynamic config removed")
 		// revert to default config
-		scaleActuatorProto := pa.podScalerProto.GetScaleActuator()
-		if scaleActuatorProto != nil {
-			pa.updateDynamicConfig(scaleActuatorProto.GetDefaultConfig())
-		}
+		pa.setDefaultDryRun()
 		return
 	}
 
 	var wrapperMessage policysyncv1.PodScalerDynamicConfigWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.PodScalerDynamicConfig == nil {
+	if err != nil {
 		return
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
@@ -409,16 +404,15 @@ func (pa *podScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarsha
 	if commonAttributes.PolicyHash != pa.GetPolicyHash() {
 		return
 	}
-	dynamicConfig := wrapperMessage.PodScalerDynamicConfig
-	pa.updateDynamicConfig(dynamicConfig)
+	pa.setDryRun(wrapperMessage.DryRun)
 }
 
-func (pa *podScaler) updateDynamicConfig(dynamicConfig *policylangv1.PodScaler_ScaleActuator_DynamicConfig) {
-	if dynamicConfig == nil {
-		pa.dryRun = false
-		return
-	}
-	pa.dryRun = dynamicConfig.GetDryRun()
+func (pa *podScaler) setDryRun(dryRun bool) {
+	pa.dryRun = dryRun
+}
+
+func (pa *podScaler) setDefaultDryRun() {
+	pa.dryRun = pa.podScalerProto.DryRun
 }
 
 func (pa *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {

@@ -26,5 +26,4 @@ if [ ! -f "${rendered_policy}" ]; then
 fi
 
 head -n 1 "${rendered_policy}" | grep -q '^#' && $SED -i '1d' "${rendered_policy}"
-cp "${rendered_policy}" "$(dirname "${values_file}")"
 cat "${rendered_policy}"

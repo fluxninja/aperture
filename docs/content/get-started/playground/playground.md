@@ -333,7 +333,7 @@ test in a loop, until the "Stop Wavepool Generator" button is not clicked.
 
 There are other playground scenarios under the `playground/scenarios/`
 directory, and they can be loaded during `Tilt` setup by passing a relative path
-to the scenario, e.g. `tilt up -- --scenario scenarios/demo-app`
+to the scenario, e.g. `tilt up -- --scenario scenarios/feature-rollout`
 
 :::note
 

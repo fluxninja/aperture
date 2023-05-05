@@ -1,103 +1,163 @@
 package loadscheduler
 
 import (
-	"context"
-	"path"
-
-	"go.uber.org/fx"
-	"google.golang.org/protobuf/proto"
+	"fmt"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
+	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
-	clientv3 "go.etcd.io/etcd/client/v3"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
-type loadSchedulerConfigSync struct {
-	policyBaseAPI      iface.Policy
-	loadSchedulerProto *policylangv1.LoadScheduler
-	etcdPath           string
-	componentID        string
-}
+const (
+	inputLoadMultiplierPortName          = "load_multiplier"
+	outputObservedLoadMultiplierPortName = "observed_load_multiplier"
+)
 
-// NewLoadSchedulerOptions creates fx options for LoadScheduler and also returns the agent group name associated with it.
-func NewLoadSchedulerOptions(
-	loadSchedulerProto *policylangv1.LoadScheduler,
-	componentStackID string,
+// ParseLoadScheduler parses a load scheduler from a spec.
+func ParseLoadScheduler(
+	loadScheduler *policylangv1.LoadScheduler,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (fx.Option, []string, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := loadSchedulerProto.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
+) (*policylangv1.NestedCircuit, error) {
+	nestedInPortsMap := make(map[string]*policylangv1.InPort)
+	inPorts := loadScheduler.GetInPorts()
+
+	if inPorts != nil {
+		loadMultiplierPort := inPorts.LoadMultiplier
+		if loadMultiplierPort != nil {
+			nestedInPortsMap[inputLoadMultiplierPortName] = loadMultiplierPort
 		}
-		loadSchedulerProto.Selectors = append(loadSchedulerProto.Selectors, selector)
-		loadSchedulerProto.FlowSelector = nil
 	}
 
-	options := []fx.Option{}
-
-	s := loadSchedulerProto.GetSelectors()
-
-	agentGroups := selectors.UniqueAgentGroups(s)
-
-	for _, agentGroup := range agentGroups {
-		etcdPath := path.Join(paths.LoadSchedulerConfigPath,
-			paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
-		configSync := &loadSchedulerConfigSync{
-			loadSchedulerProto: loadSchedulerProto,
-			policyBaseAPI:      policyReadAPI,
-			etcdPath:           etcdPath,
-			componentID:        componentStackID,
+	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
+	outPorts := loadScheduler.GetOutPorts()
+	if outPorts != nil {
+		observedLoadMultiplierPort := outPorts.ObservedLoadMultiplier
+		if observedLoadMultiplierPort != nil {
+			nestedOutPortsMap[outputObservedLoadMultiplierPortName] = observedLoadMultiplierPort
 		}
-		options = append(options, fx.Invoke(configSync.doSync))
 	}
 
-	return fx.Options(options...), agentGroups, nil
-}
+	// Prepare parameters for prometheus queries
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%s\"",
+		metrics.PolicyNameLabel,
+		policyReadAPI.GetPolicyName(),
+		metrics.PolicyHashLabel,
+		policyReadAPI.GetPolicyHash(),
+		metrics.ComponentIDLabel,
+		componentID,
+	)
 
-func (configSync *loadSchedulerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
-	logger := configSync.policyBaseAPI.GetStatusRegistry().GetLogger()
-	// Add/remove file in lifecycle hooks in order to sync with etcd.
-	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.LoadSchedulerWrapper{
-				LoadScheduler: configSync.loadSchedulerProto,
-				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:  configSync.policyBaseAPI.GetPolicyName(),
-					PolicyHash:  configSync.policyBaseAPI.GetPolicyHash(),
-					ComponentId: configSync.componentID,
+	acceptedTokensQuery := fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+		metrics.AcceptedTokensMetricName,
+		policyParams)
+
+	incomingTokenRate := fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+		metrics.IncomingTokensMetricName,
+		policyParams)
+
+	loadActuatorAnyProto, err := anypb.New(
+		&policyprivatev1.LoadActuator{
+			InPorts: &policyprivatev1.LoadActuator_Ins{
+				LoadMultiplier: &policylangv1.InPort{
+					Value: &policylangv1.InPort_SignalName{
+						SignalName: "LOAD_MULTIPLIER",
+					},
 				},
-			}
-			dat, err := proto.Marshal(wrapper)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to marshal flux meter config")
-				return err
-			}
-			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to put flux meter config")
-				return err
-			}
-			return nil
-		},
-		OnStop: func(ctx context.Context) error {
-			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to delete flux meter config")
-				return err
-			}
-			return nil
-		},
-	})
+			},
+			LoadSchedulerComponentId:   componentID.String(),
+			DefaultConfig:              loadScheduler.GetDefaultConfig(),
+			DynamicConfigKey:           loadScheduler.GetDynamicConfigKey(),
+			WorkloadLatencyBasedTokens: loadScheduler.Parameters.GetWorkloadLatencyBasedTokens(),
+			Selectors:                  loadScheduler.Parameters.GetSelectors(),
+		})
+	if err != nil {
+		return nil, err
+	}
 
-	return nil
+	nestedCircuit := &policylangv1.NestedCircuit{
+		Name:             "LoadScheduler",
+		ShortDescription: iface.GetSelectorsShortDescription(loadScheduler.Parameters.GetSelectors()),
+		InPortsMap:       nestedInPortsMap,
+		OutPortsMap:      nestedOutPortsMap,
+		Components: []*policylangv1.Component{
+			{
+				Component: &policylangv1.Component_FlowControl{
+					FlowControl: &policylangv1.FlowControl{
+						Component: &policylangv1.FlowControl_Private{
+							Private: loadActuatorAnyProto,
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Query{
+					Query: &policylangv1.Query{
+						Component: &policylangv1.Query_Promql{
+							Promql: &policylangv1.PromQL{
+								OutPorts: &policylangv1.PromQL_Outs{
+									Output: &policylangv1.OutPort{
+										SignalName: "ACCEPTED_TOKEN_RATE",
+									},
+								},
+								QueryString:        acceptedTokensQuery,
+								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Query{
+					Query: &policylangv1.Query{
+						Component: &policylangv1.Query_Promql{
+							Promql: &policylangv1.PromQL{
+								OutPorts: &policylangv1.PromQL_Outs{
+									Output: &policylangv1.OutPort{
+										SignalName: "INCOMING_TOKEN_RATE",
+									},
+								},
+								QueryString:        incomingTokenRate,
+								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_ArithmeticCombinator{
+					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
+						Operator: "div",
+						InPorts: &policylangv1.ArithmeticCombinator_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACCEPTED_TOKEN_RATE",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "INCOMING_TOKEN_RATE",
+								},
+							},
+						},
+						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "OBSERVED_LOAD_MULTIPLIER",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	components.AddNestedIngress(nestedCircuit, inputLoadMultiplierPortName, "LOAD_MULTIPLIER")
+	components.AddNestedEgress(nestedCircuit, outputObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
+
+	return nestedCircuit, nil
 }

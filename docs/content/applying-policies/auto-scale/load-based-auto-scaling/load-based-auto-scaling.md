@@ -49,10 +49,10 @@ At a high level, this policy consists of:
 - An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
   Deployment for the service.
 - Load based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
-  the blueprint. This signal measures the fraction of traffic that the
-  _Concurrency Limiter_ is throttling into a queue. The _Auto Scaler_ is
-  configured to scale-out based on a _Gradient Controller_ using this signal and
-  a setpoint of 1.0.
+  the blueprint. This signal measures the fraction of traffic that the _Load
+  Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
+  scale-out based on a _Gradient Controller_ using this signal and a setpoint of
+  1.0.
 - In addition to the load based scale-out, the policy also includes a scale-in
   _Controller_ based on CPU utilization which adjusts the instances of the
   service based on changes in CPU usage, ensuring that the service is not
@@ -97,7 +97,7 @@ proportion of requests. The _Auto Scaler_ makes a scale-out decision as the
 `OBSERVED_LOAD_MULTIPLIER` becomes less than 1. As replicas get added to the
 deployment, the `OBSERVED_LOAD_MULTIPLIER` increases to more than 1, allowing
 the service to meet increased demand. The response latency returns to a normal
-range, and the _Concurrency Limiter_ won't load shed any traffic.
+range, and the _Load Scheduler_ won't throttle any traffic.
 
 After the scale-out cooldown period, the scale-in based on CPU utilization gets
 triggered, which will cause the replicas to decrease. Once the traffic ramps up

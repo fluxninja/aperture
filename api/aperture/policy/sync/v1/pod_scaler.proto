@@ -14,8 +14,8 @@ message PodScalerWrapper {
 message PodScalerDynamicConfigWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
-  // PodScalerDynamicConfig is the dynamic configuration for the pod scaler.
-  policy.language.v1.PodScaler.ScaleActuator.DynamicConfig pod_scaler_dynamic_config = 2;
+  // Dynamic override for dry run setting.
+  bool dry_run = 2;
 }
 
 message ScaleStatusWrapper {

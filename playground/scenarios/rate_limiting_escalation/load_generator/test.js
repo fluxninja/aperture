@@ -28,7 +28,7 @@ export let options = {
     crawlers: {
       executor: "ramping-vus",
       stages: vuStages,
-      env: { USER_TYPE: "crawlers" },
+      env: { USER_TYPE: "crawler" },
     },
   },
 };

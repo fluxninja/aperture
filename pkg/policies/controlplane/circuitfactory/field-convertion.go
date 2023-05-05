@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// convertOldComponentToNew converts an old component protobuf message to a new component protobuf message using the provided field mappings.
+// ConvertOldComponentToNew converts an old component protobuf message to a new component protobuf message using the provided field mappings.
 // It takes in the oldComponentProto, newComponentProto, and fieldMappings as parameters.
 // Param: oldComponentProto is the protobuf message that needs to be converted to the new format.
 // Param: newComponentProto is the protobuf message that will be populated with the converted data.
@@ -29,7 +29,7 @@ import (
 // 3. C_field.D_field -> C_field.G_field
 // 4. C_field.D_field.E_field -> C_field.G_field.H_field
 // The function returns an error if there is an issue with marshaling or unmarshaling the protobuf messages or JSON data.
-func convertOldComponentToNew(oldComponentProto proto.Message, newComponentProto proto.Message, fieldMappings map[string]string) error {
+func ConvertOldComponentToNew(oldComponentProto proto.Message, newComponentProto proto.Message, fieldMappings map[string]string) error {
 	// Marshal the oldComponentProto to JSON
 	jsonStr, err := json.Marshal(oldComponentProto)
 	if err != nil {

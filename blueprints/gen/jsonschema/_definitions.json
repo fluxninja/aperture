@@ -1,204 +1,34 @@
 {
   "definitions": {
-    "AIMDConcurrencyController": {
-      "description": "High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.",
-      "properties": {
-        "alerter_parameters": {
-          "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for embedded Alerter.",
-          "x-order": 0
-        },
-        "default_config": {
-          "$ref": "#/definitions/LoadActuatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 1
-        },
-        "dynamic_config_key": {
-          "description": "Dynamic configuration key for load actuation.",
-          "type": "string",
-          "x-order": 2
-        },
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 3
-        },
-        "gradient_parameters": {
-          "$ref": "#/definitions/GradientControllerParameters",
-          "description": "Gradient parameters for the controller.",
-          "x-order": 4
-        },
-        "in_ports": {
-          "$ref": "#/definitions/AIMDConcurrencyControllerIns",
-          "description": "Input ports for the AIMDConcurrencyController component.",
-          "x-order": 5
-        },
-        "load_multiplier_linear_increment": {
-          "default": 0.0025,
-          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "0.0025",
-          "x-order": 6
-        },
-        "max_load_multiplier": {
-          "default": 2,
-          "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "2.0",
-          "x-order": 7
-        },
-        "out_ports": {
-          "$ref": "#/definitions/AIMDConcurrencyControllerOuts",
-          "description": "Output ports for the AIMDConcurrencyController component.",
-          "x-order": 8
-        },
-        "scheduler_parameters": {
-          "$ref": "#/definitions/SchedulerParameters",
-          "description": "Scheduler parameters.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 9
-        },
-        "selectors": {
-          "description": "Selectors for the component.\n\n",
-          "items": {
-            "$ref": "#/definitions/Selector",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 10
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AIMDConcurrencyControllerIns": {
-      "description": "Inputs for the AIMDConcurrencyController component.",
-      "properties": {
-        "enabled": {
-          "$ref": "#/definitions/InPort",
-          "description": "The enabled port controls whether the _Adaptive Load Scheduler_ can load shed _Flows_. By default, the _Adaptive Load Scheduler_ is enabled.",
-          "x-order": 0
-        },
-        "setpoint": {
-          "$ref": "#/definitions/InPort",
-          "description": "The setpoint to the controller.",
-          "x-order": 1
-        },
-        "signal": {
-          "$ref": "#/definitions/InPort",
-          "description": "The signal to the controller.",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AIMDConcurrencyControllerOuts": {
-      "description": "Outputs for the AIMDConcurrencyController component.",
-      "properties": {
-        "accepted_concurrency": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Accepted concurrency is the number of concurrent requests that are accepted by the service.",
-          "x-order": 0
-        },
-        "desired_load_multiplier": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.",
-          "x-order": 1
-        },
-        "incoming_concurrency": {
-          "$ref": "#/definitions/OutPort",
-          "description": "IncomingConcurrency is the number of concurrent requests that are received by the service.",
-          "x-order": 2
-        },
-        "is_overload": {
-          "$ref": "#/definitions/OutPort",
-          "title": "Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.\nDeprecated: 1.6.0",
-          "x-order": 3
-        },
-        "observed_load_multiplier": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.",
-          "x-order": 4
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
     "AdaptiveLoadScheduler": {
       "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.",
       "properties": {
-        "alerter_parameters": {
-          "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration parameters for the embedded Alerter.",
-          "x-order": 0
-        },
         "default_config": {
-          "$ref": "#/definitions/LoadSchedulerActuatorDynamicConfig",
+          "$ref": "#/definitions/LoadSchedulerDynamicConfig",
           "description": "Default dynamic configuration for load actuation.",
-          "x-order": 1
+          "x-order": 0
         },
         "dynamic_config_key": {
           "description": "Dynamic configuration key for load actuation.",
           "type": "string",
-          "x-order": 2
-        },
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "_Flow Selector_ is responsible for choosing the _Flows_ to which the _Load Scheduler_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 3
-        },
-        "gradient_parameters": {
-          "$ref": "#/definitions/GradientControllerParameters",
-          "description": "Parameters for the _Gradient Controller_.",
-          "x-order": 4
+          "x-order": 1
         },
         "in_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerIns",
-          "description": "Collection of input ports for the _Adaptive Load Scheduler_ component.",
-          "x-order": 5
-        },
-        "load_multiplier_linear_increment": {
-          "default": 0.0025,
-          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "0.0025",
-          "x-order": 6
-        },
-        "max_load_multiplier": {
-          "default": 2,
-          "description": "The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "2.0",
-          "x-order": 7
+          "description": "Collection of input ports for the _Adaptive Load Scheduler_ component.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 2
         },
         "out_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerOuts",
           "description": "Collection of output ports for the _Adaptive Load Scheduler_ component.",
-          "x-order": 8
+          "x-order": 3
         },
-        "scheduler_parameters": {
-          "$ref": "#/definitions/LoadSchedulerSchedulerParameters",
-          "description": "Parameters for the _Load Scheduler_.\n\n",
+        "parameters": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerParameters",
+          "description": "Parameters for the _Adaptive Load Scheduler_ component.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 9
-        },
-        "selectors": {
-          "description": "Selectors for the component.\n\n",
-          "items": {
-            "$ref": "#/definitions/Selector",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 10
+          "x-order": 4
         }
       },
       "type": "object",
@@ -209,17 +39,19 @@
       "properties": {
         "overload_confirmation": {
           "$ref": "#/definitions/InPort",
-          "description": "Overload confirmation port provides additional criteria to determine overload state which results in flow throttling at the service.",
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service.",
           "x-order": 0
         },
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "Setpoint input to the controller.",
+          "description": "The setpoint input to the controller.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 1
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "Input signal to the controller.",
+          "description": "The input signal to the controller.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 2
         }
       },
@@ -229,29 +61,58 @@
     "AdaptiveLoadSchedulerOuts": {
       "description": "Output ports for the _Adaptive Load Scheduler_ component.",
       "properties": {
-        "accepted_token_rate": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Accepted token rate is the number of tokens per second accepted by the service.",
-          "x-order": 0
-        },
         "desired_load_multiplier": {
           "$ref": "#/definitions/OutPort",
           "description": "Desired Load multiplier is the ratio of desired token rate to the incoming token rate.",
-          "x-order": 1
-        },
-        "incoming_token_rate": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Incoming token rate is the number of tokens per second incoming to the service (including rejected ones).",
-          "x-order": 2
+          "x-order": 0
         },
         "is_overload": {
           "$ref": "#/definitions/OutPort",
           "description": "A Boolean signal that indicates whether the service is in overload state.",
-          "x-order": 3
+          "x-order": 1
         },
         "observed_load_multiplier": {
           "$ref": "#/definitions/OutPort",
           "description": "Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AdaptiveLoadSchedulerParameters": {
+      "description": "Parameters for the _Adaptive Load Scheduler_ component.",
+      "properties": {
+        "alerter": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration parameters for the embedded Alerter.",
+          "x-order": 0
+        },
+        "gradient": {
+          "$ref": "#/definitions/GradientControllerParameters",
+          "description": "Parameters for the _Gradient Controller_.",
+          "x-order": 1
+        },
+        "load_multiplier_linear_increment": {
+          "default": 0.0025,
+          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "0.0025",
+          "x-order": 2
+        },
+        "load_scheduler": {
+          "$ref": "#/definitions/LoadSchedulerParameters",
+          "description": "Parameters for the _Load Scheduler_.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 3
+        },
+        "max_load_multiplier": {
+          "default": 2,
+          "description": "The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "2.0",
           "x-order": 4
         }
       },
@@ -458,15 +319,10 @@
           "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource.",
           "x-order": 0
         },
-        "pod_auto_scaler": {
-          "$ref": "#/definitions/PodAutoScaler",
-          "description": "_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.",
-          "x-order": 1
-        },
         "pod_scaler": {
           "$ref": "#/definitions/PodScaler",
           "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.",
-          "x-order": 2
+          "x-order": 1
         }
       },
       "type": "object",
@@ -474,6 +330,41 @@
     },
     "AutoScaler": {
       "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
+      "properties": {
+        "out_ports": {
+          "$ref": "#/definitions/AutoScalerOuts",
+          "description": "Output ports for the _AutoScaler_.",
+          "x-order": 0
+        },
+        "parameters": {
+          "$ref": "#/definitions/AutoScalerParameters",
+          "description": "Parameters for the _AutoScaler_.",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerOuts": {
+      "description": "Outputs for _AutoScaler_.",
+      "properties": {
+        "actual_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
+        },
+        "configured_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 1
+        },
+        "desired_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerParameters": {
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -519,15 +410,10 @@
           "x-go-tag-validate": "gte=0",
           "x-order": 4
         },
-        "out_ports": {
-          "$ref": "#/definitions/AutoScalerOuts",
-          "description": "Output ports for the _AutoScaler_.",
-          "x-order": 5
-        },
         "scale_in_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-in Alerter.",
-          "x-order": 6
+          "x-order": 5
         },
         "scale_in_controllers": {
           "description": "List of _Controllers_ for scaling in.",
@@ -536,19 +422,19 @@
             "type": "object"
           },
           "type": "array",
-          "x-order": 7
+          "x-order": 6
         },
         "scale_in_cooldown": {
           "default": "120s",
           "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "120s",
-          "x-order": 8
+          "x-order": 7
         },
         "scale_out_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-out Alerter.",
-          "x-order": 9
+          "x-order": 8
         },
         "scale_out_controllers": {
           "description": "List of _Controllers_ for scaling out.",
@@ -557,48 +443,52 @@
             "type": "object"
           },
           "type": "array",
-          "x-order": 10
+          "x-order": 9
         },
         "scale_out_cooldown": {
           "default": "30s",
           "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "30s",
-          "x-order": 11
+          "x-order": 10
         },
         "scaler": {
-          "$ref": "#/definitions/AutoScalerScaler",
+          "$ref": "#/definitions/AutoScalerParametersScaler",
           "x-go-tag-validate": "required",
-          "x-order": 12
+          "x-order": 11
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "AutoScalerOuts": {
-      "description": "Outputs for _AutoScaler_.",
-      "properties": {
-        "actual_scale": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
-        },
-        "configured_scale": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 1
-        },
-        "desired_scale": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AutoScalerScaler": {
+    "AutoScalerParametersScaler": {
       "properties": {
         "kubernetes_replicas": {
-          "$ref": "#/definitions/KubernetesReplicas",
+          "$ref": "#/definitions/AutoScalerParametersScalerKubernetesReplicas",
           "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerParametersScalerKubernetesReplicas": {
+      "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
+      "properties": {
+        "dry_run": {
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
+          "type": "boolean",
+          "x-order": 0
+        },
+        "dry_run_config_key": {
+          "description": "Configuration key for overriding dry run setting through dynamic configuration.",
+          "type": "string",
+          "x-order": 1
+        },
+        "kubernetes_object_selector": {
+          "$ref": "#/definitions/KubernetesObjectSelector",
+          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 2
         }
       },
       "type": "object",
@@ -629,19 +519,13 @@
       "additionalProperties": false
     },
     "Classifier": {
-      "description": ":::info\n\nSee also [Classifier overview](/concepts/flow-control/resources/classifier.md).\n\n:::\nExample\n```yaml\nflow_selector:\n  service_selector:\n     agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n  flow_matcher:\n     control_point: ingress\n     label_matcher:\n        match_labels:\n          user_tier: gold\n        match_expressions:\n          - key: user_type\n            operator: In\nrules:\n  user:\n   extractor:\n     from: request.http.headers.user-agent\n  telemetry: false\n```",
+      "description": ":::info\n\nSee also [Classifier overview](/concepts/flow-control/resources/classifier.md).\n\n:::\nExample\n```yaml\nselectors:\n   - agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n     control_point: ingress\n     label_matcher:\n        match_labels:\n          user_tier: gold\n        match_expressions:\n          - key: user_type\n            operator: In\nrules:\n  user:\n   extractor:\n     from: request.http.headers.user-agent\n  telemetry: false\n```",
       "properties": {
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "Defines where to apply the flow classification rule.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 0
-        },
         "rego": {
           "$ref": "#/definitions/Rego",
           "description": "Rego is a policy language used to express complex policies in a concise and declarative way.\nIt can be used to define flow classification rules by writing custom queries that extract values from request metadata.\nFor simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.",
           "title": "Rego based classification",
-          "x-order": 1
+          "x-order": 0
         },
         "rules": {
           "additionalProperties": {
@@ -650,7 +534,7 @@
           "description": "A map of {key, value} pairs mapping from\n[flow label](/concepts/flow-control/flow-label.md) keys to rules that define\nhow to extract and propagate flow labels with that key.\n\n",
           "type": "object",
           "x-go-tag-validate": "dive,keys,required,endkeys,required",
-          "x-order": 2
+          "x-order": 1
         },
         "selectors": {
           "description": "Selectors for flows that will be classified by this _Classifier_.\n\n",
@@ -658,17 +542,19 @@
             "$ref": "#/definitions/Selector",
             "type": "object"
           },
+          "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 3
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 2
         }
       },
+      "required": ["selectors"],
       "title": "Set of classification rules sharing a common selector",
       "type": "object",
       "additionalProperties": false
     },
     "Component": {
-      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components from input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nThere are three categories of components:\n* \"source\" components: they take some sort of input from \"the real world\" and output\n  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI\n  they're represented by green color.\n* signal processor components: processing components that do not interact with the external systems.\n  Examples: [GradientController](#gradient-controller), [Max](#max).\n\n  :::note\n\n  Signal processor components' output can depend on their internal state, in addition to the inputs.\n  Eg. see the [Exponential Moving Average filter](#e-m-a).\n\n  :::\n\n* \"sink\" components:\u00a0they affect the real world.\n  [_Concurrency Limiter_](#concurrency-limiter) and [_Rate Limiter_](#rate-limiter).\n  In the UI, represented by orange color.  Sink components usually come in pairs with a\n  \"sources\" component which emits a feedback signal, like\n  `accepted_concurrency` emitted by _Concurrency Limiter_.\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
+      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components from input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
       "properties": {
         "alerter": {
           "$ref": "#/definitions/Alerter",
@@ -807,41 +693,6 @@
         }
       },
       "title": "Computational block that forms the circuit",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "ConcurrencyLimiter": {
-      "description": "It's based on the actuation strategy (for example, load actuator) and workload scheduling\nwhich is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
-      "properties": {
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 0
-        },
-        "load_actuator": {
-          "$ref": "#/definitions/LoadActuator",
-          "description": "Actuator based on limiting the accepted concurrency under incoming concurrency * load multiplier.\n\nActuation strategy defines the input signal that will drive the scheduler.",
-          "x-order": 1
-        },
-        "scheduler": {
-          "$ref": "#/definitions/Scheduler",
-          "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler, and also defines some\noutput signals.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
-        },
-        "selectors": {
-          "description": "Selectors for the component.\n\n",
-          "items": {
-            "$ref": "#/definitions/Selector",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 3
-        }
-      },
-      "title": "_Concurrency Limiter_ is an actuator component that regulates flows to provide active service protection",
       "type": "object",
       "additionalProperties": false
     },
@@ -1310,55 +1161,30 @@
           "description": "_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.",
           "x-order": 0
         },
-        "aimd_concurrency_controller": {
-          "$ref": "#/definitions/AIMDConcurrencyController",
-          "title": "AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.\nDeprecated: 1.6.0",
-          "x-order": 1
-        },
-        "concurrency_limiter": {
-          "$ref": "#/definitions/ConcurrencyLimiter",
-          "title": "_Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).\nDeprecated: 1.6.0",
-          "x-order": 2
-        },
-        "flow_regulator": {
-          "$ref": "#/definitions/FlowRegulator",
-          "title": "Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.\nDeprecated: 1.6.0",
-          "x-order": 3
-        },
         "load_ramp": {
           "$ref": "#/definitions/LoadRamp",
           "description": "_Load Ramp_ smoothly regulates the flow of requests over specified steps.",
-          "x-order": 4
+          "x-order": 1
         },
         "load_ramp_series": {
           "$ref": "#/definitions/LoadRampSeries",
           "description": "_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.",
-          "x-order": 5
+          "x-order": 2
         },
         "load_scheduler": {
           "$ref": "#/definitions/LoadScheduler",
           "description": "_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
-          "x-order": 6
-        },
-        "load_shaper": {
-          "$ref": "#/definitions/LoadShaper",
-          "title": "_Load Shaper_ is a component that shapes the load at a _Control Point_.\nDeprecated: 1.6.0",
-          "x-order": 7
-        },
-        "load_shaper_series": {
-          "$ref": "#/definitions/LoadShaperSeries",
-          "title": "_Load Shaper Series_ is a series of _Load Shaper_ components that can shape load one after another at same or different _Control Points_.\nDeprecated: 1.6.0",
-          "x-order": 8
+          "x-order": 3
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
           "description": "_Rate Limiter_ provides service protection by applying rate limits.",
-          "x-order": 9
+          "x-order": 4
         },
         "regulator": {
           "$ref": "#/definitions/Regulator",
           "description": "Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
-          "x-order": 10
+          "x-order": 5
         }
       },
       "type": "object",
@@ -1390,128 +1216,8 @@
       "type": "object",
       "additionalProperties": false
     },
-    "FlowMatcher": {
-      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/flow-control/selector.md).\n\n:::\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```\n\nDeprecated 1.8.0: Use `selectors` instead.",
-      "properties": {
-        "control_point": {
-          "description": "[Control Point](/concepts/flow-control/selector.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "label_matcher": {
-          "$ref": "#/definitions/LabelMatcher",
-          "description": ":::info\n\nSee also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).\n\n:::\n\n:::note\n\n[Classifiers](#classifier) _can_ use flow labels created by some other\nclassifier, but only if they were created at some previous control point\n(and propagated in baggage).\n\nThis limitation does not apply to selectors of other entities, like\nFlux Meters or Actuators. It's valid to create a flow label on a control\npoint using classifier, and immediately use it for matching on the same\ncontrol point.\n\n:::",
-          "title": "Label matcher allows to add _additional_ condition on\n[flow labels](/concepts/flow-control/flow-label.md)\nmust also be satisfied (in addition to service+control point matching)",
-          "x-order": 1
-        }
-      },
-      "required": ["control_point"],
-      "title": "Describes which flows a [flow control\ncomponent](/concepts/flow-control/flow-control.md#components) should apply\nto",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "FlowRegulator": {
-      "description": "_Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
-      "properties": {
-        "default_config": {
-          "$ref": "#/definitions/FlowRegulatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
-          "type": "string",
-          "x-order": 1
-        },
-        "in_ports": {
-          "$ref": "#/definitions/FlowRegulatorIns",
-          "description": "Input ports for the _Flow Regulator_.",
-          "x-order": 2
-        },
-        "parameters": {
-          "$ref": "#/definitions/FlowRegulatorParameters",
-          "description": "Parameters for the _Flow Regulator_.",
-          "x-order": 3
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "FlowRegulatorDynamicConfig": {
-      "properties": {
-        "enable_label_values": {
-          "description": "Specify certain label values to be accepted by this flow filter regardless of accept percentage.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for _Flow Regulator_",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "FlowRegulatorIns": {
-      "properties": {
-        "accept_percentage": {
-          "$ref": "#/definitions/InPort",
-          "description": "The percentage of requests to accept.",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "FlowRegulatorParameters": {
-      "properties": {
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "_Flow Selector_ selects the _Flows_ at which the _Flow Regulator_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 0
-        },
-        "label_key": {
-          "description": "The flow label key for identifying sessions.\n- When label key is specified, _Flow Regulator_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Flow Regulator_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
-          "type": "string",
-          "x-order": 1
-        },
-        "selectors": {
-          "description": "Selectors for the component.\n\n",
-          "items": {
-            "$ref": "#/definitions/Selector",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "FlowSelector": {
-      "description": "Selects flows based on _Control Point_, flow labels, agent group and service that the [flow control\ncomponent](/concepts/flow-control/flow-control.md#components) operates on.\n\n:::info\n\nSee also [FlowSelector overview](/concepts/flow-control/selector.md).\n\n:::\n\nDeprecated 1.8.0: Use `selectors` instead.",
-      "properties": {
-        "flow_matcher": {
-          "$ref": "#/definitions/FlowMatcher",
-          "title": "Match control points and labels",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "service_selector": {
-          "$ref": "#/definitions/ServiceSelector",
-          "title": "Match agent group and service",
-          "x-go-tag-validate": "required",
-          "x-order": 1
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
     "FluxMeter": {
-      "description": "Flux Meter gathers metrics for the traffic that matches its selector.\nThe histogram created by Flux Meter measures the workload latency by default.\n\n:::info\n\nSee also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).\n\n:::\nExample:\n```yaml\nstatic_buckets:\n   buckets: [5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]\nflow_selector:\n  service_selector:\n     agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n  flow_matcher:\n     control_point: ingress\nattribute_key: response_duration_ms\n```",
+      "description": "Flux Meter gathers metrics for the traffic that matches its selector.\nThe histogram created by Flux Meter measures the workload latency by default.\n\n:::info\n\nSee also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).\n\n:::\nExample:\n```yaml\nstatic_buckets:\n   buckets: [5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]\nselectors:\n   - agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n     control_point: ingress\nattribute_key: response_duration_ms\n```",
       "properties": {
         "attribute_key": {
           "default": "workload_duration_ms",
@@ -1528,15 +1234,9 @@
           "$ref": "#/definitions/FluxMeterExponentialBucketsRange",
           "x-order": 2
         },
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "The selection criteria for the traffic that will be measured.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 3
-        },
         "linear_buckets": {
           "$ref": "#/definitions/FluxMeterLinearBuckets",
-          "x-order": 4
+          "x-order": 3
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -1544,15 +1244,17 @@
             "$ref": "#/definitions/Selector",
             "type": "object"
           },
+          "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 5
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 4
         },
         "static_buckets": {
           "$ref": "#/definitions/FluxMeterStaticBuckets",
-          "x-order": 6
+          "x-order": 5
         }
       },
+      "required": ["selectors"],
       "type": "object",
       "additionalProperties": false
     },
@@ -1857,7 +1559,7 @@
       "additionalProperties": false
     },
     "IncreasingGradient": {
-      "description": "Increasing Gradient defines a controller for scaling out based on Gradient Controller.",
+      "description": "Increasing Gradient defines a controller for scaling out based on _Gradient Controller_.",
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/IncreasingGradientIns",
@@ -2118,29 +1820,6 @@
       "type": "object",
       "additionalProperties": false
     },
-    "KubernetesReplicas": {
-      "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
-      "properties": {
-        "default_config": {
-          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
-          "type": "string",
-          "x-order": 1
-        },
-        "kubernetes_object_selector": {
-          "$ref": "#/definitions/KubernetesObjectSelector",
-          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
     "LabelMatcher": {
       "description": "It provides three ways to define requirements:\n- match labels\n- match expressions\n- arbitrary expression\n\nIf multiple requirements are set, they're all combined using the logical AND operator.\nAn empty label matcher always matches.",
       "properties": {
@@ -2168,52 +1847,6 @@
         }
       },
       "title": "Allows to define rules whether a map of\n[labels](/concepts/flow-control/flow-label.md)\nshould be considered a match or not",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadActuator": {
-      "properties": {
-        "default_config": {
-          "$ref": "#/definitions/LoadActuatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
-          "type": "string",
-          "x-order": 1
-        },
-        "in_ports": {
-          "$ref": "#/definitions/LoadActuatorIns",
-          "description": "Input ports for the Load Actuator component.",
-          "x-order": 2
-        }
-      },
-      "title": "Takes the load multiplier input signal and publishes it to the schedulers in the data-plane",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadActuatorDynamicConfig": {
-      "properties": {
-        "dry_run": {
-          "description": "Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.\nUseful for observing the behavior of Load Actuator without disrupting any real traffic.",
-          "type": "boolean",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for LoadActuator",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadActuatorIns": {
-      "description": "Input for the Load Actuator component.",
-      "properties": {
-        "load_multiplier": {
-          "$ref": "#/definitions/InPort",
-          "description": "Load multiplier is proportion of [incoming\ntoken rate](#scheduler-outs) that needs to be accepted.",
-          "x-order": 0
-        }
-      },
       "type": "object",
       "additionalProperties": false
     },
@@ -2411,42 +2044,8 @@
     "LoadScheduler": {
       "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling\nwhich is based on Weighted Fair Queuing principles.\nIt measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nLoadScheduler configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
       "properties": {
-        "actuator": {
-          "$ref": "#/definitions/LoadSchedulerActuator",
-          "description": "Actuator based on limiting the accepted token rate under incoming token rate * load multiplier.",
-          "x-order": 0
-        },
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "Flow Selector decides the service and flows at which the _Load Scheduler_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 1
-        },
-        "scheduler": {
-          "$ref": "#/definitions/LoadSchedulerScheduler",
-          "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler, and also defines some\noutput signals.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
-        },
-        "selectors": {
-          "description": "Selectors for the component.\n\n",
-          "items": {
-            "$ref": "#/definitions/Selector",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 3
-        }
-      },
-      "title": "_Load Scheduler_ is an actuator component that regulates flows to provide active service protection",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadSchedulerActuator": {
-      "properties": {
         "default_config": {
-          "$ref": "#/definitions/LoadSchedulerActuatorDynamicConfig",
+          "$ref": "#/definitions/LoadSchedulerDynamicConfig",
           "description": "Default configuration.",
           "x-order": 0
         },
@@ -2456,16 +2055,28 @@
           "x-order": 1
         },
         "in_ports": {
-          "$ref": "#/definitions/LoadSchedulerActuatorIns",
-          "description": "Input ports for the Actuator component.",
+          "$ref": "#/definitions/LoadSchedulerIns",
+          "description": "Input ports for the LoadScheduler component.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 2
+        },
+        "out_ports": {
+          "$ref": "#/definitions/LoadSchedulerOuts",
+          "description": "Output ports for the LoadScheduler component.",
+          "x-order": 3
+        },
+        "parameters": {
+          "$ref": "#/definitions/LoadSchedulerParameters",
+          "x-go-tag-validate": "required",
+          "x-order": 4
         }
       },
-      "title": "Takes the load multiplier input signal and publishes it to the schedulers in the data-plane",
+      "title": "_Load Scheduler_ is an actuator component that regulates flows to provide active service protection",
       "type": "object",
       "additionalProperties": false
     },
-    "LoadSchedulerActuatorDynamicConfig": {
+    "LoadSchedulerDynamicConfig": {
+      "description": "Dynamic Configuration for the LoadScheduler component.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.\nUseful for observing the behavior of actuator without disrupting any real traffic.",
@@ -2473,352 +2084,61 @@
           "x-order": 0
         }
       },
-      "title": "Dynamic Configuration for Actuator",
       "type": "object",
       "additionalProperties": false
     },
-    "LoadSchedulerActuatorIns": {
-      "description": "Input for the Actuator component.",
+    "LoadSchedulerIns": {
+      "description": "Input for the LoadScheduler component.",
       "properties": {
         "load_multiplier": {
           "$ref": "#/definitions/InPort",
-          "description": "Load multiplier is proportion of [incoming\ntoken rate](#scheduler-outs) that needs to be accepted.",
+          "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted.",
           "x-order": 0
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "LoadSchedulerScheduler": {
+    "LoadSchedulerOuts": {
+      "description": "Output for the LoadScheduler component.",
       "properties": {
-        "out_ports": {
-          "$ref": "#/definitions/LoadSchedulerSchedulerOuts",
-          "description": "Output ports for the Scheduler component.",
-          "x-order": 0
-        },
-        "parameters": {
-          "$ref": "#/definitions/LoadSchedulerSchedulerParameters",
-          "description": "Scheduler parameters.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadSchedulerSchedulerOuts": {
-      "description": "Output for the Scheduler component.",
-      "properties": {
-        "accepted_token_rate": {
+        "observed_load_multiplier": {
           "$ref": "#/definitions/OutPort",
-          "description": "Accepted token rate is the tokens admitted per second by the scheduler.\nValue of this signal is aggregated from all the relevant schedulers.",
+          "description": "Observed load multiplier is the proportion of incoming token rate that is being accepted.",
           "x-order": 0
-        },
-        "incoming_token_rate": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Incoming token rate is the incoming tokens per second for all the\nflows entering the scheduler including the rejected ones.\n\nThis is computed similar to `accepted_token_rate`,\nby summing up tokens from all the flows entering scheduler.",
-          "x-order": 1
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "LoadSchedulerSchedulerParameters": {
+    "LoadSchedulerParameters": {
       "properties": {
-        "auto_tokens": {
-          "default": false,
-          "description": "Automatically estimate the size of a flow in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrency limiting use-case, where the\nconcurrency is calculated as (avg. latency \\* in-flight flows).\n\nThe value of tokens estimated by `auto_tokens` takes lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the flow labels.\n\n",
-          "type": "boolean",
-          "x-go-tag-default": "false",
+        "scheduler": {
+          "$ref": "#/definitions/Scheduler",
+          "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler",
           "x-order": 0
         },
-        "decision_deadline_margin": {
-          "default": "0.01s",
-          "description": "Decision deadline margin is the amount of time that the scheduler will\nsubtract from the request deadline to determine the deadline for the\ndecision. This is to ensure that the scheduler has enough time to\nmake a decision before the request deadline happens, accounting for\nprocessing delays.\nThe request deadline is based on the\n[gRPC deadline](https://grpc.io/blog/deadlines) or the\n[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).\n\nFail-open logic is use for flow control APIs, so if the gRPC deadline\nreaches, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\n",
-          "type": "string",
-          "x-go-tag-default": "0.01s",
-          "x-order": 1
-        },
-        "default_workload_parameters": {
-          "$ref": "#/definitions/LoadSchedulerSchedulerWorkloadParameters",
-          "description": "Parameters to be used if none of workloads specified in `workloads` match.",
-          "x-order": 2
-        },
-        "max_timeout": {
-          "default": "0s",
-          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
-          "type": "string",
-          "x-go-tag-default": "0s",
-          "x-order": 3
-        },
-        "timeout_factor": {
-          "default": 0,
-          "description": "Deprecated: 1.5.0. Use `decision_deadline_margin` instead. This value is ignored.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0.0",
-          "x-order": 4
-        },
-        "tokens_label_key": {
-          "default": "tokens",
-          "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid uint64 number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.\n\n",
-          "type": "string",
-          "x-go-tag-default": "tokens",
-          "x-order": 5
-        },
-        "workloads": {
-          "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/load-scheduler.md#workload).\n\n:::\n\n",
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
           "items": {
-            "$ref": "#/definitions/LoadSchedulerSchedulerWorkload",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 6
-        }
-      },
-      "title": "Scheduler parameters",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadSchedulerSchedulerWorkload": {
-      "description": "Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.",
-      "properties": {
-        "label_matcher": {
-          "$ref": "#/definitions/LabelMatcher",
-          "description": "Label Matcher to select a Workload based on\n[flow labels](/concepts/flow-control/flow-label.md).\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "parameters": {
-          "$ref": "#/definitions/LoadSchedulerSchedulerWorkloadParameters",
-          "description": "Parameters associated with flows matching the label matcher.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadSchedulerSchedulerWorkloadParameters": {
-      "description": "Parameters such as priority, tokens and fairness key that\nare applicable to flows within a workload.",
-      "properties": {
-        "fairness_key": {
-          "description": "Fairness key is a label key that can be used to provide fairness within a workload.\nAny [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if\nyou have a classifier that sets `user` flow label, you might want to set\n`fairness_key = \"user\"`.",
-          "type": "string",
-          "x-order": 0
-        },
-        "priority": {
-          "default": 0,
-          "description": "$$\n\\text{virtual\\_finish\\_time} = \\text{virtual\\_time} + \\left(\\text{tokens} \\cdot \\left(\\text{256} - \\text{priority}\\right)\\right)\n$$\n\n",
-          "format": "int64",
-          "maximum": 255,
-          "minimum": 0,
-          "title": "Describes priority level of the flows within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:",
-          "type": "integer",
-          "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0,lte=255",
-          "x-order": 1
-        },
-        "tokens": {
-          "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.",
-          "format": "uint64",
-          "type": "string",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaper": {
-      "description": "The _Load Shaper_ produces a smooth and continuous traffic load\nthat changes progressively over time, based on the specified steps.\n\nEach step is defined by two parameters:\n- The `target_accept_percentage`.\n- The `duration` for the signal to change from the\n  previous step's `target_accept_percentage` to the current step's\n  `target_accept_percentage`.\n\nThe percentage of requests accepted starts at the `target_accept_percentage`\ndefined in the first step and gradually ramps up or down linearly from\nthe previous step's `target_accept_percentage` to the next\n`target_accept_percentage`, over the `duration` specified for each step.",
-      "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RegulatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Dynamic configuration key for flow regulator.",
-          "type": "string",
-          "x-order": 1
-        },
-        "in_ports": {
-          "$ref": "#/definitions/LoadShaperIns",
-          "x-order": 2
-        },
-        "out_ports": {
-          "$ref": "#/definitions/LoadShaperOuts",
-          "x-order": 3
-        },
-        "parameters": {
-          "$ref": "#/definitions/LoadShaperParameters",
-          "x-go-tag-validate": "required",
-          "x-order": 4
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperIns": {
-      "description": "Inputs for the _Load Shaper_ component.",
-      "properties": {
-        "backward": {
-          "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the _Load Shaper_ towards the previous step.",
-          "x-order": 0
-        },
-        "forward": {
-          "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the _Load Shaper_ towards the next step.",
-          "x-order": 1
-        },
-        "reset": {
-          "$ref": "#/definitions/InPort",
-          "description": "Whether to reset the _Load Shaper_ to the first step.",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperOuts": {
-      "description": "Outputs for the _Load Shaper_ component.",
-      "properties": {
-        "accept_percentage": {
-          "$ref": "#/definitions/OutPort",
-          "description": "The percentage of flows being accepted by the _Load Shaper_.",
-          "x-order": 0
-        },
-        "at_end": {
-          "$ref": "#/definitions/OutPort",
-          "description": "A Boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.",
-          "x-order": 1
-        },
-        "at_start": {
-          "$ref": "#/definitions/OutPort",
-          "description": "A Boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperParameters": {
-      "description": "Parameters for the _Load Shaper_ component.",
-      "properties": {
-        "flow_regulator_parameters": {
-          "$ref": "#/definitions/FlowRegulatorParameters",
-          "description": "Parameters for the _Flow Regulator_.",
-          "x-order": 0
-        },
-        "steps": {
-          "items": {
-            "$ref": "#/definitions/LoadShaperParametersStep",
+            "$ref": "#/definitions/Selector",
             "type": "object"
           },
           "minItems": 1,
           "type": "array",
           "x-go-tag-validate": "required,gt=0,dive",
           "x-order": 1
-        }
-      },
-      "required": ["steps"],
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperParametersStep": {
-      "properties": {
-        "duration": {
-          "description": "Duration for which the step is active.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
         },
-        "target_accept_percentage": {
-          "description": "The value of the step.\n\n",
-          "format": "double",
-          "maximum": 100,
-          "minimum": 0,
-          "type": "number",
-          "x-go-tag-validate": "gte=0,lte=100",
-          "x-order": 1
-        }
-      },
-      "required": ["duration"],
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperSeries": {
-      "description": "_LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.",
-      "properties": {
-        "in_ports": {
-          "$ref": "#/definitions/LoadShaperSeriesIns",
-          "x-order": 0
-        },
-        "parameters": {
-          "$ref": "#/definitions/LoadShaperSeriesParameters",
-          "x-go-tag-validate": "required",
-          "x-order": 1
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperSeriesIns": {
-      "description": "Inputs for the _LoadShaperSeries_ component.",
-      "properties": {
-        "backward": {
-          "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the load shaper series towards the previous step.",
-          "x-order": 0
-        },
-        "forward": {
-          "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the load shaper series towards the next step.",
-          "x-order": 1
-        },
-        "reset": {
-          "$ref": "#/definitions/InPort",
-          "description": "Whether to reset the load shaper series to the first step.",
+        "workload_latency_based_tokens": {
+          "default": true,
+          "description": "Automatically estimate the size flows within each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during the last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrency limiting use-case, where the\nconcurrency is calculated as ``(avg. latency \\* in-flight flows)`.\n\nThe value of tokens estimated takes a lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the flow labels.\n\n",
+          "type": "boolean",
+          "x-go-tag-default": "true",
           "x-order": 2
         }
       },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperSeriesLoadShaperInstance": {
-      "properties": {
-        "load_shaper": {
-          "$ref": "#/definitions/LoadShaperParameters",
-          "description": "The load shaper.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "out_ports": {
-          "$ref": "#/definitions/LoadShaperOuts",
-          "x-order": 1
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadShaperSeriesParameters": {
-      "description": "Parameters for the _LoadShaperSeries_ component.",
-      "properties": {
-        "load_shapers": {
-          "description": "An ordered list of load shapers that get applied in order.\n\n",
-          "items": {
-            "$ref": "#/definitions/LoadShaperSeriesLoadShaperInstance",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "required,dive",
-          "x-order": 0
-        }
-      },
-      "required": ["load_shapers"],
+      "required": ["selectors"],
+      "title": "Parameters for _Load Scheduler_ component",
       "type": "object",
       "additionalProperties": false
     },
@@ -3167,211 +2487,52 @@
       "type": "object",
       "additionalProperties": false
     },
-    "PodAutoScaler": {
-      "description": "_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.",
-      "properties": {
-        "cooldown_override_percentage": {
-          "default": 50,
-          "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "50",
-          "x-order": 0
-        },
-        "max_replicas": {
-          "default": "9223372036854775807",
-          "description": "The maximum scale to which the _PodAutoScaler_ can scale-out.\n\n",
-          "format": "int64",
-          "minLength": 1,
-          "type": "string",
-          "x-go-tag-default": "9223372036854775807",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 1
-        },
-        "max_scale_in_percentage": {
-          "default": 1,
-          "description": "The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "1",
-          "x-order": 2
-        },
-        "max_scale_out_percentage": {
-          "default": 10,
-          "description": "The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "10",
-          "x-order": 3
-        },
-        "min_replicas": {
-          "default": "0",
-          "description": "The minimum replicas to which the _PodAutoScaler_ can scale-in.\n\n",
-          "format": "int64",
-          "minLength": 0,
-          "type": "string",
-          "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0",
-          "x-order": 4
-        },
-        "out_ports": {
-          "$ref": "#/definitions/PodAutoScalerOuts",
-          "description": "Output ports for the _PodAutoScaler_.",
-          "x-order": 5
-        },
-        "pod_scaler": {
-          "$ref": "#/definitions/KubernetesReplicas",
-          "x-go-tag-validate": "required",
-          "x-order": 6
-        },
-        "scale_in_alerter_parameters": {
-          "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-in Alerter.",
-          "x-order": 7
-        },
-        "scale_in_controllers": {
-          "description": "List of _Controllers_ for scaling in.",
-          "items": {
-            "$ref": "#/definitions/ScaleInController",
-            "type": "object"
-          },
-          "type": "array",
-          "x-order": 8
-        },
-        "scale_in_cooldown": {
-          "default": "120s",
-          "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
-          "type": "string",
-          "x-go-tag-default": "120s",
-          "x-order": 9
-        },
-        "scale_out_alerter_parameters": {
-          "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-out Alerter.",
-          "x-order": 10
-        },
-        "scale_out_controllers": {
-          "description": "List of _Controllers_ for scaling out.",
-          "items": {
-            "$ref": "#/definitions/ScaleOutController",
-            "type": "object"
-          },
-          "type": "array",
-          "x-order": 11
-        },
-        "scale_out_cooldown": {
-          "default": "30s",
-          "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
-          "type": "string",
-          "x-go-tag-default": "30s",
-          "x-order": 12
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodAutoScalerOuts": {
-      "description": "Outputs for _PodAutoScaler_.",
-      "properties": {
-        "actual_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
-        },
-        "configured_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 1
-        },
-        "desired_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
     "PodScaler": {
       "description": "Component for scaling pods based on a signal.",
       "properties": {
-        "kubernetes_object_selector": {
-          "$ref": "#/definitions/KubernetesObjectSelector",
-          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
-          "x-go-tag-validate": "required",
+        "dry_run": {
+          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
+          "type": "boolean",
           "x-order": 0
         },
-        "scale_actuator": {
-          "$ref": "#/definitions/PodScalerScaleActuator",
-          "description": "Actuates scaling of pods based on a signal.",
-          "x-order": 1
-        },
-        "scale_reporter": {
-          "$ref": "#/definitions/PodScalerScaleReporter",
-          "description": "Reports actual and configured number of replicas.",
-          "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodScalerScaleActuator": {
-      "description": "Actuates scaling of pods based on a signal.",
-      "properties": {
-        "default_config": {
-          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
+        "dry_run_config_key": {
+          "description": "Configuration key for overriding dry run setting through dynamic configuration.",
           "type": "string",
           "x-order": 1
         },
         "in_ports": {
-          "$ref": "#/definitions/PodScalerScaleActuatorIns",
+          "$ref": "#/definitions/PodScalerIns",
           "description": "Input ports for the PodScaler component.",
           "x-order": 2
+        },
+        "kubernetes_object_selector": {
+          "$ref": "#/definitions/KubernetesObjectSelector",
+          "description": "The Kubernetes object to which this pod scaler applies.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 3
+        },
+        "out_ports": {
+          "$ref": "#/definitions/PodScalerOuts",
+          "description": "Output ports for the PodScaler component.",
+          "x-order": 4
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "PodScalerScaleActuatorDynamicConfig": {
-      "properties": {
-        "dry_run": {
-          "default": false,
-          "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n",
-          "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for ScaleActuator",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodScalerScaleActuatorIns": {
+    "PodScalerIns": {
       "description": "Inputs for the PodScaler component.",
       "properties": {
-        "desired_replicas": {
+        "replicas": {
           "$ref": "#/definitions/InPort",
+          "title": "The number of replicas to configure for the Kubernetes resource",
           "x-order": 0
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "PodScalerScaleReporter": {
-      "description": "Reports actual and configured number of replicas.",
-      "properties": {
-        "out_ports": {
-          "$ref": "#/definitions/PodScalerScaleReporterOuts",
-          "description": "Output ports for the PodScaler component.",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PodScalerScaleReporterOuts": {
+    "PodScalerOuts": {
       "description": "Outputs for the PodScaler component.",
       "properties": {
         "actual_replicas": {
@@ -3503,23 +2664,17 @@
           "type": "string",
           "x-order": 1
         },
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "Which control point to apply this rate limiter to.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 2
-        },
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
           "title": "Input ports for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 3
+          "x-order": 2
         },
         "parameters": {
           "$ref": "#/definitions/RateLimiterParameters",
           "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 4
+          "x-order": 3
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -3527,11 +2682,13 @@
             "$ref": "#/definitions/Selector",
             "type": "object"
           },
+          "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 5
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 4
         }
       },
+      "required": ["selectors"],
       "title": "Limits the traffic on a control point to specified rate",
       "type": "object",
       "additionalProperties": false
@@ -3735,16 +2892,10 @@
     },
     "RegulatorParameters": {
       "properties": {
-        "flow_selector": {
-          "$ref": "#/definitions/FlowSelector",
-          "description": "_Flow Selector_ selects the _Flows_ at which the _Regulator_ is applied.\nDeprecated 1.8.0: Use `selectors` instead.\n\n",
-          "x-go-tag-validate": "required_without=Selectors",
-          "x-order": 0
-        },
         "label_key": {
           "description": "The flow label key for identifying sessions.\n- When label key is specified, _Regulator_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Regulator_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
           "type": "string",
-          "x-order": 1
+          "x-order": 0
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -3752,11 +2903,13 @@
             "$ref": "#/definitions/Selector",
             "type": "object"
           },
+          "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required_without=FlowSelector,dive",
-          "x-order": 2
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 1
         }
       },
+      "required": ["selectors"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3915,66 +3068,24 @@
     "Scheduler": {
       "description": ":::note\n\nEach Agent instantiates an independent copy of the scheduler, but output\nsignals for accepted and incoming token rate are aggregated across all agents.\n\n:::",
       "properties": {
-        "out_ports": {
-          "$ref": "#/definitions/SchedulerOuts",
-          "description": "Output ports for the Scheduler component.",
-          "x-order": 0
-        },
-        "parameters": {
-          "$ref": "#/definitions/SchedulerParameters",
-          "description": "Scheduler parameters.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
-        }
-      },
-      "title": "Weighted Fair Queuing-based workload scheduler",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "SchedulerOuts": {
-      "description": "Output for the Scheduler component.",
-      "properties": {
-        "accepted_concurrency": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Accepted concurrency is actual concurrency on a control point that this\nscheduler is applied on.\nValue of this signal is aggregated from all the relevant schedulers.",
-          "x-order": 0
-        },
-        "incoming_concurrency": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Incoming concurrency is concurrency that'd be needed to accept all the\nflows entering the scheduler.\n\nThis is computed in the same way as `accepted_concurrency`,\nby summing up tokens from all the flows entering scheduler,\nincluding rejected ones.",
-          "x-order": 1
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "SchedulerParameters": {
-      "properties": {
-        "auto_tokens": {
-          "default": false,
-          "description": "Automatically estimate the size of a flow in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrency limiting use-case, where the\nconcurrency is calculated as (avg. latency \\* in-flight flows).\n\nThe value of tokens estimated by `auto_tokens` takes lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the flow labels.\n\n",
-          "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 0
-        },
         "decision_deadline_margin": {
           "default": "0.01s",
           "description": "Decision deadline margin is the amount of time that the scheduler will\nsubtract from the request deadline to determine the deadline for the\ndecision. This is to ensure that the scheduler has enough time to\nmake a decision before the request deadline happens, accounting for\nprocessing delays.\nThe request deadline is based on the\n[gRPC deadline](https://grpc.io/blog/deadlines) or the\n[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).\n\nFail-open logic is use for flow control APIs, so if the gRPC deadline\nreaches, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\n",
           "type": "string",
           "x-go-tag-default": "0.01s",
-          "x-order": 1
+          "x-order": 0
         },
         "default_workload_parameters": {
           "$ref": "#/definitions/SchedulerWorkloadParameters",
           "description": "Parameters to be used if none of workloads specified in `workloads` match.",
-          "x-order": 2
+          "x-order": 1
         },
         "tokens_label_key": {
           "default": "tokens",
           "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid uint64 number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.\n\n",
           "type": "string",
           "x-go-tag-default": "tokens",
-          "x-order": 3
+          "x-order": 2
         },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/load-scheduler.md#workload).\n\n:::\n\n",
@@ -3984,10 +3095,10 @@
           },
           "type": "array",
           "x-go-tag-validate": "dive",
-          "x-order": 4
+          "x-order": 3
         }
       },
-      "title": "Scheduler parameters",
+      "title": "Weighted Fair Queuing-based workload scheduler",
       "type": "object",
       "additionalProperties": false
     },
@@ -4070,28 +3181,6 @@
         }
       },
       "required": ["control_point"],
-      "type": "object",
-      "additionalProperties": false
-    },
-    "ServiceSelector": {
-      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/flow-control/selector.md).\n\n:::\n\nDeprecated 1.8.0: Use `selectors` instead.",
-      "properties": {
-        "agent_group": {
-          "default": "default",
-          "description": "Which [agent-group](/concepts/flow-control/selector.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller.\nThis is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.\nThe agents within an agent group form a peer to peer cluster and constantly share state.\n\n:::\n\n",
-          "type": "string",
-          "x-go-tag-default": "default",
-          "x-order": 0
-        },
-        "service": {
-          "default": "any",
-          "description": "The Fully Qualified Domain Name of the\n[service](/concepts/flow-control/selector.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n:::info\n\n`any` matches all services.\n\n:::\n\n:::info\n\nIn the Kubernetes sidecar installation mode, service discovery is switched off by default.\nTo scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.\n\n:::\n\n:::info\n\nAn entity (for example, Kubernetes pod) might belong to multiple services.\n\n:::\n\n",
-          "type": "string",
-          "x-go-tag-default": "any",
-          "x-order": 1
-        }
-      },
-      "title": "Describes which service a [flow control or observability\ncomponent](/concepts/flow-control/flow-control.md#components) should apply\nto",
       "type": "object",
       "additionalProperties": false
     },

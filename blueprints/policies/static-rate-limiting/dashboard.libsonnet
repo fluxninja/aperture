@@ -4,14 +4,7 @@ local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
-local row = grafana.row;
 local prometheus = grafana.prometheus;
-local template = grafana.template;
-local graphPanel = grafana.graphPanel;
-local tablePanel = grafana.tablePanel;
-local barGaugePanel = grafana.barGaugePanel;
-local statPanel = grafana.statPanel;
-local annotation = grafana.annotation;
 local timeSeriesPanel = lib.TimeSeriesPanel;
 
 local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =

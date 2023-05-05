@@ -1,0 +1,120 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: weighted-service-protection
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          default_config:
+            dry_run: false
+          dynamic_config_key: load_scheduler
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.0025
+            load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    expression:
+                      all:
+                        of:
+                        - label_matches:
+                            label: aperture.source_fqdns
+                            regex: service1-demo-app.demoapp.svc.cluster.local
+                        - label_matches:
+                            label: aperture.destination_fqdns
+                            regex: service3-demo-app.demoapp.svc.cluster.local
+                  parameters:
+                    priority: 200
+                - label_matcher:
+                    expression:
+                      all:
+                        of:
+                        - label_matches:
+                            label: aperture.source_fqdns
+                            regex: service2-demo-app.demoapp.svc.cluster.local
+                        - label_matches:
+                            label: aperture.destination_fqdns
+                            regex: service3-demo-app.demoapp.svc.cluster.local
+                  parameters:
+                    priority: 50
+              selectors:
+              - control_point: egress
+                service: service1-demo-app.demoapp.svc.cluster.local
+              - control_point: egress
+                service: service2-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="weighted-service-protection"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="weighted-service-protection"}[5s]))
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL
+          rhs:
+            constant_signal:
+              value: 2
+        operator: mul
+        out_ports:
+          output:
+            signal_name: MAX_EMA
+    - ema:
+        in_ports:
+          input:
+            signal_name: SIGNAL
+          max_envelope:
+            signal_name: MAX_EMA
+        out_ports:
+          output:
+            signal_name: SIGNAL_EMA
+        parameters:
+          correction_factor_on_max_envelope_violation: 0.95
+          ema_window: 1500s
+          warmup_window: 60s
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_EMA
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []
+      flux_meters:
+        weighted-service-protection:
+          selectors:
+          - control_point: ingress
+            service: service3-demo-app.demoapp.svc.cluster.local

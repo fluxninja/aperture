@@ -1,0 +1,59 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: service1-demoapp-rabbitmq-queue-buildup
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          default_config:
+            dry_run: false
+          dynamic_config_key: load_scheduler
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.0025
+            load_scheduler:
+              selectors:
+              - agent_group: default
+                control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})
+    - variable:
+        default_config:
+          constant_signal:
+            value: 1000
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []

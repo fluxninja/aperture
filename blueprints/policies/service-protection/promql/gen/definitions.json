@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/service-protection/promql blueprint",
+  "additionalProperties": false,
+  "required": ["common", "policy"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name", "promql_query"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "promql_query": {
+          "description": "PromQL query.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["service_protection_core", "latency_baseliner"],
+      "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "1s",
+          "type": "string"
+        },
+        "service_protection_core": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["adaptive_load_scheduler"],
+          "properties": {
+            "overload_confirmations": {
+              "description": "List of overload confirmation criteria. Load scheduler can shed flows when all of the specified overload confirmation criteria are met.",
+              "default": [
+                {
+                  "operator": "__REQUIRED_FIELD__",
+                  "query_string": "__REQUIRED_FIELD__",
+                  "threshold": "__REQUIRED_FIELD__"
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/overload_confirmation"
+              }
+            },
+            "adaptive_load_scheduler": {
+              "description": "Parameters for Adaptive Load Scheduler.",
+              "default": {
+                "alerter": {
+                  "alert_name": "Load Throttling Event"
+                },
+                "gradient": {
+                  "max_gradient": 1,
+                  "min_gradient": 0.1,
+                  "slope": -1
+                },
+                "load_multiplier_linear_increment": 0.0025,
+                "load_scheduler": {
+                  "selectors": [
+                    {
+                      "control_point": "__REQUIRED_FIELD__",
+                      "service": "__REQUIRED_FIELD__"
+                    }
+                  ]
+                },
+                "max_load_multiplier": 2
+              },
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerParameters"
+            },
+            "dry_run": {
+              "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        },
+        "latency_baseliner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["setpoint"],
+          "properties": {
+            "setpoint": {
+              "description": "Setpoint.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "15s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "From time of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "To time of dashboard.",
+          "default": "now",
+          "type": "string"
+        },
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
+              "type": "string"
+            },
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "default": "",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "overload_confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["query_string"],
+      "properties": {
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "threshold": {
+          "description": "The threshold for the overload confirmation criteria.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        },
+        "operator": {
+          "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -86,251 +86,153 @@ metadata:
   namespace: aperture-controller
   labels:
     fluxninja.com/validate: "true"
+  name: service1-demo-app
 spec:
-  resources:
-    flow_control:
-      flux_meters:
-        "service_latency":
-          selectors:
-            - control_point: "ingress"
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-      classifiers:
-        - selectors:
-            - control_point: "ingress"
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-          rego:
-            labels:
-              also_ua:
-                telemetry: true
-            module: |
-              package my.rego.pkg
-              import input.attributes.request.http
-              also_ua = http.headers["user-agent"]
-          rules:
-            # An example rule using extractor.
-            # See following RFC for list of available extractors and their syntax.
-            ua:
-              extractor:
-                from: request.http.headers.user-agent
-            user_type:
-              extractor:
-                from: request.http.headers.user_type
   circuit:
-    evaluation_interval: "0.5s"
     components:
-      - query:
-          promql:
-            query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
-            evaluation_interval: "1s"
-            out_ports:
-              output:
-                signal_name: "LATENCY"
-      - variable:
+    - flow_control:
+        adaptive_load_scheduler:
           default_config:
-            constant_signal:
-              value: 2.0
-          out_ports:
-            output:
-              signal_name: "EMA_LIMIT_MULTIPLIER"
-      - arithmetic_combinator:
-          operator: "mul"
+            dry_run: false
+          dynamic_config_key: load_scheduler
           in_ports:
-            lhs:
-              signal_name: "LATENCY"
-            rhs:
-              signal_name: "EMA_LIMIT_MULTIPLIER"
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
           out_ports:
-            output:
-              signal_name: "MAX_EMA"
-      - ema:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
           parameters:
-            ema_window: "300s"
-            warmup_window: "10s"
-            correction_factor_on_max_envelope_violation: "0.95"
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.0025
+            load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    match_labels:
+                      user_type: guest
+                  parameters:
+                    priority: 50
+                - label_matcher:
+                    match_labels:
+                      http.request.header.user_type: subscriber
+                  parameters:
+                    priority: 200
+              selectors:
+              - control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: OBSERVED_LOAD_MULTIPLIER
+          rhs:
+            constant_signal:
+              value: 1
+        operator: lt
+        out_ports:
+          output:
+            signal_name: IS_CRAWLER_ESCALATION
+        true_for: 30s
+    - switcher:
+        in_ports:
+          off_signal:
+            constant_signal:
+              value: 10
+          on_signal:
+            constant_signal:
+              value: 0
+          switch:
+            signal_name: IS_CRAWLER_ESCALATION
+        out_ports:
+          output:
+            signal_name: RATE_LIMIT
+    - flow_control:
+        rate_limiter:
+          dynamic_config_key: rate_limiter
           in_ports:
-            input:
-              signal_name: "LATENCY"
-            max_envelope:
-              signal_name: "MAX_EMA"
+            limit:
+              signal_name: RATE_LIMIT
+          parameters:
+            label_key: http.request.header.user_id
+            limit_reset_interval: 1s
+          selectors:
+          - control_point: ingress
+            label_matcher:
+              match_labels:
+                http.request.header.user_type: crawler
+            service: service1-demo-app.demoapp.svc.cluster.local
+    - query:
+        promql:
+          evaluation_interval: 1s
           out_ports:
             output:
-              signal_name: "LATENCY_EMA"
-      - variable:
-          default_config:
+              signal_name: SIGNAL
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app"}[5s]))
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL
+          rhs:
+            constant_signal:
+              value: 2
+        operator: mul
+        out_ports:
+          output:
+            signal_name: MAX_EMA
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_EMA
+          rhs:
             constant_signal:
               value: 1.1
-          out_ports:
-            output:
-              signal_name: "EMA_SETPOINT_MULTIPLIER"
-      - arithmetic_combinator:
-          operator: "mul"
-          in_ports:
-            lhs:
-              signal_name: "LATENCY_EMA"
-            rhs:
-              signal_name: "EMA_SETPOINT_MULTIPLIER"
-          out_ports:
-            output:
-              signal_name: "LATENCY_SETPOINT"
-      - gradient_controller:
-          parameters:
-            slope: -1
-            min_gradient: "0.1"
-            max_gradient: "1.0"
-          in_ports:
-            signal:
-              signal_name: "LATENCY"
-            setpoint:
-              signal_name: "LATENCY_SETPOINT"
-            max:
-              signal_name: "MAX_CONCURRENCY"
-            control_variable:
-              signal_name: "ACCEPTED_CONCURRENCY"
-            optimize:
-              signal_name: "CONCURRENCY_INCREMENT"
-          out_ports:
-            output:
-              signal_name: "DESIRED_CONCURRENCY"
-      - arithmetic_combinator:
-          operator: "div"
-          in_ports:
-            lhs:
-              signal_name: "DESIRED_CONCURRENCY"
-            rhs:
-              signal_name: "INCOMING_CONCURRENCY"
-          out_ports:
-            output:
-              signal_name: "LOAD_MULTIPLIER"
-      - flow_control:
-          concurrency_limiter:
-            selectors:
-              - control_point: "ingress"
-                service: "service1-demo-app.demoapp.svc.cluster.local"
-            scheduler:
-              parameters:
-                workloads:
-                  - parameters:
-                      priority: 50
-                    label_matcher:
-                      match_labels:
-                        user_type: "guest"
-                  - parameters:
-                      priority: 200
-                    label_matcher:
-                      match_labels:
-                        http.request.header.user_type: "subscriber"
-              out_ports:
-                accepted_concurrency:
-                  signal_name: "ACCEPTED_CONCURRENCY"
-                incoming_concurrency:
-                  signal_name: "INCOMING_CONCURRENCY"
-            load_actuator:
-              in_ports:
-                load_multiplier:
-                  signal_name: "LOAD_MULTIPLIER"
-      - variable:
-          default_config:
-            constant_signal:
-              value: 2.0
-          out_ports:
-            output:
-              signal_name: "CONCURRENCY_LIMIT_MULTIPLIER"
-      - variable:
-          default_config:
-            constant_signal:
-              value: 10.0
-          out_ports:
-            output:
-              signal_name: "MIN_CONCURRENCY"
-      - variable:
-          default_config:
-            constant_signal:
-              value: 5.0
-          out_ports:
-            output:
-              signal_name: "LINEAR_CONCURRENCY_INCREMENT"
-      - arithmetic_combinator:
-          operator: "mul"
-          in_ports:
-            lhs:
-              signal_name: "CONCURRENCY_LIMIT_MULTIPLIER"
-            rhs:
-              signal_name: "ACCEPTED_CONCURRENCY"
-          out_ports:
-            output:
-              signal_name: "UPPER_CONCURRENCY_LIMIT"
-      - max:
-          in_ports:
-            inputs:
-              - signal_name: "UPPER_CONCURRENCY_LIMIT"
-              - signal_name: "MIN_CONCURRENCY"
-          out_ports:
-            output:
-              signal_name: "MAX_CONCURRENCY"
-      - unary_operator:
-          operator: "sqrt"
-          in_ports:
-            input:
-              signal_name: "ACCEPTED_CONCURRENCY"
-          out_ports:
-            output:
-              signal_name: "SQRT_CONCURRENCY_INCREMENT"
-      - arithmetic_combinator:
-          operator: "add"
-          in_ports:
-            lhs:
-              signal_name: "LINEAR_CONCURRENCY_INCREMENT"
-            rhs:
-              signal_name: "SQRT_CONCURRENCY_INCREMENT"
-          out_ports:
-            output:
-              signal_name: "CONCURRENCY_INCREMENT_NORMAL"
-      - variable:
-          default_config:
-            constant_signal:
-              value: 1.2
-          out_ports:
-            output:
-              signal_name: "OVERLOAD_MULTIPLIER"
-      - arithmetic_combinator:
-          operator: "mul"
-          in_ports:
-            lhs:
-              signal_name: "LATENCY_EMA"
-            rhs:
-              signal_name: "OVERLOAD_MULTIPLIER"
-          out_ports:
-            output:
-              signal_name: "LATENCY_OVERLOAD"
-      - variable:
-          default_config:
-            constant_signal:
-              value: 10.0
-          out_ports:
-            output:
-              signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
-      - decider:
-          operator: "gt"
-          in_ports:
-            lhs:
-              signal_name: "LATENCY"
-            rhs:
-              signal_name: "LATENCY_OVERLOAD"
-          out_ports:
-            output:
-              signal_name: "CONCURRENCY_INCREMENT_DECISION"
-      - switcher:
-          in_ports:
-            on_signal:
-              signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
-            off_signal:
-              signal_name: "CONCURRENCY_INCREMENT_NORMAL"
-            switch:
-              signal_name: "CONCURRENCY_INCREMENT_DECISION"
-          out_ports:
-            output:
-              signal_name: "CONCURRENCY_INCREMENT"
-  `
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    - ema:
+        in_ports:
+          input:
+            signal_name: SIGNAL
+          max_envelope:
+            signal_name: MAX_EMA
+        out_ports:
+          output:
+            signal_name: SIGNAL_EMA
+        parameters:
+          correction_factor_on_max_envelope_violation: 0.95
+          ema_window: 1500s
+          warmup_window: 60s
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers:
+      - rules:
+          user_type:
+            extractor:
+              from: request.http.headers.user-type
+        selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local
+      flux_meters:
+        service1-demo-app:
+          selectors:
+          - control_point: ingress
+            service: service3-demo-app.demoapp.svc.cluster.local
+`
 
 const classificationPolicy = `
 apiVersion: fluxninja.com/v1alpha1

@@ -22,47 +22,49 @@ policy:
               signal_name: AVERAGE_CPU
     - auto_scale:
         auto_scaler:
-          scaler:
-            kubernetes_replicas:
-              kubernetes_object_selector:
-                namespace: demoapp
-                api_version: apps/v1
-                kind: Deployment
-                name: service1-demo-app
-          min_scale: "1"
-          max_scale: "10"
-          scale_in_cooldown: "40s"
-          scale_out_cooldown: "30s"
-          scale_out_controllers:
-            - controller:
-                gradient:
-                  in_ports:
-                    signal:
-                      signal_name: OBSERVED_LOAD_MULTIPLIER
-                    setpoint:
-                      constant_signal:
-                        value: 1.0
-                  parameters:
-                    slope: -1.0
-          scale_in_controllers:
-            - controller:
-                gradient:
-                  in_ports:
-                    signal:
-                      signal_name: AVERAGE_CPU
-                    setpoint:
-                      constant_signal:
-                        value: 0.5
-                  parameters:
-                    slope: 1.0
+          parameters:
+            scaler:
+              kubernetes_replicas:
+                kubernetes_object_selector:
+                  namespace: demoapp
+                  api_version: apps/v1
+                  kind: Deployment
+                  name: service1-demo-app
+            min_scale: "1"
+            max_scale: "10"
+            scale_in_cooldown: "40s"
+            scale_out_cooldown: "30s"
+            scale_out_controllers:
+              - controller:
+                  gradient:
+                    in_ports:
+                      signal:
+                        signal_name: OBSERVED_LOAD_MULTIPLIER
+                      setpoint:
+                        constant_signal:
+                          value: 1.0
+                    parameters:
+                      slope: -1.0
+            scale_in_controllers:
+              - controller:
+                  gradient:
+                    in_ports:
+                      signal:
+                        signal_name: AVERAGE_CPU
+                      setpoint:
+                        constant_signal:
+                          value: 0.5
+                    parameters:
+                      slope: 1.0
   service_protection_core:
     adaptive_load_scheduler:
-      # The selectors determine the flows that are protected by this policy.
-      # Type: []aperture.spec.v1.Selector
-      # Required: True
-      selectors:
-        - control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+      load_scheduler:
+        # The selectors determine the flows that are protected by this policy.
+        # Type: []aperture.spec.v1.Selector
+        # Required: True
+        selectors:
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
   latency_baseliner:
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter

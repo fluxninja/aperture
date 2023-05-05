@@ -165,104 +165,28 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-###### policy.service_protection_core.adaptive_load_scheduler {#policy-service-protection-core-adaptive-load-scheduler}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-adaptive-load-scheduler-selectors"></a>
+<a id="policy-service-protection-core-adaptive-load-scheduler"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.selectors'
-    description='The selectors determine the flows that are protected by this policy.'
-    type='Array of Object (aperture.spec.v1.Selector)'
-    reference='../../../spec#selector'
-    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
+    name='policy.service_protection_core.adaptive_load_scheduler'
+    description='Parameters for Adaptive Load Scheduler.'
+    type='Object (aperture.spec.v1.AdaptiveLoadSchedulerParameters)'
+    reference='../../../spec#adaptive-load-scheduler-parameters'
+    value='{"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.0025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-adaptive-load-scheduler-scheduler"></a>
+<a id="policy-service-protection-core-dry-run"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.scheduler'
-    description='Scheduler parameters.'
-    type='Object (aperture.spec.v1.SchedulerParameters)'
-    reference='../../../spec#scheduler-parameters'
-    value='{"auto_tokens": true}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-adaptive-load-scheduler-gradient"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.gradient'
-    description='Gradient Controller parameters.'
-    type='Object (aperture.spec.v1.GradientControllerParameters)'
-    reference='../../../spec#gradient-controller-parameters'
-    value='{"max_gradient": 1, "min_gradient": 0.1, "slope": -1}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-adaptive-load-scheduler-alerter"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.alerter'
-    description='Parameters for the Alerter that detects load throttling.'
-    type='Object (aperture.spec.v1.AlerterParameters)'
-    reference='../../../spec#alerter-parameters'
-    value='{"alert_name": "Load Throttling Event"}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-adaptive-load-scheduler-max-load-multiplier"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.max_load_multiplier'
-    description='Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.'
-    type='Number (double)'
+    name='policy.service_protection_core.dry_run'
+    description='Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.'
+    type='Boolean'
     reference=''
-    value='2'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-adaptive-load-scheduler-load-multiplier-linear-increment"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.load_multiplier_linear_increment'
-    description='Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.'
-    type='Number (double)'
-    reference=''
-    value='0.0025'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-adaptive-load-scheduler-default-config"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler.default_config'
-    description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the'
-    type='Object (aperture.spec.v1.LoadActuatorDynamicConfig)'
-    reference='../../../spec#load-actuator-dynamic-config'
-    value='{"dry_run": false}'
+    value='false'
 />
 
 <!-- vale on -->

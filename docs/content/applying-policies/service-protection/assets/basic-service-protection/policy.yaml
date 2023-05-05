@@ -9,15 +9,9 @@ spec:
     components:
     - flow_control:
         adaptive_load_scheduler:
-          alerter_parameters:
-            alert_name: Load Throttling Event
           default_config:
             dry_run: false
           dynamic_config_key: load_scheduler
-          gradient_parameters:
-            max_gradient: 1
-            min_gradient: 0.1
-            slope: -1
           in_ports:
             overload_confirmation:
               constant_signal:
@@ -26,22 +20,24 @@ spec:
               signal_name: SETPOINT
             signal:
               signal_name: SIGNAL
-          load_multiplier_linear_increment: 0.0025
-          max_load_multiplier: 2
           out_ports:
-            accepted_token_rate:
-              signal_name: ACCEPTED_CONCURRENCY
             desired_load_multiplier:
               signal_name: DESIRED_LOAD_MULTIPLIER
-            incoming_token_rate:
-              signal_name: INCOMING_CONCURRENCY
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
-          scheduler_parameters:
-            auto_tokens: true
-          selectors:
-          - control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.0025
+            load_scheduler:
+              selectors:
+              - control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
     - query:
         promql:
           evaluation_interval: 1s
@@ -61,17 +57,6 @@ spec:
         out_ports:
           output:
             signal_name: MAX_EMA
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL_EMA
-          rhs:
-            constant_signal:
-              value: 1.1
-        operator: mul
-        out_ports:
-          output:
-            signal_name: SETPOINT
     - ema:
         in_ports:
           input:
@@ -85,6 +70,17 @@ spec:
           correction_factor_on_max_envelope_violation: 0.95
           ema_window: 1500s
           warmup_window: 60s
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_EMA
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
     evaluation_interval: 1s
   resources:
     flow_control:

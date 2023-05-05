@@ -9,7 +9,7 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
@@ -22,13 +22,13 @@ import (
 
 // ScaleActuator struct.
 type ScaleActuator struct {
-	policyReadAPI      iface.Policy
-	decisionWriter     *etcdwriter.Writer
-	scaleActuatorProto *policylangv1.PodScaler_ScaleActuator
-	decisionsEtcdPath  string
-	agentGroupName     string
-	componentID        string
-	dryRun             bool
+	policyReadAPI        iface.Policy
+	decisionWriter       *etcdwriter.Writer
+	scaleActuatorProto   *policyprivatev1.PodScaleActuator
+	decisionsEtcdPath    string
+	agentGroupName       string
+	podScalerComponentID string
+	dryRun               bool
 }
 
 // Name implements runtime.Component.
@@ -45,24 +45,21 @@ func (*ScaleActuator) IsActuator() bool { return true }
 
 // NewScaleActuatorAndOptions creates scale actuator and its fx options.
 func NewScaleActuatorAndOptions(
-	scaleActuatorProto *policylangv1.PodScaler_ScaleActuator,
-	componentID string,
+	scaleActuatorProto *policyprivatev1.PodScaleActuator,
+	_ runtime.ComponentID,
 	policyReadAPI iface.Policy,
-	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+	agentGroup := scaleActuatorProto.GetAgentGroup()
+	podScalerComponentID := scaleActuatorProto.GetPodScalerComponentId()
+	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), podScalerComponentID)
 	decisionsEtcdPath := path.Join(paths.PodScalerDecisionsPath, etcdKey)
-	dryRun := false
-	if scaleActuatorProto.GetDefaultConfig() != nil {
-		dryRun = scaleActuatorProto.GetDefaultConfig().GetDryRun()
-	}
 	sa := &ScaleActuator{
-		policyReadAPI:      policyReadAPI,
-		agentGroupName:     agentGroup,
-		componentID:        componentID,
-		decisionsEtcdPath:  decisionsEtcdPath,
-		scaleActuatorProto: scaleActuatorProto,
-		dryRun:             dryRun,
+		policyReadAPI:        policyReadAPI,
+		agentGroupName:       agentGroup,
+		podScalerComponentID: podScalerComponentID,
+		decisionsEtcdPath:    decisionsEtcdPath,
+		scaleActuatorProto:   scaleActuatorProto,
+		dryRun:               scaleActuatorProto.GetDryRun(),
 	}
 
 	return sa, fx.Options(
@@ -95,7 +92,7 @@ func (sa *ScaleActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx
 // Execute implements runtime.Component.Execute.
 func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	// Get the decision from the port
-	replicasReading := inPortReadings.ReadSingleReadingPort("desired_replicas")
+	replicasReading := inPortReadings.ReadSingleReadingPort("replicas")
 	var replicasValue float64
 	if replicasReading.Valid() {
 		if replicasReading.Value() <= 0 {
@@ -112,27 +109,8 @@ func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToReading, tickInfo 
 
 // DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
 func (sa *ScaleActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := sa.policyReadAPI.GetStatusRegistry().GetLogger()
-	key := sa.scaleActuatorProto.GetDynamicConfigKey()
-	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		dynamicConfig := &policylangv1.PodScaler_ScaleActuator_DynamicConfig{}
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
-			return
-		}
-		sa.setConfig(dynamicConfig)
-	} else {
-		sa.setConfig(sa.scaleActuatorProto.GetDefaultConfig())
-	}
-}
-
-func (sa *ScaleActuator) setConfig(config *policylangv1.PodScaler_ScaleActuator_DynamicConfig) {
-	if config != nil {
-		sa.dryRun = config.GetDryRun()
-	} else {
-		sa.dryRun = false
-	}
+	key := sa.scaleActuatorProto.GetDryRunConfigKey()
+	sa.dryRun = config.GetBoolValue(unmarshaller, key, sa.scaleActuatorProto.GetDryRun())
 }
 
 func (sa *ScaleActuator) publishDefaultDecision() {
@@ -157,7 +135,7 @@ func (sa *ScaleActuator) publishDecision(desiredReplicas float64) error {
 		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName:  sa.policyReadAPI.GetPolicyName(),
 			PolicyHash:  sa.policyReadAPI.GetPolicyHash(),
-			ComponentId: sa.componentID,
+			ComponentId: sa.podScalerComponentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)

@@ -20,20 +20,9 @@ message LoadDecisionWrapper {
   LoadDecision load_decision = 2;
 }
 
-message TokensDecisionWrapper {
-  // CommonAttributes
-  CommonAttributes common_attributes = 1;
-  // Tokens Decision
-  TokensDecision tokens_decision = 2;
-}
-
 message LoadDecision {
-  double load_multiplier = 1;
-  bool pass_through = 2;
-  TickInfo tick_info = 3;
-}
-
-message TokensDecision {
-  // Key is workload index and value is tokens.
-  map<string, uint64> tokens_by_workload_index = 1;
+  TickInfo tick_info = 1;
+  double load_multiplier = 2;
+  bool pass_through = 3;
+  map<string, uint64> tokens_by_workload_index = 4;
 }

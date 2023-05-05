@@ -1,11 +1,18 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/rabbitmq-queue-buildup/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/promql/gen/definitions.json
 common:
   policy_name: "service1-demoapp-rabbitmq-queue-buildup"
-  queue_name: "service3-demo-app.demoapp.svc.cluster.local"
+  promql_query: 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})'
+
 policy:
-  concurrency_controller:
-    queue_buildup_setpoint: 1000
-    selectors:
-      - agent_group: default
-        service: service1-demo-app.demoapp.svc.cluster.local
-        control_point: ingress
+  service_protection_core:
+    adaptive_load_scheduler:
+      load_scheduler:
+        # The selectors determine the flows that are protected by this policy.
+        # Type: []aperture.spec.v1.Selector
+        # Required: True
+        selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+  latency_baseliner:
+    setpoint: 1000

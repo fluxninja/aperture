@@ -7,7 +7,7 @@
   },
   "aperture_policies": [
     {
-      "blueprint_name": "policies/rabbitmq-queue-buildup",
+      "blueprint_name": "policies/service-protection/promql",
       "policy_name": "service1-demoapp-rabbitmq-queue-buildup",
       "values_file": "policies/rabbitmq-queue-buildup.yaml",
       "dashboard_mixin_dir": "dashboards/"

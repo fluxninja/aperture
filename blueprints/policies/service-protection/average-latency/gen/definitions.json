@@ -67,71 +67,34 @@
               }
             },
             "adaptive_load_scheduler": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["selectors"],
-              "properties": {
-                "selectors": {
-                  "description": "The selectors determine the flows that are protected by this policy.",
-                  "default": [
+              "description": "Parameters for Adaptive Load Scheduler.",
+              "default": {
+                "alerter": {
+                  "alert_name": "Load Throttling Event"
+                },
+                "gradient": {
+                  "max_gradient": 1,
+                  "min_gradient": 0.1,
+                  "slope": -1
+                },
+                "load_multiplier_linear_increment": 0.0025,
+                "load_scheduler": {
+                  "selectors": [
                     {
                       "control_point": "__REQUIRED_FIELD__",
                       "service": "__REQUIRED_FIELD__"
                     }
-                  ],
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Selector"
-                  }
+                  ]
                 },
-                "scheduler": {
-                  "description": "Scheduler parameters.",
-                  "default": {
-                    "auto_tokens": true
-                  },
-                  "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
-                },
-                "gradient": {
-                  "description": "Gradient Controller parameters.",
-                  "default": {
-                    "max_gradient": 1,
-                    "min_gradient": 0.1,
-                    "slope": -1
-                  },
-                  "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/GradientControllerParameters"
-                },
-                "alerter": {
-                  "description": "Parameters for the Alerter that detects load throttling.",
-                  "default": {
-                    "alert_name": "Load Throttling Event"
-                  },
-                  "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
-                },
-                "max_load_multiplier": {
-                  "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.",
-                  "default": 2,
-                  "type": "number",
-                  "format": "double"
-                },
-                "load_multiplier_linear_increment": {
-                  "description": "Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.",
-                  "default": 0.0025,
-                  "type": "number",
-                  "format": "double"
-                },
-                "default_config": {
-                  "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the",
-                  "default": {
-                    "dry_run": false
-                  },
-                  "type": "object",
-                  "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
-                }
-              }
+                "max_load_multiplier": 2
+              },
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerParameters"
+            },
+            "dry_run": {
+              "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
+              "default": false,
+              "type": "boolean"
             }
           }
         },

@@ -116,10 +116,10 @@ func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sCli
 
 type podNotifier struct {
 	stateMutex       sync.Mutex
-	isLeader         bool
-	podCounter       *prometheus.GaugeVec
 	electionTrackers notifiers.Trackers
+	podCounter       *prometheus.GaugeVec
 	agentGroup       string
+	isLeader         bool
 }
 
 func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers, lifecycle fx.Lifecycle, agentGroup string) (*podNotifier, error) {

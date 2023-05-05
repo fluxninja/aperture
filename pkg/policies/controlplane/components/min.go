@@ -31,7 +31,7 @@ func (*Min) IsActuator() bool { return false }
 var _ runtime.Component = (*Min)(nil)
 
 // NewMinAndOptions creates a new Min Component.
-func NewMinAndOptions(_ *policylangv1.Min, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewMinAndOptions(_ *policylangv1.Min, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	min := Min{}
 	return &min, fx.Options(), nil
 }

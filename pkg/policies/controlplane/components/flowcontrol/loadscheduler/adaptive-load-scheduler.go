@@ -16,27 +16,12 @@ const (
 	alsIsOverloadPortName             = "is_overload"
 	alsDesiredLoadMultiplierPortName  = "desired_load_multiplier"
 	alsObservedLoadMultiplierPortName = "observed_load_multiplier"
-	alsAcceptedTokenRatePortName      = "accepted_token_rate"
-	alsIncomingTokenRatePortName      = "incoming_token_rate"
 )
 
 // ParseAdaptiveLoadScheduler parses and returns nested circuit representation of AdaptiveLoadScheduler.
 func ParseAdaptiveLoadScheduler(
 	adaptiveLoadScheduler *policylangv1.AdaptiveLoadScheduler,
 ) (*policylangv1.NestedCircuit, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := adaptiveLoadScheduler.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
-		}
-		adaptiveLoadScheduler.Selectors = append(adaptiveLoadScheduler.Selectors, selector)
-		adaptiveLoadScheduler.FlowSelector = nil
-	}
-
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := adaptiveLoadScheduler.InPorts
 	if inPorts != nil {
@@ -69,63 +54,31 @@ func ParseAdaptiveLoadScheduler(
 		if observedLoadMultiplierPort != nil {
 			nestedOutPortsMap[alsObservedLoadMultiplierPortName] = observedLoadMultiplierPort
 		}
-		acceptedTokenRatePort := outPorts.AcceptedTokenRate
-		if acceptedTokenRatePort != nil {
-			nestedOutPortsMap[alsAcceptedTokenRatePortName] = acceptedTokenRatePort
-		}
-		incomingTokenRatePort := outPorts.IncomingTokenRate
-		if incomingTokenRatePort != nil {
-			nestedOutPortsMap[alsIncomingTokenRatePortName] = incomingTokenRatePort
-		}
 	}
 
 	isOverloadDeciderOperator := "gt"
 	// if slope is greater than 0 then we want to use less than operator
-	if adaptiveLoadScheduler.GradientParameters.Slope > 0 {
+	if adaptiveLoadScheduler.Parameters.Gradient.Slope > 0 {
 		isOverloadDeciderOperator = "lt"
 	}
 
-	alerterLabels := adaptiveLoadScheduler.AlerterParameters.Labels
+	alerterLabels := adaptiveLoadScheduler.Parameters.Alerter.Labels
 	if alerterLabels == nil {
 		alerterLabels = make(map[string]string)
 	}
 	alerterLabels["type"] = "load_scheduler"
-	adaptiveLoadScheduler.AlerterParameters.Labels = alerterLabels
+	adaptiveLoadScheduler.Parameters.Alerter.Labels = alerterLabels
 
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "AdaptiveLoadScheduler",
-		ShortDescription: iface.GetSelectorsShortDescription(adaptiveLoadScheduler.GetSelectors()),
+		ShortDescription: iface.GetSelectorsShortDescription(adaptiveLoadScheduler.Parameters.LoadScheduler.GetSelectors()),
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
-				Component: &policylangv1.Component_ArithmeticCombinator{
-					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: "div",
-						InPorts: &policylangv1.ArithmeticCombinator_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_TOKEN_RATE",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "INCOMING_TOKEN_RATE",
-								},
-							},
-						},
-						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "OBSERVED_LOAD_MULTIPLIER",
-							},
-						},
-					},
-				},
-			},
-			{
 				Component: &policylangv1.Component_GradientController{
 					GradientController: &policylangv1.GradientController{
-						Parameters: adaptiveLoadScheduler.GradientParameters,
+						Parameters: adaptiveLoadScheduler.Parameters.Gradient,
 						InPorts: &policylangv1.GradientController_Ins{
 							ControlVariable: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -136,7 +89,7 @@ func ParseAdaptiveLoadScheduler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: adaptiveLoadScheduler.MaxLoadMultiplier,
+											Value: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
 										},
 									},
 								},
@@ -220,29 +173,21 @@ func ParseAdaptiveLoadScheduler(
 					FlowControl: &policylangv1.FlowControl{
 						Component: &policylangv1.FlowControl_LoadScheduler{
 							LoadScheduler: &policylangv1.LoadScheduler{
-								Selectors: adaptiveLoadScheduler.Selectors,
-								Scheduler: &policylangv1.LoadScheduler_Scheduler{
-									Parameters: adaptiveLoadScheduler.SchedulerParameters,
-									OutPorts: &policylangv1.LoadScheduler_Scheduler_Outs{
-										AcceptedTokenRate: &policylangv1.OutPort{
-											SignalName: "ACCEPTED_TOKEN_RATE",
-										},
-										IncomingTokenRate: &policylangv1.OutPort{
-											SignalName: "INCOMING_TOKEN_RATE",
+								InPorts: &policylangv1.LoadScheduler_Ins{
+									LoadMultiplier: &policylangv1.InPort{
+										Value: &policylangv1.InPort_SignalName{
+											SignalName: "DESIRED_LOAD_MULTIPLIER",
 										},
 									},
 								},
-								Actuator: &policylangv1.LoadScheduler_Actuator{
-									DynamicConfigKey: adaptiveLoadScheduler.DynamicConfigKey,
-									DefaultConfig:    adaptiveLoadScheduler.DefaultConfig,
-									InPorts: &policylangv1.LoadScheduler_Actuator_Ins{
-										LoadMultiplier: &policylangv1.InPort{
-											Value: &policylangv1.InPort_SignalName{
-												SignalName: "DESIRED_LOAD_MULTIPLIER",
-											},
-										},
+								OutPorts: &policylangv1.LoadScheduler_Outs{
+									ObservedLoadMultiplier: &policylangv1.OutPort{
+										SignalName: "OBSERVED_LOAD_MULTIPLIER",
 									},
 								},
+								DynamicConfigKey: adaptiveLoadScheduler.DynamicConfigKey,
+								DefaultConfig:    adaptiveLoadScheduler.DefaultConfig,
+								Parameters:       adaptiveLoadScheduler.Parameters.LoadScheduler,
 							},
 						},
 					},
@@ -279,7 +224,7 @@ func ParseAdaptiveLoadScheduler(
 			{
 				Component: &policylangv1.Component_Alerter{
 					Alerter: &policylangv1.Alerter{
-						Parameters: adaptiveLoadScheduler.AlerterParameters,
+						Parameters: adaptiveLoadScheduler.Parameters.Alerter,
 						InPorts: &policylangv1.Alerter_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -349,7 +294,7 @@ func ParseAdaptiveLoadScheduler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: adaptiveLoadScheduler.LoadMultiplierLinearIncrement,
+											Value: adaptiveLoadScheduler.Parameters.LoadMultiplierLinearIncrement,
 										},
 									},
 								},
@@ -358,7 +303,7 @@ func ParseAdaptiveLoadScheduler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: adaptiveLoadScheduler.MaxLoadMultiplier,
+											Value: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
 										},
 									},
 								},
@@ -386,8 +331,6 @@ func ParseAdaptiveLoadScheduler(
 	components.AddNestedEgress(nestedCircuit, alsIsOverloadPortName, "IS_OVERLOAD")
 	components.AddNestedEgress(nestedCircuit, alsDesiredLoadMultiplierPortName, "DESIRED_LOAD_MULTIPLIER")
 	components.AddNestedEgress(nestedCircuit, alsObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
-	components.AddNestedEgress(nestedCircuit, alsAcceptedTokenRatePortName, "ACCEPTED_TOKEN_RATE")
-	components.AddNestedEgress(nestedCircuit, alsIncomingTokenRatePortName, "INCOMING_TOKEN_RATE")
 
 	return nestedCircuit, nil
 }

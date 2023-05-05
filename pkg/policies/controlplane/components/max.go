@@ -31,7 +31,7 @@ func (*Max) IsActuator() bool { return false }
 var _ runtime.Component = (*Max)(nil)
 
 // NewMaxAndOptions creates a new Max Component.
-func NewMaxAndOptions(_ *policylangv1.Max, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewMaxAndOptions(_ *policylangv1.Max, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	max := Max{}
 	return &max, fx.Options(), nil
 }

@@ -4,16 +4,22 @@ import (
 	"fmt"
 
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/mapstruct"
+	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/autoscale/podscaler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/regulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // FactoryModule for component factory run via the main app.
@@ -98,28 +104,56 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
-		case *policylangv1.FlowControl_FlowRegulator:
-			// Convert from *policylangv1.FlowControl_FlowRegulator to *policylangv1.FlowControl_Regulator
-			flowRegulatorProto := flowControl.GetFlowRegulator()
-			regulatorProto := &policylangv1.Regulator{}
-			err := convertOldComponentToNew(flowRegulatorProto, regulatorProto, nil)
-			if err != nil {
-				return Tree{}, nil, nil, err
-			}
-			ctor = mkCtor(regulatorProto, regulator.NewRegulatorAndOptions)
 		case *policylangv1.FlowControl_Regulator:
 			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
+		case *policylangv1.FlowControl_Private:
+			switch flowControlConfig.Private.TypeUrl {
+			case "type.googleapis.com/aperture.policy.private.v1.LoadActuator":
+				loadActuator := &policyprivatev1.LoadActuator{}
+				if err := anypb.UnmarshalTo(flowControlConfig.Private, loadActuator, proto.UnmarshalOptions{}); err != nil {
+					return Tree{}, nil, nil, err
+				}
+				ctor = mkCtor(loadActuator, loadscheduler.NewActuatorAndOptions)
+			default:
+				err := fmt.Errorf("unknown flow control type: %s", flowControlConfig.Private.TypeUrl)
+				log.Error().Err(err).Msg("unknown flow control type")
+				return Tree{}, nil, nil, err
+			}
+
 		default:
-			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
+			return newFlowControlNestedAndOptions(flowControl, componentID, policyReadAPI)
 		}
 	case *policylangv1.Component_AutoScale:
 		autoScale := componentProto.GetAutoScale()
-		return newAutoScaleCompositeAndOptions(autoScale, componentID, policyReadAPI)
+		switch autoScaleConfig := autoScale.Component.(type) {
+		case *policylangv1.AutoScale_Private:
+			private := autoScaleConfig.Private
+			switch private.TypeUrl {
+			case "type.googleapis.com/aperture.policy.private.v1.PodScaleActuator":
+				podScaleActuator := &policyprivatev1.PodScaleActuator{}
+				if err := anypb.UnmarshalTo(private, podScaleActuator, proto.UnmarshalOptions{}); err != nil {
+					return Tree{}, nil, nil, err
+				}
+				ctor = mkCtor(podScaleActuator, podscaler.NewScaleActuatorAndOptions)
+			case "type.googleapis.com/aperture.policy.private.v1.PodScaleReporter":
+				podScaleReporter := &policyprivatev1.PodScaleReporter{}
+				if err := anypb.UnmarshalTo(private, podScaleReporter, proto.UnmarshalOptions{}); err != nil {
+					return Tree{}, nil, nil, err
+				}
+				ctor = mkCtor(podScaleReporter, podscaler.NewScaleReporterAndOptions)
+			default:
+				err := fmt.Errorf("unknown auto scale type: %s", autoScaleConfig.Private.TypeUrl)
+				log.Error().Err(err).Msg("unknown auto scale type")
+				return Tree{}, nil, nil, err
+			}
+		default:
+			return newAutoScaleNestedAndOptions(autoScale, componentID, policyReadAPI)
+		}
 	default:
 		return Tree{}, nil, nil, fmt.Errorf("unknown component type: %T", config)
 	}
 
-	component, config, option, err := ctor(componentID.String(), policyReadAPI)
+	component, config, option, err := ctor(componentID, policyReadAPI)
 	if err != nil {
 		return Tree{}, nil, nil, err
 	}
@@ -133,15 +167,15 @@ func NewComponentAndOptions(
 }
 
 type componentConstructor func(
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, any, fx.Option, error)
 
 func mkCtor[Config any, Comp runtime.Component](
 	config *Config,
-	origCtor func(*Config, string, iface.Policy) (Comp, fx.Option, error),
+	origCtor func(*Config, runtime.ComponentID, iface.Policy) (Comp, fx.Option, error),
 ) componentConstructor {
-	return func(componentID string, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
+	return func(componentID runtime.ComponentID, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
 		comp, opt, err := origCtor(config, componentID, policy)
 		return comp, config, opt, err
 	}
@@ -168,7 +202,7 @@ func prepareComponentInCircuit(
 	subCircuitID runtime.ComponentID,
 	doParsePortMapping bool,
 ) (*runtime.ConfiguredComponent, error) {
-	mapStruct, err := mapstruct.EncodeObject(config)
+	mapStruct, err := utils.ToMapStruct(config)
 	if err != nil {
 		return nil, err
 	}
