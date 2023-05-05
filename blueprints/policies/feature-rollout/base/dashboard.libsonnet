@@ -21,7 +21,7 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='rate(flow_regulator_counter{policy_name="%(policy_name)s"}[$__rate_interval])' % {
+        expr='rate(regulator_counter{policy_name="%(policy_name)s"}[$__rate_interval])' % {
           policy_name: policyName,
         },
         intervalFactor=1,
