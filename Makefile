@@ -2,8 +2,8 @@ aperture_path := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 SHELL := /bin/bash
 
-# use GOMAXPROCS from environment if set, otherwise default to 4
-export GOMAXPROCS ?= 4
+# use GOMAXPROCS from environment if set, otherwise default to 8
+export GOMAXPROCS ?= 8
 
 generate-api:
 	@echo Generating API
