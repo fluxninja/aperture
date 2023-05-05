@@ -1,6 +1,7 @@
 package envoy
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"regexp"
@@ -143,6 +144,9 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		Telemetry: true,
 	}
 
+	if req.GetAttributes().GetRequest().GetHttp().GetBody() == "" && len(req.GetAttributes().GetRequest().GetHttp().GetRawBody()) != 0 {
+		req.GetAttributes().GetRequest().GetHttp().Body = bytes.NewBuffer(req.GetAttributes().GetRequest().GetHttp().GetRawBody()).String()
+	}
 	checkHTTPReq := authzRequestToCheckHTTPRequest(req, ctrlPt)
 	input := checkhttp.RequestToInputWithServices(checkHTTPReq, sourceSvcs, destinationSvcs)
 

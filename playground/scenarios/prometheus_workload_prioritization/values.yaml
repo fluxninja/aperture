@@ -1,0 +1,13 @@
+controller:
+  prometheus:
+    server:
+      podLabels:
+        'sidecar.istio.io/inject': 'true'
+demoapp:
+  common:
+    prometheus:
+      address: http://controller-prometheus-server.aperture-controller.svc.cluster.local:80
+istio:
+  envoyfilter:
+    envoyFilter:
+      packAsBytes: true

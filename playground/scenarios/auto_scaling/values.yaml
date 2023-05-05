@@ -1,0 +1,4 @@
+demoapp:
+  common:
+    simplesrv:
+      cpuLoadPercentage: 50
