@@ -27,10 +27,10 @@ type regulatorSync struct {
 	decision               *policysyncv1.RegulatorDecision
 	decisionWriter         *etcdwriter.Writer
 	dynamicConfigWriter    *etcdwriter.Writer
+	componentID            string
 	configEtcdPaths        []string
 	decisionEtcdPaths      []string
 	dynamicConfigEtcdPaths []string
-	componentID            string
 }
 
 // Name implements runtime.Component.
@@ -50,22 +50,9 @@ func (*regulatorSync) IsActuator() bool { return true }
 // NewRegulatorAndOptions creates fx options for Regulator and also returns agent group name associated with it.
 func NewRegulatorAndOptions(
 	regulatorProto *policylangv1.Regulator,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	// Deprecated 1.8.0
-	flowSelectorProto := regulatorProto.Parameters.GetFlowSelector()
-	if flowSelectorProto != nil {
-		selector := &policylangv1.Selector{
-			ControlPoint: flowSelectorProto.FlowMatcher.ControlPoint,
-			LabelMatcher: flowSelectorProto.FlowMatcher.LabelMatcher,
-			Service:      flowSelectorProto.ServiceSelector.Service,
-			AgentGroup:   flowSelectorProto.ServiceSelector.AgentGroup,
-		}
-		regulatorProto.Parameters.Selectors = append(regulatorProto.Parameters.Selectors, selector)
-		regulatorProto.Parameters.FlowSelector = nil
-	}
-
 	s := regulatorProto.Parameters.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)
@@ -73,7 +60,7 @@ func NewRegulatorAndOptions(
 	var configEtcdPaths, decisionEtcdPaths, dynamicConfigEtcdPaths []string
 
 	for _, agentGroup := range agentGroups {
-		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
 		configEtcdPath := path.Join(paths.RegulatorConfigPath, etcdKey)
 		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
 		decisionEtcdPath := path.Join(paths.RegulatorDecisionsPath, etcdKey)
@@ -89,7 +76,7 @@ func NewRegulatorAndOptions(
 		configEtcdPaths:        configEtcdPaths,
 		decisionEtcdPaths:      decisionEtcdPaths,
 		dynamicConfigEtcdPaths: dynamicConfigEtcdPaths,
-		componentID:            componentID,
+		componentID:            componentID.String(),
 	}
 	return regulatorSync, fx.Options(
 		fx.Invoke(

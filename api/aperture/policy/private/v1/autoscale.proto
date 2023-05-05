@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package aperture.policy.private.v1;
+
+import "aperture/policy/language/v1/ports.proto";
+
+message PodScaleActuator {
+  message Ins {
+    aperture.policy.language.v1.InPort replicas = 1;
+  }
+
+  Ins in_ports = 1;
+
+  bool dry_run = 2;
+
+  string dry_run_config_key = 3;
+
+  string pod_scaler_component_id = 4;
+
+  string agent_group = 5;
+}
+
+message PodScaleReporter {
+  message Outs {
+    aperture.policy.language.v1.OutPort actual_replicas = 1;
+    aperture.policy.language.v1.OutPort configured_replicas = 2;
+  }
+
+  Outs out_ports = 1;
+
+  string pod_scaler_component_id = 2;
+
+  string agent_group = 3;
+}

@@ -9,14 +9,18 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 * @schema (overload_confirmation.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
 * @schema (overload_confirmation.threshold: float64) The threshold for the overload confirmation criteria.
 * @schema (overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`
-* @param (policy.service_protection_core.adaptive_load_scheduler.selectors: []aperture.spec.v1.Selector required) The selectors determine the flows that are protected by this policy.
-* @param (policy.service_protection_core.adaptive_load_scheduler.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
-* @param (policy.service_protection_core.adaptive_load_scheduler.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
-* @param (policy.service_protection_core.adaptive_load_scheduler.alerter: aperture.spec.v1.AlerterParameters) Parameters for the Alerter that detects load throttling.
-* @param (policy.service_protection_core.adaptive_load_scheduler.max_load_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-* @param (policy.service_protection_core.adaptive_load_scheduler.load_multiplier_linear_increment: float64) Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
-* @param (policy.service_protection_core.adaptive_load_scheduler.default_config: aperture.spec.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the
+* @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters required) Parameters for Adaptive Load Scheduler.
+* @param (policy.service_protection_core.dry_run: bool) Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
 */
+
+/**
+* @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+* @param (dashboard.time_from: string) From time of dashboard.
+* @param (dashboard.time_to: string) To time of dashboard.
+* @param (dashboard.datasource.name: string) Datasource name.
+* @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
+*/
+
 serviceProtectionDefaults {
   policy+: {
     latency_baseliner: {
@@ -41,10 +45,3 @@ serviceProtectionDefaults {
     },
   },
 }
-/**
-* @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
-* @param (dashboard.time_from: string) From time of dashboard.
-* @param (dashboard.time_to: string) To time of dashboard.
-* @param (dashboard.datasource.name: string) Datasource name.
-* @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
-*/

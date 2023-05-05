@@ -14,34 +14,36 @@ function(cfg) {
   local time_from = params.time_from,
   local time_to = params.time_to,
 
-  local throughputPanel = graphPanel.new(
-    title='Throughput - Accept/Reject',
-    datasource=dsName,
-  )
-                          .addTarget(
-    prometheus.target(
-      expr='rate(flow_regulator_counter{policy_name="%(policy_name)s"}[$__rate_interval])' % {
-        policy_name: policyName,
-      },
-      intervalFactor=1,
-    ),
-  ),
-
-
-  local acceptPercentagePanel = graphPanel.new(
-    title='Accept Percentage',
-    datasource=dsName,
-  )
-                                .addTarget(
-    prometheus.target(
-      expr=(
-        'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])' +
-        '/' +
-        'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])'
+  local throughputPanel =
+    graphPanel.new(
+      title='Throughput - Accept/Reject',
+      datasource=dsName,
+    )
+    .addTarget(
+      prometheus.target(
+        expr='rate(flow_regulator_counter{policy_name="%(policy_name)s"}[$__rate_interval])' % {
+          policy_name: policyName,
+        },
+        intervalFactor=1,
       ),
-      intervalFactor=1,
     ),
-  ),
+
+
+  local acceptPercentagePanel =
+    graphPanel.new(
+      title='Accept Percentage',
+      datasource=dsName,
+    )
+    .addTarget(
+      prometheus.target(
+        expr=(
+          'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])' +
+          '/' +
+          'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])'
+        ),
+        intervalFactor=1,
+      ),
+    ),
 
 
   local dashboardDef =

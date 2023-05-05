@@ -10,37 +10,22 @@ common:
 
 policy:
   service_protection_core:
+    # Parameters for Adaptive Load Scheduler.
+    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Required: True
     adaptive_load_scheduler:
-      # The selectors determine the flows that are protected by this policy.
-      # Type: []aperture.spec.v1.Selector
-      # Required: True
-      selectors:
-        - control_point: __REQUIRED_FIELD__
-          service: __REQUIRED_FIELD__
-      # Scheduler parameters.
-      # Type: aperture.spec.v1.SchedulerParameters
-      scheduler:
-        auto_tokens: true
-      # Gradient Controller parameters.
-      # Type: aperture.spec.v1.GradientControllerParameters
+      alerter:
+        alert_name: "Load Throttling Event"
       gradient:
         max_gradient: 1
         min_gradient: 0.1
         slope: -1
-      # Parameters for the Alerter that detects load throttling.
-      # Type: aperture.spec.v1.AlerterParameters
-      alerter:
-        alert_name: "Load Throttling Event"
-      # Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-      # Type: float64
-      max_load_multiplier: 2
-      # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
-      # Type: float64
       load_multiplier_linear_increment: 0.0025
-      # Default configuration for concurrency controller that can be updated at the runtime without shutting down the
-      # Type: aperture.spec.v1.LoadActuatorDynamicConfig
-      default_config:
-        dry_run: false
+      load_scheduler:
+        selectors:
+          - control_point: __REQUIRED_FIELD__
+            service: __REQUIRED_FIELD__
+      max_load_multiplier: 2
   latency_baseliner:
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter

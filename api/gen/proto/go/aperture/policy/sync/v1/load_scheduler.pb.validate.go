@@ -355,166 +355,6 @@ var _ interface {
 	ErrorName() string
 } = LoadDecisionWrapperValidationError{}
 
-// Validate checks the field values on TokensDecisionWrapper with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *TokensDecisionWrapper) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on TokensDecisionWrapper with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// TokensDecisionWrapperMultiError, or nil if none found.
-func (m *TokensDecisionWrapper) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *TokensDecisionWrapper) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetCommonAttributes()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, TokensDecisionWrapperValidationError{
-					field:  "CommonAttributes",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, TokensDecisionWrapperValidationError{
-					field:  "CommonAttributes",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetCommonAttributes()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return TokensDecisionWrapperValidationError{
-				field:  "CommonAttributes",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetTokensDecision()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, TokensDecisionWrapperValidationError{
-					field:  "TokensDecision",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, TokensDecisionWrapperValidationError{
-					field:  "TokensDecision",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetTokensDecision()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return TokensDecisionWrapperValidationError{
-				field:  "TokensDecision",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return TokensDecisionWrapperMultiError(errors)
-	}
-
-	return nil
-}
-
-// TokensDecisionWrapperMultiError is an error wrapping multiple validation
-// errors returned by TokensDecisionWrapper.ValidateAll() if the designated
-// constraints aren't met.
-type TokensDecisionWrapperMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m TokensDecisionWrapperMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m TokensDecisionWrapperMultiError) AllErrors() []error { return m }
-
-// TokensDecisionWrapperValidationError is the validation error returned by
-// TokensDecisionWrapper.Validate if the designated constraints aren't met.
-type TokensDecisionWrapperValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e TokensDecisionWrapperValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e TokensDecisionWrapperValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e TokensDecisionWrapperValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e TokensDecisionWrapperValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e TokensDecisionWrapperValidationError) ErrorName() string {
-	return "TokensDecisionWrapperValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e TokensDecisionWrapperValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sTokensDecisionWrapper.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = TokensDecisionWrapperValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = TokensDecisionWrapperValidationError{}
-
 // Validate checks the field values on LoadDecision with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -536,10 +376,6 @@ func (m *LoadDecision) validate(all bool) error {
 	}
 
 	var errors []error
-
-	// no validation rules for LoadMultiplier
-
-	// no validation rules for PassThrough
 
 	if all {
 		switch v := interface{}(m.GetTickInfo()).(type) {
@@ -569,6 +405,12 @@ func (m *LoadDecision) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for LoadMultiplier
+
+	// no validation rules for PassThrough
+
+	// no validation rules for TokensByWorkloadIndex
 
 	if len(errors) > 0 {
 		return LoadDecisionMultiError(errors)
@@ -646,105 +488,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadDecisionValidationError{}
-
-// Validate checks the field values on TokensDecision with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *TokensDecision) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on TokensDecision with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in TokensDecisionMultiError,
-// or nil if none found.
-func (m *TokensDecision) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *TokensDecision) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for TokensByWorkloadIndex
-
-	if len(errors) > 0 {
-		return TokensDecisionMultiError(errors)
-	}
-
-	return nil
-}
-
-// TokensDecisionMultiError is an error wrapping multiple validation errors
-// returned by TokensDecision.ValidateAll() if the designated constraints
-// aren't met.
-type TokensDecisionMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m TokensDecisionMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m TokensDecisionMultiError) AllErrors() []error { return m }
-
-// TokensDecisionValidationError is the validation error returned by
-// TokensDecision.Validate if the designated constraints aren't met.
-type TokensDecisionValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e TokensDecisionValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e TokensDecisionValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e TokensDecisionValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e TokensDecisionValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e TokensDecisionValidationError) ErrorName() string { return "TokensDecisionValidationError" }
-
-// Error satisfies the builtin error interface
-func (e TokensDecisionValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sTokensDecision.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = TokensDecisionValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = TokensDecisionValidationError{}

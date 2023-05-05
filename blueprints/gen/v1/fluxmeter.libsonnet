@@ -19,12 +19,6 @@
   withExponentialBucketsRangeMixin(exponential_buckets_range):: {
     exponential_buckets_range+: exponential_buckets_range,
   },
-  withFlowSelector(flow_selector):: {
-    flow_selector: flow_selector,
-  },
-  withFlowSelectorMixin(flow_selector):: {
-    flow_selector+: flow_selector,
-  },
   withLinearBuckets(linear_buckets):: {
     linear_buckets: linear_buckets,
   },

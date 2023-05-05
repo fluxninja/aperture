@@ -30,7 +30,7 @@ type NestedSignalIngress struct {
 }
 
 // NewNestedSignalIngressAndOptions creates a new NestedSignalIngress and its options.
-func NewNestedSignalIngressAndOptions(nestedSignalIngressProto *policylangv1.NestedSignalIngress, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewNestedSignalIngressAndOptions(nestedSignalIngressProto *policylangv1.NestedSignalIngress, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	comp := NestedSignalIngress{}
 	comp.portName = nestedSignalIngressProto.PortName
 	return &comp, fx.Options(), nil
@@ -47,7 +47,7 @@ type NestedSignalEgress struct {
 }
 
 // NewNestedSignalEgressAndOptions creates a new NestedSignalEgress and its options.
-func NewNestedSignalEgressAndOptions(nestedSignalEgressProto *policylangv1.NestedSignalEgress, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewNestedSignalEgressAndOptions(nestedSignalEgressProto *policylangv1.NestedSignalEgress, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	comp := NestedSignalEgress{}
 	comp.portName = nestedSignalEgressProto.PortName
 	return &comp, fx.Options(), nil

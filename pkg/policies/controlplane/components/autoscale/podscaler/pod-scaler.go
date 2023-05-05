@@ -1,97 +1,127 @@
 package podscaler
 
 import (
-	"context"
-	"errors"
-	"path"
+	"fmt"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"go.uber.org/fx"
-	"google.golang.org/protobuf/proto"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
-// Module returns the fx options for horizontal pod scaler in the main app.
-func Module() fx.Option {
-	return fx.Options(
-		scaleReporterModule(),
-	)
-}
+const (
+	inputReplicasPortName            = "replicas"
+	outputActualReplicasPortName     = "actual_replicas"
+	outputConfiguredReplicasPortName = "configured_replicas"
+)
 
-type podScalerConfigSync struct {
-	policyReadAPI  iface.Policy
-	podScalerProto *policylangv1.PodScaler
-	etcdPath       string
-	componentID    string
-}
+// ParsePodScaler parses a PodScaler component and returns its nested circuit representation.
+func ParsePodScaler(
+	podScaler *policylangv1.PodScaler,
+	componentID runtime.ComponentID,
+	_ iface.Policy,
+) (*policylangv1.NestedCircuit, error) {
+	nestedInPortsMap := make(map[string]*policylangv1.InPort)
+	inPorts := podScaler.GetInPorts()
 
-// NewPodScalerOptions creates fx options for HorizontalPodScaler and also returns the agent group name associated with it.
-func NewPodScalerOptions(
-	podScalerProto *policylangv1.PodScaler,
-	componentStackID string,
-	policyReadAPI iface.Policy,
-) (fx.Option, string, error) {
-	// Get Agent Group Name from HorizontalPodScaler.KubernetesObjectSelector.AgentGroup
-	k8sObjectSelectorProto := podScalerProto.GetKubernetesObjectSelector()
-	if k8sObjectSelectorProto == nil {
-		return fx.Options(), "", errors.New("podScaler.Selector is nil")
-	}
-	agentGroup := k8sObjectSelectorProto.GetAgentGroup()
-	etcdPath := path.Join(paths.PodScalerConfigPath,
-		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
-	configSync := &podScalerConfigSync{
-		podScalerProto: podScalerProto,
-		policyReadAPI:  policyReadAPI,
-		etcdPath:       etcdPath,
-		componentID:    componentStackID,
+	if inPorts != nil {
+		replicasPort := inPorts.Replicas
+		if replicasPort != nil {
+			nestedInPortsMap[inputReplicasPortName] = replicasPort
+		}
 	}
 
-	return fx.Options(
-		fx.Invoke(
-			configSync.doSync,
-		),
-	), agentGroup, nil
-}
+	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
+	outPorts := podScaler.GetOutPorts()
+	if outPorts != nil {
+		actualReplicasPort := outPorts.ActualReplicas
+		if actualReplicasPort != nil {
+			nestedOutPortsMap[outputActualReplicasPortName] = actualReplicasPort
+		}
+		configuredReplicasPort := outPorts.ConfiguredReplicas
+		if configuredReplicasPort != nil {
+			nestedOutPortsMap[outputConfiguredReplicasPortName] = configuredReplicasPort
+		}
+	}
 
-func (configSync *podScalerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
-	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	// Add/remove file in lifecycle hooks in order to sync with etcd.
-	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.PodScalerWrapper{
-				PodScaler: configSync.podScalerProto,
-				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:  configSync.policyReadAPI.GetPolicyName(),
-					PolicyHash:  configSync.policyReadAPI.GetPolicyHash(),
-					ComponentId: configSync.componentID,
+	podScaleActuatorAnyProto, err := anypb.New(
+		&policyprivatev1.PodScaleActuator{
+			InPorts: &policyprivatev1.PodScaleActuator_Ins{
+				Replicas: &policylangv1.InPort{
+					Value: &policylangv1.InPort_SignalName{
+						SignalName: "REPLICAS",
+					},
 				},
-			}
-			dat, err := proto.Marshal(wrapper)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to marshal flux meter config")
-				return err
-			}
-			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to put flux meter config")
-				return err
-			}
-			return nil
+			},
+			DryRun:               podScaler.DryRun,
+			DryRunConfigKey:      podScaler.DryRunConfigKey,
+			PodScalerComponentId: componentID.String(),
+			AgentGroup:           podScaler.KubernetesObjectSelector.AgentGroup,
 		},
-		OnStop: func(ctx context.Context) error {
-			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to delete flux meter config")
-				return err
-			}
-			return nil
-		},
-	})
+	)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil
+	podScaleReporterAnyProto, err := anypb.New(
+		&policyprivatev1.PodScaleReporter{
+			OutPorts: &policyprivatev1.PodScaleReporter_Outs{
+				ActualReplicas: &policylangv1.OutPort{
+					SignalName: "ACTUAL_REPLICAS",
+				},
+				ConfiguredReplicas: &policylangv1.OutPort{
+					SignalName: "CONFIGURED_REPLICAS",
+				},
+			},
+			PodScalerComponentId: componentID.String(),
+			AgentGroup:           podScaler.KubernetesObjectSelector.AgentGroup,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	kos := podScaler.KubernetesObjectSelector
+	sd := fmt.Sprintf("%s/%s/%s/%s/%s",
+		kos.GetAgentGroup(),
+		kos.GetNamespace(),
+		kos.GetApiVersion(),
+		kos.GetKind(),
+		kos.GetName(),
+	)
+
+	nestedCircuit := &policylangv1.NestedCircuit{
+		Name:             "PodScaler",
+		ShortDescription: sd,
+		InPortsMap:       nestedInPortsMap,
+		OutPortsMap:      nestedOutPortsMap,
+		Components: []*policylangv1.Component{
+			{
+				Component: &policylangv1.Component_AutoScale{
+					AutoScale: &policylangv1.AutoScale{
+						Component: &policylangv1.AutoScale_Private{
+							Private: podScaleActuatorAnyProto,
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_AutoScale{
+					AutoScale: &policylangv1.AutoScale{
+						Component: &policylangv1.AutoScale_Private{
+							Private: podScaleReporterAnyProto,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	components.AddNestedIngress(nestedCircuit, inputReplicasPortName, "REPLICAS")
+	components.AddNestedEgress(nestedCircuit, outputActualReplicasPortName, "ACTUAL_REPLICAS")
+	components.AddNestedEgress(nestedCircuit, outputConfiguredReplicasPortName, "CONFIGURED_REPLICAS")
+
+	return nestedCircuit, nil
 }

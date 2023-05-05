@@ -70,7 +70,7 @@ func (*Decider) IsActuator() bool { return false }
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.
-func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	operator, err := ComparisonOperatorString(deciderProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err

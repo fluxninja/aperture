@@ -10,10 +10,10 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // ParseNestedCircuit parses a nested circuit and returns the parent, leaf components, and options.
@@ -79,6 +79,16 @@ func ParseNestedCircuit(
 	// Set in and out ports at signal ingress and egress components based on the port mapping
 	for i, configuredComponent := range leafComponents {
 		component := configuredComponent.Component
+		parentComponentID, found := configuredComponent.ComponentID.ParentID()
+		if !found {
+			// not expected to happen
+			log.Fatal().Msgf("parent component id not found for component %s", configuredComponent.ComponentID)
+		}
+		if parentComponentID.String() != nestedCircuitID.String() {
+			// this will be handled by the child component, skip
+			continue
+		}
+
 		// dynamic cast to signal ingress or egress
 		if nestedSignalIngress, ok := component.(*components.NestedSignalIngress); ok {
 			portName := nestedSignalIngress.PortName()
@@ -144,7 +154,7 @@ func DecodePortMap(config any, circuitID string) (runtime.PortToSignals, error) 
 		return ports, nil
 	}
 
-	mapStruct, err := mapstruct.EncodeObject(config)
+	mapStruct, err := utils.ToMapStruct(config)
 	if err != nil {
 		return nil, err
 	}

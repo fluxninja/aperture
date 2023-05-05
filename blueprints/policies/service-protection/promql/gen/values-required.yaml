@@ -1,0 +1,37 @@
+# Generated values file for policies/service-protection/promql blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/promql
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # PromQL query.
+  # Type: string
+  # Required: True
+  promql_query: __REQUIRED_FIELD__
+
+policy:
+  service_protection_core:
+    # Parameters for Adaptive Load Scheduler.
+    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Required: True
+    adaptive_load_scheduler:
+      alerter:
+        alert_name: "Load Throttling Event"
+      gradient:
+        max_gradient: 1
+        min_gradient: 0.1
+        slope: -1
+      load_multiplier_linear_increment: 0.0025
+      load_scheduler:
+        selectors:
+          - control_point: __REQUIRED_FIELD__
+            service: __REQUIRED_FIELD__
+      max_load_multiplier: 2
+  latency_baseliner:
+    # Setpoint.
+    # Type: float64
+    # Required: True
+    setpoint: __REQUIRED_FIELD__

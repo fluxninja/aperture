@@ -8,7 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/mapstruct"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // PortMapping is description of a component's ports mapping.
@@ -165,7 +165,7 @@ func ConstantSignalFromProto(constantSignalProto *policylangv1.ConstantSignal) *
 }
 
 // PortsFromComponentConfig extracts Ports from component's config.
-func PortsFromComponentConfig(componentConfig mapstruct.Object, subCircuitID string) (PortMapping, error) {
+func PortsFromComponentConfig(componentConfig utils.MapStruct, subCircuitID string) (PortMapping, error) {
 	var ports PortMapping
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{

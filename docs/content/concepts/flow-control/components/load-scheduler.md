@@ -79,27 +79,30 @@ the same number of tokens.
 
 ### Tokens {#tokens}
 
-Tokens represent the unit of cost for processing a flow in the system.
-Typically, tokens are based on the estimated response time of a flow. Estimating
-the number of tokens for each request within a workload is critical for making
-effective flow control decisions. The concept of tokens is aligned with
+Tokens represent the unit of cost for accepting a certain flow. Typically,
+tokens are based on the estimated response time of a flow. Estimating the number
+of tokens for each request within a workload is critical for making effective
+flow control decisions. The concept of tokens is aligned with
 [Little's Law](https://en.wikipedia.org/wiki/Little%27s_law), which relates
 response times, arrival rate, and the number of requests in the system
-(concurrency).
+(concurrency). Aperture can automatically estimate the tokens for each workload
+based on historical latency measurements. See the
+`workload_latency_based_tokens`
+[configuration](/reference/policies/spec.md#load-scheduler) for more details.
 
-In certain cases, tokens can be represented as the number of requests instead of
-response times. For example, when applying flow control to external APIs that
-have strict rate limits.
-
-By default, Aperture can automatically estimate the tokens for each workload.
-See the `auto_tokens` [configuration](/reference/policies/spec.md#scheduler) for
-more details.
+Alternatively, tokens can also be represented as the number of requests instead
+of response times. For example, when scheduling access to external APIs that
+have strict rate limits (global quota). In this case, the number of tokens
+represents the number of requests that can be made to the API within a given
+time window.
 
 Tokens are determined in the following order of precedence:
 
-- Specified in the flow labels
+- Specified in the flow labels.
 - Specified in the `Workload.tokens` setting.
-- Estimated using the `auto_tokens` feature.
+- Estimated tokens (see
+  [`workload_latency_based_tokens`](/reference/policies/spec.md#load-scheduler)
+  setting).
 
 ### Token rate {#token-rate}
 

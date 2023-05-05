@@ -39,7 +39,7 @@ func (pg *PulseGenerator) ShortDescription() string {
 func (*PulseGenerator) IsActuator() bool { return false }
 
 // NewPulseGeneratorAndOptions creates an pulse generator component and its fx options.
-func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 	trueFor := math.Ceil(float64(generatorProto.TrueFor.AsDuration()) / float64(evaluationPeriod))
 	falseFor := math.Ceil(float64(generatorProto.FalseFor.AsDuration()) / float64(evaluationPeriod))

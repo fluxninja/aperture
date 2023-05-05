@@ -22,8 +22,6 @@ var (
 	PoliciesDynamicConfigPath = path.Join(ConfigPrefix, "dynamic-config-policies")
 	// ClassifiersPath is config path in etcd for classifiers.
 	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
-	// AutoTokenResultsPath is config path in etcd for query tokens.
-	AutoTokenResultsPath = path.Join(ConfigPrefix, "tokens")
 	// LoadSchedulerConfigPath is config path in etcd for load scheduler.
 	LoadSchedulerConfigPath = path.Join(ConfigPrefix, "load_scheduler")
 	// LoadSchedulerDecisionsPath is decision path in etcd for load decisions.

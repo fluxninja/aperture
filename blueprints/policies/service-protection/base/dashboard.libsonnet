@@ -4,14 +4,9 @@ local config = import './config-defaults.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
-local row = grafana.row;
 local prometheus = grafana.prometheus;
-local template = grafana.template;
-local graphPanel = grafana.graphPanel;
-local tablePanel = grafana.tablePanel;
 local barGaugePanel = grafana.barGaugePanel;
 local statPanel = grafana.statPanel;
-local annotation = grafana.annotation;
 local timeSeriesPanel = lib.TimeSeriesPanel;
 
 local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
@@ -125,7 +120,6 @@ local newStatPanel(graphTitle, datasource, graphQuery) =
   };
 
 function(cfg) {
-  local p = 'service_latency',
   local params = config.common + config.dashboard + cfg,
   local policyName = params.policy_name,
   local ds = params.datasource,

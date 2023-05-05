@@ -51,16 +51,8 @@ func main() {
 
 func processDefinitions(definitions map[string]interface{}) {
 	for _, definition := range definitions {
-		m, ok := definition.(map[string]interface{})
-		if !ok {
-			continue
-		}
-		for k, v := range m {
-			if k == "properties" {
-				properties, ok := v.(map[string]interface{})
-				if !ok {
-					continue
-				}
+		if m, ok := definition.(map[string]interface{}); ok {
+			if properties, ok := m["properties"].(map[string]interface{}); ok {
 				required := processProperties(properties)
 				if len(required) > 0 {
 					m["required"] = required

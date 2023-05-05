@@ -1,31 +1,38 @@
+local loadschedulerins = import './loadschedulerins.libsonnet';
+local loadschedulerouts = import './loadschedulerouts.libsonnet';
 {
   new():: {
   },
-  withActuator(actuator):: {
-    actuator: actuator,
+  inPorts:: loadschedulerins,
+  outPorts:: loadschedulerouts,
+  withDefaultConfig(default_config):: {
+    default_config: default_config,
   },
-  withActuatorMixin(actuator):: {
-    actuator+: actuator,
+  withDefaultConfigMixin(default_config):: {
+    default_config+: default_config,
   },
-  withFlowSelector(flow_selector):: {
-    flow_selector: flow_selector,
+  withDynamicConfigKey(dynamic_config_key):: {
+    dynamic_config_key: dynamic_config_key,
   },
-  withFlowSelectorMixin(flow_selector):: {
-    flow_selector+: flow_selector,
+  withDynamicConfigKeyMixin(dynamic_config_key):: {
+    dynamic_config_key+: dynamic_config_key,
   },
-  withScheduler(scheduler):: {
-    scheduler: scheduler,
+  withInPorts(in_ports):: {
+    in_ports: in_ports,
   },
-  withSchedulerMixin(scheduler):: {
-    scheduler+: scheduler,
+  withInPortsMixin(in_ports):: {
+    in_ports+: in_ports,
   },
-  withSelectors(selectors):: {
-    selectors:
-      if std.isArray(selectors)
-      then selectors
-      else [selectors],
+  withOutPorts(out_ports):: {
+    out_ports: out_ports,
   },
-  withSelectorsMixin(selectors):: {
-    selectors+: selectors,
+  withOutPortsMixin(out_ports):: {
+    out_ports+: out_ports,
+  },
+  withParameters(parameters):: {
+    parameters: parameters,
+  },
+  withParametersMixin(parameters):: {
+    parameters+: parameters,
   },
 }

@@ -31,6 +31,18 @@ func main() {
 	// read all definitions to look for keys with prefix
 	// these deinitions have to replaced with new names that do not contain the prefix and all the dot separators are removed
 	for k, v := range definitions {
+		// range through properties and remove all properties that start with "private"
+		if m, ok := v.(map[string]interface{}); ok {
+			if properties, ok := m["properties"].(map[string]interface{}); ok {
+				for k := range properties {
+					// field starts with private
+					if strings.HasPrefix(k, "private") {
+						delete(properties, k)
+					}
+				}
+			}
+		}
+
 		key := k
 		if strings.HasPrefix(key, "aperture.") {
 			v1 := ".v1."
