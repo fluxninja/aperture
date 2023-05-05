@@ -385,7 +385,7 @@ jobs:
             - ../.cache/golangci-lint
             - ../.cache/go-build
             - ../.cache/buf
-            - ~/.aperturectl
+            - ../.aperturectl
             - ./blueprints/vendor
           when: on_success
       - save_cache:
