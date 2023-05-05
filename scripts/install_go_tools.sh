@@ -15,3 +15,6 @@ tools=$(grep _ tools.go | awk -F'"' '{print $2}')
 parallel -j8 --no-notice --bar --eta go install ::: "$tools"
 
 popd >/dev/null
+
+# force build aperturectl
+"$gitroot"/scripts/build_aperturectl.sh --force-build
