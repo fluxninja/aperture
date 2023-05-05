@@ -306,7 +306,7 @@ jobs:
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-v6-go-cache-{{ checksum "~/day" }}
+            - aperture-v7-go-cache-{{ checksum "~/day" }}
       - run:
           name: Install Go tools
           command: scripts/install_go_tools.sh
@@ -377,7 +377,7 @@ jobs:
             fi
       - save_cache:
           name: Save go cache
-          key: aperture-v6-go-cache-{{ checksum "~/day" }}
+          key: aperture-v7-go-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/golangci-lint
             - ../.cache/go-build
@@ -1380,10 +1380,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v8-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v8-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -1401,7 +1401,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v8-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
