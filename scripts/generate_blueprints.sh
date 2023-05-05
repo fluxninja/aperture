@@ -7,7 +7,7 @@ export git_root
 
 python "$git_root"/scripts/jsonnet-lib-gen.py --output-dir "$git_root"/blueprints/gen "$git_root"/docs/gen/policy/policy.yaml
 tk fmt "$git_root"/blueprints/gen
-npx prettier@latest --write "$git_root"/blueprints/gen/jsonschema/*.json
+prettier --write "$git_root"/blueprints/gen/jsonschema/*.json
 git add "$git_root"/blueprints/gen
 
 blueprints_root=${git_root}/blueprints
@@ -35,7 +35,7 @@ function generate_readme() {
 	gen_files=("$gen_dir"/values.yaml "$gen_dir"/values-required.yaml "$gen_dir"/dynamic-config-values.yaml "$gen_dir"/dynamic-config-values-required.yaml "$gen_dir"/definitions.json "$gen_dir"/dynamic-config-definitions.json)
 	for gen_file in "${gen_files[@]}"; do
 		if [ -f "$gen_file" ]; then
-			npx prettier@latest --write "$gen_file"
+			prettier --write "$gen_file"
 		fi
 	done
 }
@@ -45,4 +45,4 @@ export -f generate_readme
 parallel -j8 --no-notice --bar --eta generate_readme ::: "$($FIND "$blueprints_root" -type f -name config.libsonnet)"
 
 # run prettier on generated readme docs
-parallel -j8 --no-notice --bar --eta npx prettier@latest --write ::: "$($FIND "$git_root"/docs/content/reference/policies/bundled-blueprints -type f -name '*.md')"
+parallel -j8 --no-notice --bar --eta prettier --write ::: "$($FIND "$git_root"/docs/content/reference/policies/bundled-blueprints -type f -name '*.md')"

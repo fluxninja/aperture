@@ -49,8 +49,7 @@ function generate_mermaid_images() {
 		# loop formats svg and png
 		# shellcheck disable=SC2043
 		for fmt in svg; do #png; do
-			npx -p @mermaid-js/mermaid-cli mmdc \
-				--quiet --input "$mmd_file" --configFile "$docsdir"/tools/mermaid/mermaid-theme.json --cssFile "$docsdir"/tools/mermaid/mermaid.css --scale 2 --output "$mmd_file"."$fmt" --backgroundColor transparent
+			mmdc --quiet --input "$mmd_file" --configFile "$docsdir"/tools/mermaid/mermaid-theme.json --cssFile "$docsdir"/tools/mermaid/mermaid.css --scale 2 --output "$mmd_file"."$fmt" --backgroundColor transparent
 		done
 		# update md5sum
 		echo "$md5sum" >"$mmd_file".md5sum

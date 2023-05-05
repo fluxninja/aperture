@@ -2,8 +2,8 @@ aperture_path := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 SHELL := /bin/bash
 
-# use GOMAXPROCS from environment if set, otherwise default to 4
-export GOMAXPROCS ?= 4
+# use GOMAXPROCS from environment if set, otherwise default to 8
+export GOMAXPROCS ?= 8
 
 generate-api:
 	@echo Generating API
@@ -41,21 +41,17 @@ go-build-plugins:
 	@echo Building go plugins
 	@./scripts/go_build_plugins.sh
 
-install-tools:
-	@echo Installing tools
-	@./scripts/manage_tools.sh
-
 install-asdf-tools:
-	@echo Installing Asdf tools
-	@./scripts/manage_asdf_tools.sh setup
+	@./scripts/install_asdf_tools.sh setup
 
 install-go-tools:
-	@echo Installing tools from tools.go
 	@./scripts/install_go_tools.sh
 
+install-node-tools:
+	@./scripts/install_node_tools.sh
+
 install-python-tools:
-	@echo Installing tools from requirements.txt
-	@pip3 install -r requirements.txt
+	@./scripts/install_python_tools.sh
 
 go-generate-swagger:
 	@echo Generating swagger code
