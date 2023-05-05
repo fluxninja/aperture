@@ -12,12 +12,10 @@ policy:
   resources:
     flow_control:
       classifiers:
-        - flow_selector:
-            service_selector:
+        - selectors:
+            - control_point: ingress
               agent_group: default
               service: controller-prometheus-server.aperture-controller.svc.cluster.local
-            flow_matcher:
-              control_point: ingress
               label_matcher:
                 match_labels:
                   "http.path": "/api/v1/write"
@@ -52,25 +50,26 @@ policy:
       # The selectors determine the flows that are protected by this policy.
       # Type: []aperture.spec.v1.Selector
       # Required: True
-      selectors:
-        - control_point: ingress
-          service: controller-prometheus-server.aperture-controller.svc.cluster.local
-          label_matcher:
-            match_labels:
-              "http.path": "/api/v1/write"
-              "is_demo_app": "true"
-      scheduler:
-        workloads:
-          - label_matcher:
+      load_scheduler:
+        selectors:
+          - control_point: ingress
+            service: controller-prometheus-server.aperture-controller.svc.cluster.local
+            label_matcher:
               match_labels:
-                is_demo_app_requests_total: "true"
-            parameters:
-              priority: 50
-          - label_matcher:
-              match_labels:
-                is_demo_app_request_duration_micro_seconds: "true"
-            parameters:
-              priority: 200
+                "http.path": "/api/v1/write"
+                "is_demo_app": "true"
+        scheduler:
+          workloads:
+            - label_matcher:
+                match_labels:
+                  is_demo_app_requests_total: "true"
+              parameters:
+                priority: 50
+            - label_matcher:
+                match_labels:
+                  is_demo_app_request_duration_micro_seconds: "true"
+              parameters:
+                priority: 200
   latency_baseliner:
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter
