@@ -16,4 +16,4 @@ aperturectl="$("$git_root"/scripts/build_aperturectl.sh)"
 dirs=$($FIND "$git_root" -name validate.sh -exec dirname {} \;)
 
 # use parallel command to cd into each directory and run validate.sh
-parallel -j4 --no-notice --bar --eta --halt-on-error now,fail,1 "cd {} && ./validate.sh" ::: "$dirs"
+parallel -j8 --no-notice --bar --eta --halt-on-error now,fail,1 "cd {} && ./validate.sh" ::: "$dirs"

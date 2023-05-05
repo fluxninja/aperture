@@ -8,6 +8,6 @@ pushd "$gitroot" >/dev/null || exit 1
 dirs=$(grep --include="*.go" --exclude-dir="vendor" -r "package main" -l plugins | xargs dirname | sort -u)
 
 # use parallel to execute "cd {} && go build" in for each directory in $dirs
-parallel -j4 --no-notice --bar --eta "cd {} && go build --buildmode=plugin" ::: "$dirs"
+parallel -j8 --no-notice --bar --eta "cd {} && go build --buildmode=plugin" ::: "$dirs"
 
 popd >/dev/null || exit 1

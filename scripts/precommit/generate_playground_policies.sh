@@ -34,6 +34,6 @@ function generate_policies() {
 
 export -f generate_policies
 
-parallel -j4 --no-notice --bar --eta generate_policies ::: "$($FIND playground -type f -name metadata.json)"
+parallel -j8 --no-notice --bar --eta generate_policies ::: "$($FIND playground -type f -name metadata.json)"
 
 popd >/dev/null
