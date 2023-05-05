@@ -334,6 +334,7 @@ jobs:
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+            asdf reshim python
       - run:
           name: Cache golangci-lint run
           command: |
