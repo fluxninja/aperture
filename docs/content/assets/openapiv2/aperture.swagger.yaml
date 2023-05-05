@@ -418,7 +418,7 @@ definitions:
                 description: |-
                     Dry run mode ensures that no scaling is invoked by this auto scaler.
                     This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
-                    This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.
+                    This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
                 type: boolean
             dry_run_config_key:
                 description: Configuration key for overriding dry run setting through dynamic configuration.
@@ -2835,7 +2835,7 @@ definitions:
                 description: |-
                     Dry run mode ensures that no scaling is invoked by this pod scaler.
                     This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
-                    This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.
+                    This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
                 type: boolean
             dry_run_config_key:
                 description: Configuration key for overriding dry run setting through dynamic configuration.

@@ -475,7 +475,7 @@
       "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.",
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },
@@ -2491,7 +2491,7 @@
       "description": "Component for scaling pods based on a signal.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.",
+          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },

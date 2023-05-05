@@ -1003,7 +1003,7 @@ KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
 
 Dry run mode ensures that no scaling is invoked by this auto scaler. This is
 Useful for observing the behavior of auto scaler without disrupting any real
-traffic. This parameter sets the default value of dry run setting which may be
+traffic. This parameter sets the default value of dry run setting which can be
 overridden at runtime using dynamic configuration.
 
 </dd>
@@ -5411,7 +5411,7 @@ Component for scaling pods based on a signal.
 
 Dry run mode ensures that no scaling is invoked by this pod scaler. This is
 Useful for observing the behavior of pod scaler without disrupting any real
-traffic. This parameter sets the default value of dry run setting which may be
+traffic. This parameter sets the default value of dry run setting which can be
 overridden at runtime using dynamic configuration.
 
 </dd>
