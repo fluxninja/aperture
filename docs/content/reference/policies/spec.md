@@ -4723,7 +4723,9 @@ Example:
 all:
   of:
     - label_exists: foo
-    - label_equals: { label = app, value = frobnicator }
+    - label_equals:
+        label: app
+        value: frobnicator
 ```
 
 <dl>
@@ -4768,7 +4770,7 @@ The expression is true when label value equals given value.
 
 <!-- vale off -->
 
-(string, **required**)
+(string)
 
 <!-- vale on -->
 

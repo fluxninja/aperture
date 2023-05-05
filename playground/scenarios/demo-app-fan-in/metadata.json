@@ -1,0 +1,37 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/demo-app",
+  "needs": ["istio"],
+  "aperture_policies": [
+    {
+      "blueprint_name": "policies/service-protection/average-latency",
+      "policy_name": "weighted-service-protection",
+      "values_file": "policies/weighted-service-protection.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service2-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service2-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service3-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service3-demo-app:serviceaccount"]
+    }
+  ]
+}

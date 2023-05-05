@@ -53,7 +53,9 @@ message K8sLabelMatcherRequirement {
 // all:
 //   of:
 //     - label_exists: foo
-//     - label_equals: { label = app, value = frobnicator }
+//     - label_equals:
+//         label: app
+//         value: frobnicator
 // ```
 message MatchExpression {
   // List of MatchExpressions that is used for all or any matching
@@ -76,7 +78,7 @@ message MatchExpression {
     List any = 3;
 
     // The expression is true when label with given name exists.
-    string label_exists = 4; // @gotags: validate:"required"
+    string label_exists = 4;
 
     // The expression is true when label value equals given value.
     EqualsMatchExpression label_equals = 5;
