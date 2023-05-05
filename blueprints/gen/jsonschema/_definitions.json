@@ -39,7 +39,7 @@
       "properties": {
         "overload_confirmation": {
           "$ref": "#/definitions/InPort",
-          "description": "The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.",
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service.",
           "x-order": 0
         },
         "setpoint": {
@@ -323,11 +323,6 @@
           "$ref": "#/definitions/PodScaler",
           "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.",
           "x-order": 1
-        },
-        "private": {
-          "$ref": "#/definitions/googleprotobufAny",
-          "description": "Extends auto scale with private components.",
-          "x-order": 2
         }
       },
       "type": "object",
@@ -480,12 +475,12 @@
       "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.",
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },
         "dry_run_config_key": {
-          "title": "Config key for overriding dry_run setting via dynamic config",
+          "description": "Configuration key for overriding dry run setting through dynamic configuration.",
           "type": "string",
           "x-order": 1
         },
@@ -1181,20 +1176,15 @@
           "description": "_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
           "x-order": 3
         },
-        "private": {
-          "$ref": "#/definitions/googleprotobufAny",
-          "description": "Extends flow control with private components.",
-          "x-order": 4
-        },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
           "description": "_Rate Limiter_ provides service protection by applying rate limits.",
-          "x-order": 5
+          "x-order": 4
         },
         "regulator": {
           "$ref": "#/definitions/Regulator",
           "description": "Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
-          "x-order": 6
+          "x-order": 5
         }
       },
       "type": "object",
@@ -1569,7 +1559,7 @@
       "additionalProperties": false
     },
     "IncreasingGradient": {
-      "description": "Increasing Gradient defines a controller for scaling out based on Gradient Controller.",
+      "description": "Increasing Gradient defines a controller for scaling out based on _Gradient Controller_.",
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/IncreasingGradientIns",
@@ -2501,12 +2491,12 @@
       "description": "Component for scaling pods based on a signal.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.",
+          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },
         "dry_run_config_key": {
-          "title": "Config key for overriding dry run setting via dynamic config",
+          "description": "Configuration key for overriding dry run setting through dynamic configuration.",
           "type": "string",
           "x-order": 1
         },
@@ -3480,18 +3470,6 @@
       },
       "type": "object",
       "additionalProperties": false
-    },
-    "googleprotobufAny": {
-      "additionalProperties": false,
-      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(&foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\nExample 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample 4: Pack and unpack a message in Go\n\n     foo := &pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := &pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": <string>,\n      \"lastName\": <string>\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }",
-      "properties": {
-        "@type": {
-          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics.",
-          "type": "string",
-          "x-order": 0
-        }
-      },
-      "type": "object"
     },
     "PolicyCustomResource": {
       "description": "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.",

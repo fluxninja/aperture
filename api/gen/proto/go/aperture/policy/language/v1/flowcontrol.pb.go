@@ -2969,7 +2969,8 @@ type AdaptiveLoadScheduler_Ins struct {
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The setpoint input to the controller.
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty" validate:"required"` // @gotags: validate:"required"
-	// The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+	// The `overload_confirmation` port provides additional criteria to determine overload state which
+	// results in _Flow_ throttling at the service.
 	OverloadConfirmation *InPort `protobuf:"bytes,3,opt,name=overload_confirmation,json=overloadConfirmation,proto3" json:"overload_confirmation,omitempty"`
 }
 

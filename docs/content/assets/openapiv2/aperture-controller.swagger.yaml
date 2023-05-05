@@ -263,8 +263,9 @@ definitions:
     type: object
     properties:
       overload_confirmation:
-        description: The overload_confirmation port provides additional criteria to
-          determine overload state which results in _Flow_ throttling at the service.
+        description: |-
+          The `overload_confirmation` port provides additional criteria to determine overload state which
+          results in _Flow_ throttling at the service.
         $ref: '#/definitions/InPort'
       setpoint:
         description: |+
@@ -523,9 +524,6 @@ definitions:
         description: PodScaler provides pod horizontal scaling functionality for scalable
           Kubernetes resources.
         $ref: '#/definitions/PodScaler'
-      private:
-        description: Extends auto scale with private components.
-        $ref: '#/definitions/googleprotobufAny'
   AutoScaler:
     description: _AutoScaler_ provides auto-scaling functionality for any scalable
       resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing
@@ -646,11 +644,12 @@ definitions:
         description: |-
           Dry run mode ensures that no scaling is invoked by this auto scaler.
           This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
-          This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.
+          This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.
         type: boolean
       dry_run_config_key:
+        description: Configuration key for overriding dry run setting through dynamic
+          configuration.
         type: string
-        title: Config key for overriding dry_run setting via dynamic config
       kubernetes_object_selector:
         description: |+
           The Kubernetes object on which horizontal scaling is applied.
@@ -1308,9 +1307,6 @@ definitions:
           load shedding of flows using a network scheduler (for example, Weighted
           Fair Queuing).
         $ref: '#/definitions/LoadScheduler'
-      private:
-        description: Extends flow control with private components.
-        $ref: '#/definitions/googleprotobufAny'
       rate_limiter:
         description: _Rate Limiter_ provides service protection by applying rate limits.
         $ref: '#/definitions/RateLimiter'
@@ -1746,7 +1742,7 @@ definitions:
         type: string
   IncreasingGradient:
     description: Increasing Gradient defines a controller for scaling out based on
-      Gradient Controller.
+      _Gradient Controller_.
     type: object
     properties:
       in_ports:
@@ -2548,11 +2544,12 @@ definitions:
         description: |-
           Dry run mode ensures that no scaling is invoked by this pod scaler.
           This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
-          This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.
+          This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.
         type: boolean
       dry_run_config_key:
+        description: Configuration key for overriding dry run setting through dynamic
+          configuration.
         type: string
-        title: Config key for overriding dry run setting via dynamic config
       in_ports:
         description: Input ports for the PodScaler component.
         $ref: '#/definitions/PodScalerIns'

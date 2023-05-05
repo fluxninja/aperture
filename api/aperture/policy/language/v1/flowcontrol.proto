@@ -757,7 +757,8 @@ message AdaptiveLoadScheduler {
     InPort signal = 1; // @gotags: validate:"required"
     // The setpoint input to the controller.
     InPort setpoint = 2; // @gotags: validate:"required"
-    // The overload_confirmation port provides additional criteria to determine overload state which results in _Flow_ throttling at the service.
+    // The `overload_confirmation` port provides additional criteria to determine overload state which
+    // results in _Flow_ throttling at the service.
     InPort overload_confirmation = 3;
   }
 

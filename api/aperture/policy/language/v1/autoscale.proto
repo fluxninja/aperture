@@ -70,17 +70,17 @@ message PodScaler {
 
   // Dry run mode ensures that no scaling is invoked by this pod scaler.
   // This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
-  // This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.
+  // This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.
   bool dry_run = 3;
 
-  // Config key for overriding dry run setting via dynamic config
+  // Configuration key for overriding dry run setting through dynamic configuration.
   string dry_run_config_key = 4;
 
   // The Kubernetes object to which this pod scaler applies.
   KubernetesObjectSelector kubernetes_object_selector = 5; // @gotags: validate:"required"
 }
 
-// Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+// Increasing Gradient defines a controller for scaling out based on _Gradient Controller_.
 message IncreasingGradient {
   // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
   message Parameters {
@@ -173,10 +173,10 @@ message AutoScaler {
 
         // Dry run mode ensures that no scaling is invoked by this auto scaler.
         // This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
-        // This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic config.
+        // This parameter sets the default value of dry run setting which may be overridden at runtime using dynamic configuration.
         bool dry_run = 2;
 
-        // Config key for overriding dry_run setting via dynamic config
+        // Configuration key for overriding dry run setting through dynamic configuration.
         string dry_run_config_key = 3;
       }
       oneof scaler {
