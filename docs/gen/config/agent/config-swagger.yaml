@@ -411,7 +411,7 @@ definitions:
             https://github.com/kubernetes-sigs/controller-tools/issues/636
             https://github.com/kubernetes-sigs/kubebuilder/issues/528
         type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+        x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/custom
     CustomMetricsConfig:
         description: |-
             :::info
@@ -456,7 +456,7 @@ definitions:
             CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller Prometheus.
             Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
         type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+        x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/custom
     CustomMetricsPipelineConfig:
         properties:
             processors:
@@ -473,7 +473,7 @@ definitions:
                 x-go-tag-json: receivers,omitempty
         title: CustomMetricsPipelineConfig defines a custom metrics pipeline.
         type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+        x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/custom
     DistCacheConfig:
         properties:
             bind_addr:

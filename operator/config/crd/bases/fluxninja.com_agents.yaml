@@ -1573,6 +1573,10 @@ spec:
                                 custom metrics pipelines. This should be in OTel format
                                 - https://opentelemetry.io/docs/collector/configuration/#receivers.
                               x-kubernetes-preserve-unknown-fields: true
+                          required:
+                          - per_agent_group
+                          - pipeline
+                          - receivers
                           type: object
                         description: "CustomMetrics configures custom metrics OTel
                           pipelines, which will send data to the controller Prometheus.

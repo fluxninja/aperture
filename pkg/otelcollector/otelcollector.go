@@ -97,7 +97,7 @@ func setup(in ConstructorIn) error {
 					LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
 						return log.NewZapAdapter(in.Logger, "otel-collector")
 					})},
-					// NOTE: do not remove this becauase it causes a data-race condition.
+					// NOTE: do not remove this because it causes a data-race condition.
 					SkipSettingGRPCLogger: true,
 				},
 			)
@@ -135,7 +135,7 @@ func registerReadinessJob(
 	readiness *jobs.MultiJob,
 	otelService *otelcol.Collector,
 ) error {
-	return readiness.RegisterJob(jobs.NewBasicJob("otel-collector", func(ctx context.Context) (proto.Message, error) {
+	return readiness.RegisterJob(jobs.NewBasicJob("otel-collector", func(context.Context) (proto.Message, error) {
 		msg, err := otelState(otelService)
 		setReadinessStatus(statusRegistry, msg, err)
 		return msg, err
