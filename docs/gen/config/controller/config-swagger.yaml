@@ -23,6 +23,21 @@ definitions:
         title: AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+    AgentInfoConfig:
+        properties:
+            agent_group:
+                default: default
+                description: |-
+                    All agents within an agent group receive the same data-plane configuration (for example, Flux Meters, Rate Limiters and so on).
+
+                    [Read more about agent groups here](/concepts/flow-control/selector.md#agent-group).
+                type: string
+                x-go-name: AgentGroup
+                x-go-tag-default: default
+                x-go-tag-json: agent_group
+        title: AgentInfoConfig is the configuration for the agent group and other agent attributes.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
     AlertManagerClientConfig:
         properties:
             address:
@@ -1158,6 +1173,16 @@ info:
     description: Aperture Controller
     title: Controller
 paths:
+    /agent_info:
+        post:
+            operationId: AgentInfo
+            parameters:
+                - in: body
+                  schema:
+                    $ref: '#/definitions/AgentInfoConfig'
+            tags:
+                - common-configuration
+            x-fn-config-env: true
     /client:
         post:
             operationId: Client

@@ -197,3 +197,9 @@ const (
 	// AlertNamespaceLabel which required by Alertmanager. Set to host name.
 	AlertNamespaceLabel = "namespace"
 )
+
+// FX tags used to pass OTel Collector factories.
+const (
+	ReceiverFactoriesFxTag  = "otel-collector-receiver-factories"
+	ProcessorFactoriesFxTag = "otel-collector-processor-factories"
+)

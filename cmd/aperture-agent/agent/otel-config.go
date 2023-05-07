@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"k8s.io/client-go/rest"
 
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	agentconfig "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -35,7 +36,15 @@ func provideAgent(
 	addLogsPipeline(otelCfg, &agentCfg)
 	addTracesPipeline(otelCfg, lis)
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
-	if err := otelcustom.AddCustomMetricsPipelines(otelCfg, agentCfg.CustomMetrics); err != nil {
+
+	customConfig := map[string]*policylangv1.InfraMeter{}
+	if !agentCfg.DisableKubeletScraper {
+		if _, ok := customConfig[otelconsts.ReceiverKubeletStats]; !ok {
+			customConfig[otelconsts.ReceiverKubeletStats] = otelcustom.InfraMeterForKubeletStats()
+		}
+	}
+
+	if err := otelcustom.AddCustomMetricsPipelines(otelCfg, customConfig); err != nil {
 		return nil, err
 	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)

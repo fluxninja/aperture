@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+import "google/protobuf/struct.proto";
+
+// TelemetryCollector defines the telemetry configuration to be synced with the agents.
+// It consists of two parts:
+// - Agent Group: Agent group to sync telemetry configuration with
+// - Infra Meters: OTel compatible metrics pipelines
+message TelemetryCollector {
+  string agent_group = 1; // @gotags: default:"default"
+  // _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
+  // receive and process telemetry at the agents and send metrics to the configured Prometheus.
+  // Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
+  // is optional, as all the components and pipeline names would be normalized.
+  //
+  // Example:
+  //
+  // ```yaml
+  //  telemetry_collector:
+  //    infra_meters:
+  //	    rabbitmq:
+  //	      processors:
+  //	        batch:
+  //	          send_batch_size: 10
+  //	          timeout: 10s
+  //	      receivers:
+  //	        rabbitmq:
+  //	          collection_interval: 10s
+  //	          endpoint: http://<rabbitmq-svc-fqdn>:15672
+  //	          password: secretpassword
+  //	          username: admin
+  //	      per_agent_group: true
+  //
+  // ```
+  //
+  map<string, InfraMeter> infra_meters = 2;
+}
+
+// InfraMeter is a resource that sets up OpenTelemetry pipelines.
+// It defines receivers, processors, and a single metrics pipeline
+// which will be exported to the configured Prometheus instance.
+// Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
+//
+// :::info
+//
+// See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+//
+// :::
+//
+message InfraMeter {
+  // MetricsPipelineConfig defines a custom metrics pipeline.
+  message MetricsPipeline {
+    repeated string receivers = 1;
+    repeated string processors = 2;
+  }
+
+  // Receivers define receivers to be used in custom metrics pipelines. This should
+  // be in [OTel format](https://opentelemetry.io/docs/collector/configuration/#receivers).
+  map<string, google.protobuf.Struct> receivers = 1;
+  // Processors define processors to be used in custom metrics pipelines. This should
+  // be in [OTel format](https://opentelemetry.io/docs/collector/configuration/#processors).
+  map<string, google.protobuf.Struct> processors = 2;
+
+  // Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
+  // and processors defined above. Exporter would be added automatically.
+  //
+  // If there are no processors defined or only one processor is defined, the
+  // pipeline definition can be omitted. In such cases, the pipeline will
+  // automatically use all given receivers and the defined processor (if
+  // any).  However, if there are more than one processor, the pipeline must
+  // be defined explicitly.
+  MetricsPipeline pipeline = 3; // @gotags: validate:"required"
+  // PerAgentGroup marks the pipeline to be instantiated only once per agent
+  // group. This is helpful for receivers that scrape for example, some cluster-wide
+  // metrics. When not set, pipeline will be instantiated on every Agent.
+  bool per_agent_group = 4; // @gotags: default:"false"
+}

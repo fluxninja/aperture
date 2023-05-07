@@ -1,6 +1,8 @@
 package leaderonlyreceiver
 
-import "go.opentelemetry.io/collector/component"
+import (
+	"go.opentelemetry.io/collector/component"
+)
 
 // WrapConfig returns configuration of leader-only receiver wrapping given receiver.
 func WrapConfig(id component.ID, cfg any) (component.ID, any) {

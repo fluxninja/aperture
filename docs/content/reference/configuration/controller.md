@@ -34,6 +34,7 @@ Generated File Starts
 
 | Key          | Reference                          |
 | ------------ | ---------------------------------- |
+| `agent_info` | [AgentInfo](#agent-info)           |
 | `client`     | [Client](#client)                  |
 | `etcd`       | [Etcd](#etcd)                      |
 | `liveness`   | [Liveness](#liveness)              |
@@ -66,6 +67,30 @@ Generated File Starts
 <!-- vale on -->
 
 ## Reference
+
+<!-- vale off -->
+
+### _agent_info_ {#agent-info}
+
+<!-- vale on -->
+
+<dl>
+
+<!-- vale off -->
+
+<dt></dt>
+<dd>
+
+([AgentInfoConfig](#agent-info-config)) Environment variable prefix:
+`APERTURE_CONTROLLER_AGENT_INFO_`
+
+</dd>
+
+<!-- vale off -->
+
+</dl>
+
+---
 
 <!-- vale off -->
 
@@ -536,6 +561,35 @@ Flag to enable the policy
 <!-- vale on -->
 
 Factor sets user-configured limit of available memory
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AgentInfoConfig {#agent-info-config}
+
+<!-- vale on -->
+
+AgentInfoConfig is the configuration for the agent group and other agent
+attributes.
+
+<dl>
+<dt>agent_group</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+All agents within an agent group receive the same data-plane configuration (for
+example, Flux Meters, Rate Limiters and so on).
+
+[Read more about agent groups here](/concepts/flow-control/selector.md#agent-group).
 
 </dd>
 </dl>

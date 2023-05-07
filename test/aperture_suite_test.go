@@ -163,8 +163,8 @@ var _ = BeforeSuite(func() {
 				agent.AgentOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
-					config.GroupTag(otelcollector.ProcessorFactoriesFxTag),
+					config.GroupTag(otelconsts.ReceiverFactoriesFxTag),
+					config.GroupTag(otelconsts.ProcessorFactoriesFxTag),
 				),
 			),
 			entities.NewEntities,

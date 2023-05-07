@@ -10,17 +10,16 @@ import (
 // comply with confmap.Provider interface.
 var _ confmap.Provider = (*OTelConfigUnmarshaller)(nil)
 
-const schemeName = "file"
-
 // OTelConfigUnmarshaller can be used as an OTel config map provider.
 type OTelConfigUnmarshaller struct {
 	lock      sync.Mutex
 	config    map[string]interface{}
 	watchFunc confmap.WatcherFunc
+	scheme    string
 }
 
 // NewOTelConfigUnmarshaler creates a new OTelConfigUnmarshaler instance.
-func NewOTelConfigUnmarshaler(config map[string]interface{}) *OTelConfigUnmarshaller {
+func NewOTelConfigUnmarshaler(scheme string, config map[string]interface{}) *OTelConfigUnmarshaller {
 	return &OTelConfigUnmarshaller{config: config}
 }
 
@@ -41,7 +40,7 @@ func (u *OTelConfigUnmarshaller) Shutdown(ctx context.Context) error {
 
 // Scheme returns the scheme name, location scheme used by Retrieve.
 func (u *OTelConfigUnmarshaller) Scheme() string {
-	return schemeName
+	return u.scheme
 }
 
 // UpdateMap sets the map to the given map.
@@ -49,5 +48,7 @@ func (u *OTelConfigUnmarshaller) UpdateMap(config map[string]interface{}) {
 	u.lock.Lock()
 	defer u.lock.Unlock()
 	u.config = config
-	u.watchFunc(&confmap.ChangeEvent{})
+	if u.watchFunc != nil {
+		u.watchFunc(&confmap.ChangeEvent{})
+	}
 }
