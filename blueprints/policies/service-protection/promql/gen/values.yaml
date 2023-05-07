@@ -50,11 +50,10 @@ policy:
     # Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
     # Type: bool
     dry_run: false
-  latency_baseliner:
-    # Setpoint.
-    # Type: float64
-    # Required: True
-    setpoint: __REQUIRED_FIELD__
+  # Setpoint.
+  # Type: float64
+  # Required: True
+  setpoint: __REQUIRED_FIELD__
 
 dashboard:
   # Refresh interval for dashboard panels.

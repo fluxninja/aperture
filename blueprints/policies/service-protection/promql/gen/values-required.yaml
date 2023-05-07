@@ -30,8 +30,7 @@ policy:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
       max_load_multiplier: 2
-  latency_baseliner:
-    # Setpoint.
-    # Type: float64
-    # Required: True
-    setpoint: __REQUIRED_FIELD__
+  # Setpoint.
+  # Type: float64
+  # Required: True
+  setpoint: __REQUIRED_FIELD__

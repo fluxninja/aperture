@@ -26,7 +26,7 @@ function(cfg) {
           + spec.v1.Variable.withDefaultConfig(
             spec.v1.VariableDynamicConfig.new()
             + spec.v1.VariableDynamicConfig.withConstantSignal(
-              local s = params.latency_baseliner.setpoint;
+              local s = params.setpoint;
               spec.v1.ConstantSignal.new()
               + spec.v1.ConstantSignal.withValue(s)
             )
