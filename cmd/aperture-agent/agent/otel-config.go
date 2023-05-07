@@ -39,9 +39,7 @@ func provideAgent(
 
 	customConfig := map[string]*policylangv1.InfraMeter{}
 	if !agentCfg.DisableKubeletScraper {
-		if _, ok := customConfig[otelconsts.ReceiverKubeletStats]; !ok {
-			customConfig[otelconsts.ReceiverKubeletStats] = otelcustom.InfraMeterForKubeletStats()
-		}
+		customConfig[otelconsts.ReceiverKubeletStats] = otelcustom.InfraMeterForKubeletStats()
 	}
 
 	if err := otelcustom.AddCustomMetricsPipelines(otelCfg, customConfig); err != nil {

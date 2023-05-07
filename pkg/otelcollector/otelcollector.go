@@ -29,7 +29,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	otelcustom "github.com/fluxninja/aperture/pkg/otelcollector/custom"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
@@ -64,28 +63,39 @@ type ConstructorIn struct {
 
 // setup creates and runs a new instance of OTel Collector with the passed configuration.
 func setup(in ConstructorIn) error {
-	policyConfigUnmarshaler := otelconfig.NewOTelConfigUnmarshaler("policy", map[string]interface{}{})
-	infraMeters := map[string]*policylangv1.InfraMeter{}
+	policyConfigUnmarshaler := otelconfig.NewOTelConfigUnmarshaller("policy", map[string]interface{}{})
+	allInfraMeters := map[string]*policylangv1.InfraMeter{}
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		log.Info().Str("event", event.String()).Msg("infra meter update")
-		infraMeter := &policylangv1.InfraMeter{}
-		if err := unmarshaller.UnmarshalKey("", infraMeter); err != nil {
-			log.Error().Err(err).Msg("unmarshalling infra meter")
+		tc := &policylangv1.TelemetryCollector{}
+		if err := unmarshaller.UnmarshalKey("", tc); err != nil {
+			log.Error().Err(err).Msg("unmarshalling telemetry collector")
 			return
 		}
+		infraMeters := tc.GetInfraMeters()
+		prefix := string(event.Key)
+
 		switch event.Type {
 		case notifiers.Write:
-			infraMeters[string(event.Key)] = infraMeter
+			// loop through all infra meters and add them to the map adding the prefix
+			for name, infraMeter := range infraMeters {
+				key := fmt.Sprintf("%s/%s", prefix, name)
+				allInfraMeters[key] = infraMeter
+			}
 		case notifiers.Remove:
-			delete(infraMeters, string(event.Key))
+			// loop through all infra meters and remove them from the map adding the prefix
+			for name := range infraMeters {
+				key := fmt.Sprintf("%s/%s", prefix, name)
+				delete(allInfraMeters, key)
+			}
 		}
 		otelCfg := otelconfig.NewOTelConfig()
-		if err := otelcustom.AddCustomMetricsPipelines(otelCfg, infraMeters); err != nil {
+		if err := otelcustom.AddCustomMetricsPipelines(otelCfg, allInfraMeters); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			return
 		}
 		// trigger update
-		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(infraMeters))
+		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(allInfraMeters))
 		policyConfigUnmarshaler.UpdateMap(otelCfg.AsMap())
 	}
 
@@ -109,19 +119,9 @@ func setup(in ConstructorIn) error {
 	var otelService *otelcol.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			in.BaseConfig.AddProcessor(otelconsts.ProcessorCustomMetrics, map[string]any{
-				"attributes": []map[string]interface{}{
-					{
-						"key":    "service.name",
-						"action": "upsert",
-						"value":  "aperture-custom-metrics",
-					},
-				},
-			})
-
 			uris := []string{"service:main", "policy:telemetry-collector"}
 			providers := map[string]confmap.Provider{
-				"service": otelconfig.NewOTelConfigUnmarshaler("service", in.BaseConfig.AsMap()),
+				"service": otelconfig.NewOTelConfigUnmarshaller("service", in.BaseConfig.AsMap()),
 				"policy":  policyConfigUnmarshaler,
 			}
 			for i, extensionConfig := range in.ExtensionConfigs {
@@ -130,7 +130,7 @@ func setup(in ConstructorIn) error {
 				}
 				scheme := fmt.Sprintf("extension-%v", i)
 				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = otelconfig.NewOTelConfigUnmarshaler(scheme, extensionConfig.AsMap())
+				providers[scheme] = otelconfig.NewOTelConfigUnmarshaller(scheme, extensionConfig.AsMap())
 			}
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
 				ResolverSettings: confmap.ResolverSettings{

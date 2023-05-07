@@ -2,16 +2,15 @@ package telemetrycollector
 
 import (
 	"context"
+	"encoding/json"
 	"path"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
-	"google.golang.org/protobuf/proto"
 )
 
 type tcConfigSync struct {
@@ -52,12 +51,8 @@ func (configSync *tcConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle 
 	lifecycle.Append(fx.Hook{
 		// OnStart hook will be called when the application starts.
 		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.TelemetryCollectorWrapper{
-				TelemetryCollector: configSync.tcProto,
-			}
-
-			// Marshal the wrapper using protobuf.
-			dat, err := proto.Marshal(wrapper)
+			// Marshal the telemetry collector using json marshaler.
+			dat, err := json.Marshal(configSync.tcProto)
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to marshal telemetry collector config")

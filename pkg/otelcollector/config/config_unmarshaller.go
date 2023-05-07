@@ -18,9 +18,12 @@ type OTelConfigUnmarshaller struct {
 	scheme    string
 }
 
-// NewOTelConfigUnmarshaler creates a new OTelConfigUnmarshaler instance.
-func NewOTelConfigUnmarshaler(scheme string, config map[string]interface{}) *OTelConfigUnmarshaller {
-	return &OTelConfigUnmarshaller{config: config}
+// NewOTelConfigUnmarshaller creates a new OTelConfigUnmarshaler instance.
+func NewOTelConfigUnmarshaller(scheme string, config map[string]interface{}) *OTelConfigUnmarshaller {
+	return &OTelConfigUnmarshaller{
+		scheme: scheme,
+		config: config,
+	}
 }
 
 // Implements MapProvider interface
