@@ -28,12 +28,10 @@ serviceProtectionDefaults {
   },
 
   policy+: {
-    latency_baseliner: {
-      /**
-      * @param (policy.latency_baseliner.setpoint: float64 required) Setpoint.
-      */
-      setpoint: '__REQUIRED_FIELD__',
-    },
+    /**
+    * @param (policy.setpoint: float64 required) Setpoint.
+    */
+    setpoint: '__REQUIRED_FIELD__',
   },
 
   /**

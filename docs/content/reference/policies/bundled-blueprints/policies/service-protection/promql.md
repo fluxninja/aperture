@@ -110,6 +110,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+<a id="policy-setpoint"></a>
+
+<ParameterDescription
+    name='policy.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### policy.service_protection_core {#policy-service-protection-core}
 
 <!-- vale on -->
@@ -152,26 +166,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Boolean'
     reference=''
     value='false'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### policy.latency_baseliner {#policy-latency-baseliner}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-setpoint"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
