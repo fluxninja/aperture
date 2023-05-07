@@ -25,7 +25,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["service_protection_core", "latency_baseliner"],
+      "required": ["service_protection_core", "setpoint"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -103,18 +103,11 @@
             }
           }
         },
-        "latency_baseliner": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["setpoint"],
-          "properties": {
-            "setpoint": {
-              "description": "Setpoint.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            }
-          }
+        "setpoint": {
+          "description": "Setpoint.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
         }
       }
     },
