@@ -1,26 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-FORCE_BUILD=false
-for arg in "$@"; do
-	case $arg in
-	--force-build)
-		FORCE_BUILD=true
-		shift
-		;;
-	*)
-		APERTURECTL_DIR="$arg"
-		;;
-	esac
-done
-
-APERTURECTL_DIR=${APERTURECTL_DIR:-$(git rev-parse --show-toplevel)/cmd/aperturectl}
+APERTURECTL_DIR=${1:-$(git rev-parse --show-toplevel)/cmd/aperturectl}
 APERTURECTL_BINARY="${APERTURECTL_DIR}/aperturectl"
-
-if [ -f "${APERTURECTL_BINARY}" ] && [ "$FORCE_BUILD" = false ]; then
-	echo -n "${APERTURECTL_BINARY}"
-	exit 0
-fi
 
 APERTURECTL_BUILD_VERSION=${APERTURECTL_BUILD_VERSION:-0.0.1}
 BUILD_TIME=${BUILD_TIME:-$(date -Iseconds)}
