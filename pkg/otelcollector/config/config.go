@@ -189,7 +189,10 @@ func (p *Pipeline) AsMap() map[string]interface{} {
 /* Specific to Agent and Controller OTel collector factories. */
 
 // BaseFxTag is the base name tag for otel components.
-var BaseFxTag = config.NameTag("base")
+var (
+	BaseFxTag               = config.NameTag("base")
+	TelemetryCollectorFxTag = config.NameTag("telemetry-collector")
+)
 
 // FxIn consumes parameters via Fx.
 type FxIn struct {

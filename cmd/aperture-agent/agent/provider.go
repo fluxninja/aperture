@@ -24,13 +24,14 @@ func ProvidePeersPrefix(agentInfo *agentinfo.AgentInfo) (peers.PeerDiscoveryPref
 // FxIn is the input for the AddAgentInfoAttribute function.
 type FxIn struct {
 	fx.In
-	BaseConfig *otelconfig.OTelConfig `name:"base"`
+	BaseConfig *otelconfig.OTelConfigProvider `name:"base"`
 	AgentInfo  *agentinfo.AgentInfo
 }
 
 // AddAgentInfoAttribute adds the agent group and instance labels to OTel config.
 func AddAgentInfoAttribute(in FxIn) {
-	in.BaseConfig.AddProcessor(otelconsts.ProcessorAgentGroup, map[string]interface{}{
+	cfg := in.BaseConfig.GetConfig()
+	cfg.AddProcessor(otelconsts.ProcessorAgentGroup, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
 				"key":    otelconsts.AgentGroupLabel,
@@ -52,7 +53,7 @@ func AddAgentInfoAttribute(in FxIn) {
 			},
 		},
 	}
-	in.BaseConfig.AddProcessor(otelconsts.ProcessorAgentResourceLabels, map[string]interface{}{
+	cfg.AddProcessor(otelconsts.ProcessorAgentResourceLabels, map[string]interface{}{
 		"log_statements":    transformStatements,
 		"metric_statements": transformStatements,
 	})

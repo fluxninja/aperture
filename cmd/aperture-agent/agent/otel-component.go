@@ -69,7 +69,7 @@ func ModuleForAgentOTel() fx.Option {
 			cache.Provide[selectors.TypedControlPointID],
 			fx.Annotate(
 				provideAgent,
-				fx.ResultTags(otelconfig.BaseFxTag),
+				fx.ResultTags(otelconfig.BaseFxTag, otelconfig.TelemetryCollectorFxTag),
 			),
 			fx.Annotate(
 				AgentOTelComponents,

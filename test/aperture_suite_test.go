@@ -245,7 +245,7 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTelConfig() *otelconfig.OTelConfig {
+func provideOTelConfig() *otelconfig.OTelConfigProvider {
 	cfg := otelconfig.NewOTelConfig()
 	if phStarted {
 		cfg.AddReceiver("prometheus", map[string]interface{}{
@@ -276,5 +276,5 @@ func provideOTelConfig() *otelconfig.OTelConfig {
 			Exporters: []string{otelconsts.ExporterLogging},
 		})
 	}
-	return cfg
+	return otelconfig.NewOTelConfigProvider("service", cfg)
 }

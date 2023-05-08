@@ -2,20 +2,28 @@ package agent
 
 import (
 	"crypto/tls"
+	"fmt"
+	"path"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
+	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	agentconfig "github.com/fluxninja/aperture/cmd/aperture-agent/config"
+	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	otelcustom "github.com/fluxninja/aperture/pkg/otelcollector/custom"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
 func provideAgent(
@@ -23,10 +31,13 @@ func provideAgent(
 	lis *listener.Listener,
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
-) (*otelconfig.OTelConfig, error) {
+	ai *agentinfo.AgentInfo,
+	etcdClient *etcdclient.Client,
+	lifecycle fx.Lifecycle,
+) (*otelconfig.OTelConfigProvider, *otelconfig.OTelConfigProvider, error) {
 	var agentCfg agentconfig.AgentOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("unmarshalling otel config: %w", err)
 	}
 
 	otelCfg := otelconfig.NewOTelConfig()
@@ -43,10 +54,67 @@ func provideAgent(
 	}
 
 	if err := otelcustom.AddCustomMetricsPipelines(otelCfg, customConfig); err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("adding custom metrics pipelines: %w", err)
 	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
-	return otelCfg, nil
+
+	baseConfigProvider := otelconfig.NewOTelConfigProvider("service", otelCfg)
+
+	tcConfigProvider := otelconfig.NewOTelConfigProvider("telemetry-collector", otelconfig.NewOTelConfig())
+
+	allInfraMeters := map[string]*policylangv1.InfraMeter{}
+	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
+		log.Info().Str("event", event.String()).Msg("infra meter update")
+		tc := &policylangv1.TelemetryCollector{}
+		if err := unmarshaller.UnmarshalKey("", tc); err != nil {
+			log.Error().Err(err).Msg("unmarshalling telemetry collector")
+			return
+		}
+		infraMeters := tc.GetInfraMeters()
+		prefix := string(event.Key)
+
+		switch event.Type {
+		case notifiers.Write:
+			// loop through all infra meters and add them to the map adding the prefix
+			for name, infraMeter := range infraMeters {
+				key := fmt.Sprintf("%s/%s", prefix, name)
+				allInfraMeters[key] = infraMeter
+			}
+		case notifiers.Remove:
+			// loop through all infra meters and remove them from the map adding the prefix
+			for name := range infraMeters {
+				key := fmt.Sprintf("%s/%s", prefix, name)
+				delete(allInfraMeters, key)
+			}
+		}
+		otelCfg := otelconfig.NewOTelConfig()
+		if err := otelcustom.AddCustomMetricsPipelines(otelCfg, allInfraMeters); err != nil {
+			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
+			return
+		}
+		// trigger update
+		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(allInfraMeters))
+		tcConfigProvider.UpdateConfig(otelCfg)
+	}
+
+	// Get Agent Group from host info gatherer
+	agentGroupName := ai.GetAgentGroup()
+	// Scope the sync to the agent group.
+	etcdPath := path.Join(paths.TelemetryCollectorConfigPath,
+		paths.AgentGroupPrefix(agentGroupName))
+	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
+	if err != nil {
+		return nil, nil, err
+	}
+	unmarshalNotifier, err := notifiers.NewUnmarshalPrefixNotifier("",
+		handleInfraMeterUpdate,
+		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating unmarshal notifier: %w", err)
+	}
+	notifiers.WatcherLifecycle(lifecycle, watcher, []notifiers.PrefixNotifier{unmarshalNotifier})
+
+	return baseConfigProvider, tcConfigProvider, nil
 }
 
 func addLogsPipeline(

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"path"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
@@ -19,19 +18,12 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
-	"github.com/fluxninja/aperture/pkg/notifiers"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelcustom "github.com/fluxninja/aperture/pkg/otelcollector/custom"
 	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -48,90 +40,42 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTel Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
-	EtcdClient       *etcdclient.Client
-	AgentInfo        *agentinfo.AgentInfo
-	Factories        otelcol.Factories
-	Lifecycle        fx.Lifecycle
-	Shutdowner       fx.Shutdowner
-	Unmarshaller     config.Unmarshaller
-	StatusRegistry   status.Registry
-	BaseConfig       *otelconfig.OTelConfig `name:"base"`
-	Logger           *log.Logger
-	Readiness        *jobs.MultiJob           `name:"readiness.service"`
-	ExtensionConfigs []*otelconfig.OTelConfig `group:"extension-config"`
+	Factories                otelcol.Factories
+	Lifecycle                fx.Lifecycle
+	Shutdowner               fx.Shutdowner
+	Unmarshaller             config.Unmarshaller
+	StatusRegistry           status.Registry
+	BaseConfig               *otelconfig.OTelConfigProvider `name:"base"`
+	TelemetryCollectorConfig *otelconfig.OTelConfigProvider `name:"telemetry-collector" optional:"true"`
+	Logger                   *log.Logger
+	Readiness                *jobs.MultiJob                   `name:"readiness.service"`
+	ExtensionConfigs         []*otelconfig.OTelConfigProvider `group:"extension-config"`
 }
 
 // setup creates and runs a new instance of OTel Collector with the passed configuration.
 func setup(in ConstructorIn) error {
-	policyConfigUnmarshaler := otelconfig.NewOTelConfigUnmarshaller("policy", map[string]interface{}{})
-	allInfraMeters := map[string]*policylangv1.InfraMeter{}
-	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
-		log.Info().Str("event", event.String()).Msg("infra meter update")
-		tc := &policylangv1.TelemetryCollector{}
-		if err := unmarshaller.UnmarshalKey("", tc); err != nil {
-			log.Error().Err(err).Msg("unmarshalling telemetry collector")
-			return
-		}
-		infraMeters := tc.GetInfraMeters()
-		prefix := string(event.Key)
-
-		switch event.Type {
-		case notifiers.Write:
-			// loop through all infra meters and add them to the map adding the prefix
-			for name, infraMeter := range infraMeters {
-				key := fmt.Sprintf("%s/%s", prefix, name)
-				allInfraMeters[key] = infraMeter
-			}
-		case notifiers.Remove:
-			// loop through all infra meters and remove them from the map adding the prefix
-			for name := range infraMeters {
-				key := fmt.Sprintf("%s/%s", prefix, name)
-				delete(allInfraMeters, key)
-			}
-		}
-		otelCfg := otelconfig.NewOTelConfig()
-		if err := otelcustom.AddCustomMetricsPipelines(otelCfg, allInfraMeters); err != nil {
-			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
-			return
-		}
-		// trigger update
-		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(allInfraMeters))
-		policyConfigUnmarshaler.UpdateMap(otelCfg.AsMap())
-	}
-
-	// Get Agent Group from host info gatherer
-	agentGroupName := in.AgentInfo.GetAgentGroup()
-	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.TelemetryCollectorConfigPath,
-		paths.AgentGroupPrefix(agentGroupName))
-	watcher, err := etcdwatcher.NewWatcher(in.EtcdClient, etcdPath)
-	if err != nil {
-		return err
-	}
-	unmarshalNotifier, err := notifiers.NewUnmarshalPrefixNotifier("",
-		handleInfraMeterUpdate,
-		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller)
-	if err != nil {
-		return fmt.Errorf("creating unmarshal notifier: %w", err)
-	}
-	notifiers.WatcherLifecycle(in.Lifecycle, watcher, []notifiers.PrefixNotifier{unmarshalNotifier})
-
 	var otelService *otelcol.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			uris := []string{"service:main", "policy:telemetry-collector"}
+			baseScheme := in.BaseConfig.Scheme()
+			uris := []string{fmt.Sprintf("%v:%v", baseScheme, baseScheme)}
 			providers := map[string]confmap.Provider{
-				"service": otelconfig.NewOTelConfigUnmarshaller("service", in.BaseConfig.AsMap()),
-				"policy":  policyConfigUnmarshaler,
+				baseScheme: in.BaseConfig,
 			}
-			for i, extensionConfig := range in.ExtensionConfigs {
+			for _, extensionConfig := range in.ExtensionConfigs {
 				if extensionConfig == nil {
 					continue
 				}
-				scheme := fmt.Sprintf("extension-%v", i)
+				scheme := extensionConfig.Scheme()
 				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = otelconfig.NewOTelConfigUnmarshaller(scheme, extensionConfig.AsMap())
+				providers[scheme] = extensionConfig
 			}
+			if in.TelemetryCollectorConfig != nil {
+				tcScheme := in.TelemetryCollectorConfig.Scheme()
+				uris = append(uris, fmt.Sprintf("%v:%v", tcScheme, tcScheme))
+				providers[tcScheme] = in.TelemetryCollectorConfig
+			}
+
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
 				ResolverSettings: confmap.ResolverSettings{
 					URIs:      uris,
