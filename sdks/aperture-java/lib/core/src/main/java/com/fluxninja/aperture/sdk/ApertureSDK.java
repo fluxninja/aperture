@@ -28,7 +28,6 @@ public final class ApertureSDK {
             httpFlowControlClient;
     private final Tracer tracer;
     private final Duration timeout;
-    private final String defaultControlPointName;
     private final List<String> ignoredPaths;
     private final boolean ignoredPathsMatchRegex;
 
@@ -37,13 +36,11 @@ public final class ApertureSDK {
             FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient,
             Tracer tracer,
             Duration timeout,
-            String defaultControlPointName,
             List<String> ignoredPaths,
             boolean ignoredPathsMatchRegex) {
         this.flowControlClient = flowControlClient;
         this.tracer = tracer;
         this.timeout = timeout;
-        this.defaultControlPointName = defaultControlPointName;
         this.httpFlowControlClient = httpFlowControlClient;
         this.ignoredPaths = ignoredPaths;
         this.ignoredPathsMatchRegex = ignoredPathsMatchRegex;
@@ -55,13 +52,6 @@ public final class ApertureSDK {
      */
     public static ApertureSDKBuilder builder() {
         return new ApertureSDKBuilder();
-    }
-
-    public Flow startFlow(Map<String, String> explicitLabels) {
-        if (this.defaultControlPointName == null || this.defaultControlPointName.isEmpty()) {
-            throw new IllegalArgumentException("No control point name set");
-        }
-        return startFlow(this.defaultControlPointName, explicitLabels);
     }
 
     public Flow startFlow(String controlPoint, Map<String, String> explicitLabels) {
@@ -116,19 +106,7 @@ public final class ApertureSDK {
         return new Flow(res, span, false);
     }
 
-    public TrafficFlow startTrafficFlow(String path, CheckHTTPRequest rawReq) {
-        CheckHTTPRequest req;
-        if (rawReq.getControlPoint().trim().isEmpty()) {
-            if (this.defaultControlPointName == null
-                    || this.defaultControlPointName.trim().isEmpty()) {
-                throw new IllegalArgumentException("No control point name set");
-            } else {
-                req = rawReq.toBuilder().setControlPoint(this.defaultControlPointName).build();
-            }
-        } else {
-            req = rawReq;
-        }
-
+    public TrafficFlow startTrafficFlow(String path, CheckHTTPRequest req) {
         if (isIgnored(path)) {
             return TrafficFlow.ignoredFlow();
         }

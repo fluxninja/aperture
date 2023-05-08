@@ -1,9 +1,6 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.FlowStatus;
-import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.*;
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
@@ -19,13 +16,7 @@ import java.util.function.Function;
 public class ApertureHTTPService extends SimpleDecoratingHttpService {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-
-    public static Function<? super HttpService, ApertureHTTPService> newDecorator(
-            ApertureSDK apertureSDK) {
-        ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
-        builder.setApertureSDK(apertureSDK);
-        return builder::build;
-    }
+    private final boolean failOpen;
 
     public static Function<? super HttpService, ApertureHTTPService> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -34,11 +25,24 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
         return builder::build;
     }
 
+    public static Function<? super HttpService, ApertureHTTPService> newDecorator(
+            ApertureSDK apertureSDK, String controlPointName, boolean failOpen) {
+        ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
+        builder.setApertureSDK(apertureSDK)
+                .setControlPointName(controlPointName)
+                .setEnableFailOpen(failOpen);
+        return builder::build;
+    }
+
     public ApertureHTTPService(
-            HttpService delegate, ApertureSDK apertureSDK, String controlPointName) {
+            HttpService delegate,
+            ApertureSDK apertureSDK,
+            String controlPointName,
+            boolean failOpen) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
+        this.failOpen = failOpen;
     }
 
     @Override
@@ -50,7 +54,12 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             return unwrap().serve(ctx, req);
         }
 
-        if (flow.accepted()) {
+        FlowResult flowResult = flow.result();
+        boolean flowAccepted =
+                (flowResult == FlowResult.Accepted
+                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+
+        if (flowAccepted) {
             HttpResponse res;
             try {
                 Map<String, String> newHeaders = Collections.emptyMap();

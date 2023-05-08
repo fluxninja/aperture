@@ -14,6 +14,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     ApertureSDK sdk;
     String agentHost;
     int agentPort;
+    boolean failOpen;
     String controlPointName;
     boolean insecureGrpc;
     String rootCertFile;
@@ -21,11 +22,13 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     public ServerInitializer(
             String agentHost,
             String agentPort,
+            boolean failOpen,
             String controlPointName,
             boolean insecureGrpc,
             String rootCertFile) {
         this.agentHost = agentHost;
         this.agentPort = Integer.parseInt(agentPort);
+        this.failOpen = failOpen;
         this.controlPointName = controlPointName;
         this.insecureGrpc = insecureGrpc;
         this.rootCertFile = rootCertFile;
@@ -50,7 +53,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
         // ApertureServerHandler must be added before the response-generating HelloWorldHandler,
         //    but after the codec handler.
-        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName));
+        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, failOpen));
         pipeline.addLast(new HelloWorldHandler());
     }
 }
