@@ -17,7 +17,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export metrics_root
 export SCRIPT_DIR
 
-function generate_metrics_files() {
+function generate_otel_docs() {
   key="$1"
   # Remove '- ' from key
   key="${key:2}"
@@ -34,7 +34,7 @@ function generate_metrics_files() {
   prettier "$metrics_root"/"$key".md --write
 }
 
-export -f generate_metrics_files
+export -f generate_otel_docs
 
-# find all jsonnet files in docs/content directory and generate them
-parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_metrics_files ::: "$(yq eval 'keys' "$SCRIPT_DIR"/metadata.yaml)"
+# generate OpenTelemetry metrics documentation for all the receivers defined in metadata.yaml
+parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_otel_docs ::: "$(yq eval 'keys' "$SCRIPT_DIR"/metadata.yaml)"
