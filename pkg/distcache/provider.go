@@ -27,6 +27,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 const (
@@ -235,7 +236,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				if startErr != nil {
 					log.Error().Err(startErr).Msg("Failed to start distcache")
 				}
-				_ = in.Shutdowner.Shutdown()
+				utils.Shutdown(in.Shutdowner)
 			})
 			// wait for olric to start by waiting on startChan until ctx is canceled
 			select {

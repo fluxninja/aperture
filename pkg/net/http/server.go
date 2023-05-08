@@ -17,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 const (
@@ -169,7 +170,9 @@ func (constructor ServerConstructor) provideServer(
 		OnStart: func(_ context.Context) error {
 			panichandler.Go(func() {
 				// request shutdown if this server exits
-				defer func() { _ = shutdowner.Shutdown() }()
+				defer func() {
+					utils.Shutdown(shutdowner)
+				}()
 
 				listener := listener.GetListener()
 

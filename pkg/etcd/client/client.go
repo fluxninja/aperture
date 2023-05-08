@@ -13,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // Module is a fx module that provides etcd client.
@@ -125,10 +126,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 					// regular shutdown
 				case <-session.Done():
 					log.Error().Msg("Etcd session is done, request shutdown")
-					shutdownErr := in.Shutdowner.Shutdown()
-					if shutdownErr != nil {
-						log.Error().Err(shutdownErr).Msg("Error on invoking shutdown")
-					}
+					utils.Shutdown(in.Shutdowner)
 				}
 			})
 
