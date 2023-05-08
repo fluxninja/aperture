@@ -38,7 +38,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/otelcollector/adapterconnector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
@@ -74,8 +73,8 @@ func ModuleForAgentOTel() fx.Option {
 				AgentOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					config.GroupTag(otelconsts.ReceiverFactoriesFxTag),
-					config.GroupTag(otelconsts.ProcessorFactoriesFxTag),
+					otelconsts.ReceiverFactoriesFxTag,
+					otelconsts.ProcessorFactoriesFxTag,
 				),
 			),
 		),
