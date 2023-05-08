@@ -3,9 +3,9 @@ package internal
 import (
 	"testing"
 
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/pdata/pcommon"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 func TestAddLuaSpecificLabels(t *testing.T) {

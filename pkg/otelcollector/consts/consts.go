@@ -1,5 +1,7 @@
 package consts
 
+import "github.com/fluxninja/aperture/pkg/config"
+
 const (
 	/* Common labels available on all flow control integrations. */
 
@@ -199,7 +201,9 @@ const (
 )
 
 // FX tags used to pass OTel Collector factories.
-const (
-	ReceiverFactoriesFxTag  = "otel-collector-receiver-factories"
-	ProcessorFactoriesFxTag = "otel-collector-processor-factories"
+var (
+	BaseFxTag               = config.NameTag("base")
+	TelemetryCollectorFxTag = config.NameTag("telemetry-collector")
+	ReceiverFactoriesFxTag  = config.GroupTag("otel-collector-receiver-factories")
+	ProcessorFactoriesFxTag = config.GroupTag("otel-collector-processor-factories")
 )

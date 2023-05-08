@@ -20,7 +20,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -163,8 +162,8 @@ var _ = BeforeSuite(func() {
 				agent.AgentOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					config.GroupTag(otelconsts.ReceiverFactoriesFxTag),
-					config.GroupTag(otelconsts.ProcessorFactoriesFxTag),
+					otelconsts.ReceiverFactoriesFxTag,
+					otelconsts.ProcessorFactoriesFxTag,
 				),
 			),
 			entities.NewEntities,
