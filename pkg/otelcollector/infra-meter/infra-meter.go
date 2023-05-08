@@ -1,4 +1,4 @@
-package config
+package inframeter
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func AddCustomMetricsPipelines(
 	config *otelconfig.OTelConfig,
 	customMetrics map[string]*policylangv1.InfraMeter,
 ) error {
-	config.AddProcessor(otelconsts.ProcessorCustomMetrics, map[string]any{
+	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
 		"attributes": []map[string]interface{}{
 			{
 				"key":    "service.name",
@@ -94,7 +94,7 @@ func addCustomMetricsPipeline(
 		Receivers: mapSlice(receiverIDs, infraMeter.Pipeline.Receivers),
 		Processors: append(
 			mapSlice(processorIDs, infraMeter.Pipeline.Processors),
-			otelconsts.ProcessorCustomMetrics,
+			otelconsts.ProcessorInfraMeter,
 			otelconsts.ProcessorAgentResourceLabels,
 		),
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},

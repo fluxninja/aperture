@@ -22,7 +22,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	otelcustom "github.com/fluxninja/aperture/pkg/otelcollector/custom"
+	inframeter "github.com/fluxninja/aperture/pkg/otelcollector/infra-meter"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 )
 
@@ -50,10 +50,10 @@ func provideAgent(
 
 	customConfig := map[string]*policylangv1.InfraMeter{}
 	if !agentCfg.DisableKubeletScraper {
-		customConfig[otelconsts.ReceiverKubeletStats] = otelcustom.InfraMeterForKubeletStats()
+		customConfig[otelconsts.ReceiverKubeletStats] = inframeter.InfraMeterForKubeletStats()
 	}
 
-	if err := otelcustom.AddCustomMetricsPipelines(otelCfg, customConfig); err != nil {
+	if err := inframeter.AddCustomMetricsPipelines(otelCfg, customConfig); err != nil {
 		return nil, nil, fmt.Errorf("adding custom metrics pipelines: %w", err)
 	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
@@ -88,7 +88,7 @@ func provideAgent(
 			}
 		}
 		otelCfg := otelconfig.NewOTelConfig()
-		if err := otelcustom.AddCustomMetricsPipelines(otelCfg, allInfraMeters); err != nil {
+		if err := inframeter.AddCustomMetricsPipelines(otelCfg, allInfraMeters); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			return
 		}
