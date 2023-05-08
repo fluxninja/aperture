@@ -57,3 +57,23 @@ spec:
   resources:
     flow_control:
       classifiers: []
+    telemetry_collectors:
+    - agent_group: default
+      infra_meters:
+        rabbitmq:
+          per_agent_group: true
+          pipeline:
+            processors:
+            - batch
+            receivers:
+            - rabbitmq
+          processors:
+            batch:
+              send_batch_size: 10
+              timeout: 10s
+          receivers:
+            rabbitmq:
+              collection_interval: 1s
+              endpoint: http://rabbitmq.rabbitmq.svc.cluster.local:15672
+              password: secretpassword
+              username: admin

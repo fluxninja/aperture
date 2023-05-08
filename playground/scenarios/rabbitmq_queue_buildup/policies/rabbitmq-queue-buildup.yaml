@@ -13,3 +13,24 @@ policy:
             control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
   setpoint: 1000
+  resources:
+    telemetry_collectors:
+      - agent_group: default
+        infra_meters:
+          rabbitmq:
+            per_agent_group: true
+            pipeline:
+              processors:
+                - batch
+              receivers:
+                - rabbitmq
+            processors:
+              batch:
+                send_batch_size: 10
+                timeout: 10s
+            receivers:
+              rabbitmq:
+                endpoint: http://rabbitmq.rabbitmq.svc.cluster.local:15672
+                username: admin
+                password: secretpassword
+                collection_interval: 1s

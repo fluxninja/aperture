@@ -3559,6 +3559,123 @@ gradient controller. For full documentation of these parameters, refer to the
 
 <!-- vale off -->
 
+### InfraMeter {#infra-meter}
+
+<!-- vale on -->
+
+InfraMeter is a resource that sets up OpenTelemetry pipelines. It defines
+receivers, processors, and a single metrics pipeline which will be exported to
+the configured Prometheus instance. Environment variables can be used in the
+configuration using format `${ENV_VAR_NAME}`.
+
+:::info
+
+See also
+[Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+
+:::
+
+<dl>
+<dt>per_agent_group</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+PerAgentGroup marks the pipeline to be instantiated only once per agent group.
+This is helpful for receivers that scrape for example, some cluster-wide
+metrics. When not set, pipeline will be instantiated on every Agent.
+
+</dd>
+<dt>pipeline</dt>
+<dd>
+
+<!-- vale off -->
+
+([InfraMeterMetricsPipeline](#infra-meter-metrics-pipeline))
+
+<!-- vale on -->
+
+Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
+and processors defined above. Exporter would be added automatically.
+
+If there are no processors defined or only one processor is defined, the
+pipeline definition can be omitted. In such cases, the pipeline will
+automatically use all given receivers and the defined processor (if any).
+However, if there are more than one processor, the pipeline must be defined
+explicitly.
+
+</dd>
+<dt>processors</dt>
+<dd>
+
+<!-- vale off -->
+
+(map of any )
+
+<!-- vale on -->
+
+Processors define processors to be used in custom metrics pipelines. This should
+be in
+[OTel format](https://opentelemetry.io/docs/collector/configuration/#processors).
+
+</dd>
+<dt>receivers</dt>
+<dd>
+
+<!-- vale off -->
+
+(map of any )
+
+<!-- vale on -->
+
+Receivers define receivers to be used in custom metrics pipelines. This should
+be in
+[OTel format](https://opentelemetry.io/docs/collector/configuration/#receivers).
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### InfraMeterMetricsPipeline {#infra-meter-metrics-pipeline}
+
+<!-- vale on -->
+
+MetricsPipelineConfig defines a custom metrics pipeline.
+
+<dl>
+<dt>processors</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+</dd>
+<dt>receivers</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### Integrator {#integrator}
 
 <!-- vale on -->
@@ -6352,6 +6469,18 @@ FlowControlResources are resources that are provided by flow control
 integration.
 
 </dd>
+<dt>telemetry_collectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]TelemetryCollector](#telemetry-collector))
+
+<!-- vale on -->
+
+TelemetryCollector configures OpenTelemetry collector integration.
+
+</dd>
 </dl>
 
 ---
@@ -7310,6 +7439,69 @@ Outputs for the Switcher component.
 <!-- vale on -->
 
 Selected signal (`on_signal` or `off_signal`).
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### TelemetryCollector {#telemetry-collector}
+
+<!-- vale on -->
+
+TelemetryCollector defines the telemetry configuration to be synced with the
+agents. It consists of two parts:
+
+- Agent Group: Agent group to sync telemetry configuration with
+- Infra Meters: OTel compatible metrics pipelines
+
+<dl>
+<dt>agent_group</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+</dd>
+<dt>infra_meters</dt>
+<dd>
+
+<!-- vale off -->
+
+(map of [InfraMeter](#infra-meter))
+
+<!-- vale on -->
+
+_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which
+will receive and process telemetry at the agents and send metrics to the
+configured Prometheus. Key in this map refers to OTel pipeline name. Prefixing
+pipeline name with `metrics/` is optional, as all the components and pipeline
+names would be normalized.
+
+Example:
+
+```yaml
+ telemetry_collector:
+   infra_meters:
+	    rabbitmq:
+	      processors:
+	        batch:
+	          send_batch_size: 10
+	          timeout: 10s
+	      receivers:
+	        rabbitmq:
+	          collection_interval: 10s
+	          endpoint: http://<rabbitmq-svc-fqdn>:15672
+	          password: secretpassword
+	          username: admin
+	      per_agent_group: true
+
+```
 
 </dd>
 </dl>

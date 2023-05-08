@@ -161,8 +161,8 @@ const (
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
-	// ProcessorCustomMetrics adds `service.name` resource attribute.
-	ProcessorCustomMetrics = "resource/custom_metrics"
+	// ProcessorInfraMeter adds `service.name` resource attribute.
+	ProcessorInfraMeter = "resource/infra_meter"
 	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
 	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
 	// ProcessorAlertsNamespace adds host info as `namespace` attribute.
@@ -196,4 +196,10 @@ const (
 	IsAlertLabel = "is_alert"
 	// AlertNamespaceLabel which required by Alertmanager. Set to host name.
 	AlertNamespaceLabel = "namespace"
+)
+
+// FX tags used to pass OTel Collector factories.
+const (
+	ReceiverFactoriesFxTag  = "otel-collector-receiver-factories"
+	ProcessorFactoriesFxTag = "otel-collector-processor-factories"
 )

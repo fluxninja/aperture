@@ -1897,6 +1897,68 @@ definitions:
                 type: number
                 x-go-tag-default: "1.0"
         type: object
+    InfraMeter:
+        description: |-
+            InfraMeter is a resource that sets up OpenTelemetry pipelines.
+            It defines receivers, processors, and a single metrics pipeline
+            which will be exported to the configured Prometheus instance.
+            Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
+
+            :::info
+
+            See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+
+            :::
+        properties:
+            per_agent_group:
+                default: false
+                description: |+
+                    PerAgentGroup marks the pipeline to be instantiated only once per agent
+                    group. This is helpful for receivers that scrape for example, some cluster-wide
+                    metrics. When not set, pipeline will be instantiated on every Agent.
+
+                type: boolean
+                x-go-tag-default: "false"
+            pipeline:
+                $ref: '#/definitions/InfraMeterMetricsPipeline'
+                description: |+
+                    Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
+                    and processors defined above. Exporter would be added automatically.
+
+                    If there are no processors defined or only one processor is defined, the
+                    pipeline definition can be omitted. In such cases, the pipeline will
+                    automatically use all given receivers and the defined processor (if
+                    any).  However, if there are more than one processor, the pipeline must
+                    be defined explicitly.
+
+                x-go-tag-validate: required
+            processors:
+                additionalProperties:
+                    type: object
+                description: |-
+                    Processors define processors to be used in custom metrics pipelines. This should
+                    be in [OTel format](https://opentelemetry.io/docs/collector/configuration/#processors).
+                type: object
+            receivers:
+                additionalProperties:
+                    type: object
+                description: |-
+                    Receivers define receivers to be used in custom metrics pipelines. This should
+                    be in [OTel format](https://opentelemetry.io/docs/collector/configuration/#receivers).
+                type: object
+        type: object
+    InfraMeterMetricsPipeline:
+        description: MetricsPipelineConfig defines a custom metrics pipeline.
+        properties:
+            processors:
+                items:
+                    type: string
+                type: array
+            receivers:
+                items:
+                    type: string
+                type: array
+        type: object
     Integrator:
         description: Accumulates sum of signal every tick.
         properties:
@@ -3421,6 +3483,12 @@ definitions:
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
+            telemetry_collectors:
+                description: TelemetryCollector configures OpenTelemetry collector integration.
+                items:
+                    $ref: '#/definitions/TelemetryCollector'
+                    type: object
+                type: array
         title: Resources that need to be setup for the policy to function
         type: object
     Response:
@@ -3995,6 +4063,47 @@ definitions:
             output:
                 $ref: '#/definitions/OutPort'
                 description: Selected signal (`on_signal` or `off_signal`).
+        type: object
+    TelemetryCollector:
+        properties:
+            agent_group:
+                default: default
+                type: string
+                x-go-tag-default: default
+            infra_meters:
+                additionalProperties:
+                    $ref: '#/definitions/InfraMeter'
+                description: |-
+                    _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
+                    receive and process telemetry at the agents and send metrics to the configured Prometheus.
+                    Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
+                    is optional, as all the components and pipeline names would be normalized.
+
+                    Example:
+
+                    ```yaml
+                     telemetry_collector:
+                       infra_meters:
+                    	    rabbitmq:
+                    	      processors:
+                    	        batch:
+                    	          send_batch_size: 10
+                    	          timeout: 10s
+                    	      receivers:
+                    	        rabbitmq:
+                    	          collection_interval: 10s
+                    	          endpoint: http://<rabbitmq-svc-fqdn>:15672
+                    	          password: secretpassword
+                    	          username: admin
+                    	      per_agent_group: true
+
+                    ```
+                type: object
+        title: |-
+            TelemetryCollector defines the telemetry configuration to be synced with the agents.
+            It consists of two parts:
+            - Agent Group: Agent group to sync telemetry configuration with
+            - Infra Meters: OTel compatible metrics pipelines
         type: object
     UnaryOperator:
         description: |-

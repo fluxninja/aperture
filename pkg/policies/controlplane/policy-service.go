@@ -43,7 +43,7 @@ func RegisterPolicyService(
 			svc.etcdWriter = etcdwriter.NewWriter(etcdClient, false)
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			if svc.etcdWriter != nil {
 				return svc.etcdWriter.Close()
 			}

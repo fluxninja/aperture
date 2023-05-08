@@ -24,7 +24,7 @@ import (
 
 type inStruct struct {
 	fx.In
-	Actual []*otelconfig.OTelConfig `group:"extension-config"`
+	Actual []*otelconfig.OTelConfigProvider `group:"extension-config"`
 }
 
 var _ = DescribeTable("FN Extension OTel", func(
@@ -59,8 +59,8 @@ var _ = DescribeTable("FN Extension OTel", func(
 				}
 			},
 			fx.Annotate(
-				func() *otelconfig.OTelConfig {
-					return baseConfig
+				func() *otelconfig.OTelConfigProvider {
+					return otelconfig.NewOTelConfigProvider("fluxninja", baseConfig)
 				},
 				fx.ResultTags(config.NameTag("base")),
 			),
@@ -91,10 +91,10 @@ var _ = DescribeTable("FN Extension OTel", func(
 	Expect(baseConfig).To(BeEquivalentTo(originalBaseConfig))
 
 	Expect(in.Actual).To(HaveLen(1))
-	Expect(in.Actual[0].Receivers).To(Equal(expected.Receivers))
-	Expect(in.Actual[0].Processors).To(Equal(expected.Processors))
-	Expect(in.Actual[0].Exporters).To(Equal(expected.Exporters))
-	Expect(in.Actual[0].Service.Pipelines).To(Equal(expected.Service.Pipelines))
+	Expect(in.Actual[0].GetConfig().Receivers).To(Equal(expected.Receivers))
+	Expect(in.Actual[0].GetConfig().Processors).To(Equal(expected.Processors))
+	Expect(in.Actual[0].GetConfig().Exporters).To(Equal(expected.Exporters))
+	Expect(in.Actual[0].GetConfig().Service.Pipelines).To(Equal(expected.Service.Pipelines))
 },
 	Entry(
 		"add FN processors and exporters",
