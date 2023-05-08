@@ -163,8 +163,8 @@ var _ = BeforeSuite(func() {
 				agent.AgentOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
-					config.GroupTag(otelcollector.ProcessorFactoriesFxTag),
+					config.GroupTag(otelconsts.ReceiverFactoriesFxTag),
+					config.GroupTag(otelconsts.ProcessorFactoriesFxTag),
 				),
 			),
 			entities.NewEntities,
@@ -245,7 +245,7 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTelConfig() *otelconfig.OTelConfig {
+func provideOTelConfig() *otelconfig.OTelConfigProvider {
 	cfg := otelconfig.NewOTelConfig()
 	if phStarted {
 		cfg.AddReceiver("prometheus", map[string]interface{}{
@@ -276,5 +276,5 @@ func provideOTelConfig() *otelconfig.OTelConfig {
 			Exporters: []string{otelconsts.ExporterLogging},
 		})
 	}
-	return cfg
+	return otelconfig.NewOTelConfigProvider("service", cfg)
 }

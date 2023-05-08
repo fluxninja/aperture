@@ -16,7 +16,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 const (
@@ -30,7 +30,7 @@ func Module() fx.Option {
 	return fx.Provide(
 		fx.Annotate(
 			NewFactory,
-			fx.ResultTags(config.GroupTag(otelcollector.ReceiverFactoriesFxTag)),
+			fx.ResultTags(config.GroupTag(otelconsts.ReceiverFactoriesFxTag)),
 		),
 	)
 }
@@ -49,12 +49,11 @@ func NewFactory(election *election.Election) receiver.Factory {
 
 // Config is a config for leader-only-receiver.
 type Config struct {
+	// Config for the wrapped receiver
+	leaderElection *election.Election
+	Inner          map[string]any `mapstructure:"config"`
 	// Type of the wrapped receiver
 	InnerType component.Type `mapstructure:"type"`
-	// Config for the wrapped receiver
-	Inner map[string]any `mapstructure:"config"`
-
-	leaderElection *election.Election
 }
 
 // Validate implements component.ConfigValidator.
@@ -80,17 +79,14 @@ func createMetricsReceiver(
 }
 
 type leaderOnlyReceiver struct {
-	config             Config
+	backgroundWG       sync.WaitGroup
 	consumer           consumer.Metrics
+	factory            receiver.Factory
+	host               component.Host
+	inner              receiver.Metrics   // nil if inner receiver not started
+	cancelBackground   context.CancelFunc // nil if background goroutine not started
 	origCreateSettings receiver.CreateSettings
-
-	factory receiver.Factory
-	host    component.Host
-
-	inner receiver.Metrics // nil if inner receiver not started
-
-	cancelBackground context.CancelFunc // nil if background goroutine not started
-	backgroundWG     sync.WaitGroup
+	config             Config
 }
 
 // Start implements component.Component.

@@ -1,6 +1,6 @@
-common:
-  policy_name: "graphql-static-rate-limiting"
+# yaml-language-server: $schema=../../../../../../blueprints/policies/static-rate-limiting/gen/definitions.json
 policy:
+  policy_name: "graphql-static-rate-limiting"
   rate_limiter:
     rate_limit: 10
     selectors:

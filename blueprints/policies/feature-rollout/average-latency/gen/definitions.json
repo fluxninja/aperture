@@ -3,22 +3,10 @@
   "type": "object",
   "title": "policies/feature-rollout/average-latency blueprint",
   "additionalProperties": false,
-  "required": ["common", "policy"],
+  "required": ["policy"],
   "properties": {
-    "common": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["policy_name"],
-      "properties": {
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        }
-      }
-    },
     "policy": {
-      "description": "Parameters for the Feature Rollout policy.",
+      "description": "Configuration for the Feature Rollout policy.",
       "default": {
         "components": [],
         "drivers": {
@@ -46,7 +34,7 @@
         },
         "evaluation_interval": "1s",
         "load_ramp": {
-          "regulator_parameters": {
+          "regulator": {
             "label_key": "",
             "selectors": [
               {
@@ -62,6 +50,7 @@
             }
           ]
         },
+        "policy_name": "__REQUIRED_FIELD__",
         "resources": {
           "flow_control": {
             "classifiers": []

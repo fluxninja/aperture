@@ -27,13 +27,14 @@ function generate_policies() {
 		blueprint_name=$(jq --raw-output '.blueprint_name' <<<"$policy")
 		values_file=$(jq --raw-output '.values_file' <<<"$policy")
 		echo "Generating policies: $policy_name"
-		"$gitroot"/playground/scripts/render-policy.sh "$scenario_dir" "$aperturectl" "$gitroot/blueprints" "$blueprint_name" "$policy_name" "$scenario_dir"/"$values_file" >/dev/null
-		"$gitroot"/scripts/git_add_safely.sh "$scenario_dir"
+		cr_file="$scenario_dir"/policies/"$policy_name"-cr.yaml
+		"$gitroot"/playground/scripts/render-policy.sh "$scenario_dir" "$aperturectl" "$gitroot/blueprints" "$blueprint_name" "$policy_name" "$scenario_dir"/"$values_file" >"$cr_file"
+		"$gitroot"/scripts/git_add_safely.sh "$cr_file"
 	done
 }
 
 export -f generate_policies
 
-parallel -j4 --no-notice --bar --eta generate_policies ::: "$($FIND playground -type f -name metadata.json)"
+parallel -j8 --no-notice --bar --eta generate_policies ::: "$($FIND playground -type f -name metadata.json)"
 
 popd >/dev/null

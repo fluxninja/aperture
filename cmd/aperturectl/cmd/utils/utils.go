@@ -198,7 +198,7 @@ func GetKubeConfig(kubeConfig string) (*rest.Config, error) {
 			}
 			kubeConfig = filepath.Join(homeDir, ".kube", "config")
 		}
-		log.Info().Msgf("Using Kubernetes config '%s'", kubeConfig)
+		log.Trace().Msgf("Using Kubernetes config '%s'", kubeConfig)
 	}
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
 	if err != nil {

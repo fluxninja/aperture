@@ -2,13 +2,7 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency
 
-common:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: __REQUIRED_FIELD__
-
-# Parameters for the Feature Rollout policy.
+# Configuration for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy
 # Required: True
 policy:
@@ -27,7 +21,7 @@ policy:
             service: __REQUIRED_FIELD__
   evaluation_interval: "1s"
   load_ramp:
-    regulator_parameters:
+    regulator:
       label_key: ""
       selectors:
         - control_point: __REQUIRED_FIELD__
@@ -35,6 +29,7 @@ policy:
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__
+  policy_name: __REQUIRED_FIELD__
   resources:
     flow_control:
       classifiers: []

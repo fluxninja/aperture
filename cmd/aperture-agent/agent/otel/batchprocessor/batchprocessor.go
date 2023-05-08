@@ -8,7 +8,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
@@ -22,7 +22,7 @@ func Module() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				provideProcessor,
-				fx.ResultTags(config.GroupTag(otelcollector.ProcessorFactoriesFxTag)),
+				fx.ResultTags(config.GroupTag(otelconsts.ProcessorFactoriesFxTag)),
 			),
 		),
 	)

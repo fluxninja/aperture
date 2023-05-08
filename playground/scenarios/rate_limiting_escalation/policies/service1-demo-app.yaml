@@ -2,13 +2,11 @@
 # Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
-common:
+policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: service1-demo-app
-
-policy:
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components:

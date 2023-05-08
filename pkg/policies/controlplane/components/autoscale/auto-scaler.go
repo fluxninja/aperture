@@ -41,6 +41,95 @@ func ParseAutoScaler(
 		}
 	}
 
+	var (
+		componentsScaler   []*policylangv1.Component
+		shortDescription   string
+		minScale, maxScale float64
+	)
+	scalingBackend := autoscaler.ScalingBackend
+	if scalingBackend == nil {
+		return nil, fmt.Errorf("no scaling backend specified")
+	}
+	if kubernetesReplicas := scalingBackend.GetKubernetesReplicas(); kubernetesReplicas != nil {
+		minScale = float64(kubernetesReplicas.MinReplicas)
+		maxScale = float64(kubernetesReplicas.MaxReplicas)
+		shortDescription = kubernetesReplicas.KubernetesObjectSelector.GetNamespace() + ":" + kubernetesReplicas.KubernetesObjectSelector.GetKind() + "/" + kubernetesReplicas.KubernetesObjectSelector.Name
+		componentsScaler = []*policylangv1.Component{
+			{
+				Component: &policylangv1.Component_AutoScale{
+					AutoScale: &policylangv1.AutoScale{
+						Component: &policylangv1.AutoScale_PodScaler{
+							PodScaler: &policylangv1.PodScaler{
+								KubernetesObjectSelector: kubernetesReplicas.KubernetesObjectSelector,
+								InPorts: &policylangv1.PodScaler_Ins{
+									Replicas: &policylangv1.InPort{
+										Value: &policylangv1.InPort_SignalName{
+											SignalName: "DESIRED_SCALE",
+										},
+									},
+								},
+								OutPorts: &policylangv1.PodScaler_Outs{
+									ActualReplicas: &policylangv1.OutPort{
+										SignalName: "ACTUAL_SCALE",
+									},
+									ConfiguredReplicas: &policylangv1.OutPort{
+										SignalName: "CONFIGURED_SCALE",
+									},
+								},
+								DryRunConfigKey: autoscaler.DryRunConfigKey,
+								DryRun:          autoscaler.DryRun,
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: autoscalerActualScalePortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACTUAL_SCALE",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: autoscalerConfiguredScalePortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "CONFIGURED_SCALE",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: autoscalerDesiredScalePortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+	} else {
+		return nil, fmt.Errorf("unsupported scaler type: %T", scalingBackend)
+	}
+
 	// Components to find the min and max values for the desired scale.
 	componentsMinDesiredScale := []*policylangv1.Component{
 		{
@@ -52,7 +141,7 @@ func ParseAutoScaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(autoscaler.Parameters.MaxScaleInPercentage) / 100.0,
+										Value: float64(autoscaler.ScalingParameters.MaxScaleInPercentage) / 100.0,
 									},
 								},
 							},
@@ -157,7 +246,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.Parameters.MinScale),
+											Value: float64(minScale),
 										},
 									},
 								},
@@ -186,7 +275,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.Parameters.MaxScale),
+											Value: float64(maxScale),
 										},
 									},
 								},
@@ -213,7 +302,7 @@ func ParseAutoScaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(autoscaler.Parameters.MaxScaleOutPercentage) / 100.0,
+										Value: float64(autoscaler.ScalingParameters.MaxScaleOutPercentage) / 100.0,
 									},
 								},
 							},
@@ -318,7 +407,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.Parameters.MaxScale),
+											Value: float64(maxScale),
 										},
 									},
 								},
@@ -347,7 +436,7 @@ func ParseAutoScaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.Parameters.MinScale),
+											Value: float64(minScale),
 										},
 									},
 								},
@@ -369,7 +458,7 @@ func ParseAutoScaler(
 		componentsScaleOut, componentsScaleIn []*policylangv1.Component
 	)
 
-	for scaleOutIndex, scaleOutController := range autoscaler.Parameters.ScaleOutControllers {
+	for scaleOutIndex, scaleOutController := range autoscaler.ScaleOutControllers {
 		signalPortName := fmt.Sprintf(autoscalerScaleOutSignalPortNameTemplate, scaleOutIndex)
 		setpointPortName := fmt.Sprintf(autoscalerScaleOutSetpointPortNameTemplate, scaleOutIndex)
 
@@ -553,7 +642,7 @@ func ParseAutoScaler(
 		}
 	}
 
-	for scaleInIndex, scaleInController := range autoscaler.Parameters.ScaleInControllers {
+	for scaleInIndex, scaleInController := range autoscaler.ScaleInControllers {
 		signalPortName := fmt.Sprintf(autoscalerScaleInSignalPortNameTemplate, scaleInIndex)
 		setpointPortName := fmt.Sprintf(autoscalerScaleInSetpointPortNameTemplate, scaleInIndex)
 
@@ -772,7 +861,7 @@ func ParseAutoScaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: autoscaler.Parameters.ScaleOutCooldown,
+					HoldFor: autoscaler.ScalingParameters.ScaleOutCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -796,7 +885,7 @@ func ParseAutoScaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: autoscaler.Parameters.ScaleInCooldown,
+					HoldFor: autoscaler.ScalingParameters.ScaleInCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -831,7 +920,7 @@ func ParseAutoScaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: (float64(autoscaler.Parameters.CooldownOverridePercentage) / 100.0) + 1.0,
+										Value: (float64(autoscaler.ScalingParameters.CooldownOverridePercentage) / 100.0) + 1.0,
 									},
 								},
 							},
@@ -872,7 +961,7 @@ func ParseAutoScaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: autoscaler.Parameters.ScaleInCooldown,
+					HoldFor: autoscaler.ScalingParameters.ScaleInCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -963,92 +1052,6 @@ func ParseAutoScaler(
 				},
 			},
 		},
-	}
-
-	var (
-		componentsScaler []*policylangv1.Component
-		shortDescription string
-	)
-	scaler := autoscaler.Parameters.Scaler
-	if scaler == nil {
-		return nil, fmt.Errorf("no scaler specified")
-	}
-	if kubernetesReplicas := scaler.GetKubernetesReplicas(); kubernetesReplicas != nil {
-		shortDescription = kubernetesReplicas.KubernetesObjectSelector.GetNamespace() + ":" + kubernetesReplicas.KubernetesObjectSelector.GetKind() + "/" + kubernetesReplicas.KubernetesObjectSelector.Name
-		componentsScaler = []*policylangv1.Component{
-			{
-				Component: &policylangv1.Component_AutoScale{
-					AutoScale: &policylangv1.AutoScale{
-						Component: &policylangv1.AutoScale_PodScaler{
-							PodScaler: &policylangv1.PodScaler{
-								KubernetesObjectSelector: kubernetesReplicas.KubernetesObjectSelector,
-								InPorts: &policylangv1.PodScaler_Ins{
-									Replicas: &policylangv1.InPort{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: "DESIRED_SCALE",
-										},
-									},
-								},
-								OutPorts: &policylangv1.PodScaler_Outs{
-									ActualReplicas: &policylangv1.OutPort{
-										SignalName: "ACTUAL_SCALE",
-									},
-									ConfiguredReplicas: &policylangv1.OutPort{
-										SignalName: "CONFIGURED_SCALE",
-									},
-								},
-								DryRunConfigKey: kubernetesReplicas.DryRunConfigKey,
-								DryRun:          kubernetesReplicas.DryRun,
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: autoscalerActualScalePortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACTUAL_SCALE",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: autoscalerConfiguredScalePortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "CONFIGURED_SCALE",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: autoscalerDesiredScalePortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_SCALE",
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-	} else {
-		return nil, fmt.Errorf("unsupported scaler type: %T", scaler)
 	}
 
 	// Concatenate the components into a single components list.

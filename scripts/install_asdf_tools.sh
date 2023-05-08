@@ -71,6 +71,7 @@ install_helm_plugins() {
 		# Which spams the screen
 		helm plugin install "${url}" --version "${version}" >/dev/null
 	done
+	asdf reshim helm
 }
 
 install_plugins() {

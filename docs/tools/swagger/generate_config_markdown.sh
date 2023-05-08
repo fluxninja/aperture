@@ -46,7 +46,7 @@ for dir in $dirs; do
 	cat "$dir"/metadata "$dir"/"$basename".md >"$dir"/"$basename".md.tmp
 	mv "$dir"/"$basename".md.tmp "$dir"/"$basename".md
 	mv "$dir"/"$basename".md "$docs_root"/content/reference/configuration
-	npx prettier@latest --write "$docs_root"/content/reference/configuration/"$basename".md
+	prettier --write "$docs_root"/content/reference/configuration/"$basename".md
 done
 rm merged-extension-swagger.yaml
 
@@ -77,4 +77,4 @@ rm "$policy_dir"/aperture.swagger.yaml
 cat "$policy_dir"/metadata "$policy_dir"/policy.md >"$policy_dir"/policy.md.tmp
 mv "$policy_dir"/policy.md.tmp "$policy_dir"/policy.md
 mv "$policy_dir"/policy.md "$docs_root"/content/reference/policies/spec.md
-npx prettier@latest --write "$docs_root"/content/reference/policies/spec.md
+prettier --write "$docs_root"/content/reference/policies/spec.md

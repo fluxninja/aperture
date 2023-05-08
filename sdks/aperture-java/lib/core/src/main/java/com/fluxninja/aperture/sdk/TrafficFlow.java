@@ -28,11 +28,29 @@ public class TrafficFlow {
         return flow;
     }
 
+    /**
+     * Returns 'true' if flow was accepted by Aperture Agent, or if the agent did not respond.
+     *
+     * @deprecated This method assumes fail-open behavior. Use {@link #result} instead
+     * @return Whether the flow was accepted.
+     */
     public boolean accepted() {
+        return result() == FlowResult.Unreachable || result() == FlowResult.Accepted;
+    }
+
+    /**
+     * Returns Aperture Agent's decision or information on Agent being unreachable.
+     *
+     * @return Result of Check query
+     */
+    public FlowResult result() {
         if (this.checkResponse == null) {
-            return true;
+            return FlowResult.Unreachable;
         }
-        return this.checkResponse.getStatus().getCode() == Code.OK_VALUE;
+        if (this.checkResponse.getStatus().getCode() == Code.OK_VALUE) {
+            return FlowResult.Accepted;
+        }
+        return FlowResult.Rejected;
     }
 
     public boolean ignored() {

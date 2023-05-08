@@ -53,7 +53,7 @@ func getEnvEditorWithFallback() (string, []string) {
 
 var valuesCmd = &cobra.Command{
 	Use:   "values",
-	Short: "Provide values file for a given Aperture Blueprint",
+	Short: "Create values file for a given Aperture Blueprint",
 	Long: `
 Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
 	SilenceErrors: true,

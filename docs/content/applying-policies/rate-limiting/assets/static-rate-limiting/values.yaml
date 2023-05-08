@@ -1,7 +1,6 @@
-common:
-  policy_name: "static-rate-limiting"
-
+# yaml-language-server: $schema=../../../../../../blueprints/policies/static-rate-limiting/gen/definitions.json
 policy:
+  policy_name: "static-rate-limiting"
   rate_limiter:
     rate_limit: 120
     selectors:

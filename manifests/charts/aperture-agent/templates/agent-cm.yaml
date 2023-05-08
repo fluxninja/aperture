@@ -20,15 +20,11 @@ data:
     {{- omit .Values.agent.config "etcd" "prometheus" "auto_scale" "service_discovery" "agent_functions" "otel" | toYaml | nindent 4 }}
     {{- end }}
     otel:
-      {{- if and .Values.agent.config.otel (omit .Values.agent.config.otel "disable_kubernetes_scraper" "custom_metrics")}}
-      {{- omit .Values.agent.config.otel "disable_kubernetes_scraper" "custom_metrics" | toYaml | nindent 6 }}
+      {{- if and .Values.agent.config.otel (omit .Values.agent.config.otel "disable_kubernetes_scraper" "disable_kubelet_scraper")}}
+      {{- omit .Values.agent.config.otel "disable_kubernetes_scraper" "disable_kubelet_scraper" | toYaml | nindent 6 }}
       {{- end }}
       disable_kubernetes_scraper: true
-      custom_metrics:
-        {{- if and .Values.agent.config.otel .Values.agent.config.otel.custom_metrics (omit .Values.agent.config.otel.custom_metrics "kubeletstats")}}
-        {{- omit .Values.agent.config.otel.custom_metrics "kubeletstats" | toYaml | nindent 8 }}
-        {{- end }}
-        kubeletstats: {}
+      disable_kubelet_scraper: true
     auto_scale:
       kubernetes:
         enabled: false

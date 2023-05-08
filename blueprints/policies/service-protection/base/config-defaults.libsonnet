@@ -32,11 +32,8 @@ local service_protection_core_defaults = {
 };
 
 {
-  common: {
-    policy_name: '__REQUIRED_FIELD__',
-  },
-
   policy: {
+    policy_name: '__REQUIRED_FIELD__',
     components: [],
     resources: {
       flow_control: {
@@ -46,8 +43,6 @@ local service_protection_core_defaults = {
     evaluation_interval: '1s',
     service_protection_core: service_protection_core_defaults,
   },
-
-  service_protection_core: service_protection_core_defaults,
 
   dashboard: {
     refresh_interval: '5s',

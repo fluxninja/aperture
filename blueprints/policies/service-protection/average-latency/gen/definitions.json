@@ -3,25 +3,22 @@
   "type": "object",
   "title": "policies/service-protection/average-latency blueprint",
   "additionalProperties": false,
-  "required": ["common", "policy"],
+  "required": ["policy"],
   "properties": {
-    "common": {
+    "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_name"],
+      "required": [
+        "policy_name",
+        "service_protection_core",
+        "latency_baseliner"
+      ],
       "properties": {
         "policy_name": {
           "description": "Name of the policy.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
-        }
-      }
-    },
-    "policy": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["service_protection_core", "latency_baseliner"],
-      "properties": {
+        },
         "components": {
           "description": "List of additional circuit components.",
           "default": [],
@@ -52,7 +49,7 @@
           "required": ["adaptive_load_scheduler"],
           "properties": {
             "overload_confirmations": {
-              "description": "List of overload confirmation criteria. Load scheduler can shed flows when all of the specified overload confirmation criteria are met.",
+              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
               "default": [
                 {
                   "operator": "__REQUIRED_FIELD__",

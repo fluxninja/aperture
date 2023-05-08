@@ -6,7 +6,7 @@ default_stages:
 repos:
   - repo: local
     hooks:
-      - id: tools
+      - id: install-tools
         name: "Install tools"
         entry: "./scripts/precommit/install_tools.sh"
         language: script
@@ -46,10 +46,10 @@ repos:
     hooks:
       - id: shellcheck
         exclude: ^(sdks/aperture-java/gradlew)$
-  # - repo: https://github.com/fluxninja/pre-commit-hooks.git
-  #   rev: v0.0.4
-  #   hooks:
-  #     - id: circleci-validate
+  - repo: https://github.com/fluxninja/pre-commit-hooks.git
+    rev: v0.0.4
+    hooks:
+      - id: circleci-validate
   - repo: https://github.com/fluxninja/pre-commit-golang
     rev: v1.0.0-fn
     hooks:
@@ -190,6 +190,13 @@ repos:
         files: ^(blueprints|playground/scenarios/)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
+      - id: generate-otel-docs
+        name: "OpenTelemetry Docs"
+        language: script
+        entry: ./scripts/precommit/generate_otel_docs.sh
+        pass_filenames: false
+        files: ^(extensions/integrations/otel|docs/tools/otel_collectors)
+        description: "Generate OpenTelemetry docs"
       - id: generate-doc-assets
         name: "Documentation Assets"
         entry: "./scripts/precommit/generate_doc_assets.sh"

@@ -1,9 +1,6 @@
 package com.fluxninja.aperture.netty;
 
-import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.FlowStatus;
-import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.*;
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -18,15 +15,29 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-
-    public ApertureServerHandler(ApertureSDK sdk) {
-        this.apertureSDK = sdk;
-        this.controlPointName = "";
-    }
+    private boolean failOpen = true;
 
     public ApertureServerHandler(ApertureSDK sdk, String controlPointName) {
+        if (controlPointName == null || controlPointName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Control Point name must not be null or empty");
+        }
+        if (sdk == null) {
+            throw new IllegalArgumentException("Aperture SDK must not be null");
+        }
         this.apertureSDK = sdk;
         this.controlPointName = controlPointName;
+    }
+
+    public ApertureServerHandler(ApertureSDK sdk, String controlPointName, boolean failOpen) {
+        if (controlPointName == null || controlPointName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Control Point name must not be null or empty");
+        }
+        if (sdk == null) {
+            throw new IllegalArgumentException("Aperture SDK must not be null");
+        }
+        this.apertureSDK = sdk;
+        this.controlPointName = controlPointName;
+        this.failOpen = failOpen;
     }
 
     @Override
@@ -42,7 +53,12 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             return;
         }
 
-        if (flow.accepted()) {
+        FlowResult flowResult = flow.result();
+        boolean flowAccepted =
+                (flowResult == FlowResult.Accepted
+                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+
+        if (flowAccepted) {
             try {
                 Map<String, String> newHeaders = new HashMap<>();
                 if (flow.checkResponse() != null) {

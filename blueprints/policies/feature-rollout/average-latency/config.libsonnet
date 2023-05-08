@@ -14,13 +14,7 @@ local rollout_policy_defaults = featureRolloutConfig.rollout_policy_base {
 
 {
   /**
-  * @param (common.policy_name: string required) Name of the policy.
-  */
-  common: {
-    policy_name: '__REQUIRED_FIELD__',
-  },
-  /**
-  * @param (policy: policies/feature-rollout/base:schema:rollout_policy required) Parameters for the Feature Rollout policy.
+  * @param (policy: policies/feature-rollout/base:schema:rollout_policy required) Configuration for the Feature Rollout policy.
   */
   policy: rollout_policy_defaults,
   /**

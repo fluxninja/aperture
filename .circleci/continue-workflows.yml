@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.3
+      - image: cimg/go:1.20.4
         user: root
   python-cimg-executor:
     docker:
@@ -217,7 +217,7 @@ jobs:
     executor: go-cimg-executor
     resource_class: xlarge
     environment:
-      GOMAXPROCS: 4
+      GOMAXPROCS: 8
     steps:
       - checkout
       - run:
@@ -278,6 +278,7 @@ jobs:
     resource_class: xlarge
     environment:
       GOMAXPROCS: 8
+      SKIP: install-tools
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -303,23 +304,9 @@ jobs:
             tanka
             yq
       - restore_cache:
-          name: Restore go cache
+          name: Restore daily cache
           keys:
-            - aperture-v5-go-cache-{{ checksum "~/day" }}
-      - run:
-          name: Install Go tools
-          command: scripts/manage_go_tools.sh
-      - run:
-          name: Install Python tools
-          command: scripts/manage_python_tools.sh
-      - run:
-          name: Install additional system dependencies for pre-commit
-          command: |
-            sudo apt-get update
-            sudo apt-get install \
-              libgtk-3-0 \
-              libgbm1 \
-              libasound2
+            - aperture-v7-daily-cache-{{ checksum "~/day" }}
       - run: &install_opsninja
           name: Install opsninja and its dependencies
           command: |
@@ -331,6 +318,23 @@ jobs:
             export SSH_AUTH_SOCK=""
             pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
       - run:
+          name: Install Go tools
+          command: scripts/install_go_tools.sh
+      - run:
+          name: Install Python tools
+          command: scripts/install_python_tools.sh
+      - run:
+          name: Install Node tools
+          command: scripts/install_node_tools.sh
+      - run:
+          name: Install additional system dependencies for pre-commit
+          command: |
+            sudo apt-get update
+            sudo apt-get install \
+              libgtk-3-0 \
+              libgbm1 \
+              libasound2
+      - run:
           name: Cache golangci-lint run
           command: |
             golangci-lint run || true
@@ -340,6 +344,7 @@ jobs:
             cp .pre-commit-config.yaml /tmp/pre-commit-cache-key.txt
             python --version --version >> /tmp/pre-commit-cache-key.txt
             pre-commit --version >> /tmp/pre-commit-cache-key.txt
+            cat requirements.txt >> /tmp/pre-commit-cache-key.txt
       - restore_cache:
           name: Restore pre-commit cache
           keys:
@@ -371,14 +376,22 @@ jobs:
               base_ref="$(git merge-base main $CIRCLE_SHA1)"
               pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
             fi
+            if asdf where golang &> /dev/null; then
+              asdf reshim golang
+            fi
+            if asdf where python &> /dev/null; then
+              asdf reshim python
+            fi
+            if asdf where nodejs &> /dev/null; then
+              asdf reshim nodejs
+            fi
       - save_cache:
-          name: Save go cache
-          key: aperture-v5-go-cache-{{ checksum "~/day" }}
+          name: Save daily cache
+          key: aperture-v7-daily-cache-{{ checksum "~/day" }}
           paths:
-            - ../.cache/golangci-lint
             - ../.cache/go-build
-            - ../.cache/buf
-            - ~/.aperturectl
+            - ../.cache/golangci-lint
+            - ../.aperturectl
             - ./blueprints/vendor
           when: on_success
       - save_cache:
@@ -386,7 +399,11 @@ jobs:
           key:
             aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
-            - ~/.cache/pre-commit
+            - ../.cache/pre-commit
+            - ../.cache/pre-commit-zipapp
+            - ../.cache/pip
+            - ../.pyenv
+            - ../.local
       - asdf_save_cache:
           cache_name: pre-commit
       - run:
@@ -1376,10 +1393,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -1397,11 +1414,12 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
             - ~/.asdf
+            - ../.cache/helm
 
   aperture_docker_build:
     description: |

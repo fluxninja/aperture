@@ -1,12 +1,10 @@
 # yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
 # Generated values file for policies/service-protection/average-latency blueprint.
-common:
+policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: weighted-service-protection
-
-policy:
   service_protection_core:
     adaptive_load_scheduler:
       load_scheduler:

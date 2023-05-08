@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM golang:1.20.3-bullseye AS builder
+FROM golang:1.20.4-bullseye AS builder
 
 WORKDIR /src
 COPY --link . .
@@ -15,12 +15,12 @@ ARG APERTURECTL_BUILD_FLAGS
 ENV APERTURECTL_BUILD_FLAGS=${APERTURECTL_BUILD_FLAGS}
 
 RUN --mount=type=cache,target=/go/pkg/ \
-  --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.20.3,sharing=private \
-  --mount=type=cache,target=/root/.aperturectl,id=agent-1.20.3,sharing=private \
+  --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.20.4,sharing=private \
+  --mount=type=cache,target=/root/.aperturectl,id=agent-1.20.4,sharing=private \
   /bin/bash -c \
   'set -eu; \
   go mod download; \
-  ./scripts/build_aperturectl.sh ./cmd/aperturectl; \
+  ./scripts/build_aperturectl.sh ./cmd/aperturectl --force-build; \
   ./scripts/generate_full_build_config.sh ./extensions > build.yaml; \
   ./cmd/aperturectl/aperturectl build agent -c build.yaml -o / --uri .; \
   '

@@ -20,7 +20,12 @@ generate-mermaid:
 generate-aperturectl-docs:
 	@echo generating aperturectl
 	@go run tools/aperturectl/generate-docs/generate-docs.go
-	@npx prettier@latest --prose-wrap="preserve" ./content/reference/aperturectl/ --write
+	@prettier --prose-wrap="preserve" ./content/reference/aperturectl/ --write
 	@git add ./content/reference/aperturectl/
 
-.PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs
+generate-otel-docs:
+	@echo generating metrics docs
+	@./tools/otel_collectors/generate_otel_docs.sh
+	@git add ./content/get-started/integrations/metrics
+
+.PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs generate-otel-docs

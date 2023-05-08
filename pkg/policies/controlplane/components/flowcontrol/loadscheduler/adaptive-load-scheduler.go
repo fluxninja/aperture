@@ -58,14 +58,8 @@ func ParseAdaptiveLoadScheduler(
 
 	isOverloadDeciderOperator := "gt"
 	// if slope is greater than 0 then we want to use less than operator
-	if adaptiveLoadScheduler.Parameters.Gradient != nil && adaptiveLoadScheduler.Parameters.Gradient.Slope > 0 {
+	if adaptiveLoadScheduler.Parameters.Gradient.Slope > 0 {
 		isOverloadDeciderOperator = "lt"
-	}
-
-	if adaptiveLoadScheduler.Parameters.Alerter == nil {
-		adaptiveLoadScheduler.Parameters.Alerter = &policylangv1.Alerter_Parameters{
-			AlertName: "Load Throttling Event",
-		}
 	}
 
 	alerterLabels := adaptiveLoadScheduler.Parameters.Alerter.Labels
