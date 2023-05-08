@@ -67,7 +67,7 @@ ensure the reliability and stability of applications, and include:
   prevent abuse and protect the service from excessive requests by users.
 - **Intelligent Auto Scaling**: Aperture adjusts resource allocation based on
   demand and performance to ensure that the application can scale up or down as
-  needed; However it is different from traditional auto-scaling as it is based
+  needed; However, it is different from traditional auto-scaling as it is based
   on the policies defined by the user which take multiple factors into
   consideration.
 - **Monitoring and telemetry**: Aperture continuously monitors service
