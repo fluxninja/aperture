@@ -46,9 +46,8 @@ policy:
                 collection_interval: 1s
 ```
 
-If you have installing the Aperture Agent on Kubernetes, you can use a Secret
-and a ConfigMap to pass environment variables to the Aperture Agent, as shown
-below:
+If you are installing the Aperture Agent on Kubernetes, you can use a Secret and
+a ConfigMap to pass environment variables to the Aperture Agent, as shown below:
 
 ```yaml
 apiVersion: v1
