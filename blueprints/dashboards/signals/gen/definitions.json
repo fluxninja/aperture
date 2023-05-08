@@ -3,9 +3,9 @@
   "type": "object",
   "title": "dashboards/signals blueprint",
   "additionalProperties": false,
-  "required": ["common"],
+  "required": ["policy"],
   "properties": {
-    "common": {
+    "policy": {
       "type": "object",
       "additionalProperties": false,
       "required": ["policy_name"],

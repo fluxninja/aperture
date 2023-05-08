@@ -1,8 +1,8 @@
 {
   /**
-  * @param (common.policy_name: string required) Name of the policy.
+  * @param (policy.policy_name: string required) Name of the policy.
   */
-  common: {
+  policy: {
     policy_name: '__REQUIRED_FIELD__',
   },
   /**
