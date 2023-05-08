@@ -2,13 +2,11 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
 
-common:
+policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-
-policy:
   # List of classification rules.
   # Type: []aperture.spec.v1.Classifier
   classifiers: []

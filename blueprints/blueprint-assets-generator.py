@@ -221,15 +221,13 @@ def update_param_defaults(
     config_path: Path,
     parameters: Blueprint,
     jsonnet_path: Path = Path(),
-    config_key: str = "",
 ):
     jsonnet_data = f"local config = import '{config_path}';\n"
     if jsonnet_path != Path():
         jsonnet_data += f"local fn = import '{jsonnet_path}';\n"
 
     if jsonnet_path != Path():
-        jsonnet_data += f"local cfg = config.common + config.{config_key};\n"
-        jsonnet_data += f"fn(cfg)\n"
+        jsonnet_data += f"fn(config)\n"
     jsonnet_data += "{_config::: config}\n"
 
     rendered_config = None
@@ -943,10 +941,7 @@ def parse_config_parameters(
     # set defaults for nested parameters
     for source in metadata["sources"].keys():
         jsonnet_path = metadata["sources"][source]
-        config_key = source
-        update_param_defaults(
-            repository_root, config_path, parameters, jsonnet_path, config_key
-        )
+        update_param_defaults(repository_root, config_path, parameters, jsonnet_path)
 
     return parameters
 

@@ -7,7 +7,9 @@ local dashboardMixin = std.parseJson(std.extVar('APERTURE_DASHBOARD'));
 
 local rateLimitPanel =
   rateLimitpolicyDashboard({
-    policy_name: std.extVar('POLICY_NAME'),
+    policy+: {
+      policy_name: std.extVar('POLICY_NAME'),
+    },
   }).dashboard.panels[0];
 
 local policyDashBoardMixin =

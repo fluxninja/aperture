@@ -31,9 +31,9 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
   };
 
 function(cfg) {
-  local params = config.common + config.dashboard + cfg,
-  local policyName = params.policy_name,
-  local ds = params.datasource,
+  local params = config + cfg,
+  local policyName = params.policy.policy_name,
+  local ds = params.dashboard.datasource,
   local dsName = ds.name,
 
   local rateLimiterPanel =
@@ -48,7 +48,7 @@ function(cfg) {
       title='Jsonnet / FluxNinja - Rate Limiter',
       editable=true,
       schemaVersion=18,
-      refresh=params.refresh_interval,
+      refresh=params.dashboard.refresh_interval,
       time_from='now-5m',
       time_to='now'
     )

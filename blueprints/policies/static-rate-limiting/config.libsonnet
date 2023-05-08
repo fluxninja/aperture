@@ -1,14 +1,12 @@
 {
-  /**
-  * @param (common.policy_name: string required) Name of the policy.
-  */
-  common: {
-    policy_name: '__REQUIRED_FIELD__',
-  },
-  /**
-  * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
-  */
   policy: {
+    /**
+    * @param (policy.policy_name: string required) Name of the policy.
+    */
+    policy_name: '__REQUIRED_FIELD__',
+    /**
+    * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
+    */
     classifiers: [],
     /**
     * @param (policy.rate_limiter.rate_limit: float64 required) Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept

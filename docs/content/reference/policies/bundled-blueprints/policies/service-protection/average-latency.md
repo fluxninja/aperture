@@ -75,29 +75,21 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-#### common {#common}
+#### policy {#policy}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="common-policy-name"></a>
+<a id="policy-policy-name"></a>
 
 <ParameterDescription
-    name='common.policy_name'
+    name='policy.policy_name'
     description='Name of the policy.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
 />
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### policy {#policy}
 
 <!-- vale on -->
 
