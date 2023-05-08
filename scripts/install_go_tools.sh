@@ -6,7 +6,7 @@ gitroot=$(git rev-parse --show-toplevel)
 
 pushd "${gitroot}" >/dev/null
 
-aperturectl="$("$gitroot"/scripts/build_aperturectl.sh --force-build)"
+aperturectl="$("$gitroot"/scripts/build_aperturectl.sh)"
 # download jsonnet dependencies as well
 "$aperturectl" blueprints list --uri="$gitroot"/blueprints >/dev/null
 
