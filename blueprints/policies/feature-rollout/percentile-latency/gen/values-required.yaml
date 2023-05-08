@@ -36,7 +36,7 @@ policy:
         percentile: 95
   evaluation_interval: "1s"
   load_ramp:
-    regulator_parameters:
+    regulator:
       label_key: ""
       selectors:
         - control_point: __REQUIRED_FIELD__

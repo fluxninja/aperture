@@ -117,7 +117,7 @@ spec:
             reset:
               signal_name: RESET
           parameters:
-            regulator_parameters:
+            regulator:
               label_key: ""
               selectors:
               - control_point: ingress

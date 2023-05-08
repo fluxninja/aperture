@@ -47,40 +47,40 @@ spec:
           query_string: avg(avg_over_time(k8s_pod_cpu_utilization{k8s_deployment_name="service1-demo-app"}[30s]))
     - auto_scale:
         auto_scaler:
-          parameters:
-            max_scale: "10"
-            min_scale: "1"
-            scale_in_controllers:
-            - controller:
-                gradient:
-                  in_ports:
-                    setpoint:
-                      constant_signal:
-                        value: 0.5
-                    signal:
-                      signal_name: AVERAGE_CPU
-                  parameters:
-                    slope: 1
+          scale_in_controllers:
+          - controller:
+              gradient:
+                in_ports:
+                  setpoint:
+                    constant_signal:
+                      value: 0.5
+                  signal:
+                    signal_name: AVERAGE_CPU
+                parameters:
+                  slope: 1
+          scale_out_controllers:
+          - controller:
+              gradient:
+                in_ports:
+                  setpoint:
+                    constant_signal:
+                      value: 1
+                  signal:
+                    signal_name: OBSERVED_LOAD_MULTIPLIER
+                parameters:
+                  slope: -1
+          scaling_backend:
+            kubernetes_replicas:
+              kubernetes_object_selector:
+                api_version: apps/v1
+                kind: Deployment
+                name: service1-demo-app
+                namespace: demoapp
+              max_replicas: "10"
+              min_replicas: "1"
+          scaling_parameters:
             scale_in_cooldown: 40s
-            scale_out_controllers:
-            - controller:
-                gradient:
-                  in_ports:
-                    setpoint:
-                      constant_signal:
-                        value: 1
-                    signal:
-                      signal_name: OBSERVED_LOAD_MULTIPLIER
-                  parameters:
-                    slope: -1
             scale_out_cooldown: 30s
-            scaler:
-              kubernetes_replicas:
-                kubernetes_object_selector:
-                  api_version: apps/v1
-                  kind: Deployment
-                  name: service1-demo-app
-                  namespace: demoapp
     - query:
         promql:
           evaluation_interval: 1s

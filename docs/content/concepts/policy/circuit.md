@@ -13,7 +13,7 @@ The _Circuit_ describes a [control system][control-system] as an execution
 graph. The _Circuit_ is defined as a graph of interconnected signal processing
 components. _Signals_ flow between components through ports. As signals traverse
 the circuit, they get processed, stored within components or get acted upon (for
-example: load-shed, rate-limit, auto-scale and so on). The _Circuit_ is
+example: load-throttling, rate-limit, auto-scale and so on). The _Circuit_ is
 evaluated periodically to respond to changes in signal readings.
 
 ## Component
@@ -100,8 +100,8 @@ Examples of built-in components include:
   - [Gradient Controller](/reference/policies/spec.md#gradient-controller): This
     controller acts on the ratio of setpoint and signal.
 - **Actuators**: Actuators are components which act on signals and interface
-  with external systems to perform actions such as shedding traffic, changing
-  rate limits or auto-scaling and so on.
+  with external systems to perform actions such as throttling and queuing
+  traffic, changing rate limits or auto-scaling.
   - [Concurrency Limiter](/reference/policies/spec.md#concurrency-limiter):
     Takes load multiplier as a signal which determines the proportion of Flow
     concurrency to accept.

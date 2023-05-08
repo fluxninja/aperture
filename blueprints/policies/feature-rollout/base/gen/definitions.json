@@ -12,7 +12,7 @@
         "drivers": {},
         "evaluation_interval": "1s",
         "load_ramp": {
-          "regulator_parameters": {
+          "regulator": {
             "label_key": "",
             "selectors": [
               {
@@ -365,7 +365,7 @@
         "load_ramp": {
           "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
           "default": {
-            "regulator_parameters": {
+            "regulator": {
               "label_key": "",
               "selectors": [
                 {

@@ -5,7 +5,7 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
-* @param (policy.service_protection_core.overload_confirmations: []overload_confirmation) List of overload confirmation criteria. Load scheduler can shed flows when all of the specified overload confirmation criteria are met.
+* @param (policy.service_protection_core.overload_confirmations: []overload_confirmation) List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
 * @schema (overload_confirmation.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
 * @schema (overload_confirmation.threshold: float64) The threshold for the overload confirmation criteria.
 * @schema (overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`

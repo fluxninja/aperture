@@ -10,7 +10,7 @@ keywords:
 
 ## aperturectl blueprints values
 
-Provide values file for a given Aperture Blueprint
+Create values file for a given Aperture Blueprint
 
 ### Synopsis
 

@@ -20,20 +20,21 @@ import Zoom from 'react-medium-image-zoom';
 ## Introduction
 
 The easiest way to get started with policies in Aperture is to use the built-in
-blueprint system. Advanced users can learn about designing new policies by
-following the
-[signal processing](/applying-policies/signal-processing/signal-processing.md)
-tutorials.
-
-The Aperture repository contains several [blueprints][blueprints] that can be
-used to generate [policies][policies] and [Grafana dashboards][grafana].
-Blueprints can be used both as a guide for creating new policies, or used as-is
-by providing required parameters or customizations.
+blueprint system. The Aperture repository contains several
+[blueprints][blueprints] that can be used to generate [policies][policies] and
+[Grafana dashboards][grafana]. Blueprints can be used both as a guide for
+creating new policies, or used as-is by providing required parameters or
+customizations.
 
 To manage blueprints and generate policies, you can use the `aperturectl`
 [CLI tool](/reference/aperturectl/aperturectl.md), by following the
 [installation steps](/get-started/aperture-cli/aperture-cli.md#installation)
 first.
+
+Advanced users can learn about designing new policies by following the example
+circuit created in
+[detecting overload](/applying-policies/alerting/detecting-overload.md)
+tutorial.
 
 <Zoom>
 

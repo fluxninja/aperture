@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withAlerterParameters(alerter_parameters):: {
-    alerter_parameters: alerter_parameters,
+  withAlerter(alerter):: {
+    alerter: alerter,
   },
-  withAlerterParametersMixin(alerter_parameters):: {
-    alerter_parameters+: alerter_parameters,
+  withAlerterMixin(alerter):: {
+    alerter+: alerter,
   },
   withController(controller):: {
     controller: controller,
