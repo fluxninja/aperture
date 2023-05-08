@@ -2,17 +2,9 @@
 package config
 
 import (
-	"crypto/tls"
 	"fmt"
 	"sort"
 	"time"
-
-	promapi "github.com/prometheus/client_golang/api"
-	"go.uber.org/fx"
-
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 )
 
 // OTelConfig represents OTel Collector configuration.
@@ -184,22 +176,4 @@ func (p *Pipeline) AsMap() map[string]interface{} {
 		"processors": p.Processors,
 		"exporters":  p.Exporters,
 	}
-}
-
-/* Specific to Agent and Controller OTel collector factories. */
-
-// BaseFxTag is the base name tag for otel components.
-var (
-	BaseFxTag               = config.NameTag("base")
-	TelemetryCollectorFxTag = config.NameTag("telemetry-collector")
-)
-
-// FxIn consumes parameters via Fx.
-type FxIn struct {
-	fx.In
-	Unmarshaller    config.Unmarshaller
-	Listener        *listener.Listener
-	PromClient      promapi.Client
-	TLSConfig       *tls.Config
-	ServerTLSConfig tlsconfig.ServerTLSConfig
 }

@@ -5,7 +5,6 @@ import (
 	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
@@ -22,7 +21,7 @@ func Module() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				provideProcessor,
-				fx.ResultTags(config.GroupTag(otelconsts.ProcessorFactoriesFxTag)),
+				fx.ResultTags(otelconsts.ProcessorFactoriesFxTag),
 			),
 		),
 	)
