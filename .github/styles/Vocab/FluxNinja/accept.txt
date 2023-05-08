@@ -76,5 +76,6 @@ Netty
 OpenTelemetry
 EnvoyFilter
 [Gg]oodput
+[Ll]aunch
 write_http
 Kubelet
