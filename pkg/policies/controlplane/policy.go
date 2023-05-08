@@ -120,7 +120,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 			// Initialize classifiers
 			classifiers := flowControl.GetClassifiers()
 			for index, classifierProto := range classifiers {
-				classifierOption, err := classifier.NewClassifierOptions(int64(index), classifierProto, policy)
+				classifierOption, err := classifier.NewClassifierOptions(index, classifierProto, policy)
 				if err != nil {
 					return nil, nil, nil, err
 				}
