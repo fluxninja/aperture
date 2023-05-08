@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.aperturectl,id=controller-1.20.4,sharing=private \
   /bin/bash -c \
   'go mod download; \
-  ./scripts/build_aperturectl.sh ./cmd/aperturectl; \
+  ./scripts/build_aperturectl.sh ./cmd/aperturectl --force-build; \
   ./cmd/aperturectl/aperturectl build controller -o / --uri .; \
   '
 

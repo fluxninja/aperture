@@ -6,13 +6,13 @@ local prometheus = grafana.prometheus;
 local graphPanel = grafana.graphPanel;
 
 function(cfg) {
-  local params = config.common + config.dashboard + cfg,
-  local policyName = params.policy_name,
-  local ds = params.datasource,
+  local params = config + cfg,
+  local policyName = params.policy.policy_name,
+  local ds = params.dashboard.datasource,
   local dsName = ds.name,
-  local refresh = params.refresh_interval,
-  local time_from = params.time_from,
-  local time_to = params.time_to,
+  local refresh = params.dashboard.refresh_interval,
+  local time_from = params.dashboard.time_from,
+  local time_to = params.dashboard.time_to,
 
   local throughputPanel =
     graphPanel.new(

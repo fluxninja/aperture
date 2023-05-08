@@ -2,14 +2,14 @@ local spec = import '../../../spec.libsonnet';
 local config = import './config.libsonnet';
 
 function(cfg) {
-  local params = config.common + config.policy + cfg,
+  local params = config + cfg,
 
-  local policyName = params.policy_name,
+  local policyName = params.policy.policy_name,
 
-  local flux_meters = params.flux_meters,
+  local flux_meters = params.policy.flux_meters,
 
   local addPromQLDriver = function(driverAccumulator, driver) {
-    local evaluationInterval = params.evaluation_interval,
+    local evaluationInterval = params.policy.evaluation_interval,
     local promQLSignalName = 'PROMQL_' + std.toString(driverAccumulator.promql_driver_count),
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(driver.query_string)
                                                                                  + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
@@ -64,7 +64,7 @@ function(cfg) {
 
   local addAverageLatencyDriver = function(driverAccumulator, driver) {
     local flux_meter_name = policyName + '/average_latency/' + std.toString(driverAccumulator.average_latency_driver_count),
-    local evaluationInterval = params.evaluation_interval,
+    local evaluationInterval = params.policy.evaluation_interval,
     local averageLatencySignalName = 'AVERAGE_LATENCY_' + std.toString(driverAccumulator.average_latency_driver_count),
     local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))' % { flux_meter_name: flux_meter_name },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
@@ -124,7 +124,7 @@ function(cfg) {
 
   local addPercentileLatencyDriver = function(driverAccumulator, driver) {
     local flux_meter_name = policyName + '/percentile_latency/' + std.toString(driverAccumulator.percentile_latency_driver_count),
-    local evaluationInterval = params.evaluation_interval,
+    local evaluationInterval = params.policy.evaluation_interval,
     local percentileLatencySignalName = 'PERCENTILE_LATENCY_' + std.toString(driverAccumulator.percentile_latency_driver_count),
     local q = 'histogram_quantile(%(percentile)f, sum(rate(flux_meter_bucket{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s])) by (le))' % { percentile: driver.percentile, flux_meter_name: flux_meter_name },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
@@ -185,7 +185,7 @@ function(cfg) {
 
   local addEMALatencyDriver = function(driverAccumulator, driver) {
     local flux_meter_name = policyName + '/ema_latency/' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local evaluationInterval = params.evaluation_interval,
+    local evaluationInterval = params.policy.evaluation_interval,
     local latencySignalName = 'LATENCY_' + std.toString(driverAccumulator.ema_latency_driver_count),
     local q = 'sum(rate(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))/sum(rate(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))' % { flux_meter_name: flux_meter_name },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
@@ -300,22 +300,22 @@ function(cfg) {
 
   local driverAccumulatorStep1 = std.foldl(
     addPromQLDriver,
-    (if std.objectHas(params.drivers, 'promql_drivers') then params.drivers.promql_drivers else []),
+    (if std.objectHas(params.policy.drivers, 'promql_drivers') then params.policy.drivers.promql_drivers else []),
     driverAccumulatorInitial
   ),
   local driverAccumulatorStep2 = std.foldl(
     addAverageLatencyDriver,
-    (if std.objectHas(params.drivers, 'average_latency_drivers') then params.drivers.average_latency_drivers else []),
+    (if std.objectHas(params.policy.drivers, 'average_latency_drivers') then params.policy.drivers.average_latency_drivers else []),
     driverAccumulatorStep1
   ),
   local driverAccumulatorStep3 = std.foldl(
     addPercentileLatencyDriver,
-    (if std.objectHas(params.drivers, 'percentile_latency_drivers') then params.drivers.percentile_latency_drivers else []),
+    (if std.objectHas(params.policy.drivers, 'percentile_latency_drivers') then params.policy.drivers.percentile_latency_drivers else []),
     driverAccumulatorStep2
   ),
   local driverAccumulator = std.foldl(
     addEMALatencyDriver,
-    (if std.objectHas(params.drivers, 'ema_latency_drivers') then params.drivers.ema_latency_drivers else []),
+    (if std.objectHas(params.policy.drivers, 'ema_latency_drivers') then params.policy.drivers.ema_latency_drivers else []),
     driverAccumulatorStep3
   ),
 
@@ -412,7 +412,7 @@ function(cfg) {
         backward: spec.v1.Port.withSignalName('BACKWARD'),
         reset: spec.v1.Port.withSignalName('RESET'),
       })
-      + spec.v1.LoadRamp.withParameters(params.load_ramp)
+      + spec.v1.LoadRamp.withParameters(params.policy.load_ramp)
       + spec.v1.LoadRamp.withDynamicConfigKey('regulator'),
     ),
   ),
@@ -423,12 +423,12 @@ function(cfg) {
     + spec.v1.Policy.withResources(spec.v1.Resources.new()
                                    + spec.v1.Resources.withFlowControl(
                                      spec.v1.FlowControlResources.new()
-                                     + spec.v1.FlowControlResources.withFluxMeters((if std.objectHas(params.resources.flow_control, 'flux_meters') then params.resources.flow_control.flux_meters else {}) + driverAccumulator.flux_meters)
-                                     + spec.v1.FlowControlResources.withClassifiers(params.resources.flow_control.classifiers)
+                                     + spec.v1.FlowControlResources.withFluxMeters((if std.objectHas(params.policy.resources.flow_control, 'flux_meters') then params.policy.resources.flow_control.flux_meters else {}) + driverAccumulator.flux_meters)
+                                     + spec.v1.FlowControlResources.withClassifiers(params.policy.resources.flow_control.classifiers)
                                    ))
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
-      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.evaluation_interval)
+      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
       + spec.v1.Circuit.withComponents(
         driverAccumulator.components + [
           forwardIntentComponent,
@@ -438,7 +438,7 @@ function(cfg) {
           forwardCriteriaComponent,
           backwardCriteriaComponent,
           loadRamp,
-        ] + params.components,
+        ] + params.policy.components,
       ),
     ),
 
@@ -446,7 +446,7 @@ function(cfg) {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
     metadata: {
-      name: params.policy_name,
+      name: params.policy.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
       },

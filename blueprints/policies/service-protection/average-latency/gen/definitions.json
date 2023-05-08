@@ -3,25 +3,22 @@
   "type": "object",
   "title": "policies/service-protection/average-latency blueprint",
   "additionalProperties": false,
-  "required": ["common", "policy"],
+  "required": ["policy"],
   "properties": {
-    "common": {
+    "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_name"],
+      "required": [
+        "policy_name",
+        "service_protection_core",
+        "latency_baseliner"
+      ],
       "properties": {
         "policy_name": {
           "description": "Name of the policy.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
-        }
-      }
-    },
-    "policy": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["service_protection_core", "latency_baseliner"],
-      "properties": {
+        },
         "components": {
           "description": "List of additional circuit components.",
           "default": [],

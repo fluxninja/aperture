@@ -1,7 +1,7 @@
 local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 
 /**
-* @param (common.policy_name: string required) Name of the policy.
+* @param (policy.policy_name: string required) Name of the policy.
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.

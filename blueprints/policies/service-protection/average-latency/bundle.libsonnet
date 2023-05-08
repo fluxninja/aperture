@@ -11,14 +11,14 @@ function(params) {
 
   local c = std.mergePatch(config, params),
 
-  local p = policy(c.common + c.policy),
-  local d = dashboard(c.common + c.dashboard),
+  local p = policy(c),
+  local d = dashboard(c),
 
   policies: {
-    [std.format('%s-cr.yaml', c.common.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', c.common.policy_name)]: p.policyDef,
+    [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,
+    [std.format('%s.yaml', c.policy.policy_name)]: p.policyDef,
   },
   dashboards: {
-    [std.format('%s.json', c.common.policy_name)]: d.dashboard,
+    [std.format('%s.json', c.policy.policy_name)]: d.dashboard,
   },
 }

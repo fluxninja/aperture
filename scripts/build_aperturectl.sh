@@ -8,10 +8,13 @@ for arg in "$@"; do
 		FORCE_BUILD=true
 		shift
 		;;
+	*)
+		APERTURECTL_DIR="$arg"
+		;;
 	esac
 done
 
-APERTURECTL_DIR=${1:-$(git rev-parse --show-toplevel)/cmd/aperturectl}
+APERTURECTL_DIR=${APERTURECTL_DIR:-$(git rev-parse --show-toplevel)/cmd/aperturectl}
 APERTURECTL_BINARY="${APERTURECTL_DIR}/aperturectl"
 
 if [ -f "${APERTURECTL_BINARY}" ] && [ "$FORCE_BUILD" = false ]; then

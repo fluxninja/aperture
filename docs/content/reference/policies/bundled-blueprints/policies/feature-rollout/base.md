@@ -45,28 +45,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-#### common {#common}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="common-policy-name"></a>
-
-<ParameterDescription
-    name='common.policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
 <a id="policy"></a>
 
 <ParameterDescription
@@ -74,7 +52,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Parameters for the Feature Rollout policy.'
     type='Object (rollout_policy)'
     reference='#rollout-policy'
-    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"regulator_parameters": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "resources": {"flow_control": {"classifiers": []}}}'
+    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"regulator_parameters": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}}'
 />
 
 <!-- vale on -->
@@ -592,6 +570,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 <!-- vale off -->
 
 #### rollout_policy {#rollout-policy}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="rollout-policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
 
 <!-- vale on -->
 

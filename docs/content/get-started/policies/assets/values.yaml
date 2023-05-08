@@ -2,13 +2,11 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
 
-common:
+policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: static-rate-limiting
-
-policy:
   rate_limiter:
     # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
     # Type: float64

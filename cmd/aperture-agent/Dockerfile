@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/go/pkg/ \
   /bin/bash -c \
   'set -eu; \
   go mod download; \
-  ./scripts/build_aperturectl.sh ./cmd/aperturectl; \
+  ./scripts/build_aperturectl.sh ./cmd/aperturectl --force-build; \
   ./scripts/generate_full_build_config.sh ./extensions > build.yaml; \
   ./cmd/aperturectl/aperturectl build agent -c build.yaml -o / --uri .; \
   '

@@ -26,16 +26,16 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-#### common {#common}
+#### policy {#policy}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="common-policy-name"></a>
+<a id="policy-policy-name"></a>
 
 <ParameterDescription
-    name='common.policy_name'
+    name='policy.policy_name'
     description='Name of the policy.'
     type='string'
     reference=''
@@ -46,23 +46,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="common-promql-query"></a>
+<a id="policy-promql-query"></a>
 
 <ParameterDescription
-    name='common.promql_query'
+    name='policy.promql_query'
     description='PromQL query.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
 />
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### policy {#policy}
 
 <!-- vale on -->
 
@@ -104,6 +96,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='string'
     reference=''
     value='"1s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-setpoint"></a>
+
+<ParameterDescription
+    name='policy.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -152,26 +158,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Boolean'
     reference=''
     value='false'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### policy.latency_baseliner {#policy-latency-baseliner}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-setpoint"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
