@@ -16,7 +16,7 @@ the Aperture Policy. See configuration [reference][config].
 ## Configuring OpenTelemetry Collectors
 
 For all the OpenTelemetry collectors, configuration can be passed using
-Environment variables in the Aperture Controller.
+Environment variables in the Aperture Agent.
 
 For example, environment variables for [RabbitMQ][rabbitmq] can be passed as
 below:
@@ -46,14 +46,16 @@ policy:
                 collection_interval: 1s
 ```
 
-You can use a Secret and a ConfigMap to pass environment variables to the
-Aperture Controller, as shown below:
+If you have installing the Aperture Agent on Kubernetes, you can use a Secret
+and a ConfigMap to pass environment variables to the Aperture Agent, as shown
+below:
 
 ```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: rabbitmq
+  namespace: aperture-agent
 data:
   RABBITMQ_ENDPOINT: http://rabbitmq.rabbitmq.svc.cluster.local:15672
 ```
@@ -63,18 +65,18 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: rabbitmq-creds
-  namespace: aperture-controller
+  namespace: aperture-agent
 data:
   RABBITMQ_USERNAME: <rabbitmq-username>
   RABBITMQ_PASSWORD: <rabbitmq-password>
 ```
 
-To use these secrets and ConfigMap during the
-[Aperture Controller Installation](/get-started/installation/controller/controller.md#installation),
+To use these Secret and ConfigMap during the
+[Aperture Agent Installation](/get-started/installation/agent/agent.md#agent-installation-modes),
 refer to them in the values.yaml file, as shown below:
 
 ```yaml
-controller:
+agent:
   extraEnvVarsSecret: "rabbitmq-creds"
   extraEnvVarsCM: "rabbitmq"
 ```

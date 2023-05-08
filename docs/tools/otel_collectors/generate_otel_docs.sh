@@ -18,7 +18,6 @@ export metrics_root
 export SCRIPT_DIR
 
 function generate_metrics_files() {
-  set -euo pipefail
   key="$1"
   # Remove '- ' from key
   key="${key:2}"
