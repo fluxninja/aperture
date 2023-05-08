@@ -1,9 +1,6 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
-import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.*;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RpcRequest;
 import com.linecorp.armeria.common.RpcResponse;
@@ -17,6 +14,7 @@ import java.util.function.Function;
 public class ApertureRPCService extends SimpleDecoratingRpcService {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
+    private final boolean failOpen;
 
     public static Function<? super RpcService, ApertureRPCService> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -25,11 +23,24 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
         return builder::build;
     }
 
+    public static Function<? super RpcService, ApertureRPCService> newDecorator(
+            ApertureSDK apertureSDK, String controlPointName, boolean failOpen) {
+        ApertureRPCServiceBuilder builder = new ApertureRPCServiceBuilder();
+        builder.setApertureSDK(apertureSDK)
+                .setControlPointName(controlPointName)
+                .setEnableFailOpen(failOpen);
+        return builder::build;
+    }
+
     public ApertureRPCService(
-            RpcService delegate, ApertureSDK apertureSDK, String controlPointName) {
+            RpcService delegate,
+            ApertureSDK apertureSDK,
+            String controlPointName,
+            boolean failOpen) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
+        this.failOpen = failOpen;
     }
 
     @Override
@@ -37,7 +48,12 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
         Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels);
 
-        if (flow.accepted()) {
+        FlowResult flowResult = flow.result();
+        boolean flowAccepted =
+                (flowResult == FlowResult.Accepted
+                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+
+        if (flowAccepted) {
             RpcResponse res;
             try {
                 res = unwrap().serve(ctx, req);
