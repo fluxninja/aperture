@@ -48,28 +48,37 @@ to grasp the system's behavior and self-correction intuitively.
 
 ## Load management capabilities
 
-Aperture's intelligent load management capabilities, such as fine-grained rate
-limiting, prioritized load shedding and auto-scaling, are applicable to a wide
-range of cloud-native applications. These capabilities, ensure the reliability
-and stability of applications.
+Aperture offers a suite of intelligent load management capabilities that are
+applicable to a wide range of cloud-native applications. These capabilities
+ensure the reliability and stability of applications, and include:
 
-- **Workload Prioritization**: Aperture provides a weighted fair queuing
-  scheduler to ensure that the most critical workloads are served first based on
-  the requirements of your application.
+- **Intelligent Workload Classification**: Aperture provides a weighted fair
+  queuing scheduler to ensure that the most critical workloads are served first
+  based on the requirements of your application.
+- **Circuit-Based policies**: Aperture provides a policy language that enables
+  teams to define how to react to different situations, such as when there is a
+  deviation from service-level objectives. These policies are expressed as a
+  signal processing circuit that enables Aperture to go from telemetry to
+  appropriate actions.
+- **Dark Launch (aka Feature Flag Rollout)**: Aperture enables teams to
+  gradually release new features to a subset of users, without impacting the
+  rest of the system, using dark launch.
 - **Distributed rate-limiting**: Aperture includes a distributed rate-limiter to
   prevent abuse and protect the service from excessive requests by users.
-- **Intelligent auto-scaling**: Aperture adjusts resource allocation based on
+- **Intelligent Auto Scaling**: Aperture adjusts resource allocation based on
   demand and performance to ensure that the application can scale up or down as
-  needed.
+  needed; However, it is different from traditional auto-scaling as it is based
+  on the policies defined by the user which take multiple factors into
+  consideration.
 - **Monitoring and telemetry**: Aperture continuously monitors service
   performance and request attributes using an in-built telemetry system, which
   enables the agent and controller to make informed decisions about how to
   handle requests and prioritize workloads.
-- **Declarative policies**: Aperture provides a policy language that enables
-  teams to define how to react to different situations, such as when there is a
-  deviation from service-level objectives. These policies are expressed as a
-  signal processing circuit that enables Aperture to go from telemetry to
-  actions within minutes.
+- **Quota Scheduling**: It is an important feature of Aperture, as it helps
+  manage and allocate quotas for API requests. This feature enables teams to
+  manage costs effectively and prevent exceeding API rate limits. By using quota
+  scheduling, you can ensure that your application stays within the limits of
+  the API and prevent being perceived as a bad actor by the API provider.
 
 ## How it works
 
