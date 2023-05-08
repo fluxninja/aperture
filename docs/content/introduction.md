@@ -74,11 +74,7 @@ ensure the reliability and stability of applications, and include:
   performance and request attributes using an in-built telemetry system, which
   enables the agent and controller to make informed decisions about how to
   handle requests and prioritize workloads.
-- **Quota Scheduling**: It is an important feature of Aperture, as it helps
-  manage and allocate quotas for API requests. This feature enables teams to
-  manage costs effectively and prevent exceeding API rate limits. By using quota
-  scheduling, you can ensure that your application stays within the limits of
-  the API and prevent being perceived as a bad actor by the API provider.
+- **Quota Scheduling**: This feature helps manage and allocate quotas for API requests, enabling teams to control costs effectively and avoid exceeding API rate limits. By using quota scheduling, you can ensure that your application stays within the limits set by the API provider and avoids being perceived as a bad actor.
 
 ## How it works
 
