@@ -15,32 +15,32 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-// AddCustomMetricsPipelines adds custom metrics pipelines to the given OTelConfig.
-func AddCustomMetricsPipelines(
+// AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
+func AddInfraMeters(
 	config *otelconfig.OTelConfig,
-	customMetrics map[string]*policylangv1.InfraMeter,
+	infraMeters map[string]*policylangv1.InfraMeter,
 ) error {
 	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
 		"attributes": []map[string]interface{}{
 			{
 				"key":    "service.name",
 				"action": "upsert",
-				"value":  "aperture-custom-metrics",
+				"value":  "aperture-infra-meter",
 			},
 		},
 	})
-	if customMetrics == nil {
-		customMetrics = map[string]*policylangv1.InfraMeter{}
+	if infraMeters == nil {
+		infraMeters = map[string]*policylangv1.InfraMeter{}
 	}
-	for pipelineName, metricConfig := range customMetrics {
-		if err := addCustomMetricsPipeline(config, pipelineName, metricConfig); err != nil {
-			return fmt.Errorf("failed to add custom metric pipeline %s: %w", pipelineName, err)
+	for pipelineName, metricConfig := range infraMeters {
+		if err := addInfraMeter(config, pipelineName, metricConfig); err != nil {
+			return fmt.Errorf("failed to add infra metric pipeline %s: %w", pipelineName, err)
 		}
 	}
 	return nil
 }
 
-func addCustomMetricsPipeline(
+func addInfraMeter(
 	config *otelconfig.OTelConfig,
 	pipelineName string,
 	infraMeter *policylangv1.InfraMeter,

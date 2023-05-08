@@ -53,7 +53,7 @@ func provideAgent(
 		customConfig[otelconsts.ReceiverKubeletStats] = inframeter.InfraMeterForKubeletStats()
 	}
 
-	if err := inframeter.AddCustomMetricsPipelines(otelCfg, customConfig); err != nil {
+	if err := inframeter.AddInfraMeters(otelCfg, customConfig); err != nil {
 		return nil, nil, fmt.Errorf("adding custom metrics pipelines: %w", err)
 	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
@@ -88,7 +88,7 @@ func provideAgent(
 			}
 		}
 		otelCfg := otelconfig.NewOTelConfig()
-		if err := inframeter.AddCustomMetricsPipelines(otelCfg, allInfraMeters); err != nil {
+		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			return
 		}
