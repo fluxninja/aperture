@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"go.opentelemetry.io/collector/confmap"
 )
 
@@ -35,9 +34,6 @@ func (u *OTelConfigProvider) Retrieve(_ context.Context, _ string, watchFn confm
 	u.lock.Lock()
 	defer u.lock.Unlock()
 	u.watchFunc = watchFn
-	// Pretty print the config.
-	log.Info().Msgf("OTelConfigProvider.Retrieve: %v", u.config)
-
 	return confmap.NewRetrieved(u.config.AsMap())
 }
 

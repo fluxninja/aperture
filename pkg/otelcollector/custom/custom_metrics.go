@@ -43,14 +43,14 @@ func AddCustomMetricsPipelines(
 func addCustomMetricsPipeline(
 	config *otelconfig.OTelConfig,
 	pipelineName string,
-	metricConfig *policylangv1.InfraMeter,
+	infraMeter *policylangv1.InfraMeter,
 ) error {
 	pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
 
 	receiverIDs := map[string]string{}
 	processorIDs := map[string]string{}
 
-	for origName, receiverConfig := range metricConfig.Receivers {
+	for origName, receiverConfig := range infraMeter.Receivers {
 		var id component.ID
 		if err := id.UnmarshalText([]byte(origName)); err != nil {
 			return fmt.Errorf("invalid id %q: %w", origName, err)
@@ -58,41 +58,42 @@ func addCustomMetricsPipeline(
 		id = component.NewIDWithName(id.Type(), normalizeComponentName(pipelineName, id.Name()))
 		var cfg any
 		cfg = receiverConfig.AsMap()
-		id, cfg = leaderonlyreceiver.WrapConfigIf(metricConfig.PerAgentGroup, id, cfg)
+		id, cfg = leaderonlyreceiver.WrapConfigIf(infraMeter.PerAgentGroup, id, cfg)
 		receiverIDs[origName] = id.String()
 		config.AddReceiver(id.String(), cfg)
 	}
 
-	for origName, processorConfig := range metricConfig.Processors {
+	for origName, processorConfig := range infraMeter.Processors {
 		id := normalizeComponentName(pipelineName, origName)
 		processorIDs[origName] = id
-		config.AddProcessor(id, processorConfig)
+		var cfg any = processorConfig.AsMap()
+		config.AddProcessor(id, cfg)
 	}
 
-	if len(metricConfig.Pipeline.Receivers) == 0 && len(metricConfig.Pipeline.Processors) == 0 {
-		if len(metricConfig.Processors) >= 1 {
+	if len(infraMeter.Pipeline.Receivers) == 0 && len(infraMeter.Pipeline.Processors) == 0 {
+		if len(infraMeter.Processors) >= 1 {
 			return fmt.Errorf("empty pipeline, inferring pipeline is supported only with 0 or 1 processors")
 		}
 
 		// Skip adding pipeline if there are no receivers and processors.
-		if len(metricConfig.Receivers) == 0 && len(metricConfig.Processors) == 0 {
+		if len(infraMeter.Receivers) == 0 && len(infraMeter.Processors) == 0 {
 			return nil
 		}
 
 		// When pipeline not set explicitly, create pipeline with all defined receivers and processors.
-		if len(metricConfig.Receivers) > 0 {
-			metricConfig.Pipeline.Receivers = maps.Keys(metricConfig.Receivers)
-			sort.Strings(metricConfig.Pipeline.Receivers)
+		if len(infraMeter.Receivers) > 0 {
+			infraMeter.Pipeline.Receivers = maps.Keys(infraMeter.Receivers)
+			sort.Strings(infraMeter.Pipeline.Receivers)
 		}
-		if len(metricConfig.Processors) > 0 {
-			metricConfig.Pipeline.Processors = maps.Keys(metricConfig.Processors)
+		if len(infraMeter.Processors) > 0 {
+			infraMeter.Pipeline.Processors = maps.Keys(infraMeter.Processors)
 		}
 	}
 
 	config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
-		Receivers: mapSlice(receiverIDs, metricConfig.Pipeline.Receivers),
+		Receivers: mapSlice(receiverIDs, infraMeter.Pipeline.Receivers),
 		Processors: append(
-			mapSlice(processorIDs, metricConfig.Pipeline.Processors),
+			mapSlice(processorIDs, infraMeter.Pipeline.Processors),
 			otelconsts.ProcessorCustomMetrics,
 			otelconsts.ProcessorAgentResourceLabels,
 		),
