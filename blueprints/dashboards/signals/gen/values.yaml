@@ -2,7 +2,7 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/dashboards/signals
 
-common:
+policy:
   # Name of the policy.
   # Type: string
   # Required: True
