@@ -62,6 +62,6 @@ func Mod(a, b int) int {
 // Shutdown invokes fx.Shutdowner and logs error if any.
 func Shutdown(shutdowner fx.Shutdowner) {
 	if err := shutdowner.Shutdown(); err != nil {
-		log.Error().Err(err).Msg("Unable to shutdown!")
+		log.Panic().Err(err).Msg("Unable to shutdown!")
 	}
 }

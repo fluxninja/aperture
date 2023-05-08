@@ -15,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 const (
@@ -46,10 +47,10 @@ func GMuxServerModule() fx.Option {
 type GRPCServerConfig struct {
 	// Connection timeout
 	ConnectionTimeout config.Duration `json:"connection_timeout" validate:"gte=0s" default:"120s"`
-	// Enable Reflection
-	EnableReflection bool `json:"enable_reflection" default:"false"`
 	// Buckets specification in latency histogram
 	LatencyBucketsMS []float64 `json:"latency_buckets_ms" validate:"gte=0" default:"[10.0,25.0,100.0,250.0,1000.0]"`
+	// Enable Reflection
+	EnableReflection bool `json:"enable_reflection" default:"false"`
 }
 
 // ServerConstructor holds fields to create an annotated gRPC Server.
@@ -60,10 +61,10 @@ type ServerConstructor struct {
 	ListenerName string
 	// Viper config key/server name
 	ConfigKey string
-	// Default Server Config
-	DefaultConfig GRPCServerConfig
 	// Additional server Options
 	ServerOptions []grpc.ServerOption
+	// Default Server Config
+	DefaultConfig GRPCServerConfig
 }
 
 // Annotate creates an annotated instance of gRPC Server.
@@ -134,7 +135,9 @@ func (constructor ServerConstructor) provideServer(
 		OnStart: func(context.Context) error {
 			panichandler.Go(func() {
 				// request shutdown if this server exits
-				defer func() { _ = shutdowner.Shutdown() }()
+				defer func() {
+					utils.Shutdown(shutdowner)
+				}()
 				listener := listener.GetListener()
 				log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Starting GRPC server")
 

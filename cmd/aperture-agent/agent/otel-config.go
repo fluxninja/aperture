@@ -24,6 +24,7 @@ import (
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	inframeter "github.com/fluxninja/aperture/pkg/otelcollector/infra-meter"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 func provideAgent(
@@ -34,6 +35,7 @@ func provideAgent(
 	ai *agentinfo.AgentInfo,
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
+	shutdowner fx.Shutdowner,
 ) (*otelconfig.OTelConfigProvider, *otelconfig.OTelConfigProvider, error) {
 	var agentCfg agentconfig.AgentOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
@@ -88,6 +90,7 @@ func provideAgent(
 		}
 		if err := inframeter.AddInfraMeters(otelCfg, ims); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
+			utils.Shutdown(shutdowner)
 			return
 		}
 		// trigger update
