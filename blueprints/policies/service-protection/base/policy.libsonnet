@@ -2,10 +2,10 @@ local spec = import '../../../spec.libsonnet';
 local config = import './config-defaults.libsonnet';
 
 function(cfg) {
-  local params = config.common + config.policy + cfg,
+  local params = config + cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
-    local evaluationInterval = params.evaluation_interval,
+    local evaluationInterval = params.policy.evaluation_interval,
 
     local promQLSignalName = 'PROMQL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
 
@@ -58,7 +58,7 @@ function(cfg) {
 
   local confirmationAccumulator = std.foldl(
     addOverloadConfirmation,
-    (if std.objectHas(params, 'overload_confirmations') then params.overload_confirmations else []),
+    (if std.objectHas(params, 'overload_confirmations') then params.policy.overload_confirmations else []),
     confirmationAccumulatorInitial
   ),
 
@@ -78,13 +78,13 @@ function(cfg) {
 
   local adaptiveLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
-      local adaptiveLoadScheduler = params.service_protection_core.adaptive_load_scheduler;
+      local adaptiveLoadScheduler = params.policy.service_protection_core.adaptive_load_scheduler;
       spec.v1.AdaptiveLoadScheduler.new()
       + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
       + spec.v1.AdaptiveLoadScheduler.withDynamicConfigKey('load_scheduler')
       + spec.v1.AdaptiveLoadScheduler.withDefaultConfig(
         {
-          dry_run: params.service_protection_core.dry_run,
+          dry_run: params.policy.service_protection_core.dry_run,
         },
       )
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
@@ -101,17 +101,17 @@ function(cfg) {
 
   local policyDef =
     spec.v1.Policy.new()
-    + spec.v1.Policy.withResources(params.resources)
+    + spec.v1.Policy.withResources(params.policy.resources)
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
-      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.evaluation_interval)
+      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
       + spec.v1.Circuit.withComponents(
         confirmationAccumulator.components
         + (if isConfirmationCriteria then [overloadConfirmationAnd] else [])
         + [
           adaptiveLoadSchedulerComponent,
         ]
-        + params.components,
+        + params.policy.components,
       ),
     ),
 

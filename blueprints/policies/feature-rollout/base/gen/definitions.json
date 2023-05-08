@@ -3,20 +3,8 @@
   "type": "object",
   "title": "policies/feature-rollout/base blueprint",
   "additionalProperties": false,
-  "required": ["common", "policy"],
+  "required": ["policy"],
   "properties": {
-    "common": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["policy_name"],
-      "properties": {
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        }
-      }
-    },
     "policy": {
       "description": "Parameters for the Feature Rollout policy.",
       "default": {
@@ -40,6 +28,7 @@
             }
           ]
         },
+        "policy_name": "__REQUIRED_FIELD__",
         "resources": {
           "flow_control": {
             "classifiers": []
@@ -366,8 +355,13 @@
     "rollout_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["load_ramp"],
+      "required": ["policy_name", "load_ramp"],
       "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
         "load_ramp": {
           "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
           "default": {

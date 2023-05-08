@@ -1,8 +1,8 @@
 local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 
 /**
-* @param (common.policy_name: string required) Name of the policy.
-* @param (common.promql_query: string required) PromQL query.
+* @param (policy.policy_name: string required) Name of the policy.
+* @param (policy.promql_query: string required) PromQL query.
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
@@ -23,11 +23,8 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 */
 
 serviceProtectionDefaults {
-  common+: {
-    promql_query: '__REQUIRED_FIELD__',
-  },
-
   policy+: {
+    promql_query: '__REQUIRED_FIELD__',
     /**
     * @param (policy.setpoint: float64 required) Setpoint.
     */

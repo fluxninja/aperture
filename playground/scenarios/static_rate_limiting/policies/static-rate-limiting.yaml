@@ -2,11 +2,8 @@
 # Generated values file for policies/static-rate-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
-
-common:
-  policy_name: "static-rate-limiting"
-
 policy:
+  policy_name: "static-rate-limiting"
   rate_limiter:
     rate_limit: 120
     selectors:

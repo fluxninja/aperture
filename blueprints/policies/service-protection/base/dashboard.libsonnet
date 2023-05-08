@@ -120,9 +120,9 @@ local newStatPanel(graphTitle, datasource, graphQuery) =
   };
 
 function(cfg) {
-  local params = config.common + config.dashboard + cfg,
-  local policyName = params.policy_name,
-  local ds = params.datasource,
+  local params = config + cfg,
+  local policyName = params.policy.policy_name,
+  local ds = params.dashboard.datasource,
   local dsName = ds.name,
 
   local fluxMeterPanel =
@@ -188,9 +188,9 @@ function(cfg) {
       title='Jsonnet / FluxNinja',
       editable=true,
       schemaVersion=18,
-      refresh=params.refresh_interval,
-      time_from=params.time_from,
-      time_to=params.time_to
+      refresh=params.dashboard.refresh_interval,
+      time_from=params.dashboard.time_from,
+      time_to=params.dashboard.time_to
     )
     .addTemplate(
       {

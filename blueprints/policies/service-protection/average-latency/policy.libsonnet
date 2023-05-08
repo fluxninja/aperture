@@ -3,7 +3,7 @@ local basePolicyFn = import '../base/policy.libsonnet';
 local config = import './config.libsonnet';
 
 function(cfg) {
-  local params = config.common + config.policy + cfg,
+  local params = config + cfg,
 
   local basePolicy = basePolicyFn(cfg).policyDef,
 
@@ -14,7 +14,7 @@ function(cfg) {
         spec.v1.Component.withQuery(
           spec.v1.Query.new()
           + spec.v1.Query.withPromql(
-            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: params.policy_name };
+            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: params.policy.policy_name };
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
             + spec.v1.PromQL.withEvaluationInterval('1s')
@@ -23,11 +23,11 @@ function(cfg) {
         ),
         spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.mul(
           spec.v1.Port.withSignalName('SIGNAL'),
-          spec.v1.Port.withConstantSignal(params.latency_baseliner.latency_ema_limit_multiplier),
+          spec.v1.Port.withConstantSignal(params.policy.latency_baseliner.latency_ema_limit_multiplier),
           output=spec.v1.Port.withSignalName('MAX_EMA')
         )),
         spec.v1.Component.withEma(
-          spec.v1.EMA.withParameters(params.latency_baseliner.ema)
+          spec.v1.EMA.withParameters(params.policy.latency_baseliner.ema)
           + spec.v1.EMA.withInPortsMixin(
             spec.v1.EMA.inPorts.withInput(spec.v1.Port.withSignalName('SIGNAL'))
             + spec.v1.EMA.inPorts.withMaxEnvelope(spec.v1.Port.withSignalName('MAX_EMA'))
@@ -36,14 +36,14 @@ function(cfg) {
         ),
         spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.mul(
           spec.v1.Port.withSignalName('SIGNAL_EMA'),
-          spec.v1.Port.withConstantSignal(params.latency_baseliner.latency_tolerance_multiplier),
+          spec.v1.Port.withConstantSignal(params.policy.latency_baseliner.latency_tolerance_multiplier),
           output=spec.v1.Port.withSignalName('SETPOINT')
         )),
       ],
     },
     resources+: {
       flow_control+: {
-        flux_meters+: { [params.policy_name]: params.latency_baseliner.flux_meter },
+        flux_meters+: { [params.policy.policy_name]: params.policy.latency_baseliner.flux_meter },
       },
     },
   },
@@ -52,7 +52,7 @@ function(cfg) {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
     metadata: {
-      name: params.policy_name,
+      name: params.policy.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
       },
