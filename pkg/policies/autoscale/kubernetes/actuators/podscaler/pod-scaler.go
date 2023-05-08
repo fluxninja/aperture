@@ -122,7 +122,7 @@ func setupPodScalerFactory(
 	reg := statusRegistry.Child("component", podScalerStatusRoot)
 	// logger := reg.GetLogger()
 
-	paFactory := &podScalerFactory{
+	psFactory := &podScalerFactory{
 		controlPointTrackers: controlPointTrackers,
 		decisionsWatcher:     decisionsWatcher,
 		dynamicConfigWatcher: dynamicConfigWatcher,
@@ -135,7 +135,7 @@ func setupPodScalerFactory(
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
 		config.NewProtobufUnmarshaller,
-		[]notifiers.FxOptionsFunc{paFactory.newPodScalerOptions})
+		[]notifiers.FxOptionsFunc{psFactory.newPodScalerOptions})
 	if err != nil {
 		return err
 	}
@@ -172,12 +172,12 @@ func setupPodScalerFactory(
 }
 
 // per component fx app.
-func (paFactory *podScalerFactory) newPodScalerOptions(
+func (psFactory *podScalerFactory) newPodScalerOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
-	logger := paFactory.registry.GetLogger()
+	logger := psFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.PodScalerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.PodScaler == nil {
@@ -191,10 +191,10 @@ func (paFactory *podScalerFactory) newPodScalerOptions(
 		Component:        wrapperMessage.GetCommonAttributes(),
 		podScalerProto:   podScalerProto,
 		registry:         reg,
-		podScalerFactory: paFactory,
+		podScalerFactory: psFactory,
 		scaleWaitGroup:   conc.NewWaitGroup(),
 	}
-	componentKey := paths.AgentComponentKey(paFactory.agentGroup, podScaler.GetPolicyName(), podScaler.GetComponentId())
+	componentKey := paths.AgentComponentKey(psFactory.agentGroup, podScaler.GetPolicyName(), podScaler.GetComponentId())
 	statusEtcdPath := path.Join(paths.PodScalerStatusPath, componentKey)
 	podScaler.statusEtcdPath = statusEtcdPath
 
@@ -203,8 +203,8 @@ func (paFactory *podScalerFactory) newPodScalerOptions(
 			podScaler.setup,
 		),
 		fx.Supply(
-			paFactory.etcdClient,
-			fx.Annotate(paFactory.k8sClient, fx.As(new(k8s.K8sClient))),
+			psFactory.etcdClient,
+			fx.Annotate(psFactory.k8sClient, fx.As(new(k8s.K8sClient))),
 		),
 	), nil
 }
@@ -230,20 +230,20 @@ type podScaler struct {
 	isLeader          bool
 }
 
-func (pa *podScaler) setup(
+func (ps *podScaler) setup(
 	lifecycle fx.Lifecycle,
 	etcdClient *etcdclient.Client,
 	k8sClient k8s.K8sClient,
 ) error {
-	logger := pa.registry.GetLogger()
-	pa.etcdClient = etcdClient
-	pa.k8sClient = k8sClient
-	etcdKey := paths.AgentComponentKey(pa.podScalerFactory.agentGroup,
-		pa.GetPolicyName(),
-		pa.GetComponentId())
+	logger := ps.registry.GetLogger()
+	ps.etcdClient = etcdClient
+	ps.k8sClient = k8sClient
+	etcdKey := paths.AgentComponentKey(ps.podScalerFactory.agentGroup,
+		ps.GetPolicyName(),
+		ps.GetComponentId())
 
 	// election notifier
-	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, pa.electionResultCallback)
+	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, ps.electionResultCallback)
 
 	// decision notifier
 	decisionUnmarshaler, err := config.NewProtobufUnmarshaller(nil)
@@ -253,7 +253,7 @@ func (pa *podScaler) setup(
 	decisionNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaler,
-		pa.decisionUpdateCallback,
+		ps.decisionUpdateCallback,
 	)
 	if err != nil {
 		return err
@@ -266,19 +266,19 @@ func (pa *podScaler) setup(
 	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		dynamicConfigUnmarshaler,
-		pa.dynamicConfigUpdateCallback,
+		ps.dynamicConfigUpdateCallback,
 	)
 	if err != nil {
 		return err
 	}
 	// control point notifier
 	// read the configured control point from the horizontal pod scaler proto
-	controlPointSelector := pa.podScalerProto.KubernetesObjectSelector
+	controlPointSelector := ps.podScalerProto.KubernetesObjectSelector
 	controlPoint, err := discovery.ControlPointFromSelector(controlPointSelector)
 	if err != nil {
 		return err
 	}
-	pa.controlPoint = controlPoint
+	ps.controlPoint = controlPoint
 	key, keyErr := json.Marshal(controlPoint)
 	if keyErr != nil {
 		return keyErr
@@ -291,7 +291,7 @@ func (pa *podScaler) setup(
 	controlPointNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(key),
 		controlPointUnmarshaler,
-		pa.controlPointUpdateCallback,
+		ps.controlPointUpdateCallback,
 	)
 	if err != nil {
 		return err
@@ -300,29 +300,29 @@ func (pa *podScaler) setup(
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			var err error
-			pa.statusWriter = etcdwriter.NewWriter(pa.etcdClient, true)
-			pa.ctx, pa.cancel = context.WithCancel(context.Background())
-			pa.setDefaultDryRun()
+			ps.statusWriter = etcdwriter.NewWriter(ps.etcdClient, true)
+			ps.ctx, ps.cancel = context.WithCancel(context.Background())
+			ps.setDefaultDryRun()
 
 			// add election notifier
-			err = pa.podScalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
+			err = ps.podScalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add election notifier")
 				return err
 			}
 			// add decisions notifier
-			err = pa.podScalerFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
+			err = ps.podScalerFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
 				return err
 			}
 			// add dynamic config notifier
-			err = pa.podScalerFactory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
+			err = ps.podScalerFactory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add dynamic config notifier")
 			}
 			// add control point notifier
-			err = pa.podScalerFactory.controlPointTrackers.AddKeyNotifier(controlPointNotifier)
+			err = ps.podScalerFactory.controlPointTrackers.AddKeyNotifier(controlPointNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add control point notifier")
 			}
@@ -332,62 +332,62 @@ func (pa *podScaler) setup(
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
 			// remove election notifier
-			err = pa.podScalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
+			err = ps.podScalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove election notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove dynamic config notifier
-			err = pa.podScalerFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
+			err = ps.podScalerFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove dynamic config notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove decisions notifier
-			err = pa.podScalerFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
+			err = ps.podScalerFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove control point notifier
-			err = pa.podScalerFactory.controlPointTrackers.RemoveKeyNotifier(controlPointNotifier)
+			err = ps.podScalerFactory.controlPointTrackers.RemoveKeyNotifier(controlPointNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove control point notifier")
 				merr = multierror.Append(merr, err)
 			}
-			pa.registry.SetStatus(status.NewStatus(nil, merr))
-			pa.cancel()
-			pa.statusWriter.Close()
-			_, err = pa.etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), pa.statusEtcdPath)
+			ps.registry.SetStatus(status.NewStatus(nil, merr))
+			ps.cancel()
+			ps.statusWriter.Close()
+			_, err = ps.etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), ps.statusEtcdPath)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to delete scale status")
 				merr = multierr.Append(merr, err)
 			}
-			pa.registry.SetStatus(status.NewStatus(nil, merr))
+			ps.registry.SetStatus(status.NewStatus(nil, merr))
 			return merr
 		},
 	})
 	return nil
 }
 
-func (pa *podScaler) electionResultCallback(_ notifiers.Event) {
+func (ps *podScaler) electionResultCallback(_ notifiers.Event) {
 	log.Info().Msg("Election result callback")
 
 	// invoke the lastScaleDecision
-	pa.stateMutex.Lock()
-	defer pa.stateMutex.Unlock()
-	if pa.lastScaleDecision != nil {
-		pa.scale(pa.lastScaleDecision)
+	ps.stateMutex.Lock()
+	defer ps.stateMutex.Unlock()
+	if ps.lastScaleDecision != nil {
+		ps.scale(ps.lastScaleDecision)
 	}
-	pa.isLeader = true
+	ps.isLeader = true
 }
 
-func (pa *podScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := pa.registry.GetLogger()
+func (ps *podScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := ps.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Dynamic config removed")
 		// revert to default config
-		pa.setDefaultDryRun()
+		ps.setDefaultDryRun()
 		return
 	}
 
@@ -401,25 +401,25 @@ func (pa *podScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarsha
 		log.Error().Msg("Common attributes not found")
 		return
 	}
-	if commonAttributes.PolicyHash != pa.GetPolicyHash() {
+	if commonAttributes.PolicyHash != ps.GetPolicyHash() {
 		return
 	}
-	pa.setDryRun(wrapperMessage.DryRun)
+	ps.setDryRun(wrapperMessage.DryRun)
 }
 
-func (pa *podScaler) setDryRun(dryRun bool) {
-	pa.dryRun = dryRun
+func (ps *podScaler) setDryRun(dryRun bool) {
+	ps.dryRun = dryRun
 }
 
-func (pa *podScaler) setDefaultDryRun() {
-	pa.dryRun = pa.podScalerProto.DryRun
+func (ps *podScaler) setDefaultDryRun() {
+	ps.dryRun = ps.podScalerProto.DryRun
 }
 
-func (pa *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	pa.stateMutex.Lock()
-	defer pa.stateMutex.Unlock()
-	logger := pa.registry.GetLogger()
-	pa.lastScaleDecision = nil
+func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	ps.stateMutex.Lock()
+	defer ps.stateMutex.Unlock()
+	logger := ps.registry.GetLogger()
+	ps.lastScaleDecision = nil
 
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
@@ -436,43 +436,43 @@ func (pa *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 		log.Error().Msg("Decision missing common attributes")
 		return
 	}
-	if commonAttributes.PolicyHash != pa.GetPolicyHash() {
+	if commonAttributes.PolicyHash != ps.GetPolicyHash() {
 		return
 	}
 	scaleDecision := wrapperMessage.ScaleDecision
-	if !pa.dryRun {
-		pa.lastScaleDecision = scaleDecision
-		if pa.isLeader {
-			pa.scale(scaleDecision)
+	if !ps.dryRun {
+		ps.lastScaleDecision = scaleDecision
+		if ps.isLeader {
+			ps.scale(scaleDecision)
 		}
 	}
 }
 
 // scale scales the associated Kubernetes object. NOTE: not thread safe, needs to be called under podScaler.scaleMutex.
-func (pa *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
+func (ps *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 	// Take mutex to prevent concurrent scale operations
 	replicas := scaleDecision.GetDesiredReplicas()
 
 	// Cancel any existing scale operation
-	if pa.scaleCancel != nil {
-		pa.scaleCancel()
+	if ps.scaleCancel != nil {
+		ps.scaleCancel()
 	}
 	// Cancel any existing scale operation
-	ctx, cancel := context.WithCancel(pa.ctx)
-	pa.scaleCancel = cancel
+	ctx, cancel := context.WithCancel(ps.ctx)
+	ps.scaleCancel = cancel
 	// Wait on existing scaleWaitGroup to make sure previous scale operation is complete
-	pa.scaleWaitGroup.Wait()
+	ps.scaleWaitGroup.Wait()
 	// Create a new scaleWaitGroup
-	pa.scaleWaitGroup = conc.NewWaitGroup()
-	pa.scaleWaitGroup.Go(func() {
-		cp := pa.controlPoint
+	ps.scaleWaitGroup = conc.NewWaitGroup()
+	ps.scaleWaitGroup.Go(func() {
+		cp := ps.controlPoint
 		targetGK := schema.GroupKind{
 			Group: cp.Group,
 			Kind:  cp.Kind,
 		}
 
 		operation := func() error {
-			scale, targetGR, err := pa.k8sClient.ScaleForGroupKind(ctx, cp.Namespace, cp.Name, targetGK)
+			scale, targetGR, err := ps.k8sClient.ScaleForGroupKind(ctx, cp.Namespace, cp.Name, targetGK)
 			if err != nil {
 				// TODO: update status
 				log.Error().Err(err).Msgf("Unable to get scale for %v", cp)
@@ -481,7 +481,7 @@ func (pa *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 
 			if scale.Spec.Replicas != replicas {
 				scale.Spec.Replicas = replicas
-				_, err = pa.k8sClient.GetScaleClient().Scales(cp.Namespace).Update(ctx, targetGR, scale, metav1.UpdateOptions{})
+				_, err = ps.k8sClient.GetScaleClient().Scales(cp.Namespace).Update(ctx, targetGR, scale, metav1.UpdateOptions{})
 				if err != nil {
 					// TODO: update status
 					log.Error().Err(err).Msg("Unable to update scale subresource")
@@ -498,11 +498,11 @@ func (pa *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 	})
 }
 
-func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := pa.registry.GetLogger()
+func (ps *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := ps.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Control point removed")
-		pa.statusWriter.Delete(pa.statusEtcdPath)
+		ps.statusWriter.Delete(ps.statusEtcdPath)
 		return
 	}
 
@@ -517,9 +517,9 @@ func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 	// create a wrapper message
 	wrapperMessage := policysyncv1.ScaleStatusWrapper{
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:  pa.GetPolicyName(),
-			PolicyHash:  pa.GetPolicyHash(),
-			ComponentId: pa.GetComponentId(),
+			PolicyName:  ps.GetPolicyName(),
+			PolicyHash:  ps.GetPolicyHash(),
+			ComponentId: ps.GetComponentId(),
 		},
 		ScaleStatus: &scaleStatus,
 	}
@@ -531,5 +531,5 @@ func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 		log.Error().Err(err).Msg("Unable to marshal scale status")
 		return
 	}
-	pa.statusWriter.Write(pa.statusEtcdPath, data)
+	ps.statusWriter.Write(ps.statusEtcdPath, data)
 }

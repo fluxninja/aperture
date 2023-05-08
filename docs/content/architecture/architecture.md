@@ -43,9 +43,9 @@ service performance and workloads, including information on customer tiers,
 request types, and other relevant attributes.
 
 The controller uses declarative policies, expressed as a control circuit, to
-analyze the collected metrics and make decisions on load shedding, flow control,
-and auto-scaling to ensure that the application operates within the specified
-SLOs. The controller's policies are based on the principles of
+analyze the collected metrics and make decisions on load throttling, workload
+prioritization, and auto-scaling to ensure that the application operates within
+the specified SLOs. The controller's policies are based on the principles of
 Observability-driven closed-loop automation, which continuously track deviations
 from service-level objectives (SLOs) and calculate recovery or escalation
 actions.
@@ -68,7 +68,7 @@ ensure the reliable operation of cloud-native applications.
 
 Aperture Agents are the workhorses of the platform, residing alongside service
 instances as sidecars. They provide powerful flow control components such as a
-weighted fair queuing scheduler for prioritized load shedding and a distributed
+weighted fair queuing scheduler for workload prioritization and a distributed
 rate-limiter for abuse prevention. A flow is the fundamental unit of work from
 the perspective of an Aperture Agent. It could be an API call, a feature, or
 even a database query.

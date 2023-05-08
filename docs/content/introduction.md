@@ -53,9 +53,9 @@ limiting, prioritized load shedding and auto-scaling, are applicable to a wide
 range of cloud-native applications. These capabilities, ensure the reliability
 and stability of applications.
 
-- **Prioritized load shedding**: Aperture enables organizations to gracefully
-  degrade application performance by dropping traffic that is deemed less
-  important, ensuring that the most critical traffic is served.
+- **Workload Prioritization**: Aperture provides a weighted fair queuing
+  scheduler to ensure that the most critical workloads are served first based on
+  the requirements of your application.
 - **Distributed rate-limiting**: Aperture includes a distributed rate-limiter to
   prevent abuse and protect the service from excessive requests by users.
 - **Intelligent auto-scaling**: Aperture adjusts resource allocation based on

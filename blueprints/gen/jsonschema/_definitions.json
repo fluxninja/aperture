@@ -333,15 +333,51 @@
     "AutoScaler": {
       "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
       "properties": {
+        "dry_run": {
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
+          "type": "boolean",
+          "x-order": 0
+        },
+        "dry_run_config_key": {
+          "description": "Configuration key for overriding dry run setting through dynamic configuration.",
+          "type": "string",
+          "x-order": 1
+        },
         "out_ports": {
           "$ref": "#/definitions/AutoScalerOuts",
           "description": "Output ports for the _AutoScaler_.",
-          "x-order": 0
+          "x-order": 2
         },
-        "parameters": {
-          "$ref": "#/definitions/AutoScalerParameters",
-          "description": "Parameters for the _AutoScaler_.",
-          "x-order": 1
+        "scale_in_controllers": {
+          "description": "List of _Controllers_ for scaling in.\n\n",
+          "items": {
+            "$ref": "#/definitions/ScaleInController",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "dive",
+          "x-order": 3
+        },
+        "scale_out_controllers": {
+          "description": "List of _Controllers_ for scaling out.\n\n",
+          "items": {
+            "$ref": "#/definitions/ScaleOutController",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "dive",
+          "x-order": 4
+        },
+        "scaling_backend": {
+          "$ref": "#/definitions/AutoScalerScalingBackend",
+          "x-go-tag-validate": "required",
+          "x-order": 5
+        },
+        "scaling_parameters": {
+          "$ref": "#/definitions/AutoScalerScalingParameters",
+          "description": "Parameters that define the scaling behavior.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 6
         }
       },
       "type": "object",
@@ -366,7 +402,50 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoScalerParameters": {
+    "AutoScalerScalingBackend": {
+      "properties": {
+        "kubernetes_replicas": {
+          "$ref": "#/definitions/AutoScalerScalingBackendKubernetesReplicas",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerScalingBackendKubernetesReplicas": {
+      "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
+      "properties": {
+        "kubernetes_object_selector": {
+          "$ref": "#/definitions/KubernetesObjectSelector",
+          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "max_replicas": {
+          "default": "9223372036854775807",
+          "description": "The maximum replicas to which the _AutoScaler_ can scale-out.\n\n",
+          "format": "int64",
+          "minLength": 1,
+          "type": "string",
+          "x-go-tag-default": "9223372036854775807",
+          "x-go-tag-validate": "gt=0",
+          "x-order": 1
+        },
+        "min_replicas": {
+          "default": "0",
+          "description": "The minimum replicas to which the _AutoScaler_ can scale-in.\n\n",
+          "format": "int64",
+          "minLength": 0,
+          "type": "string",
+          "x-go-tag-default": "0",
+          "x-go-tag-validate": "gte=0",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoScalerScalingParameters": {
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -376,23 +455,13 @@
           "x-go-tag-default": "50",
           "x-order": 0
         },
-        "max_scale": {
-          "default": "9223372036854775807",
-          "description": "The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.\n\n",
-          "format": "int64",
-          "minLength": 1,
-          "type": "string",
-          "x-go-tag-default": "9223372036854775807",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 1
-        },
         "max_scale_in_percentage": {
           "default": 1,
           "description": "The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "1",
-          "x-order": 2
+          "x-order": 1
         },
         "max_scale_out_percentage": {
           "default": 10,
@@ -400,97 +469,31 @@
           "format": "double",
           "type": "number",
           "x-go-tag-default": "10",
-          "x-order": 3
+          "x-order": 2
         },
-        "min_scale": {
-          "default": "0",
-          "description": "The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.\n\n",
-          "format": "int64",
-          "minLength": 0,
-          "type": "string",
-          "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0",
-          "x-order": 4
-        },
-        "scale_in_alerter_parameters": {
+        "scale_in_alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-in Alerter.",
-          "x-order": 5
-        },
-        "scale_in_controllers": {
-          "description": "List of _Controllers_ for scaling in.",
-          "items": {
-            "$ref": "#/definitions/ScaleInController",
-            "type": "object"
-          },
-          "type": "array",
-          "x-order": 6
+          "x-order": 3
         },
         "scale_in_cooldown": {
           "default": "120s",
           "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "120s",
-          "x-order": 7
+          "x-order": 4
         },
-        "scale_out_alerter_parameters": {
+        "scale_out_alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-out Alerter.",
-          "x-order": 8
-        },
-        "scale_out_controllers": {
-          "description": "List of _Controllers_ for scaling out.",
-          "items": {
-            "$ref": "#/definitions/ScaleOutController",
-            "type": "object"
-          },
-          "type": "array",
-          "x-order": 9
+          "x-order": 5
         },
         "scale_out_cooldown": {
           "default": "30s",
           "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "30s",
-          "x-order": 10
-        },
-        "scaler": {
-          "$ref": "#/definitions/AutoScalerParametersScaler",
-          "x-go-tag-validate": "required",
-          "x-order": 11
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AutoScalerParametersScaler": {
-      "properties": {
-        "kubernetes_replicas": {
-          "$ref": "#/definitions/AutoScalerParametersScalerKubernetesReplicas",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AutoScalerParametersScalerKubernetesReplicas": {
-      "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
-      "properties": {
-        "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
-          "type": "boolean",
-          "x-order": 0
-        },
-        "dry_run_config_key": {
-          "description": "Configuration key for overriding dry run setting through dynamic configuration.",
-          "type": "string",
-          "x-order": 1
-        },
-        "kubernetes_object_selector": {
-          "$ref": "#/definitions/KubernetesObjectSelector",
-          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-order": 6
         }
       },
       "type": "object",
@@ -1175,7 +1178,7 @@
         },
         "load_scheduler": {
           "$ref": "#/definitions/LoadScheduler",
-          "description": "_Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).",
+          "description": "_Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.",
           "x-order": 3
         },
         "rate_limiter": {
@@ -1929,7 +1932,7 @@
     "LoadRampParameters": {
       "description": "Parameters for the _Load Ramp_ component.",
       "properties": {
-        "regulator_parameters": {
+        "regulator": {
           "$ref": "#/definitions/RegulatorParameters",
           "description": "Parameters for the _Regulator_.",
           "x-order": 0
@@ -3016,7 +3019,7 @@
     },
     "ScaleInController": {
       "properties": {
-        "alerter_parameters": {
+        "alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for embedded Alerter.",
           "x-order": 0
@@ -3042,7 +3045,7 @@
     },
     "ScaleOutController": {
       "properties": {
-        "alerter_parameters": {
+        "alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for embedded Alerter.",
           "x-order": 0
@@ -3090,7 +3093,7 @@
           "x-order": 2
         },
         "workloads": {
-          "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/load-scheduler.md#workload).\n\n:::\n\n",
+          "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load throttling to be \"intelligent\" instead of queueing flows in an arbitrary order.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/load-scheduler.md#workload).\n\n:::\n\n",
           "items": {
             "$ref": "#/definitions/SchedulerWorkload",
             "type": "object"

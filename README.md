@@ -55,7 +55,7 @@ analyzing, and actuating, facilitated by agents and a controller.
   [flow control](https://docs.fluxninja.com/concepts/flow-control/) components
   such as a
   [weighted fair queuing scheduler](https://docs.fluxninja.com/concepts/flow-control/components/concurrency-limiter)
-  for prioritized load-shedding and a
+  for load throttling and workload prioritization and a
   [distributed rate-limiter](https://docs.fluxninja.com/concepts/flow-control/components/rate-limiter).
   A [flow](https://docs.fluxninja.com/concepts/flow-control/flow-label) is the
   fundamental unit of work from the perspective of an Aperture Agent. It could

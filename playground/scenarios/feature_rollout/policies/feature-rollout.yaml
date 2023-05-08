@@ -24,7 +24,7 @@ policy:
             threshold: 75
   evaluation_interval: "1s"
   load_ramp:
-    regulator_parameters:
+    regulator:
       selectors:
         - control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local

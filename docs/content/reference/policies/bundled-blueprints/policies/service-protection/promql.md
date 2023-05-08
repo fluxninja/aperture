@@ -126,7 +126,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.service_protection_core.overload_confirmations'
-    description='List of overload confirmation criteria. Load scheduler can shed flows when all of the specified overload confirmation criteria are met.'
+    description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
     value='[{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]'
@@ -293,6 +293,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
     type='string'
     reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+## Dynamic Configuration
+
+:::note
+
+The following configuration parameters can be
+[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+at runtime, without reloading the policy.
+
+:::
+
+### Parameters
+
+<!-- vale off -->
+
+<a id="load-scheduler"></a>
+
+<ParameterDescription
+    name='load_scheduler'
+    description='Default configuration for load scheduler that can be updated at the runtime without shutting down the policy.'
+    type='Object (aperture.spec.v1.LoadSchedulerDynamicConfig)'
+    reference='../../../spec#load-scheduler-dynamic-config'
     value='"__REQUIRED_FIELD__"'
 />
 

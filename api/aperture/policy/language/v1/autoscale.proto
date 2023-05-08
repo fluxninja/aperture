@@ -138,14 +138,14 @@ message ScaleOutController {
   message Controller {
     oneof controller {
       IncreasingGradient gradient = 1;
-    }
+    } // @gotags: validate:"required"
   }
 
   // Controller
   Controller controller = 1; // @gotags: validate:"required"
 
   // Configuration for embedded Alerter.
-  Alerter.Parameters alerter_parameters = 2;
+  Alerter.Parameters alerter = 2;
 }
 
 message ScaleInController {
@@ -159,63 +159,32 @@ message ScaleInController {
   Controller controller = 1;
 
   // Configuration for embedded Alerter.
-  Alerter.Parameters alerter_parameters = 2;
+  Alerter.Parameters alerter = 2;
 }
 
 // _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 message AutoScaler {
-  message Parameters {
-    message Scaler {
-      // KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-      message KubernetesReplicas {
-        // The Kubernetes object on which horizontal scaling is applied.
-        KubernetesObjectSelector kubernetes_object_selector = 1; // @gotags: validate:"required"
-
-        // Dry run mode ensures that no scaling is invoked by this auto scaler.
-        // This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
-        // This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
-        bool dry_run = 2;
-
-        // Configuration key for overriding dry run setting through dynamic configuration.
-        string dry_run_config_key = 3;
-      }
-      oneof scaler {
-        KubernetesReplicas kubernetes_replicas = 1;
-      }
-    }
-
-    Scaler scaler = 1; // @gotags: validate:"required"
-
-    // The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
-    int64 min_scale = 2; // @gotags: default:"0" validate:"gte=0"
-    // The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
-    int64 max_scale = 3; // @gotags: default:"9223372036854775807" validate:"gt=0"
-
-    // List of _Controllers_ for scaling out.
-    repeated ScaleOutController scale_out_controllers = 4;
-    // List of _Controllers_ for scaling in.
-    repeated ScaleInController scale_in_controllers = 5;
-
+  message ScalingParameters {
     // The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
-    double max_scale_out_percentage = 6; // @gotags: default:"10"
+    double max_scale_out_percentage = 1; // @gotags: default:"10"
     // The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
-    double max_scale_in_percentage = 7; // @gotags: default:"1"
+    double max_scale_in_percentage = 2; // @gotags: default:"1"
 
     // The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
-    google.protobuf.Duration scale_out_cooldown = 8; // @gotags: default:"30s"
+    google.protobuf.Duration scale_out_cooldown = 3; // @gotags: default:"30s"
     // The amount of time to wait after a scale-in operation for another scale-in operation.
-    google.protobuf.Duration scale_in_cooldown = 9; // @gotags: default:"120s"
+    google.protobuf.Duration scale_in_cooldown = 4; // @gotags: default:"120s"
 
     // Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
     // For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
     // scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
-    double cooldown_override_percentage = 10; // @gotags: default:"50"
+    double cooldown_override_percentage = 5; // @gotags: default:"50"
 
     // Configuration for scale-out Alerter.
-    Alerter.Parameters scale_out_alerter_parameters = 11;
+    Alerter.Parameters scale_out_alerter = 6;
 
     // Configuration for scale-in Alerter.
-    Alerter.Parameters scale_in_alerter_parameters = 12;
+    Alerter.Parameters scale_in_alerter = 7;
   }
 
   // Outputs for _AutoScaler_.
@@ -225,9 +194,39 @@ message AutoScaler {
     OutPort desired_scale = 3;
   }
 
-  // Output ports for the _AutoScaler_.
-  Outs out_ports = 1;
+  message ScalingBackend {
+    // KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+    message KubernetesReplicas {
+      // The Kubernetes object on which horizontal scaling is applied.
+      KubernetesObjectSelector kubernetes_object_selector = 1; // @gotags: validate:"required"
+      // The minimum replicas to which the _AutoScaler_ can scale-in.
+      int64 min_replicas = 2; // @gotags: default:"0" validate:"gte=0"
+      // The maximum replicas to which the _AutoScaler_ can scale-out.
+      int64 max_replicas = 3; // @gotags: default:"9223372036854775807" validate:"gt=0"
+    }
+    oneof scaler {
+      KubernetesReplicas kubernetes_replicas = 1;
+    }
+  }
 
-  // Parameters for the _AutoScaler_.
-  Parameters parameters = 2;
+  ScalingBackend scaling_backend = 1; // @gotags: validate:"required"
+
+  // List of _Controllers_ for scaling out.
+  repeated ScaleOutController scale_out_controllers = 2; // @gotags: validate:"dive"
+  // List of _Controllers_ for scaling in.
+  repeated ScaleInController scale_in_controllers = 3; // @gotags: validate:"dive"
+
+  // Output ports for the _AutoScaler_.
+  Outs out_ports = 4;
+
+  // Parameters that define the scaling behavior.
+  ScalingParameters scaling_parameters = 5; // @gotags: validate:"required"
+
+  // Dry run mode ensures that no scaling is invoked by this auto scaler.
+  // This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+  // This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
+  bool dry_run = 6;
+
+  // Configuration key for overriding dry run setting through dynamic configuration.
+  string dry_run_config_key = 7;
 }

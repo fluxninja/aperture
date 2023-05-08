@@ -537,12 +537,46 @@ definitions:
       such as Kubernetes to perform auto-scale.
     type: object
     properties:
+      dry_run:
+        description: |-
+          Dry run mode ensures that no scaling is invoked by this auto scaler.
+          This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+          This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
+        type: boolean
+      dry_run_config_key:
+        description: Configuration key for overriding dry run setting through dynamic
+          configuration.
+        type: string
       out_ports:
         description: Output ports for the _AutoScaler_.
         $ref: '#/definitions/AutoScalerOuts'
-      parameters:
-        description: Parameters for the _AutoScaler_.
-        $ref: '#/definitions/AutoScalerParameters'
+      scale_in_controllers:
+        description: |+
+          List of _Controllers_ for scaling in.
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/ScaleInController'
+        x-go-tag-validate: dive
+      scale_out_controllers:
+        description: |+
+          List of _Controllers_ for scaling out.
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/ScaleOutController'
+        x-go-tag-validate: dive
+      scaling_backend:
+        x-go-tag-validate: required
+        $ref: '#/definitions/AutoScalerScalingBackend'
+      scaling_parameters:
+        description: |+
+          Parameters that define the scaling behavior.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/AutoScalerScalingParameters'
   AutoScalerOuts:
     description: Outputs for _AutoScaler_.
     type: object
@@ -553,7 +587,42 @@ definitions:
         $ref: '#/definitions/OutPort'
       desired_scale:
         $ref: '#/definitions/OutPort'
-  AutoScalerParameters:
+  AutoScalerScalingBackend:
+    type: object
+    properties:
+      kubernetes_replicas:
+        $ref: '#/definitions/AutoScalerScalingBackendKubernetesReplicas'
+  AutoScalerScalingBackendKubernetesReplicas:
+    description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+    type: object
+    properties:
+      kubernetes_object_selector:
+        description: |+
+          The Kubernetes object on which horizontal scaling is applied.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/KubernetesObjectSelector'
+      max_replicas:
+        description: |+
+          The maximum replicas to which the _AutoScaler_ can scale-out.
+
+        type: string
+        format: int64
+        default: "9223372036854775807"
+        minLength: 1
+        x-go-tag-default: "9223372036854775807"
+        x-go-tag-validate: gt=0
+      min_replicas:
+        description: |+
+          The minimum replicas to which the _AutoScaler_ can scale-in.
+
+        type: string
+        format: int64
+        default: "0"
+        minLength: 0
+        x-go-tag-default: "0"
+        x-go-tag-validate: gte=0
+  AutoScalerScalingParameters:
     type: object
     properties:
       cooldown_override_percentage:
@@ -566,16 +635,6 @@ definitions:
         format: double
         default: 50
         x-go-tag-default: "50"
-      max_scale:
-        description: |+
-          The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
-
-        type: string
-        format: int64
-        default: "9223372036854775807"
-        minLength: 1
-        x-go-tag-default: "9223372036854775807"
-        x-go-tag-validate: gt=0
       max_scale_in_percentage:
         description: |+
           The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
@@ -592,25 +651,9 @@ definitions:
         format: double
         default: 10
         x-go-tag-default: "10"
-      min_scale:
-        description: |+
-          The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
-
-        type: string
-        format: int64
-        default: "0"
-        minLength: 0
-        x-go-tag-default: "0"
-        x-go-tag-validate: gte=0
-      scale_in_alerter_parameters:
+      scale_in_alerter:
         description: Configuration for scale-in Alerter.
         $ref: '#/definitions/AlerterParameters'
-      scale_in_controllers:
-        description: List of _Controllers_ for scaling in.
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/ScaleInController'
       scale_in_cooldown:
         description: |+
           The amount of time to wait after a scale-in operation for another scale-in operation.
@@ -618,15 +661,9 @@ definitions:
         type: string
         default: 120s
         x-go-tag-default: 120s
-      scale_out_alerter_parameters:
+      scale_out_alerter:
         description: Configuration for scale-out Alerter.
         $ref: '#/definitions/AlerterParameters'
-      scale_out_controllers:
-        description: List of _Controllers_ for scaling out.
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/ScaleOutController'
       scale_out_cooldown:
         description: |+
           The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
@@ -634,34 +671,6 @@ definitions:
         type: string
         default: 30s
         x-go-tag-default: 30s
-      scaler:
-        x-go-tag-validate: required
-        $ref: '#/definitions/AutoScalerParametersScaler'
-  AutoScalerParametersScaler:
-    type: object
-    properties:
-      kubernetes_replicas:
-        $ref: '#/definitions/AutoScalerParametersScalerKubernetesReplicas'
-  AutoScalerParametersScalerKubernetesReplicas:
-    description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-    type: object
-    properties:
-      dry_run:
-        description: |-
-          Dry run mode ensures that no scaling is invoked by this auto scaler.
-          This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
-          This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
-        type: boolean
-      dry_run_config_key:
-        description: Configuration key for overriding dry run setting through dynamic
-          configuration.
-        type: string
-      kubernetes_object_selector:
-        description: |+
-          The Kubernetes object on which horizontal scaling is applied.
-
-        x-go-tag-validate: required
-        $ref: '#/definitions/KubernetesObjectSelector'
   Circuit:
     description: |-
       Circuit is graph of inter-connected signal processing components.
@@ -1309,9 +1318,8 @@ definitions:
           can shape load one after another at same or different _Control Points_.
         $ref: '#/definitions/LoadRampSeries'
       load_scheduler:
-        description: _Load Scheduler_ provides service protection by applying prioritized
-          load shedding of flows using a network scheduler (for example, Weighted
-          Fair Queuing).
+        description: _Load Scheduler_ provides service protection by creating a prioritized
+          workload queue in front of the service using Weighted Fair Queuing.
         $ref: '#/definitions/LoadScheduler'
       rate_limiter:
         description: _Rate Limiter_ provides service protection by applying rate limits.
@@ -2084,7 +2092,7 @@ definitions:
     required:
     - steps
     properties:
-      regulator_parameters:
+      regulator:
         description: Parameters for the _Regulator_.
         $ref: '#/definitions/RegulatorParameters'
       steps:
@@ -3101,7 +3109,7 @@ definitions:
   ScaleInController:
     type: object
     properties:
-      alerter_parameters:
+      alerter:
         description: Configuration for embedded Alerter.
         $ref: '#/definitions/AlerterParameters'
       controller:
@@ -3115,7 +3123,7 @@ definitions:
   ScaleOutController:
     type: object
     properties:
-      alerter_parameters:
+      alerter:
         description: Configuration for embedded Alerter.
         $ref: '#/definitions/AlerterParameters'
       controller:
@@ -3174,7 +3182,7 @@ definitions:
           List of workloads to be used in scheduler.
 
           Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-          allows for load-shedding to be "intelligent" compared to random rejections.
+          allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
           There are two aspects of this "intelligence":
           * Scheduler can more precisely calculate concurrency if it understands
             that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
