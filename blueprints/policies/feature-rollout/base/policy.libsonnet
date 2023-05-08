@@ -6,8 +6,6 @@ function(cfg) {
 
   local policyName = params.policy.policy_name,
 
-  local flux_meters = params.policy.flux_meters,
-
   local addPromQLDriver = function(driverAccumulator, driver) {
     local evaluationInterval = params.policy.evaluation_interval,
     local promQLSignalName = 'PROMQL_' + std.toString(driverAccumulator.promql_driver_count),
