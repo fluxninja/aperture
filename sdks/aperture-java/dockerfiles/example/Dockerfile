@@ -6,7 +6,7 @@ WORKDIR /
 
 COPY --link . .
 
-RUN ./gradlew examples:armeria-example:shadowJar
+RUN ./gradlew clean examples:armeria-example:shadowJar
 
 FROM --platform=linux/amd64 openjdk:18-jdk-alpine
 
