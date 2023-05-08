@@ -1,8 +1,8 @@
 ---
-title: ZooKeeper
-description: Integrating ZooKeeper Metrics
+title: CAMEL_CASE
+description: Integrating CAMEL_CASE Metrics
 keywords:
-  - zookeeper
+  - METRIC_NAME
   - otel
   - opentelemetry
   - collector
@@ -11,22 +11,21 @@ keywords:
 
 :::info
 
-See also [zookeeperreceiver docs][receiver] in `opentelemetry-collector-contrib`
+See also [RECEIVER_NAME docs][receiver] in `opentelemetry-collector-contrib`
 repository.
 
 :::
 
 :::note
 
-The `zookeeperreceiver` extension is available in the default agent image. If
-you're [building][build] your own Aperture Agent, add
-`integrations/otel/zookeeperreceiver` to the `bundled_extensions` list to make
-[the receiver][receiver] available.
+The `RECEIVER_NAME` extension is available in the default agent image. If you're
+[building][build] your own Aperture Agent, add `integrations/otel/RECEIVER_NAME`
+to the `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 
 You can configure the [OpenTelemetry Collector][opentelemetry-collector] for
-ZooKeeper as part of [Policy resources][policy-resources] while [applying the
+CAMEL_CASE as part of [Policy resources][policy-resources] while [applying the
 policy][applying-policy]:
 
 ```yaml
@@ -35,24 +34,24 @@ policy:
     telemetry_collectors:
       - agent_group: default
         infra_meters:
-          zookeeper:
+          METRIC_NAME:
             per_agent_group: true
             pipeline:
               processors:
                 - batch
               receivers:
-                - zookeeper
+                - METRIC_NAME
             processors:
               batch:
                 send_batch_size: 10
                 timeout: 10s
             receivers:
-              zookeeper: [zookeeperreceiver configuration here]
+              METRIC_NAME: [RECEIVER_NAME configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
 [receiver]:
-  https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/zookeeperreceiver
+  https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/RECEIVER_NAME
 [opentelemetry-collector]: /reference/policies/spec.md#telemetry-collector
 [applying-policy]: /applying-policies/applying-policies.md
 [policy-resources]: /reference/policies/spec.md#resources

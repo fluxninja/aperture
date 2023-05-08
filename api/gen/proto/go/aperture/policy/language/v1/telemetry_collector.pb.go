@@ -40,20 +40,21 @@ type TelemetryCollector struct {
 	//
 	// ```yaml
 	//
-	//	 telemetry_collector:
-	//	   infra_meters:
-	//		    rabbitmq:
-	//		      processors:
-	//		        batch:
-	//		          send_batch_size: 10
-	//		          timeout: 10s
-	//		      receivers:
-	//		        rabbitmq:
-	//		          collection_interval: 10s
-	//		          endpoint: http://<rabbitmq-svc-fqdn>:15672
-	//		          password: secretpassword
-	//		          username: admin
-	//		      per_agent_group: true
+	//	 telemetry_collectors:
+	//	   - agent_group: default
+	//	     infra_meters:
+	//		      rabbitmq:
+	//		        processors:
+	//		          batch:
+	//		            send_batch_size: 10
+	//		            timeout: 10s
+	//		        receivers:
+	//		          rabbitmq:
+	//		            collection_interval: 10s
+	//		            endpoint: http://<rabbitmq-svc-fqdn>:15672
+	//		            password: secretpassword
+	//		            username: admin
+	//		        per_agent_group: true
 	//
 	// ```
 	InfraMeters map[string]*InfraMeter `protobuf:"bytes,2,rep,name=infra_meters,json=infraMeters,proto3" json:"infra_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`

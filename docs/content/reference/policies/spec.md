@@ -7486,20 +7486,21 @@ names would be normalized.
 Example:
 
 ```yaml
- telemetry_collector:
-   infra_meters:
-	    rabbitmq:
-	      processors:
-	        batch:
-	          send_batch_size: 10
-	          timeout: 10s
-	      receivers:
-	        rabbitmq:
-	          collection_interval: 10s
-	          endpoint: http://<rabbitmq-svc-fqdn>:15672
-	          password: secretpassword
-	          username: admin
-	      per_agent_group: true
+ telemetry_collectors:
+   - agent_group: default
+     infra_meters:
+	      rabbitmq:
+	        processors:
+	          batch:
+	            send_batch_size: 10
+	            timeout: 10s
+	        receivers:
+	          rabbitmq:
+	            collection_interval: 10s
+	            endpoint: http://<rabbitmq-svc-fqdn>:15672
+	            password: secretpassword
+	            username: admin
+	        per_agent_group: true
 
 ```
 

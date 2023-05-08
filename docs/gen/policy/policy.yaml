@@ -3679,12 +3679,13 @@ definitions:
           pipelines, which will\nreceive and process telemetry at the agents and send
           metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline
           name. Prefixing pipeline name with `metrics/`\nis optional, as all the components
-          and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collector:\n
-          \  infra_meters:\n\t    rabbitmq:\n\t      processors:\n\t        batch:\n\t
-          \         send_batch_size: 10\n\t          timeout: 10s\n\t      receivers:\n\t
-          \       rabbitmq:\n\t          collection_interval: 10s\n\t          endpoint:
-          http://<rabbitmq-svc-fqdn>:15672\n\t          password: secretpassword\n\t
-          \         username: admin\n\t      per_agent_group: true\n\n```"
+          and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n
+          \  - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t
+          \         batch:\n\t            send_batch_size: 10\n\t            timeout:
+          10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval:
+          10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password:
+          secretpassword\n\t            username: admin\n\t        per_agent_group:
+          true\n\n```"
         type: object
         additionalProperties:
           $ref: '#/definitions/InfraMeter'
