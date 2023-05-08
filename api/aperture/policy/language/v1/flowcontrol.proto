@@ -455,7 +455,7 @@ message FlowControl {
     // _Rate Limiter_ provides service protection by applying rate limits.
     RateLimiter rate_limiter = 1;
 
-    // _Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+    // _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
     LoadScheduler load_scheduler = 7;
 
     // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
@@ -688,7 +688,7 @@ message Scheduler {
   // List of workloads to be used in scheduler.
   //
   // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-  // allows for load-shedding to be "intelligent" compared to random rejections.
+  // allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
   // There are two aspects of this "intelligence":
   // * Scheduler can more precisely calculate concurrency if it understands
   //   that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
@@ -859,7 +859,7 @@ message LoadRamp {
     }
 
     // Parameters for the _Regulator_.
-    Regulator.Parameters regulator_parameters = 1;
+    Regulator.Parameters regulator = 1;
 
     repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
   }
