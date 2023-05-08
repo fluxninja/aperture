@@ -3155,7 +3155,7 @@ definitions:
           control integration.
         x-order: 0
         $ref: '#/definitions/FlowControlResources'
-      telemetry_collector:
+      telemetry_collectors:
         description: TelemetryCollector configures OpenTelemetry collector integration.
         type: array
         items:

@@ -6472,7 +6472,7 @@ FlowControlResources are resources that are provided by flow control
 integration.
 
 </dd>
-<dt>telemetry_collector</dt>
+<dt>telemetry_collectors</dt>
 <dd>
 
 <!-- vale off -->

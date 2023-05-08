@@ -2980,7 +2980,7 @@
           "description": "FlowControlResources are resources that are provided by flow control integration.",
           "x-order": 0
         },
-        "telemetry_collector": {
+        "telemetry_collectors": {
           "description": "TelemetryCollector configures OpenTelemetry collector integration.",
           "items": {
             "$ref": "#/definitions/TelemetryCollector",

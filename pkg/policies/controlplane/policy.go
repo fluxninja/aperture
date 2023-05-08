@@ -22,6 +22,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
+	telemetrycollectors "github.com/fluxninja/aperture/pkg/policies/controlplane/resources/telemetry-collectors"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -103,24 +104,36 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 	}
 
 	var resourceOptions []fx.Option
-	if policyProto.GetResources() != nil {
-		// Initialize flux meters
-		fluxMeters := policyProto.GetResources().GetFlowControl().GetFluxMeters()
-		for name, fluxMeterProto := range fluxMeters {
-			fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy)
-			if err != nil {
-				return nil, nil, nil, err
+	resources := policyProto.GetResources()
+	if resources != nil {
+		flowControl := resources.GetFlowControl()
+		if flowControl != nil {
+			// Initialize flux meters
+			fluxMeters := flowControl.GetFluxMeters()
+			for name, fluxMeterProto := range fluxMeters {
+				fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy)
+				if err != nil {
+					return nil, nil, nil, err
+				}
+				resourceOptions = append(resourceOptions, fluxMeterOption)
 			}
-			resourceOptions = append(resourceOptions, fluxMeterOption)
+			// Initialize classifiers
+			classifiers := flowControl.GetClassifiers()
+			for index, classifierProto := range classifiers {
+				classifierOption, err := classifier.NewClassifierOptions(int64(index), classifierProto, policy)
+				if err != nil {
+					return nil, nil, nil, err
+				}
+				resourceOptions = append(resourceOptions, classifierOption)
+			}
 		}
-		// Initialize classifiers
-		classifiers := policyProto.GetResources().GetFlowControl().GetClassifiers()
-		for index, classifierProto := range classifiers {
-			classifierOption, err := classifier.NewClassifierOptions(int64(index), classifierProto, policy)
+		telemetryCollectors := resources.GetTelemetryCollectors()
+		if telemetryCollectors != nil {
+			tcOption, err := telemetrycollectors.NewTelemetryCollectorsOptions(telemetryCollectors, policy)
 			if err != nil {
 				return nil, nil, nil, err
 			}
-			resourceOptions = append(resourceOptions, classifierOption)
+			resourceOptions = append(resourceOptions, tcOption)
 		}
 	}
 	var compiledCircuit *circuitfactory.Circuit

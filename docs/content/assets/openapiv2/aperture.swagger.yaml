@@ -3474,7 +3474,7 @@ definitions:
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
-            telemetry_collector:
+            telemetry_collectors:
                 description: TelemetryCollector configures OpenTelemetry collector integration.
                 items:
                     $ref: '#/definitions/TelemetryCollector'

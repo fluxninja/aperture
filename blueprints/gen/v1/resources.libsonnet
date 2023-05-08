@@ -7,13 +7,13 @@
   withFlowControlMixin(flow_control):: {
     flow_control+: flow_control,
   },
-  withTelemetryCollector(telemetry_collector):: {
-    telemetry_collector:
-      if std.isArray(telemetry_collector)
-      then telemetry_collector
-      else [telemetry_collector],
+  withTelemetryCollectors(telemetry_collectors):: {
+    telemetry_collectors:
+      if std.isArray(telemetry_collectors)
+      then telemetry_collectors
+      else [telemetry_collectors],
   },
-  withTelemetryCollectorMixin(telemetry_collector):: {
-    telemetry_collector+: telemetry_collector,
+  withTelemetryCollectorsMixin(telemetry_collectors):: {
+    telemetry_collectors+: telemetry_collectors,
   },
 }

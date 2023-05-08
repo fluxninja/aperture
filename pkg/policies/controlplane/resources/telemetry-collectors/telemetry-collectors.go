@@ -1,4 +1,4 @@
-package telemetrycollector
+package telemetrycollectors
 
 import (
 	"context"
@@ -20,8 +20,8 @@ type tcConfigSync struct {
 	agentGroupName string
 }
 
-// NewInfraMetersOptions creates fx options InfraMeters.
-func NewInfraMetersOptions(
+// NewTelemetryCollectorsOptions creates fx options InfraMeters.
+func NewTelemetryCollectorsOptions(
 	tcProtos []*policylangv1.TelemetryCollector,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {

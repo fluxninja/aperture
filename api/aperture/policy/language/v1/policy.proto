@@ -168,7 +168,7 @@ message Circuit {
 // :::
 message Resources {
   // TelemetryCollector configures OpenTelemetry collector integration.
-  repeated TelemetryCollector telemetry_collector = 1;
+  repeated TelemetryCollector telemetry_collectors = 1;
   // FlowControlResources are resources that are provided by flow control integration.
   FlowControlResources flow_control = 101;
 }

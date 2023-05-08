@@ -1322,7 +1322,7 @@ func (m *Resources) validate(all bool) error {
 
 	var errors []error
 
-	for idx, item := range m.GetTelemetryCollector() {
+	for idx, item := range m.GetTelemetryCollectors() {
 		_, _ = idx, item
 
 		if all {
@@ -1330,7 +1330,7 @@ func (m *Resources) validate(all bool) error {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, ResourcesValidationError{
-						field:  fmt.Sprintf("TelemetryCollector[%v]", idx),
+						field:  fmt.Sprintf("TelemetryCollectors[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1338,7 +1338,7 @@ func (m *Resources) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, ResourcesValidationError{
-						field:  fmt.Sprintf("TelemetryCollector[%v]", idx),
+						field:  fmt.Sprintf("TelemetryCollectors[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1347,7 +1347,7 @@ func (m *Resources) validate(all bool) error {
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ResourcesValidationError{
-					field:  fmt.Sprintf("TelemetryCollector[%v]", idx),
+					field:  fmt.Sprintf("TelemetryCollectors[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
