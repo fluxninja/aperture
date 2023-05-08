@@ -11,6 +11,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/utils"
 	concurrencyv3 "go.etcd.io/etcd/client/v3/concurrency"
 	"go.uber.org/fx"
 )
@@ -61,11 +62,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 				err := election.Election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to elect a leader")
-					shutdownErr := in.Shutdowner.Shutdown()
-					if shutdownErr != nil {
-						log.Error().Err(shutdownErr).Msg("Error on invoking shutdown")
-						return
-					}
+					utils.Shutdown(in.Shutdowner)
 				}
 				// Check if canceled
 				if ctx.Err() != nil {
