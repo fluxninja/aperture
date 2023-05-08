@@ -55,7 +55,7 @@ ensure the reliability and stability of applications, and include:
 - **Intelligent Workload Classification**: Aperture provides a weighted fair
   queuing scheduler to ensure that the most critical workloads are served first
   based on the requirements of your application.
-- **Circuit Based policies**: Aperture provides a policy language that enables
+- **Circuit-Based policies**: Aperture provides a policy language that enables
   teams to define how to react to different situations, such as when there is a
   deviation from service-level objectives. These policies are expressed as a
   signal processing circuit that enables Aperture to go from telemetry to
@@ -67,14 +67,14 @@ ensure the reliability and stability of applications, and include:
   prevent abuse and protect the service from excessive requests by users.
 - **Intelligent Auto Scaling**: Aperture adjusts resource allocation based on
   demand and performance to ensure that the application can scale up or down as
-  needed, However it is different from traditional auto-scaling as it is based
+  needed; However it is different from traditional auto-scaling as it is based
   on the policies defined by the user which take multiple factors into
   consideration.
 - **Monitoring and telemetry**: Aperture continuously monitors service
   performance and request attributes using an in-built telemetry system, which
   enables the agent and controller to make informed decisions about how to
   handle requests and prioritize workloads.
-- **Quota Scheduling**: It is an important feature of Aperture as it helps
+- **Quota Scheduling**: It is an important feature of Aperture, as it helps
   manage and allocate quotas for API requests. This feature enables teams to
   manage costs effectively and prevent exceeding API rate limits. By using quota
   scheduling, you can ensure that your application stays within the limits of
