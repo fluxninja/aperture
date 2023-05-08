@@ -35,7 +35,7 @@ public class RequestController {
 	public static final String DEFAULT_AGENT_PORT = "8089";
 
     private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "0"));
-    private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "0")));
+    private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "50")));
     private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0"));
     private  Logger log = LoggerFactory.getLogger(RequestController.class);
 
@@ -101,6 +101,14 @@ public class RequestController {
         }
 
         try {
+            HttpHeaders httpHeaders = Collections.list(request.getHeaderNames())
+            .stream()
+            .collect(Collectors.toMap(
+                Function.identity(),
+                h -> Collections.list(request.getHeaders(h)),
+                (oldValue, newValue) -> newValue,
+                HttpHeaders::new
+            ));
             Request requestObj = new ObjectMapper().readValue(payload, Request.class);
             List<List<Subrequest>> chains = requestObj.getRequest();
             for (List<Subrequest> chain : chains) {
@@ -113,7 +121,7 @@ public class RequestController {
                 }
                 String requestDestination = chain.get(0).getDestination();
                 // TODO Add check for req Dest != Hostname
-                return processChain(chain);
+                return processChain(chain, httpHeaders);
             }
 
             // If all subrequests were processed successfully, return success message
@@ -129,7 +137,7 @@ public class RequestController {
         return "Success";
     }
 
-    private String processChain(List<Subrequest> chain) {
+    private String processChain(List<Subrequest> chain, HttpHeaders httpHeaders) {
         if (chain.size() == 1) {
             return processRequest(chain.get(0));
         }
@@ -143,7 +151,7 @@ public class RequestController {
         trimmedRequest.addRequest(trimmedChain);
         String requestForwardingDestination = chain.get(1).getDestination();
 
-        return forwardRequest(trimmedRequest, requestForwardingDestination);
+        return forwardRequest(trimmedRequest, requestForwardingDestination, httpHeaders);
     }
 
     private String processRequest(Subrequest request) {
@@ -171,7 +179,7 @@ public class RequestController {
         return "Success";
     }
 
-    private String forwardRequest(Request request, String destination) {
+    private String forwardRequest(Request request, String destination, HttpHeaders httpHeaders) {
         String requestJson;
         try {
             requestJson = new ObjectMapper().writeValueAsString(request);
@@ -181,7 +189,7 @@ public class RequestController {
             return msg;
         }
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = httpHeaders;
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("X-Forwarding-Instance", getInstanceName());
 

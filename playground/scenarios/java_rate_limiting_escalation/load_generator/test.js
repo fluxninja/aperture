@@ -1,13 +1,13 @@
-import http from "k6/http";
-import { check, sleep } from "k6";
 import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
+import { check, sleep } from "k6";
 import { vu } from "k6/execution";
+import http from "k6/http";
 
 export let vuStages = [
   { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
-  { duration: "1m", target: 30 },
-  { duration: "2m", target: 30 },
+  { duration: "1m", target: 50 },
+  { duration: "2m", target: 50 },
   { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
 ];
@@ -25,10 +25,10 @@ export let options = {
       stages: vuStages,
       env: { USER_TYPE: "subscriber" },
     },
-    bots: {
+    crawlers: {
       executor: "ramping-vus",
       stages: vuStages,
-      env: { USER_TYPE: "bot" },
+      env: { USER_TYPE: "crawler" },
     },
   },
 };
