@@ -1,9 +1,6 @@
 package com.fluxninja.example;
 
-import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
-import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.*;
 import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -94,8 +91,9 @@ public class App {
         // Flow.
         Flow flow = this.apertureSDK.startFlow(this.featureName, labels);
 
+        FlowResult flowResult = flow.result();
         // See whether flow was accepted by Aperture Agent.
-        if (flow.accepted()) {
+        if (flowResult != FlowResult.Rejected) {
             // Simulate work being done
             try {
                 res.status(202);

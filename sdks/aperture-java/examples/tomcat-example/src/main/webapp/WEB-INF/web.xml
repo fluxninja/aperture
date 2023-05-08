@@ -54,6 +54,10 @@
             <param-name>control_point_name</param-name>
             <param-value>awesome_feature</param-value>
         </init-param>
+        <init-param>
+            <param-name>enable_fail_open</param-name>
+            <param-value>true</param-value>
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>ApertureFeatureFilter</filter-name>

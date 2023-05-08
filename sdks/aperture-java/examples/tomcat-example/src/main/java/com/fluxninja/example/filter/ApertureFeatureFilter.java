@@ -1,9 +1,6 @@
 package com.fluxninja.example.filter;
 
-import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
-import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
@@ -32,8 +29,9 @@ public class ApertureFeatureFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
+        FlowResult flowResult = flow.result();
         // See whether flow was accepted by Aperture Agent.
-        if (flow.accepted()) {
+        if (flowResult != FlowResult.Rejected) {
             try {
                 chain.doFilter(request, response);
                 flow.end(FlowStatus.OK);

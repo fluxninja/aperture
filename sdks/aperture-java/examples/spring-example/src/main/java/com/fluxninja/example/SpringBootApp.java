@@ -10,6 +10,7 @@ public class SpringBootApp {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_FAIL_OPEN = "true";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_GRPC_TIMEOUT_MS = "1000";
     public static final String DEFAULT_INSECURE_GRPC = "true";
@@ -36,6 +37,11 @@ public class SpringBootApp {
             controlPointName = DEFAULT_CONTROL_POINT_NAME;
         }
         System.setProperty("FN_CONTROL_POINT_NAME", controlPointName);
+        String failOpen = System.getenv("FN_ENABLE_FAIL_OPEN");
+        if (failOpen == null) {
+            failOpen = DEFAULT_FAIL_OPEN;
+        }
+        System.setProperty("FN_ENABLE_FAIL_OPEN", failOpen);
         String grpcTimeoutMs = System.getenv("FN_GRPC_TIMEOUT_MS");
         if (grpcTimeoutMs == null) {
             grpcTimeoutMs = DEFAULT_GRPC_TIMEOUT_MS;
