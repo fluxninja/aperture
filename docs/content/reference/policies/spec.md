@@ -727,6 +727,33 @@ scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs
 such as Kubernetes to perform auto-scale.
 
 <dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Dry run mode ensures that no scaling is invoked by this auto scaler. This is
+Useful for observing the behavior of auto scaler without disrupting any real
+traffic. This parameter sets the default value of dry run setting which can be
+overridden at runtime using dynamic configuration.
+
+</dd>
+<dt>dry_run_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for overriding dry run setting through dynamic configuration.
+
+</dd>
 <dt>out_ports</dt>
 <dd>
 
@@ -739,16 +766,50 @@ such as Kubernetes to perform auto-scale.
 Output ports for the _AutoScaler_.
 
 </dd>
-<dt>parameters</dt>
+<dt>scale_in_controllers</dt>
 <dd>
 
 <!-- vale off -->
 
-([AutoScalerParameters](#auto-scaler-parameters))
+([[]ScaleInController](#scale-in-controller))
 
 <!-- vale on -->
 
-Parameters for the _AutoScaler_.
+List of _Controllers_ for scaling in.
+
+</dd>
+<dt>scale_out_controllers</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]ScaleOutController](#scale-out-controller))
+
+<!-- vale on -->
+
+List of _Controllers_ for scaling out.
+
+</dd>
+<dt>scaling_backend</dt>
+<dd>
+
+<!-- vale off -->
+
+([AutoScalerScalingBackend](#auto-scaler-scaling-backend))
+
+<!-- vale on -->
+
+</dd>
+<dt>scaling_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([AutoScalerScalingParameters](#auto-scaler-scaling-parameters))
+
+<!-- vale on -->
+
+Parameters that define the scaling behavior.
 
 </dd>
 </dl>
@@ -800,7 +861,77 @@ Outputs for _AutoScaler_.
 
 <!-- vale off -->
 
-### AutoScalerParameters {#auto-scaler-parameters}
+### AutoScalerScalingBackend {#auto-scaler-scaling-backend}
+
+<!-- vale on -->
+
+<dl>
+<dt>kubernetes_replicas</dt>
+<dd>
+
+<!-- vale off -->
+
+([AutoScalerScalingBackendKubernetesReplicas](#auto-scaler-scaling-backend-kubernetes-replicas))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AutoScalerScalingBackendKubernetesReplicas {#auto-scaler-scaling-backend-kubernetes-replicas}
+
+<!-- vale on -->
+
+KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+
+<dl>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+<!-- vale off -->
+
+([KubernetesObjectSelector](#kubernetes-object-selector))
+
+<!-- vale on -->
+
+The Kubernetes object on which horizontal scaling is applied.
+
+</dd>
+<dt>max_replicas</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"9223372036854775807"`)
+
+<!-- vale on -->
+
+The maximum replicas to which the _AutoScaler_ can scale-out.
+
+</dd>
+<dt>min_replicas</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"0"`)
+
+<!-- vale on -->
+
+The minimum replicas to which the _AutoScaler_ can scale-in.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AutoScalerScalingParameters {#auto-scaler-scaling-parameters}
 
 <!-- vale on -->
 
@@ -818,19 +949,6 @@ Cooldown override percentage defines a threshold change in scale-out beyond
 which previous cooldown is overridden. For example, if the cooldown is 5 minutes
 and the cooldown override percentage is 10%, then if the scale-increases by 10%
 or more, the previous cooldown is cancelled. Defaults to 50%.
-
-</dd>
-<dt>max_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"9223372036854775807"`)
-
-<!-- vale on -->
-
-The maximum scale to which the _AutoScaler_ can scale-out. For example, in case
-of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
@@ -861,20 +979,7 @@ percentage of current scale value. Can never go below one even if percentage
 computation is less than one. Defaults to 10% of current scale value.
 
 </dd>
-<dt>min_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"0"`)
-
-<!-- vale on -->
-
-The minimum scale to which the _AutoScaler_ can scale-in. For example, in case
-of KubernetesReplicas Scaler, this is the minimum number of replicas.
-
-</dd>
-<dt>scale_in_alerter_parameters</dt>
+<dt>scale_in_alerter</dt>
 <dd>
 
 <!-- vale off -->
@@ -884,18 +989,6 @@ of KubernetesReplicas Scaler, this is the minimum number of replicas.
 <!-- vale on -->
 
 Configuration for scale-in Alerter.
-
-</dd>
-<dt>scale_in_controllers</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]ScaleInController](#scale-in-controller))
-
-<!-- vale on -->
-
-List of _Controllers_ for scaling in.
 
 </dd>
 <dt>scale_in_cooldown</dt>
@@ -911,7 +1004,7 @@ The amount of time to wait after a scale-in operation for another scale-in
 operation.
 
 </dd>
-<dt>scale_out_alerter_parameters</dt>
+<dt>scale_out_alerter</dt>
 <dd>
 
 <!-- vale off -->
@@ -921,18 +1014,6 @@ operation.
 <!-- vale on -->
 
 Configuration for scale-out Alerter.
-
-</dd>
-<dt>scale_out_controllers</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]ScaleOutController](#scale-out-controller))
-
-<!-- vale on -->
-
-List of _Controllers_ for scaling out.
 
 </dd>
 <dt>scale_out_cooldown</dt>
@@ -946,89 +1027,6 @@ List of _Controllers_ for scaling out.
 
 The amount of time to wait after a scale-out operation for another scale-out or
 scale-in operation.
-
-</dd>
-<dt>scaler</dt>
-<dd>
-
-<!-- vale off -->
-
-([AutoScalerParametersScaler](#auto-scaler-parameters-scaler))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AutoScalerParametersScaler {#auto-scaler-parameters-scaler}
-
-<!-- vale on -->
-
-<dl>
-<dt>kubernetes_replicas</dt>
-<dd>
-
-<!-- vale off -->
-
-([AutoScalerParametersScalerKubernetesReplicas](#auto-scaler-parameters-scaler-kubernetes-replicas))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AutoScalerParametersScalerKubernetesReplicas {#auto-scaler-parameters-scaler-kubernetes-replicas}
-
-<!-- vale on -->
-
-KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-
-<dl>
-<dt>dry_run</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool)
-
-<!-- vale on -->
-
-Dry run mode ensures that no scaling is invoked by this auto scaler. This is
-Useful for observing the behavior of auto scaler without disrupting any real
-traffic. This parameter sets the default value of dry run setting which can be
-overridden at runtime using dynamic configuration.
-
-</dd>
-<dt>dry_run_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for overriding dry run setting through dynamic configuration.
-
-</dd>
-<dt>kubernetes_object_selector</dt>
-<dd>
-
-<!-- vale off -->
-
-([KubernetesObjectSelector](#kubernetes-object-selector))
-
-<!-- vale on -->
-
-The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 </dl>
@@ -2591,9 +2589,8 @@ after another at same or different _Control Points_.
 
 <!-- vale on -->
 
-_Load Scheduler_ provides service protection by applying prioritized load
-shedding of flows using a network scheduler (for example, Weighted Fair
-Queuing).
+_Load Scheduler_ provides service protection by creating a prioritized workload
+queue in front of the service using Weighted Fair Queuing.
 
 </dd>
 <dt>rate_limiter</dt>
@@ -4257,7 +4254,7 @@ generation.
 Parameters for the _Load Ramp_ component.
 
 <dl>
-<dt>regulator_parameters</dt>
+<dt>regulator</dt>
 <dd>
 
 <!-- vale off -->
@@ -6560,7 +6557,7 @@ Whether the output is valid during the warm-up stage.
 <!-- vale on -->
 
 <dl>
-<dt>alerter_parameters</dt>
+<dt>alerter</dt>
 <dd>
 
 <!-- vale off -->
@@ -6616,7 +6613,7 @@ Controller
 <!-- vale on -->
 
 <dl>
-<dt>alerter_parameters</dt>
+<dt>alerter</dt>
 <dd>
 
 <!-- vale off -->
@@ -6742,8 +6739,8 @@ Parameters to be used if none of workloads specified in `workloads` match.
 List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-allows for load-shedding to be "intelligent" compared to random rejections.
-There are two aspects of this "intelligence":
+allows for load throttling to be "intelligent" instead of queueing flows in an
+arbitrary order. There are two aspects of this "intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands that
   flows belonging to different classes have different weights (for example,

@@ -44,8 +44,6 @@ local service_protection_core_defaults = {
     service_protection_core: service_protection_core_defaults,
   },
 
-  service_protection_core: service_protection_core_defaults,
-
   dashboard: {
     refresh_interval: '5s',
     time_from: 'now-15m',

@@ -66,7 +66,7 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "LoadRamp",
-		ShortDescription: iface.GetSelectorsShortDescription(loadRamp.Parameters.RegulatorParameters.GetSelectors()),
+		ShortDescription: iface.GetSelectorsShortDescription(loadRamp.Parameters.Regulator.GetSelectors()),
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
@@ -112,7 +112,7 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 					FlowControl: &policylangv1.FlowControl{
 						Component: &policylangv1.FlowControl_Regulator{
 							Regulator: &policylangv1.Regulator{
-								Parameters: loadRamp.Parameters.RegulatorParameters,
+								Parameters: loadRamp.Parameters.Regulator,
 								InPorts: &policylangv1.Regulator_Ins{
 									AcceptPercentage: &policylangv1.InPort{
 										Value: &policylangv1.InPort_SignalName{

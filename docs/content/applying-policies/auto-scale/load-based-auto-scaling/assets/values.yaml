@@ -20,40 +20,40 @@ policy:
               signal_name: AVERAGE_CPU
     - auto_scale:
         auto_scaler:
-          parameters:
-            scaler:
-              kubernetes_replicas:
-                kubernetes_object_selector:
-                  namespace: demoapp
-                  api_version: apps/v1
-                  kind: Deployment
-                  name: service1-demo-app
-            min_scale: "1"
-            max_scale: "10"
+          scaling_parameters:
             scale_in_cooldown: "40s"
             scale_out_cooldown: "30s"
-            scale_out_controllers:
-              - controller:
-                  gradient:
-                    in_ports:
-                      signal:
-                        signal_name: OBSERVED_LOAD_MULTIPLIER
-                      setpoint:
-                        constant_signal:
-                          value: 1.0
-                    parameters:
-                      slope: -1.0
-            scale_in_controllers:
-              - controller:
-                  gradient:
-                    in_ports:
-                      signal:
-                        signal_name: AVERAGE_CPU
-                      setpoint:
-                        constant_signal:
-                          value: 0.5
-                    parameters:
-                      slope: 1.0
+          scaling_backend:
+            kubernetes_replicas:
+              kubernetes_object_selector:
+                namespace: demoapp
+                api_version: apps/v1
+                kind: Deployment
+                name: service1-demo-app
+              min_replicas: "1"
+              max_replicas: "10"
+          scale_out_controllers:
+            - controller:
+                gradient:
+                  in_ports:
+                    signal:
+                      signal_name: OBSERVED_LOAD_MULTIPLIER
+                    setpoint:
+                      constant_signal:
+                        value: 1.0
+                  parameters:
+                    slope: -1.0
+          scale_in_controllers:
+            - controller:
+                gradient:
+                  in_ports:
+                    signal:
+                      signal_name: AVERAGE_CPU
+                    setpoint:
+                      constant_signal:
+                        value: 0.5
+                  parameters:
+                    slope: 1.0
   service_protection_core:
     adaptive_load_scheduler:
       load_scheduler:

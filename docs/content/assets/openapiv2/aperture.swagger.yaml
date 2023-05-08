@@ -311,12 +311,45 @@ definitions:
     AutoScaler:
         description: _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
         properties:
+            dry_run:
+                description: |-
+                    Dry run mode ensures that no scaling is invoked by this auto scaler.
+                    This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+                    This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for overriding dry run setting through dynamic configuration.
+                type: string
             out_ports:
                 $ref: '#/definitions/AutoScalerOuts'
                 description: Output ports for the _AutoScaler_.
-            parameters:
-                $ref: '#/definitions/AutoScalerParameters'
-                description: Parameters for the _AutoScaler_.
+            scale_in_controllers:
+                description: |+
+                    List of _Controllers_ for scaling in.
+
+                items:
+                    $ref: '#/definitions/ScaleInController'
+                    type: object
+                type: array
+                x-go-tag-validate: dive
+            scale_out_controllers:
+                description: |+
+                    List of _Controllers_ for scaling out.
+
+                items:
+                    $ref: '#/definitions/ScaleOutController'
+                    type: object
+                type: array
+                x-go-tag-validate: dive
+            scaling_backend:
+                $ref: '#/definitions/AutoScalerScalingBackend'
+                x-go-tag-validate: required
+            scaling_parameters:
+                $ref: '#/definitions/AutoScalerScalingParameters'
+                description: |+
+                    Parameters that define the scaling behavior.
+
+                x-go-tag-validate: required
         type: object
     AutoScalerOuts:
         description: Outputs for _AutoScaler_.
@@ -328,7 +361,42 @@ definitions:
             desired_scale:
                 $ref: '#/definitions/OutPort'
         type: object
-    AutoScalerParameters:
+    AutoScalerScalingBackend:
+        properties:
+            kubernetes_replicas:
+                $ref: '#/definitions/AutoScalerScalingBackendKubernetesReplicas'
+        type: object
+    AutoScalerScalingBackendKubernetesReplicas:
+        description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+        properties:
+            kubernetes_object_selector:
+                $ref: '#/definitions/KubernetesObjectSelector'
+                description: |+
+                    The Kubernetes object on which horizontal scaling is applied.
+
+                x-go-tag-validate: required
+            max_replicas:
+                default: "9223372036854775807"
+                description: |+
+                    The maximum replicas to which the _AutoScaler_ can scale-out.
+
+                format: int64
+                minLength: 1
+                type: string
+                x-go-tag-default: "9223372036854775807"
+                x-go-tag-validate: gt=0
+            min_replicas:
+                default: "0"
+                description: |+
+                    The minimum replicas to which the _AutoScaler_ can scale-in.
+
+                format: int64
+                minLength: 0
+                type: string
+                x-go-tag-default: "0"
+                x-go-tag-validate: gte=0
+        type: object
+    AutoScalerScalingParameters:
         properties:
             cooldown_override_percentage:
                 default: 50
@@ -340,16 +408,6 @@ definitions:
                 format: double
                 type: number
                 x-go-tag-default: "50"
-            max_scale:
-                default: "9223372036854775807"
-                description: |+
-                    The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
-
-                format: int64
-                minLength: 1
-                type: string
-                x-go-tag-default: "9223372036854775807"
-                x-go-tag-validate: gt=0
             max_scale_in_percentage:
                 default: 1
                 description: |+
@@ -366,25 +424,9 @@ definitions:
                 format: double
                 type: number
                 x-go-tag-default: "10"
-            min_scale:
-                default: "0"
-                description: |+
-                    The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
-
-                format: int64
-                minLength: 0
-                type: string
-                x-go-tag-default: "0"
-                x-go-tag-validate: gte=0
-            scale_in_alerter_parameters:
+            scale_in_alerter:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for scale-in Alerter.
-            scale_in_controllers:
-                description: List of _Controllers_ for scaling in.
-                items:
-                    $ref: '#/definitions/ScaleInController'
-                    type: object
-                type: array
             scale_in_cooldown:
                 default: 120s
                 description: |+
@@ -392,15 +434,9 @@ definitions:
 
                 type: string
                 x-go-tag-default: 120s
-            scale_out_alerter_parameters:
+            scale_out_alerter:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for scale-out Alerter.
-            scale_out_controllers:
-                description: List of _Controllers_ for scaling out.
-                items:
-                    $ref: '#/definitions/ScaleOutController'
-                    type: object
-                type: array
             scale_out_cooldown:
                 default: 30s
                 description: |+
@@ -408,33 +444,6 @@ definitions:
 
                 type: string
                 x-go-tag-default: 30s
-            scaler:
-                $ref: '#/definitions/AutoScalerParametersScaler'
-                x-go-tag-validate: required
-        type: object
-    AutoScalerParametersScaler:
-        properties:
-            kubernetes_replicas:
-                $ref: '#/definitions/AutoScalerParametersScalerKubernetesReplicas'
-        type: object
-    AutoScalerParametersScalerKubernetesReplicas:
-        description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-        properties:
-            dry_run:
-                description: |-
-                    Dry run mode ensures that no scaling is invoked by this auto scaler.
-                    This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
-                    This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
-                type: boolean
-            dry_run_config_key:
-                description: Configuration key for overriding dry run setting through dynamic configuration.
-                type: string
-            kubernetes_object_selector:
-                $ref: '#/definitions/KubernetesObjectSelector'
-                description: |+
-                    The Kubernetes object on which horizontal scaling is applied.
-
-                x-go-tag-validate: required
         type: object
     CheckHTTPRequest:
         properties:
@@ -1370,7 +1379,7 @@ definitions:
                 description: _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
             load_scheduler:
                 $ref: '#/definitions/LoadScheduler'
-                description: _Load Scheduler_ provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
+                description: _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
             rate_limiter:
                 $ref: '#/definitions/RateLimiter'
                 description: _Rate Limiter_ provides service protection by applying rate limits.
@@ -2290,7 +2299,7 @@ definitions:
     LoadRampParameters:
         description: Parameters for the _Load Ramp_ component.
         properties:
-            regulator_parameters:
+            regulator:
                 $ref: '#/definitions/RegulatorParameters'
                 description: Parameters for the _Regulator_.
             steps:
@@ -3511,7 +3520,7 @@ definitions:
         type: object
     ScaleInController:
         properties:
-            alerter_parameters:
+            alerter:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for embedded Alerter.
             controller:
@@ -3525,7 +3534,7 @@ definitions:
         type: object
     ScaleOutController:
         properties:
-            alerter_parameters:
+            alerter:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for embedded Alerter.
             controller:
@@ -3582,7 +3591,7 @@ definitions:
                     List of workloads to be used in scheduler.
 
                     Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-                    allows for load-shedding to be "intelligent" compared to random rejections.
+                    allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
                     There are two aspects of this "intelligence":
                     * Scheduler can more precisely calculate concurrency if it understands
                       that flows belonging to different classes have different weights (for example, insert queries compared to select queries).

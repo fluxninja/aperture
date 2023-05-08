@@ -55,7 +55,7 @@
           "required": ["adaptive_load_scheduler"],
           "properties": {
             "overload_confirmations": {
-              "description": "List of overload confirmation criteria. Load scheduler can shed flows when all of the specified overload confirmation criteria are met.",
+              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
               "default": [
                 {
                   "operator": "__REQUIRED_FIELD__",

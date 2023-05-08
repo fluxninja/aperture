@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withRegulatorParameters(regulator_parameters):: {
-    regulator_parameters: regulator_parameters,
+  withRegulator(regulator):: {
+    regulator: regulator,
   },
-  withRegulatorParametersMixin(regulator_parameters):: {
-    regulator_parameters+: regulator_parameters,
+  withRegulatorMixin(regulator):: {
+    regulator+: regulator,
   },
   withSteps(steps):: {
     steps:
