@@ -32,8 +32,8 @@ public class ApertureHTTPClientBuilder {
     }
 
     /**
-     * Defines client behavior when Aperture Agent is unreachable. true - pass all traffic through
-     * false - block all traffic
+     * Sets the fail-open behavior for the client when the Aperture Agent is unreachable. If set to
+     * true, all traffic will pass through; if set to false, all traffic will be blocked.
      *
      * @param enableFailOpen whether all traffic should be accepted when Aperture Agent is
      *     unreachable
