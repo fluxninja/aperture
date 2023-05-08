@@ -27,12 +27,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-// FX tags used to pass OTel Collector factories.
-const (
-	ReceiverFactoriesFxTag  = "otel-collector-receiver-factories"
-	ProcessorFactoriesFxTag = "otel-collector-processor-factories"
-)
-
 // Module is a fx module that invokes OTel Collector.
 func Module() fx.Option {
 	return fx.Options(
@@ -46,34 +40,40 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTel Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
-	Factories        otelcol.Factories
-	Lifecycle        fx.Lifecycle
-	Shutdowner       fx.Shutdowner
-	Unmarshaller     config.Unmarshaller
-	StatusRegistry   status.Registry
-	BaseConfig       *otelconfig.OTelConfig `name:"base"`
-	Logger           *log.Logger
-	Readiness        *jobs.MultiJob           `name:"readiness.service"`
-	ExtensionConfigs []*otelconfig.OTelConfig `group:"extension-config"`
+	Factories                otelcol.Factories
+	Lifecycle                fx.Lifecycle
+	Shutdowner               fx.Shutdowner
+	Unmarshaller             config.Unmarshaller
+	StatusRegistry           status.Registry
+	BaseConfig               *otelconfig.OTelConfigProvider `name:"base"`
+	TelemetryCollectorConfig *otelconfig.OTelConfigProvider `name:"telemetry-collector" optional:"true"`
+	Logger                   *log.Logger
+	Readiness                *jobs.MultiJob                   `name:"readiness.service"`
+	ExtensionConfigs         []*otelconfig.OTelConfigProvider `group:"extension-config"`
 }
 
 // setup creates and runs a new instance of OTel Collector with the passed configuration.
 func setup(in ConstructorIn) error {
-	uris := []string{"file:main"}
 	var otelService *otelcol.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTel collector starting"))
+			baseScheme := in.BaseConfig.Scheme()
+			uris := []string{fmt.Sprintf("%v:%v", baseScheme, baseScheme)}
 			providers := map[string]confmap.Provider{
-				"file": otelconfig.NewOTelConfigUnmarshaler(in.BaseConfig.AsMap()),
+				baseScheme: in.BaseConfig,
 			}
-			for i, extensionConfig := range in.ExtensionConfigs {
+			for _, extensionConfig := range in.ExtensionConfigs {
 				if extensionConfig == nil {
 					continue
 				}
-				scheme := fmt.Sprintf("extension-%v", i)
+				scheme := extensionConfig.Scheme()
 				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = otelconfig.NewOTelConfigUnmarshaler(extensionConfig.AsMap())
+				providers[scheme] = extensionConfig
+			}
+			if in.TelemetryCollectorConfig != nil {
+				tcScheme := in.TelemetryCollectorConfig.Scheme()
+				uris = append(uris, fmt.Sprintf("%v:%v", tcScheme, tcScheme))
+				providers[tcScheme] = in.TelemetryCollectorConfig
 			}
 
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
@@ -88,6 +88,8 @@ func setup(in ConstructorIn) error {
 			if err != nil {
 				return fmt.Errorf("creating OTel config provider: %w", err)
 			}
+
+			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTel collector starting"))
 			otelService, err = otelcol.NewCollector(
 				otelcol.CollectorSettings{
 					BuildInfo:               component.NewDefaultBuildInfo(),
@@ -97,7 +99,7 @@ func setup(in ConstructorIn) error {
 					LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
 						return log.NewZapAdapter(in.Logger, "otel-collector")
 					})},
-					// NOTE: do not remove this becauase it causes a data-race condition.
+					// NOTE: do not remove this because it causes a data-race condition.
 					SkipSettingGRPCLogger: true,
 				},
 			)
@@ -135,7 +137,7 @@ func registerReadinessJob(
 	readiness *jobs.MultiJob,
 	otelService *otelcol.Collector,
 ) error {
-	return readiness.RegisterJob(jobs.NewBasicJob("otel-collector", func(ctx context.Context) (proto.Message, error) {
+	return readiness.RegisterJob(jobs.NewBasicJob("otel-collector", func(context.Context) (proto.Message, error) {
 		msg, err := otelState(otelService)
 		setReadinessStatus(statusRegistry, msg, err)
 		return msg, err

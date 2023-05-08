@@ -56,39 +56,6 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
     AgentOTelConfig:
-        description: |-
-            Example configuration:
-
-            ```yaml
-
-            	otel:
-            	  batch_alerts:
-            	    send_batch_max_size: 100
-            	    send_batch_size: 100
-            	    timeout: 1s
-            	  batch_prerollup:
-            	    send_batch_max_size: 10000
-            	    send_batch_size: 10000
-            	    timeout: 10s
-            	  batch_postrollup:
-            	    send_batch_max_size: 100
-            	    send_batch_size: 100
-            	    timeout: 1s
-            	  custom_metrics:
-            	    rabbitmq:
-            	      processors:
-            	        batch:
-            	          send_batch_size: 10
-            	          timeout: 10s
-            	      receivers:
-            	        rabbitmq:
-            	          collection_interval: 10s
-            	          endpoint: http://<rabbitmq-svc-fqdn>:15672
-            	          password: secretpassword
-            	          username: admin
-            	      per_agent_group: true
-
-            ```
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -102,29 +69,16 @@ definitions:
                 $ref: '#/definitions/BatchPrerollupConfig'
                 description: BatchPrerollup configures the OTel batch pre-processor.
                 x-go-tag-json: batch_prerollup
-            custom_metrics:
-                additionalProperties:
-                    $ref: '#/definitions/CustomMetricsConfig'
-                description: |-
-                    CustomMetrics configures custom metrics OTel pipelines, which will send data to
-                    the controller Prometheus.
-                    Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
-                    is optional, as all the components and pipeline names would be normalized.
-                    By default `kubeletstats` custom metrics is added, which can be overwritten.
-
-                    Below is example to overwrite `kubeletstats` custom metrics:
-
-                    ```yaml
-                    otel:
-                    custom_metrics:
-                    kubeletstats: {}
-                    ```
-                type: object
-                x-go-name: CustomMetrics
-                x-go-tag-json: custom_metrics,omitempty
+            disable_kubelet_scraper:
+                default: false
+                description: DisableKubeletScraper disables the default metrics collection for kubelet.
+                type: boolean
+                x-go-name: DisableKubeletScraper
+                x-go-tag-default: "false"
+                x-go-tag-json: disable_kubelet_scraper
             disable_kubernetes_scraper:
                 default: false
-                description: DisableKubernetesScraper disables metrics collection for Kubernetes resources.
+                description: DisableKubernetesScraper disables the default metrics collection for Kubernetes resources.
                 type: boolean
                 x-go-name: DisableKubernetesScraper
                 x-go-tag-default: "false"
@@ -402,78 +356,6 @@ definitions:
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
-    Components:
-        additionalProperties:
-            type: object
-        description: |-
-            Components is an alias type for map[string]any. This needs to be used
-            because of the CRD requirements for the operator.
-            https://github.com/kubernetes-sigs/controller-tools/issues/636
-            https://github.com/kubernetes-sigs/kubebuilder/issues/528
-        type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
-    CustomMetricsConfig:
-        description: |-
-            :::info
-
-            See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
-
-            :::
-        properties:
-            per_agent_group:
-                description: |-
-                    PerAgentGroup marks the pipeline to be instantiated only once per agent
-                    group. This is helpful for receivers that scrape for example, some cluster-wide
-                    metrics. When not set, pipeline will be instantiated on every Agent.
-                type: boolean
-                x-go-name: PerAgentGroup
-                x-go-tag-json: per_agent_group
-            pipeline:
-                $ref: '#/definitions/CustomMetricsPipelineConfig'
-                description: |-
-                    Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
-                    and processors defined above. Exporter would be added automatically.
-
-                    If there are no processors defined or only one processor is defined, the
-                    pipeline definition can be omitted. In such cases, the pipeline will
-                    automatically use all given receivers and the defined processor (if
-                    any).  However, if there are more than one processor, the pipeline must
-                    be defined explicitly.
-                x-go-tag-json: pipeline
-            processors:
-                $ref: '#/definitions/Components'
-                description: |-
-                    Processors define processors to be used in custom metrics pipelines. This should
-                    be in OTel format - https://opentelemetry.io/docs/collector/configuration/#processors.
-                x-go-tag-json: processors,omitempty
-            receivers:
-                $ref: '#/definitions/Components'
-                description: |-
-                    Receivers define receivers to be used in custom metrics pipelines. This should
-                    be in OTel format - https://opentelemetry.io/docs/collector/configuration/#receivers.
-                x-go-tag-json: receivers
-        title: |-
-            CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller Prometheus.
-            Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
-    CustomMetricsPipelineConfig:
-        properties:
-            processors:
-                items:
-                    type: string
-                type: array
-                x-go-name: Processors
-                x-go-tag-json: processors,omitempty
-            receivers:
-                items:
-                    type: string
-                type: array
-                x-go-name: Receivers
-                x-go-tag-json: receivers,omitempty
-        title: CustomMetricsPipelineConfig defines a custom metrics pipeline.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
     DistCacheConfig:
         properties:
             bind_addr:

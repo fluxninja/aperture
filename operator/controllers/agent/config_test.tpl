@@ -149,6 +149,7 @@ otel:
     send_batch_size: 10000
     timeout: 1s
   disable_kubernetes_scraper: false
+  disable_kubelet_scraper: false
   ports:
     debug_port: 8888
     health_check_port: 13133

@@ -789,62 +789,17 @@ example, Flux Meters, Rate Limiters and so on).
 
 AgentOTelConfig is the configuration for Agent's OTel collector.
 
-Example configuration:
-
-```yaml
-
-	otel:
-	  batch_alerts:
-	    send_batch_max_size: 100
-	    send_batch_size: 100
-	    timeout: 1s
-	  batch_prerollup:
-	    send_batch_max_size: 10000
-	    send_batch_size: 10000
-	    timeout: 10s
-	  batch_postrollup:
-	    send_batch_max_size: 100
-	    send_batch_size: 100
-	    timeout: 1s
-	  custom_metrics:
-	    rabbitmq:
-	      processors:
-	        batch:
-	          send_batch_size: 10
-	          timeout: 10s
-	      receivers:
-	        rabbitmq:
-	          collection_interval: 10s
-	          endpoint: http://<rabbitmq-svc-fqdn>:15672
-	          password: secretpassword
-	          username: admin
-	      per_agent_group: true
-
-```
-
 <dl>
-<dt>custom_metrics</dt>
+<dt>disable_kubelet_scraper</dt>
 <dd>
 
 <!-- vale off -->
 
-(map of [CustomMetricsConfig](#custom-metrics-config))
+(bool, default: `false`)
 
 <!-- vale on -->
 
-CustomMetrics configures custom metrics OTel pipelines, which will send data to
-the controller Prometheus. Key in this map refers to OTel pipeline name.
-Prefixing pipeline name with `metrics/` is optional, as all the components and
-pipeline names would be normalized. By default `kubeletstats` custom metrics is
-added, which can be overwritten.
-
-Below is example to overwrite `kubeletstats` custom metrics:
-
-```yaml
-otel:
-custom_metrics:
-kubeletstats: {}
-```
+DisableKubeletScraper disables the default metrics collection for kubelet.
 
 </dd>
 <dt>disable_kubernetes_scraper</dt>
@@ -856,7 +811,8 @@ kubeletstats: {}
 
 <!-- vale on -->
 
-DisableKubernetesScraper disables metrics collection for Kubernetes resources.
+DisableKubernetesScraper disables the default metrics collection for Kubernetes
+resources.
 
 </dd>
 <dt>batch_alerts</dt>
@@ -1242,137 +1198,6 @@ ClientTLSConfig is the configuration for client TLS.
 <!-- vale off -->
 
 (string)
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### Components {#components}
-
-<!-- vale on -->
-
-Components is an alias type for map[string]any. This needs to be used because of
-the CRD requirements for the operator.
-https://github.com/kubernetes-sigs/controller-tools/issues/636
-https://github.com/kubernetes-sigs/kubebuilder/issues/528
-
-[Components](#components)
-
----
-
-<!-- vale off -->
-
-### CustomMetricsConfig {#custom-metrics-config}
-
-<!-- vale on -->
-
-CustomMetricsConfig defines receivers, processors, and single metrics pipeline
-which will be exported to the controller Prometheus. Environment variables can
-be used in the configuration using format `${ENV_VAR_NAME}`.
-
-:::info
-
-See also
-[Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
-
-:::
-
-<dl>
-<dt>per_agent_group</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool)
-
-<!-- vale on -->
-
-PerAgentGroup marks the pipeline to be instantiated only once per agent group.
-This is helpful for receivers that scrape for example, some cluster-wide
-metrics. When not set, pipeline will be instantiated on every Agent.
-
-</dd>
-<dt>pipeline</dt>
-<dd>
-
-<!-- vale off -->
-
-([CustomMetricsPipelineConfig](#custom-metrics-pipeline-config))
-
-<!-- vale on -->
-
-Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
-and processors defined above. Exporter would be added automatically.
-
-If there are no processors defined or only one processor is defined, the
-pipeline definition can be omitted. In such cases, the pipeline will
-automatically use all given receivers and the defined processor (if any).
-However, if there are more than one processor, the pipeline must be defined
-explicitly.
-
-</dd>
-<dt>processors</dt>
-<dd>
-
-<!-- vale off -->
-
-([Components](#components))
-
-<!-- vale on -->
-
-Processors define processors to be used in custom metrics pipelines. This should
-be in OTel format -
-https://opentelemetry.io/docs/collector/configuration/#processors.
-
-</dd>
-<dt>receivers</dt>
-<dd>
-
-<!-- vale off -->
-
-([Components](#components))
-
-<!-- vale on -->
-
-Receivers define receivers to be used in custom metrics pipelines. This should
-be in OTel format -
-https://opentelemetry.io/docs/collector/configuration/#receivers.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### CustomMetricsPipelineConfig {#custom-metrics-pipeline-config}
-
-<!-- vale on -->
-
-CustomMetricsPipelineConfig defines a custom metrics pipeline.
-
-<dl>
-<dt>processors</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-</dd>
-<dt>receivers</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
 
 <!-- vale on -->
 

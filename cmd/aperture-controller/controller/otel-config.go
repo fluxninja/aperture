@@ -17,7 +17,7 @@ func provideController(
 	lis *listener.Listener,
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
-) (*otelconfig.OTelConfig, error) {
+) (*otelconfig.OTelConfigProvider, error) {
 	var controllerCfg controllerconfig.ControllerOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
 		return nil, err
@@ -30,7 +30,9 @@ func provideController(
 	addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
 	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
 	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTelConfig)
-	return otelCfg, nil
+	baseConfigProvider := otelconfig.NewOTelConfigProvider("service", otelCfg)
+
+	return baseConfigProvider, nil
 }
 
 // addMetricsPipeline adds metrics to pipeline for controller OTel collector.

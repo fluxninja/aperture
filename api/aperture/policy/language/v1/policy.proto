@@ -7,6 +7,7 @@ import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/language/v1/ports.proto";
 import "aperture/policy/language/v1/query.proto";
 import "aperture/policy/language/v1/std_components.proto";
+import "aperture/policy/language/v1/telemetry_collector.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
@@ -166,6 +167,8 @@ message Circuit {
 //
 // :::
 message Resources {
+  // TelemetryCollector configures OpenTelemetry collector integration.
+  repeated TelemetryCollector telemetry_collectors = 1;
   // FlowControlResources are resources that are provided by flow control integration.
   FlowControlResources flow_control = 101;
 }

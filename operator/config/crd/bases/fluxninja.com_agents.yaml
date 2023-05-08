@@ -1526,66 +1526,13 @@ spec:
                               will be sent regardless of size.
                             type: string
                         type: object
-                      custom_metrics:
-                        additionalProperties:
-                          description: "CustomMetricsConfig defines receivers, processors,
-                            and single metrics pipeline which will be exported to
-                            the controller Prometheus. Environment variables can be
-                            used in the configuration using format `${ENV_VAR_NAME}`.
-                            \n :::info \n See also [Get Started / Setup Integrations
-                            / Metrics](/get-started/integrations/metrics/metrics.md).
-                            \n :::"
-                          properties:
-                            per_agent_group:
-                              description: PerAgentGroup marks the pipeline to be
-                                instantiated only once per agent group. This is helpful
-                                for receivers that scrape for example, some cluster-wide
-                                metrics. When not set, pipeline will be instantiated
-                                on every Agent.
-                              type: boolean
-                            pipeline:
-                              description: "Pipeline is an OTel metrics pipeline definition,
-                                which **only** uses receivers and processors defined
-                                above. Exporter would be added automatically. \n If
-                                there are no processors defined or only one processor
-                                is defined, the pipeline definition can be omitted.
-                                In such cases, the pipeline will automatically use
-                                all given receivers and the defined processor (if
-                                any).  However, if there are more than one processor,
-                                the pipeline must be defined explicitly."
-                              properties:
-                                processors:
-                                  items:
-                                    type: string
-                                  type: array
-                                receivers:
-                                  items:
-                                    type: string
-                                  type: array
-                              type: object
-                            processors:
-                              description: Processors define processors to be used
-                                in custom metrics pipelines. This should be in OTel
-                                format - https://opentelemetry.io/docs/collector/configuration/#processors.
-                              x-kubernetes-preserve-unknown-fields: true
-                            receivers:
-                              description: Receivers define receivers to be used in
-                                custom metrics pipelines. This should be in OTel format
-                                - https://opentelemetry.io/docs/collector/configuration/#receivers.
-                              x-kubernetes-preserve-unknown-fields: true
-                          type: object
-                        description: "CustomMetrics configures custom metrics OTel
-                          pipelines, which will send data to the controller Prometheus.
-                          Key in this map refers to OTel pipeline name. Prefixing
-                          pipeline name with `metrics/` is optional, as all the components
-                          and pipeline names would be normalized. By default `kubeletstats`
-                          custom metrics is added, which can be overwritten. \n Below
-                          is example to overwrite `kubeletstats` custom metrics: \n
-                          ```yaml otel: custom_metrics: kubeletstats: {} ```"
-                        type: object
+                      disable_kubelet_scraper:
+                        description: DisableKubeletScraper disables the default metrics
+                          collection for kubelet.
+                        type: boolean
                       disable_kubernetes_scraper:
-                        description: DisableKubernetesScraper disables metrics collection
-                          for Kubernetes resources.
+                        description: DisableKubernetesScraper disables the default
+                          metrics collection for Kubernetes resources.
                         type: boolean
                       ports:
                         description: Ports configures debug, health and extension

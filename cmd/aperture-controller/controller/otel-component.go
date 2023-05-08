@@ -24,10 +24,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // ModuleForControllerOTel provides fx options for ControllerOTelComponents.
@@ -42,8 +42,8 @@ func ModuleForControllerOTel() fx.Option {
 				ControllerOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
-					config.GroupTag(otelcollector.ProcessorFactoriesFxTag),
+					config.GroupTag(otelconsts.ReceiverFactoriesFxTag),
+					config.GroupTag(otelconsts.ProcessorFactoriesFxTag),
 				),
 			),
 		),

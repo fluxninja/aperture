@@ -51,16 +51,18 @@ func Module() fx.Option {
 }
 
 func provideOtelConfig(
-	baseConfig *otelconfig.OTelConfig,
+	baseConfigProvider *otelconfig.OTelConfigProvider,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	lifecycle fx.Lifecycle,
 	heartbeats *heartbeats.Heartbeats,
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
-) (*otelconfig.OTelConfig, error) {
+) (*otelconfig.OTelConfigProvider, error) {
 	if extensionConfig.APIKey == "" {
 		return nil, nil
 	}
+
+	baseConfig := baseConfigProvider.GetConfig()
 
 	config := otelconfig.NewOTelConfig()
 	addFluxNinjaExporter(config, extensionConfig, grpcClientConfig, httpClientConfig)
@@ -99,7 +101,8 @@ func provideOtelConfig(
 		},
 	})
 
-	return config, nil
+	fnConfigProvider := otelconfig.NewOTelConfigProvider("fluxninja", config)
+	return fnConfigProvider, nil
 }
 
 func addAttributesProcessor(config *otelconfig.OTelConfig, controllerID string) {
