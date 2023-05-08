@@ -33,7 +33,7 @@ first.
 
 Advanced users can learn about designing new policies by following the example
 circuit created in
-[detecting overload](../../applying-policies/alerting/detecting-overload.md)
+[detecting overload](/applying-policies/alerting/detecting-overload.md)
 tutorial.
 
 <Zoom>
