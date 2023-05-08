@@ -30,7 +30,7 @@ func NewTelemetryCollectorsOptions(
 	for i, tcProto := range tcProtos {
 		agentGroup := tcProto.GetAgentGroup()
 		etcdPath := path.Join(paths.TelemetryCollectorConfigPath,
-			paths.TelemetryCollectorKey(agentGroup, i))
+			paths.TelemetryCollectorKey(agentGroup, policyBaseAPI.GetPolicyName(), i))
 		configSync := &tcConfigSync{
 			tcProto:        tcProto,
 			policyReadAPI:  policyBaseAPI,
