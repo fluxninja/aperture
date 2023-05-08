@@ -1,5 +1,3 @@
-local aperture = import '../../../grafana/aperture.libsonnet';
-local lib = import '../../../grafana/grafana.libsonnet';
 local config = import './config-defaults.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
@@ -7,30 +5,21 @@ local dashboard = grafana.dashboard;
 local prometheus = grafana.prometheus;
 local barGaugePanel = grafana.barGaugePanel;
 local statPanel = grafana.statPanel;
-local timeSeriesPanel = lib.TimeSeriesPanel;
+local graphPanel = grafana.graphPanel;
 
-local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
-  local thresholds =
-    {
-      mode: 'absolute',
-      steps: [
-        { color: 'green', value: null },
-        { color: 'red', value: 80 },
-      ],
-    };
-  local target =
-    prometheus.target(query, intervalFactor=1)
-    + { range: true, editorMode: 'code' };
-  aperture.timeSeriesPanel.new(title, datasource, axisLabel, unit)
-  + timeSeriesPanel.withTarget(target)
-  + timeSeriesPanel.defaults.withThresholds(thresholds)
-  + timeSeriesPanel.withFieldConfigMixin(
-    timeSeriesPanel.fieldConfig.withDefaultsMixin(
-      timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
+local newGraphPanel(title, datasourceName, query, axisLabel='', unit='') =
+  graphPanel.new(
+    title=title,
+    datasource=datasourceName,
+    labelY1=axisLabel,
+    format=unit,
+  )
+  .addTarget(
+    prometheus.target(
+      expr=query,
+      intervalFactor=1,
     )
-  ) + {
-    interval: '1s',
-  };
+  );
 
 local newBarGaugePanel(graphTitle, datasource, graphQuery) =
   local target =
@@ -126,14 +115,14 @@ function(cfg) {
   local dsName = ds.name,
 
   local fluxMeterPanel =
-    newTimeSeriesPanel('FluxMeter',
-                       dsName,
-                       |||
-                         sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
-                         / sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
-                       ||| % { policy_name: policyName },
-                       'Latency (ms)',
-                       'ms'),
+    newGraphPanel('FluxMeter',
+                  dsName,
+                  |||
+                    sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
+                    / sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
+                  ||| % { policy_name: policyName },
+                  'Latency (ms)',
+                  'ms'),
   local WFQSchedulerFlows =
     newBarGaugePanel('WFQ Scheduler Flows', dsName, 'avg(wfq_flows_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }),
 
@@ -168,19 +157,19 @@ function(cfg) {
     },
 
   local IncomingConcurrency =
-    newTimeSeriesPanel('Incoming Token Rate', dsName, 'sum(rate(incoming_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
+    newGraphPanel('Incoming Token Rate', dsName, 'sum(rate(incoming_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
 
   local AcceptedConcurrency =
-    newTimeSeriesPanel('Accepted Token Rate', dsName, 'sum(rate(accepted_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
+    newGraphPanel('Accepted Token Rate', dsName, 'sum(rate(accepted_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
 
   local WorkloadDecisionsAccepted =
-    newTimeSeriesPanel('Workload Decisions (accepted)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_ACCEPTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
+    newGraphPanel('Workload Decisions (accepted)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_ACCEPTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
 
   local WorkloadDecisionsRejected =
-    newTimeSeriesPanel('Workload Decisions (rejected)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_REJECTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
+    newGraphPanel('Workload Decisions (rejected)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_REJECTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
 
   local WorkloadLatency =
-    newTimeSeriesPanel('Workload Latency (Auto Tokens)', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms'),
+    newGraphPanel('Workload Latency (Auto Tokens)', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms'),
 
 
   local dashboardDef =
