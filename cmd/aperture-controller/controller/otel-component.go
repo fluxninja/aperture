@@ -26,7 +26,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
@@ -36,7 +35,7 @@ func ModuleForControllerOTel() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				provideController,
-				fx.ResultTags(otelconfig.BaseFxTag),
+				fx.ResultTags(otelconsts.BaseFxTag),
 			),
 			fx.Annotate(
 				ControllerOTelComponents,

@@ -42,7 +42,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/adapterconnector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/leaderonlyreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
@@ -69,7 +68,7 @@ func ModuleForAgentOTel() fx.Option {
 			cache.Provide[selectors.TypedControlPointID],
 			fx.Annotate(
 				provideAgent,
-				fx.ResultTags(otelconfig.BaseFxTag, otelconfig.TelemetryCollectorFxTag),
+				fx.ResultTags(otelconsts.BaseFxTag, otelconsts.TelemetryCollectorFxTag),
 			),
 			fx.Annotate(
 				AgentOTelComponents,
