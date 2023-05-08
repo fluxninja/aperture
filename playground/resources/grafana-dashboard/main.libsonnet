@@ -13,9 +13,13 @@ function(dashboardMixin) {
       + dashboard.metadata.withNamespace('aperture-controller')
       + dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' })
       + dashboard.spec.withJson(std.manifestJsonEx(signalsDashboard({
-        policy_name: policyName,
-        datasource+: {
-          name: 'controller-prometheus',
+        policy+: {
+          policy_name: policyName,
+        },
+        dashboard+: {
+          datasource+: {
+            name: 'controller-prometheus',
+          },
         },
       }).dashboard, indent='  ', newline='\n'))
       + dashboard.spec.withDatasources({

@@ -3,13 +3,11 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
 
-common:
+policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: basic-service-protection
-
-policy:
   service_protection_core:
     adaptive_load_scheduler:
       load_scheduler:

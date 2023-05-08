@@ -32,11 +32,8 @@ local service_protection_core_defaults = {
 };
 
 {
-  common: {
-    policy_name: '__REQUIRED_FIELD__',
-  },
-
   policy: {
+    policy_name: '__REQUIRED_FIELD__',
     components: [],
     resources: {
       flow_control: {

@@ -2,7 +2,7 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/promql
 
-common:
+policy:
   # Name of the policy.
   # Type: string
   # Required: True
@@ -11,8 +11,6 @@ common:
   # Type: string
   # Required: True
   promql_query: __REQUIRED_FIELD__
-
-policy:
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []

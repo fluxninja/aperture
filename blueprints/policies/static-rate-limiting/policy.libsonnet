@@ -14,12 +14,12 @@ local port = spec.v1.Port;
 local constantSignal = spec.v1.ConstantSignal;
 
 function(cfg) {
-  local params = config.common + config.policy + cfg,
+  local params = config + cfg,
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
                            + resources.withFlowControl(flowControlResources.new()
-                                                       + flowControlResources.withClassifiers(params.classifiers)))
+                                                       + flowControlResources.withClassifiers(params.policy.classifiers)))
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')
@@ -28,11 +28,11 @@ function(cfg) {
           flowControl.new()
           + flowControl.withRateLimiter(
             rateLimiter.new()
-            + rateLimiter.withInPorts({ limit: port.withConstantSignal(params.rate_limiter.rate_limit) })
-            + rateLimiter.withSelectors(params.rate_limiter.selectors)
-            + rateLimiter.withParameters(params.rate_limiter.parameters)
+            + rateLimiter.withInPorts({ limit: port.withConstantSignal(params.policy.rate_limiter.rate_limit) })
+            + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
+            + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
             + rateLimiter.withDynamicConfigKey('rate_limiter')
-            + rateLimiter.withDefaultConfig(params.rate_limiter.default_config)
+            + rateLimiter.withDefaultConfig(params.policy.rate_limiter.default_config)
           ),
         ),
       ]),
@@ -42,7 +42,7 @@ function(cfg) {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
     metadata: {
-      name: params.policy_name,
+      name: params.policy.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
       },

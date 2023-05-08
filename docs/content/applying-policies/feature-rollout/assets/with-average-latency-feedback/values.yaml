@@ -3,16 +3,14 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency
 
-common:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: "feature-rollout"
-
 # Parameters for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy
 # Required: True
 policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "feature-rollout"
   components: []
   drivers:
     average_latency_drivers:

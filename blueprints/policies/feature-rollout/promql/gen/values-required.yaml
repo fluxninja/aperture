@@ -2,12 +2,6 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/promql
 
-common:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: __REQUIRED_FIELD__
-
 # Parameters for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy
 # Required: True
@@ -36,6 +30,7 @@ policy:
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__
+  policy_name: __REQUIRED_FIELD__
   resources:
     flow_control:
       classifiers: []
