@@ -190,6 +190,13 @@ repos:
         files: ^(blueprints|playground/scenarios/)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
+      - id: generate-otel-docs
+        name: "OpenTelemetry Docs"
+        language: script
+        entry: ./scripts/precommit/generate_otel_docs.sh
+        pass_filenames: false
+        files: ^(extensions/integrations/otel|docs/tools/otel_collectors)
+        description: "Generate OpenTelemetry docs"
       - id: generate-doc-assets
         name: "Documentation Assets"
         entry: "./scripts/precommit/generate_doc_assets.sh"

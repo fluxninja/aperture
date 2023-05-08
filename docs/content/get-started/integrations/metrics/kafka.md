@@ -1,6 +1,6 @@
 ---
-title: Kafka Metrics
-description: Integrating Kafka Metrics Metrics
+title: Kafka
+description: Integrating Kafka Metrics
 keywords:
   - kafkametrics
   - otel
@@ -25,29 +25,34 @@ make [the receiver][receiver] available.
 
 :::
 
-You can configure [Custom metrics][custom-metrics] for Kafka Metrics using the
-following configuration in the [Aperture Agent's config][agent-config]:
+You can configure the [OpenTelemetry Collector][opentelemetry-collector] for
+Kafka as part of [Policy resources][policy-resources] while [applying the
+policy][applying-policy]:
 
 ```yaml
-otel:
-  custom_metrics:
-    kafkametrics:
-      per_agent_group: true
-      pipeline:
-        processors:
-          - batch
-        receivers:
-          - kafkametrics
-      processors:
-        batch:
-          send_batch_size: 10
-          timeout: 10s
-      receivers:
-        kafkametrics: [kafkametricsreceiver configuration here]
+policy:
+  resources:
+    telemetry_collectors:
+      - agent_group: default
+        infra_meters:
+          kafkametrics:
+            per_agent_group: true
+            pipeline:
+              processors:
+                - batch
+              receivers:
+                - kafkametrics
+            processors:
+              batch:
+                send_batch_size: 10
+                timeout: 10s
+            receivers:
+              kafkametrics: [kafkametricsreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/kafkametricsreceiver
-[custom-metrics]: /reference/configuration/agent.md#custom-metrics-config
-[agent-config]: /reference/configuration/agent.md#agent-o-t-e-l-config
+[opentelemetry-collector]: /reference/policies/spec.md#telemetry-collector
+[applying-policy]: /applying-policies/applying-policies.md
+[policy-resources]: /reference/policies/spec.md#resources
