@@ -20,12 +20,12 @@ type classifierConfigSync struct {
 	classifierProto *policylangv1.Classifier
 	etcdPath        string
 	agentGroupName  string
-	classifierIndex int64
+	classifierIndex int
 }
 
 // NewClassifierOptions creates fx options for classifier.
 func NewClassifierOptions(
-	classifierIndex int64,
+	classifierIndex int,
 	classifierProto *policylangv1.Classifier,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
@@ -60,7 +60,7 @@ func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, li
 				ClassifierAttributes: &policysyncv1.ClassifierAttributes{
 					PolicyName:      configSync.policyReadAPI.GetPolicyName(),
 					PolicyHash:      configSync.policyReadAPI.GetPolicyHash(),
-					ClassifierIndex: configSync.classifierIndex,
+					ClassifierIndex: int64(configSync.classifierIndex),
 				},
 			}
 			dat, err := proto.Marshal(wrapper)

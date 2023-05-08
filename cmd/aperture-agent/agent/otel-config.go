@@ -62,7 +62,7 @@ func provideAgent(
 
 	tcConfigProvider := otelconfig.NewOTelConfigProvider("telemetry-collector", otelconfig.NewOTelConfig())
 
-	allInfraMeters := map[string]*policylangv1.InfraMeter{}
+	allInfraMeters := map[string]map[string]*policylangv1.InfraMeter{}
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		log.Info().Str("event", event.String()).Msg("infra meter update")
 		tc := &policylangv1.TelemetryCollector{}
@@ -71,24 +71,22 @@ func provideAgent(
 			return
 		}
 		infraMeters := tc.GetInfraMeters()
-		prefix := string(event.Key)
+		key := string(event.Key)
 
 		switch event.Type {
 		case notifiers.Write:
-			// loop through all infra meters and add them to the map adding the prefix
-			for name, infraMeter := range infraMeters {
-				key := fmt.Sprintf("%s/%s", prefix, name)
-				allInfraMeters[key] = infraMeter
-			}
+			allInfraMeters[key] = infraMeters
 		case notifiers.Remove:
-			// loop through all infra meters and remove them from the map adding the prefix
-			for name := range infraMeters {
-				key := fmt.Sprintf("%s/%s", prefix, name)
-				delete(allInfraMeters, key)
-			}
+			delete(allInfraMeters, key)
 		}
 		otelCfg := otelconfig.NewOTelConfig()
-		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
+		ims := map[string]*policylangv1.InfraMeter{}
+		for prefix, v := range allInfraMeters {
+			for k, v := range v {
+				ims[fmt.Sprintf("%s/%s", prefix, k)] = v
+			}
+		}
+		if err := inframeter.AddInfraMeters(otelCfg, ims); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			return
 		}
