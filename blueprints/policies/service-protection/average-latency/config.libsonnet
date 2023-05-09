@@ -44,4 +44,24 @@ serviceProtectionDefaults {
       latency_ema_limit_multiplier: 2.0,
     },
   },
+
+  /**
+  * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+  * @param (dashboard.time_from: string) Time from of dashboard.
+  * @param (dashboard.time_to: string) Time to of dashboard.
+  */
+  dashboard: {
+    refresh_interval: '15s',
+    time_from: 'now-15m',
+    time_to: 'now',
+    /**
+    * @param (dashboard.datasource.name: string) Datasource name.
+    * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
+    */
+    datasource: {
+      name: '$datasource',
+      filter_regex: '',
+    },
+    variant_name: 'Average Latency',
+  },
 }

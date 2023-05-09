@@ -8,10 +8,7 @@ local component = spec.v1.Component;
 local flowControl = spec.v1.FlowControl;
 local flowControlResources = spec.v1.FlowControlResources;
 local rateLimiter = spec.v1.RateLimiter;
-local override = spec.v1.RateLimiterOverride;
-local lazySync = spec.v1.RateLimiterLazySync;
 local port = spec.v1.Port;
-local constantSignal = spec.v1.ConstantSignal;
 
 function(cfg) {
   local params = config + cfg,

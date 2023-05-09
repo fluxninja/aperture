@@ -68,7 +68,7 @@ policy:
 dashboard:
   # Refresh interval for dashboard panels.
   # Type: string
-  refresh_interval: "5s"
+  refresh_interval: "15s"
   # From time of dashboard.
   # Type: string
   time_from: "now-15m"

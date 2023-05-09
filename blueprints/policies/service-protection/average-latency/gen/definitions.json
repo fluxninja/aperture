@@ -145,7 +145,7 @@
       "properties": {
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "5s",
+          "default": "15s",
           "type": "string"
         },
         "time_from": {
