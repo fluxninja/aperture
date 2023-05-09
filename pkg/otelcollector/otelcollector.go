@@ -25,6 +25,7 @@ import (
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // Module is a fx module that invokes OTel Collector.
@@ -117,7 +118,7 @@ func setup(in ConstructorIn) error {
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to run OTel Collector")
 				}
-				_ = in.Shutdowner.Shutdown()
+				utils.Shutdown(in.Shutdowner)
 			})
 			return nil
 		},

@@ -73,11 +73,11 @@ func FluxMeterKey(agentGroupName, fluxMeterName string) string {
 }
 
 // TelemetryCollectorKey returns the identifier for TelemetryCollector in etcd.
-func TelemetryCollectorKey(agentGroupName string, index int) string {
-	return AgentGroupPrefix(agentGroupName) + "-telemetry_collector-" + strconv.Itoa(index)
+func TelemetryCollectorKey(agentGroupName string, policyName string, index int) string {
+	return PolicyPrefix(agentGroupName, policyName) + "-telemetry_collector-" + strconv.Itoa(index)
 }
 
 // ClassifierKey returns the identifier for a Classifier in etcd.
-func ClassifierKey(agentGroupName, policyName string, classifierIndex int64) string {
-	return PolicyPrefix(agentGroupName, policyName) + "-classifier_index-" + strconv.FormatInt(classifierIndex, 10)
+func ClassifierKey(agentGroupName, policyName string, classifierIndex int) string {
+	return PolicyPrefix(agentGroupName, policyName) + "-classifier_index-" + strconv.Itoa(classifierIndex)
 }

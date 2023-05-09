@@ -1,0 +1,279 @@
+active-directory-ds:
+  metric_name: active_directory_ds
+  camel_case: Active Directory Domain Services
+  receiver_name: activedirectorydsreceiver
+
+aerospike:
+  metric_name: aerospike
+  camel_case: Aerospike
+  receiver_name: aerospikereceiver
+
+apache-web-server:
+  metric_name: apache
+  camel_case: Apache Web Server
+  receiver_name: apachereceiver
+
+aws-container-insight:
+  metric_name: awscontainerinsightreceiver
+  camel_case: AWS Container Insights Receiver
+  receiver_name: awscontainerinsightreceiver
+
+aws-ecs-container-metrics:
+  metric_name: awsecscontainermetrics
+  camel_case: AWS ECS Container Metrics
+  receiver_name: awsecscontainermetricsreceiver
+
+aws-kinesis-data-firehose:
+  metric_name: awsfirehose
+  camel_case: AWS Kinesis Data Firehose
+  receiver_name: awsfirehosereceiver
+
+azure-event-hub:
+  metric_name: azureeventhub
+  camel_case: Microsoft Azure Event Hub
+  receiver_name: azureeventhubreceiver
+
+chrony:
+  metric_name: chrony
+  camel_case: Chrony
+  receiver_name: chronyreceiver
+
+cloud-foundry:
+  metric_name: cloudfoundry
+  camel_case: Cloud Foundry
+  receiver_name: cloudfoundryreceiver
+
+collectd:
+  metric_name: collectd
+  camel_case: CollectD write_http plugin JSON
+  receiver_name: collectdreceiver
+
+couchdb:
+  metric_name: couchdb
+  camel_case: CouchDB
+  receiver_name: couchdbreceiver
+
+docker:
+  metric_name: docker_stats
+  camel_case: Docker Stats
+  receiver_name: dockerstatsreceiver
+
+elasticsearch:
+  metric_name: elasticsearch
+  camel_case: Elasticsearch
+  receiver_name: elasticsearchreceiver
+
+expvar:
+  metric_name: expvar
+  camel_case: Expvar
+  receiver_name: expvarreceiver
+
+f5-bigip:
+  metric_name: bigip
+  camel_case: F5 Big-IP
+  receiver_name: bigipreceiver
+
+flinkmetrics:
+  metric_name: flinkmetrics
+  camel_case: FlinkMetrics
+  receiver_name: flinkmetricsreceiver
+
+google-cloud-spanner:
+  metric_name: googlecloudspanner
+  camel_case: Google Cloud Spanner
+  receiver_name: googlecloudspannerreceiver
+
+google-pubsub:
+  metric_name: googlecloudpubsub
+  camel_case: Google Cloud Pub\/Sub
+  receiver_name: googlecloudpubsubreceiver
+
+haproxy:
+  metric_name: haproxy
+  camel_case: HAProxy
+  receiver_name: haproxyreceiver
+
+httpcheck:
+  metric_name: httpcheck
+  camel_case: HTTP Check
+  receiver_name: httpcheckreceiver
+
+influxdb:
+  metric_name: influxdb
+  camel_case: InfluxDB
+  receiver_name: influxdbreceiver
+
+jmx:
+  metric_name: jmx
+  camel_case: JMX
+  receiver_name: jmxreceiver
+
+kafka:
+  metric_name: kafkametrics
+  camel_case: Kafka
+  receiver_name: kafkametricsreceiver
+
+kubelet-stats:
+  metric_name: kubeletstats
+  camel_case: Kubelet Stats
+  receiver_name: kubeletstatsreceiver
+
+kubernetes-cluster:
+  metric_name: k8s_cluster
+  camel_case: Kubernetes Cluster
+  receiver_name: k8sclusterreceiver
+
+memcached:
+  metric_name: memcached
+  camel_case: Memcached
+  receiver_name: memcachedreceiver
+
+microsoft-sql-server:
+  metric_name: sqlserver
+  camel_case: Microsoft SQL Server
+  receiver_name: sqlserverreceiver
+
+mongodb-atlas:
+  metric_name: mongodbatlas
+  camel_case: MongoDB Atlas
+  receiver_name: mongodbatlasreceiver
+
+mongodb:
+  metric_name: mongodb
+  camel_case: MongoDB
+  receiver_name: mongodbreceiver
+
+mysql:
+  metric_name: mysql
+  camel_case: MySQL
+  receiver_name: mysqlreceiver
+
+nginx:
+  metric_name: nginx
+  camel_case: Nginx
+  receiver_name: nginxreceiver
+
+nsxt:
+  metric_name: nsxt
+  camel_case: NSX-T
+  receiver_name: nsxtreceiver
+
+opencensus:
+  metric_name: opencensus
+  camel_case: OpenCensus
+  receiver_name: opencensusreceiver
+
+oracledb:
+  metric_name: oracledb
+  camel_case: Oracle DB
+  receiver_name: oracledbreceiver
+
+otlp-json-file:
+  metric_name: otlpjsonfile
+  camel_case: OTLP JSON File
+  receiver_name: otlpjsonfilereceiver
+
+podman:
+  metric_name: podman_stats
+  camel_case: Podman Stats
+  receiver_name: podmanreceiver
+
+postgresql:
+  metric_name: postgresql
+  camel_case: PostgreSQL
+  receiver_name: postgresqlreceiver
+
+prometheus-simple:
+  metric_name: prometheus_simple
+  camel_case: Simple Prometheus
+  receiver_name: simpleprometheusreceiver
+
+prometheus:
+  metric_name: prometheus
+  camel_case: Prometheus
+  receiver_name: prometheusreceiver
+
+pulsar:
+  metric_name: pulsar
+  camel_case: Pulsar
+  receiver_name: pulsarreceiver
+
+pure-storage-flasharray:
+  metric_name: purefa
+  camel_case: Pure Storage FlashArray
+  receiver_name: purefareceiver
+
+pure-storage-flashblade:
+  metric_name: purefb
+  camel_case: Pure Storage FlashBlade
+  receiver_name: purefbreceiver
+
+rabbitmq:
+  metric_name: rabbitmq
+  camel_case: RabbitMQ
+  receiver_name: rabbitmqreceiver
+
+redis:
+  metric_name: redis
+  camel_case: Redis
+  receiver_name: redisreceiver
+
+riak:
+  metric_name: riak
+  camel_case: Riak
+  receiver_name: riakreceiver
+
+sap-hana:
+  metric_name: saphana
+  camel_case: SAP HANA
+  receiver_name: saphanareceiver
+
+signalfx:
+  metric_name: signalfx
+  camel_case: SignalFx
+  receiver_name: signalfxreceiver
+
+snmp:
+  metric_name: snmp
+  camel_case: SNMP
+  receiver_name: snmpreceiver
+
+snowflake:
+  metric_name: snowflake
+  camel_case: Snowflake
+  receiver_name: snowflakereceiver
+
+splunk-hec:
+  metric_name: splunk_hec
+  camel_case: Splunk HEC
+  receiver_name: splunkhecreceiver
+
+sql-query:
+  metric_name: sqlquery
+  camel_case: SQL Query
+  receiver_name: sqlqueryreceiver
+
+sshcheck:
+  metric_name: sshcheck
+  camel_case: SSH Check
+  receiver_name: sshcheckreceiver
+
+statsd:
+  metric_name: statsd
+  camel_case: StatsD
+  receiver_name: statsdreceiver
+
+vcenter:
+  metric_name: vcenter
+  camel_case: vCenter
+  receiver_name: vcenterreceiver
+
+wavefront:
+  metric_name: wavefront
+  camel_case: Wavefront
+  receiver_name: wavefrontreceiver
+
+zookeeper:
+  metric_name: zookeeper
+  camel_case: ZooKeeper
+  receiver_name: zookeeperreceiver

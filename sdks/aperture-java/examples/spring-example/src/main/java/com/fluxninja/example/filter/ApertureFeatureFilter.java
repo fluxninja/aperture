@@ -1,9 +1,6 @@
 package com.fluxninja.example.filter;
 
-import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.Flow;
-import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
@@ -20,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
+    private boolean failOpen;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -32,8 +30,13 @@ public class ApertureFeatureFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        // See whether flow was accepted by Aperture Agent.
-        if (flow.accepted()) {
+        // Check whether flow was accepted by Aperture Agent
+        FlowResult flowResult = flow.result();
+        boolean flowAccepted =
+                (flowResult == FlowResult.Accepted
+                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+
+        if (flowAccepted) {
             try {
                 chain.doFilter(request, response);
                 flow.end(FlowStatus.OK);
@@ -61,6 +64,7 @@ public class ApertureFeatureFilter implements Filter {
             agentPort = filterConfig.getInitParameter("agent_port");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
+            this.failOpen = Boolean.parseBoolean(filterConfig.getInitParameter("enable_fail_open"));
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }

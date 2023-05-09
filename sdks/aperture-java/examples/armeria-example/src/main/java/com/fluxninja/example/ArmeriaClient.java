@@ -13,6 +13,7 @@ public class ArmeriaClient {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_FAIL_OPEN = "true";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
@@ -26,6 +27,12 @@ public class ArmeriaClient {
         if (agentPort == null) {
             agentPort = DEFAULT_AGENT_PORT;
         }
+        String failOpenString = System.getenv("FN_ENABLE_FAIL_OPEN");
+        if (failOpenString == null) {
+            failOpenString = DEFAULT_FAIL_OPEN;
+        }
+        boolean failOpen = Boolean.parseBoolean(failOpenString);
+
         String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
         if (controlPointName == null) {
             controlPointName = DEFAULT_CONTROL_POINT_NAME;
@@ -58,7 +65,9 @@ public class ArmeriaClient {
 
         WebClient client =
                 Clients.builder("http://localhost:8080")
-                        .decorator(ApertureHTTPClient.newDecorator(apertureSDK, controlPointName))
+                        .decorator(
+                                ApertureHTTPClient.newDecorator(
+                                        apertureSDK, controlPointName, failOpen))
                         .build(WebClient.class);
 
         HttpResponse res = client.get("notsuper");

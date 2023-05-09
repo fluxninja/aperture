@@ -2,8 +2,7 @@
 title: F5 Big-IP
 description: Integrating F5 Big-IP Metrics
 keywords:
-  - f5
-  - big-ip
+  - bigip
   - otel
   - opentelemetry
   - collector
@@ -25,29 +24,34 @@ to the `bundled_extensions` list to make [the receiver][receiver] available.
 
 :::
 
-You can configure [Custom metrics][custom-metrics] for F5 Big-IP using the
-following configuration in the [Aperture Agent's config][agent-config]:
+You can configure the [OpenTelemetry Collector][opentelemetry-collector] for F5
+Big-IP as part of [Policy resources][policy-resources] while [applying the
+policy][applying-policy]:
 
 ```yaml
-otel:
-  custom_metrics:
-    bigip:
-      per_agent_group: true
-      pipeline:
-        processors:
-          - batch
-        receivers:
-          - bigip
-      processors:
-        batch:
-          send_batch_size: 10
-          timeout: 10s
-      receivers:
-        bigip: [bigipreceiver configuration here]
+policy:
+  resources:
+    telemetry_collectors:
+      - agent_group: default
+        infra_meters:
+          bigip:
+            per_agent_group: true
+            pipeline:
+              processors:
+                - batch
+              receivers:
+                - bigip
+            processors:
+              batch:
+                send_batch_size: 10
+                timeout: 10s
+            receivers:
+              bigip: [bigipreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/bigipreceiver
-[custom-metrics]: /reference/configuration/agent.md#custom-metrics-config
-[agent-config]: /reference/configuration/agent.md#agent-o-t-e-l-config
+[opentelemetry-collector]: /reference/policies/spec.md#telemetry-collector
+[applying-policy]: /applying-policies/applying-policies.md
+[policy-resources]: /reference/policies/spec.md#resources

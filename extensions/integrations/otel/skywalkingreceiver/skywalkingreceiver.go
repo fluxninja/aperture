@@ -5,7 +5,6 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
@@ -22,7 +21,7 @@ func Module() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				provideReceiver,
-				fx.ResultTags(config.GroupTag(otelconsts.ReceiverFactoriesFxTag)),
+				fx.ResultTags(otelconsts.ReceiverFactoriesFxTag),
 			),
 		),
 	)
