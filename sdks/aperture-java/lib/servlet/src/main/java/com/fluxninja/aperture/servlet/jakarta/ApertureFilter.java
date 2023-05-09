@@ -64,8 +64,7 @@ public class ApertureFilter implements Filter {
                 throw e;
             }
         } else {
-            int code = ServletUtils.handleRejectedFlow(flow);
-            response.sendError(code, "Request denied");
+            ServletUtils.handleRejectedFlow(flow, response);
         }
     }
 

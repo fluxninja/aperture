@@ -86,8 +86,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             }
             return res;
         } else {
-            HttpStatus code = HttpUtils.handleRejectedFlow(flow);
-            return HttpResponse.of(code);
+            return HttpUtils.handleRejectedFlow(flow);
         }
     }
 }
