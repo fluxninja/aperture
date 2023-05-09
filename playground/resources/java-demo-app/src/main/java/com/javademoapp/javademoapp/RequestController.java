@@ -44,7 +44,6 @@ public class RequestController {
     private ApertureFeatureFilter apertureFilter = new ApertureFeatureFilter();
 
     @RequestMapping(value = "/super", method = RequestMethod.GET)
-    // /super endpoint is protected by a Filter created using Aperture SDK feature flow
     public String hello() {
         String message = "Hello World";
         log.info(message);
@@ -52,7 +51,6 @@ public class RequestController {
     }
 
     @RequestMapping(value = "/super2", method = RequestMethod.GET)
-    // /super2 endpoint is protected by imported, ready-to-use Aperture Filter
     public String hello2() {
         String message = "Hello World 2";
         log.info(message);
