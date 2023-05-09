@@ -10,11 +10,9 @@ import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRespon
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
 import io.grpc.StatusRuntimeException;
 import io.opentelemetry.api.baggage.Baggage;
-import io.opentelemetry.api.baggage.BaggageBuilder;
 import io.opentelemetry.api.baggage.BaggageEntry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Context;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -136,14 +134,6 @@ public final class ApertureSDK {
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
         return new TrafficFlow(res, span, false);
-    }
-
-    public void addBaggage(Map<String, String> headers) {
-        BaggageBuilder baggageBuilder = Baggage.builder();
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            baggageBuilder.put(entry.getKey(), entry.getValue());
-        }
-        baggageBuilder.build().storeInContext(Context.current()).makeCurrent();
     }
 
     private boolean isIgnored(String path) {
