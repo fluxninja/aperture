@@ -4,6 +4,8 @@
 
 replicaCount: 1
 
+extraLabels: {}
+
 simplesrv:
   cpuLoadPercentage: 0
   rejectRatio: 0.05

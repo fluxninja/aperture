@@ -7,11 +7,19 @@ local demoappValues = if std.objectHas(values, 'demoapp') then values.demoapp el
 
 local helm = tanka.helm.new(helpers.helmChartsRoot);
 
+local istioInjectLabels = {
+  extraLabels+: {
+    'sidecar.istio.io/inject': 'true',
+  },
+};
+
+local commonValues = if std.objectHas(demoappValues, 'common') then demoappValues.common else {};
+
 local application = {
   environment:: {
     namespace: 'demoapp',
   },
-  values:: if std.objectHas(demoappValues, 'common') then demoappValues.common else {},
+  values:: commonValues + istioInjectLabels,
   service1:
     helm.template('service1', 'charts/demo-app', {
       namespace: $.environment.namespace,
