@@ -43,19 +43,6 @@ public class RequestController {
     private Semaphore limitClients = new Semaphore(concurrency);
     private ApertureFeatureFilter apertureFilter = new ApertureFeatureFilter();
 
-    @RequestMapping(value = "/super", method = RequestMethod.GET)
-    public String hello() {
-        String message = "Hello World";
-        log.info(message);
-        return message;
-    }
-
-    @RequestMapping(value = "/super2", method = RequestMethod.GET)
-    public String hello2() {
-        String message = "Hello World 2";
-        log.info(message);
-        return message;
-    }
 
     @RequestMapping(value = "/health", method = RequestMethod.GET)
     public String health() {
@@ -69,18 +56,6 @@ public class RequestController {
         String message = "Connected OK";
         log.info(message);
         return message;
-    }
-
-    @Bean
-    public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env){
-        FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
-
-        registrationBean.setFilter(apertureFilter);
-        registrationBean.addUrlPatterns("/request");
-        registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
-        registrationBean.addInitParameter("agent_port", System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
-
-        return registrationBean;
     }
 
     @GetMapping("/")
@@ -100,13 +75,13 @@ public class RequestController {
 
         try {
             HttpHeaders httpHeaders = Collections.list(request.getHeaderNames())
-            .stream()
-            .collect(Collectors.toMap(
-                Function.identity(),
-                h -> Collections.list(request.getHeaders(h)),
-                (oldValue, newValue) -> newValue,
-                HttpHeaders::new
-            ));
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Function.identity(),
+                            h -> Collections.list(request.getHeaders(h)),
+                            (oldValue, newValue) -> newValue,
+                            HttpHeaders::new
+                    ));
             Request requestObj = new ObjectMapper().readValue(payload, Request.class);
             List<List<Subrequest>> chains = requestObj.getRequest();
             for (List<Subrequest> chain : chains) {
@@ -133,6 +108,18 @@ public class RequestController {
             return msg;
         }
         return "Success";
+    }
+
+    @Bean
+    public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env){
+        FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(apertureFilter);
+        registrationBean.addUrlPatterns("/request");
+        registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
+        registrationBean.addInitParameter("agent_port", System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
+
+        return registrationBean;
     }
 
     private String processChain(List<Subrequest> chain, HttpHeaders httpHeaders) {
