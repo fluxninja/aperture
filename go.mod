@@ -13,7 +13,7 @@ require (
 	github.com/clarketm/json v1.17.1
 	github.com/containerd/cgroups v1.1.0
 	github.com/eapache/queue v1.1.0
-	github.com/elastic/gmux v0.2.0
+	github.com/elastic/gmux v0.2.1-0.20230302111114-819acd5135a3
 	github.com/elastic/gosigar v0.14.2
 	github.com/emicklei/dot v1.4.2
 	github.com/envoyproxy/go-control-plane v0.11.0
