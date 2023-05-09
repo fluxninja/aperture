@@ -1,9 +1,9 @@
 ---
-title: Feature Rollout
+title: Auto-Scaling
 keywords:
   - blueprints
-sidebar_position: 2
-sidebar_label: Feature Rollout
+sidebar_position: 1
+sidebar_label: Auto-Scaling
 ---
 
 ```mdx-code-block
