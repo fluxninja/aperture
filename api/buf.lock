@@ -9,8 +9,8 @@ deps:
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: f5049f07f04843848fcaa4be1c8d1847
-    digest: shake256:0bd201e2c932bbfaae036a1ab0b99d4f7c40af10ef8e9374eecd3b2c5019f261b753dd8a8c69f9e34043a2f5923a529104ddcd987fcee433c0d7a182314f9acc
+    commit: df4ea417269a4bf984aa74cf1ad000ad
+    digest: shake256:4a6e5de65c374e4ad9c01bd3324cdcf0de39d1e58a8a02c6b549caa89d40e0e5b6dc9b86952441d2a0f52e6fecba6b661031b31d26aaeae3861655ef3ca0fe95
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
@@ -34,8 +34,8 @@ deps:
   - remote: buf.build
     owner: opentelemetry
     repository: opentelemetry
-    commit: e47f1a1dbc0b4105ad048239f0d7aa52
-    digest: shake256:86a8f392c562990227a77b7eb3fe11870f4d488b46dee4e161aff62363363989b718b48f9727b1c86423c34e10b2730c61d1d62cd46e57ae52df4f034c681d5b
+    commit: f09eb847644240118cb5ddaa51913b1c
+    digest: shake256:1f418a74612dee5043f03c9f2f0741a920ea9b3922e672bb90ce1a173c02f49ca9af16272802c71ed74f2d02366e1828c98fc13ba8598afb31c460ac1808e745
   - remote: buf.build
     owner: prometheus
     repository: client-model

@@ -48,5 +48,6 @@ serviceProtectionDefaults {
       name: '$datasource',
       filter_regex: '',
     },
+    variant_name: 'PromQL Output',
   },
 }

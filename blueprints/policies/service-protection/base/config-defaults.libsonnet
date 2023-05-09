@@ -52,6 +52,7 @@ local service_protection_core_defaults = {
       name: '$datasource',
       filter_regex: '',
     },
+    variant_name: 'Service Protection',
   },
 
   selectors: selectors_defaults,

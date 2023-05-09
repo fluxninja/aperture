@@ -44,7 +44,6 @@ function(cfg) {
       }),
     ),
 
-
     overload_confirmation_signals: confirmationAccumulator.overload_confirmation_signals + [overloadConfirmationSignal],
     overload_confirmation_signals_count: confirmationAccumulator.overload_confirmation_signals_count + 1,
     components: confirmationAccumulator.components + [promQLComponent, confirmationDecider, firstValidComponent],
