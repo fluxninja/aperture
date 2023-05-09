@@ -1,0 +1,151 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: service1-demo-app
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          default_config:
+            dry_run: false
+          dynamic_config_key: load_scheduler
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.0025
+            load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    match_labels:
+                      user_type: guest
+                  parameters:
+                    priority: 50
+                - label_matcher:
+                    match_labels:
+                      user_type: subscriber
+                  parameters:
+                    priority: 200
+              selectors:
+              - control_point: awesomeFeature
+                service: service1-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: OBSERVED_LOAD_MULTIPLIER
+          rhs:
+            constant_signal:
+              value: 1
+        operator: lt
+        out_ports:
+          output:
+            signal_name: IS_CRAWLER_ESCALATION
+        true_for: 30s
+    - switcher:
+        in_ports:
+          off_signal:
+            constant_signal:
+              value: 10
+          on_signal:
+            constant_signal:
+              value: 0
+          switch:
+            signal_name: IS_CRAWLER_ESCALATION
+        out_ports:
+          output:
+            signal_name: RATE_LIMIT
+    - flow_control:
+        rate_limiter:
+          dynamic_config_key: rate_limiter
+          in_ports:
+            limit:
+              signal_name: RATE_LIMIT
+          parameters:
+            label_key: user_id
+            limit_reset_interval: 1s
+          selectors:
+          - control_point: awesomeFeature
+            label_matcher:
+              match_labels:
+                user_type: crawler
+            service: service1-demo-app.demoapp.svc.cluster.local
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app"}[5s]))
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL
+          rhs:
+            constant_signal:
+              value: 2
+        operator: mul
+        out_ports:
+          output:
+            signal_name: MAX_EMA
+    - ema:
+        in_ports:
+          input:
+            signal_name: SIGNAL
+          max_envelope:
+            signal_name: MAX_EMA
+        out_ports:
+          output:
+            signal_name: SIGNAL_EMA
+        parameters:
+          correction_factor_on_max_envelope_violation: 0.95
+          ema_window: 1500s
+          warmup_window: 60s
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_EMA
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers:
+      - rules:
+          user_type:
+            extractor:
+              from: request.http.headers.user-type
+        selectors:
+        - control_point: awesomeFeature
+          service: service1-demo-app.demoapp.svc.cluster.local
+      flux_meters:
+        service1-demo-app:
+          selectors:
+          - control_point: awesomeFeature
+            service: service3-demo-app.demoapp.svc.cluster.local

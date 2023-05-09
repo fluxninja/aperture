@@ -50,6 +50,9 @@ parameters:
   updated-demo-app:
     type: boolean
     default: false
+  updated-java-demo-app:
+    type: boolean
+    default: false
   updated-aperture-go:
     type: boolean
     default: false
@@ -1275,8 +1278,8 @@ workflows:
           dockerhub-image: fluxninja/demo-app
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/demo-app
-          docker-context: ./playground/demo_app
-          dockerfile: ./playground/demo_app/Dockerfile
+          docker-context: ./playground/resources/demo-app
+          dockerfile: ./playground/resources/demo-app/Dockerfile
           use-docker-layer-caching: true
           push-to-dockerhub: false
       - update-environment:
@@ -1290,9 +1293,34 @@ workflows:
           environment-path: environments/latest/
           component: demo-app
           update: images
+
   pre-commit:
     jobs:
       - pre-commit
+
+  java-demo-app:
+    when: << pipeline.parameters.updated-java-demo-app >>
+    jobs:
+      - build-push-add-tag:
+          name: image-java-demo-app
+          dockerhub-image: fluxninja/java-demo-app
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/java-demo-app
+          docker-context: ./playground/resources/java-demo-app
+          dockerfile: ./playground/resources/java-demo-app/Dockerfile
+          use-docker-layer-caching: true
+          push-to-dockerhub: false
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: java-demo-app-update-environment
+          requires:
+            - image-java-demo-app
+          environment-path: environments/latest/
+          component: java-demo-app
+          update: images
 
   publish-aperture-docs:
     when:

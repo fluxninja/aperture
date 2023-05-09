@@ -47,6 +47,13 @@ applications:
       dockerfile: playground/scenarios/demo-app/application/Dockerfile
     deployment:
       playground/tanka/charts/demo-app/.+: charts/aperture/demo-app/
+  java-demo-app:
+    image:
+      name: java-demo-app
+      docker_context: playground/scenarios/demo-app/application
+      dockerfile: playground/scenarios/demo-app/application/Dockerfile
+    deployment:
+      playground/tanka/charts/java-demo-app/.+: charts/aperture/demo-app/
   istioconfig:
     deployment:
       manifests/charts/istioconfig/.+: charts/aperture/istioconfig/

@@ -6,11 +6,19 @@ local valuesStr = std.extVar('VALUES');
 local values = if valuesStr != '' then std.parseYaml(valuesStr) else {};
 local demoappValues = if std.objectHas(values, 'demoapp') then values.demoapp else {};
 
+local istioInjectLabels = {
+  extraLabels+: {
+    'sidecar.istio.io/inject': 'true',
+  },
+};
+
+local commonValues = if std.objectHas(demoappValues, 'common') then demoappValues.common else {};
+
 local application = {
   environment:: {
     namespace: 'demoapp',
   },
-  values:: if std.objectHas(demoappValues, 'common') then demoappValues.common else {},
+  values:: commonValues + istioInjectLabels,
   service1:
     helm.template('service1', 'charts/demo-app', {
       namespace: $.environment.namespace,

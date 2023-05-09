@@ -42,7 +42,7 @@ APERTURE_PYTHON_EXAMPLE_NS = "aperture-python-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ISTIO_NS = "istio-system"
-DEFAULT_TEST_SCENARIO = "scenarios/rate_limiting_escalation"
+DEFAULT_TEST_SCENARIO = "scenarios/java_rate_limiting_escalation"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 TANKA_DEPS_HANDLED = []
@@ -114,7 +114,7 @@ DEP_TREE = {
             ]
         },
         "controller": {
-           "labels": ["ApertureController"],
+            "labels": ["ApertureController"],
             "tkenv": TANKA_ROOT + "/apps/aperture-controller",
             "images": [
                 {
@@ -219,7 +219,7 @@ DEP_TREE = {
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "agents.fluxninja.com:customresourcedefinition",
-                         "aperture-agent-defaulter:mutatingwebhookconfiguration",
+                        "aperture-agent-defaulter:mutatingwebhookconfiguration",
                     ]
                 },
                 {
@@ -387,11 +387,7 @@ DEP_TREE = {
     },
 }
 
-NS_CONFIG = {
-    APERTURE_DEMOAPP_NS: {
-        "labels": ["istio-injection: enabled"],
-    }
-}
+NS_CONFIG = {}
 
 ###############
 ### HELPERS ###
