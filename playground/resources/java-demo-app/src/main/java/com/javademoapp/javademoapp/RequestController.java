@@ -34,9 +34,9 @@ public class RequestController {
     public static final String DEFAULT_HOST = "localhost";
 	public static final String DEFAULT_AGENT_PORT = "8089";
 
-    private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "0"));
+    private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "10"));
     private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "50")));
-    private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0"));
+    private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0.05"));
     private  Logger log = LoggerFactory.getLogger(RequestController.class);
 
     // Semaphore for limiting concurrent clients
