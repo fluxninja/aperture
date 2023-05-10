@@ -5,11 +5,11 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	controlpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
-	"github.com/fluxninja/aperture/pkg/rpc"
+	controlpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
+	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // Handler is the gRPC server handler.

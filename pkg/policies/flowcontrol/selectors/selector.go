@@ -7,14 +7,14 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	mm "github.com/fluxninja/aperture/pkg/multimatcher"
+	mm "github.com/fluxninja/aperture/v2/pkg/multimatcher"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // UniqueAgentGroups returns the unique agent groups of selectors.

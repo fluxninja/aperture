@@ -43,7 +43,7 @@ definitions:
                 x-go-tag-validate: gte=0
         title: BackoffConfig holds configuration for gRPC client backoff.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
     ClientConfig:
         properties:
             grpc:
@@ -56,7 +56,7 @@ definitions:
                 x-go-tag-json: http
         title: ClientConfig is the client configuration.
         type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig
+        x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
     ClientTLSConfig:
         properties:
             ca_file:
@@ -81,12 +81,12 @@ definitions:
                 x-go-tag-json: key_log_file
         title: ClientTLSConfig is the configuration for client TLS.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/tlsconfig
     Duration:
         description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/config
     FluxNinjaExtensionConfig:
         properties:
             api_key:
@@ -130,7 +130,7 @@ definitions:
                 x-oneof: KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL
         title: FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
         type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig
+        x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
     GRPCClientConfig:
         properties:
             backoff:
@@ -167,7 +167,7 @@ definitions:
                 x-go-tag-json: use_proxy
         title: GRPCClientConfig holds configuration for gRPC Client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
     HTTPClientConfig:
         properties:
             disable_compression:
@@ -330,7 +330,7 @@ definitions:
                 x-go-tag-validate: gte=0
         title: HTTPClientConfig holds configuration for HTTP Client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/http
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/http
     Header:
         additionalProperties:
             items:

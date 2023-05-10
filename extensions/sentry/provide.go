@@ -10,12 +10,12 @@ import (
 
 	"github.com/getsentry/sentry-go"
 
-	sentryconfig "github.com/fluxninja/aperture/extensions/sentry/config"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/status"
+	sentryconfig "github.com/fluxninja/aperture/v2/extensions/sentry/config"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 // sentryWriterConstructor holds fields to create an annotated instance of Sentry Writer.

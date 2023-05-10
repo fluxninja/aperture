@@ -31,17 +31,17 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
-	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	. "github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/operator/controllers/testutils"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/etcd"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
+	controller "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers/testutils"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/etcd"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	"github.com/fluxninja/aperture/v2/pkg/net/tlsconfig"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
 )
 
 //go:embed config_test.tpl

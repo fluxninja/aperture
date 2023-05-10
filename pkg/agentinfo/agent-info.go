@@ -1,7 +1,7 @@
 // +kubebuilder:validation:Optional
 package agentinfo
 
-import "github.com/fluxninja/aperture/pkg/config"
+import "github.com/fluxninja/aperture/v2/pkg/config"
 
 const (
 	configKey = "agent_info"

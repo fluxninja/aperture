@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // Expr represents an expression that returns a bool decision based on labels.

@@ -1,10 +1,10 @@
 package heartbeats
 
 import (
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
-	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/fluxninja/v1"
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	"github.com/fluxninja/aperture/pkg/log"
+	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	heartbeatv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/fluxninja/v1"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // ServiceKey holds key for service.

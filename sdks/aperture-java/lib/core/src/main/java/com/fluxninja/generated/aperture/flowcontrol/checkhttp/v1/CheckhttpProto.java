@@ -120,16 +120,16 @@ public final class CheckhttpProto {
       "khttp.v1.CheckHTTPRequest\0324.aperture.flo" +
       "wcontrol.checkhttp.v1.CheckHTTPResponse\"" +
       "7\222A\020\n\016aperture-agent\202\323\344\223\002\036\"\031/v1/flowcont" +
-      "rol/checkhttp:\001*B\320\002\n9com.fluxninja.gener" +
+      "rol/checkhttp:\001*B\323\002\n9com.fluxninja.gener" +
       "ated.aperture.flowcontrol.checkhttp.v1B\016" +
-      "CheckhttpProtoP\001Z\\github.com/fluxninja/a" +
-      "perture/api/gen/proto/go/aperture/flowco" +
-      "ntrol/checkhttp/v1;checkhttpv1\242\002\003AFC\252\002!A" +
-      "perture.Flowcontrol.Checkhttp.V1\312\002!Apert" +
-      "ure\\Flowcontrol\\Checkhttp\\V1\342\002-Aperture\\" +
-      "Flowcontrol\\Checkhttp\\V1\\GPBMetadata\352\002$A" +
-      "perture::Flowcontrol::Checkhttp::V1b\006pro" +
-      "to3"
+      "CheckhttpProtoP\001Z_github.com/fluxninja/a" +
+      "perture/v2/api/gen/proto/go/aperture/flo" +
+      "wcontrol/checkhttp/v1;checkhttpv1\242\002\003AFC\252" +
+      "\002!Aperture.Flowcontrol.Checkhttp.V1\312\002!Ap" +
+      "erture\\Flowcontrol\\Checkhttp\\V1\342\002-Apertu" +
+      "re\\Flowcontrol\\Checkhttp\\V1\\GPBMetadata\352" +
+      "\002$Aperture::Flowcontrol::Checkhttp::V1b\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

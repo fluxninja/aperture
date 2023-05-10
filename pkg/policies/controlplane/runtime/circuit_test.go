@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/sim"
 )
 
 var _ = Describe("Circuit", func() {

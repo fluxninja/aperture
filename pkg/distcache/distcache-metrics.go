@@ -3,7 +3,7 @@ package distcache
 import (
 	"fmt"
 
-	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

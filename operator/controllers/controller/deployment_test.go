@@ -30,13 +30,13 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
-	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	. "github.com/fluxninja/aperture/operator/controllers"
+	controller "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
 
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 )
 
 var _ = Describe("Controller Deployment", func() {

@@ -3,9 +3,9 @@ package static
 import (
 	"encoding/json"
 
-	"github.com/fluxninja/aperture/pkg/discovery/static/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 )
 
 // StaticDiscovery reads entities from config and writes them to tracker.

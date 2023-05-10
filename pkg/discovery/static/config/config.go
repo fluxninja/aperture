@@ -2,7 +2,7 @@
 package config
 
 import (
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
+	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
 )
 
 // StaticDiscoveryConfig for pre-determined list of services.

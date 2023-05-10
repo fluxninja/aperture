@@ -14,8 +14,8 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/etcd/election"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 const (

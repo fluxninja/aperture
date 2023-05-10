@@ -4,9 +4,9 @@ package agents
 import (
 	"go.uber.org/fx"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	previewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
-	"github.com/fluxninja/aperture/pkg/rpc"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
+	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // Module is fx module for controlling Agents on controller side.

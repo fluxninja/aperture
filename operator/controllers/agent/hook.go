@@ -20,11 +20,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	"github.com/clarketm/json"
-	"github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/hashicorp/go-version"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )

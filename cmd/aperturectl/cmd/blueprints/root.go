@@ -10,12 +10,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 const (
-	defaultBlueprintsRepo    = "github.com/fluxninja/aperture/blueprints"
+	defaultBlueprintsRepo    = "github.com/fluxninja/aperture/v2/blueprints"
 	defaultBlueprintsVersion = "latest"
 )
 

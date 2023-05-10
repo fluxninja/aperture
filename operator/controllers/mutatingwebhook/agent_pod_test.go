@@ -25,14 +25,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 
-	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
-	. "github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	distcache "github.com/fluxninja/aperture/pkg/distcache/config"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	distcache "github.com/fluxninja/aperture/v2/pkg/distcache/config"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 )
 
 var _ = Describe("Sidecar container for Agent", func() {

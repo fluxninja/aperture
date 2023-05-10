@@ -4,8 +4,8 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 
-	controlpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
-	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
+	controlpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 )
 
 // Module returns an fx.Option that provides the Kubernetes discovery module.
