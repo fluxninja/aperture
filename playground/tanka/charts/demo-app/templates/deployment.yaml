@@ -19,6 +19,9 @@ spec:
       {{- end }}
       labels:
         {{- include "demo-app.selectorLabels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
