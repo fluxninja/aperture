@@ -1,0 +1,65 @@
+# Generated values file for policies/auto-scaling/pod-auto-scaler blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/auto-scaling/pod-auto-scaler
+
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # List of scale out controllers.
+  # Type: []promql_scale_out_controller
+  # Required: True
+  promql_scale_out_controllers:
+    - gradient:
+        slope: 1
+      query_string: __REQUIRED_FIELD__
+      threshold: 1
+  # List of scale in controllers.
+  # Type: []promql_scale_in_controller
+  # Required: True
+  promql_scale_in_controllers:
+    - gradient:
+        slope: 1
+      query_string: __REQUIRED_FIELD__
+      threshold: 0.5
+  # Parameters that define the scaling behavior.
+  # Type: aperture.spec.v1.AutoScalerScalingParameters
+  # Required: True
+  scaling_parameters:
+    scale_in_cooldown: "40s"
+    scale_out_cooldown: "30s"
+  # Scaling backend for the policy.
+  # Type: aperture.spec.v1.AutoScalerScalingBackend
+  # Required: True
+  scaling_backend:
+    # Kubernetes replicas scaling backend.
+    # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
+    # Required: True
+    kubernetes_replicas:
+      # Kubernetes object selector.
+      # Type: aperture.spec.v1.KubernetesObjectSelector
+      # Required: True
+      kubernetes_object_selector: __REQUIRED_FIELD__
+      # Minimum number of replicas.
+      # Type: string
+      # Required: True
+      min_replicas: __REQUIRED_FIELD__
+      # Maximum number of replicas.
+      # Type: string
+      # Required: True
+      max_replicas: __REQUIRED_FIELD__
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # List of additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
+  # The interval between successive evaluations of the Circuit.
+  # Type: string
+  evaluation_interval: "1s"
+  # Dry run mode ensures that no scaling is invoked by this auto scaler.
+  # Type: bool
+  dry_run: false
