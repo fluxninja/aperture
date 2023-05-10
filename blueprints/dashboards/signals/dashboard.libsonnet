@@ -109,11 +109,11 @@ function(cfg) {
     })
     .addPanel(
       panel=signalAveragePanel,
-      gridPos={ x: 0, y: 0, w: 24, h: 8 },
+      gridPos={ x: 0, y: 0, w: 24, h: 10 },
     )
     .addPanel(
       panel=InvalidFrequencyPanel,
-      gridPos={ x: 0, y: 15, w: 24, h: 8 },
+      gridPos={ x: 0, y: 15, w: 24, h: 10 },
     ),
 
   dashboard: dashboardDef,
