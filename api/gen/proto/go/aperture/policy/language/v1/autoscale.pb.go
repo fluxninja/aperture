@@ -1072,9 +1072,9 @@ type PeriodicDecrease_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The period of the timer.
-	Period *durationpb.Duration `protobuf:"bytes,1,opt,name=period,proto3" json:"period,omitempty" default:"1m"` // @gotags: default:"1m"
+	Period *durationpb.Duration `protobuf:"bytes,1,opt,name=period,proto3" json:"period,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The percentage of replicas to scale in.
-	ScaleInPercentage float64 `protobuf:"fixed64,2,opt,name=scale_in_percentage,json=scaleInPercentage,proto3" json:"scale_in_percentage,omitempty" default:"1" validate:"gte=0,lte=100"` // @gotags: default:"1" validate:"gte=0,lte=100"
+	ScaleInPercentage float64 `protobuf:"fixed64,2,opt,name=scale_in_percentage,json=scaleInPercentage,proto3" json:"scale_in_percentage,omitempty" validate:"required,gte=0,lte=100"` // @gotags: validate:"required,gte=0,lte=100"
 }
 
 func (x *PeriodicDecrease_Parameters) Reset() {

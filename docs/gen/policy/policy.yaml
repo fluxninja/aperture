@@ -2675,14 +2675,16 @@ definitions:
         $ref: '#/definitions/PeriodicDecreaseParameters'
   PeriodicDecreaseParameters:
     type: object
+    required:
+    - period
+    - scale_in_percentage
     properties:
       period:
         description: |+
           The period of the timer.
 
         type: string
-        default: 1m
-        x-go-tag-default: 1m
+        x-go-tag-validate: required
         x-order: 0
       scale_in_percentage:
         description: |+
@@ -2690,11 +2692,9 @@ definitions:
 
         type: number
         format: double
-        default: 1
         maximum: 100
         minimum: 0
-        x-go-tag-default: "1"
-        x-go-tag-validate: gte=0,lte=100
+        x-go-tag-validate: required,gte=0,lte=100
         x-order: 1
   PodScaler:
     description: Component for scaling pods based on a signal.

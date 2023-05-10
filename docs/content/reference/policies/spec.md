@@ -5540,7 +5540,7 @@ PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 
 <!-- vale off -->
 
-(string, default: `"1m"`)
+(string, **required**)
 
 <!-- vale on -->
 
@@ -5552,7 +5552,7 @@ The period of the timer.
 
 <!-- vale off -->
 
-(float64, minimum: `0`, maximum: `100`, default: `1`)
+(float64, minimum: `0`, maximum: `100`, **required**)
 
 <!-- vale on -->
 

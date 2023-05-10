@@ -3,7 +3,6 @@ package autoscale
 import (
 	"fmt"
 	"math"
-	"time"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -651,6 +650,7 @@ func ParseAutoScaler(
 		setpointPortName := fmt.Sprintf(autoscalerScaleInSetpointPortNameTemplate, scaleInIndex)
 
 		scaleInReductionPreCeil := fmt.Sprintf("SCALE_IN_REDUCTION_PRE_CEIL_%d", scaleInIndex)
+		scaleInReductionPreCeilAdjusted := fmt.Sprintf("SCALE_IN_REDUCTION_PRE_CEIL_ADJUSTED_%d", scaleInIndex)
 		scaleInReduction := fmt.Sprintf("SCALE_IN_REDUCTION_%d", scaleInIndex)
 		scaleInPropsedScale := fmt.Sprintf("SCALE_IN_PROPOSED_SCALE_%d", scaleInIndex)
 		scaleInPeriodicPulse := fmt.Sprintf("SCALE_IN_PERIODIC_PULSE_%d", scaleInIndex)
@@ -767,15 +767,7 @@ func ParseAutoScaler(
 			componentsScaleIn = append(componentsScaleIn, components...)
 		case *policylangv1.ScaleInController_Controller_Periodic:
 			periodic := controllerType.Periodic
-			parameters := &policylangv1.PeriodicDecrease_Parameters{
-				Period:            durationpb.New(time.Minute * 1),
-				ScaleInPercentage: 1,
-			}
-			params := periodic.GetParameters()
-			if params != nil {
-				parameters.Period = params.GetPeriod()
-				parameters.ScaleInPercentage = params.GetScaleInPercentage()
-			}
+			parameters := periodic.GetParameters()
 
 			components := []*policylangv1.Component{
 				{
@@ -807,13 +799,42 @@ func ParseAutoScaler(
 					},
 				},
 				{
+					Component: &policylangv1.Component_Max{
+						Max: &policylangv1.Max{
+							InPorts: &policylangv1.Max_Ins{
+								Inputs: []*policylangv1.InPort{
+									{
+										Value: &policylangv1.InPort_ConstantSignal{
+											ConstantSignal: &policylangv1.ConstantSignal{
+												Const: &policylangv1.ConstantSignal_Value{
+													Value: 1.0,
+												},
+											},
+										},
+									},
+									{
+										Value: &policylangv1.InPort_SignalName{
+											SignalName: scaleInReductionPreCeil,
+										},
+									},
+								},
+							},
+							OutPorts: &policylangv1.Max_Outs{
+								Output: &policylangv1.OutPort{
+									SignalName: scaleInReductionPreCeilAdjusted,
+								},
+							},
+						},
+					},
+				},
+				{
 					Component: &policylangv1.Component_UnaryOperator{
 						UnaryOperator: &policylangv1.UnaryOperator{
 							Operator: "ceil",
 							InPorts: &policylangv1.UnaryOperator_Ins{
 								Input: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInReductionPreCeil,
+										SignalName: scaleInReductionPreCeilAdjusted,
 									},
 								},
 							},
@@ -852,7 +873,7 @@ func ParseAutoScaler(
 				{
 					Component: &policylangv1.Component_PulseGenerator{
 						PulseGenerator: &policylangv1.PulseGenerator{
-							FalseFor: params.Period,
+							FalseFor: parameters.Period,
 							TrueFor:  durationpb.New(policyReadAPI.GetEvaluationInterval()),
 							OutPorts: &policylangv1.PulseGenerator_Outs{
 								Output: &policylangv1.OutPort{

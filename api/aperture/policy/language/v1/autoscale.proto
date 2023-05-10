@@ -138,9 +138,9 @@ message DecreasingGradient {
 message PeriodicDecrease {
   message Parameters {
     // The period of the timer.
-    google.protobuf.Duration period = 1; // @gotags: default:"1m"
+    google.protobuf.Duration period = 1; // @gotags: validate:"required"
     // The percentage of replicas to scale in.
-    double scale_in_percentage = 2; // @gotags: default:"1" validate:"gte=0,lte=100"
+    double scale_in_percentage = 2; // @gotags: validate:"required,gte=0,lte=100"
   }
 
   Parameters parameters = 1;

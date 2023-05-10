@@ -2563,24 +2563,22 @@
     "PeriodicDecreaseParameters": {
       "properties": {
         "period": {
-          "default": "1m",
           "description": "The period of the timer.\n\n",
           "type": "string",
-          "x-go-tag-default": "1m",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "scale_in_percentage": {
-          "default": 1,
           "description": "The percentage of replicas to scale in.\n\n",
           "format": "double",
           "maximum": 100,
           "minimum": 0,
           "type": "number",
-          "x-go-tag-default": "1",
-          "x-go-tag-validate": "gte=0,lte=100",
+          "x-go-tag-validate": "required,gte=0,lte=100",
           "x-order": 1
         }
       },
+      "required": ["period", "scale_in_percentage"],
       "type": "object",
       "additionalProperties": false
     },
