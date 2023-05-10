@@ -1324,35 +1324,6 @@ func (m *AutoScaler) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetOutPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScalerValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScalerValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScalerValidationError{
-				field:  "OutPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
 		switch v := interface{}(m.GetScalingParameters()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -2910,193 +2881,6 @@ var _ interface {
 	ErrorName() string
 } = AutoScaler_ScalingParametersValidationError{}
 
-// Validate checks the field values on AutoScaler_Outs with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *AutoScaler_Outs) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on AutoScaler_Outs with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// AutoScaler_OutsMultiError, or nil if none found.
-func (m *AutoScaler_Outs) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AutoScaler_Outs) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetActualScale()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_OutsValidationError{
-					field:  "ActualScale",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_OutsValidationError{
-					field:  "ActualScale",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetActualScale()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_OutsValidationError{
-				field:  "ActualScale",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetConfiguredScale()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_OutsValidationError{
-					field:  "ConfiguredScale",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_OutsValidationError{
-					field:  "ConfiguredScale",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetConfiguredScale()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_OutsValidationError{
-				field:  "ConfiguredScale",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetDesiredScale()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_OutsValidationError{
-					field:  "DesiredScale",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_OutsValidationError{
-					field:  "DesiredScale",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDesiredScale()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_OutsValidationError{
-				field:  "DesiredScale",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return AutoScaler_OutsMultiError(errors)
-	}
-
-	return nil
-}
-
-// AutoScaler_OutsMultiError is an error wrapping multiple validation errors
-// returned by AutoScaler_Outs.ValidateAll() if the designated constraints
-// aren't met.
-type AutoScaler_OutsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_OutsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AutoScaler_OutsMultiError) AllErrors() []error { return m }
-
-// AutoScaler_OutsValidationError is the validation error returned by
-// AutoScaler_Outs.Validate if the designated constraints aren't met.
-type AutoScaler_OutsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AutoScaler_OutsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AutoScaler_OutsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AutoScaler_OutsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AutoScaler_OutsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AutoScaler_OutsValidationError) ErrorName() string { return "AutoScaler_OutsValidationError" }
-
-// Error satisfies the builtin error interface
-func (e AutoScaler_OutsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAutoScaler_Outs.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AutoScaler_OutsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AutoScaler_OutsValidationError{}
-
 // Validate checks the field values on AutoScaler_ScalingBackend with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -3302,6 +3086,35 @@ func (m *AutoScaler_ScalingBackend_KubernetesReplicas) validate(all bool) error 
 
 	// no validation rules for MaxReplicas
 
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicasValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicasValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AutoScaler_ScalingBackend_KubernetesReplicasValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return AutoScaler_ScalingBackend_KubernetesReplicasMultiError(errors)
 	}
@@ -3384,3 +3197,203 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AutoScaler_ScalingBackend_KubernetesReplicasValidationError{}
+
+// Validate checks the field values on
+// AutoScaler_ScalingBackend_KubernetesReplicas_Outs with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AutoScaler_ScalingBackend_KubernetesReplicas_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// AutoScaler_ScalingBackend_KubernetesReplicas_Outs with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in
+// AutoScaler_ScalingBackend_KubernetesReplicas_OutsMultiError, or nil if none found.
+func (m *AutoScaler_ScalingBackend_KubernetesReplicas_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AutoScaler_ScalingBackend_KubernetesReplicas_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetActualReplicas()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+					field:  "ActualReplicas",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+					field:  "ActualReplicas",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActualReplicas()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+				field:  "ActualReplicas",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetConfiguredReplicas()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+					field:  "ConfiguredReplicas",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+					field:  "ConfiguredReplicas",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConfiguredReplicas()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+				field:  "ConfiguredReplicas",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDesiredReplicas()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+					field:  "DesiredReplicas",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+					field:  "DesiredReplicas",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDesiredReplicas()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{
+				field:  "DesiredReplicas",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AutoScaler_ScalingBackend_KubernetesReplicas_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// AutoScaler_ScalingBackend_KubernetesReplicas_OutsMultiError is an error
+// wrapping multiple validation errors returned by
+// AutoScaler_ScalingBackend_KubernetesReplicas_Outs.ValidateAll() if the
+// designated constraints aren't met.
+type AutoScaler_ScalingBackend_KubernetesReplicas_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AutoScaler_ScalingBackend_KubernetesReplicas_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AutoScaler_ScalingBackend_KubernetesReplicas_OutsMultiError) AllErrors() []error { return m }
+
+// AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError is the
+// validation error returned by
+// AutoScaler_ScalingBackend_KubernetesReplicas_Outs.Validate if the
+// designated constraints aren't met.
+type AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError) ErrorName() string {
+	return "AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAutoScaler_ScalingBackend_KubernetesReplicas_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AutoScaler_ScalingBackend_KubernetesReplicas_OutsValidationError{}

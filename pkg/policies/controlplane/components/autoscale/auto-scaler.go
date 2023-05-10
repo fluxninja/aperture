@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	autoscalerActualScalePortName              = "actual_scale"
-	autoscalerConfiguredScalePortName          = "configured_scale"
-	autoscalerDesiredScalePortName             = "desired_scale"
+	actualReplicasPortName                     = "actual_scale"
+	configuredReplicasPortName                 = "configured_scale"
+	desiredReplicasPortName                    = "desired_scale"
 	autoscalerScaleOutSignalPortNameTemplate   = "scale_out_signal_%d"
 	autoscalerScaleOutSetpointPortNameTemplate = "scale_out_setpoint_%d"
 	autoscalerScaleInSignalPortNameTemplate    = "scale_in_signal_%d"
@@ -25,21 +25,6 @@ func ParseAutoScaler(
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 
 	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
-	outPorts := autoscaler.OutPorts
-	if outPorts != nil {
-		actualScalePort := outPorts.ActualScale
-		if actualScalePort != nil {
-			nestedOutPortsMap[autoscalerActualScalePortName] = actualScalePort
-		}
-		configuredScalePort := outPorts.ConfiguredScale
-		if configuredScalePort != nil {
-			nestedOutPortsMap[autoscalerConfiguredScalePortName] = configuredScalePort
-		}
-		desiredScalePort := outPorts.DesiredScale
-		if desiredScalePort != nil {
-			nestedOutPortsMap[autoscalerDesiredScalePortName] = desiredScalePort
-		}
-	}
 
 	var (
 		componentsScaler   []*policylangv1.Component
@@ -54,6 +39,22 @@ func ParseAutoScaler(
 		minScale = float64(kubernetesReplicas.MinReplicas)
 		maxScale = float64(kubernetesReplicas.MaxReplicas)
 		shortDescription = kubernetesReplicas.KubernetesObjectSelector.GetNamespace() + ":" + kubernetesReplicas.KubernetesObjectSelector.GetKind() + "/" + kubernetesReplicas.KubernetesObjectSelector.Name
+		outPorts := kubernetesReplicas.OutPorts
+		if outPorts != nil {
+			actualReplicasPort := outPorts.ActualReplicas
+			if actualReplicasPort != nil {
+				nestedOutPortsMap[actualReplicasPortName] = actualReplicasPort
+			}
+			configuredReplicasPort := outPorts.ConfiguredReplicas
+			if configuredReplicasPort != nil {
+				nestedOutPortsMap[configuredReplicasPortName] = configuredReplicasPort
+			}
+			desiredReplicasPort := outPorts.DesiredReplicas
+			if desiredReplicasPort != nil {
+				nestedOutPortsMap[desiredReplicasPortName] = desiredReplicasPort
+			}
+		}
+
 		componentsScaler = []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_AutoScale{
@@ -86,7 +87,7 @@ func ParseAutoScaler(
 			{
 				Component: &policylangv1.Component_NestedSignalEgress{
 					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: autoscalerActualScalePortName,
+						PortName: actualReplicasPortName,
 						InPorts: &policylangv1.NestedSignalEgress_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -100,7 +101,7 @@ func ParseAutoScaler(
 			{
 				Component: &policylangv1.Component_NestedSignalEgress{
 					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: autoscalerConfiguredScalePortName,
+						PortName: configuredReplicasPortName,
 						InPorts: &policylangv1.NestedSignalEgress_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -114,7 +115,7 @@ func ParseAutoScaler(
 			{
 				Component: &policylangv1.Component_NestedSignalEgress{
 					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: autoscalerDesiredScalePortName,
+						PortName: desiredReplicasPortName,
 						InPorts: &policylangv1.NestedSignalEgress_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{

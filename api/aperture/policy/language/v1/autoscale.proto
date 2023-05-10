@@ -152,7 +152,7 @@ message ScaleInController {
   message Controller {
     oneof controller {
       DecreasingGradient gradient = 1;
-    }
+    } // @gotags: validate:"required"
   }
 
   // Controller
@@ -187,26 +187,27 @@ message AutoScaler {
     Alerter.Parameters scale_in_alerter = 7;
   }
 
-  // Outputs for _AutoScaler_.
-  message Outs {
-    OutPort actual_scale = 1;
-    OutPort configured_scale = 2;
-    OutPort desired_scale = 3;
-  }
-
   message ScalingBackend {
     // KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
     message KubernetesReplicas {
+      // Outputs
+      message Outs {
+        OutPort actual_replicas = 1;
+        OutPort configured_replicas = 2;
+        OutPort desired_replicas = 3;
+      }
       // The Kubernetes object on which horizontal scaling is applied.
       KubernetesObjectSelector kubernetes_object_selector = 1; // @gotags: validate:"required"
       // The minimum replicas to which the _AutoScaler_ can scale-in.
       int64 min_replicas = 2; // @gotags: default:"0" validate:"gte=0"
       // The maximum replicas to which the _AutoScaler_ can scale-out.
       int64 max_replicas = 3; // @gotags: default:"9223372036854775807" validate:"gt=0"
+      // Output ports for _Kubernetes Replicas_.
+      Outs out_ports = 4;
     }
     oneof scaler {
       KubernetesReplicas kubernetes_replicas = 1;
-    }
+    } // @gotags: validate:"required"
   }
 
   ScalingBackend scaling_backend = 1; // @gotags: validate:"required"
@@ -216,17 +217,14 @@ message AutoScaler {
   // List of _Controllers_ for scaling in.
   repeated ScaleInController scale_in_controllers = 3; // @gotags: validate:"dive"
 
-  // Output ports for the _AutoScaler_.
-  Outs out_ports = 4;
-
   // Parameters that define the scaling behavior.
-  ScalingParameters scaling_parameters = 5; // @gotags: validate:"required"
+  ScalingParameters scaling_parameters = 4; // @gotags: validate:"required"
 
   // Dry run mode ensures that no scaling is invoked by this auto scaler.
   // This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
   // This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
-  bool dry_run = 6;
+  bool dry_run = 5;
 
   // Configuration key for overriding dry run setting through dynamic configuration.
-  string dry_run_config_key = 7;
+  string dry_run_config_key = 6;
 }
