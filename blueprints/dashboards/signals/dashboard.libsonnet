@@ -22,9 +22,9 @@ function(cfg) {
     .addTarget(
       prometheus.target(
         expr=(
-          'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])' +
+          'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="${signal_name}",sub_circuit_id="${sub_circuit_id}"}[$__rate_interval])' +
           '/' +
-          'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="${signal_name}"}[$__rate_interval])'
+          'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="${signal_name}",sub_circuit_id="${sub_circuit_id}"}[$__rate_interval])'
         ),
         intervalFactor=1,
       ),
@@ -39,14 +39,14 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='avg(rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
+        expr='avg(rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}",sub_circuit_id="${sub_circuit_id}"}[$__rate_interval]))' % { policy_name: policyName },
         intervalFactor=1,
         legendFormat='Valid',
       ),
     )
     .addTarget(
       prometheus.target(
-        expr='sum(rate(invalid_signal_readings_total{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))' % { policy_name: policyName },
+        expr='sum(rate(invalid_signal_readings_total{policy_name="%(policy_name)s",signal_name="${signal_name}",sub_circuit_id="${sub_circuit_id}"}[$__rate_interval]))' % { policy_name: policyName },
         intervalFactor=1,
         legendFormat='Invalid',
       ),
@@ -81,6 +81,23 @@ function(cfg) {
       includeAll: false,
       multi: false,
       name: 'signal_name',
+      options: [],
+      refresh: 1,
+      regex: '',
+      skipUrlSync: false,
+      sort: 0,
+      type: 'query',
+    })
+    .addTemplate({
+      datasource: {
+        type: 'prometheus',
+        uid: '${datasource}',
+      },
+      query: 'label_values(signal_reading{policy_name="%(policy_name)s",signal_name="${signal_name}"}, sub_circuit_id)' % { policy_name: policyName },
+      hide: 0,
+      includeAll: false,
+      multi: false,
+      name: 'sub_circuit_id',
       options: [],
       refresh: 1,
       regex: '',
