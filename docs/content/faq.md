@@ -18,8 +18,26 @@ keywords:
   - faq
 ---
 
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
+## Product FAQ
 
-<DocCardList />
+### Question here?
+
+Answer here
+
+## Aperture Controller FAQ
+
+### Question here?
+
+Answer here
+
+## Aperture Agent FAQ
+
+### Question here?
+
+Answer here
+
+## Aperture CLI FAQ
+
+### Question here?
+
+Answer here
