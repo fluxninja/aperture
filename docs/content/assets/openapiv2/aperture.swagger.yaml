@@ -320,9 +320,6 @@ definitions:
             dry_run_config_key:
                 description: Configuration key for overriding dry run setting through dynamic configuration.
                 type: string
-            out_ports:
-                $ref: '#/definitions/AutoScalerOuts'
-                description: Output ports for the _AutoScaler_.
             scale_in_controllers:
                 description: |+
                     List of _Controllers_ for scaling in.
@@ -350,16 +347,6 @@ definitions:
                     Parameters that define the scaling behavior.
 
                 x-go-tag-validate: required
-        type: object
-    AutoScalerOuts:
-        description: Outputs for _AutoScaler_.
-        properties:
-            actual_scale:
-                $ref: '#/definitions/OutPort'
-            configured_scale:
-                $ref: '#/definitions/OutPort'
-            desired_scale:
-                $ref: '#/definitions/OutPort'
         type: object
     AutoScalerScalingBackend:
         properties:
@@ -395,6 +382,19 @@ definitions:
                 type: string
                 x-go-tag-default: "0"
                 x-go-tag-validate: gte=0
+            out_ports:
+                $ref: '#/definitions/AutoScalerScalingBackendKubernetesReplicasOuts'
+                description: Output ports for _Kubernetes Replicas_.
+        type: object
+    AutoScalerScalingBackendKubernetesReplicasOuts:
+        properties:
+            actual_replicas:
+                $ref: '#/definitions/OutPort'
+            configured_replicas:
+                $ref: '#/definitions/OutPort'
+            desired_replicas:
+                $ref: '#/definitions/OutPort'
+        title: Outputs
         type: object
     AutoScalerScalingParameters:
         properties:

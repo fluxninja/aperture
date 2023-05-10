@@ -378,10 +378,6 @@ definitions:
           configuration.
         type: string
         x-order: 1
-      out_ports:
-        description: Output ports for the _AutoScaler_.
-        x-order: 2
-        $ref: '#/definitions/AutoScalerOuts'
       scale_in_controllers:
         description: |+
           List of _Controllers_ for scaling in.
@@ -391,7 +387,7 @@ definitions:
           type: object
           $ref: '#/definitions/ScaleInController'
         x-go-tag-validate: dive
-        x-order: 3
+        x-order: 2
       scale_out_controllers:
         description: |+
           List of _Controllers_ for scaling out.
@@ -401,31 +397,18 @@ definitions:
           type: object
           $ref: '#/definitions/ScaleOutController'
         x-go-tag-validate: dive
-        x-order: 4
+        x-order: 3
       scaling_backend:
         x-go-tag-validate: required
-        x-order: 5
+        x-order: 4
         $ref: '#/definitions/AutoScalerScalingBackend'
       scaling_parameters:
         description: |+
           Parameters that define the scaling behavior.
 
         x-go-tag-validate: required
-        x-order: 6
+        x-order: 5
         $ref: '#/definitions/AutoScalerScalingParameters'
-  AutoScalerOuts:
-    description: Outputs for _AutoScaler_.
-    type: object
-    properties:
-      actual_scale:
-        x-order: 0
-        $ref: '#/definitions/OutPort'
-      configured_scale:
-        x-order: 1
-        $ref: '#/definitions/OutPort'
-      desired_scale:
-        x-order: 2
-        $ref: '#/definitions/OutPort'
   AutoScalerScalingBackend:
     type: object
     properties:
@@ -465,6 +448,23 @@ definitions:
         x-go-tag-default: "0"
         x-go-tag-validate: gte=0
         x-order: 2
+      out_ports:
+        description: Output ports for _Kubernetes Replicas_.
+        x-order: 3
+        $ref: '#/definitions/AutoScalerScalingBackendKubernetesReplicasOuts'
+  AutoScalerScalingBackendKubernetesReplicasOuts:
+    type: object
+    title: Outputs
+    properties:
+      actual_replicas:
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+      configured_replicas:
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+      desired_replicas:
+        x-order: 2
+        $ref: '#/definitions/OutPort'
   AutoScalerScalingParameters:
     type: object
     properties:

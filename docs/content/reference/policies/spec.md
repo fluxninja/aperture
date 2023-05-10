@@ -754,18 +754,6 @@ overridden at runtime using dynamic configuration.
 Configuration key for overriding dry run setting through dynamic configuration.
 
 </dd>
-<dt>out_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([AutoScalerOuts](#auto-scaler-outs))
-
-<!-- vale on -->
-
-Output ports for the _AutoScaler_.
-
-</dd>
 <dt>scale_in_controllers</dt>
 <dd>
 
@@ -810,49 +798,6 @@ List of _Controllers_ for scaling out.
 <!-- vale on -->
 
 Parameters that define the scaling behavior.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AutoScalerOuts {#auto-scaler-outs}
-
-<!-- vale on -->
-
-Outputs for _AutoScaler_.
-
-<dl>
-<dt>actual_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-<dt>configured_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-</dd>
-<dt>desired_scale</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
 
 </dd>
 </dl>
@@ -923,6 +868,61 @@ The maximum replicas to which the _AutoScaler_ can scale-out.
 <!-- vale on -->
 
 The minimum replicas to which the _AutoScaler_ can scale-in.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AutoScalerScalingBackendKubernetesReplicasOuts](#auto-scaler-scaling-backend-kubernetes-replicas-outs))
+
+<!-- vale on -->
+
+Output ports for _Kubernetes Replicas_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AutoScalerScalingBackendKubernetesReplicasOuts {#auto-scaler-scaling-backend-kubernetes-replicas-outs}
+
+<!-- vale on -->
+
+Outputs
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+</dd>
+<dt>desired_replicas</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
