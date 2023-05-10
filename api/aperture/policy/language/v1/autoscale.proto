@@ -165,8 +165,8 @@ message ScaleInController {
     oneof controller {
       DecreasingGradient gradient = 1;
       PeriodicDecrease periodic = 2;
-    }
-  } // @gotags: validate:"required"
+    } // @gotags: validate:"required"
+  }
 
   // Controller
   Controller controller = 1; // @gotags: validate:"required"
