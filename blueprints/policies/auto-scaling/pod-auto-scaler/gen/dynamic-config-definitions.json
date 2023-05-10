@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/auto-scaling/pod-auto-scaler blueprint",
+  "additionalProperties": false,
+  "required": ["auto_scaling"],
+  "properties": {
+    "auto_scaling": {
+      "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "boolean"
+    }
+  },
+  "$defs": null
+}
