@@ -87,6 +87,7 @@ function(cfg) {
       skipUrlSync: false,
       sort: 0,
       type: 'query',
+      label: 'Signal Name',
     })
     .addTemplate({
       datasource: {
@@ -104,6 +105,7 @@ function(cfg) {
       skipUrlSync: false,
       sort: 0,
       type: 'query',
+      label: 'Sub Circuit ID',
     })
     .addPanel(
       panel=signalAveragePanel,
