@@ -4,7 +4,8 @@ public class Subrequest {
 
     private String destination;
 
-    public Subrequest() {}
+    public Subrequest() {
+    }
 
     public Subrequest(String destination) {
         this.destination = destination;

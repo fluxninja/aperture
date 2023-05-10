@@ -2,14 +2,12 @@ package com.javademoapp.javademoapp;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collections;
-import java.util.stream.Collectors;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -18,6 +16,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
@@ -36,7 +37,8 @@ public class ApertureFeatureFilter implements Filter {
      * If the flow is denied then an error response is sent back to the client.
      */
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws ServletException, IOException {
         Map<String, String> labels = new HashMap<>();
         labels.put("app", "demoapp");
         labels.put("instance", System.getenv().getOrDefault("HOSTNAME", "instance-1"));
@@ -49,13 +51,12 @@ public class ApertureFeatureFilter implements Filter {
 
             // Add headers sent from k6 load generator
             HttpHeaders httpHeaders = Collections.list(request.getHeaderNames())
-                .stream()
-                .collect(Collectors.toMap(
-                    Function.identity(),
-                    h -> Collections.list(request.getHeaders(h)),
-                    (oldValue, newValue) -> newValue,
-                    HttpHeaders::new
-                ));
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Function.identity(),
+                            h -> Collections.list(request.getHeaders(h)),
+                            (oldValue, newValue) -> newValue,
+                            HttpHeaders::new));
             String userType = httpHeaders.getFirst("User-Type");
             if (userType != null) {
                 labels.put("user_type", userType);
@@ -78,7 +79,7 @@ public class ApertureFeatureFilter implements Filter {
                 flow.end(FlowStatus.Error);
             }
         } catch (ApertureSDKException e) {
-            log.error("Aperture SDK error: "+ e.getMessage());
+            log.error("Aperture SDK error: " + e.getMessage());
         }
     }
 
@@ -106,5 +107,6 @@ public class ApertureFeatureFilter implements Filter {
     }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+    }
 }

@@ -1,48 +1,54 @@
 package com.javademoapp.javademoapp;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
+import java.net.URL;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.stream.Collectors;
-import java.util.function.Function;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fluxninja.aperture.sdk.ApertureSDKException;
 
 @RestController
 public class RequestController {
     public static final String DEFAULT_HOST = "localhost";
-	public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_AGENT_PORT = "8089";
 
-    private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "10"));
-    private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "50")));
-    private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0.05"));
-    private  Logger log = LoggerFactory.getLogger(RequestController.class);
+    private int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "10"));
+    private Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "50")));
+    private double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0.05"));
+    private Logger log = LoggerFactory.getLogger(RequestController.class);
+    private String hostname = System.getenv().getOrDefault("HOSTNAME", DEFAULT_HOST);
 
     // Semaphore for limiting concurrent clients
     private Semaphore limitClients = new Semaphore(concurrency);
     private ApertureFeatureFilter apertureFilter = new ApertureFeatureFilter();
-
 
     @RequestMapping(value = "/health", method = RequestMethod.GET)
     public String health() {
@@ -66,7 +72,8 @@ public class RequestController {
     }
 
     @PostMapping("/request")
-    public String handlePostRequest(@RequestBody String payload, HttpServletRequest request, HttpServletResponse response) throws ApertureSDKException {
+    public String handlePostRequest(@RequestBody String payload, HttpServletRequest request,
+            HttpServletResponse response) throws ApertureSDKException {
         // Randomly reject requests
         if (rejectRatio > 0 && Math.random() < rejectRatio) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -80,8 +87,7 @@ public class RequestController {
                             Function.identity(),
                             h -> Collections.list(request.getHeaders(h)),
                             (oldValue, newValue) -> newValue,
-                            HttpHeaders::new
-                    ));
+                            HttpHeaders::new));
             Request requestObj = new ObjectMapper().readValue(payload, Request.class);
             List<List<Subrequest>> chains = requestObj.getRequest();
             for (List<Subrequest> chain : chains) {
@@ -93,7 +99,17 @@ public class RequestController {
                     return msg;
                 }
                 String requestDestination = chain.get(0).getDestination();
-                // TODO Add check for req Dest != Hostname
+                if (!requestDestination.startsWith("http")) {
+                    requestDestination = String.format("http://%s", requestDestination);
+                }
+
+                URL requestDestinationURL = new URL(requestDestination);
+                if (!requestDestinationURL.getHost().equals(hostname)) {
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    String msg = "Invalid message destination";
+                    log.error(String.format("%s: %s - %s", msg, hostname, requestDestinationURL.getHost()));
+                    return msg;
+                }
                 return processChain(chain, httpHeaders);
             }
 
@@ -111,13 +127,14 @@ public class RequestController {
     }
 
     @Bean
-    public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env){
+    public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env) {
         FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(apertureFilter);
         registrationBean.addUrlPatterns("/request");
         registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
-        registrationBean.addInitParameter("agent_port", System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
+        registrationBean.addInitParameter("agent_port",
+                System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
 
         return registrationBean;
     }
