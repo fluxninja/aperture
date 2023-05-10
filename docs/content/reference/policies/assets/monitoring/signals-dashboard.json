@@ -20,7 +20,7 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 24,
         "x": 0,
         "y": 0
@@ -105,7 +105,7 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 24,
         "x": 0,
         "y": 15
@@ -217,6 +217,7 @@
         },
         "hide": 0,
         "includeAll": false,
+        "label": "Signal Name",
         "multi": false,
         "name": "signal_name",
         "options": [],
@@ -234,6 +235,7 @@
         },
         "hide": 0,
         "includeAll": false,
+        "label": "Sub Circuit ID",
         "multi": false,
         "name": "sub_circuit_id",
         "options": [],
