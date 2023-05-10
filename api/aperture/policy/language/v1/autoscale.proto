@@ -139,7 +139,7 @@ message PeriodicDecrease {
   message Parameters {
     // The period of the timer.
     google.protobuf.Duration period = 1; // @gotags: validate:"required"
-    // The percentage of replicas to scale in.
+    // The percentage of scale to reduce.
     double scale_in_percentage = 2; // @gotags: validate:"required,gte=0,lte=100"
   }
 

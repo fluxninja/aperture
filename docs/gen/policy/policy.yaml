@@ -2688,7 +2688,7 @@ definitions:
         x-order: 0
       scale_in_percentage:
         description: |+
-          The percentage of replicas to scale in.
+          The percentage of scale to reduce.
 
         type: number
         format: double

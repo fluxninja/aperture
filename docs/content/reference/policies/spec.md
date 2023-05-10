@@ -5556,7 +5556,7 @@ The period of the timer.
 
 <!-- vale on -->
 
-The percentage of replicas to scale in.
+The percentage of scale to reduce.
 
 </dd>
 </dl>

@@ -2569,7 +2569,7 @@
           "x-order": 0
         },
         "scale_in_percentage": {
-          "description": "The percentage of replicas to scale in.\n\n",
+          "description": "The percentage of scale to reduce.\n\n",
           "format": "double",
           "maximum": 100,
           "minimum": 0,

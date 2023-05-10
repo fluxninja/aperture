@@ -2921,7 +2921,7 @@ definitions:
                 x-go-tag-validate: required
             scale_in_percentage:
                 description: |+
-                    The percentage of replicas to scale in.
+                    The percentage of scale to reduce.
 
                 format: double
                 maximum: 100
