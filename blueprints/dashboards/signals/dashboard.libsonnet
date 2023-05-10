@@ -107,6 +107,23 @@ function(cfg) {
       type: 'query',
       label: 'Sub Circuit ID',
     })
+    .addTemplate({
+      datasource: {
+        type: 'prometheus',
+        uid: '${datasource}',
+      },
+      query: 'label_values(signal_reading{policy_name="%(policy_name)s",signal_name="${signal_name}"}, sub_circuit_id)' % { policy_name: policyName },
+      hide: 0,
+      includeAll: false,
+      multi: false,
+      name: 'sub_circuit_id',
+      options: [],
+      refresh: 1,
+      regex: '',
+      skipUrlSync: false,
+      sort: 0,
+      type: 'query',
+    })
     .addPanel(
       panel=signalAveragePanel,
       gridPos={ x: 0, y: 0, w: 24, h: 8 },
