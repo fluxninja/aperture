@@ -35,4 +35,6 @@ RUN apt-get update \
 
 COPY --link --from=builder /aperture-agent /aperture-agent
 
+ENV GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn
+
 CMD ["/aperture-agent"]
