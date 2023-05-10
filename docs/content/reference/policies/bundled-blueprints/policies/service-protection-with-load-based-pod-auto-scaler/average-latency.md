@@ -1,6 +1,6 @@
 ---
 title:
-  Service Protection and Load based Pod Auto Scaler with Average Latency
+  Service Protection and Load-based Pod Auto-Scaler with Average Latency
   Feedback
 ---
 
@@ -14,7 +14,7 @@ overloaded, and increased by an additive factor while the service is no longer
 overloaded. An auto-scaler controller is used to dynamically adjust the number
 of instances or resources allocated to a service based on workload demands. The
 basic service protection policy protects the service from sudden traffic spikes.
-But it is necessary to scale the service to meet demand in case of a persistent
+It is necessary to scale the service to meet demand in case of a persistent
 change in load.
 
 At a high level, this policy works as follows:
@@ -44,7 +44,7 @@ At a high level, this policy works as follows:
   concurrency observed at each agent.
 - An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
   Deployment for the service.
-- Load based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
+- Load-based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
   the blueprint. This signal measures the fraction of traffic that the _Load
   Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
   scale-out based on a _Gradient Controller_ using this signal and a setpoint of

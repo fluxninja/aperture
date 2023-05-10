@@ -1,14 +1,13 @@
 local spec = import '../../../spec.libsonnet';
-local baseAutoScalinPolicyFn = import '../../auto-scaling/pod-auto-scaler/policy.libsonnet';
+local baseAutoScalingPolicyFn = import '../../auto-scaling/pod-auto-scaler/policy.libsonnet';
 local baseServiceProtectionPolicyFn = import '../../service-protection/average-latency/policy.libsonnet';
 local config = import './config.libsonnet';
 
 local scaleOutController = spec.v1.ScaleOutController;
 local scaleOutControllerController = spec.v1.ScaleOutControllerController;
-local gradient = spec.v1.GradientController;
-local gradientControllerParameters = spec.v1.GradientControllerParameters;
-local gradientInPort = spec.v1.GradientControllerIns;
-local gradientOutPort = spec.v1.GradientControllerOuts;
+local increasingGradient = spec.v1.IncreasingGradient;
+local increasingGradientInPort = spec.v1.IncreasingGradientIns;
+local increasingGradientParameters = spec.v1.IncreasingGradientParameters;
 local alerterParameters = spec.v1.AlerterParameters;
 local port = spec.v1.Port;
 
@@ -26,7 +25,7 @@ function(cfg) {
   },
 
   local baseServiceProtectionPolicy = baseServiceProtectionPolicyFn(params).policyDef,
-  local baseAutoScalinPolicy = baseAutoScalinPolicyFn(autoScalingParams).policyDef,
+  local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingParams).policyDef,
 
   local scaleOutControllers = [
     scaleOutController.new()
@@ -37,15 +36,15 @@ function(cfg) {
     + scaleOutController.withController(
       scaleOutControllerController.new()
       + scaleOutControllerController.withGradient(
-        gradient.new()
-        + gradient.withInPorts(
-          gradientInPort.new()
-          + gradientInPort.withSignal(port.withSignalName('OBSERVED_LOAD_MULTIPLIER'))
-          + gradientInPort.withSetpoint(port.withConstantSignal(1.0))
+        increasingGradient.new()
+        + increasingGradient.withInPorts(
+          increasingGradientInPort.new()
+          + increasingGradientInPort.withSignal(port.withSignalName('OBSERVED_LOAD_MULTIPLIER'))
+          + increasingGradientInPort.withSetpoint(port.withConstantSignal(1.0))
         )
-        + gradient.withParameters(
-          gradientControllerParameters.new()
-          + gradientControllerParameters.withSlope(-1.0)
+        + increasingGradient.withParameters(
+          increasingGradientParameters.new()
+          + increasingGradientParameters.withSlope(-1.0)
         )
       )
     ),
@@ -63,7 +62,7 @@ function(cfg) {
             },
           }
         else component,
-        baseAutoScalinPolicy.circuit.components
+        baseAutoScalingPolicy.circuit.components
       ),
     },
   },

@@ -1,10 +1,10 @@
 ---
-title: Service Protection and Load based Pod Auto Scaler Based on PromQL Query
+title: Service Protection and Load-based Pod Auto-Scaler Based on PromQL Query
 keywords:
   - blueprints
 sidebar_position: 3
 sidebar_label:
-  Service Protection and Load based Pod Auto Scaler Based on PromQL Query
+  Service Protection and Load-based Pod Auto Scaler Based on PromQL Query
 ---
 
 <!-- Configuration Marker -->
