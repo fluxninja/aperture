@@ -967,8 +967,7 @@ func ParseAutoScaler(
 		componentsScaleIn = append(componentsScaleIn, commonComponents...)
 	}
 
-	// Process scale in and scale out signals
-	// to scale the pods.
+	// Process scale in and scale out signals to scale the pods.
 	componentsPreScaler := []*policylangv1.Component{
 		{
 			Component: &policylangv1.Component_Max{
