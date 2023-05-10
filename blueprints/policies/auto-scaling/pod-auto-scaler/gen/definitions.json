@@ -26,7 +26,7 @@
           "default": [
             {
               "gradient": {
-                "slope": -1
+                "slope": 1
               },
               "query_string": "__REQUIRED_FIELD__",
               "threshold": 1

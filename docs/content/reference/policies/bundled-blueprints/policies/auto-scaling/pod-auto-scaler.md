@@ -63,7 +63,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale out controllers.'
     type='Array of Object (promql_scale_out_controller)'
     reference='#promql-scale-out-controller'
-    value='[{"gradient": {"slope": -1}, "query_string": "__REQUIRED_FIELD__", "threshold": 1}]'
+    value='[{"gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 1}]'
 />
 
 <!-- vale on -->

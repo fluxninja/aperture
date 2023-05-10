@@ -16,7 +16,7 @@ local promql_scale_out_controller_defaults = {
   query_string: '__REQUIRED_FIELD__',
   threshold: 1.0,
   gradient: {
-    slope: -1.0,
+    slope: 1.0,
   },
 };
 

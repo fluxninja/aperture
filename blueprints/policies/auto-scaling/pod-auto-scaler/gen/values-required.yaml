@@ -12,7 +12,7 @@ policy:
   # Required: True
   promql_scale_out_controllers:
     - gradient:
-        slope: -1
+        slope: 1
       query_string: __REQUIRED_FIELD__
       threshold: 1
   # List of scale in controllers.
