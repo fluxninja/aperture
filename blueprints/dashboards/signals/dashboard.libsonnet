@@ -76,7 +76,7 @@ function(cfg) {
         type: 'prometheus',
         uid: '${datasource}',
       },
-      query: 'label_values(signal_reading{policy_name="%(policy_name)s",sub_circuit_id="${sub_circuit_id}"}, signal_name)' % { policy_name: policyName },
+      query: 'label_values(signal_reading{policy_name="%(policy_name)s"}, signal_name)' % { policy_name: policyName },
       hide: 0,
       includeAll: false,
       multi: false,
