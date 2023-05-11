@@ -648,8 +648,6 @@ func ParseAutoScaler(
 		scaleInSignal := fmt.Sprintf("SCALE_IN_SIGNAL_%d", scaleInIndex)
 		scaleInSetpoint := fmt.Sprintf("SCALE_IN_SETPOINT_%d", scaleInIndex)
 		scaleInOutputPreCeil := fmt.Sprintf("SCALE_IN_OUTPUT_PRE_CEIL_%d", scaleInIndex)
-		scaleInOutputMin := fmt.Sprintf("SCALE_IN_OUTPUT_MIN_%d", scaleInIndex)
-		scaleInOutputMax := fmt.Sprintf("SCALE_IN_OUTPUT_MAX_%d", scaleInIndex)
 		scaleInOutput := fmt.Sprintf("SCALE_IN_OUTPUT_%d", scaleInIndex)
 		isScaleIn := fmt.Sprintf("IS_SCALE_IN_%d", scaleInIndex)
 		scaleIn := fmt.Sprintf("SCALE_IN_%d", scaleInIndex)
@@ -918,56 +916,6 @@ func ParseAutoScaler(
 				},
 			},
 			{
-				Component: &policylangv1.Component_Max{
-					Max: &policylangv1.Max{
-						InPorts: &policylangv1.Max_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInOutput,
-									},
-								},
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MIN_DESIRED_SCALE",
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.Max_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: scaleInOutputMax,
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Min{
-					Min: &policylangv1.Min{
-						InPorts: &policylangv1.Min_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInOutputMax,
-									},
-								},
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MAX_DESIRED_SCALE",
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.Min_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: scaleInOutputMin,
-							},
-						},
-					},
-				},
-			},
-			{
 				Component: &policylangv1.Component_Decider{
 					Decider: &policylangv1.Decider{
 						Operator: "lt",
@@ -976,7 +924,7 @@ func ParseAutoScaler(
 						InPorts: &policylangv1.Decider_Ins{
 							Lhs: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: scaleInOutputMin,
+									SignalName: scaleInOutput,
 								},
 							},
 							Rhs: &policylangv1.InPort{
@@ -1238,6 +1186,56 @@ func ParseAutoScaler(
 						},
 					},
 					OutPorts: &policylangv1.Max_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "DESIRED_SCALE_PRE_MAX",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Max{
+				Max: &policylangv1.Max{
+					InPorts: &policylangv1.Max_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE_PRE_MAX",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "MIN_DESIRED_SCALE",
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Max_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "DESIRED_SCALE_PRE_MIN",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Min{
+				Min: &policylangv1.Min{
+					InPorts: &policylangv1.Min_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE_PRE_MIN",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "MAX_DESIRED_SCALE",
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Min_Outs{
 						Output: &policylangv1.OutPort{
 							SignalName: "DESIRED_SCALE",
 						},
