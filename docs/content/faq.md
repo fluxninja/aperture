@@ -49,12 +49,12 @@ Aperture uses the flow label to identify the requests.
 ### How does Aperture address the issue of delays in servers becoming available and reaching a healthy state, particularly in the context of auto-scaling?
 
 As Aperture observes the system, it can detect early sign of overload and can
-take necessary actions to prevent the system from becoming unhealthy. Thus,
+take necessary actions to prevent the system from becoming unhealthy. Therefore,
 server gets enough time to reach a healthy state.
 
-### Can the Aperture controller run on a non-containerized environment?
+### Can the Aperture controller run in a non-containerized environment?
 
-No, the Aperture controller runs on a containerized environment only.
+No, the Aperture controller runs in a containerized environment only.
 
 ### Is a Kubernetes cluster necessary for working with the Aperture Controller?
 
