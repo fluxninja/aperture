@@ -2,7 +2,7 @@
 title: Static Rate Limiting Policy
 keywords:
   - blueprints
-sidebar_position: 4
+sidebar_position: 5
 sidebar_label: Static Rate Limiting Policy
 ---
 

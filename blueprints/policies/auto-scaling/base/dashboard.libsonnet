@@ -23,9 +23,9 @@ local newGraphPanel(title, datasource, query, axisLabel='', unit='') =
 
 local signalAveragePanel(title, datasource, signalName, policyName) =
   local query = |||
-    increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="%(signal_name)s",valid="true"}[$__rate_interval])
+    increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="%(signal_name)s"}[$__rate_interval])
     /
-    increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="%(signal_name)s",valid="true"}[$__rate_interval])
+    increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="%(signal_name)s"}[$__rate_interval])
   ||| % { policy_name: policyName, signal_name: signalName };
   newGraphPanel(title, datasource, query);
 

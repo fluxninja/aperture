@@ -63,6 +63,9 @@ policy:
   # Dry run mode ensures that no scaling is invoked by this auto scaler.
   # Type: bool
   dry_run: false
+  # Configuration key for overriding dry run setting through dynamic configuration.
+  # Type: string
+  dry_run_config_key: "auto_scaling"
 
 dashboard:
   # Refresh interval for dashboard panels.

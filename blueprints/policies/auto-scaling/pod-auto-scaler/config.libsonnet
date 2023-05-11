@@ -20,7 +20,7 @@ local autoScalingDefaults = import '../base/config-defaults.libsonnet';
 * @param (policy.resources: aperture.spec.v1.Resources) List of additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
 * @param (policy.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler.
-* @schema (policy.dry_run_config_key: string) Configuration key for overriding dry run setting through dynamic configuration.
+* @param (policy.dry_run_config_key: string) Configuration key for overriding dry run setting through dynamic configuration.
 */
 autoScalingDefaults {
   policy+: {

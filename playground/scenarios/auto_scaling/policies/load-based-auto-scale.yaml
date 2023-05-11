@@ -1,59 +1,13 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
-# Generated values file for policies/service-protection/average-latency blueprint
+# yaml-language-server: $schema=file:/home/hardik/Work/fluxninja/aperture/blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection-with-load-based-pod-auto-scaler/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency
 
 policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: load-based-auto-scale
-  # List of additional circuit components.
-  # Type: []aperture.spec.v1.Component
-  components:
-    - query:
-        promql:
-          query_string: 'avg(avg_over_time(k8s_pod_cpu_utilization{k8s_deployment_name="service1-demo-app"}[30s]))'
-          evaluation_interval: 10s
-          out_ports:
-            output:
-              signal_name: AVERAGE_CPU
-    - auto_scale:
-        auto_scaler:
-          scaling_parameters:
-            scale_in_cooldown: "40s"
-            scale_out_cooldown: "30s"
-          scale_out_controllers:
-            - controller:
-                gradient:
-                  in_ports:
-                    signal:
-                      signal_name: OBSERVED_LOAD_MULTIPLIER
-                    setpoint:
-                      constant_signal:
-                        value: 1.0
-                  parameters:
-                    slope: -1.0
-          scale_in_controllers:
-            - controller:
-                gradient:
-                  in_ports:
-                    signal:
-                      signal_name: AVERAGE_CPU
-                    setpoint:
-                      constant_signal:
-                        value: 0.5
-                  parameters:
-                    slope: 1.0
-          scaling_backend:
-            kubernetes_replicas:
-              kubernetes_object_selector:
-                namespace: demoapp
-                api_version: apps/v1
-                kind: Deployment
-                name: service1-demo-app
-              min_replicas: "1"
-              max_replicas: "10"
   service_protection_core:
     adaptive_load_scheduler:
       load_scheduler:
@@ -71,3 +25,42 @@ policy:
       selectors:
         - control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
+  auto_scaling:
+    # Kubernetes replicas scaling backend.
+    # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
+    # Required: True
+    kubernetes_replicas:
+      # Kubernetes object selector.
+      # Type: aperture.spec.v1.KubernetesObjectSelector
+      # Required: True
+      kubernetes_object_selector:
+        agent_group: default
+        api_version: apps/v1
+        kind: Deployment
+        name: service1-demo-app
+        namespace: demoapp
+      # Minimum number of replicas.
+      # Type: string
+      # Required: True
+      min_replicas: "1"
+      # Maximum number of replicas.
+      # Type: string
+      # Required: True
+      max_replicas: "10"
+    # List of scale in controllers.
+    # Type: []policies/auto-scaling/pod-auto-scaler:schema:promql_scale_in_controller
+    # Required: True
+    promql_scale_in_controllers:
+      - gradient:
+          slope: 1
+        query_string: 'avg(avg_over_time(k8s_pod_cpu_utilization{k8s_deployment_name="service1-demo-app"}[30s]))'
+        threshold: 0.5
+    # Dry run mode ensures that no scaling is invoked by this auto scaler.
+    # Type: bool
+    dry_run: false
+    # Parameters that define the scaling behavior.
+    # Type: aperture.spec.v1.AutoScalerScalingParameters
+    # Required: True
+    scaling_parameters:
+      scale_in_cooldown: "40s"
+      scale_out_cooldown: "30s"

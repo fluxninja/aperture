@@ -12,24 +12,30 @@ root.0observed_load_multiplier[observed_load_multiplier]
 end
 end
 root.0_overload_confirmation_FakeConstantout((1.00))
-subgraph root.1[<center>PromQL<br/>every 10s</center>]
+subgraph root.1[<center>PromQL<br/>every 1s</center>]
 subgraph root.1_outports[ ]
 style root.1_outports fill:none,stroke:none
 root.1output[output]
 end
 end
-subgraph root.2[<center>AutoScaler<br/>demoapp:Deployment/service1...</center>]
+subgraph root.2[<center>ArithmeticCombinator<br/>Mul</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
-root.2scale_in_setpoint_0[scale_in_setpoint_0]
-root.2scale_in_signal_0[scale_in_signal_0]
-root.2scale_out_setpoint_0[scale_out_setpoint_0]
-root.2scale_out_signal_0[scale_out_signal_0]
+root.2lhs[lhs]
+root.2rhs[rhs]
+end
+subgraph root.2_outports[ ]
+style root.2_outports fill:none,stroke:none
+root.2output[output]
 end
 end
-root.2_scale_in_setpoint_0_FakeConstantout((0.50))
-root.2_scale_out_setpoint_0_FakeConstantout((1.00))
-subgraph root.3[<center>PromQL<br/>every 1s</center>]
+root.2_rhs_FakeConstantout((2.00))
+subgraph root.3[<center>EMA<br/>win: 1500</center>]
+subgraph root.3_inports[ ]
+style root.3_inports fill:none,stroke:none
+root.3input[input]
+root.3max_envelope[max_envelope]
+end
 subgraph root.3_outports[ ]
 style root.3_outports fill:none,stroke:none
 root.3output[output]
@@ -46,40 +52,34 @@ style root.4_outports fill:none,stroke:none
 root.4output[output]
 end
 end
-root.4_rhs_FakeConstantout((2.00))
-subgraph root.5[<center>EMA<br/>win: 1500</center>]
+root.4_rhs_FakeConstantout((1.10))
+subgraph root.5[<center>AutoScaler<br/>demoapp:Deployment/service1...</center>]
 subgraph root.5_inports[ ]
 style root.5_inports fill:none,stroke:none
-root.5input[input]
-root.5max_envelope[max_envelope]
-end
-subgraph root.5_outports[ ]
-style root.5_outports fill:none,stroke:none
-root.5output[output]
+root.5scale_in_setpoint_0[scale_in_setpoint_0]
+root.5scale_in_signal_0[scale_in_signal_0]
+root.5scale_out_setpoint_0[scale_out_setpoint_0]
+root.5scale_out_signal_0[scale_out_signal_0]
 end
 end
-subgraph root.6[<center>ArithmeticCombinator<br/>Mul</center>]
-subgraph root.6_inports[ ]
-style root.6_inports fill:none,stroke:none
-root.6lhs[lhs]
-root.6rhs[rhs]
-end
+root.5_scale_in_setpoint_0_FakeConstantout((0.50))
+root.5_scale_out_setpoint_0_FakeConstantout((1.00))
+subgraph root.6[<center>PromQL<br/>every 1s</center>]
 subgraph root.6_outports[ ]
 style root.6_outports fill:none,stroke:none
 root.6output[output]
 end
 end
-root.6_rhs_FakeConstantout((1.10))
-root.0observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.2scale_out_signal_0
+root.0observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.5scale_out_signal_0
 root.0_overload_confirmation_FakeConstantout --> root.0overload_confirmation
-root.1output --> |AVERAGE_CPU| root.2scale_in_signal_0
-root.2_scale_in_setpoint_0_FakeConstantout --> root.2scale_in_setpoint_0
-root.2_scale_out_setpoint_0_FakeConstantout --> root.2scale_out_setpoint_0
-root.3output --> |SIGNAL| root.0signal
-root.3output --> |SIGNAL| root.4lhs
-root.3output --> |SIGNAL| root.5input
-root.4output --> |MAX_EMA| root.5max_envelope
+root.1output --> |SIGNAL| root.0signal
+root.1output --> |SIGNAL| root.2lhs
+root.1output --> |SIGNAL| root.3input
+root.2output --> |MAX_EMA| root.3max_envelope
+root.2_rhs_FakeConstantout --> root.2rhs
+root.3output --> |SIGNAL_EMA| root.4lhs
+root.4output --> |SETPOINT| root.0setpoint
 root.4_rhs_FakeConstantout --> root.4rhs
-root.5output --> |SIGNAL_EMA| root.6lhs
-root.6output --> |SETPOINT| root.0setpoint
-root.6_rhs_FakeConstantout --> root.6rhs
+root.5_scale_in_setpoint_0_FakeConstantout --> root.5scale_in_setpoint_0
+root.5_scale_out_setpoint_0_FakeConstantout --> root.5scale_out_setpoint_0
+root.6output --> |PROMQL_SCALE_IN_0| root.5scale_in_signal_0

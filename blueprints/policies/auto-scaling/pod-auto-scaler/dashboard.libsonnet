@@ -3,5 +3,5 @@ local config = import './config.libsonnet';
 
 function(cfg) {
   local params = config + cfg,
-  dashboard: baseDashboardFn(params),
+  dashboard: baseDashboardFn(params).dashboard,
 }
