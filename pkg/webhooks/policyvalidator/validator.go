@@ -10,8 +10,8 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/fluxninja/aperture/operator/api"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 )
 
 // limit the concurrent validation requests (some validations incurs rego

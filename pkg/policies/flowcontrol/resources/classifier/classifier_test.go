@@ -7,16 +7,16 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/ast"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/status"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
-	. "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
+	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
+	. "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier/compiler"
 )
 
 type object = map[string]interface{}

@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
 )
 
 const (

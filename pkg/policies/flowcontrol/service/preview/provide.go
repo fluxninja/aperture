@@ -6,11 +6,11 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	flowpreviewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
-	cfg "github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
-	previewconfig "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config"
+	flowpreviewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
+	cfg "github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
+	previewconfig "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
 )
 
 // Module provides preview handler and registers the service.

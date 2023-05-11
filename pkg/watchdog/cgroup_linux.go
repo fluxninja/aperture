@@ -8,8 +8,8 @@ import (
 	"github.com/containerd/cgroups"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/fluxninja/aperture/pkg/log"
-	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	watchdogconfig "github.com/fluxninja/aperture/v2/pkg/watchdog/config"
 )
 
 type cgroupBase struct {

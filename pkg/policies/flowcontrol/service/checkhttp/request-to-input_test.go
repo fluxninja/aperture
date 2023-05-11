@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
 	"github.com/open-policy-agent/opa/ast"
 )
 

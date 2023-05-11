@@ -24,17 +24,17 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpc"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
-	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
-	checkhttp_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp/baggage"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
+	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
+	checkhttp_baggage "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp/baggage"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 )
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)

@@ -9,7 +9,7 @@ import (
 	"github.com/natefinch/atomic"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // WriteByteBufferToFile atomically writes byte buffer to file.

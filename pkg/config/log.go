@@ -14,9 +14,9 @@ import (
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
 
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
 	"github.com/fluxninja/lumberjack"
 )
 

@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // Watcher is a generic interface for watchers/trackers.

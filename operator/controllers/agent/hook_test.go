@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/admission/v1"

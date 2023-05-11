@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
 )
 
 const (

@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/pflag"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/filesystem"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/filesystem"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
 )
 
 var (

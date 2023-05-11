@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/fluxninja/aperture/operator/controllers"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -35,7 +35,7 @@ import (
 
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/fluxninja/aperture/operator/api"
+	"github.com/fluxninja/aperture/v2/operator/api"
 	//+kubebuilder:scaffold:imports
 )
 

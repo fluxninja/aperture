@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
+	. "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy"
 )
 
 var _ = Describe("Flow labels", func() {

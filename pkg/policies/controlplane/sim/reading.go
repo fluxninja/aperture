@@ -3,7 +3,7 @@ package sim
 import (
 	"math"
 
-	rt "github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	rt "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 // Reading is implementation of rt.Reading designed for tests.

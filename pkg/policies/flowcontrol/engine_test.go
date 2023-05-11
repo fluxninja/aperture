@@ -6,12 +6,12 @@ import (
 	. "github.com/onsi/gomega"
 	goprom "github.com/prometheus/client_golang/prometheus"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/mocks"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/mocks"
 )
 
 var _ = Describe("Dataplane Engine", func() {

@@ -37,13 +37,13 @@ import (
 
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/fluxninja/aperture/operator/api"
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/etcd"
-	prometheusconfig "github.com/fluxninja/aperture/pkg/prometheus/config"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/etcd"
+	prometheusconfig "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
 	//+kubebuilder:scaffold:imports
 )
 

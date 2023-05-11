@@ -4,8 +4,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
+	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 )
 
 var _ = Describe("Cache", func() {

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 // Controller is the interface for the controller.

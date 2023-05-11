@@ -4,10 +4,10 @@ import (
 	"crypto/tls"
 	"fmt"
 
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	promapi "github.com/prometheus/client_golang/api"
 )
 

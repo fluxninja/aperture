@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
+	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
 )
 
 var (

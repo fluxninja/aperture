@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"strings"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policymonitoringv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/monitoring/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/structpb"
 )

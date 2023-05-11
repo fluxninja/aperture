@@ -7,8 +7,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // StatusService is the implementation of the statusv1.StatusServiceServer interface.

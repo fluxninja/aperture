@@ -12,16 +12,16 @@ import (
 	"github.com/mitchellh/copystructure"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
-	"github.com/fluxninja/aperture/extensions/fluxninja/heartbeats"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	httpclient "github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/heartbeats"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	httpclient "github.com/fluxninja/aperture/v2/pkg/net/http"
+	"github.com/fluxninja/aperture/v2/pkg/net/tlsconfig"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (

@@ -144,15 +144,15 @@ public final class CheckProto {
       "\030\001 \001(\tR\rfluxMeterName2z\n\022FlowControlServ" +
       "ice\022d\n\005Check\022+.aperture.flowcontrol.chec" +
       "k.v1.CheckRequest\032,.aperture.flowcontrol" +
-      ".check.v1.CheckResponse\"\000B\260\002\n5com.fluxni" +
+      ".check.v1.CheckResponse\"\000B\263\002\n5com.fluxni" +
       "nja.generated.aperture.flowcontrol.check" +
-      ".v1B\nCheckProtoP\001ZTgithub.com/fluxninja/" +
-      "aperture/api/gen/proto/go/aperture/flowc" +
-      "ontrol/check/v1;checkv1\242\002\003AFC\252\002\035Aperture" +
-      ".Flowcontrol.Check.V1\312\002\035Aperture\\Flowcon" +
-      "trol\\Check\\V1\342\002)Aperture\\Flowcontrol\\Che" +
-      "ck\\V1\\GPBMetadata\352\002 Aperture::Flowcontro" +
-      "l::Check::V1b\006proto3"
+      ".v1B\nCheckProtoP\001ZWgithub.com/fluxninja/" +
+      "aperture/v2/api/gen/proto/go/aperture/fl" +
+      "owcontrol/check/v1;checkv1\242\002\003AFC\252\002\035Apert" +
+      "ure.Flowcontrol.Check.V1\312\002\035Aperture\\Flow" +
+      "control\\Check\\V1\342\002)Aperture\\Flowcontrol\\" +
+      "Check\\V1\\GPBMetadata\352\002 Aperture::Flowcon" +
+      "trol::Check::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -3,9 +3,9 @@ package loadscheduler
 import (
 	"time"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 

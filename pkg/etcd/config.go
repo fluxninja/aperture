@@ -2,8 +2,8 @@
 package etcd
 
 import (
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/net/tlsconfig"
 )
 
 // EtcdConfig holds configuration for etcd client.

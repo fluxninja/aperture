@@ -19,15 +19,15 @@ package agent
 import (
 	"fmt"
 
-	. "github.com/fluxninja/aperture/operator/controllers"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
-	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 )
 
 var _ = Describe("clusterRoleForAgent", func() {

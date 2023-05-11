@@ -8,9 +8,9 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/metricsprocessor/internal"
 )
 
 var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1.CheckResponse, after map[string]interface{}) {

@@ -2,7 +2,7 @@
 package config
 
 import (
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 )
 
 // swagger:operation POST /otel controller-configuration OTel

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd"
 	"github.com/integralist/go-findroot/find"
 	"github.com/spf13/cobra/doc"
 	"golang.org/x/text/cases"

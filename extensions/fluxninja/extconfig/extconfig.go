@@ -4,9 +4,9 @@ package extconfig
 import (
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	"github.com/fluxninja/aperture/v2/pkg/net/http"
 )
 
 const (

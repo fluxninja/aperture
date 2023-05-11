@@ -3,12 +3,12 @@ package agentfunctions
 import (
 	"context"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	flowcontrolControlPoints "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
-	"github.com/fluxninja/aperture/pkg/rpc"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	"github.com/fluxninja/aperture/v2/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
+	flowcontrolControlPoints "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/controlpoints"
+	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // FlowControlControlPointsHandler is a handler for ListFlowControlPoints function

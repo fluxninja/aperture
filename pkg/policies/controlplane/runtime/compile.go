@@ -6,8 +6,8 @@ import (
 
 	"github.com/looplab/tarjan"
 
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // ConfiguredComponent consists of a Component and its PortMapping.

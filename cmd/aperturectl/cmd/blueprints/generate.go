@@ -12,10 +12,10 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/apply"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 var controllerConn utils.ControllerConn

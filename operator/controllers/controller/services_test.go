@@ -17,8 +17,8 @@ limitations under the License.
 package controller
 
 import (
-	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	. "github.com/fluxninja/aperture/operator/controllers"
+	controller "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,9 +28,9 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
 )
 
 var _ = Describe("Service for Controller", func() {

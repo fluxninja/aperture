@@ -5,11 +5,11 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/peers"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/peers"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // PeersWatcherModule is a fx module that watches all agent peers.

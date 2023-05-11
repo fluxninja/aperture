@@ -36,12 +36,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	"github.com/fluxninja/aperture/operator/api"
-	"github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/operator/controllers/agent"
-	"github.com/fluxninja/aperture/operator/controllers/controller"
-	"github.com/fluxninja/aperture/operator/controllers/mutatingwebhook"
-	"github.com/fluxninja/aperture/operator/controllers/namespace"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers/agent"
+	"github.com/fluxninja/aperture/v2/operator/controllers/controller"
+	"github.com/fluxninja/aperture/v2/operator/controllers/mutatingwebhook"
+	"github.com/fluxninja/aperture/v2/operator/controllers/namespace"
 	//+kubebuilder:scaffold:imports
 )
 

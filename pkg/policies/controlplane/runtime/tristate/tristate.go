@@ -2,7 +2,7 @@
 // logical combinator components.
 package tristate
 
-import "github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+import "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 
 // Bool is a tri-state boolean: False, True or Unknown.
 //

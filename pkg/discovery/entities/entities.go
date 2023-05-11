@@ -7,11 +7,11 @@ import (
 
 	"go.uber.org/fx"
 
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
-	"github.com/fluxninja/aperture/pkg/notifiers"
+	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 )
 
 // Module sets up Entities with Fx.
