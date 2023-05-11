@@ -2665,6 +2665,37 @@ definitions:
           type: string
         x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
         x-order: 0
+  PeriodicDecrease:
+    description: PeriodicDecrease defines a controller for scaling in based on a periodic
+      timer.
+    type: object
+    properties:
+      parameters:
+        x-order: 0
+        $ref: '#/definitions/PeriodicDecreaseParameters'
+  PeriodicDecreaseParameters:
+    type: object
+    required:
+    - period
+    - scale_in_percentage
+    properties:
+      period:
+        description: |+
+          The period of the timer.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 0
+      scale_in_percentage:
+        description: |+
+          The percentage of scale to reduce.
+
+        type: number
+        format: double
+        maximum: 100
+        minimum: 0
+        x-go-tag-validate: required,gte=0,lte=100
+        x-order: 1
   PodScaler:
     description: Component for scaling pods based on a signal.
     type: object
@@ -3272,6 +3303,7 @@ definitions:
         $ref: '#/definitions/AlerterParameters'
       controller:
         title: Controller
+        x-go-tag-validate: required
         x-order: 1
         $ref: '#/definitions/ScaleInControllerController'
   ScaleInControllerController:
@@ -3280,6 +3312,9 @@ definitions:
       gradient:
         x-order: 0
         $ref: '#/definitions/DecreasingGradient'
+      periodic:
+        x-order: 1
+        $ref: '#/definitions/PeriodicDecrease'
   ScaleOutController:
     type: object
     properties:

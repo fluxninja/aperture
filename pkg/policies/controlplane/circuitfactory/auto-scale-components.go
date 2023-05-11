@@ -3,15 +3,16 @@ package circuitfactory
 import (
 	"fmt"
 
+	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
+
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
-	"go.uber.org/fx"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // autoScaleModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
@@ -57,7 +58,7 @@ func newAutoScaleNestedAndOptions(
 		return tree, configuredComponents, fx.Options(options...), nil
 
 	} else if autoScaler := autoScaleComponentProto.GetAutoScaler(); autoScaler != nil {
-		nestedCircuit, err := autoscale.ParseAutoScaler(autoScaler)
+		nestedCircuit, err := autoscale.ParseAutoScaler(autoScaler, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}

@@ -5507,6 +5507,64 @@ Example:
 
 <!-- vale off -->
 
+### PeriodicDecrease {#periodic-decrease}
+
+<!-- vale on -->
+
+PeriodicDecrease defines a controller for scaling in based on a periodic timer.
+
+<dl>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([PeriodicDecreaseParameters](#periodic-decrease-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PeriodicDecreaseParameters {#periodic-decrease-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>period</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+The period of the timer.
+
+</dd>
+<dt>scale_in_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, maximum: `100`, **required**)
+
+<!-- vale on -->
+
+The percentage of scale to reduce.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### PodScaler {#pod-scaler}
 
 <!-- vale on -->
@@ -6727,6 +6785,16 @@ Controller
 <!-- vale off -->
 
 ([DecreasingGradient](#decreasing-gradient))
+
+<!-- vale on -->
+
+</dd>
+<dt>periodic</dt>
+<dd>
+
+<!-- vale off -->
+
+([PeriodicDecrease](#periodic-decrease))
 
 <!-- vale on -->
 

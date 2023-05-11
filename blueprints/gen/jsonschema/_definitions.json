@@ -2549,6 +2549,39 @@
       "type": "object",
       "additionalProperties": false
     },
+    "PeriodicDecrease": {
+      "description": "PeriodicDecrease defines a controller for scaling in based on a periodic timer.",
+      "properties": {
+        "parameters": {
+          "$ref": "#/definitions/PeriodicDecreaseParameters",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PeriodicDecreaseParameters": {
+      "properties": {
+        "period": {
+          "description": "The period of the timer.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "scale_in_percentage": {
+          "description": "The percentage of scale to reduce.\n\n",
+          "format": "double",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-validate": "required,gte=0,lte=100",
+          "x-order": 1
+        }
+      },
+      "required": ["period", "scale_in_percentage"],
+      "type": "object",
+      "additionalProperties": false
+    },
     "PodScaler": {
       "description": "Component for scaling pods based on a signal.",
       "properties": {
@@ -3093,6 +3126,7 @@
         "controller": {
           "$ref": "#/definitions/ScaleInControllerController",
           "title": "Controller",
+          "x-go-tag-validate": "required",
           "x-order": 1
         }
       },
@@ -3104,6 +3138,10 @@
         "gradient": {
           "$ref": "#/definitions/DecreasingGradient",
           "x-order": 0
+        },
+        "periodic": {
+          "$ref": "#/definitions/PeriodicDecrease",
+          "x-order": 1
         }
       },
       "type": "object",

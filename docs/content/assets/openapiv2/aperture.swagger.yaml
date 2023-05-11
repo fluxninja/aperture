@@ -2905,6 +2905,33 @@ definitions:
             self_peer:
                 $ref: '#/definitions/Peer'
         type: object
+    PeriodicDecrease:
+        description: PeriodicDecrease defines a controller for scaling in based on a periodic timer.
+        properties:
+            parameters:
+                $ref: '#/definitions/PeriodicDecreaseParameters'
+        type: object
+    PeriodicDecreaseParameters:
+        properties:
+            period:
+                description: |+
+                    The period of the timer.
+
+                type: string
+                x-go-tag-validate: required
+            scale_in_percentage:
+                description: |+
+                    The percentage of scale to reduce.
+
+                format: double
+                maximum: 100
+                minimum: 0
+                type: number
+                x-go-tag-validate: required,gte=0,lte=100
+        required:
+            - period
+            - scale_in_percentage
+        type: object
     PodScaler:
         description: Component for scaling pods based on a signal.
         properties:
@@ -3594,11 +3621,14 @@ definitions:
             controller:
                 $ref: '#/definitions/ScaleInControllerController'
                 title: Controller
+                x-go-tag-validate: required
         type: object
     ScaleInControllerController:
         properties:
             gradient:
                 $ref: '#/definitions/DecreasingGradient'
+            periodic:
+                $ref: '#/definitions/PeriodicDecrease'
         type: object
     ScaleOutController:
         properties:

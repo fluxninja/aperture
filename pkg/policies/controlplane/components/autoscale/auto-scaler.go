@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"math"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"google.golang.org/protobuf/types/known/durationpb"
+
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 )
 
 const (
@@ -21,6 +23,7 @@ const (
 // ParseAutoScaler parses a AutoScaler and returns its nested circuit representation.
 func ParseAutoScaler(
 	autoscaler *policylangv1.AutoScaler,
+	policyReadAPI iface.Policy,
 ) (*policylangv1.NestedCircuit, error) {
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 
@@ -548,16 +551,6 @@ func ParseAutoScaler(
 										SignalName: "ACTUAL_SCALE",
 									},
 								},
-								Min: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MIN_DESIRED_SCALE",
-									},
-								},
-								Max: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MAX_DESIRED_SCALE",
-									},
-								},
 							},
 							OutPorts: &policylangv1.GradientController_Outs{
 								Output: &policylangv1.OutPort{
@@ -647,6 +640,11 @@ func ParseAutoScaler(
 		signalPortName := fmt.Sprintf(autoscalerScaleInSignalPortNameTemplate, scaleInIndex)
 		setpointPortName := fmt.Sprintf(autoscalerScaleInSetpointPortNameTemplate, scaleInIndex)
 
+		scaleInReductionPreCeil := fmt.Sprintf("SCALE_IN_REDUCTION_PRE_CEIL_%d", scaleInIndex)
+		scaleInReductionPreCeilAdjusted := fmt.Sprintf("SCALE_IN_REDUCTION_PRE_CEIL_ADJUSTED_%d", scaleInIndex)
+		scaleInReduction := fmt.Sprintf("SCALE_IN_REDUCTION_%d", scaleInIndex)
+		scaleInPropsedScale := fmt.Sprintf("SCALE_IN_PROPOSED_SCALE_%d", scaleInIndex)
+		scaleInPeriodicPulse := fmt.Sprintf("SCALE_IN_PERIODIC_PULSE_%d", scaleInIndex)
 		scaleInSignal := fmt.Sprintf("SCALE_IN_SIGNAL_%d", scaleInIndex)
 		scaleInSetpoint := fmt.Sprintf("SCALE_IN_SETPOINT_%d", scaleInIndex)
 		scaleInOutputPreCeil := fmt.Sprintf("SCALE_IN_OUTPUT_PRE_CEIL_%d", scaleInIndex)
@@ -664,7 +662,11 @@ func ParseAutoScaler(
 		if controller == nil {
 			return nil, fmt.Errorf("scale in controller is nil")
 		}
-		if gradient := controller.GetGradient(); gradient != nil {
+
+		switch controllerType := controller.Controller.(type) {
+		case *policylangv1.ScaleInController_Controller_Gradient:
+			gradient := controllerType.Gradient
+
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
 				inPorts = &policylangv1.DecreasingGradient_Ins{}
@@ -732,20 +734,75 @@ func ParseAutoScaler(
 										SignalName: "ACTUAL_SCALE",
 									},
 								},
-								Min: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MIN_DESIRED_SCALE",
-									},
-								},
-								Max: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MAX_DESIRED_SCALE",
-									},
-								},
 							},
 							OutPorts: &policylangv1.GradientController_Outs{
 								Output: &policylangv1.OutPort{
 									SignalName: scaleInOutputPreCeil,
+								},
+							},
+						},
+					},
+				},
+			}
+
+			componentsScaleIn = append(componentsScaleIn, components...)
+		case *policylangv1.ScaleInController_Controller_Periodic:
+			periodic := controllerType.Periodic
+			parameters := periodic.GetParameters()
+
+			components := []*policylangv1.Component{
+				{
+					Component: &policylangv1.Component_ArithmeticCombinator{
+						ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
+							Operator: "mul",
+							InPorts: &policylangv1.ArithmeticCombinator_Ins{
+								Lhs: &policylangv1.InPort{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "ACTUAL_SCALE",
+									},
+								},
+								Rhs: &policylangv1.InPort{
+									Value: &policylangv1.InPort_ConstantSignal{
+										ConstantSignal: &policylangv1.ConstantSignal{
+											Const: &policylangv1.ConstantSignal_Value{
+												Value: (float64(parameters.ScaleInPercentage) / 100.0),
+											},
+										},
+									},
+								},
+							},
+							OutPorts: &policylangv1.ArithmeticCombinator_Outs{
+								Output: &policylangv1.OutPort{
+									SignalName: scaleInReductionPreCeil,
+								},
+							},
+						},
+					},
+				},
+				{
+					Component: &policylangv1.Component_Max{
+						Max: &policylangv1.Max{
+							InPorts: &policylangv1.Max_Ins{
+								Inputs: []*policylangv1.InPort{
+									{
+										Value: &policylangv1.InPort_ConstantSignal{
+											ConstantSignal: &policylangv1.ConstantSignal{
+												Const: &policylangv1.ConstantSignal_Value{
+													Value: 1.0,
+												},
+											},
+										},
+									},
+									{
+										Value: &policylangv1.InPort_SignalName{
+											SignalName: scaleInReductionPreCeil,
+										},
+									},
+								},
+							},
+							OutPorts: &policylangv1.Max_Outs{
+								Output: &policylangv1.OutPort{
+									SignalName: scaleInReductionPreCeilAdjusted,
 								},
 							},
 						},
@@ -758,39 +815,50 @@ func ParseAutoScaler(
 							InPorts: &policylangv1.UnaryOperator_Ins{
 								Input: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInOutputPreCeil,
+										SignalName: scaleInReductionPreCeilAdjusted,
 									},
 								},
 							},
 							OutPorts: &policylangv1.UnaryOperator_Outs{
 								Output: &policylangv1.OutPort{
-									SignalName: scaleInOutput,
+									SignalName: scaleInReduction,
 								},
 							},
 						},
 					},
 				},
 				{
-					Component: &policylangv1.Component_Decider{
-						Decider: &policylangv1.Decider{
-							Operator: "lt",
-							TrueFor:  durationpb.New(0),
-							FalseFor: durationpb.New(0),
-							InPorts: &policylangv1.Decider_Ins{
+					Component: &policylangv1.Component_ArithmeticCombinator{
+						ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
+							Operator: "sub",
+							InPorts: &policylangv1.ArithmeticCombinator_Ins{
 								Lhs: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInOutput,
-									},
-								},
-								Rhs: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
 										SignalName: "ACTUAL_SCALE",
 									},
 								},
+								Rhs: &policylangv1.InPort{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: scaleInReduction,
+									},
+								},
 							},
-							OutPorts: &policylangv1.Decider_Outs{
+							OutPorts: &policylangv1.ArithmeticCombinator_Outs{
 								Output: &policylangv1.OutPort{
-									SignalName: isScaleIn,
+									SignalName: scaleInPropsedScale,
+								},
+							},
+						},
+					},
+				},
+				{
+					Component: &policylangv1.Component_PulseGenerator{
+						PulseGenerator: &policylangv1.PulseGenerator{
+							FalseFor: parameters.Period,
+							TrueFor:  durationpb.New(policyReadAPI.GetEvaluationInterval()),
+							OutPorts: &policylangv1.PulseGenerator_Outs{
+								Output: &policylangv1.OutPort{
+									SignalName: scaleInPeriodicPulse,
 								},
 							},
 						},
@@ -802,18 +870,18 @@ func ParseAutoScaler(
 							InPorts: &policylangv1.Switcher_Ins{
 								Switch: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: isScaleIn,
+										SignalName: scaleInPeriodicPulse,
 									},
 								},
 								OnSignal: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInOutput,
+										SignalName: scaleInPropsedScale,
 									},
 								},
 							},
 							OutPorts: &policylangv1.Switcher_Outs{
 								Output: &policylangv1.OutPort{
-									SignalName: scaleIn,
+									SignalName: scaleInOutputPreCeil,
 								},
 							},
 						},
@@ -822,14 +890,86 @@ func ParseAutoScaler(
 			}
 
 			componentsScaleIn = append(componentsScaleIn, components...)
-		} else {
+		default:
 			return nil, fmt.Errorf("scale in controller is not defined or of unexpected type")
 		}
 
+		// common components
+		commonComponents := []*policylangv1.Component{
+			{
+				Component: &policylangv1.Component_UnaryOperator{
+					UnaryOperator: &policylangv1.UnaryOperator{
+						Operator: "ceil",
+						InPorts: &policylangv1.UnaryOperator_Ins{
+							Input: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: scaleInOutputPreCeil,
+								},
+							},
+						},
+						OutPorts: &policylangv1.UnaryOperator_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: scaleInOutput,
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						Operator: "lt",
+						TrueFor:  durationpb.New(0),
+						FalseFor: durationpb.New(0),
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: scaleInOutput,
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACTUAL_SCALE",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: isScaleIn,
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Switcher{
+					Switcher: &policylangv1.Switcher{
+						InPorts: &policylangv1.Switcher_Ins{
+							Switch: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: isScaleIn,
+								},
+							},
+							OnSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: scaleInOutput,
+								},
+							},
+						},
+						OutPorts: &policylangv1.Switcher_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: scaleIn,
+							},
+						},
+					},
+				},
+			},
+		}
+		// append common components to scale in components
+		componentsScaleIn = append(componentsScaleIn, commonComponents...)
 	}
 
-	// Process scale in and scale out signals
-	// to scale the pods.
+	// Process scale in and scale out signals to scale the pods.
 	componentsPreScaler := []*policylangv1.Component{
 		{
 			Component: &policylangv1.Component_Max{
@@ -1046,6 +1186,56 @@ func ParseAutoScaler(
 						},
 					},
 					OutPorts: &policylangv1.Max_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "DESIRED_SCALE_PRE_MAX",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Max{
+				Max: &policylangv1.Max{
+					InPorts: &policylangv1.Max_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE_PRE_MAX",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "MIN_DESIRED_SCALE",
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Max_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "DESIRED_SCALE_PRE_MIN",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Min{
+				Min: &policylangv1.Min{
+					InPorts: &policylangv1.Min_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE_PRE_MIN",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "MAX_DESIRED_SCALE",
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Min_Outs{
 						Output: &policylangv1.OutPort{
 							SignalName: "DESIRED_SCALE",
 						},

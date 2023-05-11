@@ -134,6 +134,18 @@ message DecreasingGradient {
   Parameters parameters = 2;
 }
 
+// PeriodicDecrease defines a controller for scaling in based on a periodic timer.
+message PeriodicDecrease {
+  message Parameters {
+    // The period of the timer.
+    google.protobuf.Duration period = 1; // @gotags: validate:"required"
+    // The percentage of scale to reduce.
+    double scale_in_percentage = 2; // @gotags: validate:"required,gte=0,lte=100"
+  }
+
+  Parameters parameters = 1;
+}
+
 message ScaleOutController {
   message Controller {
     oneof controller {
@@ -152,11 +164,12 @@ message ScaleInController {
   message Controller {
     oneof controller {
       DecreasingGradient gradient = 1;
+      PeriodicDecrease periodic = 2;
     } // @gotags: validate:"required"
   }
 
   // Controller
-  Controller controller = 1;
+  Controller controller = 1; // @gotags: validate:"required"
 
   // Configuration for embedded Alerter.
   Alerter.Parameters alerter = 2;

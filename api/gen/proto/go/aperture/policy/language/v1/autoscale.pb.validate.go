@@ -884,6 +884,135 @@ var _ interface {
 	ErrorName() string
 } = DecreasingGradientValidationError{}
 
+// Validate checks the field values on PeriodicDecrease with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *PeriodicDecrease) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PeriodicDecrease with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PeriodicDecreaseMultiError, or nil if none found.
+func (m *PeriodicDecrease) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PeriodicDecrease) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PeriodicDecreaseValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PeriodicDecreaseValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PeriodicDecreaseValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PeriodicDecreaseMultiError(errors)
+	}
+
+	return nil
+}
+
+// PeriodicDecreaseMultiError is an error wrapping multiple validation errors
+// returned by PeriodicDecrease.ValidateAll() if the designated constraints
+// aren't met.
+type PeriodicDecreaseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PeriodicDecreaseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PeriodicDecreaseMultiError) AllErrors() []error { return m }
+
+// PeriodicDecreaseValidationError is the validation error returned by
+// PeriodicDecrease.Validate if the designated constraints aren't met.
+type PeriodicDecreaseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PeriodicDecreaseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PeriodicDecreaseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PeriodicDecreaseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PeriodicDecreaseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PeriodicDecreaseValidationError) ErrorName() string { return "PeriodicDecreaseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PeriodicDecreaseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPeriodicDecrease.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PeriodicDecreaseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PeriodicDecreaseValidationError{}
+
 // Validate checks the field values on ScaleOutController with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -2358,6 +2487,140 @@ var _ interface {
 	ErrorName() string
 } = DecreasingGradient_InsValidationError{}
 
+// Validate checks the field values on PeriodicDecrease_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PeriodicDecrease_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PeriodicDecrease_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PeriodicDecrease_ParametersMultiError, or nil if none found.
+func (m *PeriodicDecrease_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PeriodicDecrease_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPeriod()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PeriodicDecrease_ParametersValidationError{
+					field:  "Period",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PeriodicDecrease_ParametersValidationError{
+					field:  "Period",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPeriod()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PeriodicDecrease_ParametersValidationError{
+				field:  "Period",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ScaleInPercentage
+
+	if len(errors) > 0 {
+		return PeriodicDecrease_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// PeriodicDecrease_ParametersMultiError is an error wrapping multiple
+// validation errors returned by PeriodicDecrease_Parameters.ValidateAll() if
+// the designated constraints aren't met.
+type PeriodicDecrease_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PeriodicDecrease_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PeriodicDecrease_ParametersMultiError) AllErrors() []error { return m }
+
+// PeriodicDecrease_ParametersValidationError is the validation error returned
+// by PeriodicDecrease_Parameters.Validate if the designated constraints
+// aren't met.
+type PeriodicDecrease_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PeriodicDecrease_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PeriodicDecrease_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PeriodicDecrease_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PeriodicDecrease_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PeriodicDecrease_ParametersValidationError) ErrorName() string {
+	return "PeriodicDecrease_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PeriodicDecrease_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPeriodicDecrease_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PeriodicDecrease_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PeriodicDecrease_ParametersValidationError{}
+
 // Validate checks the field values on ScaleOutController_Controller with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -2565,6 +2828,47 @@ func (m *ScaleInController_Controller) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ScaleInController_ControllerValidationError{
 					field:  "Gradient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ScaleInController_Controller_Periodic:
+		if v == nil {
+			err := ScaleInController_ControllerValidationError{
+				field:  "Controller",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetPeriodic()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ScaleInController_ControllerValidationError{
+						field:  "Periodic",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ScaleInController_ControllerValidationError{
+						field:  "Periodic",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPeriodic()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ScaleInController_ControllerValidationError{
+					field:  "Periodic",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
