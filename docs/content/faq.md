@@ -18,26 +18,44 @@ keywords:
   - faq
 ---
 
-## Product FAQ
+### Does the usage of Aperture entail extra overhead on requests?
 
-### Question here?
+Aperture does not add any extra overhead. Aperture keeps the latency of the
+request as low as possible.
 
-Answer here
+### If we already have circuit breakers and rate limiting in EnvoyProxy, what are the benefits of using Aperture?
 
-## Aperture Controller FAQ
+Yes, EnvoyProxy does have, but Aperture does it better by having a global view
+of the system. Aperture can be used in conjunction with Envoy to provide a
+better experience.
 
-### Question here?
+### Does Aperture reject requests immediately?
 
-Answer here
+No, Aperture does not reject requests immediately. Aperture queues the requests
+or rejects them based on the configuration.
 
-## Aperture Agent FAQ
+### If Aperture is rejecting or queuing requests, how will it impact the user experience?
 
-### Question here?
+Aperture queues the requests or rejects them based on the configuration. The
+user experience is decided based on the configuration. If you want to prioritize
+the user experience, you can configure Aperture to queue the requests. If you
+want to prioritize the system health, you can configure Aperture to reject the
+requests.
 
-Answer here
+### How can we ensure the uniqueness of requests for the flow label when using Aperture?
 
-## Aperture CLI FAQ
+Aperture uses the flow label to identify the requests.
 
-### Question here?
+### How does Aperture address the issue of delays in servers becoming available and reaching a healthy state, particularly in the context of auto-scaling?
 
-Answer here
+As Aperture observes the system, it can detect early sign of overload and can
+take necessary actions to prevent the system from becoming unhealthy. Thus,
+server gets enough time to reach a healthy state.
+
+### Can the Aperture controller run on a non-containerized environment?
+
+No, the Aperture controller runs on a containerized environment only.
+
+### Is a Kubernetes cluster necessary for working with the Aperture Controller?
+
+Yes, the Aperture controller runs on a Kubernetes cluster.
