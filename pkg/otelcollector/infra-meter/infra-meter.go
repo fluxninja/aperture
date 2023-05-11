@@ -70,6 +70,12 @@ func addInfraMeter(
 		config.AddProcessor(id, cfg)
 	}
 
+	if infraMeter.Pipeline == nil {
+		// We treat empty pipeline the same way as not-set pipeline, normalize.
+		// This also allows to avoid nil checks below.
+		infraMeter.Pipeline = &policylangv1.InfraMeter_MetricsPipeline{}
+	}
+
 	if len(infraMeter.Pipeline.Receivers) == 0 && len(infraMeter.Pipeline.Processors) == 0 {
 		if len(infraMeter.Processors) >= 1 {
 			return fmt.Errorf("empty pipeline, inferring pipeline is supported only with 0 or 1 processors")
