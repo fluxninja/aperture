@@ -16,16 +16,18 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
 )
 
+var alerterInPorts = policylangv1.Alerter_Ins{}
+
 // Alerter is a component that monitors signal value and creates alert on true value.
 type Alerter struct {
 	alerterIface   alerts.Alerter
 	policyReadAPI  iface.Policy
+	labels         map[string]string
 	name           string
 	severity       string
-	alertChannels  []string
 	componentID    string
+	alertChannels  []string
 	resolveTimeout time.Duration
-	labels         map[string]string
 }
 
 // Name implements runtime.Component.
@@ -72,7 +74,7 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 
 // Execute implements runtime.Component.Execute.
 func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	signalValue := inPortReadings.ReadSingleReadingPort("signal")
+	signalValue := inPortReadings.ReadSingleReadingPort("signal", alerterInPorts)
 
 	if tristate.FromReading(signalValue).IsTrue() {
 		a.alerterIface.AddAlert(a.createAlert())

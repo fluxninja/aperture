@@ -81,12 +81,12 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tic
 		}, err
 	}
 
-	signal := inPortReadings.ReadSingleReadingPort("signal")
-	setpoint := inPortReadings.ReadSingleReadingPort("setpoint")
-	optimize := inPortReadings.ReadSingleReadingPort("optimize")
-	max := inPortReadings.ReadSingleReadingPort("max")
-	min := inPortReadings.ReadSingleReadingPort("min")
-	controlVariable := inPortReadings.ReadSingleReadingPort("control_variable")
+	signal := inPortReadings.ReadSingleReadingPortNoValidation("signal")
+	setpoint := inPortReadings.ReadSingleReadingPortNoValidation("setpoint")
+	optimize := inPortReadings.ReadSingleReadingPortNoValidation("optimize")
+	max := inPortReadings.ReadSingleReadingPortNoValidation("max")
+	min := inPortReadings.ReadSingleReadingPortNoValidation("min")
+	controlVariable := inPortReadings.ReadSingleReadingPortNoValidation("control_variable")
 	output := runtime.InvalidReading()
 
 	prevSetpoint := cc.setpoint
