@@ -26,11 +26,8 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
-project, an open source platform that empowers platform and reliability
-engineering teams. The platform provides a unified controllability layer that
-enables platform and reliability engineering teams to manage complex
-microservices-based applications with ease.
+Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture) project, an open source platform designed to empower platform and reliability engineering teams. The platform offers a unified controllability layer that simplifies the management of modern applications, allowing teams to effortlessly handle applications of any complexity and scale across diverse infrastructures.
+
 
 ## Simplify cloud native load management
 
