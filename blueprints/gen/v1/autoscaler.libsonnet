@@ -1,8 +1,6 @@
-local autoscalerouts = import './autoscalerouts.libsonnet';
 {
   new():: {
   },
-  outPorts:: autoscalerouts,
   withDryRun(dry_run):: {
     dry_run: dry_run,
   },
@@ -14,12 +12,6 @@ local autoscalerouts = import './autoscalerouts.libsonnet';
   },
   withDryRunConfigKeyMixin(dry_run_config_key):: {
     dry_run_config_key+: dry_run_config_key,
-  },
-  withOutPorts(out_ports):: {
-    out_ports: out_ports,
-  },
-  withOutPortsMixin(out_ports):: {
-    out_ports+: out_ports,
   },
   withScaleInControllers(scale_in_controllers):: {
     scale_in_controllers:
