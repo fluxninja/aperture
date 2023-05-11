@@ -7,7 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	notifiers "github.com/fluxninja/aperture/pkg/notifiers"
+	notifiers "github.com/fluxninja/aperture/v2/pkg/notifiers"
 	gomock "github.com/golang/mock/gomock"
 )
 

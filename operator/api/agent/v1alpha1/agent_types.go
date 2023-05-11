@@ -19,16 +19,16 @@ limitations under the License.
 package v1alpha1
 
 import (
-	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
-	"github.com/fluxninja/aperture/operator/api"
-	"github.com/fluxninja/aperture/operator/api/common"
-	agentfunctions "github.com/fluxninja/aperture/pkg/agentfunctions/config"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	distcache "github.com/fluxninja/aperture/pkg/distcache/config"
-	"github.com/fluxninja/aperture/pkg/net/http"
-	peers "github.com/fluxninja/aperture/pkg/peers/config"
-	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
-	preview "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config"
+	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	agentfunctions "github.com/fluxninja/aperture/v2/pkg/agentfunctions/config"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	distcache "github.com/fluxninja/aperture/v2/pkg/distcache/config"
+	"github.com/fluxninja/aperture/v2/pkg/net/http"
+	peers "github.com/fluxninja/aperture/v2/pkg/peers/config"
+	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
+	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

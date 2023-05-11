@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd"
-	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd"
+	"github.com/fluxninja/aperture/v2/pkg/info"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 )
 
 var _ = Describe("Config", func() {

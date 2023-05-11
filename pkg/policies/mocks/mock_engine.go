@@ -8,9 +8,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	checkv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	agentinfo "github.com/fluxninja/aperture/pkg/agentinfo"
-	iface "github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	checkv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	iface "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	gomock "github.com/golang/mock/gomock"
 )
 

@@ -11,10 +11,10 @@ import (
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
 )
 
 // watcher holds the state of the watcher.

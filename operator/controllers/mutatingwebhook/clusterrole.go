@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"

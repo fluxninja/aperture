@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 
-	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/info"
 )
 
 const (

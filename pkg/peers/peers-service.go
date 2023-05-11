@@ -3,7 +3,7 @@ package peers
 import (
 	"context"
 
-	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
+	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )

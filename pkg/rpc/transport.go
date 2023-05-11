@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	rpcv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/rpc/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	rpcv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/rpc/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
 )
 
 const reconnectDelay = 10 * time.Second

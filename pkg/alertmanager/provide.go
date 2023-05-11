@@ -3,7 +3,7 @@ package alertmanager
 import (
 	"go.uber.org/fx"
 
-	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
+	amclient "github.com/fluxninja/aperture/v2/pkg/alertmanager/client"
 )
 
 // Module returns an fx.Option that provides the alertmanager module.

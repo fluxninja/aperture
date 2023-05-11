@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 var _ = Describe("Autosample", func() {

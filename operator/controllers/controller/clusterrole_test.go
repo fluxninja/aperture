@@ -19,14 +19,14 @@ package controller
 import (
 	"fmt"
 
-	. "github.com/fluxninja/aperture/operator/controllers"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
 
 var _ = Describe("clusterRoleForController", func() {

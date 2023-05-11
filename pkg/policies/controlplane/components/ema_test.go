@@ -8,8 +8,8 @@ package components_test
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/component"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/component"
 )
 
 var _ = Describe("EMA filter", func() {

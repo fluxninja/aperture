@@ -11,8 +11,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	rpcv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/rpc/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	rpcv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/rpc/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // HandlerRegistry allow registering handlers and can start a dispatcher.

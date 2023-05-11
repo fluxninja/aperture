@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // Module is a module for running cmd.v1.Controller service.

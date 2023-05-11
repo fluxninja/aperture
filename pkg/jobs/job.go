@@ -10,9 +10,9 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	jobsconfig "github.com/fluxninja/aperture/pkg/jobs/config"
-	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/status"
+	jobsconfig "github.com/fluxninja/aperture/v2/pkg/jobs/config"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 	"github.com/reugn/go-quartz/quartz"
 )
 

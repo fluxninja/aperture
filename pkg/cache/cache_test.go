@@ -1,7 +1,7 @@
 package cache_test
 
 import (
-	"github.com/fluxninja/aperture/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/cache"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

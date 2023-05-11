@@ -5,8 +5,8 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/metricsprocessor/internal"
 )
 
 var _ = DescribeTable("SDK labels", func(before map[string]int64, after map[string]float64) {

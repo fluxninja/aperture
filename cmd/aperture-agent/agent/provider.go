@@ -6,12 +6,12 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/peers"
 )
 
 // ProvidePeersPrefix provides the peers prefix.

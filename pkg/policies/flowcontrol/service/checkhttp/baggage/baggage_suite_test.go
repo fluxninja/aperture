@@ -6,9 +6,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp/baggage"
-	"github.com/fluxninja/aperture/pkg/utils"
+	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp/baggage"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 func TestBaggage(t *testing.T) {

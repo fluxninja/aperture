@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/service/controlpoints"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/service/controlpoints"
 	"go.uber.org/fx"
 )
 

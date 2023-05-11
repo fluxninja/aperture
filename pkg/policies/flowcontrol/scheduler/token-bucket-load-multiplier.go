@@ -6,7 +6,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // Check if TokenBucketLoadMultiplier implements TokenManager interface.

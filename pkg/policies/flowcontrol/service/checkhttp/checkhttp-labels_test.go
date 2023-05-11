@@ -1,11 +1,11 @@
 package checkhttp_test
 
 import (
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
+	. "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
 )
 
 var _ = Describe("Flow labels", func() {

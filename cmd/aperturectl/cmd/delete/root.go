@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/rest"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 var (

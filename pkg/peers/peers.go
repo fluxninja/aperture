@@ -15,17 +15,17 @@ import (
 	"go.uber.org/multierr"
 	"sigs.k8s.io/yaml"
 
-	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	peersconfig "github.com/fluxninja/aperture/pkg/peers/config"
-	"github.com/fluxninja/aperture/pkg/status"
+	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	peersconfig "github.com/fluxninja/aperture/v2/pkg/peers/config"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 const (

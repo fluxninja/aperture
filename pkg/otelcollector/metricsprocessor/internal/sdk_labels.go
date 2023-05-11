@@ -5,8 +5,8 @@ import (
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/fluxninja/aperture/pkg/log"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 // AddSDKSpecificLabels adds labels specific to SDK data source.

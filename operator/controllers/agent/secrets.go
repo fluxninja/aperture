@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -33,7 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 )
 
 // secretForAgentAPIKey prepares the Secret object for the ApiKey of Agent.

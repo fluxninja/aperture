@@ -3,7 +3,7 @@ package distcache
 import (
 	"bytes"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // OlricLogWriter is wrapper around aperture Logger that parse the message before writing to olricConfig.LogOutput.

@@ -1,7 +1,7 @@
 package actuators
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/actuators/podscaler"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/actuators/podscaler"
 	"go.uber.org/fx"
 )
 

@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 
-	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
 )
 
 var _ = Describe("Alerts receiver", func() {

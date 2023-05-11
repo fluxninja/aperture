@@ -10,16 +10,16 @@ import (
 	. "github.com/onsi/gomega"
 	"go.uber.org/fx"
 
-	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/fluxninja/v1"
-	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
-	"github.com/fluxninja/aperture/extensions/fluxninja/heartbeats"
-	"github.com/fluxninja/aperture/extensions/fluxninja/otel"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	httpclient "github.com/fluxninja/aperture/pkg/net/http"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/platform"
+	heartbeatv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/fluxninja/v1"
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/heartbeats"
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/otel"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	httpclient "github.com/fluxninja/aperture/v2/pkg/net/http"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/v2/pkg/platform"
 )
 
 type inStruct struct {

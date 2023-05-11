@@ -1,9 +1,9 @@
 package components
 
 import (
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 // NoOp takes array of signals and emits noOpimum value.

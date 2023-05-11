@@ -7,10 +7,10 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/operator/api"
-	_ "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	_ "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	_ "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	_ "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
 
 func init() {

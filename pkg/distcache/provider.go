@@ -10,7 +10,7 @@ import (
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
-	distcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/distcache/v1"
+	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -18,16 +18,16 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	distcacheconfig "github.com/fluxninja/aperture/pkg/distcache/config"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
-	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/peers"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	distcacheconfig "github.com/fluxninja/aperture/v2/pkg/distcache/config"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/peers"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (

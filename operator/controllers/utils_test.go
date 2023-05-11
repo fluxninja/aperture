@@ -29,9 +29,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
 
 var _ = Describe("Tests for containerSecurityContext", func() {

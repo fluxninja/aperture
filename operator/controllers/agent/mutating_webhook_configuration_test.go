@@ -22,15 +22,15 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/fluxninja/aperture/operator/controllers"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
 )
 
 var _ = Describe("MutatingWebhookConfiguration for Pods", func() {

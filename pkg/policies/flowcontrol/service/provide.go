@@ -3,11 +3,11 @@ package service
 import (
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/controlpoints"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview"
 )
 
 // Module is a set of default providers for flowcontrol components.

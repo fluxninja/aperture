@@ -9,10 +9,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	classificationv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/extractors"
-	"github.com/fluxninja/aperture/pkg/utils"
+	classificationv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier/extractors"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 func TestExtractors(t *testing.T) {

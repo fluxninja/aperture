@@ -18,14 +18,14 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/status"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // Module is a fx module that invokes OTel Collector.

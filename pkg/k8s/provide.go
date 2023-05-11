@@ -21,9 +21,9 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/klog/v2"
 
-	"github.com/fluxninja/aperture/pkg/log"
-	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/utils"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	commonhttp "github.com/fluxninja/aperture/v2/pkg/net/http"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 var (

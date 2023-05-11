@@ -5,10 +5,10 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/metricsprocessor/internal"
 )
 
 var _ = Describe("Status", func() {

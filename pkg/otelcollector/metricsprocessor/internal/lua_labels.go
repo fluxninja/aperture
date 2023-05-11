@@ -3,8 +3,8 @@ package internal
 import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 // AddLuaSpecificLabels adds labels specific to data source.

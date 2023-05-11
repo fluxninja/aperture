@@ -8,11 +8,11 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	jobsconfig "github.com/fluxninja/aperture/pkg/jobs/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	jobsconfig "github.com/fluxninja/aperture/v2/pkg/jobs/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 // MultiJobConfig holds configuration for MultiJob.

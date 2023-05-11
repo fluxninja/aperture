@@ -8,9 +8,9 @@ import (
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy/baggage"
-	"github.com/fluxninja/aperture/pkg/utils"
+	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy/baggage"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 func TestBaggage(t *testing.T) {

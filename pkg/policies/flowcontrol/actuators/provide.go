@@ -1,9 +1,9 @@
 package actuators
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/loadscheduler"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/rate"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/regulator"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/loadscheduler"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/rate"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/regulator"
 	"go.uber.org/fx"
 )
 

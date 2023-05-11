@@ -19,7 +19,7 @@ package mutatingwebhook
 import (
 	"reflect"
 
-	. "github.com/fluxninja/aperture/operator/controllers"
+	. "github.com/fluxninja/aperture/v2/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"

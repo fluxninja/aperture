@@ -5,8 +5,8 @@ import (
 	"context"
 	"net"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // ListenerConfig holds configuration for socket listeners.

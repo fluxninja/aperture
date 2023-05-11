@@ -11,11 +11,11 @@ import (
 	promalert "github.com/prometheus/alertmanager/api/v2/client/alert"
 	prommodels "github.com/prometheus/alertmanager/api/v2/models"
 
-	amconfig "github.com/fluxninja/aperture/pkg/alertmanager/config"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
+	amconfig "github.com/fluxninja/aperture/v2/pkg/alertmanager/config"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	commonhttp "github.com/fluxninja/aperture/v2/pkg/net/http"
 )
 
 var configKey = "alertmanagers"

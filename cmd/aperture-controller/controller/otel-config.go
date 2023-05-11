@@ -5,11 +5,11 @@ import (
 
 	promapi "github.com/prometheus/client_golang/api"
 
-	controllerconfig "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	controllerconfig "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 func provideController(

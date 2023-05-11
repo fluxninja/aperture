@@ -21,11 +21,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
-	"github.com/fluxninja/aperture/operator/api"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
 )
 
 // watcher holds the state of the watcher.

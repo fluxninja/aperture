@@ -14,13 +14,13 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/watchdog/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/status"
-	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
+	watchdogv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/watchdog/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/status"
+	watchdogconfig "github.com/fluxninja/aperture/v2/pkg/watchdog/config"
 )
 
 // swagger:operation POST /watchdog common-configuration Watchdog

@@ -9,16 +9,16 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
 type regulatorSync struct {

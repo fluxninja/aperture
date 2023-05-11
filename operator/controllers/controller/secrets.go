@@ -21,9 +21,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

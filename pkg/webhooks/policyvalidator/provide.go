@@ -1,7 +1,7 @@
 package policyvalidator
 
 import (
-	"github.com/fluxninja/aperture/pkg/webhooks"
+	"github.com/fluxninja/aperture/v2/pkg/webhooks"
 	"go.uber.org/fx"
 )
 

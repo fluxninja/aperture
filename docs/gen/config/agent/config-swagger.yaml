@@ -22,7 +22,7 @@ definitions:
                 x-go-tag-validate: gte=0,lte=1
         title: AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/watchdog/config
     AgentFunctionsConfig:
         properties:
             client:
@@ -39,7 +39,7 @@ definitions:
                 x-go-tag-validate: omitempty,dive,omitempty
         title: AgentFunctionsConfig is configuration for agent functions.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/agentfunctions/config
     AgentInfoConfig:
         properties:
             agent_group:
@@ -54,7 +54,7 @@ definitions:
                 x-go-tag-json: agent_group
         title: AgentInfoConfig is the configuration for the agent group and other agent attributes.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/agentinfo
     AgentOTelConfig:
         properties:
             batch_alerts:
@@ -89,7 +89,7 @@ definitions:
                 x-go-tag-json: ports
         title: AgentOTelConfig is the configuration for Agent's OTel collector.
         type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+        x-go-package: github.com/fluxninja/aperture/v2/cmd/aperture-agent/config
     AlertManagerClientConfig:
         properties:
             address:
@@ -114,7 +114,7 @@ definitions:
                 x-go-tag-json: name
         title: AlertManagerClientConfig config for single alertmanager client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/alertmanager/config
     AlertManagerConfig:
         properties:
             clients:
@@ -125,7 +125,7 @@ definitions:
                 x-go-tag-json: clients,omitempty
         title: AlertManagerConfig main level config for alertmanager.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/alertmanager/config
     AlerterConfig:
         properties:
             channel_size:
@@ -143,7 +143,7 @@ definitions:
                 x-go-tag-validate: gt=0
         title: AlerterConfig for alerter.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/alerts
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/alerts
     AutoScaleKubernetesConfig:
         properties:
             enabled:
@@ -155,7 +155,7 @@ definitions:
                 x-go-tag-json: enabled
         title: AutoScaleKubernetesConfig is the configuration for the flow preview service.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config
     BackoffConfig:
         properties:
             base_delay:
@@ -200,7 +200,7 @@ definitions:
                 x-go-tag-validate: gte=0
         title: BackoffConfig holds configuration for gRPC client backoff.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
     BatchAlertsConfig:
         properties:
             send_batch_max_size:
@@ -236,7 +236,7 @@ definitions:
                 x-go-tag-validate: gt=0
         title: BatchAlertsConfig defines configuration for OTel batch processor.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
     BatchPostrollupConfig:
         properties:
             send_batch_max_size:
@@ -272,7 +272,7 @@ definitions:
                 x-go-tag-validate: gt=0
         title: BatchPostrollupConfig defines configuration for OTel batch processor.
         type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+        x-go-package: github.com/fluxninja/aperture/v2/cmd/aperture-agent/config
     BatchPrerollupConfig:
         properties:
             send_batch_max_size:
@@ -308,7 +308,7 @@ definitions:
                 x-go-tag-validate: gt=0
         title: BatchPrerollupConfig defines configuration for OTel batch processor.
         type: object
-        x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+        x-go-package: github.com/fluxninja/aperture/v2/cmd/aperture-agent/config
     ClientConfig:
         properties:
             grpc:
@@ -317,7 +317,7 @@ definitions:
                 x-go-tag-json: grpc
         title: ClientConfig is configuration for network clients used by agent-functions.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/agentfunctions/config
     ClientTLSConfig:
         properties:
             ca_file:
@@ -342,7 +342,7 @@ definitions:
                 x-go-tag-json: key_log_file
         title: ClientTLSConfig is the configuration for client TLS.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/tlsconfig
     CommonOTelConfig:
         properties:
             batch_alerts:
@@ -355,7 +355,7 @@ definitions:
                 x-go-tag-json: ports
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
     DistCacheConfig:
         properties:
             bind_addr:
@@ -396,12 +396,12 @@ definitions:
                 x-go-tag-json: replica_count
         title: DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/distcache/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/distcache/config
     Duration:
         description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/config
     Entity:
         properties:
             ip_address:
@@ -453,7 +453,7 @@ definitions:
             - uid
         title: Entity represents a pod, VM, and so on.
         type: object
-        x-go-package: github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1
+        x-go-package: github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1
     EtcdConfig:
         properties:
             endpoints:
@@ -491,7 +491,7 @@ definitions:
             - endpoints
         title: EtcdConfig holds configuration for etcd client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/etcd
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/etcd
     FlowPreviewConfig:
         properties:
             enabled:
@@ -503,7 +503,7 @@ definitions:
                 x-go-tag-json: enabled
         title: FlowPreviewConfig is the configuration for the flow control preview service.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config
     GRPCClientConfig:
         properties:
             backoff:
@@ -540,7 +540,7 @@ definitions:
                 x-go-tag-json: use_proxy
         title: GRPCClientConfig holds configuration for gRPC Client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
     GRPCGatewayConfig:
         description: GRPCGatewayConfig holds configuration for gRPC to HTTP gateway
         properties:
@@ -553,7 +553,7 @@ definitions:
                 x-go-tag-validate: omitempty,hostname_port
                 x-pattern-rules: empty | hostname_port
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/grpcgateway
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpcgateway
     GRPCServerConfig:
         properties:
             connection_timeout:
@@ -591,7 +591,7 @@ definitions:
                 x-go-tag-validate: gte=0
         title: GRPCServerConfig holds configuration for gRPC Server.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
     HTTPClientConfig:
         properties:
             disable_compression:
@@ -754,7 +754,7 @@ definitions:
                 x-go-tag-validate: gte=0
         title: HTTPClientConfig holds configuration for HTTP Client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/http
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/http
     HTTPServerConfig:
         properties:
             disable_http_keep_alives:
@@ -829,7 +829,7 @@ definitions:
                 x-go-tag-validate: gte=0s
         title: HTTPServerConfig holds configuration for HTTP Server.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/http
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/http
     Header:
         additionalProperties:
             items:
@@ -873,7 +873,7 @@ definitions:
                 x-go-tag-json: watermarks_policy
         title: HeapConfig holds configuration for heap Watchdog.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/watchdog/config
     HeapLimit:
         properties:
             limit:
@@ -900,7 +900,7 @@ definitions:
                 x-go-tag-validate: gt=0,lte=100
         title: HeapLimit holds configuration for Watchdog heap limit.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/watchdog/config
     JobConfig:
         description: JobConfig is configuration for a periodic job
         properties:
@@ -929,7 +929,7 @@ definitions:
                 x-go-tag-default: "false"
                 x-go-tag-json: initially_healthy
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/jobs/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/jobs/config
     JobGroupConfig:
         properties:
             blocking_execution:
@@ -957,7 +957,7 @@ definitions:
                 x-go-tag-json: worker_limit
         title: JobGroupConfig holds configuration for JobGroup.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/jobs/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/jobs/config
     KubernetesDiscoveryConfig:
         properties:
             enabled:
@@ -968,7 +968,7 @@ definitions:
                 x-go-tag-json: enabled
         title: KubernetesDiscoveryConfig for Kubernetes service discovery.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config
     ListenerConfig:
         properties:
             addr:
@@ -1005,7 +1005,7 @@ definitions:
                 x-oneof: tcp | tcp4 | tcp6
         title: ListenerConfig holds configuration for socket listeners.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/listener
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/listener
     LogConfig:
         properties:
             level:
@@ -1058,7 +1058,7 @@ definitions:
                 x-go-tag-validate: omitempty,dive,omitempty
         title: LogConfig holds configuration for a logger and log writers.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/config
     LogWriterConfig:
         properties:
             compress:
@@ -1107,7 +1107,7 @@ definitions:
                 x-go-tag-validate: gte=0
         title: LogWriterConfig holds configuration for a log writer.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/config
     MetricsConfig:
         properties:
             enable_go_metrics:
@@ -1133,7 +1133,7 @@ definitions:
                 x-go-tag-json: pedantic
         title: MetricsConfig holds configuration for service metrics.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/metrics
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/metrics
     MultiJobConfig:
         properties:
             execution_period:
@@ -1162,7 +1162,7 @@ definitions:
                 x-go-tag-json: initially_healthy
         title: MultiJobConfig holds configuration for MultiJob.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/jobs
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/jobs
     PeerDiscoveryConfig:
         properties:
             advertisement_addr:
@@ -1178,7 +1178,7 @@ definitions:
                 x-pattern-rules: empty | hostname_port
         title: PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/peers/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/peers/config
     PolicyCommon:
         properties:
             enabled:
@@ -1190,7 +1190,7 @@ definitions:
                 x-go-tag-json: enabled
         title: PolicyCommon holds common configuration for Watchdog policies.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/watchdog/config
     PortsConfig:
         properties:
             debug_port:
@@ -1231,7 +1231,7 @@ definitions:
                 x-go-tag-validate: gte=0
         title: PortsConfig defines configuration for OTel debug and extension ports.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
     ProfilersConfig:
         properties:
             cpu_profiler:
@@ -1257,7 +1257,7 @@ definitions:
                 x-go-tag-json: register_http_routes
         title: ProfilersConfig holds configuration for profilers.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/profilers
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/profilers
     PrometheusConfig:
         properties:
             address:
@@ -1272,7 +1272,7 @@ definitions:
             - address
         title: PrometheusConfig holds configuration for Prometheus Server.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/prometheus/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/prometheus/config
     ProxyConfig:
         description: This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
         properties:
@@ -1299,7 +1299,7 @@ definitions:
                 x-go-tag-validate: omitempty,dive,ip|cidr|fqdn|hostname_port
         title: ProxyConfig holds proxy configuration.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/http
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/http
     SchedulerConfig:
         properties:
             blocking_execution:
@@ -1327,7 +1327,7 @@ definitions:
                 x-go-tag-json: worker_limit
         title: SchedulerConfig holds configuration for job Scheduler.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/jobs/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/jobs/config
     ServerTLSConfig:
         properties:
             allowed_cn:
@@ -1362,7 +1362,7 @@ definitions:
                 x-go-tag-json: key_file
         title: ServerTLSConfig holds configuration for setting up server TLS support.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/tlsconfig
     StaticDiscoveryConfig:
         properties:
             entities:
@@ -1373,7 +1373,7 @@ definitions:
                 x-go-tag-json: entities,omitempty
         title: StaticDiscoveryConfig for pre-determined list of services.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/discovery/static/config
     WatchdogConfig:
         properties:
             cgroup:
@@ -1390,7 +1390,7 @@ definitions:
                 x-go-tag-json: system
         title: WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/watchdog/config
     WatchdogPolicyType:
         properties:
             adaptive_policy:
@@ -1401,7 +1401,7 @@ definitions:
                 x-go-tag-json: watermarks_policy
         title: WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/watchdog/config
     WatermarksPolicy:
         properties:
             enabled:
@@ -1431,7 +1431,7 @@ definitions:
                 x-go-tag-validate: omitempty,dive,gte=0,lte=1
         title: WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/watchdog/config
 info:
     description: Aperture Agent
     title: Agent

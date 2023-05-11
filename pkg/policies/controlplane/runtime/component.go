@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 )
 
 // Component is the interface that all components must implement.
