@@ -551,16 +551,6 @@ func ParseAutoScaler(
 										SignalName: "ACTUAL_SCALE",
 									},
 								},
-								Min: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MIN_DESIRED_SCALE",
-									},
-								},
-								Max: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MAX_DESIRED_SCALE",
-									},
-								},
 							},
 							OutPorts: &policylangv1.GradientController_Outs{
 								Output: &policylangv1.OutPort{
