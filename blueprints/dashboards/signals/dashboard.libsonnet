@@ -16,7 +16,7 @@ function(cfg) {
 
   local signalAveragePanel =
     graphPanel.new(
-      title='Signal Average',
+      title='Signal Average - ${signal_name} (${sub_circuit_id})',
       datasource=dsName,
     )
     .addTarget(
@@ -32,7 +32,7 @@ function(cfg) {
 
   local InvalidFrequencyPanel =
     graphPanel.new(
-      title='Signal Validity (Frequency)',
+      title='Signal Validity (Frequency) - ${signal_name} (${sub_circuit_id})',
       datasource=dsName,
       stack=true,
       bars=true,

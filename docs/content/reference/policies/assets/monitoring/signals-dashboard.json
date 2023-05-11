@@ -63,7 +63,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Signal Average",
+      "title": "Signal Average - ${signal_name} (${sub_circuit_id})",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -155,7 +155,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Signal Validity (Frequency)",
+      "title": "Signal Validity (Frequency) - ${signal_name} (${sub_circuit_id})",
       "tooltip": {
         "shared": true,
         "sort": 0,
