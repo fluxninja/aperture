@@ -5,30 +5,7 @@ local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libso
 
 local dashboard = grafana.dashboard;
 local prometheus = grafana.prometheus;
-local timeSeriesPanel = lib.TimeSeriesPanel;
-
-local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
-  local thresholds =
-    {
-      mode: 'absolute',
-      steps: [
-        { color: 'green', value: null },
-        { color: 'red', value: 80 },
-      ],
-    };
-  local target =
-    prometheus.target(query, intervalFactor=1)
-    + { range: true, editorMode: 'code' };
-  aperture.timeSeriesPanel.new(title, datasource, axisLabel, unit)
-  + timeSeriesPanel.withTarget(target)
-  + timeSeriesPanel.defaults.withThresholds(thresholds)
-  + timeSeriesPanel.withFieldConfigMixin(
-    timeSeriesPanel.fieldConfig.withDefaultsMixin(
-      timeSeriesPanel.fieldConfig.defaults.withThresholds(thresholds)
-    )
-  ) + {
-    interval: '1s',
-  };
+local graphPanel = grafana.graphPanel;
 
 function(cfg) {
   local params = config + cfg,
@@ -37,11 +14,18 @@ function(cfg) {
   local dsName = ds.name,
 
   local rateLimiterPanel =
-    newTimeSeriesPanel('Rate Limiter',
-                       dsName,
-                       'sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
-                       'Decisions',
-                       'reqps'),
+    graphPanel.new(
+      title='Rate Limiter',
+      datasource=dsName,
+      labelY1='Decisions',
+      formatY1='reqps',
+    )
+    .addTarget(
+      prometheus.target(
+        expr='sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
+        intervalFactor=1,
+      )
+    ),
 
   local dashboardDef =
     dashboard.new(
