@@ -4,7 +4,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 
-	"github.com/fluxninja/aperture/pkg/alertmanager"
+	"github.com/fluxninja/aperture/v2/pkg/alertmanager"
 )
 
 // Config for alerts exporter.

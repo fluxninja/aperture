@@ -5,12 +5,12 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	kubernetesconfig "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
-	"github.com/fluxninja/aperture/pkg/k8s"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	kubernetesconfig "github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config"
+	"github.com/fluxninja/aperture/v2/pkg/k8s"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 // Module returns an fx.Option that provides the Kubernetes discovery module.

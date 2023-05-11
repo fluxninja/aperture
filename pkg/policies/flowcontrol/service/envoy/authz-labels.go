@@ -6,7 +6,7 @@ import (
 
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
+	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
 )
 
 const (

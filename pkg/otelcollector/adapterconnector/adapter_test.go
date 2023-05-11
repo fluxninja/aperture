@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
-	"github.com/fluxninja/aperture/pkg/otelcollector/adapterconnector"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/adapterconnector"
 )
 
 var _ = Describe("Adapter", func() {

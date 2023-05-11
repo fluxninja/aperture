@@ -3,9 +3,9 @@ package notifier
 import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/notifiers"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 )
 
 // PrefixToEtcdNotifier holds the state of a notifier that writes raw/transformed contents of a watched prefix to etcd.

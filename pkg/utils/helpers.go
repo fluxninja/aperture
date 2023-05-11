@@ -3,7 +3,7 @@ package utils
 import (
 	"regexp"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"go.uber.org/fx"
 )
 

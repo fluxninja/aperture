@@ -3,7 +3,7 @@ package servicegetter
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 )
 
 // Metrics is used for collecting metrics about servicegetter

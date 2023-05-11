@@ -1,6 +1,6 @@
 package runtime
 
-import "github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+import "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 
 // TickEndCallback is a function that is called when a tick ends.
 type TickEndCallback func(tickInfo TickInfo) error

@@ -16,8 +16,8 @@ import Zoom from 'react-medium-image-zoom';
 
 Load-based auto-scaling is a technique used to dynamically adjust the number of
 instances or resources allocated to a service based on workload demands. This
-policy builds upon the _Service Protection_
-[blueprint](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md)
+policy builds upon the _Service Protection with Load-based Pod Auto-Scaler_
+[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
 to add an escalation for auto-scaling. The basic service protection policy
 protects the service from sudden traffic spikes. But it is necessary to scale
 the service to meet demand in case of a persistent change in load.
@@ -40,7 +40,7 @@ the workload efficiently.
 ## Policy
 
 This policy extends the _Service Protection_
-[blueprint](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md)
+[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
 by adding auto-scaling to meet persistent changes in demand.
 
 At a high level, this policy consists of:
@@ -48,12 +48,12 @@ At a high level, this policy consists of:
 - Service protection based on response latency trend of the service.
 - An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
   Deployment for the service.
-- Load based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
+- Load-based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
   the blueprint. This signal measures the fraction of traffic that the _Load
   Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
   scale-out based on a _Gradient Controller_ using this signal and a setpoint of
   1.0.
-- In addition to the load based scale-out, the policy also includes a scale-in
+- In addition to the load-based scale-out, the policy also includes a scale-in
   _Controller_ based on CPU utilization which adjusts the instances of the
   service based on changes in CPU usage, ensuring that the service is not
   over-provisioned.

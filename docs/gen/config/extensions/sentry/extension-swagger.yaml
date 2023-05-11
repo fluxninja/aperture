@@ -63,7 +63,7 @@ definitions:
                 x-go-tag-validate: gte=0,lte=1
         title: SentryConfig holds configuration for Sentry.
         type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/sentry/config
+        x-go-package: github.com/fluxninja/aperture/v2/extensions/sentry/config
 info: {}
 paths:
     /sentry:

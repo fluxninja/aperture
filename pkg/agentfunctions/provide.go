@@ -3,12 +3,12 @@ package agentfunctions
 import (
 	"go.uber.org/fx"
 
-	afconfig "github.com/fluxninja/aperture/pkg/agentfunctions/config"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/log"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/rpc"
+	afconfig "github.com/fluxninja/aperture/v2/pkg/agentfunctions/config"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // Module provides rpc client for agent functions.

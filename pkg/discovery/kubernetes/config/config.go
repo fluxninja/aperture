@@ -1,7 +1,7 @@
 // +kubebuilder:validation:Optional
 package config
 
-import "github.com/fluxninja/aperture/pkg/discovery/common"
+import "github.com/fluxninja/aperture/v2/pkg/discovery/common"
 
 // Key is the key for the Kubernetes discovery configuration.
 var Key = common.DiscoveryConfigKey + ".kubernetes"

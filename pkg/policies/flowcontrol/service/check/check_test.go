@@ -9,16 +9,16 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/platform"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
+	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	"github.com/fluxninja/aperture/v2/pkg/platform"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 )
 
 var (

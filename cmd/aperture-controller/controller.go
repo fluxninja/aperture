@@ -14,16 +14,16 @@ import (
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
-	"github.com/fluxninja/aperture/pkg/agentfunctions/agents"
-	"github.com/fluxninja/aperture/pkg/cmd"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/platform"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/rpc"
-	"github.com/fluxninja/aperture/pkg/webhooks"
-	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
+	"github.com/fluxninja/aperture/v2/cmd/aperture-controller/controller"
+	"github.com/fluxninja/aperture/v2/pkg/agentfunctions/agents"
+	"github.com/fluxninja/aperture/v2/pkg/cmd"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
+	"github.com/fluxninja/aperture/v2/pkg/platform"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/v2/pkg/rpc"
+	"github.com/fluxninja/aperture/v2/pkg/webhooks"
+	"github.com/fluxninja/aperture/v2/pkg/webhooks/policyvalidator"
 )
 
 func main() {

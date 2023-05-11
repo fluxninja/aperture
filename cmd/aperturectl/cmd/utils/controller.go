@@ -22,8 +22,8 @@ import (
 	"k8s.io/client-go/tools/portforward"
 	"k8s.io/client-go/transport/spdy"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 var controllerNs string

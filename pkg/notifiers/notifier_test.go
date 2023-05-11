@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 )
 
 type testConfig struct {

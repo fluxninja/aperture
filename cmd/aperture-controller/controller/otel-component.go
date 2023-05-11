@@ -21,11 +21,11 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	"github.com/fluxninja/aperture/pkg/alertmanager"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/alertmanager"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsexporter"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsreceiver"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 // ModuleForControllerOTel provides fx options for ControllerOTelComponents.

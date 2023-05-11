@@ -5,8 +5,8 @@ import (
 
 	"github.com/buraksezer/olric"
 	"github.com/clarketm/json"
-	distcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/distcache/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

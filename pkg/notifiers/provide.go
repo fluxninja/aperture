@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 )
 
 // TrackersConstructor is a Fx constructor for Trackers.

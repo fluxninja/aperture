@@ -3,7 +3,7 @@ package internal
 import (
 	"testing"
 
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )

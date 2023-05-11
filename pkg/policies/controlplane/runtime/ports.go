@@ -7,8 +7,8 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/utils"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // PortMapping is description of a component's ports mapping.

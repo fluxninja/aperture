@@ -2,7 +2,7 @@
 package config
 
 import (
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
 )
 
 // swagger:operation POST /agent_functions common-configuration Agent Functions

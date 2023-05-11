@@ -4,10 +4,10 @@ package kubernetes
 import (
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/actuators"
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/service"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/actuators"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/service"
 )
 
 // Module returns the fx options for infra integrations of policy.

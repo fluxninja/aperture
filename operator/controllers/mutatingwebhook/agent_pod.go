@@ -19,11 +19,11 @@ package mutatingwebhook
 import (
 	"fmt"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 )
 
 // agentContainer prepares Sidecar container for the Agent based on the received parameters.

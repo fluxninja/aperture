@@ -8,8 +8,8 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // ServiceGetter can be used to query services based on client context.

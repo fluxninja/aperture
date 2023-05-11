@@ -6,9 +6,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	infov1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/info/v1"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/log"
+	infov1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/info/v1"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // InfoService is the implementation of the infov1.InfoServiceServer interface.

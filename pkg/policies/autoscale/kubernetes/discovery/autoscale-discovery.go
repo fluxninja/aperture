@@ -17,10 +17,10 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/fluxninja/aperture/pkg/etcd/election"
-	"github.com/fluxninja/aperture/pkg/k8s"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	"github.com/fluxninja/aperture/v2/pkg/k8s"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/panichandler"
 )
 
 func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, controlPointStore AutoScaleControlPointStore) (*controlPointDiscovery, error) {

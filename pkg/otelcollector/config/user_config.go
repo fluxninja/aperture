@@ -1,7 +1,7 @@
 // +kubebuilder:validation:Optional
 package config
 
-import "github.com/fluxninja/aperture/pkg/config"
+import "github.com/fluxninja/aperture/v2/pkg/config"
 
 // NewDefaultCommonOTelConfig creates CommonOTelConfig with all the default values set.
 func NewDefaultCommonOTelConfig() *CommonOTelConfig {

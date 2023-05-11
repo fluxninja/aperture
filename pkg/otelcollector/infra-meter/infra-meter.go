@@ -5,11 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/otelcollector/leaderonlyreceiver"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
 	"go.opentelemetry.io/collector/component"
 	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -68,6 +68,12 @@ func addInfraMeter(
 		processorIDs[origName] = id
 		var cfg any = processorConfig.AsMap()
 		config.AddProcessor(id, cfg)
+	}
+
+	if infraMeter.Pipeline == nil {
+		// We treat empty pipeline the same way as not-set pipeline, normalize.
+		// This also allows to avoid nil checks below.
+		infraMeter.Pipeline = &policylangv1.InfraMeter_MetricsPipeline{}
 	}
 
 	if len(infraMeter.Pipeline.Receivers) == 0 && len(infraMeter.Pipeline.Processors) == 0 {

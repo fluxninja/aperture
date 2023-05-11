@@ -1,7 +1,7 @@
 package alertmgrconfig
 
 import (
-	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
+	commonhttp "github.com/fluxninja/aperture/v2/pkg/net/http"
 )
 
 // AlertManagerConfig main level config for alertmanager.

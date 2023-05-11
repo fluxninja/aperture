@@ -1,10 +1,10 @@
 package preview
 
 import (
-	flowpreviewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
+	flowpreviewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
+	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 )
 
 // Handler implements flowpreview.v1 service.

@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
+	watchdogconfig "github.com/fluxninja/aperture/v2/pkg/watchdog/config"
 )
 
 type cgroupWatermarks struct {

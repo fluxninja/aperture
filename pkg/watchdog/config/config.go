@@ -4,8 +4,8 @@ package watchdogconfig
 import (
 	"sort"
 
-	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
-	"github.com/fluxninja/aperture/pkg/log"
+	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.

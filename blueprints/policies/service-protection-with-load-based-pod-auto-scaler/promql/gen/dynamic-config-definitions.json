@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/service-protection-with-load-based-pod-auto-scaler/promql blueprint",
+  "additionalProperties": false,
+  "required": ["load_scheduler", "auto_scaling"],
+  "properties": {
+    "load_scheduler": {
+      "description": "Default configuration for load scheduler that can be updated at the runtime without shutting down the policy.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "object",
+      "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/LoadSchedulerDynamicConfig"
+    },
+    "auto_scaling": {
+      "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "boolean"
+    }
+  },
+  "$defs": null
+}

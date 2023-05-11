@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	rpcv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/rpc/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	rpcv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/rpc/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // ServerModule are components needed for server-side of rpc.

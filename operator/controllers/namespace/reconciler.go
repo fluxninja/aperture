@@ -23,10 +23,10 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/operator/controllers/agent"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers/agent"
 
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
