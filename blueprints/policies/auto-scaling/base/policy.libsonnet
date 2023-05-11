@@ -8,9 +8,10 @@ local scaleInController = spec.v1.ScaleInController;
 local scaleInControllerController = spec.v1.ScaleInControllerController;
 local scaleOutController = spec.v1.ScaleOutController;
 local scaleOutControllerController = spec.v1.ScaleOutControllerController;
-local gradient = spec.v1.GradientController;
-local gradientInPort = spec.v1.GradientControllerIns;
-local gradientOutPort = spec.v1.GradientControllerOuts;
+local increasingGradient = spec.v1.IncreasingGradient;
+local increasingGradientInPort = spec.v1.IncreasingGradientIns;
+local decreasingGradient = spec.v1.DecreasingGradient;
+local decreasingGradientInPort = spec.v1.DecreasingGradientIns;
 local port = spec.v1.Port;
 local query = spec.v1.Query;
 local promQL = spec.v1.PromQL;
@@ -28,13 +29,13 @@ function(cfg) {
     + scaleInController.withController(
       scaleInControllerController.new()
       + scaleInControllerController.withGradient(
-        gradient.new()
-        + gradient.withInPorts(
-          gradientInPort.new()
-          + gradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_IN_%s' % controller_idx))
-          + gradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_in_controllers[controller_idx].threshold))
+        decreasingGradient.new()
+        + decreasingGradient.withInPorts(
+          decreasingGradientInPort.new()
+          + decreasingGradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_IN_%s' % controller_idx))
+          + decreasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_in_controllers[controller_idx].threshold))
         )
-        + gradient.withParameters(params.policy.promql_scale_in_controllers[controller_idx].gradient)
+        + decreasingGradient.withParameters(params.policy.promql_scale_in_controllers[controller_idx].gradient)
       )
     )
     for controller_idx in std.range(0, std.length(params.policy.promql_scale_in_controllers) - 1)
@@ -49,13 +50,13 @@ function(cfg) {
     + scaleOutController.withController(
       scaleOutControllerController.new()
       + scaleOutControllerController.withGradient(
-        gradient.new()
-        + gradient.withInPorts(
-          gradientInPort.new()
-          + gradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_OUT_%s' % controller_idx))
-          + gradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_out_controllers[controller_idx].threshold))
+        increasingGradient.new()
+        + increasingGradient.withInPorts(
+          increasingGradientInPort.new()
+          + increasingGradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_OUT_%s' % controller_idx))
+          + increasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_out_controllers[controller_idx].threshold))
         )
-        + gradient.withParameters(params.policy.promql_scale_out_controllers[controller_idx].gradient)
+        + increasingGradient.withParameters(params.policy.promql_scale_out_controllers[controller_idx].gradient)
       )
     )
     for controller_idx in std.range(0, std.length(params.policy.promql_scale_out_controllers) - 1)
