@@ -33,5 +33,4 @@ RUN apt-get update \
 
 COPY --link --from=builder /aperture-controller /aperture-controller
 
-ENV GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn
 CMD ["/aperture-controller"]
