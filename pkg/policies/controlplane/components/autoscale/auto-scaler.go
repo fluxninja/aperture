@@ -156,7 +156,7 @@ func ParseAutoScaler(
 			{
 				Component: &policylangv1.Component_Alerter{
 					Alerter: &policylangv1.Alerter{
-						Parameters: autoscaler.ScalingParameters.ScaleInAlerter,
+						Parameters: autoscaler.ScalingParameters.ScaleOutAlerter,
 						InPorts: &policylangv1.Alerter_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -194,7 +194,7 @@ func ParseAutoScaler(
 			{
 				Component: &policylangv1.Component_Alerter{
 					Alerter: &policylangv1.Alerter{
-						Parameters: autoscaler.ScalingParameters.ScaleOutAlerter,
+						Parameters: autoscaler.ScalingParameters.ScaleInAlerter,
 						InPorts: &policylangv1.Alerter_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
