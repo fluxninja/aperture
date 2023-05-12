@@ -1,4 +1,4 @@
-module github.com/fluxninja/aperture-go
+module github.com/fluxninja/aperture-go/v2
 
 go 1.20
 
