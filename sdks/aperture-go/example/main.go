@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 
-	aperture "github.com/fluxninja/aperture-go/sdk"
+	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
 const (
