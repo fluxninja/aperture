@@ -96,7 +96,11 @@ policy:
     # Type: aperture.spec.v1.AutoScalerScalingParameters
     # Required: True
     scaling_parameters:
+      scale_in_alerter:
+        alert_name: "Auto-scaler is scaling in"
       scale_in_cooldown: "40s"
+      scale_out_alerter:
+        alert_name: "Auto-scaler is scaling out"
       scale_out_cooldown: "30s"
 
 dashboard:
