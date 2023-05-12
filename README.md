@@ -23,9 +23,18 @@
 
 ## 🥷 What is FluxNinja Aperture?
 
-Welcome to Aperture, the intelligent load management platform that empowers applications with optimal performance. With Aperture, you have access to a wide range of powerful capabilities, including workload prioritization, distributed rate limiting, feature rollout, and external rate limit navigation. These features enable intelligent load management for applications of any scale and technology stack.
+Welcome to Aperture, the intelligent load management platform that empowers
+applications with optimal performance. With Aperture, you have access to a wide
+range of powerful capabilities, including workload prioritization, distributed
+rate limiting, feature rollout, and external rate limit navigation. These
+features enable intelligent load management for applications of any scale and
+technology stack.
 
-Our platform ensures intelligent load management, regardless of the size or complexity of your application. With Aperture, you can effortlessly handle high loads, maintain optimal performance, and deliver a superior user experience. Experience the power of intelligent load management, tailored to your specific application stack.
+Our platform ensures intelligent load management, regardless of the size or
+complexity of your application. With Aperture, you can effortlessly handle high
+loads, maintain optimal performance, and deliver a superior user experience.
+Experience the power of intelligent load management, tailored to your specific
+application stack.
 
 limiting and auto-scaling.
 
