@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"math"
 
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 )
 
@@ -20,11 +22,52 @@ const (
 	autoscalerScaleInSetpointPortNameTemplate  = "scale_in_setpoint_%d"
 )
 
+func parseAutoScaleGradient() (*policylangv1.NestedCircuit, error) {
+	nestedInPortsMap := make(map[string]*policylangv1.InPort)
+	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
+
+	var shortDescription string
+
+	anyProtoAutoScaleGradient, err := anypb.New(
+		&policyprivatev1.AutoScaleGradient{
+			OutPorts: &policyprivatev1.AutoScaleGradient_Outs{
+				Scale: &policylangv1.OutPort{
+					SignalName: "SCALE",
+				},
+			},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Concatenate the components into a single components list.
+	components := []*policylangv1.Component{
+		{
+			Component: &policylangv1.Component_AutoScale{
+				AutoScale: &policylangv1.AutoScale{
+					Component: &policylangv1.AutoScale_Private{
+						Private: anyProtoAutoScaleGradient,
+					},
+				},
+			},
+		},
+	}
+
+	// Construct nested circuit.
+	nestedCircuit := &policylangv1.NestedCircuit{
+		Name:             "AutoScaleGradient",
+		ShortDescription: shortDescription,
+		InPortsMap:       nestedInPortsMap,
+		OutPortsMap:      nestedOutPortsMap,
+		Components:       components,
+	}
+
+	return nestedCircuit, nil
+}
+
 // ParseAutoScaler parses a AutoScaler and returns its nested circuit representation.
-func ParseAutoScaler(
-	autoscaler *policylangv1.AutoScaler,
-	policyReadAPI iface.Policy,
-) (*policylangv1.NestedCircuit, error) {
+func ParseAutoScaler(autoscaler *policylangv1.AutoScaler, policyReadAPI iface.Policy) (*policylangv1.NestedCircuit, error) {
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 
 	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
@@ -34,10 +77,12 @@ func ParseAutoScaler(
 		shortDescription   string
 		minScale, maxScale float64
 	)
+
 	scalingBackend := autoscaler.ScalingBackend
 	if scalingBackend == nil {
 		return nil, fmt.Errorf("no scaling backend specified")
 	}
+
 	if kubernetesReplicas := scalingBackend.GetKubernetesReplicas(); kubernetesReplicas != nil {
 		minScale = float64(kubernetesReplicas.MinReplicas)
 		maxScale = float64(kubernetesReplicas.MaxReplicas)
@@ -748,7 +793,6 @@ func ParseAutoScaler(
 			componentsScaleIn = append(componentsScaleIn, components...)
 		case *policylangv1.ScaleInController_Controller_Periodic:
 			periodic := controllerType.Periodic
-			parameters := periodic.GetParameters()
 
 			components := []*policylangv1.Component{
 				{
@@ -765,7 +809,7 @@ func ParseAutoScaler(
 									Value: &policylangv1.InPort_ConstantSignal{
 										ConstantSignal: &policylangv1.ConstantSignal{
 											Const: &policylangv1.ConstantSignal_Value{
-												Value: (float64(parameters.ScaleInPercentage) / 100.0),
+												Value: (float64(periodic.ScaleInPercentage) / 100.0),
 											},
 										},
 									},
@@ -854,7 +898,7 @@ func ParseAutoScaler(
 				{
 					Component: &policylangv1.Component_PulseGenerator{
 						PulseGenerator: &policylangv1.PulseGenerator{
-							FalseFor: parameters.Period,
+							FalseFor: periodic.Period,
 							TrueFor:  durationpb.New(policyReadAPI.GetEvaluationInterval()),
 							OutPorts: &policylangv1.PulseGenerator_Outs{
 								Output: &policylangv1.OutPort{

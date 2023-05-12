@@ -74,7 +74,7 @@ func (h *Holder) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.
 	if !h.holdPhase {
 		if input.Valid() {
 			h.currentReading = input
-			h.holdPhase = true
+			h.holdPhase = false
 			h.windowCount = 0
 			output = input
 		}
@@ -92,5 +92,4 @@ func (h *Holder) reset() {
 }
 
 // DynamicConfigUpdate is a no-op for Holder.
-func (*Holder) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-}
+func (*Holder) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}

@@ -2616,11 +2616,6 @@ definitions:
     description: PeriodicDecrease defines a controller for scaling in based on a periodic
       timer.
     type: object
-    properties:
-      parameters:
-        $ref: '#/definitions/PeriodicDecreaseParameters'
-  PeriodicDecreaseParameters:
-    type: object
     required:
     - period
     - scale_in_percentage
