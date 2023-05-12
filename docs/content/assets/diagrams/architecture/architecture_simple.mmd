@@ -1,4 +1,3 @@
-%% name: architecture_simple
 flowchart TD
     blueprints[/"Blueprints"/]
     policies[/"Policies"/]
@@ -28,6 +27,10 @@ flowchart TD
     subgraph orchestrators["Orchestrators"]
       k8s["Kubernetes"]
     end
+    subgraph gateways["Gateways"]
+      kong["Kong"]
+      Nginx["Nginx"]
+    end
     blueprints --> |aperturectl| policies
     policies --> |Kubernetes Custom Resource| controller
     controller<--> |Configuration/Telemetry/Flow Control| databases
@@ -35,4 +38,6 @@ flowchart TD
     agent <-->|SDK: Telemetry/Flow Control| servicelogic
     agent <-->|Mesh: Telemetry/Flow Control| servicemesh
     orchestrators <-->|Auto Scale| agent
+    gateways <-->|Flow Control| agent
+
     discoverydb <-->|Discovery| agent
