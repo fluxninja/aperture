@@ -129,6 +129,82 @@ func ParseAutoScaler(
 					},
 				},
 			},
+			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						Operator: "gt",
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACTUAL_SCALE",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "DESIRED_SCALE_GREATER",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Alerter{
+					Alerter: &policylangv1.Alerter{
+						Parameters: autoscaler.ScalingParameters.ScaleOutAlerter,
+						InPorts: &policylangv1.Alerter_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE_GREATER",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						Operator: "lt",
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACTUAL_SCALE",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "DESIRED_SCALE_LESS",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Alerter{
+					Alerter: &policylangv1.Alerter{
+						Parameters: autoscaler.ScalingParameters.ScaleInAlerter,
+						InPorts: &policylangv1.Alerter_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE_LESS",
+								},
+							},
+						},
+					},
+				},
+			},
 		}
 	} else {
 		return nil, fmt.Errorf("unsupported scaler type: %T", scalingBackend)
@@ -508,6 +584,20 @@ func ParseAutoScaler(
 
 			components := []*policylangv1.Component{
 				{
+					Component: &policylangv1.Component_Alerter{
+						Alerter: &policylangv1.Alerter{
+							Parameters: scaleOutController.Alerter,
+							InPorts: &policylangv1.Alerter_Ins{
+								Signal: &policylangv1.InPort{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: scaleOutSetpoint,
+									},
+								},
+							},
+						},
+					},
+				},
+				{
 					Component: &policylangv1.Component_NestedSignalIngress{
 						NestedSignalIngress: &policylangv1.NestedSignalIngress{
 							PortName: signalPortName,
@@ -690,6 +780,20 @@ func ParseAutoScaler(
 			}
 
 			components := []*policylangv1.Component{
+				{
+					Component: &policylangv1.Component_Alerter{
+						Alerter: &policylangv1.Alerter{
+							Parameters: scaleInController.Alerter,
+							InPorts: &policylangv1.Alerter_Ins{
+								Signal: &policylangv1.InPort{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: scaleInSetpoint,
+									},
+								},
+							},
+						},
+					},
+				},
 				{
 					Component: &policylangv1.Component_NestedSignalIngress{
 						NestedSignalIngress: &policylangv1.NestedSignalIngress{
