@@ -1009,6 +1009,7 @@ func ParseAutoScaler(autoscaler *policylangv1.AutoScaler, policyReadAPI iface.Po
 				},
 			},
 		}
+
 		// append common components to scale in components
 		componentsScaleIn = append(componentsScaleIn, commonComponents...)
 	}
