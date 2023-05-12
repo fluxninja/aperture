@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
+	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
