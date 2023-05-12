@@ -15,9 +15,15 @@ import Zoom from 'react-medium-image-zoom';
 import {apertureVersion} from '../../apertureVersion.js';
 ```
 
-Many applications consist of intricate networks of interconnected services that drive essential features. While both monolithic and decoupled architectures offer various advantages, they also introduce new challenges and complexities. During periods of high traffic, a critical service may experience queue buildup, triggering a detrimental positive feedback loop and leading to [cascading failures](https://sre.google/sre-book/addressing-cascading-failures/). As a result, the application becomes unresponsive, causing disruptions to crucial end-user transactions.
-When traffic surges, it can result in a queue buildup on a critical service,
-
+Many applications consist of intricate networks of interconnected services that
+drive essential features. While both monolithic and decoupled architectures
+offer various advantages, they also introduce new challenges and complexities.
+During periods of high traffic, a critical service may experience queue buildup,
+triggering a detrimental positive feedback loop and leading to
+[cascading failures](https://sre.google/sre-book/addressing-cascading-failures/).
+As a result, the application becomes unresponsive, causing disruptions to
+crucial end-user transactions. When traffic surges, it can result in a queue
+buildup on a critical service,
 
 ![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
 ![Absence of flow control](assets/img/no-flow-control-dark.png#gh-dark-mode-only)
