@@ -1418,8 +1418,6 @@ github.com/open-telemetry/opentelemetry-collector-contrib/receiver/couchdbreceiv
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/couchdbreceiver v0.77.0/go.mod h1:Yf+W2hnJBJz8Jvu6hUPDeJuJ3P1uC8oO4jA1MdUdXWQ=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/dockerstatsreceiver v0.77.0 h1:BQJCB41ODUqr4V/ZfIULMKTYJTHmW+j6nbKuX4zRxcg=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/dockerstatsreceiver v0.77.0/go.mod h1:qqjU4kuGAiq3tU/NOuUe0gsq6GL1X+gdUYvHt0v0QKk=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/dotnetdiagnosticsreceiver v0.76.3 h1:JYTKZjJUAFYUT9quw3ANNMZz5c8LXvJ+AxHFZPv2RWU=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/dotnetdiagnosticsreceiver v0.76.3/go.mod h1:DMeC4jfqopkISzgnJlvR0zvyUBSGxZl0sOA6ix+hr58=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchreceiver v0.77.0 h1:asp0mjiXG2zm1DBI/wZPV9aHPCkqyIw+6C8VqxSuASs=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchreceiver v0.77.0/go.mod h1:Y6qEv1Dei00G2nf8iKti3sMgvcPoAm3PrtLAry9R04E=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/expvarreceiver v0.77.0 h1:e7MAlckPpfDH0xCCCXReRGeqth7iafmIl0wF/wYTAlI=
