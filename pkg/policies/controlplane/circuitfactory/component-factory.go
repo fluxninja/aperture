@@ -141,12 +141,6 @@ func NewComponentAndOptions(
 					return Tree{}, nil, nil, err
 				}
 				ctor = mkCtor(podScaleReporter, podscaler.NewScaleReporterAndOptions)
-			case "type.googleapis.com/aperture.policy.private.v1.AutoScaleGradient":
-				autoScaleGradient := &policyprivatev1.AutoScaleGradient{}
-				if err := anypb.UnmarshalTo(private, autoScaleGradient, proto.UnmarshalOptions{}); err != nil {
-					return Tree{}, nil, nil, err
-				}
-				ctor = mkCtor(autoScaleGradient)
 			default:
 				err := fmt.Errorf("unknown auto scale type: %s", autoScaleConfig.Private.TypeUrl)
 				log.Error().Err(err).Msg("unknown auto scale type")
