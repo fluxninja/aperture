@@ -91,7 +91,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Parameters that define the scaling behavior.'
     type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
     reference='../../../spec#auto-scaler-scaling-parameters'
-    value='{"scale_in_cooldown": "40s", "scale_out_cooldown": "30s"}'
+    value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}'
 />
 
 <!-- vale on -->
