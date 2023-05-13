@@ -27,10 +27,11 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
-project, an open source platform that empowers platform and reliability
-engineering teams. The platform provides a unified controllability layer that
-enables platform and reliability engineering teams to manage complex
-microservices-based applications with ease.
+project, an open source platform designed to empower platform and reliability
+engineering teams. The platform offers a unified controllability layer that
+simplifies the management of modern applications. It enables teams to
+effortlessly implement intelligent load management capabilities, ensuring
+optimal performance at any scale and for any infrastructure stack.
 
 ## Simplify cloud native load management
 
