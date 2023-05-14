@@ -35,9 +35,10 @@ applications.
 - **Adaptive service protection:** Guard cloud applications against
   [sudden overloads](https://sre.google/sre-book/handling-overload/) and
   [cascading failures](https://sre.google/sre-book/addressing-cascading-failures/)
-  by adaptively scheduling incoming requests based on live service health.
-  Without this critical capability, it's impossible to operate a cloud
-  application reliably.
+  by scheduling incoming requests based on live service health metrics such as
+  latency or error-rates. Without such a critical capability, it's
+  [impossible to ensure uptime and reliable operations](https://doordash.engineering/2023/03/14/failure-mitigation-for-microservices-an-intro-to-aperture/)
+  of services and API endpoints.
 - **Workload prioritization:** Optimize user experience and resource utilization
   by prioritizing workloads based on business value and urgency. Workload
   requests (for example, API calls) are labeled and prioritized using
