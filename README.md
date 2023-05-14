@@ -1,3 +1,5 @@
+<!-- vale off -->
+<!-- markdownlint-disable -->
 <p align="center">
   <img src="docs/content/assets/img/aperture_logo.png" alt="FluxNinja Aperture" width="75%">
   <br/>
@@ -20,8 +22,10 @@
     <img alt="Godoc Reference" src="https://img.shields.io/badge/godoc-reference-brightgreen?style=for-the-badge&logo=go&logoColor=white">
   </a>
 </p>
+<!-- markdownlint-enable -->
+<!-- vale on -->
 
-## 🥷 FluxNinja Aperture
+# 🥷 FluxNinja Aperture
 
 Aperture is an intelligent load management platform for modern cloud
 applications.
@@ -54,6 +58,7 @@ applications.
   or an API endpoint while monitoring for performance issues. Automatically ramp
   down the load when errors or latency spikes are detected.
 
+<!-- markdownlint-disable -->
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaadark.png" />
@@ -61,6 +66,7 @@ applications.
     <img alt="Observe. Analyze. Actuate." src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaalight.png">
   </picture>
 </p>
+<!-- markdownlint-enable -->
 
 ## 🏗️ Architecture
 
