@@ -15,6 +15,7 @@ import (
 
 const (
 	inputLoadMultiplierPortName          = "load_multiplier"
+	inputPassThroughPortName             = "pass_through"
 	outputObservedLoadMultiplierPortName = "observed_load_multiplier"
 )
 
@@ -31,6 +32,10 @@ func ParseLoadScheduler(
 		loadMultiplierPort := inPorts.LoadMultiplier
 		if loadMultiplierPort != nil {
 			nestedInPortsMap[inputLoadMultiplierPortName] = loadMultiplierPort
+		}
+		passThroughPort := inPorts.PassThrough
+		if passThroughPort != nil {
+			nestedInPortsMap[inputPassThroughPortName] = passThroughPort
 		}
 	}
 
@@ -67,6 +72,11 @@ func ParseLoadScheduler(
 				LoadMultiplier: &policylangv1.InPort{
 					Value: &policylangv1.InPort_SignalName{
 						SignalName: "LOAD_MULTIPLIER",
+					},
+				},
+				PassThrough: &policylangv1.InPort{
+					Value: &policylangv1.InPort_SignalName{
+						SignalName: "PASS_THROUGH",
 					},
 				},
 			},
@@ -157,6 +167,7 @@ func ParseLoadScheduler(
 	}
 
 	components.AddNestedIngress(nestedCircuit, inputLoadMultiplierPortName, "LOAD_MULTIPLIER")
+	components.AddNestedIngress(nestedCircuit, inputPassThroughPortName, "PASS_THROUGH")
 	components.AddNestedEgress(nestedCircuit, outputObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
 
 	return nestedCircuit, nil

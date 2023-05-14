@@ -244,7 +244,7 @@ Parameters for the _Gradient Controller_.
 <!-- vale on -->
 
 Linear increment to load multiplier in each execution tick when the system is
-not in overloaded state.
+not in the overloaded state, up until the `max_load_multiplier` is reached.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -268,9 +268,15 @@ Parameters for the _Load Scheduler_.
 
 <!-- vale on -->
 
-The accepted token rate is multiplied by this value to dynamically calculate the
-upper concurrency limit of a Service during normal (non-overload) states,
-helping to protect the Service from sudden spikes in incoming token rate.
+The maximum load multiplier that can be reached during recovery from an overload
+state.
+
+- Helps protect the service from request bursts while the system is still
+  recovering.
+- Once this value is reached, the scheduler enters the pass-through mode,
+  allowing requests to bypass the scheduler and be sent directly to the service.
+- Any future overload state is detected by the control policy, and the load
+  multiplier increment cycle is restarted.
 
 </dd>
 </dl>
@@ -3695,6 +3701,18 @@ Accumulates sum of signal every tick.
 Input ports for the Integrator component.
 
 </dd>
+<dt>initial_value</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `0`)
+
+<!-- vale on -->
+
+Initial value of the integrator.
+
+</dd>
 <dt>out_ports</dt>
 <dd>
 
@@ -4706,6 +4724,18 @@ Input for the LoadScheduler component.
 <!-- vale on -->
 
 Load multiplier is proportion of incoming token rate that needs to be accepted.
+
+</dd>
+<dt>pass_through</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+When true, pass through the requests skipping the scheduler.
 
 </dd>
 </dl>
@@ -7571,6 +7601,14 @@ Example:
 	        per_agent_group: true
 
 ```
+
+:::caution
+
+Validate the OTel configuration before applying it to the production cluster.
+Incorrect configuration will get rejected at the agents and may cause shutdown
+of the agent(s).
+
+:::
 
 </dd>
 </dl>

@@ -2839,6 +2839,8 @@ func (m *Integrator) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for InitialValue
+
 	if len(errors) > 0 {
 		return IntegratorMultiError(errors)
 	}
