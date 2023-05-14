@@ -150,7 +150,7 @@ func (btb *BasicTokenBucket) Return(tokens float64) {
 	btb.tbb.addTokens(tokens)
 }
 
-// PreprocessRequest is a no-op for BasicTokenBucket and by default, it rejects the request.
+// PreprocessRequest decides whether to proactively accept a request.
 func (btb *BasicTokenBucket) PreprocessRequest(now time.Time, rContext Request) bool {
 	return btb.passThrough
 }

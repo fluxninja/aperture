@@ -33,16 +33,17 @@ func (in *Integrator) ShortDescription() string {
 func (*Integrator) IsActuator() bool { return false }
 
 // NewIntegrator creates an integrator component.
-func NewIntegrator() runtime.Component {
+func NewIntegrator(initialValue float64) runtime.Component {
 	integrator := &Integrator{
-		sum: 0,
+		sum: initialValue,
 	}
 	return integrator
 }
 
 // NewIntegratorAndOptions creates an integrator component and its fx options.
-func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
-	return NewIntegrator(), fx.Options(), nil
+func NewIntegratorAndOptions(integratorProto *policylangv1.Integrator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
+	initialValue := integratorProto.GetInitialValue()
+	return NewIntegrator(initialValue), fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.

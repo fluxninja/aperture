@@ -36,6 +36,14 @@ message TelemetryCollector {
   //
   // ```
   //
+  // :::caution
+  //
+  // Validate the OTel configuration before applying it to the
+  // production cluster.
+  // Incorrect configuration will get rejected at the agents and may cause
+  // shutdown of the agent(s).
+  //
+  // :::
   map<string, InfraMeter> infra_meters = 2;
 }
 
