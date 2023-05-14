@@ -2893,15 +2893,10 @@ type AdaptiveLoadScheduler_Parameters struct {
 	LoadScheduler *LoadScheduler_Parameters `protobuf:"bytes,1,opt,name=load_scheduler,json=loadScheduler,proto3" json:"load_scheduler,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Parameters for the _Gradient Controller_.
 	Gradient *GradientController_Parameters `protobuf:"bytes,2,opt,name=gradient,proto3" json:"gradient,omitempty" validate:"required"` // @gotags: validate:"required"
-	// When the service is recovering from an overload state, the load multiplier
-	// is gradually increased in each execution tick. This parameter determines the
-	// maximum load multiplier that can be reached during the recovery.
-	// This parameter helps protect the service from request bursts while the system
-	// is still recovering.
-	// Once this value is reached, the scheduler enters the pass through mode, i.e.
-	// The requests bypass the scheduler and are sent directly to the service.
-	// Any future overload state is detected by the control policy and the
-	// load multiplier increment cycle is restarted.
+	// The maximum load multiplier that can be reached during recovery from an overload state.
+	// - Helps protect the service from request bursts while the system is still recovering.
+	// - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+	// - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,3,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier in each execution tick when the system is
 	// not in the overloaded state, up until the `max_load_multiplier` is reached.

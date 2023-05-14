@@ -135,15 +135,10 @@ definitions:
         $ref: '#/definitions/LoadSchedulerParameters'
       max_load_multiplier:
         description: |+
-          When the service is recovering from an overload state, the load multiplier
-          is gradually increased in each execution tick. This parameter determines the
-          maximum load multiplier that can be reached during the recovery.
-          This parameter helps protect the service from request bursts while the system
-          is still recovering.
-          Once this value is reached, the scheduler enters the pass through mode, i.e.
-          The requests bypass the scheduler and are sent directly to the service.
-          Any future overload state is detected by the control policy and the
-          load multiplier increment cycle is restarted.
+          The maximum load multiplier that can be reached during recovery from an overload state.
+          - Helps protect the service from request bursts while the system is still recovering.
+          - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+          - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
 
         type: number
         format: double

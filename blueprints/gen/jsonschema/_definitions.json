@@ -111,7 +111,7 @@
         },
         "max_load_multiplier": {
           "default": 2,
-          "description": "When the service is recovering from an overload state, the load multiplier\nis gradually increased in each execution tick. This parameter determines the\nmaximum load multiplier that can be reached during the recovery.\nThis parameter helps protect the service from request bursts while the system\nis still recovering.\nOnce this value is reached, the scheduler enters the pass through mode, i.e.\nThe requests bypass the scheduler and are sent directly to the service.\nAny future overload state is detected by the control policy and the\nload multiplier increment cycle is restarted.\n\n",
+          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "2.0",
