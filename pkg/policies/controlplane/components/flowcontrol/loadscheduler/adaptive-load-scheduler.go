@@ -169,6 +169,34 @@ func ParseAdaptiveLoadScheduler(
 				},
 			},
 			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						Operator: "gte",
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_LOAD_MULTIPLIER",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
+										},
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "PASS_THROUGH",
+							},
+						},
+					},
+				},
+			},
+			{
 				Component: &policylangv1.Component_FlowControl{
 					FlowControl: &policylangv1.FlowControl{
 						Component: &policylangv1.FlowControl_LoadScheduler{
@@ -177,6 +205,11 @@ func ParseAdaptiveLoadScheduler(
 									LoadMultiplier: &policylangv1.InPort{
 										Value: &policylangv1.InPort_SignalName{
 											SignalName: "DESIRED_LOAD_MULTIPLIER",
+										},
+									},
+									PassThrough: &policylangv1.InPort{
+										Value: &policylangv1.InPort_SignalName{
+											SignalName: "PASS_THROUGH",
 										},
 									},
 								},
@@ -289,6 +322,7 @@ func ParseAdaptiveLoadScheduler(
 			{
 				Component: &policylangv1.Component_Integrator{
 					Integrator: &policylangv1.Integrator{
+						InitialValue: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
 						InPorts: &policylangv1.Integrator_Ins{
 							Input: &policylangv1.InPort{
 								Value: &policylangv1.InPort_ConstantSignal{

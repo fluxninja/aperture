@@ -283,6 +283,35 @@ func (m *LoadActuator_Ins) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetPassThrough()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadActuator_InsValidationError{
+					field:  "PassThrough",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadActuator_InsValidationError{
+					field:  "PassThrough",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPassThrough()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadActuator_InsValidationError{
+				field:  "PassThrough",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return LoadActuator_InsMultiError(errors)
 	}

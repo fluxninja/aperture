@@ -118,7 +118,8 @@ definitions:
         $ref: '#/definitions/GradientControllerParameters'
       load_multiplier_linear_increment:
         description: |+
-          Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+          Linear increment to load multiplier in each execution tick when the system is
+          not in the overloaded state, up until the `max_load_multiplier` is reached.
 
         type: number
         format: double
@@ -134,7 +135,10 @@ definitions:
         $ref: '#/definitions/LoadSchedulerParameters'
       max_load_multiplier:
         description: |+
-          The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
+          The maximum load multiplier that can be reached during recovery from an overload state.
+          - Helps protect the service from request bursts while the system is still recovering.
+          - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+          - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
 
         type: number
         format: double
@@ -1825,9 +1829,18 @@ definitions:
         description: Input ports for the Integrator component.
         x-order: 0
         $ref: '#/definitions/IntegratorIns'
+      initial_value:
+        description: |+
+          Initial value of the integrator.
+
+        type: number
+        format: double
+        default: 0
+        x-go-tag-default: "0"
+        x-order: 1
       out_ports:
         description: Output ports for the Integrator component.
-        x-order: 1
+        x-order: 2
         $ref: '#/definitions/IntegratorOuts'
   IntegratorIns:
     description: Inputs for the Integrator component.
@@ -2303,6 +2316,10 @@ definitions:
           Load multiplier is proportion of incoming
           token rate that needs to be accepted.
         x-order: 0
+        $ref: '#/definitions/InPort'
+      pass_through:
+        description: When true, pass through the requests skipping the scheduler.
+        x-order: 1
         $ref: '#/definitions/InPort'
   LoadSchedulerOuts:
     description: Output for the LoadScheduler component.
@@ -3720,7 +3737,9 @@ definitions:
           10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval:
           10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password:
           secretpassword\n\t            username: admin\n\t        per_agent_group:
-          true\n\n```"
+          true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying
+          it to the\nproduction cluster.\nIncorrect configuration will get rejected
+          at the agents and may cause\nshutdown of the agent(s).\n\n:::"
         type: object
         additionalProperties:
           $ref: '#/definitions/InfraMeter'

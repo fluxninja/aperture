@@ -614,6 +614,8 @@ message LoadScheduler {
     // Load multiplier is proportion of incoming
     // token rate that needs to be accepted.
     InPort load_multiplier = 1;
+    // When true, pass through the requests skipping the scheduler.
+    InPort pass_through = 2;
   }
 
   // Output for the LoadScheduler component.
@@ -741,10 +743,14 @@ message AdaptiveLoadScheduler {
     // Parameters for the _Gradient Controller_.
     GradientController.Parameters gradient = 2; // @gotags: validate:"required"
 
-    // The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.
+    // The maximum load multiplier that can be reached during recovery from an overload state.
+    // - Helps protect the service from request bursts while the system is still recovering.
+    // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+    // - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
     double max_load_multiplier = 3; // @gotags: default:"2.0"
 
-    // Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+    // Linear increment to load multiplier in each execution tick when the system is
+    // not in the overloaded state, up until the `max_load_multiplier` is reached.
     double load_multiplier_linear_increment = 4; // @gotags: default:"0.0025"
 
     // Configuration parameters for the embedded Alerter.

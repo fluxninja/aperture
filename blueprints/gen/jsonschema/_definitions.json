@@ -97,7 +97,7 @@
         },
         "load_multiplier_linear_increment": {
           "default": 0.0025,
-          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
+          "description": "Linear increment to load multiplier in each execution tick when the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "0.0025",
@@ -111,7 +111,7 @@
         },
         "max_load_multiplier": {
           "default": 2,
-          "description": "The accepted token rate is multiplied by this value to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) states, helping to protect the Service from sudden spikes in incoming token rate.\n\n",
+          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "2.0",
@@ -1684,10 +1684,18 @@
           "description": "Input ports for the Integrator component.",
           "x-order": 0
         },
+        "initial_value": {
+          "default": 0,
+          "description": "Initial value of the integrator.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "0",
+          "x-order": 1
+        },
         "out_ports": {
           "$ref": "#/definitions/IntegratorOuts",
           "description": "Output ports for the Integrator component.",
-          "x-order": 1
+          "x-order": 2
         }
       },
       "type": "object",
@@ -2156,6 +2164,11 @@
           "$ref": "#/definitions/InPort",
           "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted.",
           "x-order": 0
+        },
+        "pass_through": {
+          "$ref": "#/definitions/InPort",
+          "description": "When true, pass through the requests skipping the scheduler.",
+          "x-order": 1
         }
       },
       "type": "object",
@@ -3458,7 +3471,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/InfraMeter"
           },
-          "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n   - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t          batch:\n\t            send_batch_size: 10\n\t            timeout: 10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval: 10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password: secretpassword\n\t            username: admin\n\t        per_agent_group: true\n\n```",
+          "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n   - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t          batch:\n\t            send_batch_size: 10\n\t            timeout: 10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval: 10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password: secretpassword\n\t            username: admin\n\t        per_agent_group: true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying it to the\nproduction cluster.\nIncorrect configuration will get rejected at the agents and may cause\nshutdown of the agent(s).\n\n:::",
           "type": "object",
           "x-order": 1
         }
