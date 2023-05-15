@@ -7,26 +7,36 @@ import com.fluxninja.aperture.sdk.Utils;
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 
 public class ServletUtils {
-    protected static int handleRejectedFlow(TrafficFlow flow) {
+    protected static void handleRejectedFlow(TrafficFlow flow, HttpServletResponse response)
+            throws IOException {
         try {
             flow.end(FlowStatus.Unset);
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
+
+        int code = 403;
         if (flow.checkResponse() != null
                 && flow.checkResponse().hasDeniedResponse()
                 && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
-            return flow.checkResponse().getDeniedResponse().getStatus();
+            code = flow.checkResponse().getDeniedResponse().getStatus();
+            Map<String, String> headers = flow.checkResponse().getDeniedResponse().getHeadersMap();
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                response.setHeader(entry.getKey(), entry.getValue());
+            }
         }
-        return 403;
+
+        response.sendError(code, "Request denied");
     }
 
     protected static CheckHTTPRequest checkRequestFromRequest(
