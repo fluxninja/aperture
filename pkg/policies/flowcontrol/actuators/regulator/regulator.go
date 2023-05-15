@@ -162,7 +162,7 @@ func setupRegulatorFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(factory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister load_regulator_counter metric")
+				err2 := fmt.Errorf("failed to unregister regulator_counter_total metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()
