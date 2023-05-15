@@ -5544,27 +5544,6 @@ Example:
 PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 
 <dl>
-<dt>parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([PeriodicDecreaseParameters](#periodic-decrease-parameters))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### PeriodicDecreaseParameters {#periodic-decrease-parameters}
-
-<!-- vale on -->
-
-<dl>
 <dt>period</dt>
 <dd>
 

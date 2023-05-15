@@ -40,10 +40,7 @@ function(cfg) {
     )
     + scaleInController.withController(
       scaleInControllerController.new()
-      + scaleInControllerController.withPeriodic(
-        periodicDecrease.new()
-        + periodicDecrease.withParameters(params.policy.auto_scaling.periodic_decrease)
-      )
+      + scaleInControllerController.withPeriodic(params.policy.auto_scaling.periodic_decrease)
     ),
   ],
 

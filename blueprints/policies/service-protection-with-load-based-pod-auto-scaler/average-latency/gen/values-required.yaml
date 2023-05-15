@@ -100,12 +100,10 @@ policy:
     # Disable periodic scale in.
     # Type: bool
     disable_periodic_scale_in: false
-    # Parameters for periodic scale in.
-    # Type: aperture.spec.v1.PeriodicDecreaseParameters
     periodic_decrease:
       # Period for periodic scale in.
       # Type: string
       period: "60s"
       # Percentage of replicas to scale in.
-      # Type: int
+      # Type: float64
       scale_in_percentage: 10

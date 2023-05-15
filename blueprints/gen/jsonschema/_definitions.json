@@ -2565,16 +2565,6 @@
     "PeriodicDecrease": {
       "description": "PeriodicDecrease defines a controller for scaling in based on a periodic timer.",
       "properties": {
-        "parameters": {
-          "$ref": "#/definitions/PeriodicDecreaseParameters",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PeriodicDecreaseParameters": {
-      "properties": {
         "period": {
           "description": "The period of the timer.\n\n",
           "type": "string",
