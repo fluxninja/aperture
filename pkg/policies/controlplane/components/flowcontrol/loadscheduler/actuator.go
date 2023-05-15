@@ -22,6 +22,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime/tristate"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	prometheusmodel "github.com/prometheus/common/model"
@@ -190,25 +191,25 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 		}
 	}
 
-	// Get the decision from the port
-	lm, ok := inPortReadings["load_multiplier"]
-	if !ok {
-		return retErr(fmt.Errorf("load_multiplier port not found"))
-	}
-	if len(lm) == 0 {
-		return retErr(fmt.Errorf("load_multiplier port has no reading"))
-	}
-	lmReading := lm[0]
-	var lmValue float64
-	if !lmReading.Valid() {
+	var lm float64
+	var pt bool
+
+	lmValue := inPortReadings.ReadSingleReadingPort("load_multiplier")
+	if !lmValue.Valid() {
 		return retErr(fmt.Errorf("invalid load_multiplier reading"))
 	}
-	if lmReading.Value() <= 0 {
-		lmValue = 0
-	} else {
-		lmValue = lmReading.Value()
+	lm = lmValue.Value()
+	if lm <= 0 {
+		lm = 0
 	}
-	return nil, la.publishDecision(tickInfo, lmValue, false, tokensByWorkload)
+
+	ptBool := tristate.FromReading(inPortReadings.ReadSingleReadingPort("pass_through"))
+
+	if ptBool.IsTrue() {
+		pt = true
+	}
+
+	return nil, la.publishDecision(tickInfo, lm, pt, tokensByWorkload)
 }
 
 // DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.

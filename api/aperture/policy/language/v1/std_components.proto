@@ -681,6 +681,9 @@ message Integrator {
 
   // Output ports for the Integrator component.
   Outs out_ports = 2;
+
+  // Initial value of the integrator.
+  double initial_value = 3; // @gotags: default:"0"
 }
 
 // Differentiator calculates rate of change per tick.

@@ -27,7 +27,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
+	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.

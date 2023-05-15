@@ -57,6 +57,15 @@ type TelemetryCollector struct {
 	//		        per_agent_group: true
 	//
 	// ```
+	//
+	// :::caution
+	//
+	// Validate the OTel configuration before applying it to the
+	// production cluster.
+	// Incorrect configuration will get rejected at the agents and may cause
+	// shutdown of the agent(s).
+	//
+	// :::
 	InfraMeters map[string]*InfraMeter `protobuf:"bytes,2,rep,name=infra_meters,json=infraMeters,proto3" json:"infra_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 

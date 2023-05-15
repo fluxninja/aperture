@@ -454,10 +454,11 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 		logger.Autosample().Debug().Msg("Setting pass through mode")
 		ls.tokenBucketLoadMultiplier.SetPassThrough(true)
 	} else {
-		logger.Autosample().Debug().Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
-		ls.tokenBucketLoadMultiplier.SetLoadMultiplier(ls.clock.Now(), loadDecision.LoadMultiplier)
 		ls.tokenBucketLoadMultiplier.SetPassThrough(false)
 	}
+
+	logger.Autosample().Debug().Bool("passThrough", loadDecision.PassThrough).Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
+	ls.tokenBucketLoadMultiplier.SetLoadMultiplier(ls.clock.Now(), loadDecision.LoadMultiplier)
 
 	ls.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
 }

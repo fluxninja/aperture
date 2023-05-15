@@ -1,5 +1,6 @@
 local access = require "kong.plugins.aperture-plugin.access"
 local log = require "kong.plugins.aperture-plugin.log"
+local headers = require "kong.plugins.aperture-plugin.headers"
 local json = require "cjson"
 
 local ApertureHandler = {
@@ -15,5 +16,7 @@ function ApertureHandler:access(config)
 end
 
 ApertureHandler.log = log
+
+ApertureHandler.header_filter = headers
 
 return ApertureHandler

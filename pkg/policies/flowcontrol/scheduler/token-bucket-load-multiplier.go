@@ -88,7 +88,7 @@ func (tbls *TokenBucketLoadMultiplier) LoadMultiplier() float64 {
 	return tbls.lm
 }
 
-// PreprocessRequest preprocesses a request and makes decision whether to accept or reject the request.
+// PreprocessRequest preprocesses a request and makes decision whether to pro-actively accept a request.
 func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext Request) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()

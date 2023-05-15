@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class HttpUtils {
-    protected static HttpStatus handleRejectedFlow(TrafficFlow flow) {
+    protected static HttpResponse handleRejectedFlow(TrafficFlow flow) {
         try {
             flow.end(FlowStatus.Unset);
         } catch (ApertureSDKException e) {
@@ -26,9 +26,15 @@ class HttpUtils {
                 && flow.checkResponse().hasDeniedResponse()
                 && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
             int httpStatusCode = flow.checkResponse().getDeniedResponse().getStatus();
-            return HttpStatus.valueOf(httpStatusCode);
+            HttpResponseBuilder resBuilder = HttpResponse.builder();
+            resBuilder.status(httpStatusCode);
+            for (Map.Entry<String, String> entry :
+                    flow.checkResponse().getDeniedResponse().getHeadersMap().entrySet()) {
+                resBuilder.header(entry.getKey(), entry.getValue());
+            }
+            return resBuilder.build();
         }
-        return HttpStatus.FORBIDDEN;
+        return HttpResponse.of(HttpStatus.FORBIDDEN);
     }
 
     protected static Map<String, String> labelsFromRequest(HttpRequest req) {

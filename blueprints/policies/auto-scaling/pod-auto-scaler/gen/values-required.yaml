@@ -11,7 +11,9 @@ policy:
   # Type: []promql_scale_out_controller
   # Required: True
   promql_scale_out_controllers:
-    - gradient:
+    - alerter:
+        alert_name: "Scale out controller Alerter"
+      gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__
       threshold: 1
@@ -19,7 +21,9 @@ policy:
   # Type: []promql_scale_in_controller
   # Required: True
   promql_scale_in_controllers:
-    - gradient:
+    - alerter:
+        alert_name: "Scale in controller Alerter"
+      gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__
       threshold: 0.5
@@ -27,7 +31,11 @@ policy:
   # Type: aperture.spec.v1.AutoScalerScalingParameters
   # Required: True
   scaling_parameters:
+    scale_in_alerter:
+      alert_name: "Auto-scaler is scaling in"
     scale_in_cooldown: "40s"
+    scale_out_alerter:
+      alert_name: "Auto-scaler is scaling out"
     scale_out_cooldown: "30s"
   # Scaling backend for the policy.
   # Type: aperture.spec.v1.AutoScalerScalingBackend
