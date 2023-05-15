@@ -23,7 +23,7 @@ const (
 	// InvalidFluxMeterTotal - counts invalid flux meters.
 	InvalidFluxMeterTotal = "invalid_flux_meter_total"
 	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
-	RateLimiterCounterMetricName = "rate_limiter_counter"
+	RateLimiterCounterMetricName = "rate_limiter_counter_total"
 	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
 	ClassifierCounterMetricName = "classifier_counter"
 	// RegulatorCounterMetricName - name of the counter describing times load regulator was triggered.

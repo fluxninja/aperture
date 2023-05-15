@@ -171,7 +171,7 @@ func setupRateLimiterFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(rateLimiterFactory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister rate_limiter_counter metric")
+				err2 := fmt.Errorf("failed to unregister rate_limiter_counter_total metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()

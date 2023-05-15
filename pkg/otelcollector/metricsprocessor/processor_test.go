@@ -213,9 +213,9 @@ var _ = Describe("Metrics Processor", func() {
 		expectedMetrics = `# HELP classifier_counter dummy
 # TYPE classifier_counter counter
 classifier_counter{component_id="1",policy_hash="foo-hash",policy_name="foo"} 1
-<split># HELP rate_limiter_counter dummy
-# TYPE rate_limiter_counter counter
-rate_limiter_counter{component_id="2",policy_hash="foo-hash",policy_name="foo"} 1
+<split># HELP rate_limiter_counter_total dummy
+# TYPE rate_limiter_counter_total counter
+rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="foo"} 1
 `
 
 		expectedLabels = map[string]interface{}{

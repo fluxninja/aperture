@@ -22,7 +22,7 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
+        expr='sum by(decision_type) (rate(rate_limiter_counter_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
         intervalFactor=1,
       )
     ),
