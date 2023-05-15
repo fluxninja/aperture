@@ -17,10 +17,13 @@ local averageLatencyServiceProtection = import '../../service-protection/average
 * @param (policy.auto_scaling.kubernetes_replicas.kubernetes_object_selector: aperture.spec.v1.KubernetesObjectSelector required) Kubernetes object selector.
 * @param (policy.auto_scaling.kubernetes_replicas.min_replicas: string required) Minimum number of replicas.
 * @param (policy.auto_scaling.kubernetes_replicas.max_replicas: string required) Maximum number of replicas.
-* @param (policy.auto_scaling.promql_scale_in_controllers: []policies/auto-scaling/pod-auto-scaler:schema:promql_scale_in_controller required) List of scale in controllers.
 * @param (policy.auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler.
-* @schema (policy.auto_scaling.dry_run_config_key: string) Configuration key for overriding dry run setting through dynamic configuration.
+* @param (policy.auto_scaling.dry_run_config_key: string) Configuration key for overriding dry run setting through dynamic configuration.
 * @param (policy.auto_scaling.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
+* @param (policy.auto_scaling.disable_periodic_scale_in: bool) Disable periodic scale in.
+* @param (policy.auto_scaling.periodic_decrease: aperture.spec.v1.PeriodicDecreaseParameters) Parameters for periodic scale in.
+* @param (policy.auto_scaling.periodic_decrease.period: string) Period for periodic scale in.
+* @param (policy.auto_scaling.periodic_decrease.scale_in_percentage: int) Percentage of replicas to scale in.
 */
 
 /**
@@ -34,7 +37,6 @@ local averageLatencyServiceProtection = import '../../service-protection/average
 averageLatencyServiceProtection {
   policy+: {
     auto_scaling: {
-      promql_scale_in_controllers: autoScalingDefaults.policy.promql_scale_in_controllers,
       dry_run: autoScalingDefaults.policy.dry_run,
       dry_run_config_key: autoScalingDefaults.policy.dry_run_config_key,
       kubernetes_replicas+: {
@@ -43,6 +45,11 @@ averageLatencyServiceProtection {
         max_replicas: '__REQUIRED_FIELD__',
       },
       scaling_parameters: autoScalingDefaults.policy.scaling_parameters,
+      disable_periodic_scale_in: false,
+      periodic_decrease: {
+        period: '60s',
+        scale_in_percentage: 10,
+      },
     },
   },
 }

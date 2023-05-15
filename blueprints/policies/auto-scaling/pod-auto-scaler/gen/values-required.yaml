@@ -11,7 +11,9 @@ policy:
   # Type: []promql_scale_out_controller
   # Required: True
   promql_scale_out_controllers:
-    - gradient:
+    - alerter:
+        alert_name: "Scale out controller Alerter"
+      gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__
       threshold: 1
@@ -19,7 +21,9 @@ policy:
   # Type: []promql_scale_in_controller
   # Required: True
   promql_scale_in_controllers:
-    - gradient:
+    - alerter:
+        alert_name: "Scale in controller Alerter"
+      gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__
       threshold: 0.5
