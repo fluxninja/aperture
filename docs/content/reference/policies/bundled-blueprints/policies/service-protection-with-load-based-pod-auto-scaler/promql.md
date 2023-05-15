@@ -185,20 +185,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-auto-scaling-promql-scale-in-controllers"></a>
-
-<ParameterDescription
-    name='policy.auto_scaling.promql_scale_in_controllers'
-    description='List of scale in controllers.'
-    type='Array of Object (policies/auto-scaling/pod-auto-scaler:schema:promql_scale_in_controller)'
-    reference='../../../bundled-blueprints/policies/auto-scaling/pod-auto-scaler#promql-scale-in-controller'
-    value='[{"gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 0.5}]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-auto-scaling-dry-run"></a>
 
 <ParameterDescription
@@ -235,6 +221,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
     reference='../../../spec#auto-scaler-scaling-parameters'
     value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-disable-periodic-scale-in"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.disable_periodic_scale_in'
+    description='Disable periodic scale in.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-periodic-decrease"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.periodic_decrease'
+    description='Parameters for periodic scale in.'
+    type='Object (aperture.spec.v1.PeriodicDecreaseParameters)'
+    reference='../../../spec#periodic-decrease-parameters'
+    value='{"period": "60s", "scale_in_percentage": 10}'
 />
 
 <!-- vale on -->

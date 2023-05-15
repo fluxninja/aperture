@@ -25,6 +25,9 @@
           "description": "List of scale out controllers.",
           "default": [
             {
+              "alerter": {
+                "alert_name": "Scale out controller Alerter"
+              },
               "gradient": {
                 "slope": 1
               },
@@ -42,6 +45,9 @@
           "description": "List of scale in controllers.",
           "default": [
             {
+              "alerter": {
+                "alert_name": "Scale in controller Alerter"
+              },
               "gradient": {
                 "slope": 1
               },
@@ -160,7 +166,7 @@
     "promql_scale_out_controller": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["query_string", "threshold", "gradient"],
+      "required": ["query_string", "threshold", "gradient", "alerter"],
       "properties": {
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
@@ -178,13 +184,19 @@
           "default": null,
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
+        },
+        "alerter": {
+          "description": "Alerter parameters for the controller.",
+          "default": null,
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         }
       }
     },
     "promql_scale_in_controller": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["query_string", "threshold", "gradient"],
+      "required": ["query_string", "threshold", "gradient", "alerter"],
       "properties": {
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
@@ -202,6 +214,12 @@
           "default": null,
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
+        },
+        "alerter": {
+          "description": "Alerter parameters for the controller.",
+          "default": null,
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         }
       }
     }

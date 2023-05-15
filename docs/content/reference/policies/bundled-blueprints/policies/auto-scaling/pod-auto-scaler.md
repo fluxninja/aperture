@@ -63,7 +63,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale out controllers.'
     type='Array of Object (promql_scale_out_controller)'
     reference='#promql-scale-out-controller'
-    value='[{"gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 1}]'
+    value='[{"alerter": {"alert_name": "Scale out controller Alerter"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 1}]'
 />
 
 <!-- vale on -->
@@ -77,7 +77,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale in controllers.'
     type='Array of Object (promql_scale_in_controller)'
     reference='#promql-scale-in-controller'
-    value='[{"gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 0.5}]'
+    value='[{"alerter": {"alert_name": "Scale in controller Alerter"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 0.5}]'
 />
 
 <!-- vale on -->
@@ -316,6 +316,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
 
 <!-- vale on -->
 
+<!-- vale off -->
+
+<a id="promql-scale-out-controller-alerter"></a>
+
+<ParameterDescription
+    name='alerter'
+    description='Alerter parameters for the controller.'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../../spec#alerter-parameters'
+    value='null'
+/>
+
+<!-- vale on -->
+
 ---
 
 <!-- vale off -->
@@ -361,6 +375,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Gradient parameters for the controller.'
     type='Object (aperture.spec.v1.DecreasingGradientParameters)'
     reference='../../../spec#decreasing-gradient-parameters'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-in-controller-alerter"></a>
+
+<ParameterDescription
+    name='alerter'
+    description='Alerter parameters for the controller.'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../../spec#alerter-parameters'
     value='null'
 />
 

@@ -111,11 +111,7 @@
         "auto_scaling": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "kubernetes_replicas",
-            "promql_scale_in_controllers",
-            "scaling_parameters"
-          ],
+          "required": ["kubernetes_replicas", "scaling_parameters"],
           "properties": {
             "kubernetes_replicas": {
               "description": "Kubernetes replicas scaling backend.",
@@ -126,23 +122,6 @@
               },
               "type": "object",
               "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackendKubernetesReplicas"
-            },
-            "promql_scale_in_controllers": {
-              "description": "List of scale in controllers.",
-              "default": [
-                {
-                  "gradient": {
-                    "slope": 1
-                  },
-                  "query_string": "__REQUIRED_FIELD__",
-                  "threshold": 0.5
-                }
-              ],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "../../../../policies/auto-scaling/pod-auto-scaler/gen/definitions.json#/$defs/promql_scale_in_controller"
-              }
             },
             "dry_run": {
               "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
@@ -168,6 +147,20 @@
               },
               "type": "object",
               "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
+            },
+            "disable_periodic_scale_in": {
+              "description": "Disable periodic scale in.",
+              "default": false,
+              "type": "boolean"
+            },
+            "periodic_decrease": {
+              "description": "Parameters for periodic scale in.",
+              "default": {
+                "period": "60s",
+                "scale_in_percentage": 10
+              },
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/PeriodicDecreaseParameters"
             }
           }
         }

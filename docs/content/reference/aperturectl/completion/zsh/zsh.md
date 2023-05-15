@@ -23,7 +23,7 @@ to enable it. You can execute the following once:
 
 To load completions in your current shell session:
 
-    source <(aperturectl completion zsh); compdef _aperturectl aperturectl
+    source <(aperturectl completion zsh)
 
 To load completions for every new session, execute once:
 

@@ -47,14 +47,6 @@ policy:
       # Type: string
       # Required: True
       max_replicas: "10"
-    # List of scale in controllers.
-    # Type: []policies/auto-scaling/pod-auto-scaler:schema:promql_scale_in_controller
-    # Required: True
-    promql_scale_in_controllers:
-      - gradient:
-          slope: 1
-        query_string: 'avg(avg_over_time(k8s_pod_cpu_utilization_ratio{k8s_deployment_name="service1-demo-app"}[30s]))'
-        threshold: 0.5
     # Dry run mode ensures that no scaling is invoked by this auto scaler.
     # Type: bool
     dry_run: false
