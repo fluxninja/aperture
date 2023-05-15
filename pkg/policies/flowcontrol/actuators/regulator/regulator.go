@@ -112,7 +112,7 @@ func setupRegulatorFactory(
 	reg := statusRegistry.Child("component", regulatorStatusRoot)
 	counterVector := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.RegulatorCounterMetricName,
+			Name: metrics.RegulatorCounterTotalMetricName,
 			Help: "Total number of decisions made by load regulators.",
 		},
 		metricLabelKeys,
@@ -162,7 +162,7 @@ func setupRegulatorFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(factory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister load_regulator_counter metric")
+				err2 := fmt.Errorf("failed to unregister regulator_counter_total metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()

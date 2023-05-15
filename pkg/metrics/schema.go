@@ -18,16 +18,16 @@ const (
 	SignalReadingMetricName = "signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
-	// InvalidSignalReadingsTotal - counts invalid signal readings.
-	InvalidSignalReadingsTotal = "invalid_signal_readings_total"
-	// InvalidFluxMeterTotal - counts invalid flux meters.
-	InvalidFluxMeterTotal = "invalid_flux_meter_total"
-	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
-	RateLimiterCounterMetricName = "rate_limiter_counter"
-	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
-	ClassifierCounterMetricName = "classifier_counter"
-	// RegulatorCounterMetricName - name of the counter describing times load regulator was triggered.
-	RegulatorCounterMetricName = "regulator_counter"
+	// InvalidSignalReadingsTotalMetricName - counts invalid signal readings.
+	InvalidSignalReadingsTotalMetricName = "invalid_signal_readings_total"
+	// InvalidFluxMeterTotalMetricName - counts invalid flux meters.
+	InvalidFluxMeterTotalMetricName = "invalid_flux_meter_total"
+	// RateLimiterCounterTotalMetricName - name of the counter describing times rate limiter was triggered.
+	RateLimiterCounterTotalMetricName = "rate_limiter_counter_total"
+	// ClassifierCounterTotalMetricName - name of the counter describing times classifier was triggered.
+	ClassifierCounterTotalMetricName = "classifier_counter_total"
+	// RegulatorCounterTotalMetricName - name of the counter describing times load regulator was triggered.
+	RegulatorCounterTotalMetricName = "regulator_counter_total"
 
 	// DistCache metrics scraped from Olric DMaps statistics.
 
