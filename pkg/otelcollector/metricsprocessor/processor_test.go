@@ -79,7 +79,7 @@ var _ = Describe("Metrics Processor", func() {
 			m.WorkloadIndexLabel, m.DecisionTypeLabel,
 		})
 		rateCounter = prometheus.NewCounter(prometheus.CounterOpts{
-			Name: m.RateLimiterCounterMetricName,
+			Name: m.RateLimiterCounterTotalMetricName,
 			Help: "dummy",
 			ConstLabels: prometheus.Labels{
 				m.PolicyNameLabel:  "foo",
@@ -88,7 +88,7 @@ var _ = Describe("Metrics Processor", func() {
 			},
 		})
 		classifierCounter = prometheus.NewCounter(prometheus.CounterOpts{
-			Name: m.ClassifierCounterMetricName,
+			Name: m.ClassifierCounterTotalMetricName,
 			Help: "dummy",
 			ConstLabels: prometheus.Labels{
 				m.PolicyNameLabel:      "foo",
@@ -160,9 +160,9 @@ var _ = Describe("Metrics Processor", func() {
 				Expect(err).NotTo(HaveOccurred())
 			}
 
-			if strings.Contains(expectedMetrics, m.RateLimiterCounterMetricName) {
+			if strings.Contains(expectedMetrics, m.RateLimiterCounterTotalMetricName) {
 				expected2 := strings.NewReader(expectedMetrics)
-				err = testutil.CollectAndCompare(rateCounter, expected2, m.RateLimiterCounterMetricName)
+				err = testutil.CollectAndCompare(rateCounter, expected2, m.RateLimiterCounterTotalMetricName)
 				Expect(err).NotTo(HaveOccurred())
 			}
 		}

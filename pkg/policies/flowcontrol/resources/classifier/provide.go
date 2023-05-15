@@ -102,7 +102,7 @@ func ProvideClassificationEngine(in ClassificationEngineIn) (iface.Classificatio
 				return err
 			}
 			if !in.PromRegistry.Unregister(classificationEngine.counterVec) {
-				return fmt.Errorf("failed to unregister %s metric", metrics.ClassifierCounterMetricName)
+				return fmt.Errorf("failed to unregister %s metric", metrics.ClassifierCounterTotalMetricName)
 			}
 
 			return nil

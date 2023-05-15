@@ -60,7 +60,7 @@ type rulesetID = uint64
 // NewClassificationEngine creates a new Classifier.
 func NewClassificationEngine(agentInfo *agentinfo.AgentInfo, registry status.Registry) *ClassificationEngine {
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.ClassifierCounterMetricName,
+		Name: metrics.ClassifierCounterTotalMetricName,
 		Help: "A counter measuring the number of times classifier was triggered",
 	}, []string{
 		metrics.PolicyNameLabel,

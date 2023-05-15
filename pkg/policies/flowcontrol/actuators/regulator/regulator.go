@@ -112,7 +112,7 @@ func setupRegulatorFactory(
 	reg := statusRegistry.Child("component", regulatorStatusRoot)
 	counterVector := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.RegulatorCounterMetricName,
+			Name: metrics.RegulatorCounterTotalMetricName,
 			Help: "Total number of decisions made by load regulators.",
 		},
 		metricLabelKeys,

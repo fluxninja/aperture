@@ -114,7 +114,7 @@ func setupRateLimiterFactory(
 	}
 
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.RateLimiterCounterMetricName,
+		Name: metrics.RateLimiterCounterTotalMetricName,
 		Help: "A counter measuring the number of times Rate Limiter was triggered",
 	}, metricLabelKeys)
 
