@@ -219,7 +219,7 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 		log.Error().Err(err).Msg("Handler returned error")
 		if info.FullMethod == "/opentelemetry.proto.collector.trace.v1.TraceService/Export" {
 			spanFailed = true
-		} else if info.FullMethod == "/envoy.service.auth.v3.Authorization/Check" {
+		} else if info.FullMethod == "/aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTP/CheckHTTP" || info.FullMethod == "/aperture.flowcontrol.check.v1.FlowControlService/Check" {
 			authzFailed = true
 		}
 	}
