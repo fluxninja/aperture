@@ -18,6 +18,9 @@ local promql_scale_out_controller_defaults = {
   gradient: {
     slope: 1.0,
   },
+  alerter: {
+    alert_name: 'Scale out controller Alerter',
+  },
 };
 
 local promql_scale_in_controller_defaults = {
@@ -25,6 +28,9 @@ local promql_scale_in_controller_defaults = {
   threshold: 0.5,
   gradient: {
     slope: 1.0,
+  },
+  alerter: {
+    alert_name: 'Scale in controller Alerter',
   },
 };
 

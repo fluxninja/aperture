@@ -114,7 +114,7 @@ func setupRateLimiterFactory(
 	}
 
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.RateLimiterCounterMetricName,
+		Name: metrics.RateLimiterCounterTotalMetricName,
 		Help: "A counter measuring the number of times Rate Limiter was triggered",
 	}, metricLabelKeys)
 
@@ -171,7 +171,7 @@ func setupRateLimiterFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(rateLimiterFactory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister rate_limiter_counter metric")
+				err2 := fmt.Errorf("failed to unregister rate_limiter_counter_total metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()

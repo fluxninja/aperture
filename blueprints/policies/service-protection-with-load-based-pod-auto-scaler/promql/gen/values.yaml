@@ -69,14 +69,6 @@ policy:
       # Type: string
       # Required: True
       max_replicas: __REQUIRED_FIELD__
-    # List of scale in controllers.
-    # Type: []policies/auto-scaling/pod-auto-scaler:schema:promql_scale_in_controller
-    # Required: True
-    promql_scale_in_controllers:
-      - gradient:
-          slope: 1
-        query_string: __REQUIRED_FIELD__
-        threshold: 0.5
     # Dry run mode ensures that no scaling is invoked by this auto scaler.
     # Type: bool
     dry_run: false
@@ -93,6 +85,18 @@ policy:
       scale_out_alerter:
         alert_name: "Auto-scaler is scaling out"
       scale_out_cooldown: "30s"
+    # Disable periodic scale in.
+    # Type: bool
+    disable_periodic_scale_in: false
+    # Parameters for periodic scale in.
+    # Type: aperture.spec.v1.PeriodicDecreaseParameters
+    periodic_decrease:
+      # Period for periodic scale in.
+      # Type: string
+      period: "60s"
+      # Percentage of replicas to scale in.
+      # Type: int
+      scale_in_percentage: 10
 
 dashboard:
   # Refresh interval for dashboard panels.

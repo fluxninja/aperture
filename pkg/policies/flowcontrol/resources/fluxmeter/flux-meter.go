@@ -176,7 +176,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})
 			fluxMeter.invalidFluxMeterTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-				Name:        metrics.InvalidFluxMeterTotal,
+				Name:        metrics.InvalidFluxMeterTotalMetricName,
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 				Help:        "The number of invalid readings from a Flux Meter",
 			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})

@@ -142,6 +142,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
      init_by_lua_block {
        access = require "aperture-plugin.access"
        log = require "aperture-plugin.log"
+       headers = require "aperture-plugin.headers"
      }
      ...
    }
@@ -165,7 +166,21 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    }
    ```
 
-5. Add the `log_by_lua_block` section under the `http` block of the Nginx
+5. Add the `header_filter_by_lua_block` section under the `http` block of the
+   Nginx configuration to add the headers received from Aperture check to the
+   response being returned to the client:
+
+   ```bash
+   http {
+     ...
+     header_filter_by_lua_block {
+       headers()
+     }
+     ...
+   }
+   ```
+
+6. Add the `log_by_lua_block` section under the `http` block of the Nginx
    configuration to forward the OpenTelemetry logs to Aperture for all servers
    and locations after the response is received from upstream:
 
@@ -179,7 +194,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    }
    ```
 
-6. Aperture needs the upstream address of the server using
+7. Aperture needs the upstream address of the server using
    `destination_hostname` and `destination_port` variables and also
    `control_point` variable for referring the service in Aperture Policy, which
    need to be set from Nginx `location` block:
@@ -199,7 +214,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    }
    ```
 
-7. Below is how a complete Nginx configuration would look like:
+8. Below is how a complete Nginx configuration would look like:
 
    ```bash
    worker_processes auto;
@@ -219,6 +234,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
      init_by_lua_block {
        access = require "aperture-plugin.access"
        log = require "aperture-plugin.log"
+       headers = require "aperture-plugin.headers"
      }
 
      access_by_lua_block {
@@ -231,6 +247,10 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
 
      log_by_lua_block {
        log()
+     }
+
+     header_filter_by_lua_block {
+       headers()
      }
 
      server {

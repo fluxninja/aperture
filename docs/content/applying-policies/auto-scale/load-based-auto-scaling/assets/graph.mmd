@@ -56,20 +56,11 @@ root.4_rhs_FakeConstantout((1.10))
 subgraph root.5[<center>AutoScaler<br/>demoapp:Deployment/service1...</center>]
 subgraph root.5_inports[ ]
 style root.5_inports fill:none,stroke:none
-root.5scale_in_setpoint_0[scale_in_setpoint_0]
-root.5scale_in_signal_0[scale_in_signal_0]
 root.5scale_out_setpoint_0[scale_out_setpoint_0]
 root.5scale_out_signal_0[scale_out_signal_0]
 end
 end
-root.5_scale_in_setpoint_0_FakeConstantout((0.50))
 root.5_scale_out_setpoint_0_FakeConstantout((1.00))
-subgraph root.6[<center>PromQL<br/>every 1s</center>]
-subgraph root.6_outports[ ]
-style root.6_outports fill:none,stroke:none
-root.6output[output]
-end
-end
 root.0observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.5scale_out_signal_0
 root.0_overload_confirmation_FakeConstantout --> root.0overload_confirmation
 root.1output --> |SIGNAL| root.0signal
@@ -80,6 +71,4 @@ root.2_rhs_FakeConstantout --> root.2rhs
 root.3output --> |SIGNAL_EMA| root.4lhs
 root.4output --> |SETPOINT| root.0setpoint
 root.4_rhs_FakeConstantout --> root.4rhs
-root.5_scale_in_setpoint_0_FakeConstantout --> root.5scale_in_setpoint_0
 root.5_scale_out_setpoint_0_FakeConstantout --> root.5scale_out_setpoint_0
-root.6output --> |PROMQL_SCALE_IN_0| root.5scale_in_signal_0
