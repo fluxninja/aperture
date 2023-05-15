@@ -25,7 +25,7 @@ const (
 	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
 	RateLimiterCounterMetricName = "rate_limiter_counter_total"
 	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
-	ClassifierCounterMetricName = "classifier_counter"
+	ClassifierCounterMetricName = "classifier_counter_total"
 	// RegulatorCounterMetricName - name of the counter describing times load regulator was triggered.
 	RegulatorCounterMetricName = "regulator_counter"
 

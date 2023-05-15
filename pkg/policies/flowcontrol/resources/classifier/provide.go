@@ -181,7 +181,7 @@ func (c *ClassificationEngine) invokeMiniApp(
 
 				deleted := c.counterVec.Delete(metricLabels)
 				if !deleted {
-					errMulti = multierr.Append(errMulti, errors.New("failed to delete classifier_counter from its metric vector"))
+					errMulti = multierr.Append(errMulti, errors.New("failed to delete classifier_counter_total from its metric vector"))
 				}
 				return errMulti
 			},

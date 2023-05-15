@@ -210,9 +210,9 @@ var _ = Describe("Metrics Processor", func() {
 		baseCheckResp.Services = []string{"svc1", "svc2"}
 
 		// <split> is a workaround until PR https://github.com/prometheus/client_golang/pull/1143 is released
-		expectedMetrics = `# HELP classifier_counter dummy
-# TYPE classifier_counter counter
-classifier_counter{component_id="1",policy_hash="foo-hash",policy_name="foo"} 1
+		expectedMetrics = `# HELP classifier_counter_total dummy
+# TYPE classifier_counter_total counter
+classifier_counter_total{component_id="1",policy_hash="foo-hash",policy_name="foo"} 1
 <split># HELP rate_limiter_counter_total dummy
 # TYPE rate_limiter_counter_total counter
 rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="foo"} 1
