@@ -173,6 +173,11 @@ func (ss SimpleService) Run() error {
 		http.HandleFunc("/prometheus", prometheusHandler)
 	}
 
+	// server ui build pack from public folder
+	fs := http.FileServer(http.Dir("./public"))
+
+	http.Handle("/", http.StripPrefix("/", fs))
+
 	http.Handle("/request", handlerFunc(handler))
 
 	address := fmt.Sprintf(":%d", ss.port)
