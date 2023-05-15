@@ -19,7 +19,6 @@ buf-generate:
 	@buf lint
 	@buf generate --path aperture --template buf.gen.aperture-langs.yaml
 	@buf generate --path aperture --template buf.gen.aperture-grpc-ecosystem.yaml
-	@buf generate --path envoy --template buf.gen.envoy.yaml --include-imports
 	@#inject go annotations
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 	@#generate sdk flowcontrol stubs and copy them over
