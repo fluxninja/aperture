@@ -57,11 +57,6 @@ message PodScaler {
     OutPort configured_replicas = 2;
   }
 
-  // Dynamic Configuration for PodScaler
-  message DynamicConfig {
-    bool dry_run = 1; // @gotags: default:"false"
-  }
-
   // Input ports for the PodScaler component.
   Ins in_ports = 1;
 

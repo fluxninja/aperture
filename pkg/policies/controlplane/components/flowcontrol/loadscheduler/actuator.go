@@ -75,10 +75,7 @@ func NewActuatorAndOptions(
 		etcdPaths = append(etcdPaths, etcdPath)
 	}
 
-	dryRun := false
-	if actuatorProto.GetDefaultConfig() != nil {
-		dryRun = actuatorProto.GetDefaultConfig().GetDryRun()
-	}
+	dryRun := actuatorProto.GetDryRun()
 
 	lsa := &Actuator{
 		policyReadAPI:            policyReadAPI,
@@ -215,7 +212,7 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 // DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
 func (la *Actuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
-	key := la.actuatorProto.GetDynamicConfigKey()
+	key := la.actuatorProto.GetDryRunConfigKey()
 	// read dynamic config
 	if unmarshaller.IsSet(key) {
 		dynamicConfig := &policylangv1.LoadScheduler_DynamicConfig{}

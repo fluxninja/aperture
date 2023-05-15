@@ -246,33 +246,38 @@ func (m *RateLimiterDynamicConfigWrapper) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetRateLimiterDynamicConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiterDynamicConfigWrapperValidationError{
-					field:  "RateLimiterDynamicConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	for idx, item := range m.GetCustomLimits() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimiterDynamicConfigWrapperValidationError{
+						field:  fmt.Sprintf("CustomLimits[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimiterDynamicConfigWrapperValidationError{
+						field:  fmt.Sprintf("CustomLimits[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
 			}
-		case interface{ Validate() error }:
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiterDynamicConfigWrapperValidationError{
-					field:  "RateLimiterDynamicConfig",
+				return RateLimiterDynamicConfigWrapperValidationError{
+					field:  fmt.Sprintf("CustomLimits[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetRateLimiterDynamicConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiterDynamicConfigWrapperValidationError{
-				field:  "RateLimiterDynamicConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
 	}
 
 	if len(errors) > 0 {

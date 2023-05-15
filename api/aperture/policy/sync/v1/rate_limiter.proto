@@ -15,8 +15,8 @@ message RateLimiterWrapper {
 message RateLimiterDynamicConfigWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
-  // RateLimiterDynamicConfig is the dynamic configuration for the rate limiter.
-  policy.language.v1.RateLimiter.DynamicConfig rate_limiter_dynamic_config = 2;
+  // CustomLimits dynamic config.
+  repeated policy.language.v1.RateLimiter.CustomLimit custom_limits = 2;
 }
 
 message RateLimiterDecisionWrapper {

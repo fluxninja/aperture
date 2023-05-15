@@ -236,11 +236,13 @@ definitions:
       on the deviation of the input signal from the setpoint.
     type: object
     properties:
-      default_config:
-        description: Default dynamic configuration for load actuation.
-        $ref: '#/definitions/LoadSchedulerDynamicConfig'
-      dynamic_config_key:
-        description: Dynamic configuration key for load actuation.
+      dry_run:
+        description: |-
+          Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+          It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+        type: boolean
+      dry_run_config_key:
+        description: Configuration key for setting dry run mode through dynamic configuration.
         type: string
       in_ports:
         description: |+
@@ -1404,7 +1406,7 @@ definitions:
         $ref: '#/definitions/FluxMeterLinearBuckets'
       selectors:
         description: |+
-          Selectors for the component.
+          Selectors for flows that will be metered by this _Flux Meter_.
 
         type: array
         minItems: 1
@@ -2119,12 +2121,6 @@ definitions:
       `target_accept_percentage`, over the `duration` specified for each step.
     type: object
     properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/RegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Dynamic configuration key for flow regulator.
-        type: string
       in_ports:
         $ref: '#/definitions/LoadRampIns'
       out_ports:
@@ -2132,6 +2128,16 @@ definitions:
       parameters:
         x-go-tag-validate: required
         $ref: '#/definitions/LoadRampParameters'
+      pass_through_label_values:
+        description: Specify certain label values to be always accepted by the _Regulator_
+          regardless of accept percentage.
+        type: array
+        items:
+          type: string
+      pass_through_label_values_config_key:
+        description: Configuration key for setting label value to pass through through
+          dynamic configuration.
+        type: string
   LoadRampIns:
     description: Inputs for the _Load Ramp_ component.
     type: object
@@ -2254,22 +2260,25 @@ definitions:
 
       :::
 
-      It's based on the actuation strategy (for example, load actuator) and workload scheduling
-      which is based on Weighted Fair Queuing principles.
-      It measures and controls the incoming tokens per second, which can translate
+      In order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+      A workload determines the priority and cost of admitting each Flow that belongs to it.
+      Scheduling of Flows is based on Weighted Fair Queuing principles.
+      _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
       to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
-      LoadScheduler configuration is split into two parts: An actuation
-      strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+      The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
+      The signal at port `pass_through` makes the _Load Scheduler_ pass through all incoming tokens.
     type: object
-    title: _Load Scheduler_ is an actuator component that regulates flows to provide
+    title: _Load Scheduler_ creates a queue for flows in front of a service to provide
       active service protection
     properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/LoadSchedulerDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
+      dry_run:
+        description: |-
+          Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+          It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+        type: boolean
+      dry_run_config_key:
+        description: Configuration key for setting dry run mode through dynamic config.
         type: string
       in_ports:
         description: |+
@@ -2283,15 +2292,6 @@ definitions:
       parameters:
         x-go-tag-validate: required
         $ref: '#/definitions/LoadSchedulerParameters'
-  LoadSchedulerDynamicConfig:
-    description: Dynamic Configuration for the LoadScheduler component.
-    type: object
-    properties:
-      dry_run:
-        description: |-
-          Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
-          Useful for observing the behavior of actuator without disrupting any real traffic.
-        type: boolean
   LoadSchedulerIns:
     description: Input for the LoadScheduler component.
     type: object
@@ -2326,7 +2326,7 @@ definitions:
         $ref: '#/definitions/Scheduler'
       selectors:
         description: |+
-          Selectors for the component.
+          Selectors for flows that will be scheduled by this _Load Scheduler_.
 
         type: array
         minItems: 1
@@ -2831,15 +2831,20 @@ definitions:
       to select which label should be used as key.
     type: object
     title: Limits the traffic on a control point to specified rate
-    required:
-    - selectors
     properties:
-      default_config:
-        title: Default configuration
-        $ref: '#/definitions/RateLimiterDynamicConfig'
-      dynamic_config_key:
+      custom_limits:
+        description: |+
+          Allows to specify different limits for particular label values.
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/RateLimiterCustomLimit'
+        x-go-tag-validate: dive
+      custom_limits_config_key:
+        description: Configuration key for overriding custom_limits setting through
+          dynamic config.
         type: string
-        title: Configuration key for DynamicConfig
       in_ports:
         title: Input ports for the RateLimiter component
         x-go-tag-validate: required
@@ -2848,29 +2853,26 @@ definitions:
         title: Parameters for the RateLimiter component
         x-go-tag-validate: required
         $ref: '#/definitions/RateLimiterParameters'
-      selectors:
-        description: |+
-          Selectors for the component.
-
-        type: array
-        minItems: 1
-        items:
-          type: object
-          $ref: '#/definitions/Selector'
-        x-go-tag-validate: required,gt=0,dive
-  RateLimiterDynamicConfig:
+  RateLimiterCustomLimit:
     type: object
-    title: Dynamic Configuration for the rate limiter
+    required:
+    - label_value
     properties:
-      overrides:
+      label_value:
         description: |+
-          Allows to specify different limits for particular label values.
+          Value of the label for which the custom limit should be applied.
 
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/RateLimiterOverride'
-        x-go-tag-validate: dive
+        type: string
+        x-go-tag-validate: required
+      limit_scale_factor:
+        description: |+
+          Amount by which the `in_ports.limit` should be multiplied for
+          this label value.
+
+        type: number
+        format: double
+        default: 1
+        x-go-tag-default: "1.0"
   RateLimiterIns:
     type: object
     title: Inputs for the RateLimiter component
@@ -2889,30 +2891,11 @@ definitions:
 
         x-go-tag-validate: required
         $ref: '#/definitions/InPort'
-  RateLimiterOverride:
-    type: object
-    required:
-    - label_value
-    properties:
-      label_value:
-        description: |+
-          Value of the label for which the override should be applied.
-
-        type: string
-        x-go-tag-validate: required
-      limit_scale_factor:
-        description: |+
-          Amount by which the `in_ports.limit` should be multiplied for
-          this label value.
-
-        type: number
-        format: double
-        default: 1
-        x-go-tag-default: "1.0"
   RateLimiterParameters:
     type: object
     required:
     - label_key
+    - selectors
     properties:
       label_key:
         description: |+
@@ -2936,6 +2919,16 @@ definitions:
         type: string
         default: 60s
         x-go-tag-default: 60s
+      selectors:
+        description: |+
+          Selectors for flows that will be rate limited by this _Rate Limiter_.
+
+        type: array
+        minItems: 1
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required,gt=0,dive
       tokens_label_key:
         description: |+
           Flow label key that will be used to override the number of tokens
@@ -3061,28 +3054,22 @@ definitions:
       :::
     type: object
     properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/RegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
-        type: string
       in_ports:
         description: Input ports for the _Regulator_.
         $ref: '#/definitions/RegulatorIns'
       parameters:
         description: Parameters for the _Regulator_.
         $ref: '#/definitions/RegulatorParameters'
-  RegulatorDynamicConfig:
-    type: object
-    title: Dynamic Configuration for _Regulator_
-    properties:
-      enable_label_values:
-        description: Specify certain label values to be accepted by this flow filter
+      pass_through_label_values:
+        description: Specify certain label values to be always accepted by this _Regulator_
           regardless of accept percentage.
         type: array
         items:
           type: string
+      pass_through_label_values_config_key:
+        description: Configuration key for setting label value to pass through through
+          dynamic configuration.
+        type: string
   RegulatorIns:
     type: object
     properties:
@@ -3105,7 +3092,7 @@ definitions:
         type: string
       selectors:
         description: |+
-          Selectors for the component.
+          Selectors for flows that will be regulated by this _Flow Regulator_.
 
         type: array
         minItems: 1

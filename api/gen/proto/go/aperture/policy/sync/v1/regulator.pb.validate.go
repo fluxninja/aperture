@@ -244,34 +244,7 @@ func (m *RegulatorDynamicConfigWrapper) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetRegulatorDynamicConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegulatorDynamicConfigWrapperValidationError{
-					field:  "RegulatorDynamicConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RegulatorDynamicConfigWrapperValidationError{
-					field:  "RegulatorDynamicConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetRegulatorDynamicConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RegulatorDynamicConfigWrapperValidationError{
-				field:  "RegulatorDynamicConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for PassThroughLabelValues
 
 	if len(errors) > 0 {
 		return RegulatorDynamicConfigWrapperMultiError(errors)
