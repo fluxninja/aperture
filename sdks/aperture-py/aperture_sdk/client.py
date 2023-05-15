@@ -106,7 +106,7 @@ class ApertureClient:
         try:
             # stub.Check is typed to accept an int, but it actually accepts a float
             timeout = typing.cast(int, self.timeout.total_seconds())
-            response = stub.Check(request, timeout=timeout)
+            response = stub.Check(request) if timeout == 0 else stub.Check(request, timeout=timeout)
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
