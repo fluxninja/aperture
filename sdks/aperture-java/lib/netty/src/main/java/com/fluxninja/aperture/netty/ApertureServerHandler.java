@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,21 +93,30 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
                 e.printStackTrace();
             }
             HttpResponseStatus status;
+            Map<String, String> headers;
             if (flow.checkResponse() != null
                     && flow.checkResponse().hasDeniedResponse()
                     && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
                 status =
                         HttpResponseStatus.valueOf(
                                 flow.checkResponse().getDeniedResponse().getStatus());
+                headers = flow.checkResponse().getDeniedResponse().getHeadersMap();
+
             } else {
                 status = HttpResponseStatus.FORBIDDEN;
+                headers = Collections.emptyMap();
             }
 
             ByteBuf content = Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8);
             FullHttpResponse response =
                     new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
+
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                response.headers().set(entry.getKey(), entry.getValue());
+            }
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html");
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+
             ctx.write(response);
             ctx.flush();
         }
