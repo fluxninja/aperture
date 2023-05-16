@@ -1227,13 +1227,45 @@ func ParseAutoScaler(
 			},
 		},
 		{
+			Component: &policylangv1.Component_Switcher{
+				Switcher: &policylangv1.Switcher{
+					InPorts: &policylangv1.Switcher_Ins{
+						Switch: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "SCALE_OUT_HOLD",
+							},
+						},
+						OnSignal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_ConstantSignal{
+								ConstantSignal: &policylangv1.ConstantSignal{
+									Const: &policylangv1.ConstantSignal_SpecialValue{
+										SpecialValue: "NaN",
+									},
+								},
+							},
+						},
+						OffSignal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "SCALE_IN",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Switcher_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "SCALE_IN_POST_SCALE_OUT_HOLD",
+						},
+					},
+				},
+			},
+		},
+		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
 					HoldFor: autoscaler.ScalingParameters.ScaleInCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_IN",
+								SignalName: "SCALE_IN_POST_SCALE_OUT_HOLD",
 							},
 						},
 						Reset_: &policylangv1.InPort{

@@ -102,7 +102,7 @@ spec:
                     constant_signal:
                       value: 1
                   signal:
-                    signal_name: OBSERVED_LOAD_MULTIPLIER
+                    signal_name: DESIRED_LOAD_MULTIPLIER
                 parameters:
                   slope: -1
           scaling_backend:

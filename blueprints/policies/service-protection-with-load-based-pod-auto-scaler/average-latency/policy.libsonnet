@@ -56,7 +56,7 @@ function(cfg) {
         increasingGradient.new()
         + increasingGradient.withInPorts(
           increasingGradientInPort.new()
-          + increasingGradientInPort.withSignal(port.withSignalName('OBSERVED_LOAD_MULTIPLIER'))
+          + increasingGradientInPort.withSignal(port.withSignalName('DESIRED_LOAD_MULTIPLIER'))
           + increasingGradientInPort.withSetpoint(port.withConstantSignal(1.0))
         )
         + increasingGradient.withParameters(
