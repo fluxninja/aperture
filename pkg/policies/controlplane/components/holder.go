@@ -74,7 +74,7 @@ func (h *Holder) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.
 	if !h.holdPhase {
 		if input.Valid() {
 			h.currentReading = input
-			h.holdPhase = false
+			h.holdPhase = true
 			h.windowCount = 0
 			output = input
 		}
