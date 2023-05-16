@@ -33,7 +33,8 @@ are still benefits of using Aperture:
 - The ability to configure global rate limiting without configuring any external
   components
   – [mesh of Agents is providing distributed counters](/concepts/flow-control/components/rate-limiter.md#distributed-counters).
-- Rate-limiting decisions can be made locally on agent if lazy sync is enabled.
+- Rate-limiting decisions can be made locally on the agent if lazy sync is
+  enabled.
 - In addition to Rate Limiter, Aperture also offers Load Scheduler, which Envoy
   doesn't have an equivalent of.
 
@@ -56,8 +57,8 @@ or 503 Service Unavailable response and react accordingly.
 
 Remember that while receiving 503 by some of the users may seem like a thing to
 avoid, if such a case occurs an overload is already happening and Aperture is
-protecting your service from unhealthy state (e.g. crashing) and thus affecting
-even more users.
+protecting your service from an unhealthy state (e.g. crashing) and thus
+affecting even more users.
 
 ### How can we define Flow Labels for workload prioritization or ratelimiting?
 
@@ -76,7 +77,7 @@ take necessary actions to prevent the system from becoming unhealthy. Therefore,
 the server gets enough time to reach a healthy state.
 
 It may happen that overload is happening too quickly for auto-scale to happen.
-In such case, Load Scheduler will queue or drop excessive load to protect
+In such case, the Load Scheduler will queue or drop excessive load to protect
 existing services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
