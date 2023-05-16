@@ -42,11 +42,10 @@ are still benefits of using Aperture:
 
 - Rate Limiter always accepts/rejects immediately.
 - [Load Scheduler][] can hold a request within some time period (derived from
-  request's grpc-timeout).
+  gRPC request timeout).
 - Load Scheduler can also be configured in a way which effectively disables the
-  holding/scheduling part. If such configuration is desired, it will
-  accept/reject request immediately based on workload priorities and other
-  factors.
+  holding/scheduling part. If such configuration is desired, it will accept or
+  reject request immediately based on workload priorities and other factors.
 
 ### If Aperture is rejecting or queuing requests, how will it impact the user experience?
 
@@ -55,15 +54,16 @@ latency). When it comes to rejecting requests, clients (whether it's frontend
 code or some other service) should be prepared to receive 429 Too Many Requests
 or 503 Service Unavailable response and react accordingly.
 
-Remember that while receiving 503 by some of the users may seem like a thing to
-avoid, if such a case occurs an overload is already happening and Aperture is
-protecting your service from an unhealthy state (e.g. crashing) and thus
+Remember that while receiving 503 by some of the users might seem like a thing
+to avoid, if such a case occurs an overload is already happening and Aperture is
+protecting your service from an unhealthy state (e.g. crashing) and therefore
 affecting even more users.
 
-### How can we define Flow Labels for workload prioritization or ratelimiting?
+### How can we define Flow Labels for workload prioritization or rate limiting?
 
 - In proxy- or web-framework-based Control Point insertion, most request
-  metadata is already available as Flow Labels, e.g. `http.request.header.foo`.
+  metadata is already available as Flow Labels, for example
+  `http.request.header.foo`.
 - Already existing baggage is also available as Flow Labels.
 - With SDKs, it's possible to explicitly pass Flow Labels to the Check call.
 - Proxy-based integrations can use a [Classifier][] to define new Flow Labels.
@@ -76,14 +76,14 @@ As Aperture observes the system, it can detect early sign of overload and can
 take necessary actions to prevent the system from becoming unhealthy. Therefore,
 the server gets enough time to reach a healthy state.
 
-It may happen that overload is happening too quickly for auto-scale to happen.
+It might happen that overload is happening too quickly for auto-scale to happen.
 In such case, the Load Scheduler will queue or drop excessive load to protect
 existing services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
 
-No, right now, we only support deploying [Aperture Controller][] on a Kubernetes
-cluster.
+No, as for now, we only support deploying [Aperture Controller][] on a
+Kubernetes cluster.
 
 [Rate Limiter]: /concepts/flow-control/components/rate-limiter.md
 [Load Scheduler]: /concepts/flow-control/components/load-scheduler.md
