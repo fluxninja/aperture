@@ -21,9 +21,8 @@ local averageLatencyServiceProtection = import '../../service-protection/average
 * @param (policy.auto_scaling.dry_run_config_key: string) Configuration key for overriding dry run setting through dynamic configuration.
 * @param (policy.auto_scaling.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
 * @param (policy.auto_scaling.disable_periodic_scale_in: bool) Disable periodic scale in.
-* @param (policy.auto_scaling.periodic_decrease: aperture.spec.v1.PeriodicDecreaseParameters) Parameters for periodic scale in.
 * @param (policy.auto_scaling.periodic_decrease.period: string) Period for periodic scale in.
-* @param (policy.auto_scaling.periodic_decrease.scale_in_percentage: int) Percentage of replicas to scale in.
+* @param (policy.auto_scaling.periodic_decrease.scale_in_percentage: float64) Percentage of replicas to scale in.
 */
 
 /**

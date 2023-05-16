@@ -90,9 +90,8 @@ spec:
               alert_name: Scale in controller Alerter
             controller:
               periodic:
-                parameters:
-                  period: 60s
-                  scale_in_percentage: 10
+                period: 60s
+                scale_in_percentage: 10
           scale_out_controllers:
           - alerter:
               alert_name: Scale out controller Alerter
@@ -103,7 +102,7 @@ spec:
                     constant_signal:
                       value: 1
                   signal:
-                    signal_name: OBSERVED_LOAD_MULTIPLIER
+                    signal_name: DESIRED_LOAD_MULTIPLIER
                 parameters:
                   slope: -1
           scaling_backend:

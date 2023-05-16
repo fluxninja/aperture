@@ -473,7 +473,8 @@
         },
         "scale_in_alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-in Alerter.",
+          "description": "Configuration for scale-in Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 3
         },
         "scale_in_cooldown": {
@@ -485,7 +486,8 @@
         },
         "scale_out_alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-out Alerter.",
+          "description": "Configuration for scale-out Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 5
         },
         "scale_out_cooldown": {
@@ -2565,16 +2567,6 @@
     "PeriodicDecrease": {
       "description": "PeriodicDecrease defines a controller for scaling in based on a periodic timer.",
       "properties": {
-        "parameters": {
-          "$ref": "#/definitions/PeriodicDecreaseParameters",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PeriodicDecreaseParameters": {
-      "properties": {
         "period": {
           "description": "The period of the timer.\n\n",
           "type": "string",
@@ -3471,7 +3463,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/InfraMeter"
           },
-          "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n   - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t          batch:\n\t            send_batch_size: 10\n\t            timeout: 10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval: 10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password: secretpassword\n\t            username: admin\n\t        per_agent_group: true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying it to the\nproduction cluster.\nIncorrect configuration will get rejected at the agents and may cause\nshutdown of the agent(s).\n\n:::",
+          "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n   - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t          batch:\n\t            send_batch_size: 10\n\t            timeout: 10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval: 10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password: secretpassword\n\t            username: admin\n\t        per_agent_group: true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying it to the\nproduction cluster.\nIncorrect configuration will get rejected at the agents and might cause\nshutdown of the agent(s).\n\n:::",
           "type": "object",
           "x-order": 1
         }

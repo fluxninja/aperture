@@ -136,14 +136,10 @@ message DecreasingGradient {
 
 // PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 message PeriodicDecrease {
-  message Parameters {
-    // The period of the timer.
-    google.protobuf.Duration period = 1; // @gotags: validate:"required"
-    // The percentage of scale to reduce.
-    double scale_in_percentage = 2; // @gotags: validate:"required,gte=0,lte=100"
-  }
-
-  Parameters parameters = 1;
+  // The period of the timer.
+  google.protobuf.Duration period = 1; // @gotags: validate:"required"
+  // The percentage of scale to reduce.
+  double scale_in_percentage = 2; // @gotags: validate:"required,gte=0,lte=100"
 }
 
 message ScaleOutController {
@@ -194,10 +190,10 @@ message AutoScaler {
     double cooldown_override_percentage = 5; // @gotags: default:"50"
 
     // Configuration for scale-out Alerter.
-    Alerter.Parameters scale_out_alerter = 6;
+    Alerter.Parameters scale_out_alerter = 6; // @gotags: validate:"required"
 
     // Configuration for scale-in Alerter.
-    Alerter.Parameters scale_in_alerter = 7;
+    Alerter.Parameters scale_in_alerter = 7; // @gotags: validate:"required"
   }
 
   message ScalingBackend {
@@ -227,6 +223,7 @@ message AutoScaler {
 
   // List of _Controllers_ for scaling out.
   repeated ScaleOutController scale_out_controllers = 2; // @gotags: validate:"dive"
+
   // List of _Controllers_ for scaling in.
   repeated ScaleInController scale_in_controllers = 3; // @gotags: validate:"dive"
 

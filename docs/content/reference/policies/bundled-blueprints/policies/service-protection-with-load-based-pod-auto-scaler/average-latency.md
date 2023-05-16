@@ -335,14 +335,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-auto-scaling-periodic-decrease"></a>
+###### policy.auto_scaling.periodic_decrease {#policy-auto-scaling-periodic-decrease}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-periodic-decrease-period"></a>
 
 <ParameterDescription
-    name='policy.auto_scaling.periodic_decrease'
-    description='Parameters for periodic scale in.'
-    type='Object (aperture.spec.v1.PeriodicDecreaseParameters)'
-    reference='../../../spec#periodic-decrease-parameters'
-    value='{"period": "60s", "scale_in_percentage": 10}'
+    name='policy.auto_scaling.periodic_decrease.period'
+    description='Period for periodic scale in.'
+    type='string'
+    reference=''
+    value='"60s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-periodic-decrease-scale-in-percentage"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.periodic_decrease.scale_in_percentage'
+    description='Percentage of replicas to scale in.'
+    type='Number (double)'
+    reference=''
+    value='10'
 />
 
 <!-- vale on -->

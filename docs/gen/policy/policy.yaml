@@ -502,7 +502,10 @@ definitions:
         x-go-tag-default: "10"
         x-order: 2
       scale_in_alerter:
-        description: Configuration for scale-in Alerter.
+        description: |+
+          Configuration for scale-in Alerter.
+
+        x-go-tag-validate: required
         x-order: 3
         $ref: '#/definitions/AlerterParameters'
       scale_in_cooldown:
@@ -514,7 +517,10 @@ definitions:
         x-go-tag-default: 120s
         x-order: 4
       scale_out_alerter:
-        description: Configuration for scale-out Alerter.
+        description: |+
+          Configuration for scale-out Alerter.
+
+        x-go-tag-validate: required
         x-order: 5
         $ref: '#/definitions/AlerterParameters'
       scale_out_cooldown:
@@ -2686,12 +2692,6 @@ definitions:
     description: PeriodicDecrease defines a controller for scaling in based on a periodic
       timer.
     type: object
-    properties:
-      parameters:
-        x-order: 0
-        $ref: '#/definitions/PeriodicDecreaseParameters'
-  PeriodicDecreaseParameters:
-    type: object
     required:
     - period
     - scale_in_percentage
@@ -3739,7 +3739,7 @@ definitions:
           secretpassword\n\t            username: admin\n\t        per_agent_group:
           true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying
           it to the\nproduction cluster.\nIncorrect configuration will get rejected
-          at the agents and may cause\nshutdown of the agent(s).\n\n:::"
+          at the agents and might cause\nshutdown of the agent(s).\n\n:::"
         type: object
         additionalProperties:
           $ref: '#/definitions/InfraMeter'

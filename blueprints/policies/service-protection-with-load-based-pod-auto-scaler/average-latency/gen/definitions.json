@@ -184,13 +184,21 @@
               "type": "boolean"
             },
             "periodic_decrease": {
-              "description": "Parameters for periodic scale in.",
-              "default": {
-                "period": "60s",
-                "scale_in_percentage": 10
-              },
               "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/PeriodicDecreaseParameters"
+              "additionalProperties": false,
+              "properties": {
+                "period": {
+                  "description": "Period for periodic scale in.",
+                  "default": "60s",
+                  "type": "string"
+                },
+                "scale_in_percentage": {
+                  "description": "Percentage of replicas to scale in.",
+                  "default": 10,
+                  "type": "number",
+                  "format": "double"
+                }
+              }
             }
           }
         }
