@@ -7584,7 +7584,7 @@ Example:
 :::caution
 
 Validate the OTel configuration before applying it to the production cluster.
-Incorrect configuration will get rejected at the agents and may cause shutdown
+Incorrect configuration will get rejected at the agents and might cause shutdown
 of the agent(s).
 
 :::
