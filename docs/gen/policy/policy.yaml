@@ -502,7 +502,10 @@ definitions:
         x-go-tag-default: "10"
         x-order: 2
       scale_in_alerter:
-        description: Configuration for scale-in Alerter.
+        description: |+
+          Configuration for scale-in Alerter.
+
+        x-go-tag-validate: required
         x-order: 3
         $ref: '#/definitions/AlerterParameters'
       scale_in_cooldown:
@@ -514,7 +517,10 @@ definitions:
         x-go-tag-default: 120s
         x-order: 4
       scale_out_alerter:
-        description: Configuration for scale-out Alerter.
+        description: |+
+          Configuration for scale-out Alerter.
+
+        x-go-tag-validate: required
         x-order: 5
         $ref: '#/definitions/AlerterParameters'
       scale_out_cooldown:

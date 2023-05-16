@@ -129,85 +129,88 @@ func ParseAutoScaler(
 					},
 				},
 			},
-			{
-				Component: &policylangv1.Component_Decider{
-					Decider: &policylangv1.Decider{
-						Operator: "gt",
-						InPorts: &policylangv1.Decider_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_SCALE",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACTUAL_SCALE",
-								},
+		}
+	} else {
+		return nil, fmt.Errorf("unsupported scaler type: %T", scalingBackend)
+	}
+
+	componentsAlerters := []*policylangv1.Component{
+		{
+			Component: &policylangv1.Component_Decider{
+				Decider: &policylangv1.Decider{
+					Operator: "gt",
+					InPorts: &policylangv1.Decider_Ins{
+						Lhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "DESIRED_SCALE",
 							},
 						},
-						OutPorts: &policylangv1.Decider_Outs{
-							Output: &policylangv1.OutPort{
+						Rhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "CONFIGURED_SCALE",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Decider_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "DESIRED_SCALE_GREATER",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Alerter{
+				Alerter: &policylangv1.Alerter{
+					Parameters: autoscaler.ScalingParameters.ScaleOutAlerter,
+					InPorts: &policylangv1.Alerter_Ins{
+						Signal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
 								SignalName: "DESIRED_SCALE_GREATER",
 							},
 						},
 					},
 				},
 			},
-			{
-				Component: &policylangv1.Component_Alerter{
-					Alerter: &policylangv1.Alerter{
-						Parameters: autoscaler.ScalingParameters.ScaleOutAlerter,
-						InPorts: &policylangv1.Alerter_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_SCALE_GREATER",
-								},
+		},
+		{
+			Component: &policylangv1.Component_Decider{
+				Decider: &policylangv1.Decider{
+					Operator: "lt",
+					InPorts: &policylangv1.Decider_Ins{
+						Lhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "DESIRED_SCALE",
+							},
+						},
+						Rhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "CONFIGURED_SCALE",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Decider_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "DESIRED_SCALE_LESSER",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Alerter{
+				Alerter: &policylangv1.Alerter{
+					Parameters: autoscaler.ScalingParameters.ScaleInAlerter,
+					InPorts: &policylangv1.Alerter_Ins{
+						Signal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "DESIRED_SCALE_LESSER",
 							},
 						},
 					},
 				},
 			},
-			{
-				Component: &policylangv1.Component_Decider{
-					Decider: &policylangv1.Decider{
-						Operator: "lt",
-						InPorts: &policylangv1.Decider_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_SCALE",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACTUAL_SCALE",
-								},
-							},
-						},
-						OutPorts: &policylangv1.Decider_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "DESIRED_SCALE_LESS",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Alerter{
-					Alerter: &policylangv1.Alerter{
-						Parameters: autoscaler.ScalingParameters.ScaleInAlerter,
-						InPorts: &policylangv1.Alerter_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_SCALE_LESS",
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-	} else {
-		return nil, fmt.Errorf("unsupported scaler type: %T", scalingBackend)
+		},
 	}
 
 	// Components to find the min and max values for the desired scale.
@@ -1052,13 +1055,13 @@ func ParseAutoScaler(
 						},
 						Rhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "CONFIGURED_SCALE",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 					},
 					OutPorts: &policylangv1.Decider_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "IS_SCALE_OUT",
+							SignalName: "IS_SCALE_OUT_INTENT",
 						},
 					},
 				},
@@ -1070,7 +1073,7 @@ func ParseAutoScaler(
 					InPorts: &policylangv1.Switcher_Ins{
 						Switch: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "IS_SCALE_OUT",
+								SignalName: "IS_SCALE_OUT_INTENT",
 							},
 						},
 						OnSignal: &policylangv1.InPort{
@@ -1081,7 +1084,7 @@ func ParseAutoScaler(
 					},
 					OutPorts: &policylangv1.Switcher_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "SCALE_OUT",
+							SignalName: "SCALE_OUT_INTENT",
 						},
 					},
 				},
@@ -1115,13 +1118,13 @@ func ParseAutoScaler(
 						},
 						Rhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "CONFIGURED_SCALE",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 					},
 					OutPorts: &policylangv1.Decider_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "IS_SCALE_IN",
+							SignalName: "IS_SCALE_IN_INTENT",
 						},
 					},
 				},
@@ -1133,7 +1136,7 @@ func ParseAutoScaler(
 					InPorts: &policylangv1.Switcher_Ins{
 						Switch: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "IS_SCALE_IN",
+								SignalName: "IS_SCALE_IN_INTENT",
 							},
 						},
 						OnSignal: &policylangv1.InPort{
@@ -1144,7 +1147,7 @@ func ParseAutoScaler(
 					},
 					OutPorts: &policylangv1.Switcher_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "SCALE_IN",
+							SignalName: "SCALE_IN_INTENT",
 						},
 					},
 				},
@@ -1157,7 +1160,7 @@ func ParseAutoScaler(
 					InPorts: &policylangv1.ArithmeticCombinator_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_OUT_HOLD",
+								SignalName: "SCALE_OUT_INTENT_HOLD",
 							},
 						},
 						Rhs: &policylangv1.InPort{
@@ -1185,7 +1188,7 @@ func ParseAutoScaler(
 					InPorts: &policylangv1.Decider_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_OUT",
+								SignalName: "SCALE_OUT_INTENT",
 							},
 						},
 						Rhs: &policylangv1.InPort{
@@ -1209,7 +1212,7 @@ func ParseAutoScaler(
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_OUT",
+								SignalName: "SCALE_OUT_INTENT",
 							},
 						},
 						Reset_: &policylangv1.InPort{
@@ -1220,7 +1223,7 @@ func ParseAutoScaler(
 					},
 					OutPorts: &policylangv1.Holder_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "SCALE_OUT_HOLD",
+							SignalName: "SCALE_OUT_INTENT_HOLD",
 						},
 					},
 				},
@@ -1232,7 +1235,7 @@ func ParseAutoScaler(
 					InPorts: &policylangv1.Switcher_Ins{
 						Switch: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_OUT_HOLD",
+								SignalName: "SCALE_OUT_INTENT_HOLD",
 							},
 						},
 						OnSignal: &policylangv1.InPort{
@@ -1246,13 +1249,13 @@ func ParseAutoScaler(
 						},
 						OffSignal: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_IN",
+								SignalName: "SCALE_IN_INTENT",
 							},
 						},
 					},
 					OutPorts: &policylangv1.Switcher_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "SCALE_IN_POST_SCALE_OUT_HOLD",
+							SignalName: "SCALE_IN_ONLY_INTENT",
 						},
 					},
 				},
@@ -1265,18 +1268,112 @@ func ParseAutoScaler(
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_IN_POST_SCALE_OUT_HOLD",
+								SignalName: "SCALE_IN_ONLY_INTENT",
 							},
 						},
 						Reset_: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "SCALE_OUT_HOLD",
+								SignalName: "SCALE_OUT_INTENT_HOLD",
 							},
 						},
 					},
 					OutPorts: &policylangv1.Holder_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "SCALE_IN_HOLD",
+							SignalName: "SCALE_IN_ONLY_INTENT_HOLD",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Decider{
+				Decider: &policylangv1.Decider{
+					Operator: "gt",
+					InPorts: &policylangv1.Decider_Ins{
+						Lhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "SCALE_OUT_INTENT_HOLD",
+							},
+						},
+						Rhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "CONFIGURED_SCALE",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Decider_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "IS_SCALE_OUT",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Switcher{
+				Switcher: &policylangv1.Switcher{
+					InPorts: &policylangv1.Switcher_Ins{
+						Switch: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "IS_SCALE_OUT",
+							},
+						},
+						OnSignal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "SCALE_OUT_INTENT_HOLD",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Switcher_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "SCALE_OUT",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Decider{
+				Decider: &policylangv1.Decider{
+					Operator: "lt",
+					InPorts: &policylangv1.Decider_Ins{
+						Lhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "SCALE_IN_ONLY_INTENT_HOLD",
+							},
+						},
+						Rhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "CONFIGURED_SCALE",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Decider_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "IS_SCALE_IN_ONLY",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Switcher{
+				Switcher: &policylangv1.Switcher{
+					InPorts: &policylangv1.Switcher_Ins{
+						Switch: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "IS_SCALE_IN_ONLY",
+							},
+						},
+						OnSignal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "SCALE_IN_ONLY_INTENT_HOLD",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Switcher_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "SCALE_IN_ONLY",
 						},
 					},
 				},
@@ -1289,12 +1386,12 @@ func ParseAutoScaler(
 						Inputs: []*policylangv1.InPort{
 							{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SCALE_OUT_HOLD",
+									SignalName: "SCALE_OUT",
 								},
 							},
 							{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SCALE_IN_HOLD",
+									SignalName: "SCALE_IN_ONLY",
 								},
 							},
 						},
@@ -1367,6 +1464,7 @@ func ParseAutoScaler(
 	components = append(components, componentsScaleOut...)
 	components = append(components, componentsPreScaler...)
 	components = append(components, componentsScaler...)
+	components = append(components, componentsAlerters...)
 
 	// Construct nested circuit.
 	nestedCircuit := &policylangv1.NestedCircuit{

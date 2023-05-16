@@ -656,7 +656,10 @@ definitions:
         default: 10
         x-go-tag-default: "10"
       scale_in_alerter:
-        description: Configuration for scale-in Alerter.
+        description: |+
+          Configuration for scale-in Alerter.
+
+        x-go-tag-validate: required
         $ref: '#/definitions/AlerterParameters'
       scale_in_cooldown:
         description: |+
@@ -666,7 +669,10 @@ definitions:
         default: 120s
         x-go-tag-default: 120s
       scale_out_alerter:
-        description: Configuration for scale-out Alerter.
+        description: |+
+          Configuration for scale-out Alerter.
+
+        x-go-tag-validate: required
         $ref: '#/definitions/AlerterParameters'
       scale_out_cooldown:
         description: |+

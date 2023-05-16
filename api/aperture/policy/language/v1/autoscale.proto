@@ -190,10 +190,10 @@ message AutoScaler {
     double cooldown_override_percentage = 5; // @gotags: default:"50"
 
     // Configuration for scale-out Alerter.
-    Alerter.Parameters scale_out_alerter = 6;
+    Alerter.Parameters scale_out_alerter = 6; // @gotags: validate:"required"
 
     // Configuration for scale-in Alerter.
-    Alerter.Parameters scale_in_alerter = 7;
+    Alerter.Parameters scale_in_alerter = 7; // @gotags: validate:"required"
   }
 
   message ScalingBackend {

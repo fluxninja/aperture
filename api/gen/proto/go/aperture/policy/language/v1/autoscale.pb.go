@@ -1233,9 +1233,9 @@ type AutoScaler_ScalingParameters struct {
 	// scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 	CooldownOverridePercentage float64 `protobuf:"fixed64,5,opt,name=cooldown_override_percentage,json=cooldownOverridePercentage,proto3" json:"cooldown_override_percentage,omitempty" default:"50"` // @gotags: default:"50"
 	// Configuration for scale-out Alerter.
-	ScaleOutAlerter *Alerter_Parameters `protobuf:"bytes,6,opt,name=scale_out_alerter,json=scaleOutAlerter,proto3" json:"scale_out_alerter,omitempty"`
+	ScaleOutAlerter *Alerter_Parameters `protobuf:"bytes,6,opt,name=scale_out_alerter,json=scaleOutAlerter,proto3" json:"scale_out_alerter,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Configuration for scale-in Alerter.
-	ScaleInAlerter *Alerter_Parameters `protobuf:"bytes,7,opt,name=scale_in_alerter,json=scaleInAlerter,proto3" json:"scale_in_alerter,omitempty"`
+	ScaleInAlerter *Alerter_Parameters `protobuf:"bytes,7,opt,name=scale_in_alerter,json=scaleInAlerter,proto3" json:"scale_in_alerter,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *AutoScaler_ScalingParameters) Reset() {

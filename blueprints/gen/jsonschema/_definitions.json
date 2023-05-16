@@ -473,7 +473,8 @@
         },
         "scale_in_alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-in Alerter.",
+          "description": "Configuration for scale-in Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 3
         },
         "scale_in_cooldown": {
@@ -485,7 +486,8 @@
         },
         "scale_out_alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-out Alerter.",
+          "description": "Configuration for scale-out Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 5
         },
         "scale_out_cooldown": {
