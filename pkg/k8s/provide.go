@@ -77,9 +77,13 @@ type RealK8sClient struct {
 // RealK8sClient implements K8sClient.
 var _ K8sClient = &RealK8sClient{}
 
-// NewK8sClient returns a new kubernetes client.
+// NewK8sClient returns a new kubernetes client, or nil if outside a Kubernetes cluster.
 func NewK8sClient(httpClient *http.Client, shutdowner fx.Shutdowner) (*RealK8sClient, error) {
 	clientSet, config, err := newK8sClientSet(httpClient, shutdowner)
+	if err == rest.ErrNotInCluster {
+		log.Info().Msg("Not in Kubernetes Cluster, creating nil client")
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -137,14 +141,14 @@ func (r *RealK8sClient) GetRESTMapper() apimeta.RESTMapper {
 // a working one is found.  If none work, the first error is returned.  It returns
 // both the scale, as well as the group-resource from the working mapping.
 func (r *RealK8sClient) ScaleForGroupKind(ctx context.Context, namespace, name string, groupKind schema.GroupKind) (*autoscalingv1.Scale, schema.GroupResource, error) {
-	mappings, err := r.mapper.RESTMappings(groupKind)
+	mappings, err := r.GetRESTMapper().RESTMappings(groupKind)
 	if err != nil {
 		return nil, schema.GroupResource{}, err
 	}
 	var firstErr error
 	for i, mapping := range mappings {
 		targetGR := mapping.Resource.GroupResource()
-		scale, err := r.scaleClient.Scales(namespace).Get(ctx, targetGR, name, metav1.GetOptions{})
+		scale, err := r.GetScaleClient().Scales(namespace).Get(ctx, targetGR, name, metav1.GetOptions{})
 		if err == nil {
 			return scale, targetGR, nil
 		}
