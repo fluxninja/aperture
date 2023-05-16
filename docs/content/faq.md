@@ -28,8 +28,8 @@ colocating agents with services, it's a single RPC call within a single node.
 While Envoy does have some local and non-local rate limiting capabilities, there
 are still benefits of using Aperture:
 
-- Aperture Rate limiter allows dynamically configuring Rate Limiter parameters
-  via signals from Policy.
+- Aperture [Rate Limiter][] allows dynamically configuring Rate Limiter
+  parameters via signals from Policy.
 - Ability to configure global rate limiting without configuring any external
   components
   – [mesh of Agents is providing distributed counters](/concepts/flow-control/components/rate-limiter.md#distributed-counters).
@@ -40,9 +40,9 @@ are still benefits of using Aperture:
 ### Does Aperture reject requests immediately?
 
 - Rate Limiter always accepts/rejects immediately.
-- Load Scheduler can hold a request within some time period (derived from
-  request's grpc-timeout)
-- Load Scheduler can also be configured which effectively disables
+- [Load Scheduler][] can hold a request within some time period (derived from
+  request's grpc-timeout).
+- Load Scheduler can also be configured in a way which effectively disables
   holding/scheduling part. If such configuration is desired, it will
   accept/reject request immediately based on workload priorities and other
   factors.
@@ -55,23 +55,19 @@ other service) should be prepared to receive 429 Too Many Requests or 503
 Service Unavailable response and react accordingly.
 
 Remember that while receiving 503 by some of users may seem like a thing to
-avoid, if such case occurs overload is already happening Aperture is protecting
-your service from unhealthy state (eg. crashing) and thus affecting even more
-users.
+avoid, if such case occurs overload is already happening and Aperture is
+protecting your service from unhealthy state (eg. crashing) and thus affecting
+even more users.
 
 ### How can we define Flow Labels for workload prioritization or ratelimiting?
 
 - In proxy- or web-framework-based Control Point insertion, most request
   metadata is already available as Flow Labels, e.g. `http.request.header.foo`.
 - Already existing baggage is also available as Flow Labels.
-- SDKs can explicitly pass Flow Labels to the Check call.
-- Proxy-based integrations can use a
-  [Classifier](https://docs.fluxninja.com/development/concepts/flow-control/resources/classifier)
-  to define new Flow Labels.
+- With SDKs, it's possible to explicitly pass Flow Labels to the Check call.
+- Proxy-based integrations can use a [Classifier][] to define new Flow Labels.
 
-See the
-[Flow Label sources](https://docs.fluxninja.com/development/concepts/flow-control/flow-label#sources)
-section for more details.
+See the [Flow Label][] page for more details.
 
 ### How does Aperture address the issue of delays in servers becoming available and reaching a healthy state, particularly in the context of auto-scaling?
 
@@ -85,5 +81,11 @@ existing services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
 
-No, right now we only support deploying Aperture Controller on a Kubernetes
+No, right now we only support deploying [Aperture Controller][] on a Kubernetes
 cluster.
+
+[Rate Limiter]: /concepts/flow-control/components/rate-limiter.md
+[Load Scheduler]: /concepts/flow-control/components/load-scheduler.md
+[Classifier]: /concepts/flow-control/resources/classifier.md
+[Flow Label]: /concepts/flow-control/flow-label.md
+[Aperture Controller]: /get-started/installation/controller/controller.md
