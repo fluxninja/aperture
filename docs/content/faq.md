@@ -29,7 +29,7 @@ While Envoy does have some local and non-local rate-limiting capabilities, there
 are still benefits of using Aperture:
 
 - Aperture [Rate Limiter][] allows dynamically configuring Rate Limiter
-  parameters via signals from Policy.
+  parameters through signals from Policy.
 - The ability to configure global rate limiting without configuring any external
   components
   – [mesh of Agents is providing distributed counters](/concepts/flow-control/components/rate-limiter.md#distributed-counters).
@@ -40,12 +40,12 @@ are still benefits of using Aperture:
 
 ### Does Aperture reject requests immediately?
 
-- Rate Limiter always accepts/rejects immediately.
+- Rate Limiter always accepts or rejects immediately.
 - [Load Scheduler][] can hold a request within some time period (derived from
   gRPC request timeout).
 - Load Scheduler can also be configured in a way which effectively disables the
-  holding/scheduling part. If such configuration is desired, it will accept or
-  reject request immediately based on workload priorities and other factors.
+  holding/scheduling part. If such a configuration is desired, it will accept or
+  reject the request immediately based on workload priorities and other factors.
 
 ### If Aperture is rejecting or queuing requests, how will it impact the user experience?
 
@@ -56,8 +56,8 @@ or 503 Service Unavailable response and react accordingly.
 
 Remember that while receiving 503 by some of the users might seem like a thing
 to avoid, if such a case occurs an overload is already happening and Aperture is
-protecting your service from an unhealthy state (e.g. crashing) and therefore
-affecting even more users.
+protecting your service from an unhealthy state (for example crashing) and
+therefore affecting even more users.
 
 ### How can we define Flow Labels for workload prioritization or rate limiting?
 
