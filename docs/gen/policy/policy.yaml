@@ -3315,7 +3315,10 @@ definitions:
     type: object
     properties:
       alerter:
-        description: Configuration for embedded Alerter.
+        description: |+
+          Configuration for embedded Alerter.
+
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/AlerterParameters'
       controller:
@@ -3336,7 +3339,10 @@ definitions:
     type: object
     properties:
       alerter:
-        description: Configuration for embedded Alerter.
+        description: |+
+          Configuration for embedded Alerter.
+
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/AlerterParameters'
       controller:

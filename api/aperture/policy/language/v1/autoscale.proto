@@ -153,7 +153,7 @@ message ScaleOutController {
   Controller controller = 1; // @gotags: validate:"required"
 
   // Configuration for embedded Alerter.
-  Alerter.Parameters alerter = 2;
+  Alerter.Parameters alerter = 2; // @gotags: validate:"required"
 }
 
 message ScaleInController {
@@ -168,7 +168,7 @@ message ScaleInController {
   Controller controller = 1; // @gotags: validate:"required"
 
   // Configuration for embedded Alerter.
-  Alerter.Parameters alerter = 2;
+  Alerter.Parameters alerter = 2; // @gotags: validate:"required"
 }
 
 // _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
