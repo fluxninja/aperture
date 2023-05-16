@@ -25,15 +25,15 @@ colocating agents with services, it's a single RPC call within a single node.
 
 ### If we already have circuit breakers and rate limiting in EnvoyProxy, what are the benefits of using Aperture? {#envoy-rate-limit}
 
-While Envoy does have some local and non-local rate limiting capabilities, there
+While Envoy does have some local and non-local rate-limiting capabilities, there
 are still benefits of using Aperture:
 
 - Aperture [Rate Limiter][] allows dynamically configuring Rate Limiter
   parameters via signals from Policy.
-- Ability to configure global rate limiting without configuring any external
+- The ability to configure global rate limiting without configuring any external
   components
   – [mesh of Agents is providing distributed counters](/concepts/flow-control/components/rate-limiter.md#distributed-counters).
-- Rate-limiting decisions can be made locally on agent, if lazy sync is enabled.
+- Rate-limiting decisions can be made locally on agent if lazy sync is enabled.
 - In addition to Rate Limiter, Aperture also offers Load Scheduler, which Envoy
   doesn't have an equivalent of.
 
@@ -42,21 +42,21 @@ are still benefits of using Aperture:
 - Rate Limiter always accepts/rejects immediately.
 - [Load Scheduler][] can hold a request within some time period (derived from
   request's grpc-timeout).
-- Load Scheduler can also be configured in a way which effectively disables
+- Load Scheduler can also be configured in a way which effectively disables the
   holding/scheduling part. If such configuration is desired, it will
   accept/reject request immediately based on workload priorities and other
   factors.
 
 ### If Aperture is rejecting or queuing requests, how will it impact the user experience?
 
-Queuing requests should not affect user experience (apart of increased latency).
-When it comes to rejecting requests, clients (whether it's frontend code or some
-other service) should be prepared to receive 429 Too Many Requests or 503
-Service Unavailable response and react accordingly.
+Queuing requests should not affect user experience (apart from increased
+latency). When it comes to rejecting requests, clients (whether it's frontend
+code or some other service) should be prepared to receive 429 Too Many Requests
+or 503 Service Unavailable response and react accordingly.
 
-Remember that while receiving 503 by some of users may seem like a thing to
-avoid, if such case occurs overload is already happening and Aperture is
-protecting your service from unhealthy state (eg. crashing) and thus affecting
+Remember that while receiving 503 by some of the users may seem like a thing to
+avoid, if such a case occurs an overload is already happening and Aperture is
+protecting your service from unhealthy state (e.g. crashing) and thus affecting
 even more users.
 
 ### How can we define Flow Labels for workload prioritization or ratelimiting?
@@ -73,15 +73,15 @@ See the [Flow Label][] page for more details.
 
 As Aperture observes the system, it can detect early sign of overload and can
 take necessary actions to prevent the system from becoming unhealthy. Therefore,
-server gets enough time to reach a healthy state.
+the server gets enough time to reach a healthy state.
 
 It may happen that overload is happening too quickly for auto-scale to happen.
-In such case, load scheduler will queue or drop excessive load to protect
+In such case, Load Scheduler will queue or drop excessive load to protect
 existing services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
 
-No, right now we only support deploying [Aperture Controller][] on a Kubernetes
+No, right now, we only support deploying [Aperture Controller][] on a Kubernetes
 cluster.
 
 [Rate Limiter]: /concepts/flow-control/components/rate-limiter.md
