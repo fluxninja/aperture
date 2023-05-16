@@ -52,19 +52,26 @@ are still benefits of using Aperture:
 Queuing requests should not affect user experience (apart of increased latency).
 When it comes to rejecting requests, clients (whether it's frontend code or some
 other service) should be prepared to receive 429 Too Many Requests or 503
-Service Unavailable response and react accordingly. We're working on a library
-to make it easy to handle these scenarios and provide nice UX for end users.
+Service Unavailable response and react accordingly.
 
 Remember that while receiving 503 by some of users may seem like a thing to
 avoid, if such case occurs overload is already happening Aperture is protecting
 your service from unhealthy state (eg. crashing) and thus affecting even more
 users.
 
-### How can we ensure the uniqueness of requests for the flow label when using Aperture?
+### How can we define Flow Labels for workload prioritization or ratelimiting?
 
-Aperture uses the flow label to identify the requests.
+- In proxy- or web-framework-based Control Point insertion, most request
+  metadata is already available as Flow Labels, e.g. `http.request.header.foo`.
+- Already existing baggage is also available as Flow Labels.
+- SDKs can explicitly pass Flow Labels to the Check call.
+- Proxy-based integrations can use a
+  [Classifier](https://docs.fluxninja.com/development/concepts/flow-control/resources/classifier)
+  to define new Flow Labels.
 
-TODO (I don't get the question tbh)
+See the
+[Flow Label sources](https://docs.fluxninja.com/development/concepts/flow-control/flow-label#sources)
+section for more details.
 
 ### How does Aperture address the issue of delays in servers becoming available and reaching a healthy state, particularly in the context of auto-scaling?
 
@@ -76,10 +83,7 @@ It may happen that overload is happening too quickly for auto-scale to happen.
 In such case, load scheduler will queue or drop excessive load to protect
 existing services.
 
-### Can the Aperture controller run in a non-containerized environment?
+### Can the Aperture Controller run in a non-containerized environment?
 
-No, the Aperture controller runs in a containerized environment only.
-
-### Is a Kubernetes cluster necessary for working with the Aperture Controller?
-
-Yes, the Aperture controller runs on a Kubernetes cluster.
+No, right now we only support deploying Aperture Controller on a Kubernetes
+cluster.
