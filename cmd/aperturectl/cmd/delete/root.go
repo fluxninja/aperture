@@ -5,18 +5,16 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/rest"
 
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 var (
-	kubeRestConfig *rest.Config
-	controller     utils.ControllerConn
-	client         cmdv1.ControllerClient
-	controllerNs   string
-	policyName     string
+	controller   utils.ControllerConn
+	client       cmdv1.ControllerClient
+	controllerNs string
+	policyName   string
 )
 
 func init() {
