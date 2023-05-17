@@ -57,6 +57,7 @@ Use this command to apply the Aperture Policies.`,
 			}
 
 			Controller.IsKube = true
+			isKube = true
 		}
 
 		if isKube {
