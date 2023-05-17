@@ -87,14 +87,14 @@ spec:
           dry_run_config_key: auto_scaling
           scale_in_controllers:
           - alerter:
-              alert_name: Scale in controller Alerter
+              alert_name: Gradient controller intends to scale in
             controller:
               periodic:
                 period: 60s
                 scale_in_percentage: 10
           scale_out_controllers:
           - alerter:
-              alert_name: Scale out controller Alerter
+              alert_name: Gradient controller intends to scale out
             controller:
               gradient:
                 in_ports:

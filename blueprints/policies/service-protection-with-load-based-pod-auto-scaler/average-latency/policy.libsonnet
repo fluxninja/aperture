@@ -7,8 +7,6 @@ local scaleOutController = spec.v1.ScaleOutController;
 local scaleOutControllerController = spec.v1.ScaleOutControllerController;
 local scaleInController = spec.v1.ScaleInController;
 local scaleInControllerController = spec.v1.ScaleInControllerController;
-local periodicDecrease = spec.v1.PeriodicDecrease;
-local periodicDecreaseParameters = spec.v1.PeriodicDecreaseParameters;
 local increasingGradient = spec.v1.IncreasingGradient;
 local increasingGradientInPort = spec.v1.IncreasingGradientIns;
 local increasingGradientParameters = spec.v1.IncreasingGradientParameters;
@@ -36,7 +34,7 @@ function(cfg) {
     scaleInController.new()
     + scaleInController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale in controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale in')
     )
     + scaleInController.withController(
       scaleInControllerController.new()
@@ -48,7 +46,7 @@ function(cfg) {
     scaleOutController.new()
     + scaleOutController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale out controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale out')
     )
     + scaleOutController.withController(
       scaleOutControllerController.new()

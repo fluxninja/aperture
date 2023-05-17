@@ -2,9 +2,7 @@ syntax = "proto3";
 
 package aperture.policy.private.v1;
 
-import "aperture/policy/language/v1/autoscale.proto";
 import "aperture/policy/language/v1/ports.proto";
-import "aperture/policy/language/v1/std_components.proto";
 
 message PodScaleActuator {
   message Ins {
@@ -33,52 +31,4 @@ message PodScaleReporter {
   string pod_scaler_component_id = 2;
 
   string agent_group = 3;
-}
-
-message AutoScaleGradient {
-  message Ins {
-    aperture.policy.language.v1.InPort signal = 1;
-    aperture.policy.language.v1.InPort setpoint = 2;
-    aperture.policy.language.v1.InPort actual_scale = 3;
-  }
-
-  message Outs {
-    aperture.policy.language.v1.OutPort scale = 1;
-  }
-
-  Ins in_ports = 1;
-
-  Outs out_ports = 2;
-
-  aperture.policy.language.v1.GradientController.Parameters gradient_controller = 3;
-}
-
-message AutoScalePeriodic {
-  message Ins {
-    aperture.policy.language.v1.InPort actual_scale = 1;
-  }
-
-  message Outs {
-    aperture.policy.language.v1.OutPort scale = 1;
-  }
-
-  Ins in_ports = 1;
-
-  Outs out_ports = 2;
-
-  aperture.policy.language.v1.PeriodicDecrease periodic_decrease = 3;
-}
-
-message AutoScaleControllerOutputProcessor {
-  message Ins {
-    aperture.policy.language.v1.InPort scale = 1;
-  }
-
-  message Outs {
-    aperture.policy.language.v1.OutPort proposed_scale = 1;
-  }
-
-  Ins in_ports = 1;
-
-  Outs out_ports = 2;
 }
