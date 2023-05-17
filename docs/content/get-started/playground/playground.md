@@ -41,9 +41,9 @@ $ cd aperture/playground
 # start a local kubernetes cluster
 $ ctlptl apply -f ctlptl-kind-config.yaml
 # start Tilt and run services defined in Tiltfile
-$ tilt up -- --scenario=./scenarios/basic_service_protection
+$ tilt up
 Tilt started on http://localhost:10350/
-v0.30.2, built 2022-06-06
+v0.30.3, built 2022-06-06
 
 (space) to open the browser
 (s) to stream logs (--stream=true)
@@ -61,26 +61,30 @@ Verify that nothing else is running on the [ports forwarded](#port-forwards) by
 :::
 
 The above command starts an Aperture Controller and an Aperture Agent on each
-worker node in the local Kubernetes cluster. Additionally, it starts a demo
-application with an Istio and Envoy based service mesh configured to integrate
-with Aperture. There is an instance of Grafana running on the cluster as well
-for viewing metrics from experiments.
+worker node in the local Kubernetes cluster. Additionally, it starts a Java
+based demo application with
+[Aperture Java SDK](/get-started/integrations/flow-control/sdk/java/java.md)
+configured to integrate with Aperture. There is an instance of Grafana running
+on the cluster as well for viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
-[Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md),
-which protects the demo application against sudden surges in traffic load. You
-can verify it using the following command:
+[Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
+with combination of
+[Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
+dynamically rate-limit traffic from unwanted users, which protects the demo
+application against sudden surges in traffic load. You can verify it using the
+following command:
 
 ```sh
-$ kubectl get policy -n aperture-controller basic-service-protection
+$ kubectl get policy -n aperture-controller rate-limit-escalation
 NAME                       STATUS     AGE
-basic-service-protection   uploaded   41s
+rate-limit-escalation   uploaded   41s
 ```
 
 The Playground includes a demo application so that you can generate simulated
 traffic and see the policy in action. The demo application can be found in the
 `demoapp` namespace. You can read more about the demo application
-[here](https://github.com/fluxninja/aperture/tree/main/playground/resources/demo-app).
+[here](https://github.com/fluxninja/aperture/tree/main/playground/resources/java-demo-app).
 
 ```sh
 $ kubectl get pods -n demoapp
@@ -111,10 +115,10 @@ policy running on Aperture Agent:
 - Each service simulates an artificial workload by taking a few milliseconds to
   reply to a request.
 - The _Flux Meter_ is configured on `service3`. The _Flux Meter_ helps monitor
-  service-level health signals such as latency, which are used in the basic
-  service protection policy.
-- Concurrency Limiter and Rate Limiter are configured on `service1`. That's,
-  when the `service3` is overloaded, load shedding happens on `service1`.
+  service-level health signals such as latency, which are used in the Basic
+  Service Protection policy.
+- Load scheduler and Rate Limiter are configured on `service1`. That's, when the
+  `service3` is overloaded, load scheduling happens on `service1`.
 
 Once all the resources are in the running state, simulated traffic will start
 getting generated automatically against the demo application. The traffic is
