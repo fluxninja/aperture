@@ -111,11 +111,11 @@ class LimiterDecision(_message.Message):
         CURRENT_FIELD_NUMBER: _ClassVar[int]
         LABEL_FIELD_NUMBER: _ClassVar[int]
         TOKENS_CONSUMED_FIELD_NUMBER: _ClassVar[int]
-        remaining: int
-        current: int
+        remaining: float
+        current: float
         label: str
-        tokens_consumed: int
-        def __init__(self, remaining: _Optional[int] = ..., current: _Optional[int] = ..., label: _Optional[str] = ..., tokens_consumed: _Optional[int] = ...) -> None: ...
+        tokens_consumed: float
+        def __init__(self, remaining: _Optional[float] = ..., current: _Optional[float] = ..., label: _Optional[str] = ..., tokens_consumed: _Optional[float] = ...) -> None: ...
     class LoadSchedulerInfo(_message.Message):
         __slots__ = ["workload_index", "tokens_consumed"]
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]

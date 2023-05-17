@@ -24,7 +24,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit int, ttl time.Duration, overrides map[string]float64) (RateTracker, error) {
+func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, ttl time.Duration, overrides map[string]float64) (RateTracker, error) {
 	limitCheck := NewBasicRateLimitChecker()
 	limitCheck.SetRateLimit(limit)
 	limitCheck.SetOverrides(overrides)
@@ -230,7 +230,7 @@ func createJobGroup(limiter RateTracker) *jobs.JobGroup {
 }
 
 // createOlricLimiters creates a set of Olric limiters
-func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit int, ttl time.Duration, overrides map[string]float64) []RateTracker {
+func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, ttl time.Duration, overrides map[string]float64) []RateTracker {
 	var limiters []RateTracker
 	for _, distCache := range cl.members {
 		limiter, err := newTestLimiter(t, distCache, limit, ttl, overrides)
@@ -307,7 +307,7 @@ type testConfig struct {
 	overrides             map[string]float64
 	flows                 []*flow
 	numOlrics             int
-	limit                 int
+	limit                 float64
 	ttl                   time.Duration
 	tolerance             float64
 	duration              time.Duration

@@ -14,7 +14,7 @@ type Overrides map[string]float64
 type BasicRateLimitChecker struct {
 	lock      sync.RWMutex
 	overrides Overrides
-	limit     int
+	limit     float64
 }
 
 // NewBasicRateLimitChecker creates a new instance of BasicLimitCheck.
@@ -33,7 +33,7 @@ func (l *BasicRateLimitChecker) SetOverrides(overrides Overrides) {
 }
 
 // CheckRateLimit checks the limit for a specific label and the remaining limit. If limit is exceeded then we return false and 0 as remaining limit.
-func (l *BasicRateLimitChecker) CheckRateLimit(label string, count int) (bool, int) {
+func (l *BasicRateLimitChecker) CheckRateLimit(label string, count float64) (bool, float64) {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
 	limit := l.GetLabelRateLimit(label)
@@ -48,25 +48,25 @@ func (l *BasicRateLimitChecker) CheckRateLimit(label string, count int) (bool, i
 }
 
 // SetRateLimit sets the limit.
-func (l *BasicRateLimitChecker) SetRateLimit(limit int) {
+func (l *BasicRateLimitChecker) SetRateLimit(limit float64) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 	l.limit = limit
 }
 
 // GetRateLimit returns the limit.
-func (l *BasicRateLimitChecker) GetRateLimit() int {
+func (l *BasicRateLimitChecker) GetRateLimit() float64 {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
 	return l.limit
 }
 
 // GetLabelRateLimit returns the limit for a specific label.
-func (l *BasicRateLimitChecker) GetLabelRateLimit(label string) int {
+func (l *BasicRateLimitChecker) GetLabelRateLimit(label string) float64 {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
 	if scaleFactor, ok := l.overrides[label]; ok {
-		return int(float64(l.limit) * scaleFactor)
+		return l.limit * scaleFactor
 	}
 	return l.limit
 }

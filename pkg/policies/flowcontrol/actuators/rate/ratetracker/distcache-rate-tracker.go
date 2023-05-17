@@ -59,13 +59,13 @@ func (ol *DistCacheRateTracker) Close() error {
 }
 
 // Take is a wrapper for TakeN(label, 1).
-func (ol *DistCacheRateTracker) Take(label string) (bool, int, int) {
+func (ol *DistCacheRateTracker) Take(label string) (bool, float64, float64) {
 	return ol.TakeN(label, 1)
 }
 
 // TakeN increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (ol *DistCacheRateTracker) TakeN(label string, n int) (bool, int, int) {
+func (ol *DistCacheRateTracker) TakeN(label string, n float64) (bool, float64, float64) {
 	ol.mu.RLock()
 	defer ol.mu.RUnlock()
 	newN, err := ol.dMap.Incr(label, n)
