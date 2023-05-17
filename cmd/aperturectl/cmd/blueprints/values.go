@@ -1,6 +1,7 @@
 package blueprints
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -51,6 +52,12 @@ Provides a values file for a given Aperture Blueprint that can be then used to g
 
 aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		return createValuesFile(false)
+		if blueprintName == "" {
+			return fmt.Errorf("--name must be provided")
+		}
+		if valuesFile == "" {
+			return fmt.Errorf("--output-file must be provided")
+		}
+		return createValuesFile(blueprintName, valuesFile, false)
 	},
 }

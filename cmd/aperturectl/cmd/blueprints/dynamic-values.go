@@ -1,6 +1,8 @@
 package blueprints
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +27,12 @@ Provides a dynamic values file for a given Aperture Blueprint that can be then u
 	SilenceErrors: true,
 	Example:       `aperturectl blueprints dynamic-values --name=policies/static-rate-limiting --output-file=values.yaml`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		return createValuesFile(true)
+		if blueprintName == "" {
+			return fmt.Errorf("--name must be provided")
+		}
+		if valuesFile == "" {
+			return fmt.Errorf("--output-file must be provided")
+		}
+		return createValuesFile(blueprintName, valuesFile, true)
 	},
 }

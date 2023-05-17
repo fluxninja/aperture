@@ -11,32 +11,17 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-func createValuesFile(dynamicConfig bool) error {
-	if blueprintName == "" {
-		return fmt.Errorf("--name must be provided")
-	}
-	if valuesFile == "" {
-		return fmt.Errorf("--output-file must be provided")
-	}
-
-	var valFileName string
-
-	if !dynamicConfig {
-		if !onlyRequired {
-			valFileName = valuesFileName
-		} else {
-			valFileName = requiredValuesFileName
-		}
-	} else {
-		if !onlyRequired {
-			valFileName = dynamicConfigValuesFileName
-		} else {
-			valFileName = requiredDynamicConfigValuesFileName
-		}
-	}
-
+func createValuesFile(blueprintName string, valuesFile string, dynamicConfig bool) error {
+	valFileName := valuesFileName
 	if onlyRequired {
 		valFileName = requiredValuesFileName
+	}
+
+	if dynamicConfig {
+		valFileName = dynamicConfigValuesFileName
+		if onlyRequired {
+			valFileName = requiredDynamicConfigValuesFileName
+		}
 	}
 
 	blueprintDir := filepath.Join(blueprintsDir, blueprintName)
