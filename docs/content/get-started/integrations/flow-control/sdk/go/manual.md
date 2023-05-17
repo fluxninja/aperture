@@ -72,15 +72,15 @@ do so, after creating an instance of ApertureClient, use the middleware on your
 router:
 
 ```go
-  mux.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", nil))
+  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil))
 ```
 
 For simplicity, you can also pass a list of regexp patterns to match against the
-request path, for which the middleware will passthrough. This is especially
+request path, for which the middleware will pass through. This is especially
 useful for endpoints like `/healthz`:
 
 ```go
-  mux.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", []regexp.Regexp{regexp.MustCompile("/health.*")}))
+  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", []regexp.Regexp{regexp.MustCompile("/health.*")}))
 ```
 
 [example]: https://github.com/fluxninja/aperture-go/tree/v1.0.0/example
