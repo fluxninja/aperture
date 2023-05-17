@@ -3125,7 +3125,8 @@
       "properties": {
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for embedded Alerter.",
+          "description": "Configuration for embedded Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "controller": {
@@ -3156,7 +3157,8 @@
       "properties": {
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for embedded Alerter.",
+          "description": "Configuration for embedded Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "controller": {

@@ -34,7 +34,7 @@ Assuming that you have already cloned the aperture repository and brought up a
 [required tools](#tools). To bring up the Playground, run the following
 commands:
 
-```sh
+```bash
 $ git clone https://github.com/fluxninja/aperture.git
 # change directory to playground
 $ cd aperture/playground
@@ -43,7 +43,7 @@ $ ctlptl apply -f ctlptl-kind-config.yaml
 # start Tilt and run services defined in Tiltfile
 $ tilt up
 Tilt started on http://localhost:10350/
-v0.30.2, built 2022-06-06
+v0.30.3, built 2022-06-06
 
 (space) to open the browser
 (s) to stream logs (--stream=true)
@@ -61,26 +61,30 @@ Verify that nothing else is running on the [ports forwarded](#port-forwards) by
 :::
 
 The above command starts an Aperture Controller and an Aperture Agent on each
-worker node in the local Kubernetes cluster. Additionally, it starts a demo
-application with an Istio and Envoy based service mesh configured to integrate
-with Aperture. There is an instance of Grafana running on the cluster as well
-for viewing metrics from experiments.
+worker node in the local Kubernetes cluster. Additionally, it starts a
+Java-based demo application with
+[Aperture Java SDK](/get-started/integrations/flow-control/sdk/java/java.md)
+configured to integrate with Aperture. There is an instance of Grafana running
+on the cluster as well for viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
-[Latency Gradient Policy](/applying-policies/service-protection/basic-service-protection.md),
-which protects the demo application against sudden surges in traffic load. You
-can verify it using the following command:
+[Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
+with a combination of
+[Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
+dynamically rate-limit traffic from unwanted users, which protects the demo
+application against sudden surges in traffic load. You can verify it using the
+following command:
 
 ```sh
-$ kubectl get policy -n aperture-controller service1-demo-app
-NAME                STATUS     AGE
-service1-demo-app   uploaded   103s
+$ kubectl get policy -n aperture-controller rate-limit-escalation
+NAME                       STATUS     AGE
+rate-limit-escalation   uploaded   41s
 ```
 
 The Playground includes a demo application so that you can generate simulated
 traffic and see the policy in action. The demo application can be found in the
 `demoapp` namespace. You can read more about the demo application
-[here](https://github.com/fluxninja/aperture/tree/main/playground/resources/demo-app).
+[here](https://github.com/fluxninja/aperture/tree/main/playground/resources/java-demo-app).
 
 ```sh
 $ kubectl get pods -n demoapp
@@ -111,10 +115,10 @@ policy running on Aperture Agent:
 - Each service simulates an artificial workload by taking a few milliseconds to
   reply to a request.
 - The _Flux Meter_ is configured on `service3`. The _Flux Meter_ helps monitor
-  service-level health signals such as latency, which are used in the Latency
-  Gradient policy.
-- Concurrency Limiter and Rate Limiter are configured on `service1`. That's,
-  when the `service3` is overloaded, load shedding happens on `service1`.
+  service-level health signals such as latency, which are used in the Basic
+  Service Protection policy.
+- Load scheduler and Rate Limiter are configured on `service1`. So, when the
+  `service3` is overloaded, load scheduling happens on `service1`.
 
 Once all the resources are in the running state, simulated traffic will start
 getting generated automatically against the demo application. The traffic is
@@ -325,11 +329,12 @@ Below is the mapping of the ports being forwarded by Tilt:
 ### Running demo applications and designing test scenarios
 
 By default, playground is started with a simple demo scenario loaded. The demo
-application includes three sets of pods and services. There is also a simple
-latency gradient policy applied to them, and K6 load generator pattern created.
-When the entire deployment turns green, the load generator can be started with
-the "Start Wavepool Generator" button in the Tilt UI. It will run a 2-minute
-test in a loop, until the "Stop Wavepool Generator" button is not clicked.
+application includes three sets of pods and services. There is also a java rate
+limiting escalation policy applied to them, and K6 load generator pattern
+created. When the entire deployment turns green, the load generator can be
+started with the "Start Wavepool Generator" button in the Tilt UI. It will run a
+2-minute test in a loop, until the "Stop Wavepool Generator" button is not
+clicked.
 
 There are other playground scenarios under the `playground/scenarios/`
 directory, and they can be loaded during `Tilt` setup by passing a relative path

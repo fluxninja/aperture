@@ -36,7 +36,7 @@ function(cfg) {
     scaleInController.new()
     + scaleInController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale in controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale in')
     )
     + scaleInController.withController(
       scaleInControllerController.new()
@@ -48,7 +48,7 @@ function(cfg) {
     scaleOutController.new()
     + scaleOutController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale out controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale out')
     )
     + scaleOutController.withController(
       scaleOutControllerController.new()

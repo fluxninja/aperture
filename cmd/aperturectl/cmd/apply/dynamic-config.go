@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/types/known/structpb"
+	appsv1 "k8s.io/api/apps/v1"
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -60,61 +61,82 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			return fmt.Errorf("failed to connect to Kubernetes: %w", err)
 		}
 
-		c, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
-			Scheme: scheme.Scheme,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to create Kubernetes client: %w", err)
-		}
-
-		deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
-		if err != nil {
-			return err
-		}
-
 		dynamicConfigYAML := make(map[string]interface{})
 		err = yaml.Unmarshal(dynamicConfigBytes, &dynamicConfigYAML)
 		if err != nil {
 			return fmt.Errorf("failed to parse DynamicConfig YAML: %w", err)
 		}
-		dynamicConfigBytes, err := json.Marshal(dynamicConfigYAML)
-		if err != nil {
-			return fmt.Errorf("failed to parse DynamicConfig JSON: %w", err)
-		}
 
-		policy := &policyv1alpha1.Policy{}
-		err = c.Get(context.Background(), k8sclient.ObjectKey{
-			Namespace: deployment.Namespace,
-			Name:      policyName,
-		}, policy)
-		if err != nil {
-			if apimeta.IsNoMatchError(err) {
-				var dynamicConfigStruct *structpb.Struct
-				dynamicConfigStruct, err = structpb.NewStruct(dynamicConfigYAML)
-				if err != nil {
-					return fmt.Errorf("failed to parse DynamicConfig Struct: %w", err)
-				}
-				request := languagev1.PostDynamicConfigRequest{
-					PolicyName:    policyName,
-					DynamicConfig: dynamicConfigStruct,
-				}
-				_, err = client.PostDynamicConfig(context.Background(), &request)
-				if err != nil {
-					return fmt.Errorf("failed to update DynamicConfig: %w", err)
+		if Controller.IsKube() {
+			var kubeClient k8sclient.Client
+			kubeClient, err = k8sclient.New(Controller.GetKubeRestConfig(), k8sclient.Options{
+				Scheme: scheme.Scheme,
+			})
+			if err != nil {
+				return fmt.Errorf("failed to create Kubernetes client: %w", err)
+			}
+
+			var deployment *appsv1.Deployment
+			deployment, err = utils.GetControllerDeployment(Controller.GetKubeRestConfig(), controllerNs)
+			if err != nil {
+				return err
+			}
+
+			dynamicConfigBytes, err = json.Marshal(dynamicConfigYAML)
+			if err != nil {
+				return fmt.Errorf("failed to parse DynamicConfig JSON: %w", err)
+			}
+
+			policy := &policyv1alpha1.Policy{}
+			err = kubeClient.Get(context.Background(), k8sclient.ObjectKey{
+				Namespace: deployment.Namespace,
+				Name:      policyName,
+			}, policy)
+			if err != nil {
+				if apimeta.IsNoMatchError(err) {
+					err = applyDynamicConfigUsingAPI(dynamicConfigYAML)
+					if err != nil {
+						return err
+					}
+				} else {
+					return fmt.Errorf("failed to get Policy '%s': %w", policyName, err)
 				}
 			} else {
-				return fmt.Errorf("failed to get Policy '%s': %w", policyName, err)
+				policy.DynamicConfig.Raw = dynamicConfigBytes
+				err = kubeClient.Update(context.Background(), policy)
+				if err != nil {
+					return fmt.Errorf("failed to update DynamicConfig for policy '%s': %w", policyName, err)
+				}
 			}
 		} else {
-			policy.DynamicConfig.Raw = dynamicConfigBytes
-			err = c.Update(context.Background(), policy)
+			err = applyDynamicConfigUsingAPI(dynamicConfigYAML)
 			if err != nil {
-				return fmt.Errorf("failed to update DynamicConfig for policy '%s': %w", policyName, err)
+				return err
 			}
 		}
 
-		log.Info().Str("policy", policyName).Str("namespace", deployment.Namespace).Msg("Updated DynamicConfig successfully")
+		log.Info().Str("policy", policyName).Msg("Updated DynamicConfig successfully")
 
 		return nil
 	},
+}
+
+// applyDynamicConfig applies the DynamicConfig to the Policy using API.
+func applyDynamicConfigUsingAPI(dynamicConfigYAML map[string]interface{}) error {
+	var dynamicConfigStruct *structpb.Struct
+	var err error
+	dynamicConfigStruct, err = structpb.NewStruct(dynamicConfigYAML)
+	if err != nil {
+		return fmt.Errorf("failed to parse DynamicConfig Struct: %w", err)
+	}
+	request := languagev1.PostDynamicConfigRequest{
+		PolicyName:    policyName,
+		DynamicConfig: dynamicConfigStruct,
+	}
+	_, err = client.PostDynamicConfig(context.Background(), &request)
+	if err != nil {
+		return fmt.Errorf("failed to update DynamicConfig: %w", err)
+	}
+
+	return nil
 }

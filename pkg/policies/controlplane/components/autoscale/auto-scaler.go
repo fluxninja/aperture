@@ -3,6 +3,7 @@ package autoscale
 import (
 	"fmt"
 	"math"
+	"time"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -11,13 +12,9 @@ import (
 )
 
 const (
-	actualReplicasPortName                     = "actual_scale"
-	configuredReplicasPortName                 = "configured_scale"
-	desiredReplicasPortName                    = "desired_scale"
-	autoscalerScaleOutSignalPortNameTemplate   = "scale_out_signal_%d"
-	autoscalerScaleOutSetpointPortNameTemplate = "scale_out_setpoint_%d"
-	autoscalerScaleInSignalPortNameTemplate    = "scale_in_signal_%d"
-	autoscalerScaleInSetpointPortNameTemplate  = "scale_in_setpoint_%d"
+	actualReplicasPortName     = "actual_scale"
+	configuredReplicasPortName = "configured_scale"
+	desiredReplicasPortName    = "desired_scale"
 )
 
 // ParseAutoScaler parses a AutoScaler and returns its nested circuit representation.
@@ -542,18 +539,14 @@ func ParseAutoScaler(
 	)
 
 	for scaleOutIndex, scaleOutController := range autoscaler.ScaleOutControllers {
-		signalPortName := fmt.Sprintf(autoscalerScaleOutSignalPortNameTemplate, scaleOutIndex)
-		setpointPortName := fmt.Sprintf(autoscalerScaleOutSetpointPortNameTemplate, scaleOutIndex)
+		signalPortName := fmt.Sprintf("scale_out_signal_%d", scaleOutIndex)
+		setpointPortName := fmt.Sprintf("scale_out_setpoint_%d", scaleOutIndex)
 
-		scaleOutSignal := fmt.Sprintf("SCALE_OUT_SIGNAL_%d", scaleOutIndex)
-		scaleOutSetpoint := fmt.Sprintf("SCALE_OUT_SETPOINT_%d", scaleOutIndex)
-		scaleOutPreCeil := fmt.Sprintf("SCALE_OUT_PRE_CEIL_%d", scaleOutIndex)
-		scaleOutPreCeilFirstValid := fmt.Sprintf("SCALE_OUT_PRE_CEIL_FIRST_VALID_%d", scaleOutIndex)
-		scaleOut := fmt.Sprintf("SCALE_OUT_%d", scaleOutIndex)
+		const prefix string = "SCALE_OUT"
 
 		scaleOuts = append(scaleOuts, &policylangv1.InPort{
 			Value: &policylangv1.InPort_SignalName{
-				SignalName: scaleOut,
+				SignalName: fmt.Sprintf("%s_%d", prefix, scaleOutIndex),
 			},
 		})
 
@@ -561,7 +554,16 @@ func ParseAutoScaler(
 		if controller == nil {
 			return nil, fmt.Errorf("scale out controller is nil")
 		}
-		if gradient := controller.GetGradient(); gradient != nil {
+
+		alerter := scaleOutController.GetAlerter()
+		if alerter == nil {
+			return nil, fmt.Errorf("alerter is nil")
+		}
+
+		switch controllerType := controller.Controller.(type) {
+		case *policylangv1.ScaleOutController_Controller_Gradient:
+			gradient := controllerType.Gradient
+
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
 				inPorts = &policylangv1.IncreasingGradient_Ins{}
@@ -584,150 +586,34 @@ func ParseAutoScaler(
 				parameters.MaxGradient = params.MaxGradient
 			}
 
-			components := []*policylangv1.Component{
-				{
-					Component: &policylangv1.Component_Alerter{
-						Alerter: &policylangv1.Alerter{
-							Parameters: scaleOutController.Alerter,
-							InPorts: &policylangv1.Alerter_Ins{
-								Signal: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleOutSetpoint,
-									},
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_NestedSignalIngress{
-						NestedSignalIngress: &policylangv1.NestedSignalIngress{
-							PortName: signalPortName,
-							OutPorts: &policylangv1.NestedSignalIngress_Outs{
-								Signal: &policylangv1.OutPort{
-									SignalName: scaleOutSignal,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_NestedSignalIngress{
-						NestedSignalIngress: &policylangv1.NestedSignalIngress{
-							PortName: setpointPortName,
-							OutPorts: &policylangv1.NestedSignalIngress_Outs{
-								Signal: &policylangv1.OutPort{
-									SignalName: scaleOutSetpoint,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_GradientController{
-						GradientController: &policylangv1.GradientController{
-							Parameters: parameters,
-							InPorts: &policylangv1.GradientController_Ins{
-								Signal: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleOutSignal,
-									},
-								},
-								Setpoint: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleOutSetpoint,
-									},
-								},
-								ControlVariable: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_SCALE",
-									},
-								},
-							},
-							OutPorts: &policylangv1.GradientController_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleOutPreCeil,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_FirstValid{
-						FirstValid: &policylangv1.FirstValid{
-							InPorts: &policylangv1.FirstValid_Ins{
-								Inputs: []*policylangv1.InPort{
-									{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: scaleOutPreCeil,
-										},
-									},
-									{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: "ACTUAL_SCALE",
-										},
-									},
-								},
-							},
-							OutPorts: &policylangv1.FirstValid_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleOutPreCeilFirstValid,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_UnaryOperator{
-						UnaryOperator: &policylangv1.UnaryOperator{
-							Operator: "ceil",
-							InPorts: &policylangv1.UnaryOperator_Ins{
-								Input: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleOutPreCeilFirstValid,
-									},
-								},
-							},
-							OutPorts: &policylangv1.UnaryOperator_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleOut,
-								},
-							},
-						},
-					},
-				},
-			}
+			components := createGradientControllerComponents(prefix, scaleOutIndex, signalPortName, setpointPortName, parameters, alerter)
 
 			componentsScaleOut = append(componentsScaleOut, components...)
-		} else {
+		default:
 			return nil, fmt.Errorf("scale out controller is not defined or of unexpected type")
 		}
 	}
 
 	for scaleInIndex, scaleInController := range autoscaler.ScaleInControllers {
-		signalPortName := fmt.Sprintf(autoscalerScaleInSignalPortNameTemplate, scaleInIndex)
-		setpointPortName := fmt.Sprintf(autoscalerScaleInSetpointPortNameTemplate, scaleInIndex)
+		signalPortName := fmt.Sprintf("scale_in_signal_%d", scaleInIndex)
+		setpointPortName := fmt.Sprintf("scale_in_setpoint_%d", scaleInIndex)
 
-		scaleInReductionPreCeil := fmt.Sprintf("SCALE_IN_REDUCTION_PRE_CEIL_%d", scaleInIndex)
-		scaleInReductionPreCeilAdjusted := fmt.Sprintf("SCALE_IN_REDUCTION_PRE_CEIL_ADJUSTED_%d", scaleInIndex)
-		scaleInReduction := fmt.Sprintf("SCALE_IN_REDUCTION_%d", scaleInIndex)
-		scaleInPropsedScale := fmt.Sprintf("SCALE_IN_PROPOSED_SCALE_%d", scaleInIndex)
-		scaleInPeriodicPulse := fmt.Sprintf("SCALE_IN_PERIODIC_PULSE_%d", scaleInIndex)
-		scaleInSignal := fmt.Sprintf("SCALE_IN_SIGNAL_%d", scaleInIndex)
-		scaleInSetpoint := fmt.Sprintf("SCALE_IN_SETPOINT_%d", scaleInIndex)
-		scaleInPreCeil := fmt.Sprintf("SCALE_IN_PRE_CEIL_%d", scaleInIndex)
-		scaleInPreCeilFirstValid := fmt.Sprintf("SCALE_IN_PRE_CEIL_FIRST_VALID_%d", scaleInIndex)
-		scaleIn := fmt.Sprintf("SCALE_IN_%d", scaleInIndex)
+		const prefix string = "SCALE_IN"
 
 		scaleIns = append(scaleIns, &policylangv1.InPort{
 			Value: &policylangv1.InPort_SignalName{
-				SignalName: scaleIn,
+				SignalName: fmt.Sprintf("%s_%d", prefix, scaleInIndex),
 			},
 		})
 
 		controller := scaleInController.GetController()
 		if controller == nil {
 			return nil, fmt.Errorf("scale in controller is nil")
+		}
+
+		alerter := scaleInController.GetAlerter()
+		if alerter == nil {
+			return nil, fmt.Errorf("alerter is nil")
 		}
 
 		switch controllerType := controller.Controller.(type) {
@@ -756,273 +642,18 @@ func ParseAutoScaler(
 				parameters.MinGradient = params.GetMinGradient()
 			}
 
-			components := []*policylangv1.Component{
-				{
-					Component: &policylangv1.Component_Alerter{
-						Alerter: &policylangv1.Alerter{
-							Parameters: scaleInController.Alerter,
-							InPorts: &policylangv1.Alerter_Ins{
-								Signal: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInSetpoint,
-									},
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_NestedSignalIngress{
-						NestedSignalIngress: &policylangv1.NestedSignalIngress{
-							PortName: signalPortName,
-							OutPorts: &policylangv1.NestedSignalIngress_Outs{
-								Signal: &policylangv1.OutPort{
-									SignalName: scaleInSignal,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_NestedSignalIngress{
-						NestedSignalIngress: &policylangv1.NestedSignalIngress{
-							PortName: setpointPortName,
-							OutPorts: &policylangv1.NestedSignalIngress_Outs{
-								Signal: &policylangv1.OutPort{
-									SignalName: scaleInSetpoint,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_GradientController{
-						GradientController: &policylangv1.GradientController{
-							Parameters: parameters,
-							InPorts: &policylangv1.GradientController_Ins{
-								Signal: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInSignal,
-									},
-								},
-								Setpoint: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInSetpoint,
-									},
-								},
-								ControlVariable: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_SCALE",
-									},
-								},
-							},
-							OutPorts: &policylangv1.GradientController_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleInPreCeil,
-								},
-							},
-						},
-					},
-				},
-			}
+			components := createGradientControllerComponents(prefix, scaleInIndex, signalPortName, setpointPortName, parameters, alerter)
 
 			componentsScaleIn = append(componentsScaleIn, components...)
 		case *policylangv1.ScaleInController_Controller_Periodic:
 			parameters := controllerType.Periodic
 
-			components := []*policylangv1.Component{
-				{
-					Component: &policylangv1.Component_ArithmeticCombinator{
-						ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-							Operator: "mul",
-							InPorts: &policylangv1.ArithmeticCombinator_Ins{
-								Lhs: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_SCALE",
-									},
-								},
-								Rhs: &policylangv1.InPort{
-									Value: &policylangv1.InPort_ConstantSignal{
-										ConstantSignal: &policylangv1.ConstantSignal{
-											Const: &policylangv1.ConstantSignal_Value{
-												Value: (float64(parameters.ScaleInPercentage) / 100.0),
-											},
-										},
-									},
-								},
-							},
-							OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleInReductionPreCeil,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_Max{
-						Max: &policylangv1.Max{
-							InPorts: &policylangv1.Max_Ins{
-								Inputs: []*policylangv1.InPort{
-									{
-										Value: &policylangv1.InPort_ConstantSignal{
-											ConstantSignal: &policylangv1.ConstantSignal{
-												Const: &policylangv1.ConstantSignal_Value{
-													Value: 1.0,
-												},
-											},
-										},
-									},
-									{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: scaleInReductionPreCeil,
-										},
-									},
-								},
-							},
-							OutPorts: &policylangv1.Max_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleInReductionPreCeilAdjusted,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_UnaryOperator{
-						UnaryOperator: &policylangv1.UnaryOperator{
-							Operator: "ceil",
-							InPorts: &policylangv1.UnaryOperator_Ins{
-								Input: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInReductionPreCeilAdjusted,
-									},
-								},
-							},
-							OutPorts: &policylangv1.UnaryOperator_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleInReduction,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_ArithmeticCombinator{
-						ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-							Operator: "sub",
-							InPorts: &policylangv1.ArithmeticCombinator_Ins{
-								Lhs: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_SCALE",
-									},
-								},
-								Rhs: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInReduction,
-									},
-								},
-							},
-							OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleInPropsedScale,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_PulseGenerator{
-						PulseGenerator: &policylangv1.PulseGenerator{
-							FalseFor: parameters.Period,
-							TrueFor:  durationpb.New(policyReadAPI.GetEvaluationInterval()),
-							OutPorts: &policylangv1.PulseGenerator_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleInPeriodicPulse,
-								},
-							},
-						},
-					},
-				},
-				{
-					Component: &policylangv1.Component_Switcher{
-						Switcher: &policylangv1.Switcher{
-							InPorts: &policylangv1.Switcher_Ins{
-								Switch: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInPeriodicPulse,
-									},
-								},
-								OnSignal: &policylangv1.InPort{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInPropsedScale,
-									},
-								},
-							},
-							OutPorts: &policylangv1.Switcher_Outs{
-								Output: &policylangv1.OutPort{
-									SignalName: scaleInPreCeil,
-								},
-							},
-						},
-					},
-				},
-			}
+			components := createPeriodicControllerComponents(prefix, scaleInIndex, policyReadAPI.GetEvaluationInterval(), parameters, alerter)
 
 			componentsScaleIn = append(componentsScaleIn, components...)
 		default:
 			return nil, fmt.Errorf("scale in controller is not defined or of unexpected type")
 		}
-
-		// common components
-		commonComponents := []*policylangv1.Component{
-			{
-				Component: &policylangv1.Component_FirstValid{
-					FirstValid: &policylangv1.FirstValid{
-						InPorts: &policylangv1.FirstValid_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: scaleInPreCeil,
-									},
-								},
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_SCALE",
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.FirstValid_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: scaleInPreCeilFirstValid,
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_UnaryOperator{
-					UnaryOperator: &policylangv1.UnaryOperator{
-						Operator: "ceil",
-						InPorts: &policylangv1.UnaryOperator_Ins{
-							Input: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: scaleInPreCeilFirstValid,
-								},
-							},
-						},
-						OutPorts: &policylangv1.UnaryOperator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: scaleIn,
-							},
-						},
-					},
-				},
-			},
-		}
-		// append common components to scale in components
-		componentsScaleIn = append(componentsScaleIn, commonComponents...)
 	}
 
 	// Process scale in and scale out signals to scale the pods.
@@ -1476,4 +1107,316 @@ func ParseAutoScaler(
 	}
 
 	return nestedCircuit, nil
+}
+
+func createGradientControllerComponents(
+	prefix string,
+	index int,
+	signalPortName string,
+	setpointPortName string,
+	parameters *policylangv1.GradientController_Parameters,
+	alerter *policylangv1.Alerter_Parameters,
+) []*policylangv1.Component {
+	scaleXSignal := fmt.Sprintf("%s_SIGNAL_%d", prefix, index)
+	scaleXSetpoint := fmt.Sprintf("%s_SETPOINT_%d", prefix, index)
+	scaleXPreCeil := fmt.Sprintf("%s_PRE_CEIL_%d", prefix, index)
+	scaleXPreCeilFirstValid := fmt.Sprintf("%s_PRE_CEIL_FIRST_VALID_%d", prefix, index)
+	scaleX := fmt.Sprintf("%s_%d", prefix, index)
+
+	components := []*policylangv1.Component{}
+
+	gradientComponents := []*policylangv1.Component{
+		{
+			Component: &policylangv1.Component_NestedSignalIngress{
+				NestedSignalIngress: &policylangv1.NestedSignalIngress{
+					PortName: signalPortName,
+					OutPorts: &policylangv1.NestedSignalIngress_Outs{
+						Signal: &policylangv1.OutPort{
+							SignalName: scaleXSignal,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_NestedSignalIngress{
+				NestedSignalIngress: &policylangv1.NestedSignalIngress{
+					PortName: setpointPortName,
+					OutPorts: &policylangv1.NestedSignalIngress_Outs{
+						Signal: &policylangv1.OutPort{
+							SignalName: scaleXSetpoint,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_GradientController{
+				GradientController: &policylangv1.GradientController{
+					Parameters: parameters,
+					InPorts: &policylangv1.GradientController_Ins{
+						Signal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scaleXSignal,
+							},
+						},
+						Setpoint: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scaleXSetpoint,
+							},
+						},
+						ControlVariable: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "ACTUAL_SCALE",
+							},
+						},
+					},
+					OutPorts: &policylangv1.GradientController_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scaleXPreCeil,
+						},
+					},
+				},
+			},
+		},
+	}
+	components = append(components, gradientComponents...)
+
+	commonComponents := createCommonComponents(scaleXPreCeil, scaleXPreCeilFirstValid, scaleX, alerter)
+	components = append(components, commonComponents...)
+
+	return components
+}
+
+func createPeriodicControllerComponents(
+	prefix string,
+	index int,
+	policyEvaluationInterval time.Duration,
+	parameters *policylangv1.PeriodicDecrease,
+	alerter *policylangv1.Alerter_Parameters,
+) []*policylangv1.Component {
+	scaleXReductionPreCeil := fmt.Sprintf("%s_REDUCTION_PRE_CEIL_%d", prefix, index)
+	scaleXReductionPreCeilAdjusted := fmt.Sprintf("%s_REDUCTION_PRE_CEIL_ADJUSTED_%d", prefix, index)
+	scaleXReduction := fmt.Sprintf("%s_REDUCTION_%d", prefix, index)
+	scaleXPropsedScale := fmt.Sprintf("%s_PROPOSED_SCALE_%d", prefix, index)
+	scaleXPeriodicPulse := fmt.Sprintf("%s_PERIODIC_PULSE_%d", prefix, index)
+	scaleXPreCeil := fmt.Sprintf("%s_PRE_CEIL_%d", prefix, index)
+	scaleXPreCeilFirstValid := fmt.Sprintf("%s_PRE_CEIL_FIRST_VALID_%d", prefix, index)
+	scaleX := fmt.Sprintf("%s_%d", prefix, index)
+
+	components := []*policylangv1.Component{}
+
+	periodicComponents := []*policylangv1.Component{
+		{
+			Component: &policylangv1.Component_ArithmeticCombinator{
+				ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
+					Operator: "mul",
+					InPorts: &policylangv1.ArithmeticCombinator_Ins{
+						Lhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "ACTUAL_SCALE",
+							},
+						},
+						Rhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_ConstantSignal{
+								ConstantSignal: &policylangv1.ConstantSignal{
+									Const: &policylangv1.ConstantSignal_Value{
+										Value: (float64(parameters.ScaleInPercentage) / 100.0),
+									},
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.ArithmeticCombinator_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scaleXReductionPreCeil,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Max{
+				Max: &policylangv1.Max{
+					InPorts: &policylangv1.Max_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: 1.0,
+										},
+									},
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: scaleXReductionPreCeil,
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Max_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scaleXReductionPreCeilAdjusted,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_UnaryOperator{
+				UnaryOperator: &policylangv1.UnaryOperator{
+					Operator: "ceil",
+					InPorts: &policylangv1.UnaryOperator_Ins{
+						Input: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scaleXReductionPreCeilAdjusted,
+							},
+						},
+					},
+					OutPorts: &policylangv1.UnaryOperator_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scaleXReduction,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_ArithmeticCombinator{
+				ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
+					Operator: "sub",
+					InPorts: &policylangv1.ArithmeticCombinator_Ins{
+						Lhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "ACTUAL_SCALE",
+							},
+						},
+						Rhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scaleXReduction,
+							},
+						},
+					},
+					OutPorts: &policylangv1.ArithmeticCombinator_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scaleXPropsedScale,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_PulseGenerator{
+				PulseGenerator: &policylangv1.PulseGenerator{
+					FalseFor: parameters.Period,
+					TrueFor:  durationpb.New(policyEvaluationInterval),
+					OutPorts: &policylangv1.PulseGenerator_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scaleXPeriodicPulse,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Switcher{
+				Switcher: &policylangv1.Switcher{
+					InPorts: &policylangv1.Switcher_Ins{
+						Switch: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scaleXPeriodicPulse,
+							},
+						},
+						OnSignal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scaleXPropsedScale,
+							},
+						},
+					},
+					OutPorts: &policylangv1.Switcher_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scaleXPreCeil,
+						},
+					},
+				},
+			},
+		},
+	}
+	components = append(components, periodicComponents...)
+
+	commonComponents := createCommonComponents(scaleXPreCeil, scaleXPreCeilFirstValid, scaleX, alerter)
+	components = append(components, commonComponents...)
+
+	return components
+}
+
+func createCommonComponents(
+	scalePreCeil string,
+	scalePreCeilFirstValid string,
+	scale string,
+	alerter *policylangv1.Alerter_Parameters,
+) []*policylangv1.Component {
+	components := []*policylangv1.Component{
+		{
+			Component: &policylangv1.Component_FirstValid{
+				FirstValid: &policylangv1.FirstValid{
+					InPorts: &policylangv1.FirstValid_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: scalePreCeil,
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACTUAL_SCALE",
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.FirstValid_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scalePreCeilFirstValid,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_UnaryOperator{
+				UnaryOperator: &policylangv1.UnaryOperator{
+					Operator: "ceil",
+					InPorts: &policylangv1.UnaryOperator_Ins{
+						Input: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scalePreCeilFirstValid,
+							},
+						},
+					},
+					OutPorts: &policylangv1.UnaryOperator_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: scale,
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Alerter{
+				Alerter: &policylangv1.Alerter{
+					Parameters: alerter,
+					InPorts: &policylangv1.Alerter_Ins{
+						Signal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: scale,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	return components
 }

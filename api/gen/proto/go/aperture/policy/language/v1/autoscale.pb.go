@@ -483,7 +483,7 @@ type ScaleOutController struct {
 	// Controller
 	Controller *ScaleOutController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Configuration for embedded Alerter.
-	Alerter *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter,proto3" json:"alerter,omitempty"`
+	Alerter *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter,proto3" json:"alerter,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *ScaleOutController) Reset() {
@@ -540,7 +540,7 @@ type ScaleInController struct {
 	// Controller
 	Controller *ScaleInController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Configuration for embedded Alerter.
-	Alerter *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter,proto3" json:"alerter,omitempty"`
+	Alerter *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter,proto3" json:"alerter,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *ScaleInController) Reset() {
