@@ -11,7 +11,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-func createValuesFile() error {
+func createValuesFile(dynamicConfig bool) error {
 	if blueprintName == "" {
 		return fmt.Errorf("--name must be provided")
 	}

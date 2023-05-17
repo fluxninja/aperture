@@ -25,7 +25,6 @@ Provides a dynamic values file for a given Aperture Blueprint that can be then u
 	SilenceErrors: true,
 	Example:       `aperturectl blueprints dynamic-values --name=policies/static-rate-limiting --output-file=values.yaml`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		dynamicConfig = true
-		return createValuesFile()
+		return createValuesFile(true)
 	},
 }

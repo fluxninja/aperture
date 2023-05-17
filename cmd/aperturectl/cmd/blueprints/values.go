@@ -17,7 +17,6 @@ func init() {
 	valuesCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to provide values file for")
 	valuesCmd.Flags().StringVar(&valuesFile, "output-file", "", "Path to the output values file")
 	valuesCmd.Flags().BoolVar(&onlyRequired, "only-required", false, "Show only required values")
-	valuesCmd.Flags().BoolVar(&dynamicConfig, "dynamic-config", false, "Show dynamic config values instead")
 	valuesCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	valuesCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing values file")
 }
@@ -52,6 +51,6 @@ Provides a values file for a given Aperture Blueprint that can be then used to g
 
 aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		return createValuesFile()
+		return createValuesFile(false)
 	},
 }
