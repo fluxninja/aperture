@@ -22,9 +22,10 @@ Use this command to query information about active Discovery integrations
       --controller string      Address of Aperture controller
       --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for discovery
-      --insecure               Allow insecure connection to controller
+      --insecure               Allow connection to controller running without TLS
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --skip-verify            Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO

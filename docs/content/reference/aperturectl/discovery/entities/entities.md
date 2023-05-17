@@ -23,11 +23,11 @@ aperturectl discovery entities [flags]
 ### Examples
 
 ```
-aperturectl discovery entities --kube
+aperturectl discovery entities
 
-aperturectl discovery entities --kube --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
+aperturectl discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
 
-aperturectl discovery entities --kube --find-by=“ip=10.244.1.24”
+aperturectl discovery entities --find-by=“ip=10.244.1.24”
 ```
 
 ### Options
@@ -42,9 +42,10 @@ aperturectl discovery entities --kube --find-by=“ip=10.244.1.24”
 ```
       --controller string      Address of Aperture controller
       --controller-ns string   Namespace in which the Aperture Controller is running
-      --insecure               Allow insecure connection to controller
+      --insecure               Allow connection to controller running without TLS
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --skip-verify            Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO

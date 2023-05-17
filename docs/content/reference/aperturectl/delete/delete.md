@@ -22,10 +22,11 @@ Use this command to delete the Aperture Policies.
       --controller string      Address of Aperture controller
       --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for delete
-      --insecure               Allow insecure connection to controller
+      --insecure               Allow connection to controller running without TLS
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
       --policy string          Name of the Policy to delete
+      --skip-verify            Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO

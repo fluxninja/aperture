@@ -18,7 +18,7 @@ var ControlPointsCmd = &cobra.Command{
 	Short:         "List Flow Control control points",
 	Long:          `List Flow Control control points`,
 	SilenceErrors: true,
-	Example:       `aperturectl flow-control control-points --kube`,
+	Example:       `aperturectl flow-control control-points`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.Client()
 		if err != nil {

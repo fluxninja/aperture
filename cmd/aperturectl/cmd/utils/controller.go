@@ -15,6 +15,7 @@ import (
 	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -31,9 +32,12 @@ var controllerNs string
 // ControllerConn manages flags for connecting to controller – either via
 // address or kubeconfig.
 type ControllerConn struct {
+	// kube is true if controller should be found in Kubernetes cluster.
+	kube bool
+
 	controllerAddr string
 	allowInsecure  bool
-	isKube         bool
+	skipVerify     bool
 	kubeConfigPath string
 	kubeConfig     *rest.Config
 
@@ -53,10 +57,16 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&c.allowInsecure,
 		"insecure",
 		false,
-		"Allow insecure connection to controller",
+		"Allow connection to controller running without TLS",
 	)
 	flags.BoolVar(
-		&c.isKube,
+		&c.skipVerify,
+		"skip-verify",
+		false,
+		"Skip TLS certificate verification while connecting to controller",
+	)
+	flags.BoolVar(
+		&c.kube,
 		"kube",
 		false,
 		"Find controller in Kubernetes cluster, instead of connecting directly",
@@ -77,19 +87,20 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
-	if c.controllerAddr == "" && !c.isKube {
-		return errors.New("either --controller or --kube should be set")
+	if c.controllerAddr == "" && !c.kube {
+		log.Info().Msg("Neither --controller not --kube flags are set. Assuming --kube=true.")
+		c.kube = true
 	}
 
-	if c.controllerAddr != "" && c.isKube {
+	if c.controllerAddr != "" && c.kube {
 		return errors.New("--controller cannot be used with --kube")
 	}
 
-	if c.kubeConfigPath != "" && !c.isKube {
+	if c.kubeConfigPath != "" && !c.kube {
 		return errors.New("--kube-config can only be used with --kube")
 	}
 
-	if c.isKube {
+	if c.kube {
 		var err error
 		c.kubeConfig, err = GetKubeConfig(c.kubeConfigPath)
 		if err != nil {
@@ -109,12 +120,14 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 	var addr string
 	var cred credentials.TransportCredentials
 	if c.allowInsecure {
+		cred = insecure.NewCredentials()
+	} else if c.skipVerify {
 		cred = credentials.NewTLS(&tls.Config{
 			InsecureSkipVerify: true, //nolint:gosec // Requires enabling CLI option
 		})
 	}
 
-	if !c.isKube {
+	if !c.kube {
 		addr = c.controllerAddr
 
 		if cred == nil {
@@ -256,4 +269,19 @@ func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err 
 	}
 
 	return ports[0].Local, cert, nil
+}
+
+// IsKube returns true if controller should be found in Kubernetes cluster.
+func (c *ControllerConn) IsKube() bool {
+	return c.kube
+}
+
+// GetKubeRestConfig returns kubeRestConfig.
+func (c *ControllerConn) GetKubeRestConfig() *rest.Config {
+	return c.kubeConfig
+}
+
+// GetControllerNs returns namespace in which the Aperture Controller is running.
+func GetControllerNs() string {
+	return controllerNs
 }

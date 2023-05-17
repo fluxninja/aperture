@@ -62,7 +62,7 @@ aperturectl apply policy --dir=policies`,
 			for policyIndex := range model.Selected {
 				fileName := policies[policyIndex]
 				if err := applyPolicy(fileName); err != nil {
-					log.Error().Err(err).Msgf("failed to apply policy '%s' on Kubernetes.", fileName)
+					log.Error().Err(err).Msgf("failed to apply policy '%s'.", fileName)
 				}
 			}
 			return nil
@@ -119,60 +119,68 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 		return err
 	}
 
-	policyCR := &policyv1alpha1.Policy{}
-	policyCR.Spec.Raw = policyBytes
-	policyCR.Name = name
+	if Controller.IsKube() {
+		policyCR := &policyv1alpha1.Policy{}
+		policyCR.Spec.Raw = policyBytes
+		policyCR.Name = name
 
-	deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
-	if err != nil {
-		return err
-	}
-	controllerNs = deployment.GetNamespace()
+		deployment, err := utils.GetControllerDeployment(Controller.GetKubeRestConfig(), controllerNs)
+		if err != nil {
+			return err
+		}
+		controllerNs = deployment.GetNamespace()
 
-	err = api.AddToScheme(scheme.Scheme)
-	if err != nil {
-		return fmt.Errorf("failed to connect to Kubernetes: %w", err)
-	}
+		err = api.AddToScheme(scheme.Scheme)
+		if err != nil {
+			return fmt.Errorf("failed to connect to Kubernetes: %w", err)
+		}
 
-	kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
-		Scheme: scheme.Scheme,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create Kubernetes client: %w", err)
-	}
+		kubeClient, err := k8sclient.New(Controller.GetKubeRestConfig(), k8sclient.Options{
+			Scheme: scheme.Scheme,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create Kubernetes client: %w", err)
+		}
 
-	policyCR.Namespace = deployment.GetNamespace()
-	policyCR.Annotations = map[string]string{
-		"fluxninja.com/validate": "true",
-	}
-	err = kubeClient.Create(context.Background(), policyCR)
-	if err != nil {
-		if apimeta.IsNoMatchError(err) {
-			var isUpdated bool
-			isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
-			if !isUpdated {
-				return updatePolicyUsingAPIErr
+		policyCR.Namespace = deployment.GetNamespace()
+		policyCR.Annotations = map[string]string{
+			"fluxninja.com/validate": "true",
+		}
+		err = kubeClient.Create(context.Background(), policyCR)
+		if err != nil {
+			if apimeta.IsNoMatchError(err) {
+				var isUpdated bool
+				isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
+				if !isUpdated {
+					return updatePolicyUsingAPIErr
+				}
+			} else if apierrors.IsAlreadyExists(err) {
+				var update bool
+				update, checkForUpdateErr := checkForUpdate(name)
+				if checkForUpdateErr != nil {
+					return fmt.Errorf("failed to check for update: %w", checkForUpdateErr)
+				}
+				if !update {
+					log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
+					return nil
+				}
+				updatePolicyCRErr := updatePolicyCR(name, policyCR, kubeClient)
+				if updatePolicyCRErr != nil {
+					return updatePolicyCRErr
+				}
+			} else {
+				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 			}
-		} else if apierrors.IsAlreadyExists(err) {
-			var update bool
-			update, checkForUpdateErr := checkForUpdate(name)
-			if checkForUpdateErr != nil {
-				return fmt.Errorf("failed to check for update: %w", checkForUpdateErr)
-			}
-			if !update {
-				log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
-				return nil
-			}
-			updatePolicyCRErr := updatePolicyCR(name, policyCR, kubeClient)
-			if updatePolicyCRErr != nil {
-				return updatePolicyCRErr
-			}
-		} else {
-			return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
+		}
+
+	} else {
+		isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
+		if !isUpdated {
+			return updatePolicyUsingAPIErr
 		}
 	}
 
-	log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Applied Policy successfully")
+	log.Info().Str("policy", name).Msg("Applied Policy successfully")
 	return nil
 }
 
