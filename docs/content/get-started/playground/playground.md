@@ -111,8 +111,8 @@ policy running on Aperture Agent:
 - Each service simulates an artificial workload by taking a few milliseconds to
   reply to a request.
 - The _Flux Meter_ is configured on `service3`. The _Flux Meter_ helps monitor
-  service-level health signals such as latency, which are used in the Latency
-  Gradient policy.
+  service-level health signals such as latency, which are used in the basic
+  service protection policy.
 - Concurrency Limiter and Rate Limiter are configured on `service1`. That's,
   when the `service3` is overloaded, load shedding happens on `service1`.
 
@@ -325,11 +325,12 @@ Below is the mapping of the ports being forwarded by Tilt:
 ### Running demo applications and designing test scenarios
 
 By default, playground is started with a simple demo scenario loaded. The demo
-application includes three sets of pods and services. There is also a simple
-latency gradient policy applied to them, and K6 load generator pattern created.
-When the entire deployment turns green, the load generator can be started with
-the "Start Wavepool Generator" button in the Tilt UI. It will run a 2-minute
-test in a loop, until the "Stop Wavepool Generator" button is not clicked.
+application includes three sets of pods and services. There is also a java rate
+limiting escalation policy applied to them, and K6 load generator pattern
+created. When the entire deployment turns green, the load generator can be
+started with the "Start Wavepool Generator" button in the Tilt UI. It will run a
+2-minute test in a loop, until the "Stop Wavepool Generator" button is not
+clicked.
 
 There are other playground scenarios under the `playground/scenarios/`
 directory, and they can be loaded during `Tilt` setup by passing a relative path
