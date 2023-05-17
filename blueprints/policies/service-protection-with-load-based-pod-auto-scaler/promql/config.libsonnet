@@ -21,7 +21,7 @@ local promqlServiceProtection = import '../../service-protection/promql/config.l
 * @param (policy.auto_scaling.disable_periodic_scale_in: bool) Disable periodic scale in.
 * @param (policy.auto_scaling.periodic_decrease: aperture.spec.v1.PeriodicDecreaseParameters) Parameters for periodic scale in.
 * @param (policy.auto_scaling.periodic_decrease.period: string) Period for periodic scale in.
-* @param (policy.auto_scaling.periodic_decrease.scale_in_percentage: int) Percentage of replicas to scale in.
+* @param (policy.auto_scaling.periodic_decrease.scale_in_percentage: float64) Percentage of replicas to scale in.
 */
 
 /**

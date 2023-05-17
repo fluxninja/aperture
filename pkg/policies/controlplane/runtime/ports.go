@@ -116,13 +116,13 @@ func (p PortToSignals) merge(other PortToSignals) error {
 
 // ConstantSignal is a mirror struct to same proto message.
 type ConstantSignal struct {
-	specialValue string  `mapstructure:"special_value"`
+	SpecialValue string  `mapstructure:"special_value"`
 	Value        float64 `mapstructure:"value"`
 }
 
 // Description returns a description of the constant signal.
 func (constantSignal *ConstantSignal) Description() string {
-	specialValue := constantSignal.specialValue
+	specialValue := constantSignal.SpecialValue
 	value := constantSignal.Value
 	var description string
 	if specialValue != "" {
@@ -136,7 +136,7 @@ func (constantSignal *ConstantSignal) Description() string {
 
 // Float returns the float value of the constant signal.
 func (constantSignal *ConstantSignal) Float() float64 {
-	specialValue := constantSignal.specialValue
+	specialValue := constantSignal.SpecialValue
 	value := constantSignal.Value
 	if specialValue == "NaN" {
 		return math.NaN()
@@ -159,7 +159,7 @@ func (constantSignal *ConstantSignal) IsSpecial() bool {
 // ConstantSignalFromProto creates a ConstantSignal from a proto message.
 func ConstantSignalFromProto(constantSignalProto *policylangv1.ConstantSignal) *ConstantSignal {
 	return &ConstantSignal{
-		specialValue: constantSignalProto.GetSpecialValue(),
+		SpecialValue: constantSignalProto.GetSpecialValue(),
 		Value:        constantSignalProto.GetValue(),
 	}
 }
@@ -177,6 +177,7 @@ func PortsFromComponentConfig(componentConfig utils.MapStruct, subCircuitID stri
 	}
 
 	err = decoder.Decode(componentConfig)
+
 	// Add circuitID to all signals.
 	for _, signals := range ports.Ins {
 		for i := range signals {

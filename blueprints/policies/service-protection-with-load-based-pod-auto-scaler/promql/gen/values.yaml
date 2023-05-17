@@ -95,7 +95,7 @@ policy:
       # Type: string
       period: "60s"
       # Percentage of replicas to scale in.
-      # Type: int
+      # Type: float64
       scale_in_percentage: 10
 
 dashboard:

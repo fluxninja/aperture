@@ -35,10 +35,7 @@ func newAutoScaleNestedAndOptions(
 	if podScalerProto := autoScaleComponentProto.GetPodScaler(); podScalerProto != nil {
 		var options []fx.Option
 		// sync config
-		podScalerOptions, podScalerErr := podscaler.NewConfigSyncOptions(
-			podScalerProto,
-			componentID,
-			policyReadAPI)
+		podScalerOptions, podScalerErr := podscaler.NewConfigSyncOptions(podScalerProto, componentID, policyReadAPI)
 		if podScalerErr != nil {
 			return retErr(podScalerErr)
 		}
@@ -56,7 +53,6 @@ func newAutoScaleNestedAndOptions(
 		options = append(options, nestedOptions)
 
 		return tree, configuredComponents, fx.Options(options...), nil
-
 	} else if autoScaler := autoScaleComponentProto.GetAutoScaler(); autoScaler != nil {
 		nestedCircuit, err := autoscale.ParseAutoScaler(autoScaler, policyReadAPI)
 		if err != nil {
@@ -73,5 +69,6 @@ func newAutoScaleNestedAndOptions(
 			}
 		}
 	}
+
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", autoScaleComponentProto))
 }

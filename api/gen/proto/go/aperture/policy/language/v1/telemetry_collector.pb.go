@@ -62,7 +62,7 @@ type TelemetryCollector struct {
 	//
 	// Validate the OTel configuration before applying it to the
 	// production cluster.
-	// Incorrect configuration will get rejected at the agents and may cause
+	// Incorrect configuration will get rejected at the agents and might cause
 	// shutdown of the agent(s).
 	//
 	// :::

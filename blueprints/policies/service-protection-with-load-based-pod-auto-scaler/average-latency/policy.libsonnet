@@ -7,8 +7,6 @@ local scaleOutController = spec.v1.ScaleOutController;
 local scaleOutControllerController = spec.v1.ScaleOutControllerController;
 local scaleInController = spec.v1.ScaleInController;
 local scaleInControllerController = spec.v1.ScaleInControllerController;
-local periodicDecrease = spec.v1.PeriodicDecrease;
-local periodicDecreaseParameters = spec.v1.PeriodicDecreaseParameters;
 local increasingGradient = spec.v1.IncreasingGradient;
 local increasingGradientInPort = spec.v1.IncreasingGradientIns;
 local increasingGradientParameters = spec.v1.IncreasingGradientParameters;
@@ -36,14 +34,11 @@ function(cfg) {
     scaleInController.new()
     + scaleInController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale in controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale in')
     )
     + scaleInController.withController(
       scaleInControllerController.new()
-      + scaleInControllerController.withPeriodic(
-        periodicDecrease.new()
-        + periodicDecrease.withParameters(params.policy.auto_scaling.periodic_decrease)
-      )
+      + scaleInControllerController.withPeriodic(params.policy.auto_scaling.periodic_decrease)
     ),
   ],
 
@@ -51,7 +46,7 @@ function(cfg) {
     scaleOutController.new()
     + scaleOutController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale out controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale out')
     )
     + scaleOutController.withController(
       scaleOutControllerController.new()
@@ -59,7 +54,7 @@ function(cfg) {
         increasingGradient.new()
         + increasingGradient.withInPorts(
           increasingGradientInPort.new()
-          + increasingGradientInPort.withSignal(port.withSignalName('OBSERVED_LOAD_MULTIPLIER'))
+          + increasingGradientInPort.withSignal(port.withSignalName('DESIRED_LOAD_MULTIPLIER'))
           + increasingGradientInPort.withSetpoint(port.withConstantSignal(1.0))
         )
         + increasingGradient.withParameters(

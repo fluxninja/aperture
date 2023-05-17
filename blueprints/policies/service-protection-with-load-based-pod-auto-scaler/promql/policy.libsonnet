@@ -36,14 +36,11 @@ function(cfg) {
     scaleInController.new()
     + scaleInController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale in controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale in')
     )
     + scaleInController.withController(
       scaleInControllerController.new()
-      + scaleInControllerController.withPeriodic(
-        periodicDecrease.new()
-        + periodicDecrease.withParameters(params.policy.auto_scaling.periodic_decrease)
-      )
+      + scaleInControllerController.withPeriodic(params.policy.auto_scaling.periodic_decrease)
     ),
   ],
 
@@ -51,7 +48,7 @@ function(cfg) {
     scaleOutController.new()
     + scaleOutController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale out controller Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale out')
     )
     + scaleOutController.withController(
       scaleOutControllerController.new()

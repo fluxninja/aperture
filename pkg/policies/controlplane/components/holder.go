@@ -92,5 +92,4 @@ func (h *Holder) reset() {
 }
 
 // DynamicConfigUpdate is a no-op for Holder.
-func (*Holder) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-}
+func (*Holder) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}

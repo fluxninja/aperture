@@ -111,7 +111,6 @@
   OutPort: import 'outport.libsonnet',
   PathTemplateMatcher: import 'pathtemplatematcher.libsonnet',
   PeriodicDecrease: import 'periodicdecrease.libsonnet',
-  PeriodicDecreaseParameters: import 'periodicdecreaseparameters.libsonnet',
   PodScaler: import 'podscaler.libsonnet',
   PodScalerIns: import 'podscalerins.libsonnet',
   PodScalerOuts: import 'podscalerouts.libsonnet',

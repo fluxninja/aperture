@@ -36,7 +36,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
       --controller-ns string   Namespace in which the Aperture Controller is running
       --graph-depth int        Max depth of the graph when generating DOT and Mermaid files (default 1)
   -h, --help                   help for generate
-      --insecure               Allow insecure connection to controller
+      --insecure               Allow connection to controller running without TLS
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
       --name string            Name of the Aperture Blueprint to generate Aperture Policy resources for
@@ -44,6 +44,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
       --no-yaml-modeline       Do not add YAML language server modeline to generated YAML files
       --output-dir string      Directory path where the generated Policy resources will be stored. If not provided, will use current directory
       --overwrite              Overwrite existing output directory
+      --skip-verify            Skip TLS certificate verification while connecting to controller
       --values-file string     Path to the values file for Blueprint's input
 ```
 

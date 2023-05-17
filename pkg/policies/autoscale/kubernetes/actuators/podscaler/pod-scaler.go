@@ -105,6 +105,10 @@ func setupPodScalerFactory(
 		log.Info().Msg("Kubernetes AutoScaler is disabled")
 		return nil
 	}
+	if k8sClient == nil {
+		log.Info().Msg("Not in Kubernetes cluster, omitting AutoScaler")
+		return nil
+	}
 
 	agentGroup := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.PodScalerDecisionsPath)
