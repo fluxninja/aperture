@@ -1,37 +1,35 @@
 ---
-sidebar_label: Values
+sidebar_label: Dynamic-Values
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_blueprints_values
+  - aperturectl_blueprints_dynamic-values
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl blueprints values
+## aperturectl blueprints dynamic-values
 
-Create values file for a given Aperture Blueprint
+Create dynamic values file for a given Aperture Blueprint
 
 ### Synopsis
 
-Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization
+Provides a dynamic values file for a given Aperture Blueprint that can be then used to generate policies after customization
 
 ```
-aperturectl blueprints values [flags]
+aperturectl blueprints dynamic-values [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml
-
-aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required
+aperturectl blueprints dynamic-values --name=policies/static-rate-limiting --output-file=values.yaml
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for values
+  -h, --help                 help for dynamic-values
       --name string          Name of the Aperture Blueprint to provide values file for
       --no-yaml-modeline     Do not add YAML language server modeline to generated YAML files
       --only-required        Show only required values
