@@ -6,7 +6,7 @@ policy:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: service1-demo-app
+  policy_name: rate-limit-escalation
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components:
