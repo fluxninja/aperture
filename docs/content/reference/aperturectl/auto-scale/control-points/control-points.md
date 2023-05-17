@@ -23,7 +23,7 @@ aperturectl auto-scale control-points [flags]
 ### Examples
 
 ```
-aperturectl auto-scale control-points --kube
+aperturectl auto-scale control-points
 ```
 
 ### Options

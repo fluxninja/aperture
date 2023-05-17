@@ -16,7 +16,7 @@ func init() {
 }
 
 var agentsCmd = &cobra.Command{
-	Use:               "agents {--kube | --controller ADDRESS}",
+	Use:               "agents",
 	Short:             "List connected agents",
 	Long:              `List connected agents`,
 	SilenceErrors:     true,

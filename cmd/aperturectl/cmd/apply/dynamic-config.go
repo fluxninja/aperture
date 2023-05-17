@@ -67,7 +67,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			return fmt.Errorf("failed to parse DynamicConfig YAML: %w", err)
 		}
 
-		if isKube {
+		if Controller.IsKube() {
 			var kubeClient k8sclient.Client
 			kubeClient, err = k8sclient.New(kubeRestConfig, k8sclient.Options{
 				Scheme: scheme.Scheme,

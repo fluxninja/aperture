@@ -119,7 +119,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 		return err
 	}
 
-	if isKube {
+	if Controller.IsKube() {
 		policyCR := &policyv1alpha1.Policy{}
 		policyCR.Spec.Raw = policyBytes
 		policyCR.Name = name

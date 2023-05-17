@@ -17,7 +17,7 @@ List connected agents
 List connected agents
 
 ```
-aperturectl agents {--kube | --controller ADDRESS} [flags]
+aperturectl agents [flags]
 ```
 
 ### Options

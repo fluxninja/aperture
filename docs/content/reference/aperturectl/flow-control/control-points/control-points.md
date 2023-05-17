@@ -23,7 +23,7 @@ aperturectl flow-control control-points [flags]
 ### Examples
 
 ```
-aperturectl flow-control control-points --kube
+aperturectl flow-control control-points
 ```
 
 ### Options

@@ -32,8 +32,8 @@ var controllerNs string
 // ControllerConn manages flags for connecting to controller – either via
 // address or kubeconfig.
 type ControllerConn struct {
-	// IsKube is true if controller should be found in Kubernetes cluster.
-	IsKube bool
+	// kube is true if controller should be found in Kubernetes cluster.
+	kube bool
 
 	controllerAddr string
 	allowInsecure  bool
@@ -66,7 +66,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"Skip TLS certificate verification while connecting to controller",
 	)
 	flags.BoolVar(
-		&c.IsKube,
+		&c.kube,
 		"kube",
 		false,
 		"Find controller in Kubernetes cluster, instead of connecting directly",
@@ -87,19 +87,20 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
-	if c.controllerAddr == "" && !c.IsKube {
-		return errors.New("either --controller or --kube should be set")
+	if c.controllerAddr == "" && !c.kube {
+		log.Info().Msg("Neither --controller not --kube flags are set. Assuming --kube=true.")
+		c.kube = true
 	}
 
-	if c.controllerAddr != "" && c.IsKube {
+	if c.controllerAddr != "" && c.kube {
 		return errors.New("--controller cannot be used with --kube")
 	}
 
-	if c.kubeConfigPath != "" && !c.IsKube {
+	if c.kubeConfigPath != "" && !c.kube {
 		return errors.New("--kube-config can only be used with --kube")
 	}
 
-	if c.IsKube {
+	if c.kube {
 		var err error
 		c.kubeConfig, err = GetKubeConfig(c.kubeConfigPath)
 		if err != nil {
@@ -126,7 +127,7 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 		})
 	}
 
-	if !c.IsKube {
+	if !c.kube {
 		addr = c.controllerAddr
 
 		if cred == nil {
@@ -268,4 +269,9 @@ func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err 
 	}
 
 	return ports[0].Local, cert, nil
+}
+
+// IsKube returns true if controller should be found in Kubernetes cluster.
+func (c *ControllerConn) IsKube() bool {
+	return c.kube
 }
