@@ -34,14 +34,14 @@ Assuming that you have already cloned the aperture repository and brought up a
 [required tools](#tools). To bring up the Playground, run the following
 commands:
 
-```sh
+```bash
 $ git clone https://github.com/fluxninja/aperture.git
 # change directory to playground
 $ cd aperture/playground
 # start a local kubernetes cluster
 $ ctlptl apply -f ctlptl-kind-config.yaml
 # start Tilt and run services defined in Tiltfile
-$ tilt up
+$ tilt up -- --scenario=./scenarios/basic_service_protection
 Tilt started on http://localhost:10350/
 v0.30.2, built 2022-06-06
 
@@ -67,14 +67,14 @@ with Aperture. There is an instance of Grafana running on the cluster as well
 for viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
-[Latency Gradient Policy](/applying-policies/service-protection/basic-service-protection.md),
+[Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md),
 which protects the demo application against sudden surges in traffic load. You
 can verify it using the following command:
 
 ```sh
-$ kubectl get policy -n aperture-controller service1-demo-app
-NAME                STATUS     AGE
-service1-demo-app   uploaded   103s
+$ kubectl get policy -n aperture-controller basic-service-protection
+NAME                       STATUS     AGE
+basic-service-protection   uploaded   41s
 ```
 
 The Playground includes a demo application so that you can generate simulated
