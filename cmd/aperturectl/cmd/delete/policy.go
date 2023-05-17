@@ -32,7 +32,7 @@ var DeletePolicyCmd = &cobra.Command{
 // deletePolicy deletes the policy from the cluster.
 func deletePolicy() error {
 	if controller.IsKube() {
-		deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
+		deployment, err := utils.GetControllerDeployment(controller.GetKubeRestConfig(), controllerNs)
 		if err != nil {
 			return err
 		}
@@ -42,7 +42,7 @@ func deletePolicy() error {
 			return fmt.Errorf("failed to connect to Kubernetes: %w", err)
 		}
 
-		kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
+		kubeClient, err := k8sclient.New(controller.GetKubeRestConfig(), k8sclient.Options{
 			Scheme: scheme.Scheme,
 		})
 		if err != nil {
@@ -53,7 +53,12 @@ func deletePolicy() error {
 		policyCR.Name = policyName
 		policyCR.Namespace = deployment.GetNamespace()
 		err = kubeClient.Delete(context.Background(), policyCR)
-		if err != nil && !apierrors.IsNotFound(err) {
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				log.Info().Str("policy", policyName).Msg("Policy not found in Kubernetes")
+				return nil
+			}
+
 			if apimeta.IsNoMatchError(err) {
 				err = deletePolicyUsingAPI()
 			}
