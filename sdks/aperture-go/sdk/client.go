@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
+	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/stdr"
 	"github.com/gorilla/mux"
@@ -26,8 +28,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -37,6 +37,7 @@ type Client interface {
 	Shutdown(ctx context.Context) error
 	HTTPMiddleware(controlPoint string, labels map[string]string) mux.MiddlewareFunc
 	GRPCUnaryInterceptor(controlPoint string, labels map[string]string) grpc.UnaryServerInterceptor
+	GetLogger() logr.Logger
 }
 
 type apertureClient struct {
@@ -111,7 +112,8 @@ func (c *apertureClient) getSpan(ctx context.Context) trace.Span {
 	return span
 }
 
-func labelsFromCtx(ctx context.Context) map[string]string {
+// LabelsFromCtx extracts baggage labels from context.
+func LabelsFromCtx(ctx context.Context) map[string]string {
 	labels := make(map[string]string)
 	baggageCtx := baggage.FromContext(ctx)
 	for _, member := range baggageCtx.Members() {
@@ -136,7 +138,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		defer cancel()
 	}
 
-	labels := labelsFromCtx(ctx)
+	labels := LabelsFromCtx(ctx)
 
 	// Explicit labels override baggage
 	for key, value := range explicitLabels {
@@ -303,4 +305,9 @@ func newResource() (*resource.Resource, error) {
 		return nil, err
 	}
 	return r, nil
+}
+
+// GetLogger returns the logger used by the aperture client.
+func (c *apertureClient) GetLogger() logr.Logger {
+	return c.log
 }
