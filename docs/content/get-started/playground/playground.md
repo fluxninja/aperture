@@ -61,15 +61,15 @@ Verify that nothing else is running on the [ports forwarded](#port-forwards) by
 :::
 
 The above command starts an Aperture Controller and an Aperture Agent on each
-worker node in the local Kubernetes cluster. Additionally, it starts a Java
-based demo application with
+worker node in the local Kubernetes cluster. Additionally, it starts a
+Java-based demo application with
 [Aperture Java SDK](/get-started/integrations/flow-control/sdk/java/java.md)
 configured to integrate with Aperture. There is an instance of Grafana running
 on the cluster as well for viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
 [Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
-with combination of
+with a combination of
 [Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
 dynamically rate-limit traffic from unwanted users, which protects the demo
 application against sudden surges in traffic load. You can verify it using the
@@ -117,7 +117,7 @@ policy running on Aperture Agent:
 - The _Flux Meter_ is configured on `service3`. The _Flux Meter_ helps monitor
   service-level health signals such as latency, which are used in the Basic
   Service Protection policy.
-- Load scheduler and Rate Limiter are configured on `service1`. That's, when the
+- Load scheduler and Rate Limiter are configured on `service1`. So, when the
   `service3` is overloaded, load scheduling happens on `service1`.
 
 Once all the resources are in the running state, simulated traffic will start
