@@ -44,8 +44,9 @@ are still benefits of using Aperture:
 - [Load Scheduler][] can hold a request within some time period (derived from
   gRPC request timeout).
 - Load Scheduler can also be configured in a way which effectively disables the
-  holding/scheduling part. If such a configuration is desired, it will accept or
-  reject the request immediately based on workload priorities and other factors.
+  holding/scheduling part. If such a configuration is desired, it will either
+  accept or reject the request immediately based on workload priorities and
+  other factors.
 
 ### If Aperture is rejecting or queuing requests, how will it impact the user experience?
 
