@@ -28,6 +28,7 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 ### SEE ALSO
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl blueprints dynamic-values](/reference/aperturectl/blueprints/dynamic-values/dynamic-values.md) - Create dynamic values file for a given Aperture Blueprint
 - [aperturectl blueprints generate](/reference/aperturectl/blueprints/generate/generate.md) - Generate Aperture Policy related resources from Aperture Blueprints
 - [aperturectl blueprints list](/reference/aperturectl/blueprints/list/list.md) - List Aperture Blueprints
 - [aperturectl blueprints pull](/reference/aperturectl/blueprints/pull/pull.md) - Pull Aperture Blueprints
