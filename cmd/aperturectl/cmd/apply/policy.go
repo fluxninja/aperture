@@ -124,7 +124,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 		policyCR.Spec.Raw = policyBytes
 		policyCR.Name = name
 
-		deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
+		deployment, err := utils.GetControllerDeployment(Controller.GetKubeRestConfig(), controllerNs)
 		if err != nil {
 			return err
 		}
@@ -135,7 +135,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 			return fmt.Errorf("failed to connect to Kubernetes: %w", err)
 		}
 
-		kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
+		kubeClient, err := k8sclient.New(Controller.GetKubeRestConfig(), k8sclient.Options{
 			Scheme: scheme.Scheme,
 		})
 		if err != nil {

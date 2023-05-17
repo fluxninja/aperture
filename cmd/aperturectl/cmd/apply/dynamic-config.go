@@ -69,7 +69,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 
 		if Controller.IsKube() {
 			var kubeClient k8sclient.Client
-			kubeClient, err = k8sclient.New(kubeRestConfig, k8sclient.Options{
+			kubeClient, err = k8sclient.New(Controller.GetKubeRestConfig(), k8sclient.Options{
 				Scheme: scheme.Scheme,
 			})
 			if err != nil {
@@ -77,7 +77,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			}
 
 			var deployment *appsv1.Deployment
-			deployment, err = utils.GetControllerDeployment(kubeRestConfig, controllerNs)
+			deployment, err = utils.GetControllerDeployment(Controller.GetKubeRestConfig(), controllerNs)
 			if err != nil {
 				return err
 			}

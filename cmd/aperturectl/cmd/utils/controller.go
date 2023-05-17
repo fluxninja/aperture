@@ -275,3 +275,13 @@ func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err 
 func (c *ControllerConn) IsKube() bool {
 	return c.kube
 }
+
+// GetKubeRestConfig returns kubeRestConfig.
+func (c *ControllerConn) GetKubeRestConfig() *rest.Config {
+	return c.kubeConfig
+}
+
+// GetControllerNs returns namespace in which the Aperture Controller is running.
+func GetControllerNs() string {
+	return controllerNs
+}

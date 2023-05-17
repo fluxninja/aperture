@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/rest"
 
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
@@ -14,10 +13,8 @@ var (
 	// Controller is the controller connection object.
 	Controller utils.ControllerConn
 
-	kubeConfig     string
-	kubeRestConfig *rest.Config
-	client         cmdv1.ControllerClient
-	controllerNs   string
+	client       cmdv1.ControllerClient
+	controllerNs string
 )
 
 func init() {
@@ -41,17 +38,7 @@ Use this command to apply the Aperture Policies.`,
 			return fmt.Errorf("failed to run controller pre-run: %w", err)
 		}
 
-		if Controller.IsKube() {
-			kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
-			if err != nil {
-				return fmt.Errorf("failed to get kube config: %w", err)
-			}
-
-			controllerNs, err = cmd.Flags().GetString("controller-ns")
-			if err != nil {
-				return fmt.Errorf("failed to get controller namespace flag: %w", err)
-			}
-		}
+		controllerNs = utils.GetControllerNs()
 
 		client, err = Controller.Client()
 		if err != nil {

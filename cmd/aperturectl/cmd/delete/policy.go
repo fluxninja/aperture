@@ -3,10 +3,10 @@ package delete
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -31,38 +31,45 @@ var DeletePolicyCmd = &cobra.Command{
 
 // deletePolicy deletes the policy from the cluster.
 func deletePolicy() error {
-	deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
-	if err != nil {
-		return err
-	}
-
-	err = api.AddToScheme(scheme.Scheme)
-	if err != nil {
-		return fmt.Errorf("failed to connect to Kubernetes: %w", err)
-	}
-
-	kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
-		Scheme: scheme.Scheme,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create Kubernetes client: %w", err)
-	}
-
-	policyCR := &policyv1alpha1.Policy{}
-	policyCR.Name = policyName
-	policyCR.Namespace = deployment.GetNamespace()
-	err = kubeClient.Delete(context.Background(), policyCR)
-	if err != nil && !apierrors.IsNotFound(err) {
-		if strings.Contains(err.Error(), "no matches for kind") {
-			err = deletePolicyUsingAPI()
-		}
-
+	if controller.IsKube() {
+		deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
 		if err != nil {
-			return fmt.Errorf("failed to delete policy in Kubernetes: %w", err)
+			return err
+		}
+
+		err = api.AddToScheme(scheme.Scheme)
+		if err != nil {
+			return fmt.Errorf("failed to connect to Kubernetes: %w", err)
+		}
+
+		kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
+			Scheme: scheme.Scheme,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create Kubernetes client: %w", err)
+		}
+
+		policyCR := &policyv1alpha1.Policy{}
+		policyCR.Name = policyName
+		policyCR.Namespace = deployment.GetNamespace()
+		err = kubeClient.Delete(context.Background(), policyCR)
+		if err != nil && !apierrors.IsNotFound(err) {
+			if apimeta.IsNoMatchError(err) {
+				err = deletePolicyUsingAPI()
+			}
+
+			if err != nil {
+				return fmt.Errorf("failed to delete policy from Kubernetes: %w", err)
+			}
+		}
+	} else {
+		err := deletePolicyUsingAPI()
+		if err != nil {
+			return fmt.Errorf("failed to delete policy: %w", err)
 		}
 	}
 
-	log.Info().Str("policy", policyName).Str("namespace", deployment.GetNamespace()).Msg("Deleted Policy successfully")
+	log.Info().Str("policy", policyName).Msg("Deleted Policy successfully")
 	return nil
 }
 
