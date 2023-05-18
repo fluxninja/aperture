@@ -38,9 +38,27 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 		labels := aperture.LabelsFromCtx(ctx)
 
 		md, ok := metadata.FromIncomingContext(ctx)
+		authority := ""
+		scheme := ""
+		var destinationSocket *flowcontrolhttp.SocketAddress
+
 		if ok {
 			for key, value := range md {
 				labels[key] = strings.Join(value, ",")
+			}
+			authorityValues := md.Get(":authority")
+			if len(authorityValues) > 0 {
+				authority = authorityValues[0]
+				destinationHost, destinationPort := splitAddress(c.GetLogger(), authority)
+				destinationSocket = &flowcontrolhttp.SocketAddress{
+					Address:  destinationHost,
+					Protocol: flowcontrolhttp.SocketAddress_TCP,
+					Port:     destinationPort,
+				}
+			}
+			schemeValues := md.Get(":scheme")
+			if len(schemeValues) > 0 {
+				scheme = schemeValues[0]
 			}
 		}
 
@@ -48,34 +66,22 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 		if sourceAddr, ok := peer.FromContext(ctx); ok {
 			sourceSocket = socketAddressFromNetAddr(c.GetLogger(), sourceAddr.Addr)
 		}
-		// TODO: Can we retrieve the address somehow?
-		var destinationSocket *flowcontrolhttp.SocketAddress
-		//if server, ok := info.Server.(*grpc.Server); ok {
-		//	service := strings.Split(path.Dir(info.FullMethod), "/")[1]
-		//	if serviceInfo, ok := server.GetServiceInfo()[service]; ok {
-		//		if listener, ok := serviceInfo.Metadata["listener"]; ok {
-		//			if listener2, ok := listener.(net.Listener); ok {
-		//				destinationSocket = c.socketAddressFromNetAddr(listener2.Addr())
-		//			}
-		//		}
-		//	}
-		//}
+
 		body, err := json.Marshal(req)
 		if err != nil {
 			c.GetLogger().V(2).Info("Unable to marshal request body")
 		}
 
-		// TODO: Fill this up properly
 		checkreq := &flowcontrolhttp.CheckHTTPRequest{
 			Source:       sourceSocket,
 			Destination:  destinationSocket,
 			ControlPoint: controlPoint,
 			Request: &flowcontrolhttp.CheckHTTPRequest_HttpRequest{
-				Method:   "",
+				Method:   "POST",
 				Path:     info.FullMethod,
-				Host:     "",
+				Host:     authority,
 				Headers:  labels,
-				Scheme:   "",
+				Scheme:   scheme,
 				Size:     -1,
 				Protocol: "HTTP/2",
 				Body:     string(body),
