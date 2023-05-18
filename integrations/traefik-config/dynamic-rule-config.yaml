@@ -1,0 +1,23 @@
+http:
+  routers:
+    Router0:
+      entryPoints:
+        - http
+      service: service-whoami
+      rule: Path(`/whoami`)
+      middlewares:
+        - my-plugin
+
+
+  services:
+    service-whoami:
+      loadBalancer:
+        servers:
+        - url: http://localhost:8080/
+        passHostHeader: true
+
+  middlewares:
+    my-plugin:
+      plugin:
+        example:
+          ControlPoint: "awesomeFeature"

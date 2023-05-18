@@ -1,0 +1,21 @@
+# Static configuration
+
+api:
+  dashboard: true
+  insecure: true
+
+experimental:
+  localPlugins:
+    example:
+      moduleName: github.com/fluxninja/aperture-traefik-plugin
+
+entryPoints:
+  http:
+    address: ":8000"
+    forwardedHeaders:
+      insecure: true
+
+
+providers:
+  file:
+    filename: dyanmic-rule-config.yaml
