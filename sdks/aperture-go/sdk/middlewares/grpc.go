@@ -40,7 +40,6 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 		md, ok := metadata.FromIncomingContext(ctx)
 		authority := ""
 		scheme := ""
-		var destinationSocket *flowcontrolhttp.SocketAddress
 
 		if ok {
 			for key, value := range md {
@@ -49,12 +48,6 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 			authorityValues := md.Get(":authority")
 			if len(authorityValues) > 0 {
 				authority = authorityValues[0]
-				destinationHost, destinationPort := splitAddress(c.GetLogger(), authority)
-				destinationSocket = &flowcontrolhttp.SocketAddress{
-					Address:  destinationHost,
-					Protocol: flowcontrolhttp.SocketAddress_TCP,
-					Port:     destinationPort,
-				}
 			}
 			schemeValues := md.Get(":scheme")
 			if len(schemeValues) > 0 {
@@ -65,6 +58,11 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 		var sourceSocket *flowcontrolhttp.SocketAddress
 		if sourceAddr, ok := peer.FromContext(ctx); ok {
 			sourceSocket = socketAddressFromNetAddr(c.GetLogger(), sourceAddr.Addr)
+		}
+		destinationSocket := &flowcontrolhttp.SocketAddress{
+			Address:  getLocalIP(c.GetLogger()),
+			Protocol: flowcontrolhttp.SocketAddress_TCP,
+			Port:     0,
 		}
 
 		body, err := json.Marshal(req)

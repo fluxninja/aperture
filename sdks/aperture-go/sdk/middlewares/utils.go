@@ -10,7 +10,6 @@ import (
 	"github.com/go-logr/logr"
 )
 
-
 // splits address into host and port
 func splitAddress(logger logr.Logger, address string) (string, uint32) {
 	host, port, err := net.SplitHostPort(address)
@@ -38,4 +37,21 @@ func readClonedBody(r *http.Request) ([]byte, error) {
 	}
 	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 	return bodyBytes, nil
+}
+
+// try to figure out the local ip address
+func getLocalIP(logger logr.Logger) string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		logger.V(2).Info("Failed to get local IP address", "error", err)
+		return ""
+	}
+
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+			return ipnet.IP.String()
+		}
+	}
+	logger.V(2).Info("Failed to get local IP address")
+	return ""
 }

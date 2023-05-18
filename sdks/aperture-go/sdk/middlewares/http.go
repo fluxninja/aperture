@@ -57,12 +57,9 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 		protocol := flowcontrolhttp.SocketAddress_TCP
 
 		sourceHost, sourcePort := splitAddress(m.client.GetLogger(), r.RemoteAddr)
-		destinationHost, destinationPort := "", uint32(0)
-		if r.URL.Host != "" {
-			destinationHost, destinationPort = splitAddress(m.client.GetLogger(), r.URL.Host)
-		} else {
-			destinationHost, destinationPort = splitAddress(m.client.GetLogger(), r.Host)
-		}
+		// TODO: Figure out if we can narrow down the port or figure out the host in a better way
+		destinationPort := uint32(0)
+		destinationHost := getLocalIP(m.client.GetLogger())
 
 		bodyBytes, err := readClonedBody(r)
 		if err != nil {
