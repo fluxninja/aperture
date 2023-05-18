@@ -632,7 +632,7 @@ require (
 )
 
 replace (
-	github.com/buraksezer/olric => github.com/fluxninja/olric v0.4.10-fn.patch.4
+	github.com/buraksezer/olric => github.com/fluxninja/olric v0.4.10-fn.patch.5
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.1
 	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.77.0-fn.patch.1

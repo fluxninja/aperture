@@ -13,7 +13,7 @@ policy:
     - decider:
         in_ports:
           lhs:
-            signal_name: OBSERVED_LOAD_MULTIPLIER
+            signal_name: DESIRED_LOAD_MULTIPLIER
           rhs:
             constant_signal:
               value: 1.0
@@ -49,6 +49,9 @@ policy:
           parameters:
             limit_reset_interval: 1s
             label_key: http.request.header.user_id
+            lazy_sync:
+              enabled: true
+              num_sync: 4
           dynamic_config_key: rate_limiter
   # Additional resources.
   # Type: aperture.spec.v1.Resources
