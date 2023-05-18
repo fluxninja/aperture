@@ -36,7 +36,7 @@ func (l *BasicRateLimitChecker) SetOverrides(overrides Overrides) {
 func (l *BasicRateLimitChecker) CheckRateLimit(label string, count float64) (bool, float64) {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
-	limit := l.GetLabelRateLimit(label)
+	limit := l.getLabelRateLimit(label)
 	// limit < 0 means that there is no limit
 	if limit < 0 {
 		return true, -1
@@ -61,10 +61,8 @@ func (l *BasicRateLimitChecker) GetRateLimit() float64 {
 	return l.limit
 }
 
-// GetLabelRateLimit returns the limit for a specific label.
-func (l *BasicRateLimitChecker) GetLabelRateLimit(label string) float64 {
-	l.lock.RLock()
-	defer l.lock.RUnlock()
+// getLabelRateLimit returns the limit for a specific label.
+func (l *BasicRateLimitChecker) getLabelRateLimit(label string) float64 {
 	if scaleFactor, ok := l.overrides[label]; ok {
 		return l.limit * scaleFactor
 	}
