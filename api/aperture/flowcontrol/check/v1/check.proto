@@ -77,10 +77,10 @@ message ClassifierInfo {
 // LimiterDecision describes details for each limiter.
 message LimiterDecision {
   message RateLimiterInfo {
-    int64 remaining = 1;
-    int64 current = 2;
+    double remaining = 1;
+    double current = 2;
     string label = 3;
-    uint64 tokens_consumed = 4;
+    double tokens_consumed = 4;
   }
 
   message LoadSchedulerInfo {

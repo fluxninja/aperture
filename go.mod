@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.0
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/buger/jsonparser v1.1.1
-	github.com/buraksezer/olric v0.4.9
+	github.com/buraksezer/olric v0.0.0-00010101000000-000000000000
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/charmbracelet/bubbletea v0.23.2
 	github.com/clarketm/json v1.17.1
@@ -632,6 +632,7 @@ require (
 )
 
 replace (
+	github.com/buraksezer/olric => github.com/fluxninja/olric v0.4.10-fn.patch.4
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.1
 	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.77.0-fn.patch.1

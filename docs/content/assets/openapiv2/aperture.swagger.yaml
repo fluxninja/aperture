@@ -2244,16 +2244,16 @@ definitions:
     LimiterDecisionRateLimiterInfo:
         properties:
             current:
-                format: int64
-                type: string
+                format: double
+                type: number
             label:
                 type: string
             remaining:
-                format: int64
-                type: string
+                format: double
+                type: number
             tokens_consumed:
-                format: uint64
-                type: string
+                format: double
+                type: number
         type: object
     LimiterDecisionRegulatorInfo:
         properties:

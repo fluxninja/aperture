@@ -131,9 +131,9 @@ public final class CheckProto {
       "ulerInfo\022e\n\016regulator_info\030\010 \001(\0132<.apert" +
       "ure.flowcontrol.check.v1.LimiterDecision" +
       ".RegulatorInfoH\000R\rregulatorInfo\032\210\001\n\017Rate" +
-      "LimiterInfo\022\034\n\tremaining\030\001 \001(\003R\tremainin" +
-      "g\022\030\n\007current\030\002 \001(\003R\007current\022\024\n\005label\030\003 \001" +
-      "(\tR\005label\022\'\n\017tokens_consumed\030\004 \001(\004R\016toke" +
+      "LimiterInfo\022\034\n\tremaining\030\001 \001(\001R\tremainin" +
+      "g\022\030\n\007current\030\002 \001(\001R\007current\022\024\n\005label\030\003 \001" +
+      "(\tR\005label\022\'\n\017tokens_consumed\030\004 \001(\001R\016toke" +
       "nsConsumed\032c\n\021LoadSchedulerInfo\022%\n\016workl" +
       "oad_index\030\001 \001(\tR\rworkloadIndex\022\'\n\017tokens" +
       "_consumed\030\002 \001(\004R\016tokensConsumed\032%\n\rRegul" +

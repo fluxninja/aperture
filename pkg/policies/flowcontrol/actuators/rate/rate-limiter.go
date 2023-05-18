@@ -373,24 +373,22 @@ func (rateLimiter *rateLimiter) GetSelectors() []*policylangv1.Selector {
 }
 
 // Decide runs the limiter.
-func (rateLimiter *rateLimiter) Decide(ctx context.Context,
-	labels map[string]string,
-) *flowcontrolv1.LimiterDecision {
+func (rateLimiter *rateLimiter) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
-	tokens := uint64(1)
+	tokens := float64(1)
 	// get tokens from labels
 	if rateLimiter.rateLimiterProto.Parameters.TokensLabelKey != "" {
 		if val, ok := labels[rateLimiter.rateLimiterProto.Parameters.TokensLabelKey]; ok {
-			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
+			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
 				tokens = parsedTokens
 			}
 		}
 	}
 
-	label, ok, remaining, current := rateLimiter.TakeN(labels, int(tokens))
+	label, ok, remaining, current := rateLimiter.TakeN(labels, tokens)
 
-	tokensConsumed := uint64(0)
+	tokensConsumed := float64(0)
 	if ok {
 		tokensConsumed = tokens
 	}
@@ -408,8 +406,8 @@ func (rateLimiter *rateLimiter) Decide(ctx context.Context,
 		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 			RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
 				Label:          label,
-				Remaining:      int64(remaining),
-				Current:        int64(current),
+				Remaining:      remaining,
+				Current:        current,
 				TokensConsumed: tokensConsumed,
 			},
 		},
@@ -421,13 +419,13 @@ func (rateLimiter *rateLimiter) Revert(labels map[string]string, decision *flowc
 	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
 		tokens := rateLimiterDecision.RateLimiterInfo.TokensConsumed
 		if tokens > 0 {
-			rateLimiter.TakeN(labels, -int(tokens))
+			rateLimiter.TakeN(labels, -tokens)
 		}
 	}
 }
 
 // TakeN takes n tokens from the limiter.
-func (rateLimiter *rateLimiter) TakeN(labels map[string]string, n int) (label string, ok bool, remaining int, current int) {
+func (rateLimiter *rateLimiter) TakeN(labels map[string]string, n float64) (label string, ok bool, remaining float64, current float64) {
 	labelKey := rateLimiter.rateLimiterProto.Parameters.GetLabelKey()
 	var labelValue string
 	if val, found := labels[labelKey]; found {
@@ -464,7 +462,7 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 	limitDecision := wrapperMessage.RateLimiterDecision
-	rateLimiter.rateLimitChecker.SetRateLimit(int(limitDecision.GetLimit()))
+	rateLimiter.rateLimitChecker.SetRateLimit(limitDecision.GetLimit())
 }
 
 func (rateLimiter *rateLimiter) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {

@@ -100,7 +100,7 @@ func (lsl *LazySyncRateTracker) sync(ctx context.Context) (proto.Message, error)
 			go func(i int64) {
 				dur := time.Duration(i * int64(requestDelay))
 				time.Sleep(dur)
-				_, _, global := lsl.limiter.TakeN(label.(string), int(local))
+				_, _, global := lsl.limiter.TakeN(label.(string), float64(local))
 				atomic.StoreInt64(&c.global, int64(global))
 			}(i)
 			i++
@@ -116,14 +116,14 @@ func (lsl *LazySyncRateTracker) Name() string {
 }
 
 // TakeN takes n tokens from the limiter.
-func (lsl *LazySyncRateTracker) TakeN(label string, n int) (bool, int, int) {
-	checkLimit := func(c *counter) (bool, int, int) {
+func (lsl *LazySyncRateTracker) TakeN(label string, n float64) (bool, float64, float64) {
+	checkLimit := func(c *counter) (bool, float64, float64) {
 		// atomic increment local counter
 		local := atomic.AddInt32(&c.local, int32(n))
 		total := int(local) + int(atomic.LoadInt64(&c.global))
 		// check limit
-		ok, remaining := lsl.limiter.GetRateLimitChecker().CheckRateLimit(label, total)
-		return ok, remaining, total
+		ok, remaining := lsl.limiter.GetRateLimitChecker().CheckRateLimit(label, float64(total))
+		return ok, remaining, float64(total)
 	}
 
 	// check if the counter exists in the map
@@ -149,7 +149,7 @@ func (lsl *LazySyncRateTracker) TakeN(label string, n int) (bool, int, int) {
 }
 
 // Take is a wrapper for TakeN(label, 1).
-func (lsl *LazySyncRateTracker) Take(label string) (bool, int, int) {
+func (lsl *LazySyncRateTracker) Take(label string) (bool, float64, float64) {
 	return lsl.TakeN(label, 1)
 }
 

@@ -331,8 +331,6 @@ github.com/buraksezer/connpool v0.6.0 h1:NnTWkd3OH3BAn4qbeI+Ks1XDzU0DQRgOfF+SxsU
 github.com/buraksezer/connpool v0.6.0/go.mod h1:qPiG7gKXo+EjrwG/yqn2StZM4ek6gcYnnGgFIVKN6b0=
 github.com/buraksezer/consistent v0.10.0 h1:hqBgz1PvNLC5rkWcEBVAL9dFMBWz6I0VgUCW25rrZlU=
 github.com/buraksezer/consistent v0.10.0/go.mod h1:6BrVajWq7wbKZlTOUPs/XVfR8c0maujuPowduSpZqmw=
-github.com/buraksezer/olric v0.4.9 h1:dCJbLtEWmBP/6rIQtsi2I0HG7evE+BduOOEVM8BLX10=
-github.com/buraksezer/olric v0.4.9/go.mod h1:kFohMoEizS/hAdYI13W3mfDZhwGeZyz/uXnGCgzCiGE=
 github.com/bwesterb/go-ristretto v1.2.0/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
 github.com/bytecodealliance/wasmtime-go/v3 v3.0.2 h1:3uZCA/BLTIu+DqCfguByNMJa2HVHpXvjfy0Dy7g6fuA=
 github.com/campoy/embedmd v1.0.0/go.mod h1:oxyr9RCiSXg0M3VJ3ks0UGfp98BpSSGr0kpiX3MzVl8=
@@ -520,6 +518,8 @@ github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1 h1:aZbbKMGqnRUQubdJS5tfoZ
 github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1/go.mod h1:Qrdw/7mOFS2SKCOALKFfEH8gdvXJi8XZjw9g5ilpf4I=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
+github.com/fluxninja/olric v0.4.10-fn.patch.4 h1:UQnVqgSxFHSb50pPy3EJkng51FhgkoEWtb79e6vABIA=
+github.com/fluxninja/olric v0.4.10-fn.patch.4/go.mod h1:kFohMoEizS/hAdYI13W3mfDZhwGeZyz/uXnGCgzCiGE=
 github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.1 h1:bfMOGF75+R6LQ3kI9OiKNk9fuNc2wsx/uQMgKuNAItE=
 github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.1/go.mod h1:DhLxVqYW2XcA+FBhYaj7ZCgMP1IWsYmk/gLrsxE0XXM=
 github.com/fluxninja/opentelemetry-collector/component v0.77.0-fn.patch.1 h1:S8nOwlL1C2Diod0fufYzIWpC99U/bEOyvnRqLTZAE4M=
