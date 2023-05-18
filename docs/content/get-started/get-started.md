@@ -7,8 +7,6 @@ sidebar_position: 2
 sidebar_label: Get Started
 ---
 
-# Get started with Aperture
-
 This guide will help you get started with Aperture in few steps. To begin with
 you need to prepare your application to have Aperture integrated. Aperture can
 be integrated in multiple ways. You can choose the one that best suits your
@@ -43,19 +41,19 @@ application.
 
 1. `aperturectl`
 
-Aperture includes its own CLI tool called `aperturectl`. You can use this tool
-to install Aperture in your Kubernetes cluster. Not just installation, it can
-help you do a many other things like creating policies, preview live traffic,
-and so on.
+   Aperture includes its own CLI tool called `aperturectl`. You can use this
+   tool to install Aperture in your Kubernetes cluster. Not just installation,
+   it can help you do a many other things like creating policies, preview live
+   traffic, and so on.
 
-Begin with Aperture installation by heading over to the
-[Installation](../get-started/installation/installation.md) section.
+   Begin with Aperture installation by heading over to the
+   [Installation](../get-started/installation/installation.md) section.
 
 2. Helm
 
-Although there is a Helm chart available for installing Aperture, we recommend
-using `aperturectl` as it provides an easier and less cumbersome way to get
-started.
+   Although there is a Helm chart available for installing Aperture, we
+   recommend using `aperturectl` as it provides an easier and less cumbersome
+   way to get started.
 
 ## Your First Policy
 
