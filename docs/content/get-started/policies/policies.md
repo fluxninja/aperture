@@ -56,7 +56,16 @@ Which will output the following:
 
 ```bash
 dashboards/signals
-policies/latency-aimd-concurrency-limiting
+policies/auto-scaling/pod-auto-scaler
+policies/feature-rollout/average-latency
+policies/feature-rollout/base
+policies/feature-rollout/ema-latency
+policies/feature-rollout/percentile-latency
+policies/feature-rollout/promql
+policies/service-protection/average-latency
+policies/service-protection/promql
+policies/service-protection-with-load-based-pod-auto-scaler/average-latency
+policies/service-protection-with-load-based-pod-auto-scaler/promql
 policies/static-rate-limiting
 ```
 
