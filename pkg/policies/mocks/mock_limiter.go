@@ -226,13 +226,13 @@ func (mr *MockRateLimiterMockRecorder) Revert(labels, decision interface{}) *gom
 }
 
 // TakeN mocks base method.
-func (m *MockRateLimiter) TakeN(labels map[string]string, count int) (string, bool, int, int) {
+func (m *MockRateLimiter) TakeN(labels map[string]string, count float64) (string, bool, float64, float64) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TakeN", labels, count)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
-	ret2, _ := ret[2].(int)
-	ret3, _ := ret[3].(int)
+	ret2, _ := ret[2].(float64)
+	ret3, _ := ret[3].(float64)
 	return ret0, ret1, ret2, ret3
 }
 
