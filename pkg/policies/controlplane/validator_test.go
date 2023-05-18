@@ -136,7 +136,7 @@ spec:
     - decider:
         in_ports:
           lhs:
-            signal_name: OBSERVED_LOAD_MULTIPLIER
+            signal_name: DESIRED_LOAD_MULTIPLIER
           rhs:
             constant_signal:
               value: 1

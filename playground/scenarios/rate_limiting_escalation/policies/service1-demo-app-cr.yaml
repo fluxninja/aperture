@@ -53,7 +53,7 @@ spec:
     - decider:
         in_ports:
           lhs:
-            signal_name: OBSERVED_LOAD_MULTIPLIER
+            signal_name: DESIRED_LOAD_MULTIPLIER
           rhs:
             constant_signal:
               value: 1
@@ -83,6 +83,9 @@ spec:
               signal_name: RATE_LIMIT
           parameters:
             label_key: http.request.header.user_id
+            lazy_sync:
+              enabled: true
+              num_sync: 4
             limit_reset_interval: 1s
           selectors:
           - control_point: ingress
