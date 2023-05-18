@@ -102,25 +102,27 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 		}
 	}
 
-	componentValues, ok := values[releaseName].(map[string]interface{})
-	if !ok {
-		return nil, nil, nil, fmt.Errorf("failed to get %s values", releaseName)
-	}
-
-	isNamespaceScoped, ok := componentValues["namespaceScoped"].(bool)
-	if !ok {
-		isNamespaceScoped = false
-	}
-
-	if releaseName == controller && isNamespaceScoped {
-		values, err = manageControllerCertificateSecret(values, fmt.Sprintf("%s-%s", controller, apertureController), namespace, order)
-		if err != nil {
-			return nil, nil, nil, err
+	var isNamespaceScoped bool
+	if releaseName == controller || releaseName == agent {
+		componentValues, ok := values[releaseName].(map[string]interface{})
+		if !ok {
+			return nil, nil, nil, fmt.Errorf("failed to get %s values", releaseName)
 		}
-	} else if releaseName == agent && isNamespaceScoped {
-		values, err = manageAgentControllerClientCertConfigMap(values, fmt.Sprintf("%s-%s", agent, apertureAgent), namespace, order)
-		if err != nil {
-			return nil, nil, nil, err
+
+		isNamespaceScoped, ok = componentValues["namespaceScoped"].(bool)
+		if !ok {
+			isNamespaceScoped = false
+		}
+		if releaseName == controller && isNamespaceScoped {
+			values, err = manageControllerCertificateSecret(values, fmt.Sprintf("%s-%s", controller, apertureController), namespace, order)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+		} else if releaseName == agent && isNamespaceScoped {
+			values, err = manageAgentControllerClientCertConfigMap(values, fmt.Sprintf("%s-%s", agent, apertureAgent), namespace, order)
+			if err != nil {
+				return nil, nil, nil, err
+			}
 		}
 	}
 
@@ -173,15 +175,16 @@ func applyManifest(manifest string) error {
 func applyObjectToKubernetesWithRetry(unstructuredObject *unstructured.Unstructured) error {
 	log.Info().Msgf("Applying - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
 	attempt := 0
+	var err error
 	for attempt < 5 {
 		attempt++
-		err := applyObjectToKubernetes(unstructuredObject)
+		err = applyObjectToKubernetes(unstructuredObject)
 		if err == nil || (!apimeta.IsNoMatchError(err) && !apierrors.IsConflict(err)) {
 			return err
 		}
 		time.Sleep(time.Second * time.Duration(attempt))
 	}
-	return fmt.Errorf("failed to apply object after %d attempts", attempt)
+	return fmt.Errorf("failed to apply object after %d attempts due to: %v", attempt, err)
 }
 
 // applyObjectToKubernetes applies the given object to Kubernetes.
