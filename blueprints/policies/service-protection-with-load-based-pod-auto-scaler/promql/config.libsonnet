@@ -16,8 +16,7 @@ local promqlServiceProtection = import '../../service-protection/promql/config.l
 * @param (policy.auto_scaling.kubernetes_replicas.min_replicas: string required) Minimum number of replicas.
 * @param (policy.auto_scaling.kubernetes_replicas.max_replicas: string required) Maximum number of replicas.
 * @param (policy.auto_scaling.promql_scale_in_controllers: []policies/auto-scaling/pod-auto-scaler:schema:promql_scale_in_controller required) List of scale in controllers.
-* @param (policy.auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler.
-* @param (policy.auto_scaling.dry_run_config_key: string) Configuration key for overriding dry run setting through dynamic configuration.
+* @param (policy.auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.
 * @param (policy.auto_scaling.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
 */
 
@@ -34,7 +33,6 @@ promqlServiceProtection {
     auto_scaling: {
       promql_scale_in_controllers: autoScalingDefaults.policy.promql_scale_in_controllers,
       dry_run: autoScalingDefaults.policy.dry_run,
-      dry_run_config_key: autoScalingDefaults.policy.dry_run_config_key,
       kubernetes_replicas+: {
         kubernetes_object_selector: '__REQUIRED_FIELD__',
         min_replicas: '__REQUIRED_FIELD__',

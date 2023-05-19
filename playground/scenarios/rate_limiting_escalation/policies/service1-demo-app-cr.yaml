@@ -9,9 +9,8 @@ spec:
     components:
     - flow_control:
         adaptive_load_scheduler:
-          default_config:
-            dry_run: false
-          dynamic_config_key: load_scheduler
+          dry_run: false
+          dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
               constant_signal:
@@ -77,19 +76,19 @@ spec:
             signal_name: RATE_LIMIT
     - flow_control:
         rate_limiter:
-          dynamic_config_key: rate_limiter
+          custom_limits_config_key: custom_limits
           in_ports:
             limit:
               signal_name: RATE_LIMIT
           parameters:
             label_key: http.request.header.user_id
             limit_reset_interval: 1s
-          selectors:
-          - control_point: ingress
-            label_matcher:
-              match_labels:
-                http.request.header.user_type: crawler
-            service: service1-demo-app.demoapp.svc.cluster.local
+            selectors:
+            - control_point: ingress
+              label_matcher:
+                match_labels:
+                  http.request.header.user_type: crawler
+              service: service1-demo-app.demoapp.svc.cluster.local
     - query:
         promql:
           evaluation_interval: 1s

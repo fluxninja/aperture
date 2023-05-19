@@ -9,9 +9,8 @@ spec:
     components:
       - flow_control:
           rate_limiter:
-            default_config:
-              overrides: []
-            dynamic_config_key: rate_limiter
+            custom_limits: []
+            custom_limits_config_key: custom_limits
             in_ports:
               limit:
                 constant_signal:
@@ -19,9 +18,9 @@ spec:
             parameters:
               label_key: user_id
               limit_reset_interval: 1s
-            selectors:
-              - control_point: ingress
-                service: service-graphql-demo-app.demoapp.svc.cluster.local
+              selectors:
+                - control_point: ingress
+                  service: service-graphql-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 1s
   resources:
     flow_control:

@@ -108,7 +108,6 @@ spec:
             signal_name: BACKWARD
     - flow_control:
         load_ramp:
-          dynamic_config_key: regulator
           in_ports:
             backward:
               signal_name: BACKWARD
@@ -127,6 +126,7 @@ spec:
               target_accept_percentage: 1
             - duration: 300s
               target_accept_percentage: 100
+          pass_through_label_values_config_key: pass_through_label_values
     evaluation_interval: 1s
   resources:
     flow_control:

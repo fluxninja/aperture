@@ -19,6 +19,15 @@
   withLimitResetIntervalMixin(limit_reset_interval):: {
     limit_reset_interval+: limit_reset_interval,
   },
+  withSelectors(selectors):: {
+    selectors:
+      if std.isArray(selectors)
+      then selectors
+      else [selectors],
+  },
+  withSelectorsMixin(selectors):: {
+    selectors+: selectors,
+  },
   withTokensLabelKey(tokens_label_key):: {
     tokens_label_key: tokens_label_key,
   },

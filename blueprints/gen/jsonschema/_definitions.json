@@ -3,13 +3,13 @@
     "AdaptiveLoadScheduler": {
       "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/LoadSchedulerDynamicConfig",
-          "description": "Default dynamic configuration for load actuation.",
+        "dry_run": {
+          "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
+          "type": "boolean",
           "x-order": 0
         },
-        "dynamic_config_key": {
-          "description": "Dynamic configuration key for load actuation.",
+        "dry_run_config_key": {
+          "description": "Configuration key for setting dry run mode through dynamic configuration.",
           "type": "string",
           "x-order": 1
         },
@@ -334,7 +334,7 @@
       "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is useful for observing the behavior of auto scaler without disrupting any real deployment.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },
@@ -1244,7 +1244,7 @@
           "x-order": 3
         },
         "selectors": {
-          "description": "Selectors for the component.\n\n",
+          "description": "Selectors for flows that will be metered by this _Flux Meter_.\n\n",
           "items": {
             "$ref": "#/definitions/Selector",
             "type": "object"
@@ -1923,27 +1923,30 @@
     "LoadRamp": {
       "description": "The _Load Ramp_ produces a smooth and continuous traffic load\nthat changes progressively over time, based on the specified steps.\n\nEach step is defined by two parameters:\n- The `target_accept_percentage`.\n- The `duration` for the signal to change from the\n  previous step's `target_accept_percentage` to the current step's\n  `target_accept_percentage`.\n\nThe percentage of requests accepted starts at the `target_accept_percentage`\ndefined in the first step and gradually ramps up or down linearly from\nthe previous step's `target_accept_percentage` to the next\n`target_accept_percentage`, over the `duration` specified for each step.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RegulatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Dynamic configuration key for flow regulator.",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/LoadRampIns",
-          "x-order": 2
+          "x-order": 0
         },
         "out_ports": {
           "$ref": "#/definitions/LoadRampOuts",
-          "x-order": 3
+          "x-order": 1
         },
         "parameters": {
           "$ref": "#/definitions/LoadRampParameters",
           "x-go-tag-validate": "required",
+          "x-order": 2
+        },
+        "pass_through_label_values": {
+          "description": "Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "x-order": 3
+        },
+        "pass_through_label_values_config_key": {
+          "description": "Configuration key for setting label value to pass through through dynamic configuration.",
+          "type": "string",
           "x-order": 4
         }
       },
@@ -2112,15 +2115,15 @@
       "additionalProperties": false
     },
     "LoadScheduler": {
-      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling\nwhich is based on Weighted Fair Queuing principles.\nIt measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nLoadScheduler configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
+      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nIn order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n_Load Scheduler_ measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.\nThe signal at port `pass_through` makes the _Load Scheduler_ pass through all incoming tokens.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/LoadSchedulerDynamicConfig",
-          "description": "Default configuration.",
+        "dry_run": {
+          "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
+          "type": "boolean",
           "x-order": 0
         },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
+        "dry_run_config_key": {
+          "description": "Configuration key for setting dry run mode through dynamic config.",
           "type": "string",
           "x-order": 1
         },
@@ -2141,19 +2144,7 @@
           "x-order": 4
         }
       },
-      "title": "_Load Scheduler_ is an actuator component that regulates flows to provide active service protection",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadSchedulerDynamicConfig": {
-      "description": "Dynamic Configuration for the LoadScheduler component.",
-      "properties": {
-        "dry_run": {
-          "description": "Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.\nUseful for observing the behavior of actuator without disrupting any real traffic.",
-          "type": "boolean",
-          "x-order": 0
-        }
-      },
+      "title": "_Load Scheduler_ creates a queue for flows in front of a service to provide active service protection",
       "type": "object",
       "additionalProperties": false
     },
@@ -2194,7 +2185,7 @@
           "x-order": 0
         },
         "selectors": {
-          "description": "Selectors for the component.\n\n",
+          "description": "Selectors for flows that will be scheduled by this _Load Scheduler_.\n\n",
           "items": {
             "$ref": "#/definitions/Selector",
             "type": "object"
@@ -2599,7 +2590,7 @@
       "description": "Component for scaling pods based on a signal.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
+          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is useful for observing the behavior of pod scaler without disrupting any real deployment.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },
@@ -2762,13 +2753,18 @@
     "RateLimiter": {
       "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value basis. Use `label_key`\nto select which label should be used as key.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RateLimiterDynamicConfig",
-          "title": "Default configuration",
+        "custom_limits": {
+          "description": "Allows to specify different limits for particular label values.\n\n",
+          "items": {
+            "$ref": "#/definitions/RateLimiterCustomLimit",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "dive",
           "x-order": 0
         },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
+        "custom_limits_config_key": {
+          "description": "Configuration key for overriding custom_limits setting through dynamic config.",
           "type": "string",
           "x-order": 1
         },
@@ -2783,58 +2779,16 @@
           "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required",
           "x-order": 3
-        },
-        "selectors": {
-          "description": "Selectors for the component.\n\n",
-          "items": {
-            "$ref": "#/definitions/Selector",
-            "type": "object"
-          },
-          "minItems": 1,
-          "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 4
         }
       },
-      "required": ["selectors"],
       "title": "Limits the traffic on a control point to specified rate",
       "type": "object",
       "additionalProperties": false
     },
-    "RateLimiterDynamicConfig": {
-      "properties": {
-        "overrides": {
-          "description": "Allows to specify different limits for particular label values.\n\n",
-          "items": {
-            "$ref": "#/definitions/RateLimiterOverride",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for the rate limiter",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RateLimiterIns": {
-      "properties": {
-        "limit": {
-          "$ref": "#/definitions/InPort",
-          "description": "Number of flows allowed per `limit_reset_interval` per each label.\nNegative values disable the rate limiter.\n\n:::tip\n\nNegative limit can be useful to _conditionally_ enable the rate limiter\nunder certain circumstances. [Decider](#decider) might be helpful.\n\n:::\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        }
-      },
-      "title": "Inputs for the RateLimiter component",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RateLimiterOverride": {
+    "RateLimiterCustomLimit": {
       "properties": {
         "label_value": {
-          "description": "Value of the label for which the override should be applied.\n\n",
+          "description": "Value of the label for which the custom limit should be applied.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 0
@@ -2849,6 +2803,19 @@
         }
       },
       "required": ["label_value"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RateLimiterIns": {
+      "properties": {
+        "limit": {
+          "$ref": "#/definitions/InPort",
+          "description": "Number of flows allowed per `limit_reset_interval` per each label.\nNegative values disable the rate limiter.\n\n:::tip\n\nNegative limit can be useful to _conditionally_ enable the rate limiter\nunder certain circumstances. [Decider](#decider) might be helpful.\n\n:::\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        }
+      },
+      "title": "Inputs for the RateLimiter component",
       "type": "object",
       "additionalProperties": false
     },
@@ -2872,15 +2839,26 @@
           "x-go-tag-default": "60s",
           "x-order": 2
         },
+        "selectors": {
+          "description": "Selectors for flows that will be rate limited by this _Rate Limiter_.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array",
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 3
+        },
         "tokens_label_key": {
           "default": "tokens",
           "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
           "type": "string",
           "x-go-tag-default": "tokens",
-          "x-order": 3
+          "x-order": 4
         }
       },
-      "required": ["label_key"],
+      "required": ["label_key", "selectors"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2948,42 +2926,30 @@
     "Regulator": {
       "description": "_Regulator_ is a component that regulates the load at a\n[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).\n\n:::",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RegulatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/RegulatorIns",
           "description": "Input ports for the _Regulator_.",
-          "x-order": 2
+          "x-order": 0
         },
         "parameters": {
           "$ref": "#/definitions/RegulatorParameters",
           "description": "Parameters for the _Regulator_.",
-          "x-order": 3
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RegulatorDynamicConfig": {
-      "properties": {
-        "enable_label_values": {
-          "description": "Specify certain label values to be accepted by this flow filter regardless of accept percentage.",
+          "x-order": 1
+        },
+        "pass_through_label_values": {
+          "description": "Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.",
           "items": {
             "type": "string"
           },
           "type": "array",
-          "x-order": 0
+          "x-order": 2
+        },
+        "pass_through_label_values_config_key": {
+          "description": "Configuration key for setting label value to pass through through dynamic configuration.",
+          "type": "string",
+          "x-order": 3
         }
       },
-      "title": "Dynamic Configuration for _Regulator_",
       "type": "object",
       "additionalProperties": false
     },
@@ -3006,7 +2972,7 @@
           "x-order": 0
         },
         "selectors": {
-          "description": "Selectors for the component.\n\n",
+          "description": "Selectors for flows that will be regulated by this _Flow Regulator_.\n\n",
           "items": {
             "$ref": "#/definitions/Selector",
             "type": "object"

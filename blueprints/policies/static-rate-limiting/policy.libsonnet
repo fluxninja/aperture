@@ -14,9 +14,7 @@ function(cfg) {
   local params = config + cfg,
   local policyDef =
     policy.new()
-    + policy.withResources(resources.new()
-                           + resources.withFlowControl(flowControlResources.new()
-                                                       + flowControlResources.withClassifiers(params.policy.classifiers)))
+    + policy.withResources(params.policy.resources)
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')
@@ -25,11 +23,10 @@ function(cfg) {
           flowControl.new()
           + flowControl.withRateLimiter(
             rateLimiter.new()
-            + rateLimiter.withInPorts({ limit: port.withConstantSignal(params.policy.rate_limiter.rate_limit) })
-            + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
-            + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
-            + rateLimiter.withDynamicConfigKey('rate_limiter')
-            + rateLimiter.withDefaultConfig(params.policy.rate_limiter.default_config)
+            + rateLimiter.withInPorts({ limit: port.withConstantSignal(params.policy.rate_limit) })
+            + rateLimiter.withParameters(params.policy.rate_limiter)
+            + rateLimiter.withCustomLimitsConfigKey('custom_limits')
+            + rateLimiter.withCustomLimits(params.policy.custom_limits)
           ),
         ),
       ]),

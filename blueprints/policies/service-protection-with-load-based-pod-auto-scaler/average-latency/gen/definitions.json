@@ -175,7 +175,7 @@
               }
             },
             "dry_run": {
-              "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
+              "description": "Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.",
               "default": false,
               "type": "boolean"
             },

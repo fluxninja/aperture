@@ -77,13 +77,12 @@ func provideWatchers(
 }
 
 type regulatorFactory struct {
-	engineAPI            iface.Engine
-	registry             status.Registry
-	distCache            *distcache.DistCache
-	decisionsWatcher     notifiers.Watcher
-	dynamicConfigWatcher notifiers.Watcher
-	counterVector        *prometheus.CounterVec
-	agentGroupName       string
+	engineAPI        iface.Engine
+	registry         status.Registry
+	distCache        *distcache.DistCache
+	decisionsWatcher notifiers.Watcher
+	counterVector    *prometheus.CounterVec
+	agentGroupName   string
 }
 
 func setupRegulatorFactory(
@@ -103,12 +102,6 @@ func setupRegulatorFactory(
 		return err
 	}
 
-	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		paths.RegulatorDynamicConfigPath)
-	if err != nil {
-		return err
-	}
-
 	reg := statusRegistry.Child("component", regulatorStatusRoot)
 	counterVector := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
@@ -119,13 +112,12 @@ func setupRegulatorFactory(
 	)
 
 	factory := &regulatorFactory{
-		engineAPI:            e,
-		registry:             statusRegistry,
-		distCache:            distCache,
-		decisionsWatcher:     decisionsWatcher,
-		dynamicConfigWatcher: dynamicConfigWatcher,
-		counterVector:        counterVector,
-		agentGroupName:       agentGroupName,
+		engineAPI:        e,
+		registry:         statusRegistry,
+		distCache:        distCache,
+		decisionsWatcher: decisionsWatcher,
+		counterVector:    counterVector,
+		agentGroupName:   agentGroupName,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
@@ -145,19 +137,11 @@ func setupRegulatorFactory(
 			if err != nil {
 				return err
 			}
-			err = dynamicConfigWatcher.Start()
-			if err != nil {
-				return err
-			}
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			var err, merr error
 			err = decisionsWatcher.Stop()
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = dynamicConfigWatcher.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -191,12 +175,12 @@ func (frf *regulatorFactory) newRegulatorOptions(
 
 	regulatorProto := wrapperMessage.Regulator
 	fr := &regulator{
-		Component:         wrapperMessage.GetCommonAttributes(),
-		proto:             regulatorProto,
-		labelKey:          regulatorProto.GetParameters().GetLabelKey(),
-		factory:           frf,
-		registry:          reg,
-		enableLabelValues: make(map[string]bool),
+		Component:              wrapperMessage.GetCommonAttributes(),
+		proto:                  regulatorProto,
+		labelKey:               regulatorProto.GetParameters().GetLabelKey(),
+		factory:                frf,
+		registry:               reg,
+		passthroughLabelValues: make(map[string]bool),
 	}
 	fr.name = iface.ComponentKey(fr)
 
@@ -208,15 +192,15 @@ func (frf *regulatorFactory) newRegulatorOptions(
 }
 
 type regulator struct {
-	enableValuesMutex sync.RWMutex
+	passthroughLabelValuesMutex sync.RWMutex
 	iface.Component
-	registry          status.Registry
-	factory           *regulatorFactory
-	proto             *policylangv1.Regulator
-	enableLabelValues map[string]bool
-	name              string
-	labelKey          string
-	acceptPercentage  float64
+	registry               status.Registry
+	factory                *regulatorFactory
+	proto                  *policylangv1.Regulator
+	passthroughLabelValues map[string]bool
+	name                   string
+	labelKey               string
+	acceptPercentage       float64
 }
 
 // Make sure regulator implements iface.Limiter.
@@ -240,19 +224,6 @@ func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
-	// dynamic config notifier
-	dynamicConfigUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
-	if err != nil {
-		return err
-	}
-	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(etcdKey),
-		dynamicConfigUnmarshaller,
-		fr.dynamicConfigUpdateCallback,
-	)
-	if err != nil {
-		return err
-	}
 
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = fr.GetPolicyName()
@@ -263,18 +234,10 @@ func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			fr.updateDynamicConfig(fr.proto.GetDefaultConfig())
-
 			// add decisions notifier
 			err = fr.factory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
-				return err
-			}
-			// add dynamic config notifier
-			err = fr.factory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to add dynamic config notifier")
 				return err
 			}
 
@@ -299,12 +262,6 @@ func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
 				merr = multierr.Append(merr, err)
 			}
-			// remove dynamic config notifier
-			err = fr.factory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to remove dynamic config notifier")
-				merr = multierr.Append(merr, err)
-			}
 			// remove decisions notifier
 			err = fr.factory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
@@ -319,27 +276,14 @@ func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 	return nil
 }
 
-func (fr *regulator) updateDynamicConfig(dynamicConfig *policylangv1.Regulator_DynamicConfig) {
-	logger := fr.registry.GetLogger()
-
-	if dynamicConfig == nil {
-		return
+func (fr *regulator) setPassthroughLabelValues(labelList []string) {
+	labelSet := make(map[string]bool)
+	for _, labelValue := range labelList {
+		labelSet[labelValue] = true
 	}
-	labelValues := make(map[string]bool)
-	// loop through overrides
-	for _, labelValue := range dynamicConfig.EnableLabelValues {
-		labelValues[labelValue] = true
-	}
-
-	logger.Debug().Interface("enable values", labelValues).Str("name", fr.name).Msgf("Updating dynamic config for load regulator")
-
-	fr.setEnableValues(labelValues)
-}
-
-func (fr *regulator) setEnableValues(labelValues map[string]bool) {
-	fr.enableValuesMutex.Lock()
-	defer fr.enableValuesMutex.Unlock()
-	fr.enableLabelValues = labelValues
+	fr.passthroughLabelValuesMutex.Lock()
+	defer fr.passthroughLabelValuesMutex.Unlock()
+	fr.passthroughLabelValues = labelSet
 }
 
 // GetSelectors returns the selectors for the load regulator.
@@ -372,6 +316,15 @@ func (fr *regulator) Decide(ctx context.Context,
 				Label: labelKey + ":" + labelValue,
 			},
 		},
+	}
+
+	// Check if labelValue is in passthroughLabelValues
+	fr.passthroughLabelValuesMutex.RLock()
+	_, ok := fr.passthroughLabelValues[labelValue]
+	fr.passthroughLabelValuesMutex.RUnlock()
+	if ok {
+		limiterDecision.Dropped = false
+		return limiterDecision
 	}
 
 	// If label_key is a non-empty string and is found within labels
@@ -431,32 +384,8 @@ func (fr *regulator) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 		return
 	}
 	regulatorDecision := wrapperMessage.RegulatorDecision
+	fr.setPassthroughLabelValues(regulatorDecision.PassThroughLabelValues)
 	fr.acceptPercentage = regulatorDecision.AcceptPercentage
-}
-
-func (fr *regulator) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := fr.registry.GetLogger()
-	if event.Type == notifiers.Remove {
-		logger.Debug().Msg("Dynamic config removed")
-		fr.enableLabelValues = make(map[string]bool)
-		return
-	}
-
-	var wrapperMessage policysyncv1.RegulatorDynamicConfigWrapper
-	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.RegulatorDynamicConfig == nil {
-		return
-	}
-	commonAttributes := wrapperMessage.GetCommonAttributes()
-	if commonAttributes == nil {
-		log.Error().Msg("Common attributes not found")
-		return
-	}
-	if commonAttributes.PolicyHash != fr.GetPolicyHash() {
-		return
-	}
-	dynamicConfig := wrapperMessage.RegulatorDynamicConfig
-	fr.updateDynamicConfig(dynamicConfig)
 }
 
 // GetLimiterID returns the limiter ID.

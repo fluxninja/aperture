@@ -89,7 +89,7 @@ policy:
           slope: 1
         query_string: __REQUIRED_FIELD__
         threshold: 0.5
-    # Dry run mode ensures that no scaling is invoked by this auto scaler.
+    # Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.
     # Type: bool
     dry_run: false
     # Parameters that define the scaling behavior.

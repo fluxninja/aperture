@@ -22,15 +22,13 @@ import (
 )
 
 type rateLimiterSync struct {
-	policyReadAPI          iface.Policy
-	rateLimiterProto       *policylangv1.RateLimiter
-	decision               *policysyncv1.RateLimiterDecision
-	decisionWriter         *etcdwriter.Writer
-	dynamicConfigWriter    *etcdwriter.Writer
-	componentID            string
-	configEtcdPaths        []string
-	decisionEtcdPaths      []string
-	dynamicConfigEtcdPaths []string
+	policyReadAPI     iface.Policy
+	rateLimiterProto  *policylangv1.RateLimiter
+	decisionWriter    *etcdwriter.Writer
+	componentID       string
+	configEtcdPaths   []string
+	decisionEtcdPaths []string
+	customLimits      []*policylangv1.RateLimiter_CustomLimit
 }
 
 // Name implements runtime.Component.
@@ -41,7 +39,7 @@ func (*rateLimiterSync) Type() runtime.ComponentType { return runtime.ComponentT
 
 // ShortDescription implements runtime.Component.
 func (limiterSync *rateLimiterSync) ShortDescription() string {
-	return iface.GetSelectorsShortDescription(limiterSync.rateLimiterProto.GetSelectors())
+	return iface.GetSelectorsShortDescription(limiterSync.rateLimiterProto.GetParameters().GetSelectors())
 }
 
 // IsActuator implements runtime.Component.
@@ -53,11 +51,11 @@ func NewRateLimiterAndOptions(
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	s := rateLimiterProto.GetSelectors()
+	s := rateLimiterProto.GetParameters().GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)
 
-	var configEtcdPaths, decisionEtcdPaths, dynamicConfigEtcdPaths []string
+	var configEtcdPaths, decisionEtcdPaths []string
 
 	for _, agentGroup := range agentGroups {
 
@@ -66,18 +64,15 @@ func NewRateLimiterAndOptions(
 		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
 		decisionEtcdPath := path.Join(paths.RateLimiterDecisionsPath, etcdKey)
 		decisionEtcdPaths = append(decisionEtcdPaths, decisionEtcdPath)
-		dynamicConfigEtcdPath := path.Join(paths.RateLimiterDynamicConfigPath, etcdKey)
-		dynamicConfigEtcdPaths = append(dynamicConfigEtcdPaths, dynamicConfigEtcdPath)
 	}
 
 	limiterSync := &rateLimiterSync{
-		rateLimiterProto:       rateLimiterProto,
-		decision:               &policysyncv1.RateLimiterDecision{},
-		policyReadAPI:          policyReadAPI,
-		configEtcdPaths:        configEtcdPaths,
-		decisionEtcdPaths:      decisionEtcdPaths,
-		dynamicConfigEtcdPaths: dynamicConfigEtcdPaths,
-		componentID:            componentID.String(),
+		rateLimiterProto:  rateLimiterProto,
+		policyReadAPI:     policyReadAPI,
+		configEtcdPaths:   configEtcdPaths,
+		decisionEtcdPaths: decisionEtcdPaths,
+		componentID:       componentID.String(),
+		customLimits:      rateLimiterProto.GetCustomLimits(),
 	}
 	return limiterSync, fx.Options(
 		fx.Invoke(
@@ -113,11 +108,9 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 				}
 			}
 			limiterSync.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
-			limiterSync.dynamicConfigWriter = etcdwriter.NewWriter(etcdClient, true)
 			return merr
 		},
 		OnStop: func(ctx context.Context) error {
-			limiterSync.dynamicConfigWriter.Close()
 			limiterSync.decisionWriter.Close()
 			deleteEtcdPath := func(paths []string) error {
 				var merr error
@@ -133,7 +126,6 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 
 			merr := deleteEtcdPath(limiterSync.configEtcdPaths)
 			merr = multierr.Append(merr, deleteEtcdPath(limiterSync.decisionEtcdPaths))
-			merr = multierr.Append(merr, deleteEtcdPath(limiterSync.dynamicConfigEtcdPaths))
 			return merr
 		},
 	})
@@ -164,30 +156,30 @@ func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToReading
 func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Publish only if there's a change
-	if limiterSync.decision.GetLimit() != limitValue {
-		// Save the decision
-		limiterSync.decision.Limit = limitValue
-		// Publish decision
-		logger.Debug().Float64("limit", limitValue).Msg("publishing rate limiter decision")
-		wrapper := &policysyncv1.RateLimiterDecisionWrapper{
-			RateLimiterDecision: limiterSync.decision,
-			CommonAttributes: &policysyncv1.CommonAttributes{
-				PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
-				PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
-				ComponentId: limiterSync.componentID,
-			},
-		}
-		dat, err := proto.Marshal(wrapper)
-		if err != nil {
-			logger.Error().Err(err).Msg("failed to marshal rate limiter decision")
-			return err
-		}
-		if limiterSync.decisionWriter == nil {
-			logger.Panic().Msg("decision writer is nil")
-		}
-		for _, decisionEtcdPath := range limiterSync.decisionEtcdPaths {
-			limiterSync.decisionWriter.Write(decisionEtcdPath, dat)
-		}
+	decision := &policysyncv1.RateLimiterDecision{
+		Limit:        limitValue,
+		CustomLimits: limiterSync.customLimits,
+	}
+	// Publish decision
+	logger.Debug().Float64("limit", limitValue).Msg("publishing rate limiter decision")
+	wrapper := &policysyncv1.RateLimiterDecisionWrapper{
+		RateLimiterDecision: decision,
+		CommonAttributes: &policysyncv1.CommonAttributes{
+			PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
+			PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
+			ComponentId: limiterSync.componentID,
+		},
+	}
+	dat, err := proto.Marshal(wrapper)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to marshal rate limiter decision")
+		return err
+	}
+	if limiterSync.decisionWriter == nil {
+		logger.Panic().Msg("decision writer is nil")
+	}
+	for _, decisionEtcdPath := range limiterSync.decisionEtcdPaths {
+		limiterSync.decisionWriter.Write(decisionEtcdPath, dat)
 	}
 	return nil
 }
@@ -195,38 +187,17 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 // DynamicConfigUpdate handles overrides.
 func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	publishDynamicConfig := func(dynamicConfig *policylangv1.RateLimiter_DynamicConfig) {
-		wrapper := &policysyncv1.RateLimiterDynamicConfigWrapper{
-			RateLimiterDynamicConfig: dynamicConfig,
-			CommonAttributes: &policysyncv1.CommonAttributes{
-				PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
-				PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
-				ComponentId: limiterSync.componentID,
-			},
-		}
-		dat, err := proto.Marshal(wrapper)
-		if err != nil {
-			logger.Error().Err(err).Msg("failed to marshal dynamic config")
-			return
-		}
-		if limiterSync.dynamicConfigWriter == nil {
-			logger.Panic().Msg("dynamic config writer is nil")
-		}
-		for _, dynamicConfigEtcdPath := range limiterSync.dynamicConfigEtcdPaths {
-			limiterSync.dynamicConfigWriter.Write(dynamicConfigEtcdPath, dat)
-		}
-		logger.Info().Msg("rate limiter dynamic config updated")
+	key := limiterSync.rateLimiterProto.GetCustomLimitsConfigKey()
+	customLimits := []*policylangv1.RateLimiter_CustomLimit{}
+	if !unmarshaller.IsSet(key) {
+		limiterSync.customLimits = limiterSync.rateLimiterProto.GetCustomLimits()
+		return
 	}
-	dynamicConfig := &policylangv1.RateLimiter_DynamicConfig{}
-	key := limiterSync.rateLimiterProto.GetDynamicConfigKey()
-	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
-			return
-		}
-		publishDynamicConfig(dynamicConfig)
-	} else {
-		publishDynamicConfig(limiterSync.rateLimiterProto.GetDefaultConfig())
+	err := unmarshaller.UnmarshalKey(key, &customLimits)
+	if err != nil {
+		logger.Error().Err(err).Msgf("failed to unmarshal key %s", key)
+		limiterSync.customLimits = limiterSync.rateLimiterProto.GetCustomLimits()
+		return
 	}
+	limiterSync.customLimits = customLimits
 }

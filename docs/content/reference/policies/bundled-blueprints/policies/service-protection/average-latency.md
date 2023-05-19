@@ -397,13 +397,13 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="load-scheduler"></a>
+<a id="dry-run"></a>
 
 <ParameterDescription
-    name='load_scheduler'
-    description='Default configuration for load scheduler that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.LoadSchedulerDynamicConfig)'
-    reference='../../../spec#load-scheduler-dynamic-config'
+    name='dry_run'
+    description='Dynamic configuration for setting dry run mode at runtime without restarting this policy. In dry run mode the scheduler acts as pass through to all flow and does not queue flows. It is useful for observing the behavior of load scheduler without disrupting any real traffic.'
+    type='Boolean'
+    reference=''
     value='"__REQUIRED_FIELD__"'
 />
 

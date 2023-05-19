@@ -721,14 +721,14 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="regulator"></a>
+<a id="pass-through-label-values"></a>
 
 <ParameterDescription
-    name='regulator'
-    description='Default configuration for _Regulator_ that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.RegulatorDynamicConfig)'
-    reference='../../../spec#regulator-dynamic-config'
-    value='"__REQUIRED_FIELD__"'
+    name='pass_through_label_values'
+    description='Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.'
+    type='Array of string'
+    reference=''
+    value='["__REQUIRED_FIELD__"]'
 />
 
 <!-- vale on -->

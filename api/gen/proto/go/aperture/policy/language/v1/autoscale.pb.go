@@ -219,7 +219,7 @@ type PodScaler struct {
 	// Output ports for the PodScaler component.
 	OutPorts *PodScaler_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Dry run mode ensures that no scaling is invoked by this pod scaler.
-	// This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
+	// This is useful for observing the behavior of pod scaler without disrupting any real deployment.
 	// This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
 	DryRun bool `protobuf:"varint,3,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`
 	// Configuration key for overriding dry run setting through dynamic configuration.
@@ -593,7 +593,7 @@ type AutoScaler struct {
 	// Parameters that define the scaling behavior.
 	ScalingParameters *AutoScaler_ScalingParameters `protobuf:"bytes,4,opt,name=scaling_parameters,json=scalingParameters,proto3" json:"scaling_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Dry run mode ensures that no scaling is invoked by this auto scaler.
-	// This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+	// This is useful for observing the behavior of auto scaler without disrupting any real deployment.
 	// This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
 	DryRun bool `protobuf:"varint,5,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`
 	// Configuration key for overriding dry run setting through dynamic configuration.

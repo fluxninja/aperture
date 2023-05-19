@@ -3,17 +3,20 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   new():: {
   },
   inPorts:: ratelimiterins,
-  withDefaultConfig(default_config):: {
-    default_config: default_config,
+  withCustomLimits(custom_limits):: {
+    custom_limits:
+      if std.isArray(custom_limits)
+      then custom_limits
+      else [custom_limits],
   },
-  withDefaultConfigMixin(default_config):: {
-    default_config+: default_config,
+  withCustomLimitsMixin(custom_limits):: {
+    custom_limits+: custom_limits,
   },
-  withDynamicConfigKey(dynamic_config_key):: {
-    dynamic_config_key: dynamic_config_key,
+  withCustomLimitsConfigKey(custom_limits_config_key):: {
+    custom_limits_config_key: custom_limits_config_key,
   },
-  withDynamicConfigKeyMixin(dynamic_config_key):: {
-    dynamic_config_key+: dynamic_config_key,
+  withCustomLimitsConfigKeyMixin(custom_limits_config_key):: {
+    custom_limits_config_key+: custom_limits_config_key,
   },
   withInPorts(in_ports):: {
     in_ports: in_ports,
@@ -26,14 +29,5 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   },
   withParametersMixin(parameters):: {
     parameters+: parameters,
-  },
-  withSelectors(selectors):: {
-    selectors:
-      if std.isArray(selectors)
-      then selectors
-      else [selectors],
-  },
-  withSelectorsMixin(selectors):: {
-    selectors+: selectors,
   },
 }

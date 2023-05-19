@@ -67,3 +67,31 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 <!-- vale on -->
 
 ---
+
+## Dynamic Configuration
+
+:::note
+
+The following configuration parameters can be
+[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+at runtime, without reloading the policy.
+
+:::
+
+### Parameters
+
+<!-- vale off -->
+
+<a id="pass-through-label-values"></a>
+
+<ParameterDescription
+    name='pass_through_label_values'
+    description='Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.'
+    type='Array of string'
+    reference=''
+    value='["__REQUIRED_FIELD__"]'
+/>
+
+<!-- vale on -->
+
+---

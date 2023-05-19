@@ -1,27 +1,33 @@
-# Generated values.yaml file for policies/static-rate-limiting blueprint
+# yaml-language-server: $schema=../../../../../blueprints/policies/static-rate-limiting/gen/definitions.json
+# Generated values file for policies/static-rate-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
 
 policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: static-rate-limiting
+  # Number of requests per `policy.rate_limiter.limit_reset_interval` to accept
+  # Type: float64
+  # Required: True
+  rate_limit: 50
+  # Parameters for _Rate Limiter_.
+  # Type: aperture.spec.v1.RateLimiterParameters
   rate_limiter:
-    # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
-    # Type: float64
-    # Required: True
-    rate_limit: 50
+    label_key: http.request.header.user_type
+    limit_reset_interval: 60s
     selectors:
-      - agent_group: default
+      - control_point: ingress
         service: service1-demo-app.demoapp.svc.cluster.local
-        control_point: ingress
-    parameters:
-      # Time after which the limit for a given label value will be reset.
-      # Type: string
-      # Required: True
-      limit_reset_interval: 60s
-      # Flow label to use for rate limiting.
-      # Type: string
-      # Required: True
-      label_key: http.request.header.user_type
+  # Allows to specify different limits for particular label values. This setting can be updated at runtime without restarting the policy via dynamic config.
+  # Type: []aperture.spec.v1.RateLimiterCustomLimit
+  custom_limits: []

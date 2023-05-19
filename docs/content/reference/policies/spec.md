@@ -36,19 +36,22 @@ The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
 deviation of the input signal from the setpoint.
 
 <dl>
-<dt>default_config</dt>
+<dt>dry_run</dt>
 <dd>
 
 <!-- vale off -->
 
-([LoadSchedulerDynamicConfig](#load-scheduler-dynamic-config))
+(bool)
 
 <!-- vale on -->
 
-Default dynamic configuration for load actuation.
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
 
 </dd>
-<dt>dynamic_config_key</dt>
+<dt>dry_run_config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -57,7 +60,7 @@ Default dynamic configuration for load actuation.
 
 <!-- vale on -->
 
-Dynamic configuration key for load actuation.
+Configuration key for setting dry run mode through dynamic configuration.
 
 </dd>
 <dt>in_ports</dt>
@@ -743,9 +746,9 @@ such as Kubernetes to perform auto-scale.
 <!-- vale on -->
 
 Dry run mode ensures that no scaling is invoked by this auto scaler. This is
-Useful for observing the behavior of auto scaler without disrupting any real
-traffic. This parameter sets the default value of dry run setting which can be
-overridden at runtime using dynamic configuration.
+useful for observing the behavior of auto scaler without disrupting any real
+deployment. This parameter sets the default value of dry run setting which can
+be overridden at runtime using dynamic configuration.
 
 </dd>
 <dt>dry_run_config_key</dt>
@@ -2771,7 +2774,7 @@ For list of available attributes in Envoy access logs, refer
 
 <!-- vale on -->
 
-Selectors for the component.
+Selectors for flows that will be metered by this _Flux Meter_.
 
 </dd>
 <dt>static_buckets</dt>
@@ -4222,30 +4225,6 @@ previous step's `target_accept_percentage` to the next
 `target_accept_percentage`, over the `duration` specified for each step.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([RegulatorDynamicConfig](#regulator-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Dynamic configuration key for flow regulator.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -4274,6 +4253,32 @@ Dynamic configuration key for flow regulator.
 ([LoadRampParameters](#load-ramp-parameters))
 
 <!-- vale on -->
+
+</dd>
+<dt>pass_through_label_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+Specify certain label values to be always accepted by the _Regulator_ regardless
+of accept percentage.
+
+</dd>
+<dt>pass_through_label_values_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting label value to pass through through dynamic
+configuration.
 
 </dd>
 </dl>
@@ -4597,8 +4602,8 @@ An ordered list of load ramps that get applied in order.
 
 <!-- vale on -->
 
-_Load Scheduler_ is an actuator component that regulates flows to provide active
-service protection
+_Load Scheduler_ creates a queue for flows in front of a service to provide
+active service protection
 
 :::info
 
@@ -4607,28 +4612,34 @@ See also
 
 :::
 
-It's based on the actuation strategy (for example, load actuator) and workload
-scheduling which is based on Weighted Fair Queuing principles. It measures and
-controls the incoming tokens per second, which can translate to (avg. latency \*
-in-flight requests) (Little's Law) in concurrency limiting use-case.
+In order to make scheduling decisions the Flows are mapped into Workloads by
+providing match rules. A workload determines the priority and cost of admitting
+each Flow that belongs to it. Scheduling of Flows is based on Weighted Fair
+Queuing principles. _Load Scheduler_ measures and controls the incoming tokens
+per second, which can translate to (avg. latency \* in-flight requests)
+(Little's Law) in concurrency limiting use-case.
 
-LoadScheduler configuration is split into two parts: An actuation strategy and a
-scheduler. At this time, only `load_actuator` strategy is available.
+The signal at port `load_multiplier` determines the fraction of incoming tokens
+that get admitted. The signal at port `pass_through` makes the _Load Scheduler_
+pass through all incoming tokens.
 
 <dl>
-<dt>default_config</dt>
+<dt>dry_run</dt>
 <dd>
 
 <!-- vale off -->
 
-([LoadSchedulerDynamicConfig](#load-scheduler-dynamic-config))
+(bool)
 
 <!-- vale on -->
 
-Default configuration.
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
 
 </dd>
-<dt>dynamic_config_key</dt>
+<dt>dry_run_config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -4637,7 +4648,7 @@ Default configuration.
 
 <!-- vale on -->
 
-Configuration key for DynamicConfig.
+Configuration key for setting dry run mode through dynamic config.
 
 </dd>
 <dt>in_ports</dt>
@@ -4672,33 +4683,6 @@ Output ports for the LoadScheduler component.
 ([LoadSchedulerParameters](#load-scheduler-parameters))
 
 <!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadSchedulerDynamicConfig {#load-scheduler-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for the LoadScheduler component.
-
-<dl>
-<dt>dry_run</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool)
-
-<!-- vale on -->
-
-Decides whether to run the actuator in dry-run mode. Dry run mode ensures that
-no traffic gets dropped by this actuator. Useful for observing the behavior of
-actuator without disrupting any real traffic.
 
 </dd>
 </dl>
@@ -4800,7 +4784,7 @@ Contains configuration of per-agent scheduler
 
 <!-- vale on -->
 
-Selectors for the component.
+Selectors for flows that will be scheduled by this _Load Scheduler_.
 
 </dd>
 <dt>workload_latency_based_tokens</dt>
@@ -5612,9 +5596,9 @@ Component for scaling pods based on a signal.
 <!-- vale on -->
 
 Dry run mode ensures that no scaling is invoked by this pod scaler. This is
-Useful for observing the behavior of pod scaler without disrupting any real
-traffic. This parameter sets the default value of dry run setting which can be
-overridden at runtime using dynamic configuration.
+useful for observing the behavior of pod scaler without disrupting any real
+deployment. This parameter sets the default value of dry run setting which can
+be overridden at runtime using dynamic configuration.
 
 </dd>
 <dt>dry_run_config_key</dt>
@@ -5995,19 +5979,19 @@ RateLimiting is done on per-label-value basis. Use `label_key` to select which
 label should be used as key.
 
 <dl>
-<dt>default_config</dt>
+<dt>custom_limits</dt>
 <dd>
 
 <!-- vale off -->
 
-([RateLimiterDynamicConfig](#rate-limiter-dynamic-config))
+([[]RateLimiterCustomLimit](#rate-limiter-custom-limit))
 
 <!-- vale on -->
 
-Default configuration
+Allows to specify different limits for particular label values.
 
 </dd>
-<dt>dynamic_config_key</dt>
+<dt>custom_limits_config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -6016,7 +6000,7 @@ Default configuration
 
 <!-- vale on -->
 
-Configuration key for DynamicConfig
+Configuration key for overriding custom_limits setting through dynamic config.
 
 </dd>
 <dt>in_ports</dt>
@@ -6043,41 +6027,39 @@ Input ports for the RateLimiter component
 Parameters for the RateLimiter component
 
 </dd>
-<dt>selectors</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]Selector](#selector), **required**)
-
-<!-- vale on -->
-
-Selectors for the component.
-
-</dd>
 </dl>
 
 ---
 
 <!-- vale off -->
 
-### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
+### RateLimiterCustomLimit {#rate-limiter-custom-limit}
 
 <!-- vale on -->
 
-Dynamic Configuration for the rate limiter
-
 <dl>
-<dt>overrides</dt>
+<dt>label_value</dt>
 <dd>
 
 <!-- vale off -->
 
-([[]RateLimiterOverride](#rate-limiter-override))
+(string, **required**)
 
 <!-- vale on -->
 
-Allows to specify different limits for particular label values.
+Value of the label for which the custom limit should be applied.
+
+</dd>
+<dt>limit_scale_factor</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `1`)
+
+<!-- vale on -->
+
+Amount by which the `in_ports.limit` should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -6111,41 +6093,6 @@ Negative limit can be useful to _conditionally_ enable the rate limiter under
 certain circumstances. [Decider](#decider) might be helpful.
 
 :::
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RateLimiterOverride {#rate-limiter-override}
-
-<!-- vale on -->
-
-<dl>
-<dt>label_value</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-Value of the label for which the override should be applied.
-
-</dd>
-<dt>limit_scale_factor</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `1`)
-
-<!-- vale on -->
-
-Amount by which the `in_ports.limit` should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -6198,6 +6145,18 @@ Configuration of lazy-syncing behavior of rate limiter
 <!-- vale on -->
 
 Time after which the limit for a given label value will be reset.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+Selectors for flows that will be rate limited by this _Rate Limiter_.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -6387,30 +6346,6 @@ See also
 :::
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([RegulatorDynamicConfig](#regulator-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -6435,20 +6370,7 @@ Input ports for the _Regulator_.
 Parameters for the _Regulator_.
 
 </dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RegulatorDynamicConfig {#regulator-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for _Regulator_
-
-<dl>
-<dt>enable_label_values</dt>
+<dt>pass_through_label_values</dt>
 <dd>
 
 <!-- vale off -->
@@ -6457,8 +6379,21 @@ Dynamic Configuration for _Regulator_
 
 <!-- vale on -->
 
-Specify certain label values to be accepted by this flow filter regardless of
-accept percentage.
+Specify certain label values to be always accepted by this _Regulator_
+regardless of accept percentage.
+
+</dd>
+<dt>pass_through_label_values_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting label value to pass through through dynamic
+configuration.
 
 </dd>
 </dl>
@@ -6522,7 +6457,7 @@ The flow label key for identifying sessions.
 
 <!-- vale on -->
 
-Selectors for the component.
+Selectors for flows that will be regulated by this _Flow Regulator_.
 
 </dd>
 </dl>

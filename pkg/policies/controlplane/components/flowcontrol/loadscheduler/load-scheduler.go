@@ -81,8 +81,8 @@ func ParseLoadScheduler(
 				},
 			},
 			LoadSchedulerComponentId:   componentID.String(),
-			DefaultConfig:              loadScheduler.GetDefaultConfig(),
-			DynamicConfigKey:           loadScheduler.GetDynamicConfigKey(),
+			DryRun:                     loadScheduler.GetDryRun(),
+			DryRunConfigKey:            loadScheduler.GetDryRunConfigKey(),
 			WorkloadLatencyBasedTokens: loadScheduler.Parameters.GetWorkloadLatencyBasedTokens(),
 			Selectors:                  loadScheduler.Parameters.GetSelectors(),
 		})

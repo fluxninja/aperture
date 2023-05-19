@@ -411,7 +411,7 @@ function(cfg) {
         reset: spec.v1.Port.withSignalName('RESET'),
       })
       + spec.v1.LoadRamp.withParameters(params.policy.load_ramp)
-      + spec.v1.LoadRamp.withDynamicConfigKey('regulator'),
+      + spec.v1.LoadRamp.withPassThroughLabelValuesConfigKey('pass_through_label_values'),
     ),
   ),
 

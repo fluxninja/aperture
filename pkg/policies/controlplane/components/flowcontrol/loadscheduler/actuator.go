@@ -11,7 +11,6 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -211,27 +210,9 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 
 // DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
 func (la *Actuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	key := la.actuatorProto.GetDryRunConfigKey()
 	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		dynamicConfig := &policylangv1.LoadScheduler_DynamicConfig{}
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
-			return
-		}
-		la.setConfig(dynamicConfig)
-	} else {
-		la.setConfig(la.actuatorProto.GetDefaultConfig())
-	}
-}
-
-func (la *Actuator) setConfig(config *policylangv1.LoadScheduler_DynamicConfig) {
-	if config != nil {
-		la.dryRun = config.GetDryRun()
-	} else {
-		la.dryRun = false
-	}
+	la.dryRun = config.GetBoolValue(unmarshaller, key, la.actuatorProto.GetDryRun())
 }
 
 func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {

@@ -3,13 +3,21 @@
   "type": "object",
   "title": "policies/static-rate-limiting blueprint",
   "additionalProperties": false,
-  "required": ["rate_limiter"],
+  "required": ["custom_limits"],
   "properties": {
-    "rate_limiter": {
-      "description": "Rate limiter dynamic configuration that is updated at runtime.",
-      "default": "__REQUIRED_FIELD__",
-      "type": "object",
-      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
+    "custom_limits": {
+      "description": "Allows to specify different limits for particular label values.",
+      "default": [
+        {
+          "label_value": "__REQUIRED_FIELD__",
+          "limit_scale_factor": "__REQUIRED_FIELD__"
+        }
+      ],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterCustomLimit"
+      }
     }
   },
   "$defs": null

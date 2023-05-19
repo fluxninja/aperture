@@ -38,6 +38,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 
 <!-- vale off -->
 
+<a id="policy-components"></a>
+
+<ParameterDescription
+    name='policy.components'
+    description='List of additional circuit components.'
+    type='Array of Object (aperture.spec.v1.Component)'
+    reference='../../spec#component'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-resources"></a>
+
+<ParameterDescription
+    name='policy.resources'
+    description='Additional resources.'
+    type='Object (aperture.spec.v1.Resources)'
+    reference='../../spec#resources'
+    value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-policy-name"></a>
 
 <ParameterDescription
@@ -52,31 +80,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 
 <!-- vale off -->
 
-<a id="policy-classifiers"></a>
+<a id="policy-rate-limit"></a>
 
 <ParameterDescription
-    name='policy.classifiers'
-    description='List of classification rules.'
-    type='Array of Object (aperture.spec.v1.Classifier)'
-    reference='../../spec#classifier'
-    value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### policy.rate_limiter {#policy-rate-limiter}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-rate-limiter-rate-limit"></a>
-
-<ParameterDescription
-    name='policy.rate_limiter.rate_limit'
-    description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept'
+    name='policy.rate_limit'
+    description='Number of requests per `policy.rate_limiter.limit_reset_interval` to accept'
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -86,42 +94,28 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-selectors"></a>
+<a id="policy-rate-limiter"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.selectors'
-    description='Flow selectors to match requests against'
-    type='Array of Object (aperture.spec.v1.Selector)'
-    reference='../../spec#selector'
-    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-rate-limiter-parameters"></a>
-
-<ParameterDescription
-    name='policy.rate_limiter.parameters'
-    description='Parameters.'
+    name='policy.rate_limiter'
+    description='Parameters for _Rate Limiter_.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../spec#rate-limiter-parameters'
-    value='{"label_key": "__REQUIRED_FIELD__", "limit_reset_interval": "__REQUIRED_FIELD__"}'
+    value='{"label_key": "__REQUIRED_FIELD__", "limit_reset_interval": "__REQUIRED_FIELD__", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-default-config"></a>
+<a id="policy-custom-limits"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.default_config'
-    description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
-    reference='../../spec#rate-limiter-dynamic-config'
-    value='{"overrides": []}'
+    name='policy.custom_limits'
+    description='Allows to specify different limits for particular label values. This setting can be updated at runtime without restarting the policy via dynamic config.'
+    type='Array of Object (aperture.spec.v1.RateLimiterCustomLimit)'
+    reference='../../spec#rate-limiter-custom-limit'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -198,14 +192,14 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="rate-limiter"></a>
+<a id="custom-limits"></a>
 
 <ParameterDescription
-    name='rate_limiter'
-    description='Rate limiter dynamic configuration that is updated at runtime.'
-    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
-    reference='../../spec#rate-limiter-dynamic-config'
-    value='"__REQUIRED_FIELD__"'
+    name='custom_limits'
+    description='Allows to specify different limits for particular label values.'
+    type='Array of Object (aperture.spec.v1.RateLimiterCustomLimit)'
+    reference='../../spec#rate-limiter-custom-limit'
+    value='[{"label_value": "__REQUIRED_FIELD__", "limit_scale_factor": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->

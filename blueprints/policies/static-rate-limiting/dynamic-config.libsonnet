@@ -1,6 +1,11 @@
 {
   /**
-  * @param (rate_limiter: aperture.spec.v1.RateLimiterDynamicConfig required) Rate limiter dynamic configuration that is updated at runtime.
+  * @param (custom_limits: []aperture.spec.v1.RateLimiterCustomLimit required) Allows to specify different limits for particular label values.
   */
-  rate_limiter: '__REQUIRED_FIELD__',
+  custom_limits: [
+    {
+      label_value: '__REQUIRED_FIELD__',
+      limit_scale_factor: '__REQUIRED_FIELD__',
+    },
+  ],
 }
