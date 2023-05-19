@@ -380,7 +380,7 @@ func TestOlricLimiterWithBasicLimitAndOverride(t *testing.T) {
 	}
 
 	overrides := map[string]float64{
-		"user-0": 0.5,
+		"user-0": 5,
 	}
 	baseOfLimiterTest(testConfig{
 		t:         t,
