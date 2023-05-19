@@ -41,19 +41,15 @@ monitors the system using an in-built telemetry system and collects metrics on
 service performance and workloads, including information on customer tiers,
 request types, and other relevant attributes.
 
-The Controller works by:
+The controller uses declarative policies, expressed as a control circuit, to
+analyze the collected metrics and make decisions on load throttling, workload
+prioritization, and auto-scaling to ensure that the application operates within
+the specified SLOs. The controller's policies are based on the principles of
+Observability-driven closed-loop automation, which continuously track deviations
+from service-level objectives (SLOs) and calculate recovery or escalation
+actions.
 
-1. Using declarative, often referred to as a "control circuit" to understand
-   collected metrics.
-2. Making decisions on load throttling, workload prioritization, and
-   auto-scaling other actions based on applied policy, making sure the
-   application works within Service-Level Objectives (SLOs).
-
-The Controller's policies are based on the principles of Observability-driven
-closed-loop automation, which continuously track deviations from service-level
-objectives (SLOs) and calculate recovery or escalation actions.
-
-The Controller's policies are stored in a policy database and are managed using
+The controller's policies are stored in a policy database and are managed using
 the Kubernetes Custom Resource Definition (CRD) API, allowing users to configure
 and modify policies as needed. The controller interacts with Aperture Agents to
 enforce the policies and ensure the reliable operation of cloud-native
@@ -61,29 +57,27 @@ applications.
 
 ### Aperture Agents
 
-Aperture Agents are the workhorses of the platform, residing alongside service
-instances as sidecars. They provide powerful flow control components such as a
-weighted fair queuing scheduler for workload prioritization and a distributed
-rate-limiter for abuse prevention.
+Aperture Agents are the workhorses of the platform as they provide powerful flow
+control components such as a weighted fair queuing scheduler for workload
+prioritization and a distributed rate-limiter for abuse prevention.
 
 A flow is the fundamental unit of work from the perspective of an Aperture
 Agent. It could be an API call, a feature, or even a database query.
 
-The agents monitor signals, that vary from request latency, error rate, health
-signals, infra signals using an in-built telemetry system. In addition, a
-programmable, high-fidelity flow classifier is used to label requests based on
-attributes such as customer tier or request type. These metrics are then
-analyzed by the Aperture Controller.
+The agents monitor service and infrastructure health signals using an in-built
+telemetry system. In addition, a programmable, high-fidelity flow classifier is
+used to label requests based on attributes such as customer tier or request
+type. These metrics are then analyzed by the Aperture Controller.
 
-Graceful degradation of services is achieved by prioritizing critical
-application features over background workloads. Similar to boarding an aircraft,
-business class passengers get priority over other passengers; every application
-has workloads with varying priorities. For example, a video streaming service
-might prioritize a request to play a movie by a customer over running an
-internal machine learning workload. A SaaS product might prioritize features
-used by paid users over those being used by free users. Aperture Agents schedule
-workloads based on their priorities, helping maximize user experience or revenue
-even during overload scenarios.
+Aperture Agents schedule workloads based on their priorities, helping maximize
+user experience or revenue even during overload scenarios. Similar to boarding
+an aircraft, first class passengers get priority over other passengers; every
+application has workloads with varying priorities. For example, a video
+streaming service might prioritize a request to play a movie by a customer over
+running an internal machine learning workload. A SaaS product might prioritize
+features used by paid users over those being used by free users. Graceful
+degradation of services is achieved by prioritizing critical application
+features over background workloads.
 
 Aperture Agents can be installed on a variety of infrastructure such as
 Kubernetes, VMs, or bare-metal. They integrate with Service Meshes or can be
@@ -91,18 +85,15 @@ used with SDKs to provide [flow control](/concepts/flow-control/flow-control.md)
 capabilities. Additionally, agents work with auto-scaling APIs for platforms
 such as Kubernetes, to help scale infrastructure when needed.
 
-## Aperture Databases
+### Aperture Databases
 
 Aperture uses two databases to store configuration, telemetry, and flow control
 information: [Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
-Prometheus is a time-series database used to store and query telemetry data
-collected from Aperture Agents. It enables Aperture to monitor the system and
-detect deviations from the service-level objectives (SLOs) defined in the
-declarative policies.
-
-Aperture Controller uses etcd (distributed key-value store) to persist the
-declarative policies that define the control circuits and their components, as
-well as the current system state.
+Prometheus enables Aperture to monitor the system and detect deviations from the
+service-level objectives (SLOs) defined in the declarative policies. Aperture
+Controller uses etcd (distributed key-value store) to persist the declarative
+policies that define the control circuits and their components, as well as the
+current system state.
 
 Users can optionally reuse their existing etcd or
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)
