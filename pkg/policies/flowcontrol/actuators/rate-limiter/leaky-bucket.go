@@ -185,7 +185,7 @@ type leakyBucket struct {
 	iface.Component
 	registry  status.Registry
 	lbFactory *leakyBucketFactory
-	lb        *leakybucket.LeakyBucketRateLimiter
+	limiter   *leakybucket.LeakyBucketRateLimiter
 	lbProto   *policylangv1.LeakyBucketRateLimiter
 	name      string
 }
@@ -221,9 +221,10 @@ func (rateLimiter *leakyBucket) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			rateLimiter.lb, err = leakybucket.NewLeakyBucket(
+			rateLimiter.limiter, err = leakybucket.NewLeakyBucket(
 				rateLimiter.lbFactory.distCache,
 				rateLimiter.name,
+				rateLimiter.lbProto.Parameters.GetLeakInterval().AsDuration(),
 				rateLimiter.lbProto.Parameters.GetMaxIdleTime().AsDuration(),
 			)
 			if err != nil {
@@ -264,7 +265,7 @@ func (rateLimiter *leakyBucket) setup(lifecycle fx.Lifecycle) error {
 				logger.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierr.Append(merr, err)
 			}
-			rateLimiter.lb.Close()
+			rateLimiter.limiter.Close()
 			rateLimiter.registry.SetStatus(status.NewStatus(nil, merr))
 
 			return merr
@@ -342,11 +343,11 @@ func (rateLimiter *leakyBucket) TakeIfAvailable(labels map[string]string, n floa
 
 	label = labelKey + ":" + labelValue
 
-	if rateLimiter.lb.GetParameters().BucketCapacity < 0 {
+	if rateLimiter.limiter.GetRateLimit() < 0 {
 		return label, true, -1, -1
 	}
 
-	ok, remaining, current = rateLimiter.lb.TakeIfAvailable(label, n)
+	ok, remaining, current = rateLimiter.limiter.TakeIfAvailable(label, n)
 	return
 }
 
@@ -354,10 +355,7 @@ func (rateLimiter *leakyBucket) decisionUpdateCallback(event notifiers.Event, un
 	logger := rateLimiter.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
-		rateLimiter.lb.SetParameters(
-			leakybucket.Parameters{
-				BucketCapacity: -1,
-			})
+		rateLimiter.limiter.SetRateLimit(-1)
 		return
 	}
 
@@ -375,12 +373,8 @@ func (rateLimiter *leakyBucket) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 	limitDecision := wrapperMessage.RateLimiterDecision
-	rateLimiter.lb.SetParameters(
-		leakybucket.Parameters{
-			BucketCapacity: limitDecision.BucketCapacity,
-			LeakAmount:     limitDecision.LeakAmount,
-			LeakInterval:   limitDecision.LeakInterval.AsDuration(),
-		})
+	rateLimiter.limiter.SetRateLimit(limitDecision.BucketCapacity)
+	rateLimiter.limiter.SetLeakAmount(limitDecision.LeakAmount)
 }
 
 // GetLimiterID returns the limiter ID.
@@ -399,6 +393,5 @@ func (rateLimiter *leakyBucket) GetRequestCounter(labels map[string]string) prom
 		log.Warn().Err(err).Msg("Failed to get counter")
 		return nil
 	}
-
 	return counter
 }

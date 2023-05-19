@@ -82,11 +82,9 @@ spec:
               signal_name: RATE_LIMIT
             leak_amount:
               signal_name: RATE_LIMIT
-            leak_interval_ms:
-              constant_signal:
-                value: 1000
           parameters:
             label_key: http.request.header.user_id
+            leak_interval: 1s
           selectors:
           - control_point: ingress
             label_matcher:

@@ -77,7 +77,6 @@ spec:
             signal_name: RATE_LIMIT
     - flow_control:
         rate_limiter:
-          dynamic_config_key: rate_limiter
           in_ports:
             limit:
               signal_name: RATE_LIMIT

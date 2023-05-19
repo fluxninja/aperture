@@ -102,20 +102,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/le
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-leak-interval-ms"></a>
-
-<ParameterDescription
-    name='policy.rate_limiter.leak_interval_ms'
-    description='Leak interval in milliseconds.'
-    type='Integer (int64)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-rate-limiter-selectors"></a>
 
 <ParameterDescription
@@ -135,9 +121,9 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/le
 <ParameterDescription
     name='policy.rate_limiter.parameters'
     description='Parameters.'
-    type='Object (aperture.spec.v1.RateLimiterParameters)'
-    reference='../../spec#rate-limiter-parameters'
-    value='{"label_key": "__REQUIRED_FIELD__"}'
+    type='Object (aperture.spec.v1.LeakyBucketRateLimiterParameters)'
+    reference='../../spec#leaky-bucket-rate-limiter-parameters'
+    value='{"label_key": "__REQUIRED_FIELD__", "leak_interval": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

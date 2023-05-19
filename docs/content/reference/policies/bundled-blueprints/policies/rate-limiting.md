@@ -112,20 +112,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale on -->
 
-<!-- vale off -->
-
-<a id="policy-rate-limiter-default-config"></a>
-
-<ParameterDescription
-    name='policy.rate_limiter.default_config'
-    description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
-    reference='../../spec#rate-limiter-dynamic-config'
-    value='{"overrides": []}'
-/>
-
-<!-- vale on -->
-
 ---
 
 <!-- vale off -->
@@ -178,34 +164,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
     type='string'
     reference=''
     value='""'
-/>
-
-<!-- vale on -->
-
----
-
-## Dynamic Configuration
-
-:::note
-
-The following configuration parameters can be
-[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
-at runtime, without reloading the policy.
-
-:::
-
-### Parameters
-
-<!-- vale off -->
-
-<a id="rate-limiter"></a>
-
-<ParameterDescription
-    name='rate_limiter'
-    description='Rate limiter dynamic configuration that is updated at runtime.'
-    type='Object (aperture.spec.v1.RateLimiterDynamicConfig)'
-    reference='../../spec#rate-limiter-dynamic-config'
-    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

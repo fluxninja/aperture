@@ -25,7 +25,6 @@ type rateLimiterSync struct {
 	policyReadAPI     iface.Policy
 	rateLimiterProto  *policylangv1.RateLimiter
 	decision          *policysyncv1.RateLimiterDecision
-	dynamicConfig     *policylangv1.RateLimiter_DynamicConfig
 	decisionWriter    *etcdwriter.Writer
 	componentID       string
 	configEtcdPaths   []string
@@ -68,11 +67,8 @@ func NewRateLimiterAndOptions(
 	}
 
 	limiterSync := &rateLimiterSync{
-		rateLimiterProto: rateLimiterProto,
-		decision: &policysyncv1.RateLimiterDecision{
-			Limit: -1,
-		},
-		dynamicConfig:     &policylangv1.RateLimiter_DynamicConfig{},
+		rateLimiterProto:  rateLimiterProto,
+		decision:          &policysyncv1.RateLimiterDecision{},
 		policyReadAPI:     policyReadAPI,
 		configEtcdPaths:   configEtcdPaths,
 		decisionEtcdPaths: decisionEtcdPaths,
@@ -176,8 +172,7 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 func (limiterSync *rateLimiterSync) publishDecision() error {
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	wrapper := &policysyncv1.RateLimiterDecisionWrapper{
-		RateLimiterDecision:      limiterSync.decision,
-		RateLimiterDynamicConfig: limiterSync.dynamicConfig,
+		RateLimiterDecision: limiterSync.decision,
 		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
 			PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
@@ -198,26 +193,6 @@ func (limiterSync *rateLimiterSync) publishDecision() error {
 	return nil
 }
 
-// DynamicConfigUpdate handles overrides.
+// DynamicConfigUpdate is a no-op.
 func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	publishDynamicConfig := func(dynamicConfig *policylangv1.RateLimiter_DynamicConfig) {
-		limiterSync.dynamicConfig = dynamicConfig
-		err := limiterSync.publishDecision()
-		if err != nil {
-			logger.Error().Err(err).Msg("failed to publish decision")
-		}
-	}
-	dynamicConfig := &policylangv1.RateLimiter_DynamicConfig{}
-	key := limiterSync.rateLimiterProto.GetDynamicConfigKey()
-	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
-			return
-		}
-		publishDynamicConfig(dynamicConfig)
-	} else {
-		publishDynamicConfig(limiterSync.rateLimiterProto.GetDefaultConfig())
-	}
 }

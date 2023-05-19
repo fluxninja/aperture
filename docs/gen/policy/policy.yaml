@@ -2164,17 +2164,11 @@ definitions:
         x-go-tag-validate: required
         x-order: 1
         $ref: '#/definitions/InPort'
-      leak_interval_ms:
-        description: |+
-          Leak interval in ms.
-
-        x-go-tag-validate: required
-        x-order: 2
-        $ref: '#/definitions/InPort'
   LeakyBucketRateLimiterParameters:
     type: object
     required:
     - label_key
+    - leak_interval
     properties:
       label_key:
         description: |+
@@ -2189,6 +2183,14 @@ definitions:
         type: string
         x-go-tag-validate: required
         x-order: 0
+      leak_interval:
+        description: |+
+          Leak interval defines the time interval in which the leaky bucket
+          will leak tokens specified by `leak_amount` signal.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 1
       max_idle_time:
         description: |+
           Max idle time before leaky bucket state for a label is removed.
@@ -2197,7 +2199,7 @@ definitions:
         type: string
         default: 7200s
         x-go-tag-default: 7200s
-        x-order: 1
+        x-order: 2
       tokens_label_key:
         description: |+
           Flow label key that will be used to override the number of tokens
@@ -2209,7 +2211,7 @@ definitions:
         type: string
         default: tokens
         x-go-tag-default: tokens
-        x-order: 2
+        x-order: 3
   LoadRamp:
     description: |-
       The _Load Ramp_ produces a smooth and continuous traffic load
@@ -3007,23 +3009,15 @@ definitions:
     required:
     - selectors
     properties:
-      default_config:
-        title: Default configuration
-        x-order: 0
-        $ref: '#/definitions/RateLimiterDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-        x-order: 1
       in_ports:
         title: Input ports for the RateLimiter component
         x-go-tag-validate: required
-        x-order: 2
+        x-order: 0
         $ref: '#/definitions/RateLimiterIns'
       parameters:
         title: Parameters for the RateLimiter component
         x-go-tag-validate: required
-        x-order: 3
+        x-order: 1
         $ref: '#/definitions/RateLimiterParameters'
       selectors:
         description: |+
@@ -3035,21 +3029,7 @@ definitions:
           type: object
           $ref: '#/definitions/Selector'
         x-go-tag-validate: required,gt=0,dive
-        x-order: 4
-  RateLimiterDynamicConfig:
-    type: object
-    title: Dynamic Configuration for the rate limiter
-    properties:
-      overrides:
-        description: |+
-          Allows to specify different limits for particular label values.
-
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/RateLimiterOverride'
-        x-go-tag-validate: dive
-        x-order: 0
+        x-order: 2
   RateLimiterIns:
     type: object
     title: Inputs for the RateLimiter component
@@ -3069,31 +3049,11 @@ definitions:
         x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/InPort'
-  RateLimiterOverride:
-    type: object
-    required:
-    - label_value
-    - limit
-    properties:
-      label_value:
-        description: |+
-          Value of the label for which the override should be applied.
-
-        type: string
-        x-go-tag-validate: required
-        x-order: 0
-      limit:
-        description: |+
-          Number of flows allowed per `limit_reset_interval` for the given label value. Negative value means no limit.
-
-        type: number
-        format: double
-        x-go-tag-validate: required
-        x-order: 1
   RateLimiterParameters:
     type: object
     required:
     - label_key
+    - limit_reset_interval
     properties:
       label_key:
         description: |+
@@ -3117,8 +3077,7 @@ definitions:
           Time after which the limit for a given label value will be reset.
 
         type: string
-        default: 60s
-        x-go-tag-default: 60s
+        x-go-tag-validate: required
         x-order: 2
       tokens_label_key:
         description: |+

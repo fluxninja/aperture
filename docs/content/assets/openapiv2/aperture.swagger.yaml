@@ -2268,12 +2268,6 @@ definitions:
                     Number of tokens to leak per `leak_interval`.
 
                 x-go-tag-validate: required
-            leak_interval_ms:
-                $ref: '#/definitions/InPort'
-                description: |+
-                    Leak interval in ms.
-
-                x-go-tag-validate: required
         title: Inputs for the LeakyBucketRateLimiter component
         type: object
     LeakyBucketRateLimiterParameters:
@@ -2287,6 +2281,13 @@ definitions:
                     For example, to give each user a separate limit, assuming you
                     have a _user_ flow
                     label set up, set `label_key: "user"`.
+
+                type: string
+                x-go-tag-validate: required
+            leak_interval:
+                description: |+
+                    Leak interval defines the time interval in which the leaky bucket
+                    will leak tokens specified by `leak_amount` signal.
 
                 type: string
                 x-go-tag-validate: required
@@ -2311,6 +2312,7 @@ definitions:
                 x-go-tag-default: tokens
         required:
             - label_key
+            - leak_interval
         type: object
     LimiterDecision:
         description: LimiterDecision describes details for each limiter.
@@ -3289,12 +3291,6 @@ definitions:
             RateLimiting is done on per-label-value basis. Use `label_key`
             to select which label should be used as key.
         properties:
-            default_config:
-                $ref: '#/definitions/RateLimiterDynamicConfig'
-                title: Default configuration
-            dynamic_config_key:
-                title: Configuration key for DynamicConfig
-                type: string
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
                 title: Input ports for the RateLimiter component
@@ -3317,19 +3313,6 @@ definitions:
             - selectors
         title: Limits the traffic on a control point to specified rate
         type: object
-    RateLimiterDynamicConfig:
-        properties:
-            overrides:
-                description: |+
-                    Allows to specify different limits for particular label values.
-
-                items:
-                    $ref: '#/definitions/RateLimiterOverride'
-                    type: object
-                type: array
-                x-go-tag-validate: dive
-        title: Dynamic Configuration for the rate limiter
-        type: object
     RateLimiterIns:
         properties:
             limit:
@@ -3347,25 +3330,6 @@ definitions:
 
                 x-go-tag-validate: required
         title: Inputs for the RateLimiter component
-        type: object
-    RateLimiterOverride:
-        properties:
-            label_value:
-                description: |+
-                    Value of the label for which the override should be applied.
-
-                type: string
-                x-go-tag-validate: required
-            limit:
-                description: |+
-                    Number of flows allowed per `limit_reset_interval` for the given label value. Negative value means no limit.
-
-                format: double
-                type: number
-                x-go-tag-validate: required
-        required:
-            - label_value
-            - limit
         type: object
     RateLimiterParameters:
         properties:
@@ -3385,12 +3349,11 @@ definitions:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behavior of rate limiter
             limit_reset_interval:
-                default: 60s
                 description: |+
                     Time after which the limit for a given label value will be reset.
 
                 type: string
-                x-go-tag-default: 60s
+                x-go-tag-validate: required
             tokens_label_key:
                 default: tokens
                 description: |+
@@ -3404,6 +3367,7 @@ definitions:
                 x-go-tag-default: tokens
         required:
             - label_key
+            - limit_reset_interval
         type: object
     RateLimiterParametersLazySync:
         properties:

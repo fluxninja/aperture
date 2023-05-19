@@ -499,7 +499,7 @@ message RateLimiter {
     }
 
     // Time after which the limit for a given label value will be reset.
-    google.protobuf.Duration limit_reset_interval = 1; // @gotags: default:"60s"
+    google.protobuf.Duration limit_reset_interval = 1; // @gotags: validate:"required"
 
     // Specifies which label the rate limiter should be keyed by.
     //
@@ -521,20 +521,6 @@ message RateLimiter {
     string tokens_label_key = 4; // @gotags: default:"tokens"
   }
 
-  message Override {
-    // Value of the label for which the override should be applied.
-    string label_value = 1; // @gotags: validate:"required"
-
-    // Number of flows allowed per `limit_reset_interval` for the given label value. Negative value means no limit.
-    double limit = 2; // @gotags: validate:"required"
-  }
-
-  // Dynamic Configuration for the rate limiter
-  message DynamicConfig {
-    // Allows to specify different limits for particular label values.
-    repeated Override overrides = 1; // @gotags: validate:"dive"
-  }
-
   // Inputs for the RateLimiter component
   message Ins {
     // Number of flows allowed per `limit_reset_interval` per each label.
@@ -554,12 +540,6 @@ message RateLimiter {
 
   // Parameters for the RateLimiter component
   Parameters parameters = 3; // @gotags: validate:"required"
-
-  // Configuration key for DynamicConfig
-  string dynamic_config_key = 4;
-
-  // Default configuration
-  DynamicConfig default_config = 5;
 
   // Selectors for the component.
   repeated Selector selectors = 6; // @gotags: validate:"required,gt=0,dive"
@@ -603,9 +583,13 @@ message LeakyBucketRateLimiter {
     // The label value must be a valid uint64 number.
     string tokens_label_key = 2; // @gotags: default:"tokens"
 
+    // Leak interval defines the time interval in which the leaky bucket
+    // will leak tokens specified by `leak_amount` signal.
+    google.protobuf.Duration leak_interval = 3; // @gotags: validate:"required"
+
     // Max idle time before leaky bucket state for a label is removed.
     // If set to 0, the state is never removed.
-    google.protobuf.Duration max_idle_time = 3; // @gotags: default:"7200s"
+    google.protobuf.Duration max_idle_time = 4; // @gotags: default:"7200s"
   }
 
   // Inputs for the LeakyBucketRateLimiter component
@@ -615,8 +599,6 @@ message LeakyBucketRateLimiter {
     InPort bucket_capacity = 1; // @gotags: validate:"required"
     // Number of tokens to leak per `leak_interval`.
     InPort leak_amount = 2; // @gotags: validate:"required"
-    // Leak interval in ms.
-    InPort leak_interval_ms = 3; // @gotags: validate:"required"
   }
 
   // Input ports for the RateLimiter component

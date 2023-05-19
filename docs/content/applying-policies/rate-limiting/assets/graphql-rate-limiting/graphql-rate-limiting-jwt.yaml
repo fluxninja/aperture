@@ -9,9 +9,6 @@ spec:
     components:
       - flow_control:
           rate_limiter:
-            default_config:
-              overrides: []
-            dynamic_config_key: rate_limiter
             in_ports:
               limit:
                 constant_signal:

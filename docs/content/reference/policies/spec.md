@@ -4325,18 +4325,6 @@ unbounded and all requests are allowed.
 Number of tokens to leak per `leak_interval`.
 
 </dd>
-<dt>leak_interval_ms</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Leak interval in ms.
-
-</dd>
 </dl>
 
 ---
@@ -4363,6 +4351,19 @@ Rate limiting is done independently for each value of the
 [label](/concepts/flow-control/flow-label.md) with given key. For example, to
 give each user a separate limit, assuming you have a _user_ flow label set up,
 set `label_key: "user"`.
+
+</dd>
+<dt>leak_interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Leak interval defines the time interval in which the leaky bucket will leak
+tokens specified by `leak_amount` signal.
 
 </dd>
 <dt>max_idle_time</dt>
@@ -6169,30 +6170,6 @@ RateLimiting is done on per-label-value basis. Use `label_key` to select which
 label should be used as key.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([RateLimiterDynamicConfig](#rate-limiter-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -6235,31 +6212,6 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for the rate limiter
-
-<dl>
-<dt>overrides</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]RateLimiterOverride](#rate-limiter-override))
-
-<!-- vale on -->
-
-Allows to specify different limits for particular label values.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### RateLimiterIns {#rate-limiter-ins}
 
 <!-- vale on -->
@@ -6285,42 +6237,6 @@ Negative limit can be useful to _conditionally_ enable the rate limiter under
 certain circumstances. [Decider](#decider) might be helpful.
 
 :::
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RateLimiterOverride {#rate-limiter-override}
-
-<!-- vale on -->
-
-<dl>
-<dt>label_value</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-Value of the label for which the override should be applied.
-
-</dd>
-<dt>limit</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, **required**)
-
-<!-- vale on -->
-
-Number of flows allowed per `limit_reset_interval` for the given label value.
-Negative value means no limit.
 
 </dd>
 </dl>
@@ -6368,7 +6284,7 @@ Configuration of lazy-syncing behavior of rate limiter
 
 <!-- vale off -->
 
-(string, default: `"60s"`)
+(string, **required**)
 
 <!-- vale on -->
 

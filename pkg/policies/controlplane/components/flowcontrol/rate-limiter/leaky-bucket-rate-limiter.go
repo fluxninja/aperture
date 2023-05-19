@@ -3,13 +3,11 @@ package ratelimiter
 import (
 	"context"
 	"path"
-	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -69,10 +67,8 @@ func NewLeakyBucketRateLimiterAndOptions(
 	}
 
 	limiterSync := &leakyBucketRateLimiterSync{
-		rateLimiterProto: rateLimiterProto,
-		decision: &policysyncv1.LeakyBucketRateLimiterDecision{
-			BucketCapacity: -1,
-		},
+		rateLimiterProto:  rateLimiterProto,
+		decision:          &policysyncv1.LeakyBucketRateLimiterDecision{},
 		policyReadAPI:     policyReadAPI,
 		configEtcdPaths:   configEtcdPaths,
 		decisionEtcdPaths: decisionEtcdPaths,
@@ -140,22 +136,17 @@ func (limiterSync *leakyBucketRateLimiterSync) setupSync(etcdClient *etcdclient.
 func (limiterSync *leakyBucketRateLimiterSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	bucketCapacity := inPortReadings.ReadSingleReadingPort("bucket_capacity")
 	leakAmount := inPortReadings.ReadSingleReadingPort("leak_amount")
-	leakIntervalMs := inPortReadings.ReadSingleReadingPort("leak_interval_ms")
 
 	decision := &policysyncv1.LeakyBucketRateLimiterDecision{
 		BucketCapacity: -1,
 		LeakAmount:     0,
-		LeakInterval:   &durationpb.Duration{Seconds: 0},
 	}
-	if !bucketCapacity.Valid() || !leakAmount.Valid() || !leakIntervalMs.Valid() {
+	if !bucketCapacity.Valid() || !leakAmount.Valid() {
 		return nil, limiterSync.publishDecision(decision)
 	}
 
-	leakInterval := time.Duration(leakIntervalMs.Value()) * time.Millisecond
-
 	decision.BucketCapacity = bucketCapacity.Value()
 	decision.LeakAmount = leakAmount.Value()
-	decision.LeakInterval = &durationpb.Duration{Seconds: int64(leakInterval.Seconds())}
 
 	return nil, limiterSync.publishDecision(decision)
 }

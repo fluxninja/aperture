@@ -1,4 +1,4 @@
-package ratetracker
+package lazysync
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
 )
 
 type counter struct {
@@ -17,22 +18,22 @@ type counter struct {
 	global int64
 }
 
-// LazySyncRateTracker is a limiter that syncs its state lazily with another limiter.
-type LazySyncRateTracker struct {
+// LazySyncRateLimiter is a limiter that syncs its state lazily with another limiter.
+type LazySyncRateLimiter struct {
 	counters      sync.Map
-	limiter       RateTracker
+	limiter       ratelimiter.RateLimiter
 	jobGroup      *jobs.JobGroup
 	name          string
 	syncDuration  time.Duration
 	totalCounters int64
 }
 
-// NewLazySyncRateTracker creates a new LazySyncLimiter.
-func NewLazySyncRateTracker(limiter RateTracker,
+// NewLazySyncRateLimiter creates a new LazySyncLimiter.
+func NewLazySyncRateLimiter(limiter ratelimiter.RateLimiter,
 	syncDuration time.Duration,
 	jobGroup *jobs.JobGroup,
-) (RateTracker, error) {
-	lsl := &LazySyncRateTracker{
+) (*LazySyncRateLimiter, error) {
+	lsl := &LazySyncRateLimiter{
 		limiter:      limiter,
 		jobGroup:     jobGroup,
 		name:         limiter.Name() + "-lazy-sync",
@@ -53,7 +54,7 @@ func NewLazySyncRateTracker(limiter RateTracker,
 }
 
 // Close closes the limiter.
-func (lsl *LazySyncRateTracker) Close() error {
+func (lsl *LazySyncRateLimiter) Close() error {
 	err := lsl.jobGroup.DeregisterJob(lsl.name)
 	if err != nil {
 		return err
@@ -62,7 +63,17 @@ func (lsl *LazySyncRateTracker) Close() error {
 	return nil
 }
 
-func (lsl *LazySyncRateTracker) sync(ctx context.Context) (proto.Message, error) {
+// GetRateLimit returns the rate limit.
+func (lsl *LazySyncRateLimiter) GetRateLimit() float64 {
+	return lsl.limiter.GetRateLimit()
+}
+
+// SetRateLimit sets the rate limit.
+func (lsl *LazySyncRateLimiter) SetRateLimit(limit float64) {
+	lsl.limiter.SetRateLimit(limit)
+}
+
+func (lsl *LazySyncRateLimiter) sync(ctx context.Context) (proto.Message, error) {
 	requestDelay := time.Duration(0)
 
 	totalCount := atomic.LoadInt64(&lsl.totalCounters)
@@ -111,18 +122,18 @@ func (lsl *LazySyncRateTracker) sync(ctx context.Context) (proto.Message, error)
 }
 
 // Name returns the name of the limiter.
-func (lsl *LazySyncRateTracker) Name() string {
+func (lsl *LazySyncRateLimiter) Name() string {
 	return lsl.name
 }
 
 // TakeIfAvailable takes n tokens from the limiter.
-func (lsl *LazySyncRateTracker) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
+func (lsl *LazySyncRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
 	checkLimit := func(c *counter) (bool, float64, float64) {
 		// atomic increment local counter
 		local := atomic.AddInt32(&c.local, int32(n))
 		total := int(local) + int(atomic.LoadInt64(&c.global))
 		// check limit
-		ok, remaining := lsl.limiter.GetRateLimitChecker().CheckRateLimit(label, float64(total))
+		ok, remaining := ratelimiter.CheckRateLimit(float64(total), lsl.GetRateLimit())
 		return ok, remaining, float64(total)
 	}
 
@@ -146,9 +157,4 @@ func (lsl *LazySyncRateTracker) TakeIfAvailable(label string, n float64) (bool, 
 		atomic.AddInt64(&lsl.totalCounters, 1)
 	}
 	return ok, remaining, current
-}
-
-// GetRateLimitChecker returns the limit checker of the limiter.
-func (lsl *LazySyncRateTracker) GetRateLimitChecker() RateLimitChecker {
-	return lsl.limiter.GetRateLimitChecker()
 }

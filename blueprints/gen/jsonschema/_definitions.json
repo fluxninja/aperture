@@ -1972,12 +1972,6 @@
           "description": "Number of tokens to leak per `leak_interval`.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 1
-        },
-        "leak_interval_ms": {
-          "$ref": "#/definitions/InPort",
-          "description": "Leak interval in ms.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
         }
       },
       "title": "Inputs for the LeakyBucketRateLimiter component",
@@ -1992,22 +1986,28 @@
           "x-go-tag-validate": "required",
           "x-order": 0
         },
+        "leak_interval": {
+          "description": "Leak interval defines the time interval in which the leaky bucket\nwill leak tokens specified by `leak_amount` signal.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
         "max_idle_time": {
           "default": "7200s",
           "description": "Max idle time before leaky bucket state for a label is removed.\nIf set to 0, the state is never removed.\n\n",
           "type": "string",
           "x-go-tag-default": "7200s",
-          "x-order": 1
+          "x-order": 2
         },
         "tokens_label_key": {
           "default": "tokens",
           "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
           "type": "string",
           "x-go-tag-default": "tokens",
-          "x-order": 2
+          "x-order": 3
         }
       },
-      "required": ["label_key"],
+      "required": ["label_key", "leak_interval"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2843,27 +2843,17 @@
     "RateLimiter": {
       "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value basis. Use `label_key`\nto select which label should be used as key.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RateLimiterDynamicConfig",
-          "title": "Default configuration",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
           "title": "Input ports for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-order": 0
         },
         "parameters": {
           "$ref": "#/definitions/RateLimiterParameters",
           "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 3
+          "x-order": 1
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -2874,28 +2864,11 @@
           "minItems": 1,
           "type": "array",
           "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 4
+          "x-order": 2
         }
       },
       "required": ["selectors"],
       "title": "Limits the traffic on a control point to specified rate",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RateLimiterDynamicConfig": {
-      "properties": {
-        "overrides": {
-          "description": "Allows to specify different limits for particular label values.\n\n",
-          "items": {
-            "$ref": "#/definitions/RateLimiterOverride",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for the rate limiter",
       "type": "object",
       "additionalProperties": false
     },
@@ -2909,26 +2882,6 @@
         }
       },
       "title": "Inputs for the RateLimiter component",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RateLimiterOverride": {
-      "properties": {
-        "label_value": {
-          "description": "Value of the label for which the override should be applied.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "limit": {
-          "description": "Number of flows allowed per `limit_reset_interval` for the given label value. Negative value means no limit.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-validate": "required",
-          "x-order": 1
-        }
-      },
-      "required": ["label_value", "limit"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2946,10 +2899,9 @@
           "x-order": 1
         },
         "limit_reset_interval": {
-          "default": "60s",
           "description": "Time after which the limit for a given label value will be reset.\n\n",
           "type": "string",
-          "x-go-tag-default": "60s",
+          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "tokens_label_key": {
@@ -2960,7 +2912,7 @@
           "x-order": 3
         }
       },
-      "required": ["label_key"],
+      "required": ["label_key", "limit_reset_interval"],
       "type": "object",
       "additionalProperties": false
     },

@@ -21,25 +21,27 @@ const (
 
 // LeakyBucketRateLimiter implements Limiter.
 type LeakyBucketRateLimiter struct {
-	mu         sync.RWMutex
-	dMap       *olric.DMap
-	name       string
-	parameters Parameters
+	mu             sync.RWMutex
+	dMap           *olric.DMap
+	name           string
+	bucketCapacity float64
+	leakAmount     float64
+	leakInterval   time.Duration
 }
 
 // NewLeakyBucket creates a new instance of DistCacheRateTracker.
 func NewLeakyBucket(dc *distcache.DistCache,
 	name string,
+	leakInterval time.Duration,
 	maxIdleDuration time.Duration,
 ) (*LeakyBucketRateLimiter, error) {
 	dc.Mutex.Lock()
 	defer dc.Mutex.Unlock()
 
 	lbrl := &LeakyBucketRateLimiter{
-		name: name,
-		parameters: Parameters{
-			BucketCapacity: -1,
-		},
+		name:           name,
+		leakInterval:   leakInterval,
+		bucketCapacity: -1,
 	}
 
 	dmapConfig := config.DMap{
@@ -61,18 +63,25 @@ func NewLeakyBucket(dc *distcache.DistCache,
 	return lbrl, nil
 }
 
-// SetParameters sets the default parameters for the rate limiter.
-func (lbrl *LeakyBucketRateLimiter) SetParameters(params Parameters) {
+// SetRateLimit sets the rate limit for the rate limiter.
+func (lbrl *LeakyBucketRateLimiter) SetRateLimit(rateLimit float64) {
 	lbrl.mu.Lock()
 	defer lbrl.mu.Unlock()
-	lbrl.parameters = params
+	lbrl.bucketCapacity = rateLimit
 }
 
-// GetParameters returns the default parameters for the rate limiter.
-func (lbrl *LeakyBucketRateLimiter) GetParameters() Parameters {
+// GetRateLimit returns the rate limit for the rate limiter.
+func (lbrl *LeakyBucketRateLimiter) GetRateLimit() float64 {
 	lbrl.mu.RLock()
 	defer lbrl.mu.RUnlock()
-	return lbrl.parameters
+	return lbrl.bucketCapacity
+}
+
+// SetLeakAmount sets the default leak amount for the rate limiter.
+func (lbrl *LeakyBucketRateLimiter) SetLeakAmount(leakAmount float64) {
+	lbrl.mu.Lock()
+	defer lbrl.mu.Unlock()
+	lbrl.leakAmount = leakAmount
 }
 
 // Name returns the name of the DistCacheRateTracker.
@@ -124,13 +133,6 @@ func (lbrl *LeakyBucketRateLimiter) TakeIfAvailable(label string, n float64) (bo
 	return resp.Ok, resp.Remaining, resp.Current
 }
 
-// Parameters are the parameters for the leaky bucket rate limiter.
-type Parameters struct {
-	BucketCapacity float64
-	LeakAmount     float64
-	LeakInterval   time.Duration
-}
-
 // Per-label tracking in distributed cache.
 type leakyBucketState struct {
 	LastLeak time.Time
@@ -157,7 +159,6 @@ func (lbrl *LeakyBucketRateLimiter) takeN(key string, currentStateBytes, argByte
 	// Decode currentState from gob encoded currentStateBytes
 	now := time.Now()
 	currentState := leakyBucketState{
-		Current:  lbrl.parameters.BucketCapacity,
 		LastLeak: now,
 	}
 
@@ -186,47 +187,44 @@ func (lbrl *LeakyBucketRateLimiter) takeN(key string, currentStateBytes, argByte
 		AvailableAt: now,
 	}
 
-	if lbrl.parameters.BucketCapacity >= 0 {
-		// First calculate current size of bucket based on time passed since last leak
-		// and leak rate
-		timeSinceLastLeak := now.Sub(currentState.LastLeak)
+	// First calculate current size of bucket based on time passed since last leak
+	// and leak rate
+	timeSinceLastLeak := now.Sub(currentState.LastLeak)
 
-		if timeSinceLastLeak > lbrl.parameters.LeakInterval {
-			// Calculate number of leaks since last leak
-			leaks := int(timeSinceLastLeak / lbrl.parameters.LeakInterval)
-			// Calculate amount to leak
-			leakAmount := lbrl.parameters.LeakAmount * float64(leaks)
-			// Leak
-			currentState.Current -= leakAmount
-			if currentState.Current < 0 {
-				currentState.Current = 0
-			}
-			// Update lastLeak
-			currentState.LastLeak = currentState.LastLeak.Add(time.Duration(leaks) * lbrl.parameters.LeakInterval)
+	if timeSinceLastLeak > lbrl.leakInterval {
+		// Calculate number of leaks since last leak
+		leaks := int(timeSinceLastLeak / lbrl.leakInterval)
+		// Calculate amount to leak
+		leakAmount := lbrl.leakAmount * float64(leaks)
+		// Leak
+		currentState.Current -= leakAmount
+		if currentState.Current < 0 {
+			currentState.Current = 0
 		}
+		// Update lastLeak
+		currentState.LastLeak = currentState.LastLeak.Add(time.Duration(leaks) * lbrl.leakInterval)
+	}
 
-		currentState.Current += arg.Want
-
-		if currentState.Current > lbrl.parameters.BucketCapacity {
-			if arg.CanWait {
-				waitTime := time.Duration((currentState.Current - lbrl.parameters.BucketCapacity) / lbrl.parameters.LeakAmount * float64(lbrl.parameters.LeakInterval))
-				availableAt := now.Add(waitTime)
-				result = response{
-					Ok:          true,
-					AvailableAt: availableAt,
-				}
-			} else {
-				result.Ok = false
+	currentState.Current += arg.Want
+	if currentState.Current > lbrl.bucketCapacity {
+		if arg.CanWait {
+			waitTime := time.Duration((currentState.Current - lbrl.bucketCapacity) / lbrl.leakAmount * float64(lbrl.leakInterval))
+			availableAt := now.Add(waitTime)
+			result = response{
+				Ok:          true,
+				AvailableAt: availableAt,
 			}
-		}
-
-		// return the tokens to the bucket if the request is not ok
-		if !result.Ok {
-			currentState.Current -= arg.Want
+		} else {
+			result.Ok = false
 		}
 	}
 
-	result.Remaining = lbrl.parameters.BucketCapacity - currentState.Current
+	// return the tokens to the bucket if the request is not ok
+	if !result.Ok {
+		currentState.Current -= arg.Want
+	}
+
+	result.Remaining = lbrl.bucketCapacity - currentState.Current
 	result.Current = currentState.Current
 
 	// Encode result to gob encoded resultBytes

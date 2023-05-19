@@ -4,7 +4,6 @@ package aperture.policy.sync.v1;
 
 import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
-import "google/protobuf/duration.proto";
 
 message RateLimiterWrapper {
   // CommonAttributes
@@ -18,8 +17,6 @@ message RateLimiterDecisionWrapper {
   CommonAttributes common_attributes = 1;
   // Rate Limiter Decision
   RateLimiterDecision rate_limiter_decision = 2;
-  // RateLimiterDynamicConfig is the dynamic configuration for the rate limiter.
-  policy.language.v1.RateLimiter.DynamicConfig rate_limiter_dynamic_config = 3;
 }
 
 message RateLimiterDecision {
@@ -42,6 +39,5 @@ message LeakyBucketRateLimiterDecisionWrapper {
 
 message LeakyBucketRateLimiterDecision {
   double bucket_capacity = 1;
-  google.protobuf.Duration leak_interval = 2;
-  double leak_amount = 3;
+  double leak_amount = 2;
 }

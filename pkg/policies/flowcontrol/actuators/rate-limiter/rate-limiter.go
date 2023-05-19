@@ -24,7 +24,9 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
-	ratetracker "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/rate-tracker"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/basic"
+	lazysync "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/lazy-sync"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
@@ -201,8 +203,7 @@ type rateLimiter struct {
 	iface.Component
 	registry           status.Registry
 	rateLimiterFactory *rateLimiterFactory
-	rateTracker        ratetracker.RateTracker
-	rateLimitChecker   *ratetracker.BasicRateLimitChecker
+	limiter            ratelimiter.RateLimiter
 	rateLimiterProto   *policylangv1.RateLimiter
 	name               string
 }
@@ -228,19 +229,6 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
-	// dynamic config notifier
-	dynamicConfigUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
-	if err != nil {
-		return err
-	}
-	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(etcdKey),
-		dynamicConfigUnmarshaller,
-		rateLimiter.dynamicConfigUpdateCallback,
-	)
-	if err != nil {
-		return err
-	}
 
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()
@@ -251,10 +239,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			rateLimiter.rateLimitChecker = ratetracker.NewBasicRateLimitChecker()
-			rateLimiter.updateDynamicConfig(rateLimiter.rateLimiterProto.GetDefaultConfig())
-			rateLimiter.rateTracker, err = ratetracker.NewDistCacheRateTracker(
-				rateLimiter.rateLimitChecker,
+			rateLimiter.limiter, err = basic.NewBasicRateLimiter(
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
 				rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration())
@@ -266,7 +251,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			if lazySyncConfig := rateLimiter.rateLimiterProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
 					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
-					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,
+					rateLimiter.limiter, err = lazysync.NewLazySyncRateLimiter(rateLimiter.limiter,
 						lazySyncInterval,
 						rateLimiter.rateLimiterFactory.lazySyncJobGroup)
 					if err != nil {
@@ -279,12 +264,6 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			err = rateLimiter.rateLimiterFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
-				return err
-			}
-			// add dynamic config notifier
-			err = rateLimiter.rateLimiterFactory.decisionsWatcher.AddKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to add dynamic config notifier")
 				return err
 			}
 
@@ -309,43 +288,19 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
 				merr = multierr.Append(merr, err)
 			}
-			// remove dynamic config notifier
-			err = rateLimiter.rateLimiterFactory.decisionsWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to remove dynamic config notifier")
-				merr = multierr.Append(merr, err)
-			}
 			// remove decisions notifier
 			err = rateLimiter.rateLimiterFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierr.Append(merr, err)
 			}
-			rateLimiter.rateTracker.Close()
+			rateLimiter.limiter.Close()
 			rateLimiter.registry.SetStatus(status.NewStatus(nil, merr))
 
 			return merr
 		},
 	})
 	return nil
-}
-
-func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.RateLimiter_DynamicConfig) {
-	logger := rateLimiter.registry.GetLogger()
-
-	if dynamicConfig == nil {
-		return
-	}
-	overrides := ratetracker.Overrides{}
-	// loop through overrides
-	for _, override := range dynamicConfig.GetOverrides() {
-		label := rateLimiter.rateLimiterProto.Parameters.GetLabelKey() + ":" + override.GetLabelValue()
-		overrides[label] = override.GetLimit()
-	}
-
-	logger.Debug().Interface("overrides", overrides).Str("name", rateLimiter.name).Msgf("Updating dynamic config for rate limiter")
-
-	rateLimiter.rateLimitChecker.SetOverrides(overrides)
 }
 
 // GetSelectors returns the selectors for the rate limiter.
@@ -417,7 +372,11 @@ func (rateLimiter *rateLimiter) TakeIfAvailable(labels map[string]string, n floa
 
 	label = labelKey + ":" + labelValue
 
-	ok, remaining, current = rateLimiter.rateTracker.TakeIfAvailable(label, n)
+	if rateLimiter.limiter.GetRateLimit() < 0 {
+		return label, true, -1, -1
+	}
+
+	ok, remaining, current = rateLimiter.limiter.TakeIfAvailable(label, n)
 	return
 }
 
@@ -425,7 +384,7 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 	logger := rateLimiter.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
-		rateLimiter.rateLimitChecker.SetRateLimit(-1)
+		rateLimiter.limiter.SetRateLimit(-1)
 		return
 	}
 
@@ -443,32 +402,7 @@ func (rateLimiter *rateLimiter) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 	limitDecision := wrapperMessage.RateLimiterDecision
-	rateLimiter.rateLimitChecker.SetRateLimit(limitDecision.GetLimit())
-}
-
-func (rateLimiter *rateLimiter) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := rateLimiter.registry.GetLogger()
-	if event.Type == notifiers.Remove {
-		logger.Debug().Msg("Dynamic config removed")
-		rateLimiter.rateLimitChecker.SetOverrides(ratetracker.Overrides{})
-		return
-	}
-
-	var wrapperMessage policysyncv1.RateLimiterDecisionWrapper
-	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.RateLimiterDynamicConfig == nil {
-		return
-	}
-	commonAttributes := wrapperMessage.GetCommonAttributes()
-	if commonAttributes == nil {
-		log.Error().Msg("Common attributes not found")
-		return
-	}
-	if commonAttributes.PolicyHash != rateLimiter.GetPolicyHash() {
-		return
-	}
-	dynamicConfig := wrapperMessage.RateLimiterDynamicConfig
-	rateLimiter.updateDynamicConfig(dynamicConfig)
+	rateLimiter.limiter.SetRateLimit(limitDecision.GetLimit())
 }
 
 // GetLimiterID returns the limiter ID.

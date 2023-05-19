@@ -1,4 +1,4 @@
-package ratetracker
+package basic
 
 import (
 	"bytes"
@@ -10,18 +10,19 @@ import (
 	"github.com/buraksezer/olric/config"
 
 	"github.com/fluxninja/aperture/v2/pkg/distcache"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
 )
 
-// DistCacheRateTracker implements Limiter.
-type DistCacheRateTracker struct {
-	mu         sync.RWMutex
-	limitCheck RateLimitChecker
-	dMap       *olric.DMap
-	name       string
+// BasicRateLimiter implements Limiter.
+type BasicRateLimiter struct {
+	mu    sync.RWMutex
+	dMap  *olric.DMap
+	name  string
+	limit float64
 }
 
-// NewDistCacheRateTracker creates a new instance of DistCacheRateTracker.
-func NewDistCacheRateTracker(limitCheck RateLimitChecker, dc *distcache.DistCache, name string, ttl time.Duration) (RateTracker, error) {
+// NewBasicRateLimiter creates a new instance of DistCacheRateTracker.
+func NewBasicRateLimiter(dc *distcache.DistCache, name string, ttl time.Duration) (*BasicRateLimiter, error) {
 	dc.Mutex.Lock()
 	defer dc.Mutex.Unlock()
 	dmapConfig := config.DMap{
@@ -37,22 +38,22 @@ func NewDistCacheRateTracker(limitCheck RateLimitChecker, dc *distcache.DistCach
 	}
 	dc.RemoveDMapCustomConfig(name)
 
-	ol := &DistCacheRateTracker{
-		name:       name,
-		dMap:       dMap,
-		limitCheck: limitCheck,
+	ol := &BasicRateLimiter{
+		name:  name,
+		dMap:  dMap,
+		limit: -1,
 	}
 
 	return ol, nil
 }
 
 // Name returns the name of the DistCacheRateTracker.
-func (ol *DistCacheRateTracker) Name() string {
+func (ol *BasicRateLimiter) Name() string {
 	return ol.name
 }
 
 // Close cleans up DMap held within the DistCacheRateTracker.
-func (ol *DistCacheRateTracker) Close() error {
+func (ol *BasicRateLimiter) Close() error {
 	ol.mu.Lock()
 	defer ol.mu.Unlock()
 	err := ol.dMap.Destroy()
@@ -62,9 +63,23 @@ func (ol *DistCacheRateTracker) Close() error {
 	return nil
 }
 
+// SetRateLimit sets the limit.
+func (ol *BasicRateLimiter) SetRateLimit(limit float64) {
+	ol.mu.Lock()
+	defer ol.mu.Unlock()
+	ol.limit = limit
+}
+
+// GetRateLimit returns the limit.
+func (ol *BasicRateLimiter) GetRateLimit() float64 {
+	ol.mu.RLock()
+	defer ol.mu.RUnlock()
+	return ol.limit
+}
+
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (ol *DistCacheRateTracker) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
+func (ol *BasicRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
 	ol.mu.RLock()
 	defer ol.mu.RUnlock()
 
@@ -89,14 +104,9 @@ func (ol *DistCacheRateTracker) TakeIfAvailable(label string, n float64) (bool, 
 		return true, 0, 0
 	}
 
-	ok, remaining := ol.limitCheck.CheckRateLimit(label, newN)
+	ok, remaining := ratelimiter.CheckRateLimit(newN, ol.limit)
 	return ok, remaining, newN
 }
 
-// GetRateLimitChecker returns the RateLimitCheck of the DistCacheRateTracker.
-func (ol *DistCacheRateTracker) GetRateLimitChecker() RateLimitChecker {
-	return ol.limitCheck
-}
-
 // Make sure DistCacheRateTracker implements Limiter interface.
-var _ RateTracker = (*DistCacheRateTracker)(nil)
+var _ ratelimiter.RateLimiter = (*BasicRateLimiter)(nil)

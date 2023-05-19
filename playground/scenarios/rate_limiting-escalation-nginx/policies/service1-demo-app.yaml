@@ -48,7 +48,6 @@ policy:
           parameters:
             limit_reset_interval: 1s
             label_key: http.request.header.user_id
-          dynamic_config_key: rate_limiter
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:

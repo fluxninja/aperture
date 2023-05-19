@@ -7,9 +7,9 @@ policy:
   rate_limiter:
     bucket_capacity: 40
     leak_amount: 2
-    leak_interval_ms: 1000
     selectors:
       - service: "service1-demo-app.demoapp.svc.cluster.local"
         control_point: "ingress"
     parameters:
       label_key: "http.request.header.user_id"
+      leak_interval: "1s"

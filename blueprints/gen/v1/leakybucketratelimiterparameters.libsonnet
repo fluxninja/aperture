@@ -7,6 +7,12 @@
   withLabelKeyMixin(label_key):: {
     label_key+: label_key,
   },
+  withLeakInterval(leak_interval):: {
+    leak_interval: leak_interval,
+  },
+  withLeakIntervalMixin(leak_interval):: {
+    leak_interval+: leak_interval,
+  },
   withMaxIdleTime(max_idle_time):: {
     max_idle_time: max_idle_time,
   },

@@ -13,10 +13,4 @@
   withLeakAmountMixin(leak_amount):: {
     leak_amount+: leak_amount,
   },
-  withLeakIntervalMs(leak_interval_ms):: {
-    leak_interval_ms: leak_interval_ms,
-  },
-  withLeakIntervalMsMixin(leak_interval_ms):: {
-    leak_interval_ms+: leak_interval_ms,
-  },
 }

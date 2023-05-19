@@ -19,22 +19,22 @@ policy:
     # Type: float64
     # Required: True
     leak_amount: __REQUIRED_FIELD__
-    # Leak interval in milliseconds.
-    # Type: int64
-    # Required: True
-    leak_interval_ms: __REQUIRED_FIELD__
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     selectors:
       - control_point: __REQUIRED_FIELD__
         service: __REQUIRED_FIELD__
     # Parameters.
-    # Type: aperture.spec.v1.RateLimiterParameters
+    # Type: aperture.spec.v1.LeakyBucketRateLimiterParameters
     parameters:
       # Flow label to use for rate limiting.
       # Type: string
       # Required: True
       label_key: __REQUIRED_FIELD__
+      # Leak interval e.g. "1s".
+      # Type: string
+      # Required: True
+      leak_interval: __REQUIRED_FIELD__
 
 dashboard:
   # Refresh interval for dashboard panels.

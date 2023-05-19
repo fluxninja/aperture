@@ -28,8 +28,6 @@ function(cfg) {
             + rateLimiter.withInPorts({ limit: port.withConstantSignal(params.policy.rate_limiter.rate_limit) })
             + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
             + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
-            + rateLimiter.withDynamicConfigKey('rate_limiter')
-            + rateLimiter.withDefaultConfig(params.policy.rate_limiter.default_config)
           ),
         ),
       ]),

@@ -1,4 +1,4 @@
-package ratetracker
+package ratelimiter
 
 import (
 	"context"
@@ -21,18 +21,19 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/distcache"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/basic"
+	lazysync "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/lazy-sync"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, ttl time.Duration, overrides map[string]float64) (RateTracker, error) {
-	limitCheck := NewBasicRateLimitChecker()
-	limitCheck.SetRateLimit(limit)
-	limitCheck.SetOverrides(overrides)
-	limiter, err := NewDistCacheRateTracker(limitCheck, distCache, "Limiter", ttl)
+func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, ttl time.Duration) (ratelimiter.RateLimiter, error) {
+	limiter, err := basic.NewBasicRateLimiter(distCache, "Limiter", ttl)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
 	}
+	limiter.SetRateLimit(limit)
 
 	t.Logf("Successfully created new Limiter")
 	return limiter, nil
@@ -166,7 +167,7 @@ func newTestDistCacheCluster(t *testing.T, n int) *testDistCacheCluster {
 type flow struct {
 	requestlabel string // what label it needs
 	requestRate  int32
-	initialLimit int32
+	limit        int32
 	// counters
 	totalRequests    int32 // total requests made
 	acceptedRequests int32 // total requests accepted
@@ -174,7 +175,7 @@ type flow struct {
 
 type flowRunner struct {
 	wg       sync.WaitGroup
-	limiters []RateTracker
+	limiters []ratelimiter.RateLimiter
 	flows    []*flow
 	duration time.Duration
 }
@@ -182,8 +183,7 @@ type flowRunner struct {
 // runFlows runs the flows for the given duration.
 func (fr *flowRunner) runFlows(t *testing.T) {
 	for _, f := range fr.flows {
-		_, limit := fr.limiters[0].GetRateLimitChecker().CheckRateLimit(f.requestlabel, 0)
-		f.initialLimit = int32(limit)
+		f.limit = int32(fr.limiters[0].GetRateLimit())
 
 		fr.wg.Add(1)
 		go func(f *flow) {
@@ -216,7 +216,7 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 }
 
 // createJobGroup creates a job group for the given limiter..
-func createJobGroup(_ RateTracker) *jobs.JobGroup {
+func createJobGroup(_ ratelimiter.RateLimiter) *jobs.JobGroup {
 	var gws jobs.GroupWatchers
 
 	alerter := alerts.NewSimpleAlerter(100)
@@ -231,10 +231,10 @@ func createJobGroup(_ RateTracker) *jobs.JobGroup {
 }
 
 // createOlricLimiters creates a set of Olric limiters.
-func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, ttl time.Duration, overrides map[string]float64) []RateTracker {
-	var limiters []RateTracker
+func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, ttl time.Duration) []ratelimiter.RateLimiter {
+	var limiters []ratelimiter.RateLimiter
 	for _, distCache := range cl.members {
-		limiter, err := newTestLimiter(t, distCache, limit, ttl, overrides)
+		limiter, err := newTestLimiter(t, distCache, limit, ttl)
 		if err != nil {
 			t.Logf("Error creating limiter: %v", err)
 			t.FailNow()
@@ -245,11 +245,11 @@ func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, 
 }
 
 // createLazySyncLimiters creates a set of lazy-sync-limiters.
-func createLazySyncLimiters(t *testing.T, limiters []RateTracker, syncDuration time.Duration) []RateTracker {
-	var lazySyncLimiters []RateTracker
+func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, syncDuration time.Duration) []ratelimiter.RateLimiter {
+	var lazySyncLimiters []ratelimiter.RateLimiter
 	for _, limiter := range limiters {
 		jobGroup := createJobGroup(limiter)
-		lazySyncLimiter, err := NewLazySyncRateTracker(limiter, syncDuration, jobGroup)
+		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, syncDuration, jobGroup)
 		if err != nil {
 			t.Logf("Error creating lazy sync limiter: %v", err)
 			t.FailNow()
@@ -262,13 +262,13 @@ func createLazySyncLimiters(t *testing.T, limiters []RateTracker, syncDuration t
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
 func checkResults(t *testing.T, fr *flowRunner, ttlsResets int32, tolerance float64) {
 	for _, f := range fr.flows {
-		actualRequestsExpected := math.Min(float64(f.initialLimit*ttlsResets), float64(f.totalRequests))
+		actualRequestsExpected := math.Min(float64(f.limit*ttlsResets), float64(f.totalRequests))
 		t.Logf("flow (%s) @ %d requests/sec: \n ttlResets=%d, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
 			f.requestlabel,
 			f.requestRate,
 			ttlsResets,
 			f.totalRequests,
-			f.initialLimit,
+			f.limit,
 			f.acceptedRequests,
 			int32(actualRequestsExpected))
 		acceptedReqRatio := float64(f.acceptedRequests) / float64(actualRequestsExpected)
@@ -280,7 +280,7 @@ func checkResults(t *testing.T, fr *flowRunner, ttlsResets int32, tolerance floa
 }
 
 // closeLimiters closes all the limiters.
-func closeLimiters(t *testing.T, limiters []RateTracker) {
+func closeLimiters(t *testing.T, limiters []ratelimiter.RateLimiter) {
 	for _, limiter := range limiters {
 		err := limiter.Close()
 		if err != nil {
@@ -305,7 +305,6 @@ func closeTestDistCacheCluster(t *testing.T, cl *testDistCacheCluster) {
 
 type testConfig struct {
 	t                     *testing.T
-	overrides             map[string]float64
 	flows                 []*flow
 	numOlrics             int
 	limit                 float64
@@ -319,7 +318,7 @@ type testConfig struct {
 // baseOfLimiterTest is the base test for all limiter tests.
 func baseOfLimiterTest(config testConfig) {
 	var fr *flowRunner
-	var lazySyncLimiters []RateTracker
+	var lazySyncLimiters []ratelimiter.RateLimiter
 	ttlResets := int32(config.duration / config.ttl)
 	t := config.t
 	cl := newTestDistCacheCluster(t, config.numOlrics)
@@ -329,7 +328,7 @@ func baseOfLimiterTest(config testConfig) {
 		t.FailNow()
 	}
 
-	limiters := createOlricLimiters(t, cl, config.limit, config.ttl, config.overrides)
+	limiters := createOlricLimiters(t, cl, config.limit, config.ttl)
 
 	if config.enableLazySyncLimiter {
 		limiters = createLazySyncLimiters(t, limiters, config.syncDuration)
@@ -367,28 +366,6 @@ func TestOlricLimiterWithBasicLimit(t *testing.T) {
 		limit:     10,
 		ttl:       time.Second * 1,
 		flows:     flows,
-		duration:  time.Second * 10,
-	})
-}
-
-// TestOlricLimiterWithBasicLimitAndOverride tests the basic limit functionality with override of a certain request.
-func TestOlricLimiterWithBasicLimitAndOverride(t *testing.T) {
-	flows := []*flow{
-		{requestlabel: "user-0", requestRate: 20},
-		{requestlabel: "user-1", requestRate: 20},
-		{requestlabel: "user-2", requestRate: 5},
-	}
-
-	overrides := map[string]float64{
-		"user-0": 5,
-	}
-	baseOfLimiterTest(testConfig{
-		t:         t,
-		numOlrics: 1,
-		limit:     10,
-		ttl:       time.Second * 1,
-		flows:     flows,
-		overrides: overrides,
 		duration:  time.Second * 10,
 	})
 }

@@ -27,12 +27,7 @@
         "rate_limiter": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "bucket_capacity",
-            "leak_amount",
-            "leak_interval_ms",
-            "parameters"
-          ],
+          "required": ["bucket_capacity", "leak_amount", "parameters"],
           "properties": {
             "bucket_capacity": {
               "description": "Bucket capacity.",
@@ -45,12 +40,6 @@
               "default": "__REQUIRED_FIELD__",
               "type": "number",
               "format": "double"
-            },
-            "leak_interval_ms": {
-              "description": "Leak interval in milliseconds.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "integer",
-              "format": "int64"
             },
             "selectors": {
               "description": "Flow selectors to match requests against",
@@ -69,10 +58,11 @@
             "parameters": {
               "description": "Parameters.",
               "default": {
-                "label_key": "__REQUIRED_FIELD__"
+                "label_key": "__REQUIRED_FIELD__",
+                "leak_interval": "__REQUIRED_FIELD__"
               },
               "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LeakyBucketRateLimiterParameters"
             }
           }
         }

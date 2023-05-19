@@ -57,14 +57,6 @@
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
-            },
-            "default_config": {
-              "description": "Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.",
-              "default": {
-                "overrides": []
-              },
-              "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
             }
           }
         }
