@@ -8,7 +8,8 @@ git_root=$(git rev-parse --show-toplevel)
 source "$git_root"/docs/tools/aperturectl/validate_common.sh
 
 generate_compare \
-	policies/static-rate-limiting \
+	policies/rate-limiting \
 	values.yaml \
 	tmp/policies/static-rate-limiting-cr.yaml \
 	static-rate-limiting.yaml
+

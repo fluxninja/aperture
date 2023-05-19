@@ -1,0 +1,201 @@
+---
+title: Leaky Bucket Rate Limiting Policy
+keywords:
+  - blueprints
+sidebar_position: 6
+sidebar_label: Leaky Bucket Rate Limiting Policy
+---
+
+## Introduction
+
+This blueprint provides a
+[leaky-bucket](https://en.wikipedia.org/wiki/Leaky_bucket) based rate-limiting
+policy and a dashboard. This policy uses the
+[`LeakyBucketRateLimiter`](/reference/policies/spec.md#leaky-bucket-rate-limiter)
+component.
+
+<!-- Configuration Marker -->
+
+```mdx-code-block
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
+```
+
+## Configuration
+
+<!-- vale off -->
+
+Blueprint name: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/leaky-bucket-rate-limiting`}>policies/leaky-bucket-rate-limiting</a>
+
+<!-- vale on -->
+
+### Parameters
+
+<!-- vale off -->
+
+#### policy {#policy}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-classifiers"></a>
+
+<ParameterDescription
+    name='policy.classifiers'
+    description='List of classification rules.'
+    type='Array of Object (aperture.spec.v1.Classifier)'
+    reference='../../spec#classifier'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.rate_limiter {#policy-rate-limiter}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-bucket-capacity"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.bucket_capacity'
+    description='Bucket capacity.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-leak-amount"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.leak_amount'
+    description='Leak amount.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-leak-interval-ms"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.leak_interval_ms'
+    description='Leak interval in milliseconds.'
+    type='Integer (int64)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-selectors"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.selectors'
+    description='Flow selectors to match requests against'
+    type='Array of Object (aperture.spec.v1.Selector)'
+    reference='../../spec#selector'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-parameters"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.parameters'
+    description='Parameters.'
+    type='Object (aperture.spec.v1.RateLimiterParameters)'
+    reference='../../spec#rate-limiter-parameters'
+    value='{"label_key": "__REQUIRED_FIELD__"}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### dashboard {#dashboard}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-refresh-interval"></a>
+
+<ParameterDescription
+    name='dashboard.refresh_interval'
+    description='Refresh interval for dashboard panels.'
+    type='string'
+    reference=''
+    value='"10s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### dashboard.datasource {#dashboard-datasource}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-filter-regex"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.filter_regex'
+    description='Datasource filter regex.'
+    type='string'
+    reference=''
+    value='""'
+/>
+
+<!-- vale on -->
+
+---

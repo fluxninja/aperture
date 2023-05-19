@@ -23,9 +23,9 @@ aperturectl blueprints values [flags]
 ### Examples
 
 ```
-aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml
+aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml
 
-aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required
+aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml --only-required
 ```
 
 ### Options

@@ -2561,6 +2561,19 @@ and reduces token rate proportionally (or any arbitrary power) based on
 deviation of the signal from setpoint.
 
 </dd>
+<dt>leaky_bucket_rate_limiter</dt>
+<dd>
+
+<!-- vale off -->
+
+([LeakyBucketRateLimiter](#leaky-bucket-rate-limiter))
+
+<!-- vale on -->
+
+_Leaky Bucket Rate Limiter_ provides service protection by applying rate limits
+using the leaky bucket algorithm.
+
+</dd>
 <dt>load_ramp</dt>
 <dd>
 
@@ -4195,6 +4208,188 @@ A map of {key,value} pairs representing labels to be matched. A single
 equal to `value`.
 
 Note: The requirements are combined using the logical AND operator.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LeakyBucketRateLimiter {#leaky-bucket-rate-limiter}
+
+<!-- vale on -->
+
+Limits the traffic on a control point to specified rate
+
+:::info
+
+See also
+[_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+
+:::
+
+RateLimiting is done on per-label-value (`label_key`) basis and it uses the
+_Leaky Bucket Algorithm_.
+
+This algorithm lets your app make an unlimited amount of requests in infrequent
+bursts over time. The main points to understand about the leaky bucket metaphor
+are as follows:
+
+- Each app has access to a bucket. It can hold, say, 60 “marbles”.
+- Each second, a marble is removed from the bucket (if there are any). That way
+  there’s always more room.
+- Each API request requires you to toss a marble in the bucket.
+- If the bucket gets full, you get an error and have to wait for room to become
+  available in the bucket.
+
+This model ensures that apps that manage API calls responsibly will always have
+room in their buckets to make a burst of requests if needed. For example, if you
+average 20 requests (“marbles”) per second but suddenly need to make 30 requests
+all at once, you can still do so without hitting your rate limit. The basic
+principles of the leaky bucket algorithm apply to all our rate limits,
+regardless of the specific methods used to apply them.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([LeakyBucketRateLimiterIns](#leaky-bucket-rate-limiter-ins))
+
+<!-- vale on -->
+
+Input ports for the RateLimiter component
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([LeakyBucketRateLimiterParameters](#leaky-bucket-rate-limiter-parameters))
+
+<!-- vale on -->
+
+Parameters for the RateLimiter component
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+Selectors for the component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LeakyBucketRateLimiterIns {#leaky-bucket-rate-limiter-ins}
+
+<!-- vale on -->
+
+Inputs for the LeakyBucketRateLimiter component
+
+<dl>
+<dt>bucket_capacity</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Capacity of the bucket. If this capacity is negative, then the bucket is
+unbounded and all requests are allowed.
+
+</dd>
+<dt>leak_amount</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Number of tokens to leak per `leak_interval`.
+
+</dd>
+<dt>leak_interval_ms</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Leak interval in ms.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### LeakyBucketRateLimiterParameters {#leaky-bucket-rate-limiter-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Specifies which label the rate limiter should be keyed by.
+
+Rate limiting is done independently for each value of the
+[label](/concepts/flow-control/flow-label.md) with given key. For example, to
+give each user a separate limit, assuming you have a _user_ flow label set up,
+set `label_key: "user"`.
+
+</dd>
+<dt>max_idle_time</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"7200s"`)
+
+<!-- vale on -->
+
+Max idle time before leaky bucket state for a label is removed. If set to 0, the
+state is never removed.
+
+</dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"tokens"`)
+
+<!-- vale on -->
+
+Flow label key that will be used to override the number of tokens for this
+request. This is an optional parameter and takes highest precedence when
+assigning tokens to a request. The label value must be a valid uint64 number.
 
 </dd>
 </dl>
@@ -6115,16 +6310,17 @@ certain circumstances. [Decider](#decider) might be helpful.
 Value of the label for which the override should be applied.
 
 </dd>
-<dt>limit_scale_factor</dt>
+<dt>limit</dt>
 <dd>
 
 <!-- vale off -->
 
-(float64, default: `1`)
+(float64, **required**)
 
 <!-- vale on -->
 
-Amount by which the `in_ports.limit` should be multiplied for this label value.
+Number of flows allowed per `limit_reset_interval` for the given label value.
+Negative value means no limit.
 
 </dd>
 </dl>

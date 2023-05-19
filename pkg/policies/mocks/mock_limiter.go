@@ -225,10 +225,10 @@ func (mr *MockRateLimiterMockRecorder) Revert(labels, decision interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockRateLimiter)(nil).Revert), labels, decision)
 }
 
-// TakeN mocks base method.
-func (m *MockRateLimiter) TakeN(labels map[string]string, count float64) (string, bool, float64, float64) {
+// TakeIfAvailable mocks base method.
+func (m *MockRateLimiter) TakeIfAvailable(labels map[string]string, count float64) (string, bool, float64, float64) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TakeN", labels, count)
+	ret := m.ctrl.Call(m, "TakeIfAvailable", labels, count)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
 	ret2, _ := ret[2].(float64)
@@ -236,10 +236,10 @@ func (m *MockRateLimiter) TakeN(labels map[string]string, count float64) (string
 	return ret0, ret1, ret2, ret3
 }
 
-// TakeN indicates an expected call of TakeN.
-func (mr *MockRateLimiterMockRecorder) TakeN(labels, count interface{}) *gomock.Call {
+// TakeIfAvailable indicates an expected call of TakeIfAvailable.
+func (mr *MockRateLimiterMockRecorder) TakeIfAvailable(labels, count interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeN", reflect.TypeOf((*MockRateLimiter)(nil).TakeN), labels, count)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeIfAvailable", reflect.TypeOf((*MockRateLimiter)(nil).TakeIfAvailable), labels, count)
 }
 
 // MockLoadScheduler is a mock of LoadScheduler interface.

@@ -7,10 +7,10 @@
   withLabelValueMixin(label_value):: {
     label_value+: label_value,
   },
-  withLimitScaleFactor(limit_scale_factor):: {
-    limit_scale_factor: limit_scale_factor,
+  withLimit(limit):: {
+    limit: limit,
   },
-  withLimitScaleFactorMixin(limit_scale_factor):: {
-    limit_scale_factor+: limit_scale_factor,
+  withLimitMixin(limit):: {
+    limit+: limit,
   },
 }

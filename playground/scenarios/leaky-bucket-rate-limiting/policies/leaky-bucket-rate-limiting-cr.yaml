@@ -1,0 +1,30 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: leaky-bucket-rate-limiting
+spec:
+  circuit:
+    components:
+    - flow_control:
+        leaky_bucket_rate_limiter:
+          in_ports:
+            bucket_capacity:
+              constant_signal:
+                value: 40
+            leak_amount:
+              constant_signal:
+                value: 2
+            leak_interval_ms:
+              constant_signal:
+                value: 1000
+          parameters:
+            label_key: http.request.header.user_id
+          selectors:
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []

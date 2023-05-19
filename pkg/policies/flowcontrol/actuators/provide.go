@@ -2,7 +2,7 @@ package actuators
 
 import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/loadscheduler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/rate"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/rate-limiter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/regulator"
 	"go.uber.org/fx"
 )
@@ -11,7 +11,7 @@ import (
 func Module() fx.Option {
 	return fx.Options(
 		loadscheduler.Module(),
-		rate.Module(),
+		ratelimiter.Module(),
 		regulator.Module(),
 	)
 }
