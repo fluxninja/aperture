@@ -1,9 +1,11 @@
 displayName: Aperture traefik plugin
 type: middleware
 
-import: github.com/fluxninja/aperture-traefik-plugin
+import: github.com/fluxninja/aperturetraefikplugin
 
 summary: 'Integrate Traefik API proxy with Aperture'
 
 testData:
   ControlPoint: "awesomeFeature"
+  AgentHost: "localhost"
+  AgentPort: "8089"

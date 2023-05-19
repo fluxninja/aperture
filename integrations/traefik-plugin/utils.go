@@ -1,18 +1,12 @@
-package traefikplugin
+package aperturetraefikplugin
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/credentials/insecure"
-)
-
-const (
-	defaultAgentHost = "localhost"
-	defaultAgentPort = "8080"
 )
 
 func grpcClient(ctx context.Context, address string) (*grpc.ClientConn, error) {
@@ -26,12 +20,4 @@ func grpcClient(ctx context.Context, address string) (*grpc.ClientConn, error) {
 	grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return grpc.DialContext(ctx, address, grpcDialOptions...)
-}
-
-func getEnvOrDefault(envName, defaultValue string) string {
-	val := os.Getenv(envName)
-	if val == "" {
-		return defaultValue
-	}
-	return val
 }

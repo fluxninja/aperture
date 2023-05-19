@@ -1,11 +1,11 @@
-module github.com/fluxninja/aperture-traefik-plugin
+module github.com/fluxninja/aperturetraefikplugin
 
 go 1.20
 
-replace github.com/fluxninja/aperture-go/v2 => /home/sachinmaurya/fluxninja/test/aperture/sdks/aperture-go
+replace github.com/fluxninja/aperture-go/v2 => /home/sachinmaurya/fluxninja/test/aperture/sdks/aperture-go/
 
 require (
-	github.com/fluxninja/aperture-go/v2 v2.0.0
+	github.com/fluxninja/aperture-go/v2 v2.0.0-00010101000000-000000000000
 	github.com/go-logr/stdr v1.2.2
 	google.golang.org/grpc v1.55.0
 )

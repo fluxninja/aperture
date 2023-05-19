@@ -4,10 +4,13 @@ api:
   dashboard: true
   insecure: true
 
+# log:
+#   level: DEBUG
+
 experimental:
   localPlugins:
     example:
-      moduleName: github.com/fluxninja/aperture-traefik-plugin
+      moduleName: github.com/fluxninja/aperturetraefikplugin
 
 entryPoints:
   http:
