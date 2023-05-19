@@ -94,9 +94,6 @@ func (lbrl *LeakyBucketRateLimiter) Close() error {
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
 func (lbrl *LeakyBucketRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
-	lbrl.mu.RLock()
-	defer lbrl.mu.RUnlock()
-
 	req := request{
 		Want:    n,
 		CanWait: false,
