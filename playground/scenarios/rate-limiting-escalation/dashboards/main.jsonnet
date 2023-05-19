@@ -1,7 +1,7 @@
 local apertureDashboard = import '../../../resources/grafana-dashboard/main.libsonnet';
 
 local aperture = import '../../../../blueprints/main.libsonnet';
-local rateLimitpolicyDashboard = aperture.policies.LeakyBucketRateLimiting.dashboard;
+local rateLimitpolicyDashboard = aperture.policies.RateLimiting.dashboard;
 
 local dashboardMixin = std.parseJson(std.extVar('APERTURE_DASHBOARD'));
 

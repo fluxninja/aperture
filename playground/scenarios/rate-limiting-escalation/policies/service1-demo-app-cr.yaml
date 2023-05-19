@@ -84,6 +84,9 @@ spec:
               signal_name: RATE_LIMIT
           parameters:
             label_key: http.request.header.user_id
+            lazy_sync:
+              enabled: true
+              num_sync: 4
             leak_interval: 1s
           selectors:
           - control_point: ingress

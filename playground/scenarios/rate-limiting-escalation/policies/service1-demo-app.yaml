@@ -51,6 +51,9 @@ policy:
           parameters:
             leak_interval: "1s"
             label_key: http.request.header.user_id
+            lazy_sync:
+              enabled: true
+              num_sync: 4
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:

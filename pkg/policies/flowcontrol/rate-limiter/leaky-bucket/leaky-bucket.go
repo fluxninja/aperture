@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/distcache"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (
@@ -108,23 +109,21 @@ func (lbrl *LeakyBucketRateLimiter) TakeIfAvailable(label string, n float64) (bo
 		CanWait: false,
 	}
 	// encode request
-	var reqBuf bytes.Buffer
-	enc := gob.NewEncoder(&reqBuf)
-	err := enc.Encode(req)
+	reqBytes, err := utils.MarshalGob(req)
 	if err != nil {
 		log.Autosample().Errorf("error encoding request: %v", err)
 		return true, 0, 0
 	}
 
-	resultBytes, err := lbrl.dMap.Function(label, TakeNFunction, reqBuf.Bytes())
+	resultBytes, err := lbrl.dMap.Function(label, TakeNFunction, reqBytes)
 	if err != nil {
 		log.Autosample().Errorf("error taking from leaky bucket: %v", err)
 		return true, 0, 0
 	}
 
 	var resp response
-	resBuf := bytes.NewBuffer(resultBytes)
-	err = gob.NewDecoder(resBuf).Decode(&resp)
+
+	err = utils.UnmarshalGob(resultBytes, &resp)
 	if err != nil {
 		log.Autosample().Errorf("error decoding response: %v", err)
 		return true, 0, 0
