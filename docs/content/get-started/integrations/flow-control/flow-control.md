@@ -45,5 +45,16 @@ _SDKs_:
   application is experiencing an overload. The Aperture Controller can be
   programmed to degrade features as an escalated recovery action when basic load
   shedding is triggered for several minutes.
+- API Gateways: Aperture seamlessly integrates with various API gateways,
+  including [Kong](https://docs.konghq.com/gateway/latest/) and
+  [NGINX](https://www.nginx.com/products/nginx/api-gateway/), enabling easy
+  integration with a diverse range of gateways. This integration at the gateway
+  level simplifies traffic flow management before it reaches the main
+  application. Prior to forwarding a request to the upstream service, the API
+  gateway transmits request metadata to the Aperture Agent for flow control
+  decision-making. Within the Aperture Agent, the request undergoes
+  classification, rate-limiting, and scheduling processes, culminating in a
+  decision to accept or drop the request, which is then relayed back to the API
+  gateway.
 
 <DocCardList />
