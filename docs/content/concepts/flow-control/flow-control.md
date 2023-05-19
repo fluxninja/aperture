@@ -15,14 +15,14 @@ import Zoom from 'react-medium-image-zoom';
 import {apertureVersion} from '../../apertureVersion.js';
 ```
 
-Modern web-scale apps are a complex network of interconnected microservices that
-implement features such as account management, search, payments & more. This
-decoupled architecture has advantages but introduces new complex failure modes.
-When traffic surges, it can result in a queue buildup on a critical service,
-kick-starting a positive feedback loop and causing
+Many applications consist of intricate networks of interconnected services that
+drive essential features. While both monolithic and decoupled architectures
+offer various advantages, they also introduce new challenges and complexities.
+During periods of high traffic, a critical service may experience queue buildup,
+triggering a detrimental positive feedback loop and leading to
 [cascading failures](https://sre.google/sre-book/addressing-cascading-failures/).
-The application stops serving timely responses and critical end-user
-transactions are interrupted.
+As a result, the application becomes unresponsive, causing disruptions to
+crucial end-user transactions.
 
 ![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
 ![Absence of flow control](assets/img/no-flow-control-dark.png#gh-dark-mode-only)
