@@ -15,21 +15,21 @@ function(cfg) {
 
   local rateLimiterPanel =
     graphPanel.new(
-      title='Rate Limiter',
+      title='Leaky Bucket Rate Limiter',
       datasource=dsName,
       labelY1='Decisions',
       formatY1='reqps',
     )
     .addTarget(
       prometheus.target(
-        expr='sum by(decision_type) (rate(rate_limiter_counter_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
+        expr='sum by(decision_type) (rate(leaky_bucket_rate_limiter_counter_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
         intervalFactor=1,
       )
     ),
 
   local dashboardDef =
     dashboard.new(
-      title='Jsonnet / FluxNinja - Rate Limiter',
+      title='Jsonnet / FluxNinja - Leaky Bucket Rate Limiter',
       editable=true,
       schemaVersion=18,
       refresh=params.dashboard.refresh_interval,

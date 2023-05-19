@@ -1,0 +1,16 @@
+demoapp:
+  common:
+    simplesrv:
+      rejectRatio: 0.0
+      hostname: kong-server.demoapp.svc.cluster.local
+  service1:
+    kong:
+      enabled: true
+      replicaCount: 2
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+        limits:
+          cpu: 4
+          memory: 4Gi

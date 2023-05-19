@@ -97,7 +97,7 @@ func setupLeakyBucketFactory(
 	reg := statusRegistry.Child("component", leakyBucketRateLimiterStatusRoot)
 
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.RateLimiterCounterTotalMetricName,
+		Name: metrics.LeakyBucketRateLimiterCounterTotalMetricName,
 		Help: "A counter measuring the number of times Rate Limiter was triggered",
 	}, metricLabelKeys)
 
