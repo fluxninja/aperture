@@ -17,10 +17,11 @@ local policyResource = RateLimiting({
     policy_name: 'graphql-rate-limiting',
     rate_limiter+: {
       selectors: svcSelectors,
-      rate_limit: 10.0,
+      bucket_capacity: 40,
+      leak_amount: 2,
       parameters+: {
         label_key: 'user_id',
-        limit_reset_interval: '1s',
+        leak_interval: '1s',
       },
     },
     classifiers: [

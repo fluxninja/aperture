@@ -8,9 +8,10 @@ sidebar_label: Rate Limiting Policy
 
 ## Introduction
 
-This blueprint provides a simple based rate-limiting policy and a dashboard.
-This policy uses the [`RateLimiter`](/reference/policies/spec.md#rate-limiter)
-component.
+This blueprint provides a
+[leaky-bucket](https://en.wikipedia.org/wiki/Leaky_bucket) based rate-limiting
+policy and a dashboard. This policy uses the
+[`RateLimiter`](/reference/policies/spec.md#rate-limiter) component.
 
 <!-- Configuration Marker -->
 
@@ -72,11 +73,25 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-rate-limit"></a>
+<a id="policy-rate-limiter-bucket-capacity"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.rate_limit'
-    description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept'
+    name='policy.rate_limiter.bucket_capacity'
+    description='Bucket capacity.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-leak-amount"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.leak_amount'
+    description='Leak amount.'
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -107,7 +122,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
     description='Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../spec#rate-limiter-parameters'
-    value='{"label_key": "__REQUIRED_FIELD__", "limit_reset_interval": "__REQUIRED_FIELD__"}'
+    value='{"label_key": "__REQUIRED_FIELD__", "leak_interval": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

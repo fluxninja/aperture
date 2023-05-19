@@ -13,11 +13,17 @@
   withLazySyncMixin(lazy_sync):: {
     lazy_sync+: lazy_sync,
   },
-  withLimitResetInterval(limit_reset_interval):: {
-    limit_reset_interval: limit_reset_interval,
+  withLeakInterval(leak_interval):: {
+    leak_interval: leak_interval,
   },
-  withLimitResetIntervalMixin(limit_reset_interval):: {
-    limit_reset_interval+: limit_reset_interval,
+  withLeakIntervalMixin(leak_interval):: {
+    leak_interval+: leak_interval,
+  },
+  withMaxIdleTime(max_idle_time):: {
+    max_idle_time: max_idle_time,
+  },
+  withMaxIdleTimeMixin(max_idle_time):: {
+    max_idle_time+: max_idle_time,
   },
   withTokensLabelKey(tokens_label_key):: {
     tokens_label_key: tokens_label_key,

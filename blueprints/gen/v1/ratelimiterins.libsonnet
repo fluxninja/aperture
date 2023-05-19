@@ -1,10 +1,16 @@
 {
   new():: {
   },
-  withLimit(limit):: {
-    limit: limit,
+  withBucketCapacity(bucket_capacity):: {
+    bucket_capacity: bucket_capacity,
   },
-  withLimitMixin(limit):: {
-    limit+: limit,
+  withBucketCapacityMixin(bucket_capacity):: {
+    bucket_capacity+: bucket_capacity,
+  },
+  withLeakAmount(leak_amount):: {
+    leak_amount: leak_amount,
+  },
+  withLeakAmountMixin(leak_amount):: {
+    leak_amount+: leak_amount,
   },
 }

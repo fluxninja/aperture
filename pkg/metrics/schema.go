@@ -22,8 +22,6 @@ const (
 	InvalidSignalReadingsTotalMetricName = "invalid_signal_readings_total"
 	// InvalidFluxMeterTotalMetricName - counts invalid flux meters.
 	InvalidFluxMeterTotalMetricName = "invalid_flux_meter_total"
-	// LeakyBucketRateLimiterCounterTotalMetricName - name of the counter describing times rate limiter was triggered.
-	LeakyBucketRateLimiterCounterTotalMetricName = "leaky_bucket_rate_limiter_counter_total"
 	// RateLimiterCounterTotalMetricName - name of the counter describing times rate limiter was triggered.
 	RateLimiterCounterTotalMetricName = "rate_limiter_counter_total"
 	// ClassifierCounterTotalMetricName - name of the counter describing times classifier was triggered.

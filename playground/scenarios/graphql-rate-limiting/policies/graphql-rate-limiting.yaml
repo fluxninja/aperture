@@ -46,10 +46,8 @@ policy:
             u := claims.userID
           }
   rate_limiter:
-    # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
-    # Type: float64
-    # Required: True
-    rate_limit: 10
+    bucket_capacity: 40
+    leak_amount: 2
     selectors:
       - agent_group: default
         service: service-graphql-demo-app.demoapp.svc.cluster.local
@@ -64,4 +62,4 @@ policy:
       lazy_sync:
         enabled: true
         num_sync: 5
-      limit_reset_interval: 1s
+      leak_interval: 1s

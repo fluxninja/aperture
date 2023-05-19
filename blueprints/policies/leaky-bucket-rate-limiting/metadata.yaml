@@ -1,4 +1,0 @@
-blueprint: Rate Limiting Policy
-sources:
-  dashboard: policies/leaky-bucket-rate-limiting/dashboard.libsonnet
-  policy: policies/leaky-bucket-rate-limiting/policy.libsonnet

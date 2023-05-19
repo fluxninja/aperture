@@ -10,15 +10,18 @@ spec:
     - flow_control:
         rate_limiter:
           in_ports:
-            limit:
+            bucket_capacity:
               constant_signal:
-                value: 10
+                value: 40
+            leak_amount:
+              constant_signal:
+                value: 2
           parameters:
             label_key: user_id
             lazy_sync:
               enabled: true
               num_sync: 5
-            limit_reset_interval: 1s
+            leak_interval: 1s
           selectors:
           - agent_group: default
             control_point: ingress

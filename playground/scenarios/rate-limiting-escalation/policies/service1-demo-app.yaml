@@ -36,7 +36,7 @@ policy:
           output:
             signal_name: RATE_LIMIT
     - flow_control:
-        leaky_bucket_rate_limiter:
+        rate_limiter:
           selectors:
             - service: service1-demo-app.demoapp.svc.cluster.local
               control_point: ingress

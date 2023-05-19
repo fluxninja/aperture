@@ -20,24 +20,6 @@ message RateLimiterDecisionWrapper {
 }
 
 message RateLimiterDecision {
-  double limit = 1;
-}
-
-message LeakyBucketRateLimiterWrapper {
-  // CommonAttributes
-  CommonAttributes common_attributes = 1;
-  // Rate Limiter
-  policy.language.v1.LeakyBucketRateLimiter rate_limiter = 2;
-}
-
-message LeakyBucketRateLimiterDecisionWrapper {
-  // CommonAttributes
-  CommonAttributes common_attributes = 1;
-  // Rate Limiter Decision
-  LeakyBucketRateLimiterDecision rate_limiter_decision = 2;
-}
-
-message LeakyBucketRateLimiterDecision {
   double bucket_capacity = 1;
   double leak_amount = 2;
 }

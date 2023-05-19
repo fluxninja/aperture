@@ -104,8 +104,6 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, ratelimiter.NewRateLimiterAndOptions)
-		case *policylangv1.FlowControl_LeakyBucketRateLimiter:
-			ctor = mkCtor(flowControlConfig.LeakyBucketRateLimiter, ratelimiter.NewLeakyBucketRateLimiterAndOptions)
 		case *policylangv1.FlowControl_Regulator:
 			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
 		case *policylangv1.FlowControl_Private:

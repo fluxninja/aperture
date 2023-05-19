@@ -110,7 +110,7 @@ each `userID`.
 
 In this example, the traffic generator is configured to generate
 `50 requests/second` for 2-minutes. When loading the above policy in the
-playground, you can observe that it accepts no more than `10 requests/second` at
+playground, you can observe that it accepts no more than `2 requests/second` at
 any given time, and rejects the rest of the requests.
 
 <Zoom>

@@ -7,12 +7,6 @@
   withAdaptiveLoadSchedulerMixin(adaptive_load_scheduler):: {
     adaptive_load_scheduler+: adaptive_load_scheduler,
   },
-  withLeakyBucketRateLimiter(leaky_bucket_rate_limiter):: {
-    leaky_bucket_rate_limiter: leaky_bucket_rate_limiter,
-  },
-  withLeakyBucketRateLimiterMixin(leaky_bucket_rate_limiter):: {
-    leaky_bucket_rate_limiter+: leaky_bucket_rate_limiter,
-  },
   withLoadRamp(load_ramp):: {
     load_ramp: load_ramp,
   },

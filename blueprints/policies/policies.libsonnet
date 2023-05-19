@@ -1,6 +1,5 @@
 {
   RateLimiting: import 'rate-limiting/rate-limiting.libsonnet',
-  LeakyBucketRateLimiting: import 'leaky-bucket-rate-limiting/leaky-bucket-rate-limiting.libsonnet',
   FeatureRollout: import 'feature-rollout/base/feature-rollout.libsonnet',
   PromQLServiceProtection: import 'service-protection/promql/promql.libsonnet',
   ServiceProtectionAverageLatency: import 'service-protection/average-latency/average-latency.libsonnet',

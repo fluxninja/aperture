@@ -10,12 +10,15 @@ spec:
       - flow_control:
           rate_limiter:
             in_ports:
-              limit:
+              bucket_capacity:
                 constant_signal:
-                  value: 10
+                  value: 40
+              leak_amount:
+                constant_signal:
+                  value: 2
             parameters:
               label_key: user_id
-              limit_reset_interval: 1s
+              leak_interval: 1s
             selectors:
               - control_point: ingress
                 service: service-graphql-demo-app.demoapp.svc.cluster.local

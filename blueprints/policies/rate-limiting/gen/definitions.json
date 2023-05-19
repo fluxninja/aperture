@@ -27,10 +27,16 @@
         "rate_limiter": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["rate_limit", "parameters"],
+          "required": ["bucket_capacity", "leak_amount", "parameters"],
           "properties": {
-            "rate_limit": {
-              "description": "Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept",
+            "bucket_capacity": {
+              "description": "Bucket capacity.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "leak_amount": {
+              "description": "Leak amount.",
               "default": "__REQUIRED_FIELD__",
               "type": "number",
               "format": "double"
@@ -53,7 +59,7 @@
               "description": "Parameters.",
               "default": {
                 "label_key": "__REQUIRED_FIELD__",
-                "limit_reset_interval": "__REQUIRED_FIELD__"
+                "leak_interval": "__REQUIRED_FIELD__"
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"

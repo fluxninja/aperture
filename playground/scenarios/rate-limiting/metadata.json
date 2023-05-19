@@ -4,9 +4,9 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "policies/leaky-bucket-rate-limiting",
-      "policy_name": "leaky-bucket-rate-limiting",
-      "values_file": "policies/leaky-bucket-rate-limiting.yaml",
+      "blueprint_name": "policies/rate-limiting",
+      "policy_name": "rate-limiting",
+      "values_file": "policies/rate-limiting.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

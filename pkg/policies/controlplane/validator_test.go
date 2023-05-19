@@ -162,11 +162,13 @@ spec:
         rate_limiter:
           dynamic_config_key: rate_limiter
           in_ports:
-            limit:
+            bucket_capacity:
+              signal_name: RATE_LIMIT
+            leak_amount:
               signal_name: RATE_LIMIT
           parameters:
             label_key: http.request.header.user_id
-            limit_reset_interval: 1s
+            leak_interval: 1s
           selectors:
           - control_point: ingress
             label_matcher:
@@ -292,12 +294,14 @@ spec:
       - flow_control:
           rate_limiter:
             in_ports:
-              limit:
+              bucket_capacity:
+                signal_name: "RATE_LIMIT"
+              leak_amount:
                 signal_name: "RATE_LIMIT"
             selectors:
               - control_point: "ingress"
                 service: "service1-demo-app.demoapp.svc.cluster.local"
             parameters:
               label_key: "http.request.header.user_type"
-              limit_reset_interval: "1s"
+              leak_interval: "1s"
 `

@@ -16,10 +16,11 @@ local policyResource = RateLimiting({
     policy_name: 'static-rate-limiting',
     rate_limiter+: {
       selectors: svcSelectors,
-      rate_limit: 120.0,
+      bucket_capacity: 40,
+      leak_amount: 2,
       parameters+: {
         label_key: 'http.request.header.user_id',
-        limit_reset_interval: '60s',
+        leak_interval: '1s',
       },
     },
   },

@@ -77,11 +77,13 @@ spec:
     - flow_control:
         rate_limiter:
           in_ports:
-            limit:
+            bucket_capacity:
+              signal_name: RATE_LIMIT
+            leak_amount:
               signal_name: RATE_LIMIT
           parameters:
             label_key: http.request.header.user_id
-            limit_reset_interval: 1s
+            leak_interval: 1s
           selectors:
           - control_point: service1-demo-app
             label_matcher:

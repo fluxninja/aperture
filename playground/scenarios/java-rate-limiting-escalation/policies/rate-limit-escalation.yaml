@@ -44,11 +44,13 @@ policy:
                 match_labels:
                   user_type: crawler
           in_ports:
-            limit:
+            bucket_capacity:
+              signal_name: RATE_LIMIT
+            leak_amount:
               signal_name: RATE_LIMIT
           parameters:
-            limit_reset_interval: 1s
             label_key: user_id
+            leak_interval: 1s
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:

@@ -1912,47 +1912,6 @@ func (m *FlowControl) validate(all bool) error {
 			}
 		}
 
-	case *FlowControl_LeakyBucketRateLimiter:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetLeakyBucketRateLimiter()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LeakyBucketRateLimiter",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LeakyBucketRateLimiter",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetLeakyBucketRateLimiter()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "LeakyBucketRateLimiter",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *FlowControl_LoadScheduler:
 		if v == nil {
 			err := FlowControlValidationError{
@@ -2470,200 +2429,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimiterValidationError{}
-
-// Validate checks the field values on LeakyBucketRateLimiter with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *LeakyBucketRateLimiter) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LeakyBucketRateLimiter with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// LeakyBucketRateLimiterMultiError, or nil if none found.
-func (m *LeakyBucketRateLimiter) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LeakyBucketRateLimiter) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiterValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiterValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LeakyBucketRateLimiterValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiterValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiterValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LeakyBucketRateLimiterValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	for idx, item := range m.GetSelectors() {
-		_, _ = idx, item
-
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, LeakyBucketRateLimiterValidationError{
-						field:  fmt.Sprintf("Selectors[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, LeakyBucketRateLimiterValidationError{
-						field:  fmt.Sprintf("Selectors[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return LeakyBucketRateLimiterValidationError{
-					field:  fmt.Sprintf("Selectors[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	if len(errors) > 0 {
-		return LeakyBucketRateLimiterMultiError(errors)
-	}
-
-	return nil
-}
-
-// LeakyBucketRateLimiterMultiError is an error wrapping multiple validation
-// errors returned by LeakyBucketRateLimiter.ValidateAll() if the designated
-// constraints aren't met.
-type LeakyBucketRateLimiterMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LeakyBucketRateLimiterMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LeakyBucketRateLimiterMultiError) AllErrors() []error { return m }
-
-// LeakyBucketRateLimiterValidationError is the validation error returned by
-// LeakyBucketRateLimiter.Validate if the designated constraints aren't met.
-type LeakyBucketRateLimiterValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LeakyBucketRateLimiterValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LeakyBucketRateLimiterValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LeakyBucketRateLimiterValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LeakyBucketRateLimiterValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LeakyBucketRateLimiterValidationError) ErrorName() string {
-	return "LeakyBucketRateLimiterValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e LeakyBucketRateLimiterValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLeakyBucketRateLimiter.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LeakyBucketRateLimiterValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LeakyBucketRateLimiterValidationError{}
 
 // Validate checks the field values on LoadScheduler with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -4415,12 +4180,16 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for LabelKey
+
+	// no validation rules for TokensLabelKey
+
 	if all {
-		switch v := interface{}(m.GetLimitResetInterval()).(type) {
+		switch v := interface{}(m.GetLeakInterval()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "LimitResetInterval",
+					field:  "LeakInterval",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -4428,23 +4197,50 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "LimitResetInterval",
+					field:  "LeakInterval",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetLimitResetInterval()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetLeakInterval()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimiter_ParametersValidationError{
-				field:  "LimitResetInterval",
+				field:  "LeakInterval",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	// no validation rules for LabelKey
+	if all {
+		switch v := interface{}(m.GetMaxIdleTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiter_ParametersValidationError{
+					field:  "MaxIdleTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiter_ParametersValidationError{
+					field:  "MaxIdleTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMaxIdleTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiter_ParametersValidationError{
+				field:  "MaxIdleTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if all {
 		switch v := interface{}(m.GetLazySync()).(type) {
@@ -4474,8 +4270,6 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 			}
 		}
 	}
-
-	// no validation rules for TokensLabelKey
 
 	if len(errors) > 0 {
 		return RateLimiter_ParametersMultiError(errors)
@@ -4580,11 +4374,11 @@ func (m *RateLimiter_Ins) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetLimit()).(type) {
+		switch v := interface{}(m.GetBucketCapacity()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "Limit",
+					field:  "BucketCapacity",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -4592,16 +4386,45 @@ func (m *RateLimiter_Ins) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "Limit",
+					field:  "BucketCapacity",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetLimit()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetBucketCapacity()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimiter_InsValidationError{
-				field:  "Limit",
+				field:  "BucketCapacity",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetLeakAmount()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiter_InsValidationError{
+					field:  "LeakAmount",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiter_InsValidationError{
+					field:  "LeakAmount",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLeakAmount()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiter_InsValidationError{
+				field:  "LeakAmount",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -4792,333 +4615,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimiter_Parameters_LazySyncValidationError{}
-
-// Validate checks the field values on LeakyBucketRateLimiter_Parameters with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the first error encountered is returned, or nil if there are
-// no violations.
-func (m *LeakyBucketRateLimiter_Parameters) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LeakyBucketRateLimiter_Parameters
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the result is a list of violation errors wrapped in
-// LeakyBucketRateLimiter_ParametersMultiError, or nil if none found.
-func (m *LeakyBucketRateLimiter_Parameters) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LeakyBucketRateLimiter_Parameters) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for LabelKey
-
-	// no validation rules for TokensLabelKey
-
-	if all {
-		switch v := interface{}(m.GetLeakInterval()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_ParametersValidationError{
-					field:  "LeakInterval",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_ParametersValidationError{
-					field:  "LeakInterval",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetLeakInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LeakyBucketRateLimiter_ParametersValidationError{
-				field:  "LeakInterval",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetMaxIdleTime()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_ParametersValidationError{
-					field:  "MaxIdleTime",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_ParametersValidationError{
-					field:  "MaxIdleTime",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetMaxIdleTime()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LeakyBucketRateLimiter_ParametersValidationError{
-				field:  "MaxIdleTime",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return LeakyBucketRateLimiter_ParametersMultiError(errors)
-	}
-
-	return nil
-}
-
-// LeakyBucketRateLimiter_ParametersMultiError is an error wrapping multiple
-// validation errors returned by
-// LeakyBucketRateLimiter_Parameters.ValidateAll() if the designated
-// constraints aren't met.
-type LeakyBucketRateLimiter_ParametersMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LeakyBucketRateLimiter_ParametersMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LeakyBucketRateLimiter_ParametersMultiError) AllErrors() []error { return m }
-
-// LeakyBucketRateLimiter_ParametersValidationError is the validation error
-// returned by LeakyBucketRateLimiter_Parameters.Validate if the designated
-// constraints aren't met.
-type LeakyBucketRateLimiter_ParametersValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LeakyBucketRateLimiter_ParametersValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LeakyBucketRateLimiter_ParametersValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LeakyBucketRateLimiter_ParametersValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LeakyBucketRateLimiter_ParametersValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LeakyBucketRateLimiter_ParametersValidationError) ErrorName() string {
-	return "LeakyBucketRateLimiter_ParametersValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e LeakyBucketRateLimiter_ParametersValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLeakyBucketRateLimiter_Parameters.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LeakyBucketRateLimiter_ParametersValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LeakyBucketRateLimiter_ParametersValidationError{}
-
-// Validate checks the field values on LeakyBucketRateLimiter_Ins with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *LeakyBucketRateLimiter_Ins) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LeakyBucketRateLimiter_Ins with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// LeakyBucketRateLimiter_InsMultiError, or nil if none found.
-func (m *LeakyBucketRateLimiter_Ins) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LeakyBucketRateLimiter_Ins) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetBucketCapacity()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_InsValidationError{
-					field:  "BucketCapacity",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_InsValidationError{
-					field:  "BucketCapacity",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetBucketCapacity()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LeakyBucketRateLimiter_InsValidationError{
-				field:  "BucketCapacity",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetLeakAmount()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_InsValidationError{
-					field:  "LeakAmount",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LeakyBucketRateLimiter_InsValidationError{
-					field:  "LeakAmount",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetLeakAmount()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LeakyBucketRateLimiter_InsValidationError{
-				field:  "LeakAmount",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return LeakyBucketRateLimiter_InsMultiError(errors)
-	}
-
-	return nil
-}
-
-// LeakyBucketRateLimiter_InsMultiError is an error wrapping multiple
-// validation errors returned by LeakyBucketRateLimiter_Ins.ValidateAll() if
-// the designated constraints aren't met.
-type LeakyBucketRateLimiter_InsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LeakyBucketRateLimiter_InsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LeakyBucketRateLimiter_InsMultiError) AllErrors() []error { return m }
-
-// LeakyBucketRateLimiter_InsValidationError is the validation error returned
-// by LeakyBucketRateLimiter_Ins.Validate if the designated constraints aren't met.
-type LeakyBucketRateLimiter_InsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LeakyBucketRateLimiter_InsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LeakyBucketRateLimiter_InsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LeakyBucketRateLimiter_InsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LeakyBucketRateLimiter_InsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LeakyBucketRateLimiter_InsValidationError) ErrorName() string {
-	return "LeakyBucketRateLimiter_InsValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e LeakyBucketRateLimiter_InsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLeakyBucketRateLimiter_Ins.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LeakyBucketRateLimiter_InsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LeakyBucketRateLimiter_InsValidationError{}
 
 // Validate checks the field values on LoadScheduler_Parameters with the rules
 // defined in the proto definition for this message. If any rules are

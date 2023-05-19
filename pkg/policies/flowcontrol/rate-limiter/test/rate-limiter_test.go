@@ -22,18 +22,19 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/basic"
 	lazysync "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/lazy-sync"
+	leakybucket "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/leaky-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, ttl time.Duration) (ratelimiter.RateLimiter, error) {
-	limiter, err := basic.NewBasicRateLimiter(distCache, "Limiter", ttl)
+func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, leakInterval time.Duration) (ratelimiter.RateLimiter, error) {
+	limiter, err := leakybucket.NewLeakyBucket(distCache, "Limiter", leakInterval, time.Hour)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
 	}
 	limiter.SetRateLimit(limit)
+	limiter.SetLeakAmount(limit)
 
 	t.Logf("Successfully created new Limiter")
 	return limiter, nil
@@ -231,10 +232,10 @@ func createJobGroup(_ ratelimiter.RateLimiter) *jobs.JobGroup {
 }
 
 // createOlricLimiters creates a set of Olric limiters.
-func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, ttl time.Duration) []ratelimiter.RateLimiter {
+func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, leakInterval time.Duration) []ratelimiter.RateLimiter {
 	var limiters []ratelimiter.RateLimiter
 	for _, distCache := range cl.members {
-		limiter, err := newTestLimiter(t, distCache, limit, ttl)
+		limiter, err := newTestLimiter(t, distCache, limit, leakInterval)
 		if err != nil {
 			t.Logf("Error creating limiter: %v", err)
 			t.FailNow()
@@ -260,13 +261,13 @@ func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, sy
 }
 
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
-func checkResults(t *testing.T, fr *flowRunner, ttlsResets int32, tolerance float64) {
+func checkResults(t *testing.T, fr *flowRunner, leaks int32, tolerance float64) {
 	for _, f := range fr.flows {
-		actualRequestsExpected := math.Min(float64(f.limit*ttlsResets), float64(f.totalRequests))
-		t.Logf("flow (%s) @ %d requests/sec: \n ttlResets=%d, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
+		actualRequestsExpected := math.Min(float64(f.limit*leaks), float64(f.totalRequests))
+		t.Logf("flow (%s) @ %d requests/sec: \n leaks=%d, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
 			f.requestlabel,
 			f.requestRate,
-			ttlsResets,
+			leaks,
 			f.totalRequests,
 			f.limit,
 			f.acceptedRequests,
@@ -308,7 +309,7 @@ type testConfig struct {
 	flows                 []*flow
 	numOlrics             int
 	limit                 float64
-	ttl                   time.Duration
+	leakInterval          time.Duration
 	tolerance             float64
 	duration              time.Duration
 	syncDuration          time.Duration
@@ -319,7 +320,7 @@ type testConfig struct {
 func baseOfLimiterTest(config testConfig) {
 	var fr *flowRunner
 	var lazySyncLimiters []ratelimiter.RateLimiter
-	ttlResets := int32(config.duration / config.ttl)
+	leaks := int32(config.duration / config.leakInterval)
 	t := config.t
 	cl := newTestDistCacheCluster(t, config.numOlrics)
 
@@ -328,7 +329,7 @@ func baseOfLimiterTest(config testConfig) {
 		t.FailNow()
 	}
 
-	limiters := createOlricLimiters(t, cl, config.limit, config.ttl)
+	limiters := createOlricLimiters(t, cl, config.limit, config.leakInterval)
 
 	if config.enableLazySyncLimiter {
 		limiters = createLazySyncLimiters(t, limiters, config.syncDuration)
@@ -345,7 +346,7 @@ func baseOfLimiterTest(config testConfig) {
 
 	fr.runFlows(t)
 
-	checkResults(t, fr, ttlResets, config.tolerance)
+	checkResults(t, fr, leaks, config.tolerance)
 
 	if config.enableLazySyncLimiter {
 		closeLimiters(t, lazySyncLimiters)
@@ -355,22 +356,22 @@ func baseOfLimiterTest(config testConfig) {
 	closeTestDistCacheCluster(t, cl)
 }
 
-// TestOlricLimiterWithBasicLimit tests the basic limit functionality of the limiter and if it accepts the limit of requests sent within ttl.
+// TestOlricLimiterWithBasicLimit tests the basic limit functionality of the limiter and if it accepts the limit of requests sent within leakInterval.
 func TestOlricLimiterWithBasicLimit(t *testing.T) {
 	flows := []*flow{
 		{requestlabel: "user-0", requestRate: 50},
 	}
 	baseOfLimiterTest(testConfig{
-		t:         t,
-		numOlrics: 1,
-		limit:     10,
-		ttl:       time.Second * 1,
-		flows:     flows,
-		duration:  time.Second * 10,
+		t:            t,
+		numOlrics:    1,
+		limit:        10,
+		leakInterval: time.Second * 1,
+		flows:        flows,
+		duration:     time.Second * 10,
 	})
 }
 
-// TestOlricClusterMultiLimiter tests the behavior of a cluster of OlricLimiter and if it accepts the limit of requests sent within a given ttl.
+// TestOlricClusterMultiLimiter tests the behavior of a cluster of OlricLimiter and if it accepts the limit of requests sent within a given leakInterval.
 func TestOlricClusterMultiLimiter(t *testing.T) {
 	flows := []*flow{
 		{requestlabel: "user-0", requestRate: 200},
@@ -379,12 +380,12 @@ func TestOlricClusterMultiLimiter(t *testing.T) {
 		{requestlabel: "user-3", requestRate: 90},
 	}
 	baseOfLimiterTest(testConfig{
-		t:         t,
-		numOlrics: 6,
-		limit:     10,
-		ttl:       time.Second * 1,
-		flows:     flows,
-		duration:  time.Second * 10,
+		t:            t,
+		numOlrics:    6,
+		limit:        10,
+		leakInterval: time.Second * 1,
+		flows:        flows,
+		duration:     time.Second * 10,
 	})
 }
 
@@ -400,7 +401,7 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 		t:                     t,
 		numOlrics:             3,
 		limit:                 10,
-		ttl:                   time.Second * 1,
+		leakInterval:          time.Second * 1,
 		flows:                 flows,
 		duration:              time.Second * 10,
 		enableLazySyncLimiter: true,

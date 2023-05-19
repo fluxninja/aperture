@@ -134,65 +134,54 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 
 // Execute implements runtime.Component.Execute.
 func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	limit, ok := inPortReadings["limit"]
-	if !ok {
-		return nil, nil
+	bucketCapacity := inPortReadings.ReadSingleReadingPort("bucket_capacity")
+	leakAmount := inPortReadings.ReadSingleReadingPort("leak_amount")
+
+	decision := &policysyncv1.RateLimiterDecision{
+		BucketCapacity: -1,
+		LeakAmount:     0,
+	}
+	if !bucketCapacity.Valid() || !leakAmount.Valid() {
+		return nil, limiterSync.publishDecision(decision)
 	}
 
-	if len(limit) == 0 {
-		return nil, nil
-	}
+	decision.BucketCapacity = bucketCapacity.Value()
+	decision.LeakAmount = leakAmount.Value()
 
-	limitReading := limit[0]
-	var limitValue float64
-	if !limitReading.Valid() {
-		limitValue = -1.0 // no limit is applied
-	} else {
-		limitValue = limitReading.Value()
-	}
-	return nil, limiterSync.publishLimit(limitValue)
+	return nil, limiterSync.publishDecision(decision)
 }
 
-func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
+func (limiterSync *rateLimiterSync) publishDecision(decision *policysyncv1.RateLimiterDecision) error {
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Publish only if there's a change
-	if limiterSync.decision.GetLimit() != limitValue {
-		// Save the decision
-		limiterSync.decision.Limit = limitValue
+	if !proto.Equal(limiterSync.decision, decision) {
+		limiterSync.decision = decision
 		// Publish decision
-		logger.Debug().Float64("limit", limitValue).Msg("publishing rate limiter decision")
-		err := limiterSync.publishDecision()
+		logger.Debug().Msg("publishing rate limiter decision")
+		wrapper := &policysyncv1.RateLimiterDecisionWrapper{
+			RateLimiterDecision: decision,
+			CommonAttributes: &policysyncv1.CommonAttributes{
+				PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
+				PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
+				ComponentId: limiterSync.componentID,
+			},
+		}
+
+		dat, err := proto.Marshal(wrapper)
 		if err != nil {
+			logger.Error().Err(err).Msg("failed to marshal rate limiter decision")
 			return err
+		}
+		if limiterSync.decisionWriter == nil {
+			logger.Panic().Msg("decision writer is nil")
+		}
+		for _, decisionEtcdPath := range limiterSync.decisionEtcdPaths {
+			limiterSync.decisionWriter.Write(decisionEtcdPath, dat)
 		}
 	}
 	return nil
 }
 
-func (limiterSync *rateLimiterSync) publishDecision() error {
-	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	wrapper := &policysyncv1.RateLimiterDecisionWrapper{
-		RateLimiterDecision: limiterSync.decision,
-		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
-			PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
-			ComponentId: limiterSync.componentID,
-		},
-	}
-	dat, err := proto.Marshal(wrapper)
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to marshal rate limiter decision")
-		return err
-	}
-	if limiterSync.decisionWriter == nil {
-		logger.Panic().Msg("decision writer is nil")
-	}
-	for _, decisionEtcdPath := range limiterSync.decisionEtcdPaths {
-		limiterSync.decisionWriter.Write(decisionEtcdPath, dat)
-	}
-	return nil
-}
-
-// DynamicConfigUpdate is a no-op.
+// DynamicConfigUpdate is a no-op for rate limiter.
 func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 }

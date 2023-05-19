@@ -25,7 +25,10 @@ function(cfg) {
           flowControl.new()
           + flowControl.withRateLimiter(
             rateLimiter.new()
-            + rateLimiter.withInPorts({ limit: port.withConstantSignal(params.policy.rate_limiter.rate_limit) })
+            + rateLimiter.withInPorts({
+              bucket_capacity: port.withConstantSignal(params.policy.rate_limiter.bucket_capacity),
+              leak_amount: port.withConstantSignal(params.policy.rate_limiter.leak_amount),
+            })
             + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
             + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
           ),

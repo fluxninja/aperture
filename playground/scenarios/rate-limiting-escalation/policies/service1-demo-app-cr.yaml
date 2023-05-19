@@ -76,7 +76,7 @@ spec:
           output:
             signal_name: RATE_LIMIT
     - flow_control:
-        leaky_bucket_rate_limiter:
+        rate_limiter:
           in_ports:
             bucket_capacity:
               signal_name: RATE_LIMIT

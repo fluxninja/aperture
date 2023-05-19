@@ -11,10 +11,14 @@ policy:
   # Type: []aperture.spec.v1.Classifier
   classifiers: []
   rate_limiter:
-    # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
+    # Bucket capacity.
     # Type: float64
     # Required: True
-    rate_limit: __REQUIRED_FIELD__
+    bucket_capacity: __REQUIRED_FIELD__
+    # Leak amount.
+    # Type: float64
+    # Required: True
+    leak_amount: __REQUIRED_FIELD__
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     selectors:
@@ -27,7 +31,7 @@ policy:
       # Type: string
       # Required: True
       label_key: __REQUIRED_FIELD__
-      # Time after which the limit for a given label value will be reset.
+      # Leak interval e.g. "1s".
       # Type: string
       # Required: True
-      limit_reset_interval: __REQUIRED_FIELD__
+      leak_interval: __REQUIRED_FIELD__
