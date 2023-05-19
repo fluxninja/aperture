@@ -2886,17 +2886,6 @@ definitions:
       :::
 
       RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Leaky Bucket Algorithm_.
-
-      This algorithm lets your app make an unlimited amount of requests in infrequent bursts over time.
-      The main points to understand about the leaky bucket metaphor are as follows:
-
-      - Each app has access to a bucket. It can hold, say, 60 “marbles”.
-      - Each second, a marble is removed from the bucket (if there are any). That way there’s always more room.
-      - Each API request requires you to toss a marble in the bucket.
-      - If the bucket gets full, you get an error and have to wait for room to become available in the bucket.
-
-      This model ensures that apps that manage API calls responsibly will always have room in their buckets to make a burst of requests if needed. For example, if you average 20 requests (“marbles”) per second but suddenly need to make 30 requests all at once, you can still do so without hitting your rate limit.
-      The basic principles of the leaky bucket algorithm apply to all our rate limits, regardless of the specific methods used to apply them.
     type: object
     title: Limits the traffic on a control point to specified rate
     required:
