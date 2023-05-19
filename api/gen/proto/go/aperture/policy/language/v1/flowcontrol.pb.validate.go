@@ -4185,11 +4185,11 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 	// no validation rules for TokensLabelKey
 
 	if all {
-		switch v := interface{}(m.GetLeakInterval()).(type) {
+		switch v := interface{}(m.GetInterval()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "LeakInterval",
+					field:  "Interval",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -4197,16 +4197,16 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "LeakInterval",
+					field:  "Interval",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetLeakInterval()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetInterval()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimiter_ParametersValidationError{
-				field:  "LeakInterval",
+				field:  "Interval",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

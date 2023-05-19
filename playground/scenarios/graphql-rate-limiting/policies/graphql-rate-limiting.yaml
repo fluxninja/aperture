@@ -62,4 +62,4 @@ policy:
       lazy_sync:
         enabled: true
         num_sync: 5
-      leak_interval: 1s
+      interval: 1s

@@ -27,13 +27,13 @@ type LeakyBucketRateLimiter struct {
 	name           string
 	bucketCapacity float64
 	leakAmount     float64
-	leakInterval   time.Duration
+	interval       time.Duration
 }
 
 // NewLeakyBucket creates a new instance of DistCacheRateTracker.
 func NewLeakyBucket(dc *distcache.DistCache,
 	name string,
-	leakInterval time.Duration,
+	interval time.Duration,
 	maxIdleDuration time.Duration,
 ) (*LeakyBucketRateLimiter, error) {
 	dc.Mutex.Lock()
@@ -41,7 +41,7 @@ func NewLeakyBucket(dc *distcache.DistCache,
 
 	lbrl := &LeakyBucketRateLimiter{
 		name:           name,
-		leakInterval:   leakInterval,
+		interval:       interval,
 		bucketCapacity: -1,
 	}
 
@@ -186,28 +186,25 @@ func (lbrl *LeakyBucketRateLimiter) takeN(key string, currentStateBytes, argByte
 		AvailableAt: now,
 	}
 
-	// First calculate current size of bucket based on time passed since last leak
-	// and leak rate
+	// Calculate the time passed since the last leak
 	timeSinceLastLeak := now.Sub(currentState.LastLeak)
 
-	if timeSinceLastLeak > lbrl.leakInterval {
-		// Calculate number of leaks since last leak
-		leaks := int(timeSinceLastLeak / lbrl.leakInterval)
-		// Calculate amount to leak
-		leakAmount := lbrl.leakAmount * float64(leaks)
-		// Leak
-		currentState.Current -= leakAmount
-		if currentState.Current < 0 {
-			currentState.Current = 0
-		}
-		// Update lastLeak
-		currentState.LastLeak = currentState.LastLeak.Add(time.Duration(leaks) * lbrl.leakInterval)
+	// Calculate the amount to leak based on the time passed and leak rate
+	leakAmount := lbrl.leakAmount * float64(timeSinceLastLeak/lbrl.interval)
+
+	// Leak the calculated amount
+	currentState.Current -= leakAmount
+	if currentState.Current < 0 {
+		currentState.Current = 0
 	}
+
+	// Update lastLeak
+	currentState.LastLeak = now
 
 	currentState.Current += arg.Want
 	if currentState.Current > lbrl.bucketCapacity {
 		if arg.CanWait {
-			waitTime := time.Duration((currentState.Current - lbrl.bucketCapacity) / lbrl.leakAmount * float64(lbrl.leakInterval))
+			waitTime := time.Duration((currentState.Current - lbrl.bucketCapacity) / lbrl.leakAmount * float64(lbrl.interval))
 			availableAt := now.Add(waitTime)
 			result = response{
 				Ok:          true,

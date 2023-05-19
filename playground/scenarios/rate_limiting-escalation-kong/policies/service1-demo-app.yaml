@@ -48,7 +48,7 @@ policy:
             leak_amount:
               signal_name: RATE_LIMIT
           parameters:
-            leak_interval: 1s
+            interval: 1s
             label_key: http.request.header.user_id
   # Additional resources.
   # Type: aperture.spec.v1.Resources

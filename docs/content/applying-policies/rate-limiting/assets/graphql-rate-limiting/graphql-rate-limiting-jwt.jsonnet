@@ -21,7 +21,7 @@ local policyResource = RateLimiting({
       leak_amount: 2,
       parameters+: {
         label_key: 'user_id',
-        leak_interval: '1s',
+        interval: '1s',
       },
     },
     classifiers: [

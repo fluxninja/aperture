@@ -6046,7 +6046,7 @@ unbounded and all requests are allowed.
 
 <!-- vale on -->
 
-Number of tokens to leak per `leak_interval`.
+Number of tokens to leak per `interval`.
 
 </dd>
 </dl>
@@ -6060,6 +6060,19 @@ Number of tokens to leak per `leak_interval`.
 <!-- vale on -->
 
 <dl>
+<dt>interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Interval defines the time interval in which the leaky bucket will leak tokens
+specified by `leak_amount` signal.
+
+</dd>
 <dt>label_key</dt>
 <dd>
 
@@ -6087,19 +6100,6 @@ set `label_key: "user"`.
 <!-- vale on -->
 
 Configuration of lazy-syncing behavior of rate limiter
-
-</dd>
-<dt>leak_interval</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-Leak interval defines the time interval in which the leaky bucket will leak
-tokens specified by `leak_amount` signal.
 
 </dd>
 <dt>max_idle_time</dt>
@@ -6161,7 +6161,7 @@ Enables lazy sync
 
 <!-- vale on -->
 
-Number of times to lazy sync within the `leak_interval`.
+Number of times to lazy sync within the `interval`.
 
 </dd>
 </dl>

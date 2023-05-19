@@ -17,11 +17,11 @@ spec:
               constant_signal:
                 value: 2
           parameters:
+            interval: 1s
             label_key: user_id
             lazy_sync:
               enabled: true
               num_sync: 5
-            leak_interval: 1s
           selectors:
           - agent_group: default
             control_point: ingress

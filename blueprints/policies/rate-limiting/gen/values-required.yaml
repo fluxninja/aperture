@@ -34,4 +34,4 @@ policy:
       # Leak interval e.g. "1s".
       # Type: string
       # Required: True
-      leak_interval: __REQUIRED_FIELD__
+      interval: __REQUIRED_FIELD__

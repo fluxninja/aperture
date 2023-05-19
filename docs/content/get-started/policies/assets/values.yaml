@@ -36,4 +36,4 @@ policy:
       # Leak interval e.g. "1s".
       # Type: string
       # Required: True
-      leak_interval: 1s
+      interval: 1s

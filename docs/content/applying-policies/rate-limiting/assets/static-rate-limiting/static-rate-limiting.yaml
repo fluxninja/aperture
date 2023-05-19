@@ -17,8 +17,8 @@ spec:
                 constant_signal:
                   value: 2
             parameters:
+              interval: 1s
               label_key: http.request.header.user_id
-              leak_interval: 1s
             selectors:
               - agent_group: default
                 control_point: ingress

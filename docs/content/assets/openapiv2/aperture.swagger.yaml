@@ -3217,13 +3217,20 @@ definitions:
             leak_amount:
                 $ref: '#/definitions/InPort'
                 description: |+
-                    Number of tokens to leak per `leak_interval`.
+                    Number of tokens to leak per `interval`.
 
                 x-go-tag-validate: required
         title: Inputs for the LeakyBucketRateLimiter component
         type: object
     RateLimiterParameters:
         properties:
+            interval:
+                description: |+
+                    Interval defines the time interval in which the leaky bucket
+                    will leak tokens specified by `leak_amount` signal.
+
+                type: string
+                x-go-tag-validate: required
             label_key:
                 description: |+
                     Specifies which label the rate limiter should be keyed by.
@@ -3239,13 +3246,6 @@ definitions:
             lazy_sync:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behavior of rate limiter
-            leak_interval:
-                description: |+
-                    Leak interval defines the time interval in which the leaky bucket
-                    will leak tokens specified by `leak_amount` signal.
-
-                type: string
-                x-go-tag-validate: required
             max_idle_time:
                 default: 7200s
                 description: |+
@@ -3266,8 +3266,8 @@ definitions:
                 type: string
                 x-go-tag-default: tokens
         required:
+            - interval
             - label_key
-            - leak_interval
         type: object
     RateLimiterParametersLazySync:
         properties:
@@ -3279,7 +3279,7 @@ definitions:
             num_sync:
                 default: 4
                 description: |+
-                    Number of times to lazy sync within the `leak_interval`.
+                    Number of times to lazy sync within the `interval`.
 
                 exclusiveMinimum: true
                 format: int64

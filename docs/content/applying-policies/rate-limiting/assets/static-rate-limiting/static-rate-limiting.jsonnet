@@ -20,7 +20,7 @@ local policyResource = RateLimiting({
       leak_amount: 2,
       parameters+: {
         label_key: 'http.request.header.user_id',
-        leak_interval: '1s',
+        interval: '1s',
       },
     },
   },

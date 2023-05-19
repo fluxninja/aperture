@@ -27,8 +27,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, leakInterval time.Duration) (ratelimiter.RateLimiter, error) {
-	limiter, err := leakybucket.NewLeakyBucket(distCache, "Limiter", leakInterval, time.Hour)
+func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, interval time.Duration) (ratelimiter.RateLimiter, error) {
+	limiter, err := leakybucket.NewLeakyBucket(distCache, "Limiter", interval, time.Hour)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
@@ -232,10 +232,10 @@ func createJobGroup(_ ratelimiter.RateLimiter) *jobs.JobGroup {
 }
 
 // createOlricLimiters creates a set of Olric limiters.
-func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, leakInterval time.Duration) []ratelimiter.RateLimiter {
+func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, interval time.Duration) []ratelimiter.RateLimiter {
 	var limiters []ratelimiter.RateLimiter
 	for _, distCache := range cl.members {
-		limiter, err := newTestLimiter(t, distCache, limit, leakInterval)
+		limiter, err := newTestLimiter(t, distCache, limit, interval)
 		if err != nil {
 			t.Logf("Error creating limiter: %v", err)
 			t.FailNow()
@@ -309,7 +309,7 @@ type testConfig struct {
 	flows                 []*flow
 	numOlrics             int
 	limit                 float64
-	leakInterval          time.Duration
+	interval              time.Duration
 	tolerance             float64
 	duration              time.Duration
 	syncDuration          time.Duration
@@ -320,7 +320,7 @@ type testConfig struct {
 func baseOfLimiterTest(config testConfig) {
 	var fr *flowRunner
 	var lazySyncLimiters []ratelimiter.RateLimiter
-	leaks := int32(config.duration / config.leakInterval)
+	leaks := int32(config.duration / config.interval)
 	t := config.t
 	cl := newTestDistCacheCluster(t, config.numOlrics)
 
@@ -329,7 +329,7 @@ func baseOfLimiterTest(config testConfig) {
 		t.FailNow()
 	}
 
-	limiters := createOlricLimiters(t, cl, config.limit, config.leakInterval)
+	limiters := createOlricLimiters(t, cl, config.limit, config.interval)
 
 	if config.enableLazySyncLimiter {
 		limiters = createLazySyncLimiters(t, limiters, config.syncDuration)
@@ -356,22 +356,22 @@ func baseOfLimiterTest(config testConfig) {
 	closeTestDistCacheCluster(t, cl)
 }
 
-// TestOlricLimiterWithBasicLimit tests the basic limit functionality of the limiter and if it accepts the limit of requests sent within leakInterval.
+// TestOlricLimiterWithBasicLimit tests the basic limit functionality of the limiter and if it accepts the limit of requests sent within interval.
 func TestOlricLimiterWithBasicLimit(t *testing.T) {
 	flows := []*flow{
 		{requestlabel: "user-0", requestRate: 50},
 	}
 	baseOfLimiterTest(testConfig{
-		t:            t,
-		numOlrics:    1,
-		limit:        10,
-		leakInterval: time.Second * 1,
-		flows:        flows,
-		duration:     time.Second * 10,
+		t:         t,
+		numOlrics: 1,
+		limit:     10,
+		interval:  time.Second * 1,
+		flows:     flows,
+		duration:  time.Second * 10,
 	})
 }
 
-// TestOlricClusterMultiLimiter tests the behavior of a cluster of OlricLimiter and if it accepts the limit of requests sent within a given leakInterval.
+// TestOlricClusterMultiLimiter tests the behavior of a cluster of OlricLimiter and if it accepts the limit of requests sent within a given interval.
 func TestOlricClusterMultiLimiter(t *testing.T) {
 	flows := []*flow{
 		{requestlabel: "user-0", requestRate: 200},
@@ -380,16 +380,16 @@ func TestOlricClusterMultiLimiter(t *testing.T) {
 		{requestlabel: "user-3", requestRate: 90},
 	}
 	baseOfLimiterTest(testConfig{
-		t:            t,
-		numOlrics:    6,
-		limit:        10,
-		leakInterval: time.Second * 1,
-		flows:        flows,
-		duration:     time.Second * 10,
+		t:         t,
+		numOlrics: 6,
+		limit:     10,
+		interval:  time.Second * 1,
+		flows:     flows,
+		duration:  time.Second * 10,
 	})
 }
 
-// TestLazySyncClusterLimiter tests the lazy sync limiter which has a non-determistic behavior and results may vary for each run.
+// TestLazySyncClusterLimiter tests the lazy sync limiter which has a non-deterministic behavior and results may vary for each run.
 // In order to pass the test, a 5% tolerance is allowed.
 func TestLazySyncClusterLimiter(t *testing.T) {
 	flows := []*flow{
@@ -401,7 +401,7 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 		t:                     t,
 		numOlrics:             3,
 		limit:                 10,
-		leakInterval:          time.Second * 1,
+		interval:              time.Second * 1,
 		flows:                 flows,
 		duration:              time.Second * 10,
 		enableLazySyncLimiter: true,

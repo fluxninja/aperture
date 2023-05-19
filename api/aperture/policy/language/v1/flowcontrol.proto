@@ -490,7 +490,7 @@ message RateLimiter {
       // Enables lazy sync
       bool enabled = 1; // @gotags: default:"false"
 
-      // Number of times to lazy sync within the `leak_interval`.
+      // Number of times to lazy sync within the `interval`.
       uint32 num_sync = 2; // @gotags: default:"4" validate:"gt=0"
     }
     // Specifies which label the rate limiter should be keyed by.
@@ -509,9 +509,9 @@ message RateLimiter {
     // The label value must be a valid uint64 number.
     string tokens_label_key = 2; // @gotags: default:"tokens"
 
-    // Leak interval defines the time interval in which the leaky bucket
+    // Interval defines the time interval in which the leaky bucket
     // will leak tokens specified by `leak_amount` signal.
-    google.protobuf.Duration leak_interval = 3; // @gotags: validate:"required"
+    google.protobuf.Duration interval = 3; // @gotags: validate:"required"
 
     // Max idle time before leaky bucket state for a label is removed.
     // If set to 0, the state is never removed.
@@ -526,7 +526,7 @@ message RateLimiter {
     // Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
     // and all requests are allowed.
     InPort bucket_capacity = 1; // @gotags: validate:"required"
-    // Number of tokens to leak per `leak_interval`.
+    // Number of tokens to leak per `interval`.
     InPort leak_amount = 2; // @gotags: validate:"required"
   }
 

@@ -2793,7 +2793,7 @@
         },
         "leak_amount": {
           "$ref": "#/definitions/InPort",
-          "description": "Number of tokens to leak per `leak_interval`.\n\n",
+          "description": "Number of tokens to leak per `interval`.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 1
         }
@@ -2804,21 +2804,21 @@
     },
     "RateLimiterParameters": {
       "properties": {
-        "label_key": {
-          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
+        "interval": {
+          "description": "Interval defines the time interval in which the leaky bucket\nwill leak tokens specified by `leak_amount` signal.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 0
         },
+        "label_key": {
+          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
         "lazy_sync": {
           "$ref": "#/definitions/RateLimiterParametersLazySync",
           "title": "Configuration of lazy-syncing behavior of rate limiter",
-          "x-order": 1
-        },
-        "leak_interval": {
-          "description": "Leak interval defines the time interval in which the leaky bucket\nwill leak tokens specified by `leak_amount` signal.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "max_idle_time": {
@@ -2836,7 +2836,7 @@
           "x-order": 4
         }
       },
-      "required": ["label_key", "leak_interval"],
+      "required": ["interval", "label_key"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2851,7 +2851,7 @@
         },
         "num_sync": {
           "default": 4,
-          "description": "Number of times to lazy sync within the `leak_interval`.\n\n",
+          "description": "Number of times to lazy sync within the `interval`.\n\n",
           "exclusiveMinimum": 0,
           "format": "int64",
           "type": "integer",

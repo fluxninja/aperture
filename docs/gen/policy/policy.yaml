@@ -2926,7 +2926,7 @@ definitions:
         $ref: '#/definitions/InPort'
       leak_amount:
         description: |+
-          Number of tokens to leak per `leak_interval`.
+          Number of tokens to leak per `interval`.
 
         x-go-tag-validate: required
         x-order: 1
@@ -2934,9 +2934,17 @@ definitions:
   RateLimiterParameters:
     type: object
     required:
+    - interval
     - label_key
-    - leak_interval
     properties:
+      interval:
+        description: |+
+          Interval defines the time interval in which the leaky bucket
+          will leak tokens specified by `leak_amount` signal.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 0
       label_key:
         description: |+
           Specifies which label the rate limiter should be keyed by.
@@ -2949,19 +2957,11 @@ definitions:
 
         type: string
         x-go-tag-validate: required
-        x-order: 0
+        x-order: 1
       lazy_sync:
         title: Configuration of lazy-syncing behavior of rate limiter
-        x-order: 1
-        $ref: '#/definitions/RateLimiterParametersLazySync'
-      leak_interval:
-        description: |+
-          Leak interval defines the time interval in which the leaky bucket
-          will leak tokens specified by `leak_amount` signal.
-
-        type: string
-        x-go-tag-validate: required
         x-order: 2
+        $ref: '#/definitions/RateLimiterParametersLazySync'
       max_idle_time:
         description: |+
           Max idle time before leaky bucket state for a label is removed.
@@ -2994,7 +2994,7 @@ definitions:
         x-order: 0
       num_sync:
         description: |+
-          Number of times to lazy sync within the `leak_interval`.
+          Number of times to lazy sync within the `interval`.
 
         type: integer
         format: int64

@@ -82,8 +82,8 @@ spec:
             leak_amount:
               signal_name: RATE_LIMIT
           parameters:
+            interval: 1s
             label_key: http.request.header.user_id
-            leak_interval: 1s
           selectors:
           - control_point: service1-demo-app
             label_matcher:

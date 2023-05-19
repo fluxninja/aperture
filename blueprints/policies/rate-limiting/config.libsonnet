@@ -14,7 +14,7 @@
     * @param (policy.rate_limiter.selectors: []aperture.spec.v1.Selector) Flow selectors to match requests against
     * @param (policy.rate_limiter.parameters: aperture.spec.v1.RateLimiterParameters) Parameters.
     * @param (policy.rate_limiter.parameters.label_key: string required) Flow label to use for rate limiting.
-    * @param (policy.rate_limiter.parameters.leak_interval: string required) Leak interval e.g. "1s".
+    * @param (policy.rate_limiter.parameters.interval: string required) Leak interval e.g. "1s".
     */
     rate_limiter: {
       bucket_capacity: '__REQUIRED_FIELD__',
@@ -25,7 +25,7 @@
       }],
       parameters: {
         label_key: '__REQUIRED_FIELD__',
-        leak_interval: '__REQUIRED_FIELD__',
+        interval: '__REQUIRED_FIELD__',
       },
     },
   },

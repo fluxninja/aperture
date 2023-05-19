@@ -9,7 +9,7 @@ policy:
         service: service-graphql-demo-app.demoapp.svc.cluster.local
     parameters:
       label_key: user_id
-      leak_interval: 1s
+      interval: 1s
   classifiers:
     - selectors:
         - control_point: ingress

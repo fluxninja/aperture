@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withInterval(interval):: {
+    interval: interval,
+  },
+  withIntervalMixin(interval):: {
+    interval+: interval,
+  },
   withLabelKey(label_key):: {
     label_key: label_key,
   },
@@ -12,12 +18,6 @@
   },
   withLazySyncMixin(lazy_sync):: {
     lazy_sync+: lazy_sync,
-  },
-  withLeakInterval(leak_interval):: {
-    leak_interval: leak_interval,
-  },
-  withLeakIntervalMixin(leak_interval):: {
-    leak_interval+: leak_interval,
   },
   withMaxIdleTime(max_idle_time):: {
     max_idle_time: max_idle_time,

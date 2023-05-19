@@ -247,7 +247,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			rl.inner, err = leakybucket.NewLeakyBucket(
 				rl.lbFactory.distCache,
 				rl.name,
-				rl.lbProto.Parameters.GetLeakInterval().AsDuration(),
+				rl.lbProto.Parameters.GetInterval().AsDuration(),
 				rl.lbProto.Parameters.GetMaxIdleTime().AsDuration(),
 			)
 			if err != nil {
@@ -258,7 +258,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			// check whether lazy limiter is enabled
 			if lazySyncConfig := rl.lbProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					lazySyncInterval := time.Duration(int64(rl.lbProto.Parameters.GetLeakInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
+					lazySyncInterval := time.Duration(int64(rl.lbProto.Parameters.GetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
 					rl.limiter, err = lazysync.NewLazySyncRateLimiter(rl.limiter,
 						lazySyncInterval,
 						rl.lbFactory.lazySyncJobGroup)
