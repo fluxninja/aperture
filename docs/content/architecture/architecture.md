@@ -57,7 +57,7 @@ applications.
 
 ### Aperture Agents
 
-Aperture Agents are the workhorses of the platform as they provide powerful flow
+Aperture Agents are the workhorses of the platform, providing powerful flow
 control components such as a weighted fair queuing scheduler for workload
 prioritization and a distributed rate-limiter for abuse prevention.
 
