@@ -47,7 +47,7 @@ definitions:
                 x-go-tag-json: name
         title: AlertManagerClientConfig config for single alertmanager client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/alertmanager/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/alert-manager/config
     AlertManagerConfig:
         properties:
             clients:
@@ -58,7 +58,7 @@ definitions:
                 x-go-tag-json: clients,omitempty
         title: AlertManagerConfig main level config for alertmanager.
         type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/alertmanager/config
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/alert-manager/config
     AlerterConfig:
         properties:
             channel_size:

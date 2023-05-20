@@ -14,7 +14,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 )
 
 // watcher holds the state of the watcher.

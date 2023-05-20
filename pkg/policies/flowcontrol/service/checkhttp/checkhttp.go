@@ -32,9 +32,9 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
 	checkhttp_baggage "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp/baggage"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 )
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)

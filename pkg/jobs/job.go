@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	jobsconfig "github.com/fluxninja/aperture/v2/pkg/jobs/config"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 	"github.com/reugn/go-quartz/quartz"
 )

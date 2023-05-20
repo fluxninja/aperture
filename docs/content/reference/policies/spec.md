@@ -6033,8 +6033,7 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Capacity of the bucket. If this capacity is negative, then the bucket is
-unbounded and all requests are allowed.
+Capacity of the bucket.
 
 </dd>
 <dt>fill_amount</dt>
@@ -6047,6 +6046,18 @@ unbounded and all requests are allowed.
 <!-- vale on -->
 
 Number of tokens to fill within an `interval`.
+
+</dd>
+<dt>pass_through</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+PassThrough port determines whether all requests
 
 </dd>
 </dl>

@@ -3210,8 +3210,7 @@ definitions:
             bucket_capacity:
                 $ref: '#/definitions/InPort'
                 description: |+
-                    Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
-                    and all requests are allowed.
+                    Capacity of the bucket.
 
                 x-go-tag-validate: required
             fill_amount:
@@ -3220,6 +3219,9 @@ definitions:
                     Number of tokens to fill within an `interval`.
 
                 x-go-tag-validate: required
+            pass_through:
+                $ref: '#/definitions/InPort'
+                title: PassThrough port determines whether all requests
         title: Inputs for the RateLimiter component
         type: object
     RateLimiterParameters:

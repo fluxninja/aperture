@@ -19,10 +19,10 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
-	"github.com/fluxninja/aperture/v2/pkg/multimatcher"
+	multimatcher "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
+	"github.com/fluxninja/aperture/v2/pkg/scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 

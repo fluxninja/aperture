@@ -14,7 +14,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 

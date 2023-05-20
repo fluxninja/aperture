@@ -2918,8 +2918,7 @@ definitions:
     properties:
       bucket_capacity:
         description: |+
-          Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
-          and all requests are allowed.
+          Capacity of the bucket.
 
         x-go-tag-validate: required
         x-order: 0
@@ -2930,6 +2929,10 @@ definitions:
 
         x-go-tag-validate: required
         x-order: 1
+        $ref: '#/definitions/InPort'
+      pass_through:
+        title: PassThrough port determines whether all requests
+        x-order: 2
         $ref: '#/definitions/InPort'
   RateLimiterParameters:
     type: object

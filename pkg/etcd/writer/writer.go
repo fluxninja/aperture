@@ -6,7 +6,7 @@ import (
 
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/lukejoshuapark/infchan"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )

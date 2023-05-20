@@ -381,6 +381,8 @@ func (m *RateLimiterDecision) validate(all bool) error {
 
 	// no validation rules for FillAmount
 
+	// no validation rules for PassThrough
+
 	if len(errors) > 0 {
 		return RateLimiterDecisionMultiError(errors)
 	}

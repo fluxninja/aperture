@@ -17,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime/tristate"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
@@ -136,10 +137,10 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	bucketCapacity := inPortReadings.ReadSingleReadingPort("bucket_capacity")
 	fillAmount := inPortReadings.ReadSingleReadingPort("fill_amount")
+	ptBool := tristate.FromReading(inPortReadings.ReadSingleReadingPort("pass_through"))
 
 	decision := &policysyncv1.RateLimiterDecision{
-		BucketCapacity: -1,
-		FillAmount:     0,
+		PassThrough: true,
 	}
 	if !bucketCapacity.Valid() || !fillAmount.Valid() {
 		return nil, limiterSync.publishDecision(decision)
@@ -147,6 +148,7 @@ func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToReading
 
 	decision.BucketCapacity = bucketCapacity.Value()
 	decision.FillAmount = fillAmount.Value()
+	decision.PassThrough = ptBool.IsTrue()
 
 	return nil, limiterSync.publishDecision(decision)
 }

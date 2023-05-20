@@ -527,11 +527,12 @@ message RateLimiter {
 
   // Inputs for the RateLimiter component
   message Ins {
-    // Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
-    // and all requests are allowed.
+    // Capacity of the bucket.
     InPort bucket_capacity = 1; // @gotags: validate:"required"
     // Number of tokens to fill within an `interval`.
     InPort fill_amount = 2; // @gotags: validate:"required"
+    // PassThrough port determines whether all requests
+    InPort pass_through = 3;
   }
 
   // Input ports for the RateLimiter component

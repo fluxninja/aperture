@@ -7,7 +7,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/fluxmeter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 )
 
 // Module returns the fx options for dataplane side pieces of policy.

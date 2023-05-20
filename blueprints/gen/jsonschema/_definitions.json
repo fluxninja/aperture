@@ -2787,7 +2787,7 @@
       "properties": {
         "bucket_capacity": {
           "$ref": "#/definitions/InPort",
-          "description": "Capacity of the bucket. If this capacity is negative, then the bucket is unbounded\nand all requests are allowed.\n\n",
+          "description": "Capacity of the bucket.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 0
         },
@@ -2796,6 +2796,11 @@
           "description": "Number of tokens to fill within an `interval`.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 1
+        },
+        "pass_through": {
+          "$ref": "#/definitions/InPort",
+          "title": "PassThrough port determines whether all requests",
+          "x-order": 2
         }
       },
       "title": "Inputs for the RateLimiter component",
