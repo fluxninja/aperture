@@ -13,7 +13,7 @@ spec:
             bucket_capacity:
               constant_signal:
                 value: 40
-            leak_amount:
+            fill_amount:
               constant_signal:
                 value: 2
           parameters:

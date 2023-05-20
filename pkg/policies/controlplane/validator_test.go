@@ -163,7 +163,7 @@ spec:
           in_ports:
             bucket_capacity:
               signal_name: RATE_LIMIT
-            leak_amount:
+            fill_amount:
               signal_name: RATE_LIMIT
           parameters:
             label_key: http.request.header.user_id
@@ -295,7 +295,7 @@ spec:
             in_ports:
               bucket_capacity:
                 signal_name: "RATE_LIMIT"
-              leak_amount:
+              fill_amount:
                 signal_name: "RATE_LIMIT"
             selectors:
               - control_point: "ingress"

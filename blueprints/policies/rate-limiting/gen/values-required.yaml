@@ -15,10 +15,10 @@ policy:
     # Type: float64
     # Required: True
     bucket_capacity: __REQUIRED_FIELD__
-    # Leak amount.
+    # Fill amount.
     # Type: float64
     # Required: True
-    leak_amount: __REQUIRED_FIELD__
+    fill_amount: __REQUIRED_FIELD__
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     selectors:
@@ -31,7 +31,7 @@ policy:
       # Type: string
       # Required: True
       label_key: __REQUIRED_FIELD__
-      # Leak interval e.g. "1s".
+      # Fill interval e.g. "1s".
       # Type: string
       # Required: True
       interval: __REQUIRED_FIELD__

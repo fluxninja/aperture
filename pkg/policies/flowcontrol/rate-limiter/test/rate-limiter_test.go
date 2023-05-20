@@ -23,18 +23,18 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
 	lazysync "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/lazy-sync"
-	leakybucket "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/leaky-bucket"
+	tokenbucket "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, interval time.Duration) (ratelimiter.RateLimiter, error) {
-	limiter, err := leakybucket.NewLeakyBucket(distCache, "Limiter", interval, time.Hour)
+	limiter, err := tokenbucket.NewTokenBucket(distCache, "Limiter", interval, time.Hour, true)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
 	}
 	limiter.SetRateLimit(limit)
-	limiter.SetLeakAmount(limit)
+	limiter.SetFillAmount(limit)
 
 	t.Logf("Successfully created new Limiter")
 	return limiter, nil
@@ -261,18 +261,18 @@ func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, sy
 }
 
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
-func checkResults(t *testing.T, fr *flowRunner, leaks float64, tolerance float64) {
+func checkResults(t *testing.T, fr *flowRunner, fills float64, tolerance float64) {
 	for _, f := range fr.flows {
 		// calculate expected requests taking into account the burst capacity in the limiter
-		actualRequestsExpected := int32(math.Min(float64(f.limit)*(leaks), float64(f.totalRequests)))
+		actualRequestsExpected := int32(math.Min(float64(f.limit)*(fills), float64(f.totalRequests)))
 		if actualRequestsExpected != f.totalRequests {
 			// add burst capacity
 			actualRequestsExpected += f.limit
 		}
-		t.Logf("flow (%s) @ %d requests/sec: \n leaks=%f, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
+		t.Logf("flow (%s) @ %d requests/sec: \n fills=%f, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
 			f.requestlabel,
 			f.requestRate,
-			leaks,
+			fills,
 			f.totalRequests,
 			f.limit,
 			f.acceptedRequests,
@@ -352,9 +352,9 @@ func baseOfLimiterTest(config testConfig) {
 	fr.runFlows(t)
 	end := time.Now()
 
-	leaks := float64(end.Sub(start)) / float64(config.interval)
+	fills := float64(end.Sub(start)) / float64(config.interval)
 
-	checkResults(t, fr, leaks, config.tolerance)
+	checkResults(t, fr, fills, config.tolerance)
 
 	if config.enableLazySyncLimiter {
 		closeLimiters(t, lazySyncLimiters)
@@ -376,6 +376,7 @@ func TestOlricLimiterWithBasicLimit(t *testing.T) {
 		interval:  time.Second * 1,
 		flows:     flows,
 		duration:  time.Second * 10,
+		tolerance: 0.1,
 	})
 }
 
@@ -394,6 +395,7 @@ func TestOlricClusterMultiLimiter(t *testing.T) {
 		interval:  time.Second * 1,
 		flows:     flows,
 		duration:  time.Second * 10,
+		tolerance: 0.1,
 	})
 }
 

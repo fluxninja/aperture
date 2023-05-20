@@ -27,7 +27,7 @@
         "rate_limiter": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["bucket_capacity", "leak_amount", "parameters"],
+          "required": ["bucket_capacity", "fill_amount", "parameters"],
           "properties": {
             "bucket_capacity": {
               "description": "Bucket capacity.",
@@ -35,8 +35,8 @@
               "type": "number",
               "format": "double"
             },
-            "leak_amount": {
-              "description": "Leak amount.",
+            "fill_amount": {
+              "description": "Fill amount.",
               "default": "__REQUIRED_FIELD__",
               "type": "number",
               "format": "double"

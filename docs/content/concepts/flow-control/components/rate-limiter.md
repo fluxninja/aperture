@@ -12,7 +12,7 @@ See also [_Rate Limiter_ reference][reference]
 The _Rate Limiter_ is a powerful component that can be used to prevent recurring
 overloads by proactively regulating heavy-hitters. It achieves this by accepting
 or rejecting incoming flows based on per-label limits, which are configured
-using the [leaky bucket algorithm](https://en.wikipedia.org/wiki/Leaky_bucket).
+using the [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket).
 The _Rate Limiter_ is a component of Aperture's [policy][policies] system, and
 it can be configured to work with different labels and limits depending on the
 needs of your application.
@@ -27,26 +27,26 @@ seamless coordination and control across agents. The agents within an [agent
 group][agent-group] constantly share state and detect failures using a gossip
 protocol.
 
-### Leaky Bucket Algorithm {#leaky-bucket-algorithm}
+### Token Bucket Algorithm {#token-bucket-algorithm}
 
-This algorithm lets users make an unlimited number of requests in infrequent
-bursts over time. The main points to understand about the leaky bucket metaphor
-are as follows:
+This algorithm allows users to execute a substantial number of requests in
+bursts, and then continue at a steady rate. Here are the key points to
+understand about the token bucket metaphor:
 
-- Each user (or any flow label) has access to a bucket. It can hold, say, 60
-  “marbles”.
-- Each second, a marble is removed from the bucket (if there are any). That way
-  there’s always more room.
-- Each API request requires the user to toss a marble in the bucket.
-- If the bucket gets full, the user gets an error and has to wait for room to
-  become available in the bucket.
+- Each user (or any flow label) has access to a bucket, which can hold, say, 60
+  "tokens".
+- Every second, a token is added to the bucket (if there's room). In this way,
+  the bucket is steadily refilled over time.
+- Each API request requires the user to remove a token from the bucket.
+- If the bucket is empty, the user gets an error and has to wait for new tokens
+  to be added to the bucket before making more requests.
 
-This model ensures that apps that manage API calls responsibly will always have
-room in their buckets to make a burst of requests if needed. For example, if
-users average 20 requests (“marbles”) per second but suddenly need to make 30
-requests all at once, users can still do so without hitting their rate limit.
-The basic principles of the leaky bucket algorithm apply to all our rate limits,
-regardless of the specific methods used to apply them.
+This model ensures that apps that handle API calls judiciously will always have
+a supply of tokens for a burst of requests when necessary. For example, if users
+average 20 requests ("tokens") per second but suddenly need to make 30 requests
+at once, users can do so if they have accumulated enough tokens. The basic
+principles of the token bucket algorithm apply to all our rate limits,
+regardless of the specific methods used to implement them.
 
 ### Lazy Syncing {#lazy-syncing}
 

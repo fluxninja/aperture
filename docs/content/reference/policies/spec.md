@@ -2609,7 +2609,7 @@ queue in front of the service using Weighted Fair Queuing.
 <!-- vale on -->
 
 _Rate Limiter_ provides service protection by applying rate limits using the
-leaky bucket algorithm.
+token bucket algorithm.
 
 </dd>
 <dt>regulator</dt>
@@ -5972,7 +5972,7 @@ See also
 :::
 
 RateLimiting is done on per-label-value (`label_key`) basis and it uses the
-_Leaky Bucket Algorithm_.
+_Token Bucket Algorithm_.
 
 <dl>
 <dt>in_ports</dt>
@@ -6021,7 +6021,7 @@ Selectors for the component.
 
 <!-- vale on -->
 
-Inputs for the LeakyBucketRateLimiter component
+Inputs for the RateLimiter component
 
 <dl>
 <dt>bucket_capacity</dt>
@@ -6037,7 +6037,7 @@ Capacity of the bucket. If this capacity is negative, then the bucket is
 unbounded and all requests are allowed.
 
 </dd>
-<dt>leak_amount</dt>
+<dt>fill_amount</dt>
 <dd>
 
 <!-- vale off -->
@@ -6046,7 +6046,7 @@ unbounded and all requests are allowed.
 
 <!-- vale on -->
 
-Number of tokens to leak per `interval`.
+Number of tokens to fill within an `interval`.
 
 </dd>
 </dl>
@@ -6060,6 +6060,19 @@ Number of tokens to leak per `interval`.
 <!-- vale on -->
 
 <dl>
+<dt>continuous_fill</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Continuous fill determines whether the token bucket should be filled
+continuously or only on discrete intervals.
+
+</dd>
 <dt>interval</dt>
 <dd>
 
@@ -6069,8 +6082,8 @@ Number of tokens to leak per `interval`.
 
 <!-- vale on -->
 
-Interval defines the time interval in which the leaky bucket will leak tokens
-specified by `leak_amount` signal.
+Interval defines the time interval in which the token bucket will fill tokens
+specified by `fill_amount` signal.
 
 </dd>
 <dt>label_key</dt>
@@ -6111,7 +6124,7 @@ Configuration of lazy-syncing behavior of rate limiter
 
 <!-- vale on -->
 
-Max idle time before leaky bucket state for a label is removed. If set to 0, the
+Max idle time before token bucket state for a label is removed. If set to 0, the
 state is never removed.
 
 </dd>

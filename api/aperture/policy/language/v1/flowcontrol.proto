@@ -452,8 +452,8 @@ message PathTemplateMatcher {
 // _Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
 message FlowControl {
   oneof component {
-    // _Rate Limiter_ provides service protection by applying rate limits using the leaky bucket algorithm.
-    RateLimiter rate_limiter = 2;
+    // _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
+    RateLimiter rate_limiter = 6;
 
     // _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
     LoadScheduler load_scheduler = 7;
@@ -483,7 +483,7 @@ message FlowControl {
 //
 // :::
 //
-// RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Leaky Bucket Algorithm_.
+// RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
 message RateLimiter {
   message Parameters {
     message LazySync {
@@ -509,25 +509,29 @@ message RateLimiter {
     // The label value must be a valid uint64 number.
     string tokens_label_key = 2; // @gotags: default:"tokens"
 
-    // Interval defines the time interval in which the leaky bucket
-    // will leak tokens specified by `leak_amount` signal.
+    // Interval defines the time interval in which the token bucket
+    // will fill tokens specified by `fill_amount` signal.
     google.protobuf.Duration interval = 3; // @gotags: validate:"required"
 
-    // Max idle time before leaky bucket state for a label is removed.
+    // Continuous fill determines whether the token bucket should be filled
+    // continuously or only on discrete intervals.
+    bool continuous_fill = 4; // @gotags: default:"true"
+
+    // Max idle time before token bucket state for a label is removed.
     // If set to 0, the state is never removed.
-    google.protobuf.Duration max_idle_time = 4; // @gotags: default:"7200s"
+    google.protobuf.Duration max_idle_time = 5; // @gotags: default:"7200s"
 
     // Configuration of lazy-syncing behavior of rate limiter
-    LazySync lazy_sync = 5;
+    LazySync lazy_sync = 6;
   }
 
-  // Inputs for the LeakyBucketRateLimiter component
+  // Inputs for the RateLimiter component
   message Ins {
     // Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
     // and all requests are allowed.
     InPort bucket_capacity = 1; // @gotags: validate:"required"
-    // Number of tokens to leak per `interval`.
-    InPort leak_amount = 2; // @gotags: validate:"required"
+    // Number of tokens to fill within an `interval`.
+    InPort fill_amount = 2; // @gotags: validate:"required"
   }
 
   // Input ports for the RateLimiter component

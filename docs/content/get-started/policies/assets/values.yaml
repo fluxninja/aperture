@@ -19,7 +19,7 @@ policy:
     # Leak amount.
     # Type: float64
     # Required: True
-    leak_amount: 2
+    fill_amount: 2
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     selectors:

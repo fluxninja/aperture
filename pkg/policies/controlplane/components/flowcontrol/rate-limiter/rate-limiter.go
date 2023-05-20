@@ -135,18 +135,18 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 // Execute implements runtime.Component.Execute.
 func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	bucketCapacity := inPortReadings.ReadSingleReadingPort("bucket_capacity")
-	leakAmount := inPortReadings.ReadSingleReadingPort("leak_amount")
+	fillAmount := inPortReadings.ReadSingleReadingPort("fill_amount")
 
 	decision := &policysyncv1.RateLimiterDecision{
 		BucketCapacity: -1,
-		LeakAmount:     0,
+		FillAmount:     0,
 	}
-	if !bucketCapacity.Valid() || !leakAmount.Valid() {
+	if !bucketCapacity.Valid() || !fillAmount.Valid() {
 		return nil, limiterSync.publishDecision(decision)
 	}
 
 	decision.BucketCapacity = bucketCapacity.Value()
-	decision.LeakAmount = leakAmount.Value()
+	decision.FillAmount = fillAmount.Value()
 
 	return nil, limiterSync.publishDecision(decision)
 }

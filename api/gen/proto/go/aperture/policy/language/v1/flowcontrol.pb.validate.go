@@ -4213,6 +4213,8 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ContinuousFill
+
 	if all {
 		switch v := interface{}(m.GetMaxIdleTime()).(type) {
 		case interface{ ValidateAll() error }:
@@ -4403,11 +4405,11 @@ func (m *RateLimiter_Ins) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetLeakAmount()).(type) {
+		switch v := interface{}(m.GetFillAmount()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "LeakAmount",
+					field:  "FillAmount",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -4415,16 +4417,16 @@ func (m *RateLimiter_Ins) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "LeakAmount",
+					field:  "FillAmount",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetLeakAmount()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetFillAmount()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimiter_InsValidationError{
-				field:  "LeakAmount",
+				field:  "FillAmount",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

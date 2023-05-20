@@ -26,7 +26,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
 	lazysync "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/lazy-sync"
-	leakybucket "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/leaky-bucket"
+	tokenbucket "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
@@ -208,7 +208,7 @@ type rateLimiter struct {
 	registry  status.Registry
 	lbFactory *rateLimiterFactory
 	limiter   ratelimiter.RateLimiter
-	inner     *leakybucket.LeakyBucketRateLimiter
+	inner     *tokenbucket.TokenBucketRateLimiter
 	lbProto   *policylangv1.RateLimiter
 	name      string
 }
@@ -244,11 +244,12 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			rl.inner, err = leakybucket.NewLeakyBucket(
+			rl.inner, err = tokenbucket.NewTokenBucket(
 				rl.lbFactory.distCache,
 				rl.name,
 				rl.lbProto.Parameters.GetInterval().AsDuration(),
 				rl.lbProto.Parameters.GetMaxIdleTime().AsDuration(),
+				rl.lbProto.Parameters.GetContinuousFill(),
 			)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
@@ -412,7 +413,7 @@ func (rl *rateLimiter) decisionUpdateCallback(event notifiers.Event, unmarshalle
 	}
 	limitDecision := wrapperMessage.RateLimiterDecision
 	rl.limiter.SetRateLimit(limitDecision.BucketCapacity)
-	rl.inner.SetLeakAmount(limitDecision.LeakAmount)
+	rl.inner.SetFillAmount(limitDecision.FillAmount)
 }
 
 // GetLimiterID returns the limiter ID.

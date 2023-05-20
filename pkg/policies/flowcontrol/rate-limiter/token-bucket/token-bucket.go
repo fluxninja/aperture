@@ -1,8 +1,6 @@
-package leakybucket
+package tokenbucket
 
 import (
-	"bytes"
-	"encoding/gob"
 	"sync"
 	"time"
 
@@ -20,29 +18,32 @@ const (
 	TakeNFunction = "TakeN"
 )
 
-// LeakyBucketRateLimiter implements Limiter.
-type LeakyBucketRateLimiter struct {
+// TokenBucketRateLimiter implements Limiter.
+type TokenBucketRateLimiter struct {
 	mu             sync.RWMutex
 	dMap           *olric.DMap
 	name           string
 	bucketCapacity float64
-	leakAmount     float64
+	fillAmount     float64
 	interval       time.Duration
+	continuousFill bool
 }
 
-// NewLeakyBucket creates a new instance of DistCacheRateTracker.
-func NewLeakyBucket(dc *distcache.DistCache,
+// NewTokenBucket creates a new instance of DistCacheRateTracker.
+func NewTokenBucket(dc *distcache.DistCache,
 	name string,
 	interval time.Duration,
 	maxIdleDuration time.Duration,
-) (*LeakyBucketRateLimiter, error) {
+	continuousFill bool,
+) (*TokenBucketRateLimiter, error) {
 	dc.Mutex.Lock()
 	defer dc.Mutex.Unlock()
 
-	lbrl := &LeakyBucketRateLimiter{
+	lbrl := &TokenBucketRateLimiter{
 		name:           name,
 		interval:       interval,
 		bucketCapacity: -1,
+		continuousFill: continuousFill,
 	}
 
 	dmapConfig := config.DMap{
@@ -65,33 +66,33 @@ func NewLeakyBucket(dc *distcache.DistCache,
 }
 
 // SetRateLimit sets the rate limit for the rate limiter.
-func (lbrl *LeakyBucketRateLimiter) SetRateLimit(rateLimit float64) {
+func (lbrl *TokenBucketRateLimiter) SetRateLimit(rateLimit float64) {
 	lbrl.mu.Lock()
 	defer lbrl.mu.Unlock()
 	lbrl.bucketCapacity = rateLimit
 }
 
 // GetRateLimit returns the rate limit for the rate limiter.
-func (lbrl *LeakyBucketRateLimiter) GetRateLimit() float64 {
+func (lbrl *TokenBucketRateLimiter) GetRateLimit() float64 {
 	lbrl.mu.RLock()
 	defer lbrl.mu.RUnlock()
 	return lbrl.bucketCapacity
 }
 
-// SetLeakAmount sets the default leak amount for the rate limiter.
-func (lbrl *LeakyBucketRateLimiter) SetLeakAmount(leakAmount float64) {
+// SetFillAmount sets the default fill amount for the rate limiter.
+func (lbrl *TokenBucketRateLimiter) SetFillAmount(fillAmount float64) {
 	lbrl.mu.Lock()
 	defer lbrl.mu.Unlock()
-	lbrl.leakAmount = leakAmount
+	lbrl.fillAmount = fillAmount
 }
 
 // Name returns the name of the DistCacheRateTracker.
-func (lbrl *LeakyBucketRateLimiter) Name() string {
+func (lbrl *TokenBucketRateLimiter) Name() string {
 	return lbrl.name
 }
 
 // Close cleans up DMap held within the DistCacheRateTracker.
-func (lbrl *LeakyBucketRateLimiter) Close() error {
+func (lbrl *TokenBucketRateLimiter) Close() error {
 	lbrl.mu.Lock()
 	defer lbrl.mu.Unlock()
 	err := lbrl.dMap.Destroy()
@@ -103,7 +104,7 @@ func (lbrl *LeakyBucketRateLimiter) Close() error {
 
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (lbrl *LeakyBucketRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
+func (lbrl *TokenBucketRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
 	req := request{
 		Want:    n,
 		CanWait: false,
@@ -117,7 +118,7 @@ func (lbrl *LeakyBucketRateLimiter) TakeIfAvailable(label string, n float64) (bo
 
 	resultBytes, err := lbrl.dMap.Function(label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Errorf("error taking from leaky bucket: %v", err)
+		log.Autosample().Errorf("error taking from token bucket: %v", err)
 		return true, 0, 0
 	}
 
@@ -129,12 +130,12 @@ func (lbrl *LeakyBucketRateLimiter) TakeIfAvailable(label string, n float64) (bo
 		return true, 0, 0
 	}
 
-	return resp.Ok, resp.Remaining, resp.Current
+	return resp.Ok, resp.Remaining, resp.Consumed
 }
 
 // Per-label tracking in distributed cache.
-type leakyBucketState struct {
-	LastLeak time.Time
+type tokenBucketState struct {
+	LastFill time.Time
 	Current  float64
 }
 
@@ -145,36 +146,37 @@ type request struct {
 
 type response struct {
 	AvailableAt time.Time
-	Current     float64
+	Consumed    float64
 	Remaining   float64
 	Ok          bool
 }
 
 // takeN takes a number of tokens from the bucket.
-func (lbrl *LeakyBucketRateLimiter) takeN(key string, currentStateBytes, argBytes []byte) ([]byte, []byte, error) {
+func (lbrl *TokenBucketRateLimiter) takeN(key string, currentStateBytes, argBytes []byte) ([]byte, []byte, error) {
 	lbrl.mu.RLock()
 	defer lbrl.mu.RUnlock()
 
 	// Decode currentState from gob encoded currentStateBytes
 	now := time.Now()
-	currentState := leakyBucketState{
-		LastLeak: now,
-	}
+	var currentState tokenBucketState
 
 	if currentStateBytes != nil {
-		buf := bytes.NewBuffer(currentStateBytes)
-		err := gob.NewDecoder(buf).Decode(&currentState)
+		err := utils.UnmarshalGob(currentStateBytes, &currentState)
 		if err != nil {
 			log.Autosample().Errorf("error decoding current state: %v", err)
 			return nil, nil, err
+		}
+	} else {
+		currentState = tokenBucketState{
+			LastFill: now,
+			Current:  lbrl.bucketCapacity,
 		}
 	}
 
 	// Decode arg from gob encoded argBytes
 	var arg request
 	if argBytes != nil {
-		buf := bytes.NewBuffer(argBytes)
-		err := gob.NewDecoder(buf).Decode(&arg)
+		err := utils.UnmarshalGob(argBytes, &arg)
 		if err != nil {
 			log.Autosample().Errorf("error decoding arg: %v", err)
 			return nil, nil, err
@@ -184,63 +186,71 @@ func (lbrl *LeakyBucketRateLimiter) takeN(key string, currentStateBytes, argByte
 	result := response{
 		Ok:          true,
 		AvailableAt: now,
+		Remaining:   -1,
+		Consumed:    -1,
 	}
 
-	// Calculate the time passed since the last leak
-	timeSinceLastLeak := now.Sub(currentState.LastLeak)
+	if lbrl.bucketCapacity >= 0 {
+		// Calculate the time passed since the last fill
+		sinceLastFill := now.Sub(currentState.LastFill)
+		fillAmount := 0.0
 
-	// Calculate the amount to leak based on the time passed and leak rate
-	leakAmount := lbrl.leakAmount * float64(timeSinceLastLeak) / float64(lbrl.interval)
-
-	// Leak the calculated amount
-	currentState.Current -= leakAmount
-	if currentState.Current < 0 {
-		currentState.Current = 0
-	}
-
-	// Update lastLeak
-	currentState.LastLeak = now
-
-	currentState.Current += arg.Want
-	if currentState.Current > lbrl.bucketCapacity {
-		if arg.CanWait {
-			waitTime := time.Duration((currentState.Current - lbrl.bucketCapacity) / lbrl.leakAmount * float64(lbrl.interval))
-			availableAt := now.Add(waitTime)
-			result = response{
-				Ok:          true,
-				AvailableAt: availableAt,
+		if lbrl.continuousFill {
+			fillAmount = lbrl.fillAmount * float64(sinceLastFill) / float64(lbrl.interval)
+			currentState.LastFill = now
+		} else if sinceLastFill >= lbrl.interval {
+			fills := int(sinceLastFill / lbrl.interval)
+			if fills > 0 {
+				fillAmount = lbrl.fillAmount * float64(fills)
+				currentState.LastFill = currentState.LastFill.Add(time.Duration(fills) * lbrl.interval)
 			}
-		} else {
-			result.Ok = false
 		}
-	}
+		// Fill the calculated amount
+		currentState.Current += fillAmount
 
-	// return the tokens to the bucket if the request is not ok
-	if !result.Ok {
+		if currentState.Current > lbrl.bucketCapacity {
+			currentState.Current = lbrl.bucketCapacity
+		}
+
 		currentState.Current -= arg.Want
-	}
 
-	result.Remaining = lbrl.bucketCapacity - currentState.Current
-	result.Current = currentState.Current
+		if currentState.Current < 0 {
+			if arg.CanWait && lbrl.fillAmount > 0 {
+				waitTime := time.Duration(-currentState.Current / lbrl.fillAmount * float64(lbrl.interval))
+				availableAt := now.Add(waitTime)
+				result = response{
+					Ok:          true,
+					AvailableAt: availableAt,
+				}
+			} else {
+				result.Ok = false
+			}
+		}
+
+		// return the tokens to the bucket if the request is not ok
+		if !result.Ok {
+			currentState.Current += arg.Want
+		}
+		result.Remaining = currentState.Current
+		result.Consumed = lbrl.bucketCapacity - currentState.Current
+	}
 
 	// Encode result to gob encoded resultBytes
-	resultBuf := bytes.Buffer{}
-	err := gob.NewEncoder(&resultBuf).Encode(result)
+	resultBytes, err := utils.MarshalGob(result)
 	if err != nil {
 		log.Autosample().Errorf("error encoding result: %v", err)
 		return nil, nil, err
 	}
 
 	// Encode currentState to gob encoded newStateBytes
-	newStateBuf := bytes.Buffer{}
-	err = gob.NewEncoder(&newStateBuf).Encode(currentState)
+	newStateBytes, err := utils.MarshalGob(currentState)
 	if err != nil {
 		log.Autosample().Errorf("error encoding new state: %v", err)
 		return nil, nil, err
 	}
 
-	return newStateBuf.Bytes(), resultBuf.Bytes(), nil
+	return newStateBytes, resultBytes, nil
 }
 
 // Make sure DistCacheRateTracker implements Limiter interface.
-var _ ratelimiter.RateLimiter = (*LeakyBucketRateLimiter)(nil)
+var _ ratelimiter.RateLimiter = (*TokenBucketRateLimiter)(nil)

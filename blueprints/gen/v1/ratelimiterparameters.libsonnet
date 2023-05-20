@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withContinuousFill(continuous_fill):: {
+    continuous_fill: continuous_fill,
+  },
+  withContinuousFillMixin(continuous_fill):: {
+    continuous_fill+: continuous_fill,
+  },
   withInterval(interval):: {
     interval: interval,
   },

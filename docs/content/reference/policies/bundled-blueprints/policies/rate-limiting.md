@@ -9,7 +9,7 @@ sidebar_label: Rate Limiting Policy
 ## Introduction
 
 This blueprint provides a
-[leaky-bucket](https://en.wikipedia.org/wiki/Leaky_bucket) based rate-limiting
+[token bucket](https://en.wikipedia.org/wiki/Token_bucket) based rate-limiting
 policy and a dashboard. This policy uses the
 [`RateLimiter`](/reference/policies/spec.md#rate-limiter) component.
 
@@ -87,11 +87,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-leak-amount"></a>
+<a id="policy-rate-limiter-fill-amount"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.leak_amount'
-    description='Leak amount.'
+    name='policy.rate_limiter.fill_amount'
+    description='Fill amount.'
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'

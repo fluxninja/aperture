@@ -47,7 +47,7 @@ policy:
           }
   rate_limiter:
     bucket_capacity: 40
-    leak_amount: 2
+    fill_amount: 2
     selectors:
       - agent_group: default
         service: service-graphql-demo-app.demoapp.svc.cluster.local

@@ -7,10 +7,10 @@
   withBucketCapacityMixin(bucket_capacity):: {
     bucket_capacity+: bucket_capacity,
   },
-  withLeakAmount(leak_amount):: {
-    leak_amount: leak_amount,
+  withFillAmount(fill_amount):: {
+    fill_amount: fill_amount,
   },
-  withLeakAmountMixin(leak_amount):: {
-    leak_amount+: leak_amount,
+  withFillAmountMixin(fill_amount):: {
+    fill_amount+: fill_amount,
   },
 }

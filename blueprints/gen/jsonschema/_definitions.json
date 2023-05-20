@@ -1185,7 +1185,7 @@
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
-          "description": "_Rate Limiter_ provides service protection by applying rate limits using the leaky bucket algorithm.",
+          "description": "_Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.",
           "x-order": 4
         },
         "regulator": {
@@ -2752,7 +2752,7 @@
       "additionalProperties": false
     },
     "RateLimiter": {
-      "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value (`label_key`) basis and it uses the _Leaky Bucket Algorithm_.",
+      "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.",
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
@@ -2791,49 +2791,56 @@
           "x-go-tag-validate": "required",
           "x-order": 0
         },
-        "leak_amount": {
+        "fill_amount": {
           "$ref": "#/definitions/InPort",
-          "description": "Number of tokens to leak per `interval`.\n\n",
+          "description": "Number of tokens to fill within an `interval`.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 1
         }
       },
-      "title": "Inputs for the LeakyBucketRateLimiter component",
+      "title": "Inputs for the RateLimiter component",
       "type": "object",
       "additionalProperties": false
     },
     "RateLimiterParameters": {
       "properties": {
+        "continuous_fill": {
+          "default": true,
+          "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",
+          "type": "boolean",
+          "x-go-tag-default": "true",
+          "x-order": 0
+        },
         "interval": {
-          "description": "Interval defines the time interval in which the leaky bucket\nwill leak tokens specified by `leak_amount` signal.\n\n",
+          "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-order": 1
         },
         "label_key": {
           "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-order": 2
         },
         "lazy_sync": {
           "$ref": "#/definitions/RateLimiterParametersLazySync",
           "title": "Configuration of lazy-syncing behavior of rate limiter",
-          "x-order": 2
+          "x-order": 3
         },
         "max_idle_time": {
           "default": "7200s",
-          "description": "Max idle time before leaky bucket state for a label is removed.\nIf set to 0, the state is never removed.\n\n",
+          "description": "Max idle time before token bucket state for a label is removed.\nIf set to 0, the state is never removed.\n\n",
           "type": "string",
           "x-go-tag-default": "7200s",
-          "x-order": 3
+          "x-order": 4
         },
         "tokens_label_key": {
           "default": "tokens",
           "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
           "type": "string",
           "x-go-tag-default": "tokens",
-          "x-order": 4
+          "x-order": 5
         }
       },
       "required": ["interval", "label_key"],

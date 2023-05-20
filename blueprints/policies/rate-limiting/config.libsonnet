@@ -10,15 +10,15 @@
     classifiers: [],
     /**
     * @param (policy.rate_limiter.bucket_capacity: float64 required) Bucket capacity.
-    * @param (policy.rate_limiter.leak_amount: float64 required) Leak amount.
+    * @param (policy.rate_limiter.fill_amount: float64 required) Fill amount.
     * @param (policy.rate_limiter.selectors: []aperture.spec.v1.Selector) Flow selectors to match requests against
     * @param (policy.rate_limiter.parameters: aperture.spec.v1.RateLimiterParameters) Parameters.
     * @param (policy.rate_limiter.parameters.label_key: string required) Flow label to use for rate limiting.
-    * @param (policy.rate_limiter.parameters.interval: string required) Leak interval e.g. "1s".
+    * @param (policy.rate_limiter.parameters.interval: string required) Fill interval e.g. "1s".
     */
     rate_limiter: {
       bucket_capacity: '__REQUIRED_FIELD__',
-      leak_amount: '__REQUIRED_FIELD__',
+      fill_amount: '__REQUIRED_FIELD__',
       selectors: [{
         service: '__REQUIRED_FIELD__',
         control_point: '__REQUIRED_FIELD__',

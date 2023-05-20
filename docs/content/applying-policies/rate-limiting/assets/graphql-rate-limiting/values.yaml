@@ -3,7 +3,7 @@ policy:
   policy_name: "graphql-rate-limiting"
   rate_limiter:
     bucket_capacity: 40
-    leak_amount: 2
+    fill_amount: 2
     selectors:
       - control_point: ingress
         service: service-graphql-demo-app.demoapp.svc.cluster.local

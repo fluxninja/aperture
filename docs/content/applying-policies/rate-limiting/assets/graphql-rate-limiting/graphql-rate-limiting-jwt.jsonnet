@@ -18,7 +18,7 @@ local policyResource = RateLimiting({
     rate_limiter+: {
       selectors: svcSelectors,
       bucket_capacity: 40,
-      leak_amount: 2,
+      fill_amount: 2,
       parameters+: {
         label_key: 'user_id',
         interval: '1s',

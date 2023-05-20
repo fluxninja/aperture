@@ -379,7 +379,7 @@ func (m *RateLimiterDecision) validate(all bool) error {
 
 	// no validation rules for BucketCapacity
 
-	// no validation rules for LeakAmount
+	// no validation rules for FillAmount
 
 	if len(errors) > 0 {
 		return RateLimiterDecisionMultiError(errors)

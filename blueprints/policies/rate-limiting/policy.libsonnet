@@ -27,7 +27,7 @@ function(cfg) {
             rateLimiter.new()
             + rateLimiter.withInPorts({
               bucket_capacity: port.withConstantSignal(params.policy.rate_limiter.bucket_capacity),
-              leak_amount: port.withConstantSignal(params.policy.rate_limiter.leak_amount),
+              fill_amount: port.withConstantSignal(params.policy.rate_limiter.fill_amount),
             })
             + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
             + rateLimiter.withParameters(params.policy.rate_limiter.parameters)

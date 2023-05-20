@@ -1333,7 +1333,7 @@ definitions:
         $ref: '#/definitions/LoadScheduler'
       rate_limiter:
         description: _Rate Limiter_ provides service protection by applying rate limits
-          using the leaky bucket algorithm.
+          using the token bucket algorithm.
         $ref: '#/definitions/RateLimiter'
       regulator:
         description: Regulator is a component that regulates the flow of requests
@@ -2829,7 +2829,7 @@ definitions:
 
       :::
 
-      RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Leaky Bucket Algorithm_.
+      RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
     type: object
     title: Limits the traffic on a control point to specified rate
     required:
@@ -2855,7 +2855,7 @@ definitions:
         x-go-tag-validate: required,gt=0,dive
   RateLimiterIns:
     type: object
-    title: Inputs for the LeakyBucketRateLimiter component
+    title: Inputs for the RateLimiter component
     properties:
       bucket_capacity:
         description: |+
@@ -2864,9 +2864,9 @@ definitions:
 
         x-go-tag-validate: required
         $ref: '#/definitions/InPort'
-      leak_amount:
+      fill_amount:
         description: |+
-          Number of tokens to leak per `interval`.
+          Number of tokens to fill within an `interval`.
 
         x-go-tag-validate: required
         $ref: '#/definitions/InPort'
@@ -2876,10 +2876,18 @@ definitions:
     - interval
     - label_key
     properties:
+      continuous_fill:
+        description: |+
+          Continuous fill determines whether the token bucket should be filled
+          continuously or only on discrete intervals.
+
+        type: boolean
+        default: true
+        x-go-tag-default: "true"
       interval:
         description: |+
-          Interval defines the time interval in which the leaky bucket
-          will leak tokens specified by `leak_amount` signal.
+          Interval defines the time interval in which the token bucket
+          will fill tokens specified by `fill_amount` signal.
 
         type: string
         x-go-tag-validate: required
@@ -2900,7 +2908,7 @@ definitions:
         $ref: '#/definitions/RateLimiterParametersLazySync'
       max_idle_time:
         description: |+
-          Max idle time before leaky bucket state for a label is removed.
+          Max idle time before token bucket state for a label is removed.
           If set to 0, the state is never removed.
 
         type: string
