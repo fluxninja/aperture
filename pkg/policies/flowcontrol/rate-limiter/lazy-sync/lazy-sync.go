@@ -2,30 +2,30 @@ package lazysync
 
 import (
 	"context"
+	"math"
 	"sync"
-	"sync/atomic"
 	"time"
-
-	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
+	"google.golang.org/protobuf/proto"
 )
 
 type counter struct {
-	local  int32
-	global int64
+	lock      sync.Mutex
+	nextSync  time.Time
+	available float64
+	credit    float64
 }
 
 // LazySyncRateLimiter is a limiter that syncs its state lazily with another limiter.
 type LazySyncRateLimiter struct {
-	counters      sync.Map
-	limiter       ratelimiter.RateLimiter
-	jobGroup      *jobs.JobGroup
-	name          string
-	syncDuration  time.Duration
-	totalCounters int64
+	counters     sync.Map
+	limiter      ratelimiter.RateLimiter
+	jobGroup     *jobs.JobGroup
+	name         string
+	syncDuration time.Duration
 }
 
 // NewLazySyncRateLimiter creates a new LazySyncLimiter.
@@ -40,11 +40,11 @@ func NewLazySyncRateLimiter(limiter ratelimiter.RateLimiter,
 		syncDuration: syncDuration,
 	}
 
-	job := jobs.NewBasicJob(lsl.name, lsl.sync)
+	job := jobs.NewBasicJob(lsl.name, lsl.audit)
 	// register job with job group
 	err := lsl.jobGroup.RegisterJob(job, jobs.JobConfig{
-		ExecutionPeriod:  config.MakeDuration(syncDuration),
-		ExecutionTimeout: config.MakeDuration(syncDuration),
+		ExecutionPeriod:  config.MakeDuration(syncDuration * 2),
+		ExecutionTimeout: config.MakeDuration(syncDuration * 2),
 	})
 	if err != nil {
 		return nil, err
@@ -73,48 +73,18 @@ func (lsl *LazySyncRateLimiter) SetRateLimit(limit float64) {
 	lsl.limiter.SetRateLimit(limit)
 }
 
-func (lsl *LazySyncRateLimiter) sync(ctx context.Context) (proto.Message, error) {
-	requestDelay := time.Duration(0)
-
-	totalCount := atomic.LoadInt64(&lsl.totalCounters)
-	if totalCount == 0 {
-		return nil, nil
-	}
-
-	// get deadline
-	deadline, ok := ctx.Deadline()
-	if ok {
-		// spread out requests over the deadline
-		duration := time.Until(deadline)
-		// reduce duration by 5ms to account for any processing overheads and the last few sync's
-		duration -= 5 * time.Millisecond
-		// if duration is less than 0, set it to 0
-		if duration < 0 {
-			duration = 0
-		}
-		requestDelay = time.Duration(int64(duration) / totalCount)
-	}
-
-	var i int64
+func (lsl *LazySyncRateLimiter) audit(ctx context.Context) (proto.Message, error) {
+	now := time.Now()
 	// range through the map and sync the counters
 	lsl.counters.Range(func(label, value interface{}) bool {
 		c := value.(*counter)
+		c.lock.Lock()
+		defer c.lock.Unlock()
 
-		// reset the local counter to 0 and asynchronously update the global counter if needed
-		local := atomic.SwapInt32(&c.local, 0)
-		// if local counter is 0, then remove the label from the map
-		if local == 0 {
-			// decrement total counters
-			atomic.AddInt64(&lsl.totalCounters, -1)
+		// if this counter has not synced in a while, then remove it from the map
+		if now.After(c.nextSync.Add(lsl.syncDuration)) {
 			lsl.counters.Delete(label)
-		} else {
-			go func(i int64) {
-				dur := time.Duration(i * int64(requestDelay))
-				time.Sleep(dur)
-				_, _, global := lsl.limiter.TakeIfAvailable(label.(string), float64(local))
-				atomic.StoreInt64(&c.global, int64(global))
-			}(i)
-			i++
+			return true
 		}
 		return true
 	})
@@ -128,13 +98,36 @@ func (lsl *LazySyncRateLimiter) Name() string {
 
 // TakeIfAvailable takes n tokens from the limiter.
 func (lsl *LazySyncRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
+	if lsl.GetRateLimit() < 0 {
+		return true, -1, -1
+	}
+
+	now := time.Now()
+	syncRemote := func(c *counter, n float64) (bool, float64, float64) {
+		ok, waitTime, remaining, current := lsl.limiter.Take(label, c.credit+n)
+		c.credit = 0
+		c.available = remaining
+		if waitTime > 0 {
+			c.nextSync = now.Add(waitTime)
+		} else {
+			c.nextSync = now.Add(lsl.syncDuration)
+		}
+		return ok, remaining, current
+	}
+
 	checkLimit := func(c *counter) (bool, float64, float64) {
-		// atomic increment local counter
-		local := atomic.AddInt32(&c.local, int32(n))
-		total := int(local) + int(atomic.LoadInt64(&c.global))
-		// check limit
-		ok, remaining := ratelimiter.CheckRateLimit(float64(total), lsl.GetRateLimit())
-		return ok, remaining, float64(total)
+		c.lock.Lock()
+		defer c.lock.Unlock()
+		// check if we need to sync
+		if now.After(c.nextSync) {
+			return syncRemote(c, n)
+		}
+
+		if c.credit+n > c.available {
+			return false, math.Max(0, c.available-c.credit), c.credit
+		}
+		c.credit += n
+		return true, math.Max(0, c.available-c.credit), c.credit
 	}
 
 	// check if the counter exists in the map
@@ -143,18 +136,23 @@ func (lsl *LazySyncRateLimiter) TakeIfAvailable(label string, n float64) (bool, 
 		return checkLimit(c)
 	}
 	// fallback to using the underlying limiter
-	ok, remaining, current := lsl.limiter.TakeIfAvailable(label, n)
-	c := &counter{
-		local:  int32(0), // we have already taken these tokens from the underlying limiter
-		global: int64(current),
-	}
+	c := &counter{}
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	existing, loaded := lsl.counters.LoadOrStore(label, c)
 	if loaded {
-		c := existing.(*counter)
-		return checkLimit(c)
-	} else {
-		// increment total counters
-		atomic.AddInt64(&lsl.totalCounters, 1)
+		ce := existing.(*counter)
+		return checkLimit(ce)
 	}
-	return ok, remaining, current
+	return syncRemote(c, n)
 }
+
+// Take takes n tokens from the limiter.
+func (lsl *LazySyncRateLimiter) Take(label string, n float64) (bool, time.Duration, float64, float64) {
+	waitTime := time.Duration(0)
+	ok, remaining, current := lsl.TakeIfAvailable(label, n)
+	return ok, waitTime, remaining, current
+}
+
+// Make sure TokenBucketRateTracker implements Limiter interface.
+var _ ratelimiter.RateLimiter = (*LazySyncRateLimiter)(nil)
