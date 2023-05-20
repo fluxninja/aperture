@@ -893,7 +893,7 @@ def process_aperture_scenario(scenario_path):
 
 
     # Load k6 configuration and process it for inclusion into a yaml file
-    wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
+    wavepool_js = str(read_file(scenario_path + "/" + "load-generator/test.js"))
     lines = wavepool_js.replace("\"", "\\\"").split("\n")
     wavepool_js = "\\n".join(lines)
     wavepool = {
