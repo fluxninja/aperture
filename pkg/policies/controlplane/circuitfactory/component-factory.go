@@ -14,7 +14,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/controller"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/regulator"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -103,7 +103,7 @@ func NewComponentAndOptions(
 		flowControl := componentProto.GetFlowControl()
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_RateLimiter:
-			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+			ctor = mkCtor(flowControlConfig.RateLimiter, ratelimiter.NewRateLimiterAndOptions)
 		case *policylangv1.FlowControl_Regulator:
 			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
 		case *policylangv1.FlowControl_Private:

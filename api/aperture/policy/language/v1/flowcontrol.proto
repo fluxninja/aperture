@@ -452,8 +452,8 @@ message PathTemplateMatcher {
 // _Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
 message FlowControl {
   oneof component {
-    // _Rate Limiter_ provides service protection by applying rate limits.
-    RateLimiter rate_limiter = 1;
+    // _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
+    RateLimiter rate_limiter = 6;
 
     // _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
     LoadScheduler load_scheduler = 7;
@@ -483,21 +483,16 @@ message FlowControl {
 //
 // :::
 //
-// RateLimiting is done on per-label-value basis. Use `label_key`
-// to select which label should be used as key.
+// RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
 message RateLimiter {
   message Parameters {
     message LazySync {
       // Enables lazy sync
       bool enabled = 1; // @gotags: default:"false"
 
-      // Number of times to lazy sync within the `limit_reset_interval`.
-      uint32 num_sync = 2; // @gotags: default:"5" validate:"gt=0"
+      // Number of times to lazy sync within the `interval`.
+      uint32 num_sync = 2; // @gotags: default:"4" validate:"gt=0"
     }
-
-    // Time after which the limit for a given label value will be reset.
-    google.protobuf.Duration limit_reset_interval = 1; // @gotags: default:"60s"
-
     // Specifies which label the rate limiter should be keyed by.
     //
     // Rate limiting is done independently for each value of the
@@ -505,62 +500,48 @@ message RateLimiter {
     // For example, to give each user a separate limit, assuming you
     // have a _user_ flow
     // label set up, set `label_key: "user"`.
-    string label_key = 2; // @gotags: validate:"required"
-
-    // Configuration of lazy-syncing behavior of rate limiter
-    LazySync lazy_sync = 3;
+    string label_key = 1; // @gotags: validate:"required"
 
     // Flow label key that will be used to override the number of tokens
     // for this request.
     // This is an optional parameter and takes highest precedence
     // when assigning tokens to a request.
     // The label value must be a valid uint64 number.
-    string tokens_label_key = 4; // @gotags: default:"tokens"
-  }
+    string tokens_label_key = 2; // @gotags: default:"tokens"
 
-  message Override {
-    // Value of the label for which the override should be applied.
-    string label_value = 1; // @gotags: validate:"required"
+    // Interval defines the time interval in which the token bucket
+    // will fill tokens specified by `fill_amount` signal.
+    google.protobuf.Duration interval = 3; // @gotags: validate:"required"
 
-    // Amount by which the `in_ports.limit` should be multiplied for
-    // this label value.
-    double limit_scale_factor = 2; // @gotags: default:"1.0"
-  }
+    // Continuous fill determines whether the token bucket should be filled
+    // continuously or only on discrete intervals.
+    bool continuous_fill = 4; // @gotags: default:"true"
 
-  // Dynamic Configuration for the rate limiter
-  message DynamicConfig {
-    // Allows to specify different limits for particular label values.
-    repeated Override overrides = 1; // @gotags: validate:"dive"
+    // Max idle time before token bucket state for a label is removed.
+    // If set to 0, the state is never removed.
+    google.protobuf.Duration max_idle_time = 5; // @gotags: default:"7200s"
+
+    // Configuration of lazy-syncing behavior of rate limiter
+    LazySync lazy_sync = 6;
   }
 
   // Inputs for the RateLimiter component
   message Ins {
-    // Number of flows allowed per `limit_reset_interval` per each label.
-    // Negative values disable the rate limiter.
-    //
-    // :::tip
-    //
-    // Negative limit can be useful to _conditionally_ enable the rate limiter
-    // under certain circumstances. [Decider](#decider) might be helpful.
-    //
-    // :::
-    InPort limit = 1; // @gotags: validate:"required"
+    // Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
+    // and all requests are allowed.
+    InPort bucket_capacity = 1; // @gotags: validate:"required"
+    // Number of tokens to fill within an `interval`.
+    InPort fill_amount = 2; // @gotags: validate:"required"
   }
 
   // Input ports for the RateLimiter component
   Ins in_ports = 1; // @gotags: validate:"required"
 
   // Parameters for the RateLimiter component
-  Parameters parameters = 3; // @gotags: validate:"required"
-
-  // Configuration key for DynamicConfig
-  string dynamic_config_key = 4;
-
-  // Default configuration
-  DynamicConfig default_config = 5;
+  Parameters parameters = 2; // @gotags: validate:"required"
 
   // Selectors for the component.
-  repeated Selector selectors = 6; // @gotags: validate:"required,gt=0,dive"
+  repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
 }
 
 // _Load Scheduler_ is an actuator component that regulates flows to provide active service protection

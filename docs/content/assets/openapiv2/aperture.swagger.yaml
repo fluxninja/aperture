@@ -1392,7 +1392,7 @@ definitions:
                 description: _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
             rate_limiter:
                 $ref: '#/definitions/RateLimiter'
-                description: _Rate Limiter_ provides service protection by applying rate limits.
+                description: _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
             regulator:
                 $ref: '#/definitions/Regulator'
                 description: Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
@@ -3181,15 +3181,8 @@ definitions:
 
             :::
 
-            RateLimiting is done on per-label-value basis. Use `label_key`
-            to select which label should be used as key.
+            RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
         properties:
-            default_config:
-                $ref: '#/definitions/RateLimiterDynamicConfig'
-                title: Default configuration
-            dynamic_config_key:
-                title: Configuration key for DynamicConfig
-                type: string
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
                 title: Input ports for the RateLimiter component
@@ -3212,59 +3205,40 @@ definitions:
             - selectors
         title: Limits the traffic on a control point to specified rate
         type: object
-    RateLimiterDynamicConfig:
-        properties:
-            overrides:
-                description: |+
-                    Allows to specify different limits for particular label values.
-
-                items:
-                    $ref: '#/definitions/RateLimiterOverride'
-                    type: object
-                type: array
-                x-go-tag-validate: dive
-        title: Dynamic Configuration for the rate limiter
-        type: object
     RateLimiterIns:
         properties:
-            limit:
+            bucket_capacity:
                 $ref: '#/definitions/InPort'
                 description: |+
-                    Number of flows allowed per `limit_reset_interval` per each label.
-                    Negative values disable the rate limiter.
+                    Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
+                    and all requests are allowed.
 
-                    :::tip
-
-                    Negative limit can be useful to _conditionally_ enable the rate limiter
-                    under certain circumstances. [Decider](#decider) might be helpful.
-
-                    :::
+                x-go-tag-validate: required
+            fill_amount:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    Number of tokens to fill within an `interval`.
 
                 x-go-tag-validate: required
         title: Inputs for the RateLimiter component
         type: object
-    RateLimiterOverride:
+    RateLimiterParameters:
         properties:
-            label_value:
+            continuous_fill:
+                default: true
                 description: |+
-                    Value of the label for which the override should be applied.
+                    Continuous fill determines whether the token bucket should be filled
+                    continuously or only on discrete intervals.
+
+                type: boolean
+                x-go-tag-default: "true"
+            interval:
+                description: |+
+                    Interval defines the time interval in which the token bucket
+                    will fill tokens specified by `fill_amount` signal.
 
                 type: string
                 x-go-tag-validate: required
-            limit_scale_factor:
-                default: 1
-                description: |+
-                    Amount by which the `in_ports.limit` should be multiplied for
-                    this label value.
-
-                format: double
-                type: number
-                x-go-tag-default: "1.0"
-        required:
-            - label_value
-        type: object
-    RateLimiterParameters:
-        properties:
             label_key:
                 description: |+
                     Specifies which label the rate limiter should be keyed by.
@@ -3280,13 +3254,14 @@ definitions:
             lazy_sync:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behavior of rate limiter
-            limit_reset_interval:
-                default: 60s
+            max_idle_time:
+                default: 7200s
                 description: |+
-                    Time after which the limit for a given label value will be reset.
+                    Max idle time before token bucket state for a label is removed.
+                    If set to 0, the state is never removed.
 
                 type: string
-                x-go-tag-default: 60s
+                x-go-tag-default: 7200s
             tokens_label_key:
                 default: tokens
                 description: |+
@@ -3299,6 +3274,7 @@ definitions:
                 type: string
                 x-go-tag-default: tokens
         required:
+            - interval
             - label_key
         type: object
     RateLimiterParametersLazySync:
@@ -3309,15 +3285,15 @@ definitions:
                 type: boolean
                 x-go-tag-default: "false"
             num_sync:
-                default: 5
+                default: 4
                 description: |+
-                    Number of times to lazy sync within the `limit_reset_interval`.
+                    Number of times to lazy sync within the `interval`.
 
                 exclusiveMinimum: true
                 format: int64
                 minimum: 0
                 type: integer
-                x-go-tag-default: "5"
+                x-go-tag-default: "4"
                 x-go-tag-validate: gt=0
         type: object
     Rego:

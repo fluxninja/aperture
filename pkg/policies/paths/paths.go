@@ -30,8 +30,6 @@ var (
 	RateLimiterConfigPath = path.Join(ConfigPrefix, "rate_limiter")
 	// RateLimiterDecisionsPath is decision path in etcd for rate limiter decisions.
 	RateLimiterDecisionsPath = path.Join(DecisionsPrefix, "rate_limiter")
-	// RateLimiterDynamicConfigPath is config path in etcd for dynamic config of rate limiter.
-	RateLimiterDynamicConfigPath = path.Join(ConfigPrefix, "rate_limiter_dynamic_config")
 	// FluxMeterConfigPath is config path in etcd for flux meters.
 	FluxMeterConfigPath = path.Join(ConfigPrefix, "flux_meter")
 	// TelemetryCollectorConfigPath is config path in etcd for telemetry collector.

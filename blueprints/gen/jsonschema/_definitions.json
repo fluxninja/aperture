@@ -1185,7 +1185,7 @@
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
-          "description": "_Rate Limiter_ provides service protection by applying rate limits.",
+          "description": "_Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.",
           "x-order": 4
         },
         "regulator": {
@@ -2752,29 +2752,19 @@
       "additionalProperties": false
     },
     "RateLimiter": {
-      "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value basis. Use `label_key`\nto select which label should be used as key.",
+      "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RateLimiterDynamicConfig",
-          "title": "Default configuration",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
           "title": "Input ports for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-order": 0
         },
         "parameters": {
           "$ref": "#/definitions/RateLimiterParameters",
           "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 3
+          "x-order": 1
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -2785,7 +2775,7 @@
           "minItems": 1,
           "type": "array",
           "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 4
+          "x-order": 2
         }
       },
       "required": ["selectors"],
@@ -2793,86 +2783,67 @@
       "type": "object",
       "additionalProperties": false
     },
-    "RateLimiterDynamicConfig": {
-      "properties": {
-        "overrides": {
-          "description": "Allows to specify different limits for particular label values.\n\n",
-          "items": {
-            "$ref": "#/definitions/RateLimiterOverride",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for the rate limiter",
-      "type": "object",
-      "additionalProperties": false
-    },
     "RateLimiterIns": {
       "properties": {
-        "limit": {
+        "bucket_capacity": {
           "$ref": "#/definitions/InPort",
-          "description": "Number of flows allowed per `limit_reset_interval` per each label.\nNegative values disable the rate limiter.\n\n:::tip\n\nNegative limit can be useful to _conditionally_ enable the rate limiter\nunder certain circumstances. [Decider](#decider) might be helpful.\n\n:::\n\n",
+          "description": "Capacity of the bucket. If this capacity is negative, then the bucket is unbounded\nand all requests are allowed.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 0
+        },
+        "fill_amount": {
+          "$ref": "#/definitions/InPort",
+          "description": "Number of tokens to fill within an `interval`.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 1
         }
       },
       "title": "Inputs for the RateLimiter component",
       "type": "object",
       "additionalProperties": false
     },
-    "RateLimiterOverride": {
-      "properties": {
-        "label_value": {
-          "description": "Value of the label for which the override should be applied.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "limit_scale_factor": {
-          "default": 1,
-          "description": "Amount by which the `in_ports.limit` should be multiplied for\nthis label value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "1.0",
-          "x-order": 1
-        }
-      },
-      "required": ["label_value"],
-      "type": "object",
-      "additionalProperties": false
-    },
     "RateLimiterParameters": {
       "properties": {
+        "continuous_fill": {
+          "default": true,
+          "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",
+          "type": "boolean",
+          "x-go-tag-default": "true",
+          "x-order": 0
+        },
+        "interval": {
+          "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
         "label_key": {
           "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-order": 2
         },
         "lazy_sync": {
           "$ref": "#/definitions/RateLimiterParametersLazySync",
           "title": "Configuration of lazy-syncing behavior of rate limiter",
-          "x-order": 1
+          "x-order": 3
         },
-        "limit_reset_interval": {
-          "default": "60s",
-          "description": "Time after which the limit for a given label value will be reset.\n\n",
+        "max_idle_time": {
+          "default": "7200s",
+          "description": "Max idle time before token bucket state for a label is removed.\nIf set to 0, the state is never removed.\n\n",
           "type": "string",
-          "x-go-tag-default": "60s",
-          "x-order": 2
+          "x-go-tag-default": "7200s",
+          "x-order": 4
         },
         "tokens_label_key": {
           "default": "tokens",
           "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
           "type": "string",
           "x-go-tag-default": "tokens",
-          "x-order": 3
+          "x-order": 5
         }
       },
-      "required": ["label_key"],
+      "required": ["interval", "label_key"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2886,12 +2857,12 @@
           "x-order": 0
         },
         "num_sync": {
-          "default": 5,
-          "description": "Number of times to lazy sync within the `limit_reset_interval`.\n\n",
+          "default": 4,
+          "description": "Number of times to lazy sync within the `interval`.\n\n",
           "exclusiveMinimum": 0,
           "format": "int64",
           "type": "integer",
-          "x-go-tag-default": "5",
+          "x-go-tag-default": "4",
           "x-go-tag-validate": "gt=0",
           "x-order": 1
         }

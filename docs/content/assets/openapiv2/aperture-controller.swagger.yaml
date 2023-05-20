@@ -1332,7 +1332,8 @@ definitions:
           workload queue in front of the service using Weighted Fair Queuing.
         $ref: '#/definitions/LoadScheduler'
       rate_limiter:
-        description: _Rate Limiter_ provides service protection by applying rate limits.
+        description: _Rate Limiter_ provides service protection by applying rate limits
+          using the token bucket algorithm.
         $ref: '#/definitions/RateLimiter'
       regulator:
         description: Regulator is a component that regulates the flow of requests
@@ -2828,19 +2829,12 @@ definitions:
 
       :::
 
-      RateLimiting is done on per-label-value basis. Use `label_key`
-      to select which label should be used as key.
+      RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
     type: object
     title: Limits the traffic on a control point to specified rate
     required:
     - selectors
     properties:
-      default_config:
-        title: Default configuration
-        $ref: '#/definitions/RateLimiterDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
       in_ports:
         title: Input ports for the RateLimiter component
         x-go-tag-validate: required
@@ -2859,62 +2853,44 @@ definitions:
           type: object
           $ref: '#/definitions/Selector'
         x-go-tag-validate: required,gt=0,dive
-  RateLimiterDynamicConfig:
-    type: object
-    title: Dynamic Configuration for the rate limiter
-    properties:
-      overrides:
-        description: |+
-          Allows to specify different limits for particular label values.
-
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/RateLimiterOverride'
-        x-go-tag-validate: dive
   RateLimiterIns:
     type: object
     title: Inputs for the RateLimiter component
     properties:
-      limit:
+      bucket_capacity:
         description: |+
-          Number of flows allowed per `limit_reset_interval` per each label.
-          Negative values disable the rate limiter.
-
-          :::tip
-
-          Negative limit can be useful to _conditionally_ enable the rate limiter
-          under certain circumstances. [Decider](#decider) might be helpful.
-
-          :::
+          Capacity of the bucket. If this capacity is negative, then the bucket is unbounded
+          and all requests are allowed.
 
         x-go-tag-validate: required
         $ref: '#/definitions/InPort'
-  RateLimiterOverride:
-    type: object
-    required:
-    - label_value
-    properties:
-      label_value:
+      fill_amount:
         description: |+
-          Value of the label for which the override should be applied.
+          Number of tokens to fill within an `interval`.
 
-        type: string
         x-go-tag-validate: required
-      limit_scale_factor:
-        description: |+
-          Amount by which the `in_ports.limit` should be multiplied for
-          this label value.
-
-        type: number
-        format: double
-        default: 1
-        x-go-tag-default: "1.0"
+        $ref: '#/definitions/InPort'
   RateLimiterParameters:
     type: object
     required:
+    - interval
     - label_key
     properties:
+      continuous_fill:
+        description: |+
+          Continuous fill determines whether the token bucket should be filled
+          continuously or only on discrete intervals.
+
+        type: boolean
+        default: true
+        x-go-tag-default: "true"
+      interval:
+        description: |+
+          Interval defines the time interval in which the token bucket
+          will fill tokens specified by `fill_amount` signal.
+
+        type: string
+        x-go-tag-validate: required
       label_key:
         description: |+
           Specifies which label the rate limiter should be keyed by.
@@ -2930,13 +2906,14 @@ definitions:
       lazy_sync:
         title: Configuration of lazy-syncing behavior of rate limiter
         $ref: '#/definitions/RateLimiterParametersLazySync'
-      limit_reset_interval:
+      max_idle_time:
         description: |+
-          Time after which the limit for a given label value will be reset.
+          Max idle time before token bucket state for a label is removed.
+          If set to 0, the state is never removed.
 
         type: string
-        default: 60s
-        x-go-tag-default: 60s
+        default: 7200s
+        x-go-tag-default: 7200s
       tokens_label_key:
         description: |+
           Flow label key that will be used to override the number of tokens
@@ -2958,14 +2935,14 @@ definitions:
         x-go-tag-default: "false"
       num_sync:
         description: |+
-          Number of times to lazy sync within the `limit_reset_interval`.
+          Number of times to lazy sync within the `interval`.
 
         type: integer
         format: int64
-        default: 5
+        default: 4
         minimum: 0
         exclusiveMinimum: true
-        x-go-tag-default: "5"
+        x-go-tag-default: "4"
         x-go-tag-validate: gt=0
   Rego:
     description: |-

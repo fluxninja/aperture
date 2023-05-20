@@ -1,14 +1,15 @@
-# yaml-language-server: $schema=../../../../../../blueprints/policies/static-rate-limiting/gen/definitions.json
+# yaml-language-server: $schema=../../../../../../blueprints/policies/rate-limiting/gen/definitions.json
 policy:
-  policy_name: "graphql-static-rate-limiting"
+  policy_name: "graphql-rate-limiting"
   rate_limiter:
-    rate_limit: 10
+    bucket_capacity: 40
+    fill_amount: 2
     selectors:
       - control_point: ingress
         service: service-graphql-demo-app.demoapp.svc.cluster.local
     parameters:
       label_key: user_id
-      limit_reset_interval: 1s
+      interval: 1s
   classifiers:
     - selectors:
         - control_point: ingress

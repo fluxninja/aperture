@@ -1,10 +1,16 @@
 {
   new():: {
   },
-  withLimit(limit):: {
-    limit: limit,
+  withBucketCapacity(bucket_capacity):: {
+    bucket_capacity: bucket_capacity,
   },
-  withLimitMixin(limit):: {
-    limit+: limit,
+  withBucketCapacityMixin(bucket_capacity):: {
+    bucket_capacity+: bucket_capacity,
+  },
+  withFillAmount(fill_amount):: {
+    fill_amount: fill_amount,
+  },
+  withFillAmountMixin(fill_amount):: {
+    fill_amount+: fill_amount,
   },
 }

@@ -23,7 +23,7 @@ aperturectl apply policy [flags]
 ### Examples
 
 ```
-aperturectl apply policy --file=policies/static-rate-limiting.yaml
+aperturectl apply policy --file=policies/rate-limiting.yaml
 
 aperturectl apply policy --dir=policies
 ```

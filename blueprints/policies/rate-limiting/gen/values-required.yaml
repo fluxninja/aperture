@@ -1,0 +1,37 @@
+# Generated values file for policies/rate-limiting blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/rate-limiting
+
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # List of classification rules.
+  # Type: []aperture.spec.v1.Classifier
+  classifiers: []
+  rate_limiter:
+    # Bucket capacity.
+    # Type: float64
+    # Required: True
+    bucket_capacity: __REQUIRED_FIELD__
+    # Fill amount.
+    # Type: float64
+    # Required: True
+    fill_amount: __REQUIRED_FIELD__
+    # Flow selectors to match requests against
+    # Type: []aperture.spec.v1.Selector
+    selectors:
+      - control_point: __REQUIRED_FIELD__
+        service: __REQUIRED_FIELD__
+    # Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
+    parameters:
+      # Flow label to use for rate limiting.
+      # Type: string
+      # Required: True
+      label_key: __REQUIRED_FIELD__
+      # Fill interval e.g. "1s".
+      # Type: string
+      # Required: True
+      interval: __REQUIRED_FIELD__

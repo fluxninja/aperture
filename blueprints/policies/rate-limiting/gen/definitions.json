@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/rate-limiting blueprint",
+  "additionalProperties": false,
+  "required": ["policy"],
+  "properties": {
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name", "rate_limiter"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "classifiers": {
+          "description": "List of classification rules.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
+          }
+        },
+        "rate_limiter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bucket_capacity", "fill_amount", "parameters"],
+          "properties": {
+            "bucket_capacity": {
+              "description": "Bucket capacity.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "fill_amount": {
+              "description": "Fill amount.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "selectors": {
+              "description": "Flow selectors to match requests against",
+              "default": [
+                {
+                  "control_point": "__REQUIRED_FIELD__",
+                  "service": "__REQUIRED_FIELD__"
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+              }
+            },
+            "parameters": {
+              "description": "Parameters.",
+              "default": {
+                "interval": "__REQUIRED_FIELD__",
+                "label_key": "__REQUIRED_FIELD__"
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+            }
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "10s",
+          "type": "string"
+        },
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
+              "type": "string"
+            },
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "default": "",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": null
+}
