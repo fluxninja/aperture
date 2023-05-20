@@ -1044,6 +1044,82 @@ scale-in operation.
 
 <!-- vale off -->
 
+### BoolVariable {#bool-variable}
+
+<!-- vale on -->
+
+Component that emits a constant bool which can be changed at runtime via dynamic
+configuration.
+
+<dl>
+<dt>constant_bool</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Constant bool emitted by this component. The value of the constant bool can be
+overridden at runtime via dynamic config.
+
+</dd>
+<dt>constant_bool_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for overriding constant_bool setting through dynamic config.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([BoolVariableOuts](#bool-variable-outs))
+
+<!-- vale on -->
+
+Output ports for the BoolVariable component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### BoolVariableOuts {#bool-variable-outs}
+
+<!-- vale on -->
+
+Outputs for the BoolVariable component.
+
+<dl>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The value is emitted to the output port.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### Circuit {#circuit}
 
 <!-- vale on -->
@@ -1263,6 +1339,19 @@ Applies the given operator on input operands (signals) and emits the result.
 <!-- vale on -->
 
 AutoScale components are used to scale the service.
+
+</dd>
+<dt>bool_variable</dt>
+<dd>
+
+<!-- vale off -->
+
+([BoolVariable](#bool-variable))
+
+<!-- vale on -->
+
+BoolVariable emits a constant bool signal which can be changed at runtime via
+dynamic configuration.
 
 </dd>
 <dt>decider</dt>
@@ -1548,7 +1637,8 @@ Takes an input signal and emits the square root of the input signal.
 
 <!-- vale on -->
 
-Emits a variable signal which can be set to invalid.
+Emits a variable signal which can be changed at runtime via dynamic
+configuration.
 
 </dd>
 </dl>
@@ -3004,30 +3094,6 @@ The output can be _optionally_ clamped to desired range using `max` and `min`
 input.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([GradientControllerDynamicConfig](#gradient-controller-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -3038,6 +3104,32 @@ Configuration key for DynamicConfig
 <!-- vale on -->
 
 Input ports of the Gradient Controller.
+
+</dd>
+<dt>manual_mode</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+In manual mode, the controller does not adjust the control variable. It emits
+the same output as the control variable input. This setting can be adjusted at
+runtime via dynamic config without restarting the policy.
+
+</dd>
+<dt>manual_mode_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for overriding manual_mode setting through dynamic config.
 
 </dd>
 <dt>out_ports</dt>
@@ -3062,33 +3154,6 @@ Output ports of the Gradient Controller.
 <!-- vale on -->
 
 Gradient Parameters.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### GradientControllerDynamicConfig {#gradient-controller-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for a Controller
-
-<dl>
-<dt>manual_mode</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool, default: `false`)
-
-<!-- vale on -->
-
-Decides whether the controller runs in `manual_mode`. In manual mode, the
-controller does not adjust the control variable It emits the same output as the
-control variable input.
 
 </dd>
 </dl>
@@ -7702,23 +7767,24 @@ Output signal.
 
 <!-- vale on -->
 
-Component that emits a variable value as an output signal, can be defined in
+Component that emits a constant signal which can be changed at runtime via
 dynamic configuration.
 
 <dl>
-<dt>default_config</dt>
+<dt>constant_signal</dt>
 <dd>
 
 <!-- vale off -->
 
-([VariableDynamicConfig](#variable-dynamic-config))
+([ConstantSignal](#constant-signal))
 
 <!-- vale on -->
 
-Default configuration.
+Constant signal emitted by this component. The value of the constant signal can
+be overridden at runtime via dynamic config.
 
 </dd>
-<dt>dynamic_config_key</dt>
+<dt>constant_signal_config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -7727,7 +7793,7 @@ Default configuration.
 
 <!-- vale on -->
 
-Configuration key for DynamicConfig.
+Configuration key for overriding constant_signal setting through dynamic config.
 
 </dd>
 <dt>out_ports</dt>
@@ -7740,27 +7806,6 @@ Configuration key for DynamicConfig.
 <!-- vale on -->
 
 Output ports for the Variable component.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### VariableDynamicConfig {#variable-dynamic-config}
-
-<!-- vale on -->
-
-<dl>
-<dt>constant_signal</dt>
-<dd>
-
-<!-- vale off -->
-
-([ConstantSignal](#constant-signal))
-
-<!-- vale on -->
 
 </dd>
 </dl>

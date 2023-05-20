@@ -677,6 +677,29 @@ definitions:
         type: string
         default: 30s
         x-go-tag-default: 30s
+  BoolVariable:
+    description: Component that emits a constant bool which can be changed at runtime
+      via dynamic configuration.
+    type: object
+    properties:
+      constant_bool:
+        description: Constant bool emitted by this component. The value of the constant
+          bool can be overridden at runtime via dynamic config.
+        type: boolean
+      constant_bool_config_key:
+        description: Configuration key for overriding constant_bool setting through
+          dynamic config.
+        type: string
+      out_ports:
+        description: Output ports for the BoolVariable component.
+        $ref: '#/definitions/BoolVariableOuts'
+  BoolVariableOuts:
+    description: Outputs for the BoolVariable component.
+    type: object
+    properties:
+      output:
+        description: The value is emitted to the output port.
+        $ref: '#/definitions/OutPort'
   Circuit:
     description: |-
       Circuit is graph of inter-connected signal processing components.
@@ -818,6 +841,10 @@ definitions:
       auto_scale:
         description: AutoScale components are used to scale the service.
         $ref: '#/definitions/AutoScale'
+      bool_variable:
+        description: BoolVariable emits a constant bool signal which can be changed
+          at runtime via dynamic configuration.
+        $ref: '#/definitions/BoolVariable'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
@@ -896,7 +923,8 @@ definitions:
           signal.
         $ref: '#/definitions/UnaryOperator'
       variable:
-        description: Emits a variable signal which can be set to invalid.
+        description: Emits a variable signal which can be changed at runtime via dynamic
+          configuration.
         $ref: '#/definitions/Variable'
   ConstantSignal:
     description: Special constant input for ports and Variable component. Can provide
@@ -1560,15 +1588,18 @@ definitions:
       control variable proportionally to the relative difference between setpoint
       and actual value of the signal
     properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/GradientControllerDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
       in_ports:
         description: Input ports of the Gradient Controller.
         $ref: '#/definitions/GradientControllerIns'
+      manual_mode:
+        description: In manual mode, the controller does not adjust the control variable.
+          It emits the same output as the control variable input. This setting can
+          be adjusted at runtime via dynamic config without restarting the policy.
+        type: boolean
+      manual_mode_config_key:
+        description: Configuration key for overriding manual_mode setting through
+          dynamic config.
+        type: string
       out_ports:
         description: Output ports of the Gradient Controller.
         $ref: '#/definitions/GradientControllerOuts'
@@ -1578,18 +1609,6 @@ definitions:
 
         x-go-tag-validate: required
         $ref: '#/definitions/GradientControllerParameters'
-  GradientControllerDynamicConfig:
-    type: object
-    title: Dynamic Configuration for a Controller
-    properties:
-      manual_mode:
-        description: |+
-          Decides whether the controller runs in `manual_mode`.
-          In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
-
-        type: boolean
-        default: false
-        x-go-tag-default: "false"
   GradientControllerIns:
     description: Inputs for the Gradient Controller component.
     type: object
@@ -3733,28 +3752,23 @@ definitions:
         description: Output signal.
         $ref: '#/definitions/OutPort'
   Variable:
-    description: Component that emits a variable value as an output signal, can be
-      defined in dynamic configuration.
+    description: Component that emits a constant signal which can be changed at runtime
+      via dynamic configuration.
     type: object
     properties:
-      default_config:
+      constant_signal:
         description: |+
-          Default configuration.
+          Constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
 
         x-go-tag-validate: required
-        $ref: '#/definitions/VariableDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
+        $ref: '#/definitions/ConstantSignal'
+      constant_signal_config_key:
+        description: Configuration key for overriding constant_signal setting through
+          dynamic config.
         type: string
       out_ports:
         description: Output ports for the Variable component.
         $ref: '#/definitions/VariableOuts'
-  VariableDynamicConfig:
-    type: object
-    properties:
-      constant_signal:
-        x-go-tag-validate: required
-        $ref: '#/definitions/ConstantSignal'
   VariableOuts:
     description: Outputs for the Variable component.
     type: object

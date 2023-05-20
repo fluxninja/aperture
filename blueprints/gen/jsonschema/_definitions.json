@@ -499,6 +499,40 @@
       "type": "object",
       "additionalProperties": false
     },
+    "BoolVariable": {
+      "description": "Component that emits a constant bool which can be changed at runtime via dynamic configuration.",
+      "properties": {
+        "constant_bool": {
+          "description": "Constant bool emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.",
+          "type": "boolean",
+          "x-order": 0
+        },
+        "constant_bool_config_key": {
+          "description": "Configuration key for overriding constant_bool setting through dynamic config.",
+          "type": "string",
+          "x-order": 1
+        },
+        "out_ports": {
+          "$ref": "#/definitions/BoolVariableOuts",
+          "description": "Output ports for the BoolVariable component.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "BoolVariableOuts": {
+      "description": "Outputs for the BoolVariable component.",
+      "properties": {
+        "output": {
+          "$ref": "#/definitions/OutPort",
+          "description": "The value is emitted to the output port.",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
     "Circuit": {
       "description": "Circuit is graph of inter-connected signal processing components.\n\n:::info\n\nSee also [Circuit overview](/concepts/policy/circuit.md).\n\n:::\n\nSignals flow between components through ports.\nAs signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).\nCircuit is evaluated periodically to respond to changes in signal readings.\n\n:::info Signals\n\nSignals are floating point values.\n\nA signal can also have a special **Invalid** value. It's usually used to\ncommunicate that signal does not have a meaningful value at the moment, for example,\n[PromQL](#prom-q-l) emits such a value if it cannot execute a query.\nComponents know when their input signals are invalid and can act\naccordingly. They can either propagate the invalid signal, by making their\noutput itself invalid (for example,\n[ArithmeticCombinator](#arithmetic-combinator)) or use some different\nlogic, for example, [Extrapolator](#extrapolator). Refer to a component's\ndocs on how exactly it handles invalid inputs.\n\n:::",
       "properties": {
@@ -581,120 +615,125 @@
           "description": "AutoScale components are used to scale the service.",
           "x-order": 3
         },
+        "bool_variable": {
+          "$ref": "#/definitions/BoolVariable",
+          "description": "BoolVariable emits a constant bool signal which can be changed at runtime via dynamic configuration.",
+          "x-order": 4
+        },
         "decider": {
           "$ref": "#/definitions/Decider",
           "description": "Decider emits the binary result of comparison operator on two operands.",
-          "x-order": 4
+          "x-order": 5
         },
         "differentiator": {
           "$ref": "#/definitions/Differentiator",
           "description": "Differentiator calculates rate of change per tick.",
-          "x-order": 5
+          "x-order": 6
         },
         "ema": {
           "$ref": "#/definitions/EMA",
           "description": "Exponential Moving Average filter.",
-          "x-order": 6
+          "x-order": 7
         },
         "extrapolator": {
           "$ref": "#/definitions/Extrapolator",
           "description": "Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.",
-          "x-order": 7
+          "x-order": 8
         },
         "first_valid": {
           "$ref": "#/definitions/FirstValid",
           "description": "Picks the first valid input signal and emits it.",
-          "x-order": 8
+          "x-order": 9
         },
         "flow_control": {
           "$ref": "#/definitions/FlowControl",
           "description": "FlowControl components are used to regulate requests flow.",
-          "x-order": 9
+          "x-order": 10
         },
         "gradient_controller": {
           "$ref": "#/definitions/GradientController",
           "description": "Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.\nThis controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.",
-          "x-order": 10
+          "x-order": 11
         },
         "holder": {
           "$ref": "#/definitions/Holder",
           "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold.",
-          "x-order": 11
+          "x-order": 12
         },
         "integrator": {
           "$ref": "#/definitions/Integrator",
           "description": "Accumulates sum of signal every tick.",
-          "x-order": 12
+          "x-order": 13
         },
         "inverter": {
           "$ref": "#/definitions/Inverter",
           "description": "Logical NOT.",
-          "x-order": 13
+          "x-order": 14
         },
         "max": {
           "$ref": "#/definitions/Max",
           "description": "Emits the maximum of the input signals.",
-          "x-order": 14
+          "x-order": 15
         },
         "min": {
           "$ref": "#/definitions/Min",
           "description": "Emits the minimum of the input signals.",
-          "x-order": 15
+          "x-order": 16
         },
         "nested_circuit": {
           "$ref": "#/definitions/NestedCircuit",
           "description": "Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.",
-          "x-order": 16
+          "x-order": 17
         },
         "nested_signal_egress": {
           "$ref": "#/definitions/NestedSignalEgress",
           "description": "Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.",
-          "x-order": 17
+          "x-order": 18
         },
         "nested_signal_ingress": {
           "$ref": "#/definitions/NestedSignalIngress",
           "description": "Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.",
-          "x-order": 18
+          "x-order": 19
         },
         "or": {
           "$ref": "#/definitions/Or",
           "description": "Logical OR.",
-          "x-order": 19
+          "x-order": 20
         },
         "pulse_generator": {
           "$ref": "#/definitions/PulseGenerator",
           "description": "Generates 0 and 1 in turns.",
-          "x-order": 20
+          "x-order": 21
         },
         "query": {
           "$ref": "#/definitions/Query",
           "description": "Query components that are query databases such as Prometheus.",
-          "x-order": 21
+          "x-order": 22
         },
         "signal_generator": {
           "$ref": "#/definitions/SignalGenerator",
           "description": "Generates the specified signal.",
-          "x-order": 22
+          "x-order": 23
         },
         "sma": {
           "$ref": "#/definitions/SMA",
           "description": "Simple Moving Average filter.",
-          "x-order": 23
+          "x-order": 24
         },
         "switcher": {
           "$ref": "#/definitions/Switcher",
           "description": "Switcher acts as a switch that emits one of the two signals based on third signal.",
-          "x-order": 24
+          "x-order": 25
         },
         "unary_operator": {
           "$ref": "#/definitions/UnaryOperator",
           "description": "Takes an input signal and emits the square root of the input signal.",
-          "x-order": 25
+          "x-order": 26
         },
         "variable": {
           "$ref": "#/definitions/Variable",
-          "description": "Emits a variable signal which can be set to invalid.",
-          "x-order": 26
+          "description": "Emits a variable signal which can be changed at runtime via dynamic configuration.",
+          "x-order": 27
         }
       },
       "title": "Computational block that forms the circuit",
@@ -1368,19 +1407,19 @@
     "GradientController": {
       "description": "The `gradient` describes a corrective factor that should be applied to the\ncontrol variable to get the signal closer to the setpoint. It's computed as follows:\n\n$$\n\\text{gradient} = \\left(\\frac{\\text{signal}}{\\text{setpoint}}\\right)^{\\text{slope}}\n$$\n\n`gradient` is then clamped to `[min_gradient, max_gradient]` range.\n\nThe output of gradient controller is computed as follows:\n$$\n\\text{output} = \\text{gradient}_{\\text{clamped}} \\cdot \\text{control\\_variable} + \\text{optimize}.\n$$\n\nNote the additional `optimize` signal, that can be used to \"nudge\" the\ncontroller into desired idle state.\n\nThe output can be _optionally_ clamped to desired range using `max` and\n`min` input.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/GradientControllerDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/GradientControllerIns",
           "description": "Input ports of the Gradient Controller.",
+          "x-order": 0
+        },
+        "manual_mode": {
+          "description": "In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime via dynamic config without restarting the policy.",
+          "type": "boolean",
+          "x-order": 1
+        },
+        "manual_mode_config_key": {
+          "description": "Configuration key for overriding manual_mode setting through dynamic config.",
+          "type": "string",
           "x-order": 2
         },
         "out_ports": {
@@ -1396,20 +1435,6 @@
         }
       },
       "title": "Gradient controller is a type of controller which tries to adjust the\ncontrol variable proportionally to the relative difference between setpoint\nand actual value of the signal",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "GradientControllerDynamicConfig": {
-      "properties": {
-        "manual_mode": {
-          "default": false,
-          "description": "Decides whether the controller runs in `manual_mode`.\nIn manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.\n\n",
-          "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for a Controller",
       "type": "object",
       "additionalProperties": false
     },
@@ -3535,16 +3560,16 @@
       "additionalProperties": false
     },
     "Variable": {
-      "description": "Component that emits a variable value as an output signal, can be defined in dynamic configuration.",
+      "description": "Component that emits a constant signal which can be changed at runtime via dynamic configuration.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/VariableDynamicConfig",
-          "description": "Default configuration.\n\n",
+        "constant_signal": {
+          "$ref": "#/definitions/ConstantSignal",
+          "description": "Constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 0
         },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
+        "constant_signal_config_key": {
+          "description": "Configuration key for overriding constant_signal setting through dynamic config.",
           "type": "string",
           "x-order": 1
         },
@@ -3552,17 +3577,6 @@
           "$ref": "#/definitions/VariableOuts",
           "description": "Output ports for the Variable component.",
           "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "VariableDynamicConfig": {
-      "properties": {
-        "constant_signal": {
-          "$ref": "#/definitions/ConstantSignal",
-          "x-go-tag-validate": "required",
-          "x-order": 0
         }
       },
       "type": "object",

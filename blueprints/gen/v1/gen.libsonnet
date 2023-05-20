@@ -19,6 +19,8 @@
   AutoScalerScalingBackendKubernetesReplicas: import 'autoscalerscalingbackendkubernetesreplicas.libsonnet',
   AutoScalerScalingBackendKubernetesReplicasOuts: import 'autoscalerscalingbackendkubernetesreplicasouts.libsonnet',
   AutoScalerScalingParameters: import 'autoscalerscalingparameters.libsonnet',
+  BoolVariable: import 'boolvariable.libsonnet',
+  BoolVariableOuts: import 'boolvariableouts.libsonnet',
   Circuit: import 'circuit.libsonnet',
   Classifier: import 'classifier.libsonnet',
   Component: import 'component.libsonnet',
@@ -53,7 +55,6 @@
   FluxMeterLinearBuckets: import 'fluxmeterlinearbuckets.libsonnet',
   FluxMeterStaticBuckets: import 'fluxmeterstaticbuckets.libsonnet',
   GradientController: import 'gradientcontroller.libsonnet',
-  GradientControllerDynamicConfig: import 'gradientcontrollerdynamicconfig.libsonnet',
   GradientControllerIns: import 'gradientcontrollerins.libsonnet',
   GradientControllerOuts: import 'gradientcontrollerouts.libsonnet',
   GradientControllerParameters: import 'gradientcontrollerparameters.libsonnet',
@@ -157,6 +158,5 @@
   UnaryOperatorIns: import 'unaryoperatorins.libsonnet',
   UnaryOperatorOuts: import 'unaryoperatorouts.libsonnet',
   Variable: import 'variable.libsonnet',
-  VariableDynamicConfig: import 'variabledynamicconfig.libsonnet',
   VariableOuts: import 'variableouts.libsonnet',
 }

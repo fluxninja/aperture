@@ -102,3 +102,35 @@ at runtime, without reloading the policy.
 <!-- vale on -->
 
 ---
+
+<!-- vale off -->
+
+<a id="rollout"></a>
+
+<ParameterDescription
+    name='rollout'
+    description='Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+<a id="reset"></a>
+
+<ParameterDescription
+    name='reset'
+    description='Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+---

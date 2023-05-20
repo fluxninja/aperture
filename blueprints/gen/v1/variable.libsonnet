@@ -3,17 +3,17 @@ local variableouts = import './variableouts.libsonnet';
   new():: {
   },
   outPorts:: variableouts,
-  withDefaultConfig(default_config):: {
-    default_config: default_config,
+  withConstantSignal(constant_signal):: {
+    constant_signal: constant_signal,
   },
-  withDefaultConfigMixin(default_config):: {
-    default_config+: default_config,
+  withConstantSignalMixin(constant_signal):: {
+    constant_signal+: constant_signal,
   },
-  withDynamicConfigKey(dynamic_config_key):: {
-    dynamic_config_key: dynamic_config_key,
+  withConstantSignalConfigKey(constant_signal_config_key):: {
+    constant_signal_config_key: constant_signal_config_key,
   },
-  withDynamicConfigKeyMixin(dynamic_config_key):: {
-    dynamic_config_key+: dynamic_config_key,
+  withConstantSignalConfigKeyMixin(constant_signal_config_key):: {
+    constant_signal_config_key+: constant_signal_config_key,
   },
   withOutPorts(out_ports):: {
     out_ports: out_ports,

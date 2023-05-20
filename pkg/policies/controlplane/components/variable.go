@@ -46,7 +46,7 @@ func NewVariableAndOptions(variableProto *policylangv1.Variable, _ runtime.Compo
 		policyReadAPI: policyReadAPI,
 		variableProto: variableProto,
 	}
-	variable.constantSignal = runtime.ConstantSignalFromProto(variableProto.GetDefaultConfig().ConstantSignal)
+	variable.constantSignal = runtime.ConstantSignalFromProto(variableProto.GetConstantSignal())
 
 	return variable, fx.Options(), nil
 }
@@ -62,16 +62,16 @@ func (v *Variable) Execute(inPortReadings runtime.PortToReading, tickInfo runtim
 // DynamicConfigUpdate finds the dynamic config and syncs the constant value.
 func (v *Variable) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := v.policyReadAPI.GetStatusRegistry().GetLogger()
-	key := v.variableProto.GetDynamicConfigKey()
+	key := v.variableProto.GetConstantSignalConfigKey()
 	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		dynamicConfig := &policylangv1.Variable_DynamicConfig{}
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
-			return
-		}
-		v.constantSignal = runtime.ConstantSignalFromProto(dynamicConfig.ConstantSignal)
-	} else {
-		v.constantSignal = runtime.ConstantSignalFromProto(v.variableProto.GetDefaultConfig().ConstantSignal)
+	if !unmarshaller.IsSet(key) {
+		v.constantSignal = runtime.ConstantSignalFromProto(v.variableProto.GetConstantSignal())
 	}
+	constantSignalProto := &policylangv1.ConstantSignal{}
+	if err := unmarshaller.UnmarshalKey(key, constantSignalProto); err != nil {
+		logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
+		v.constantSignal = runtime.ConstantSignalFromProto(v.variableProto.GetConstantSignal())
+		return
+	}
+	v.constantSignal = runtime.ConstantSignalFromProto(constantSignalProto)
 }

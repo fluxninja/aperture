@@ -40,22 +40,6 @@ func (msg *GradientController_Parameters) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *GradientController_DynamicConfig) MarshalJSON() ([]byte, error) {
-	return protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		UseProtoNames:   true,
-	}.Marshal(msg)
-}
-
-// UnmarshalJSON implements json.Unmarshaler
-func (msg *GradientController_DynamicConfig) UnmarshalJSON(b []byte) error {
-	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
-	}.Unmarshal(b, msg)
-}
-
-// MarshalJSON implements json.Marshaler
 func (msg *GradientController_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
@@ -376,22 +360,6 @@ func (msg *Variable) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Variable_DynamicConfig) MarshalJSON() ([]byte, error) {
-	return protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		UseProtoNames:   true,
-	}.Marshal(msg)
-}
-
-// UnmarshalJSON implements json.Unmarshaler
-func (msg *Variable_DynamicConfig) UnmarshalJSON(b []byte) error {
-	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
-	}.Unmarshal(b, msg)
-}
-
-// MarshalJSON implements json.Marshaler
 func (msg *Variable_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
@@ -402,6 +370,38 @@ func (msg *Variable_Outs) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *Variable_Outs) UnmarshalJSON(b []byte) error {
+	return protojson.UnmarshalOptions{
+		DiscardUnknown: false,
+	}.Unmarshal(b, msg)
+}
+
+// MarshalJSON implements json.Marshaler
+func (msg *BoolVariable) MarshalJSON() ([]byte, error) {
+	return protojson.MarshalOptions{
+		UseEnumNumbers:  false,
+		EmitUnpopulated: false,
+		UseProtoNames:   true,
+	}.Marshal(msg)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (msg *BoolVariable) UnmarshalJSON(b []byte) error {
+	return protojson.UnmarshalOptions{
+		DiscardUnknown: false,
+	}.Unmarshal(b, msg)
+}
+
+// MarshalJSON implements json.Marshaler
+func (msg *BoolVariable_Outs) MarshalJSON() ([]byte, error) {
+	return protojson.MarshalOptions{
+		UseEnumNumbers:  false,
+		EmitUnpopulated: false,
+		UseProtoNames:   true,
+	}.Marshal(msg)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (msg *BoolVariable_Outs) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
