@@ -261,17 +261,22 @@ func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, sy
 }
 
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
-func checkResults(t *testing.T, fr *flowRunner, leaks int32, tolerance float64) {
+func checkResults(t *testing.T, fr *flowRunner, leaks float64, tolerance float64) {
 	for _, f := range fr.flows {
-		actualRequestsExpected := math.Min(float64(f.limit*leaks), float64(f.totalRequests))
-		t.Logf("flow (%s) @ %d requests/sec: \n leaks=%d, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
+		// calculate expected requests taking into account the burst capacity in the limiter
+		actualRequestsExpected := int32(math.Min(float64(f.limit)*(leaks), float64(f.totalRequests)))
+		if actualRequestsExpected != f.totalRequests {
+			// add burst capacity
+			actualRequestsExpected += f.limit
+		}
+		t.Logf("flow (%s) @ %d requests/sec: \n leaks=%f, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
 			f.requestlabel,
 			f.requestRate,
 			leaks,
 			f.totalRequests,
 			f.limit,
 			f.acceptedRequests,
-			int32(actualRequestsExpected))
+			actualRequestsExpected)
 		acceptedReqRatio := float64(f.acceptedRequests) / float64(actualRequestsExpected)
 		if math.Abs(1-acceptedReqRatio) > tolerance {
 			t.Logf("Accepted request ratio is %f, which is outside the tolerance of %f", acceptedReqRatio, tolerance)
@@ -320,7 +325,6 @@ type testConfig struct {
 func baseOfLimiterTest(config testConfig) {
 	var fr *flowRunner
 	var lazySyncLimiters []ratelimiter.RateLimiter
-	leaks := int32(config.duration / config.interval)
 	t := config.t
 	cl := newTestDistCacheCluster(t, config.numOlrics)
 
@@ -344,7 +348,11 @@ func baseOfLimiterTest(config testConfig) {
 		duration: config.duration,
 	}
 
+	start := time.Now()
 	fr.runFlows(t)
+	end := time.Now()
+
+	leaks := float64(end.Sub(start)) / float64(config.interval)
 
 	checkResults(t, fr, leaks, config.tolerance)
 

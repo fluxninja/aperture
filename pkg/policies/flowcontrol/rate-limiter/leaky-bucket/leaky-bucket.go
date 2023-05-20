@@ -190,7 +190,7 @@ func (lbrl *LeakyBucketRateLimiter) takeN(key string, currentStateBytes, argByte
 	timeSinceLastLeak := now.Sub(currentState.LastLeak)
 
 	// Calculate the amount to leak based on the time passed and leak rate
-	leakAmount := lbrl.leakAmount * float64(timeSinceLastLeak/lbrl.interval)
+	leakAmount := lbrl.leakAmount * float64(timeSinceLastLeak) / float64(lbrl.interval)
 
 	// Leak the calculated amount
 	currentState.Current -= leakAmount
