@@ -43,8 +43,8 @@ func NewLazySyncRateLimiter(limiter ratelimiter.RateLimiter,
 	job := jobs.NewBasicJob(lsl.name, lsl.audit)
 	// register job with job group
 	err := lsl.jobGroup.RegisterJob(job, jobs.JobConfig{
-		ExecutionPeriod:  config.MakeDuration(syncDuration * 2),
-		ExecutionTimeout: config.MakeDuration(syncDuration * 2),
+		ExecutionPeriod:  config.MakeDuration(syncDuration * 4),
+		ExecutionTimeout: config.MakeDuration(syncDuration * 4),
 	})
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (lsl *LazySyncRateLimiter) audit(ctx context.Context) (proto.Message, error
 		defer c.lock.Unlock()
 
 		// if this counter has not synced in a while, then remove it from the map
-		if now.After(c.nextSync.Add(lsl.syncDuration)) {
+		if now.After(c.nextSync.Add(lsl.syncDuration * 4)) {
 			lsl.counters.Delete(label)
 			return true
 		}
