@@ -310,11 +310,15 @@ func (lbrl *TokenBucketRateLimiter) fastForwardState(now time.Time, stateBytes [
 
 // SetPassThrough sets the pass through flag.
 func (lbrl *TokenBucketRateLimiter) SetPassThrough(passThrough bool) {
+	lbrl.mu.Lock()
+	defer lbrl.mu.Unlock()
 	lbrl.passThrough = passThrough
 }
 
 // GetPassThrough returns the pass through flag.
 func (lbrl *TokenBucketRateLimiter) GetPassThrough() bool {
+	lbrl.mu.RLock()
+	defer lbrl.mu.RUnlock()
 	return lbrl.passThrough
 }
 

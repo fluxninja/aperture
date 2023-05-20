@@ -589,6 +589,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		// Running Train and deplete the bucket
 		depleteRunTime := time.Second * 2
 		loadMultiplierBucket.SetLoadMultiplier(c.Now(), 0.0)
+		loadMultiplierBucket.SetPassThrough(false)
 
 		runFlows(sched, &wg, flows, depleteRunTime, c)
 		wg.Wait()

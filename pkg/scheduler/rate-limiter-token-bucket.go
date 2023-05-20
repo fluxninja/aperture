@@ -10,9 +10,8 @@ var _ TokenManager = &RateLimiterTokenBucket{}
 
 // RateLimiterTokenBucket is a distributed rate-limiter token bucket implementation.
 type RateLimiterTokenBucket struct {
-	limiter     ratelimiter.RateLimiter
-	key         string
-	passThrough bool
+	limiter ratelimiter.RateLimiter
+	key     string
 }
 
 // NewRateLimiterTokenBucket creates a new instance of RateLimiterTokenBucket.
@@ -25,12 +24,12 @@ func NewRateLimiterTokenBucket(key string, limiter ratelimiter.RateLimiter) *Rat
 
 // SetPassThrough sets the passthrough value.
 func (rltb *RateLimiterTokenBucket) SetPassThrough(passthrough bool) {
-	rltb.passThrough = passthrough
+	rltb.limiter.SetPassThrough(passthrough)
 }
 
 // GetPassThrough returns the passthrough value.
 func (rltb *RateLimiterTokenBucket) GetPassThrough() bool {
-	return rltb.passThrough
+	return rltb.limiter.GetPassThrough()
 }
 
 // PreprocessRequest is a no-op.
