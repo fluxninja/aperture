@@ -35,7 +35,7 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent/otel/prometheusreceiver"
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent/otel/resourceprocessor"
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent/otel/transformprocessor"
-	"github.com/fluxninja/aperture/v2/pkg/alertmanager"
+	alertmanager "github.com/fluxninja/aperture/v2/pkg/alert-manager"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/cache"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/adapterconnector"

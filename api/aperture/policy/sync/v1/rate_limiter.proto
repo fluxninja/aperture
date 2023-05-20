@@ -22,4 +22,5 @@ message RateLimiterDecisionWrapper {
 message RateLimiterDecision {
   double bucket_capacity = 1;
   double fill_amount = 2;
+  bool pass_through = 3;
 }

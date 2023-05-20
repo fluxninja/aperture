@@ -14,9 +14,9 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
-	"github.com/fluxninja/aperture/v2/pkg/distcache"
+	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
@@ -24,10 +24,10 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
-	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter"
-	lazysync "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/lazy-sync"
-	tokenbucket "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
+	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
+	tokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
@@ -382,7 +382,7 @@ func (rl *rateLimiter) TakeIfAvailable(labels map[string]string, n float64) (lab
 
 	label = labelKey + ":" + labelValue
 
-	if rl.limiter.GetRateLimit() < 0 {
+	if rl.limiter.GetPassThrough() {
 		return label, true, -1, -1
 	}
 
@@ -394,7 +394,7 @@ func (rl *rateLimiter) decisionUpdateCallback(event notifiers.Event, unmarshalle
 	logger := rl.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
-		rl.limiter.SetRateLimit(-1)
+		rl.limiter.SetPassThrough(true)
 		return
 	}
 
@@ -412,8 +412,9 @@ func (rl *rateLimiter) decisionUpdateCallback(event notifiers.Event, unmarshalle
 		return
 	}
 	limitDecision := wrapperMessage.RateLimiterDecision
-	rl.limiter.SetRateLimit(limitDecision.BucketCapacity)
+	rl.inner.SetBucketCapacity(limitDecision.BucketCapacity)
 	rl.inner.SetFillAmount(limitDecision.FillAmount)
+	rl.inner.SetPassThrough(limitDecision.PassThrough)
 }
 
 // GetLimiterID returns the limiter ID.

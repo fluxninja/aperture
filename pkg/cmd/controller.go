@@ -12,7 +12,7 @@ import (
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentfunctions/agents"
+	"github.com/fluxninja/aperture/v2/pkg/agent-functions/agents"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"

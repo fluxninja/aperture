@@ -9,7 +9,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 )
 
 // Handler implements the flowcontrol.v1 Service

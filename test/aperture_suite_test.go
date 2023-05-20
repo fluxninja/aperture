@@ -17,7 +17,7 @@ import (
 
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent/otel/prometheusreceiver"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/cache"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
@@ -36,7 +36,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 	"github.com/fluxninja/aperture/v2/test/harness"

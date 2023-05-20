@@ -12,9 +12,9 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
-	"github.com/fluxninja/aperture/v2/pkg/multimatcher"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	multimatcher "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"

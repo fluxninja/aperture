@@ -13,4 +13,10 @@
   withFillAmountMixin(fill_amount):: {
     fill_amount+: fill_amount,
   },
+  withPassThrough(pass_through):: {
+    pass_through: pass_through,
+  },
+  withPassThroughMixin(pass_through):: {
+    pass_through+: pass_through,
+  },
 }
