@@ -1,10 +1,6 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.FlowStatus;
-import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.aperture.sdk.Utils;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
+import com.fluxninja.aperture.sdk.*;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
 import jakarta.servlet.ServletRequest;
@@ -37,7 +33,7 @@ public class ServletUtils {
         response.sendError(code, "Request denied");
     }
 
-    protected static CheckHTTPRequest checkRequestFromRequest(
+    protected static TrafficFlowRequest trafficFlowRequestFromRequest(
             ServletRequest req, String controlPointName) {
         Map<String, String> baggageLabels = new HashMap<>();
 
@@ -55,7 +51,7 @@ public class ServletUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        CheckHTTPRequest.Builder builder = addHttpAttributes(baggageLabels, req);
+        TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, req);
         builder.setControlPoint(controlPointName);
         return builder.build();
     }
@@ -91,7 +87,7 @@ public class ServletUtils {
         };
     }
 
-    private static CheckHTTPRequest.Builder addHttpAttributes(
+    private static TrafficFlowRequestBuilder addHttpAttributes(
             Map<String, String> headers, ServletRequest req) {
         HttpServletRequest request = (HttpServletRequest) req;
         Enumeration<String> originalHeaders = request.getHeaderNames();
@@ -105,24 +101,21 @@ public class ServletUtils {
         String destinationIp = req.getLocalAddr();
         int destinationPort = req.getLocalPort();
 
-        CheckHTTPRequest.Builder builder = CheckHTTPRequest.newBuilder();
+        TrafficFlowRequestBuilder builder = TrafficFlowRequest.newBuilder();
 
-        builder.setRequest(
-                CheckHTTPRequest.HttpRequest.newBuilder()
-                        .setMethod(request.getMethod())
-                        .setPath(request.getServletPath())
-                        .setHost(req.getRemoteHost())
-                        .setScheme(req.getScheme())
-                        .setSize(req.getContentLength())
-                        .setProtocol(req.getProtocol())
-                        .putAllHeaders(headers));
+        builder.setHttpMethod(request.getMethod())
+                .setHttpPath(request.getServletPath())
+                .setHttpHost(req.getRemoteHost())
+                .setHttpScheme(req.getScheme())
+                .setHttpSize(req.getContentLength())
+                .setHttpProtocol(req.getProtocol())
+                .setHttpHeaders(headers);
 
         if (sourceIp != null) {
-            builder.setSource(Utils.createSocketAddress(sourceIp, sourcePort, "TCP"));
+            builder.setSource(sourceIp, sourcePort, "TCP");
         }
         if (destinationIp != null) {
-            builder.setDestination(
-                    Utils.createSocketAddress(destinationIp, destinationPort, "TCP"));
+            builder.setDestination(destinationIp, destinationPort, "TCP");
         }
         return builder;
     }
