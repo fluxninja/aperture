@@ -158,7 +158,7 @@ local dashboardWithPanels(dashboardParams, policyName) =
     newGraphPanel('Workload Decisions (rejected)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_REJECTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps');
 
   local WorkloadLatency =
-    newGraphPanel('Workload Latency (Auto Tokens)', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms');
+    newGraphPanel('Workload Latency', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms');
 
   dashboard.new(
     title='Aperture Service Protection',
