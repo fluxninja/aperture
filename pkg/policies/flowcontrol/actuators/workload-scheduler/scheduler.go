@@ -26,6 +26,11 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
+// Module provides the fx options for the workload scheduler.
+func Module() fx.Option {
+	return fx.Provide(newFactory)
+}
+
 // MetricLabelKeys is an array of Label Keys for WFQ and Token Bucket Metrics.
 var MetricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 
@@ -44,8 +49,8 @@ type Factory struct {
 	workloadCounterVec        *prometheus.CounterVec
 }
 
-// NewFactory sets up the load scheduler module in the main fx app.
-func NewFactory(
+// newFactory sets up the load scheduler module in the main fx app.
+func newFactory(
 	lifecycle fx.Lifecycle,
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
@@ -278,7 +283,6 @@ type Scheduler struct {
 	scheduler             scheduler.Scheduler
 	registry              status.Registry
 	proto                 *policylangv1.Scheduler
-	wsFactory             *Factory
 	workloadMultiMatcher  *multiMatcher
 	tokensByWorkloadIndex map[string]uint64
 	metrics               *SchedulerMetrics
@@ -436,13 +440,11 @@ func (ws *Scheduler) Decide(ctx context.Context,
 		tokensConsumed = req.Tokens
 	}
 
-	if ws.metrics != nil {
-		// update load scheduler metrics and decisionType
-		ws.metrics.incomingTokensCounter.Add(float64(req.Tokens) / 1000)
+	// update load scheduler metrics and decisionType
+	ws.metrics.incomingTokensCounter.Add(float64(req.Tokens) / 1000)
 
-		if accepted {
-			ws.metrics.acceptedTokensCounter.Add(float64(req.Tokens) / 1000)
-		}
+	if accepted {
+		ws.metrics.acceptedTokensCounter.Add(float64(req.Tokens) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{
@@ -471,12 +473,12 @@ func (ws *Scheduler) Revert(labels map[string]string, decision *flowcontrolv1.Li
 
 // GetLatencyObserver returns histogram for specific workload.
 func (ws *Scheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
-	return ws.wsFactory.GetLatencyObserver(labels)
+	return ws.metrics.wsFactory.GetLatencyObserver(labels)
 }
 
 // GetRequestCounter returns request counter for specific workload.
 func (ws *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
-	return ws.wsFactory.GetRequestCounter(labels)
+	return ws.metrics.wsFactory.GetRequestCounter(labels)
 }
 
 // GetEstimatedTokens returns estimated tokens for specific workload.

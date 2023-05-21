@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "policies/rate-limiting blueprint",
+  "title": "policies/quota-scheduler blueprint",
   "additionalProperties": false,
   "required": ["policy"],
   "properties": {
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_name", "rate_limiter"],
+      "required": ["policy_name", "quota_scheduler"],
       "properties": {
         "policy_name": {
           "description": "Name of the policy.",
@@ -24,7 +24,7 @@
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
           }
         },
-        "rate_limiter": {
+        "quota_scheduler": {
           "type": "object",
           "additionalProperties": false,
           "required": ["bucket_capacity", "fill_amount", "parameters"],
@@ -63,6 +63,12 @@
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+            },
+            "scheduler": {
+              "description": "Scheduler configuration.",
+              "default": {},
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
             }
           }
         }
@@ -75,6 +81,16 @@
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
           "default": "10s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "Time from of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "Time to of dashboard.",
+          "default": "now",
           "type": "string"
         },
         "datasource": {

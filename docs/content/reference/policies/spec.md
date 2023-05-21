@@ -6165,7 +6165,7 @@ specified by `fill_amount` signal.
 
 <!-- vale off -->
 
-(string, **required**)
+(string)
 
 <!-- vale on -->
 
@@ -6174,7 +6174,8 @@ Specifies which label the rate limiter should be keyed by.
 Rate limiting is done independently for each value of the
 [label](/concepts/flow-control/flow-label.md) with given key. For example, to
 give each user a separate limit, assuming you have a _user_ flow label set up,
-set `label_key: "user"`.
+set `label_key: "user"`. If label_key is not specified, then all requests are
+rate limited that match the selectors.
 
 </dd>
 <dt>lazy_sync</dt>

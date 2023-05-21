@@ -39,7 +39,14 @@ const quotaSchedulerStatusRoot = "quota_scheduler"
 
 var (
 	fxTag           = config.NameTag(quotaSchedulerStatusRoot)
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel, metrics.DecisionTypeLabel, metrics.LimiterDroppedLabel}
+	metricLabelKeys = []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.DecisionTypeLabel,
+		metrics.LimiterDroppedLabel,
+		metrics.WorkloadIndexLabel,
+	}
 )
 
 func quotaSchedulerModule() fx.Option {
@@ -96,6 +103,7 @@ func setupQuotaSchedulerFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	wsFactory *workloadscheduler.Factory,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.QuotaSchedulerDecisionsPath)
@@ -115,18 +123,9 @@ func setupQuotaSchedulerFactory(
 	}
 
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.QuotaSchedulerCounterTotalMetricName,
+		Name: metrics.QuotaCheckCounterTotalMetricName,
 		Help: "A counter measuring the number of times Quota Scheduler was triggered",
 	}, metricLabelKeys)
-
-	wsFactory, err := workloadscheduler.NewFactory(
-		lifecycle,
-		reg,
-		prometheusRegistry,
-	)
-	if err != nil {
-		return err
-	}
 
 	quotaSchedulerFactory := &quotaSchedulerFactory{
 		engineAPI:        e,
@@ -256,8 +255,6 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.PolicyHashLabel] = qs.GetPolicyHash()
 	metricLabels[metrics.ComponentIDLabel] = qs.GetComponentId()
 
-	qsCounterVec := qs.qsFactory.counterVector
-
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
@@ -323,7 +320,8 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
-			deleted := qsCounterVec.DeletePartialMatch(metricLabels)
+
+			deleted := qs.qsFactory.counterVector.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
@@ -370,13 +368,16 @@ func (qs *quotaScheduler) GetSelectors() []*policylangv1.Selector {
 
 func (qs *quotaScheduler) getLabelKey(labels map[string]string) (string, bool) {
 	labelKey := qs.proto.Parameters.GetLabelKey()
-	var labelValue string
-	val, found := labels[labelKey]
-	if !found {
-		return "", false
+	var label string
+	if labelKey == "" {
+		label = "default"
+	} else {
+		labelValue, found := labels[labelKey]
+		if !found {
+			return "", false
+		}
+		label = labelKey + ":" + labelValue
 	}
-	labelValue = val
-	label := labelKey + ":" + labelValue
 	return label, true
 }
 

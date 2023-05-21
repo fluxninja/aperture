@@ -84,7 +84,9 @@ message RateLimiter {
     // For example, to give each user a separate limit, assuming you
     // have a _user_ flow
     // label set up, set `label_key: "user"`.
-    string label_key = 1; // @gotags: validate:"required"
+    // If label_key is not specified, then all requests are rate limited
+    // that match the selectors.
+    string label_key = 1;
 
     // Flow label key that will be used to override the number of tokens
     // for this request.

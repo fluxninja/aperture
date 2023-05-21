@@ -239,7 +239,6 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.PolicyNameLabel] = rl.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = rl.GetPolicyHash()
 	metricLabels[metrics.ComponentIDLabel] = rl.GetComponentId()
-	rateCounterVec := rl.lbFactory.counterVector
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -288,7 +287,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
-			deleted := rateCounterVec.DeletePartialMatch(metricLabels)
+			deleted := rl.lbFactory.counterVector.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
@@ -377,14 +376,15 @@ func (rl *rateLimiter) TakeIfAvailable(labels map[string]string, n float64) (lab
 	}
 
 	labelKey := rl.lbProto.Parameters.GetLabelKey()
-	var labelValue string
-	if val, found := labels[labelKey]; found {
-		labelValue = val
+	if labelKey == "" {
+		label = "default"
 	} else {
-		return "", true, 0, 0
+		labelValue, found := labels[labelKey]
+		if !found {
+			return "", true, 0, 0
+		}
+		label = labelKey + ":" + labelValue
 	}
-
-	label = labelKey + ":" + labelValue
 
 	ok, remaining, current = rl.limiter.TakeIfAvailable(label, n)
 	return

@@ -1,17 +1,17 @@
 ---
-title: Rate Limiting Policy
+title: Quota Scheduler Policy
 keywords:
   - blueprints
-sidebar_position: 5
-sidebar_label: Rate Limiting Policy
+sidebar_position: 6
+sidebar_label: Quota Scheduler Policy
 ---
 
 ## Introduction
 
 This blueprint provides a
-[token bucket](https://en.wikipedia.org/wiki/Token_bucket) based rate-limiting
+[token bucket](https://en.wikipedia.org/wiki/Token_bucket) based quota scheduler
 policy and a dashboard. This policy uses the
-[`RateLimiter`](/reference/policies/spec.md#rate-limiter) component.
+[`QuotaScheduler`](/reference/policies/spec.md#quota-scheduler) component.
 
 <!-- Configuration Marker -->
 
@@ -25,7 +25,7 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/rate-limiting`}>policies/rate-limiting</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/quota-scheduler`}>policies/quota-scheduler</a>
 
 <!-- vale on -->
 
@@ -67,16 +67,16 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-##### policy.rate_limiter {#policy-rate-limiter}
+##### policy.quota_scheduler {#policy-quota-scheduler}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-bucket-capacity"></a>
+<a id="policy-quota-scheduler-bucket-capacity"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.bucket_capacity'
+    name='policy.quota_scheduler.bucket_capacity'
     description='Bucket capacity.'
     type='Number (double)'
     reference=''
@@ -87,10 +87,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-fill-amount"></a>
+<a id="policy-quota-scheduler-fill-amount"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.fill_amount'
+    name='policy.quota_scheduler.fill_amount'
     description='Fill amount.'
     type='Number (double)'
     reference=''
@@ -101,10 +101,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-selectors"></a>
+<a id="policy-quota-scheduler-selectors"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.selectors'
+    name='policy.quota_scheduler.selectors'
     description='Flow selectors to match requests against'
     type='Array of Object (aperture.spec.v1.Selector)'
     reference='../../spec#selector'
@@ -115,14 +115,28 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-parameters"></a>
+<a id="policy-quota-scheduler-parameters"></a>
 
 <ParameterDescription
-    name='policy.rate_limiter.parameters'
+    name='policy.quota_scheduler.parameters'
     description='Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../spec#rate-limiter-parameters'
     value='{"interval": "__REQUIRED_FIELD__", "label_key": ""}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-quota-scheduler-scheduler"></a>
+
+<ParameterDescription
+    name='policy.quota_scheduler.scheduler'
+    description='Scheduler configuration.'
+    type='Object (aperture.spec.v1.Scheduler)'
+    reference='../../spec#scheduler'
+    value='{}'
 />
 
 <!-- vale on -->
@@ -145,6 +159,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
     type='string'
     reference=''
     value='"10s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-from"></a>
+
+<ParameterDescription
+    name='dashboard.time_from'
+    description='Time from of dashboard.'
+    type='string'
+    reference=''
+    value='"now-15m"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-to"></a>
+
+<ParameterDescription
+    name='dashboard.time_to'
+    description='Time to of dashboard.'
+    type='string'
+    reference=''
+    value='"now"'
 />
 
 <!-- vale on -->

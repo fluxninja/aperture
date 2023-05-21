@@ -2860,9 +2860,8 @@
           "x-order": 1
         },
         "label_key": {
-          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
+          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf label_key is not specified, then all requests are rate limited\nthat match the selectors.",
           "type": "string",
-          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "lazy_sync": {
@@ -2885,7 +2884,7 @@
           "x-order": 5
         }
       },
-      "required": ["interval", "label_key"],
+      "required": ["interval"],
       "type": "object",
       "additionalProperties": false
     },

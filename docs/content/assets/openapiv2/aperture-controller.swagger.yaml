@@ -2900,7 +2900,6 @@ definitions:
     type: object
     required:
     - interval
-    - label_key
     properties:
       continuous_fill:
         description: |+
@@ -2918,7 +2917,7 @@ definitions:
         type: string
         x-go-tag-validate: required
       label_key:
-        description: |+
+        description: |-
           Specifies which label the rate limiter should be keyed by.
 
           Rate limiting is done independently for each value of the
@@ -2926,9 +2925,9 @@ definitions:
           For example, to give each user a separate limit, assuming you
           have a _user_ flow
           label set up, set `label_key: "user"`.
-
+          If label_key is not specified, then all requests are rate limited
+          that match the selectors.
         type: string
-        x-go-tag-validate: required
       lazy_sync:
         title: Configuration of lazy-syncing behavior of rate limiter
         $ref: '#/definitions/RateLimiterParametersLazySync'

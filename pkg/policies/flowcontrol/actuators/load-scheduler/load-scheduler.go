@@ -87,6 +87,7 @@ func setupLoadSchedulerFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	wsFactory *workloadscheduler.Factory,
 ) error {
 	reg := registry.Child("component", "load_scheduler")
 
@@ -96,15 +97,6 @@ func setupLoadSchedulerFactory(
 	etcdDecisionsPath := path.Join(paths.LoadSchedulerDecisionsPath,
 		paths.AgentGroupPrefix(agentGroup))
 	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdDecisionsPath)
-	if err != nil {
-		return err
-	}
-
-	wsFactory, err := workloadscheduler.NewFactory(
-		lifecycle,
-		reg,
-		prometheusRegistry,
-	)
 	if err != nil {
 		return err
 	}

@@ -161,7 +161,7 @@ local dashboardWithPanels(dashboardParams, policyName) =
     newGraphPanel('Workload Latency (Auto Tokens)', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms');
 
   dashboard.new(
-    title='Jsonnet / FluxNinja',
+    title='Aperture Service Protection',
     editable=true,
     schemaVersion=18,
     refresh=dashboardParams.refresh_interval,
