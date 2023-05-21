@@ -19,7 +19,6 @@ spec:
           parameters:
             interval: 1s
             label_key: ""
-            max_idle_time: 30s
           scheduler:
             workloads:
             - label_matcher:

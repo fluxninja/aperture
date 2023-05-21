@@ -12,7 +12,6 @@ policy:
         control_point: ingress
     parameters:
       interval: 1s
-      max_idle_time: 30s
     scheduler:
       workloads:
         - label_matcher:

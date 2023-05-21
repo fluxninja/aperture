@@ -1961,7 +1961,7 @@ type RateLimiter_Parameters struct {
 	// For example, to give each user a separate limit, assuming you
 	// have a _user_ flow
 	// label set up, set `label_key: "user"`.
-	// If label_key is not specified, then all requests are rate limited
+	// If `label_key` is not specified, then all requests are rate limited
 	// that match the selectors.
 	LabelKey string `protobuf:"bytes,1,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty"`
 	// Flow label key that will be used to override the number of tokens

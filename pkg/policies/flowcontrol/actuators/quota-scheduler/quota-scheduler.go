@@ -2,7 +2,6 @@ package quotascheduler
 
 import (
 	"context"
-	"fmt"
 	"path"
 	"sync"
 	"time"
@@ -37,17 +36,7 @@ import (
 
 const quotaSchedulerStatusRoot = "quota_scheduler"
 
-var (
-	fxTag           = config.NameTag(quotaSchedulerStatusRoot)
-	metricLabelKeys = []string{
-		metrics.PolicyNameLabel,
-		metrics.PolicyHashLabel,
-		metrics.ComponentIDLabel,
-		metrics.DecisionTypeLabel,
-		metrics.LimiterDroppedLabel,
-		metrics.WorkloadIndexLabel,
-	}
-)
+var fxTag = config.NameTag(quotaSchedulerStatusRoot)
 
 func quotaSchedulerModule() fx.Option {
 	return fx.Options(
@@ -88,7 +77,6 @@ type quotaSchedulerFactory struct {
 	decisionsWatcher notifiers.Watcher
 	distCache        *distcache.DistCache
 	auditJobGroup    *jobs.JobGroup
-	counterVector    *prometheus.CounterVec
 	wsFactory        *workloadscheduler.Factory
 	agentGroupName   string
 }
@@ -122,11 +110,6 @@ func setupQuotaSchedulerFactory(
 		return err
 	}
 
-	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.QuotaCheckCounterTotalMetricName,
-		Help: "A counter measuring the number of times Quota Scheduler was triggered",
-	}, metricLabelKeys)
-
 	quotaSchedulerFactory := &quotaSchedulerFactory{
 		engineAPI:        e,
 		distCache:        distCache,
@@ -134,7 +117,6 @@ func setupQuotaSchedulerFactory(
 		decisionsWatcher: decisionsWatcher,
 		agentGroupName:   agentGroupName,
 		registry:         reg,
-		counterVector:    counterVector,
 		wsFactory:        wsFactory,
 	}
 
@@ -147,10 +129,6 @@ func setupQuotaSchedulerFactory(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := prometheusRegistry.Register(quotaSchedulerFactory.counterVector)
-			if err != nil {
-				return err
-			}
 			err = auditJobGroup.Start()
 			if err != nil {
 				return err
@@ -170,10 +148,6 @@ func setupQuotaSchedulerFactory(
 			err = auditJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
-			}
-			if !prometheusRegistry.Unregister(quotaSchedulerFactory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister metric")
-				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()
 			return merr
@@ -321,10 +295,6 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 		OnStop: func(context.Context) error {
 			var merr, err error
 
-			deleted := qs.qsFactory.counterVector.DeletePartialMatch(metricLabels)
-			if deleted == 0 {
-				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
-			}
 			// remove from data engine
 			err = qs.qsFactory.engineAPI.UnregisterScheduler(qs)
 			if err != nil {
@@ -472,7 +442,6 @@ func (qs *quotaScheduler) audit(ctx context.Context) (proto.Message, error) {
 		// if this counter has not synced in a while, then remove it from the map
 		if now.After(lastAccess.Add(qs.proto.Parameters.MaxIdleTime.AsDuration())) &&
 			size == 0 {
-			log.Info().Msgf("Removing scheduler %s from map", label)
 			qs.schedulers.Delete(label)
 			return true
 		}
@@ -524,10 +493,5 @@ func (qs *quotaScheduler) GetLatencyObserver(labels map[string]string) prometheu
 
 // GetRequestCounter returns counter for tracking number of times rateLimiter was triggered.
 func (qs *quotaScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
-	counter, err := qs.qsFactory.counterVector.GetMetricWith(labels)
-	if err != nil {
-		log.Warn().Err(err).Msg("Failed to get counter")
-		return nil
-	}
-	return counter
+	return qs.qsFactory.wsFactory.GetRequestCounter(labels)
 }

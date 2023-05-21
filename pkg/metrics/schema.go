@@ -24,8 +24,6 @@ const (
 	InvalidFluxMeterTotalMetricName = "invalid_flux_meter_total"
 	// RateLimiterCounterTotalMetricName - name of the counter describing times rate limiter was triggered.
 	RateLimiterCounterTotalMetricName = "rate_limiter_counter_total"
-	// QuotaCheckCounterTotalMetricName - name of the counter describing times quota was checked for all the labels.
-	QuotaCheckCounterTotalMetricName = "quota_check_counter_total"
 	// ClassifierCounterTotalMetricName - name of the counter describing times classifier was triggered.
 	ClassifierCounterTotalMetricName = "classifier_counter_total"
 	// RegulatorCounterTotalMetricName - name of the counter describing times load regulator was triggered.
