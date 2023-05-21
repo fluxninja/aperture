@@ -130,6 +130,7 @@ type WFQScheduler struct {
 	// generation helps close the queue in face of concurrent requests leaving the queue while new requests also arrive.
 	generation uint64
 	queueOpen  bool // This tracks overload state
+	lastAccess time.Time
 }
 
 // NewWFQScheduler creates a new weighted fair queue scheduler.
@@ -141,6 +142,7 @@ func NewWFQScheduler(tokenManger TokenManager, clk clockwork.Clock, metrics *WFQ
 	sched.flows = make(map[string]*flowInfo)
 	sched.manager = tokenManger
 	sched.clk = clk
+	sched.lastAccess = sched.clk.Now()
 
 	if metrics != nil {
 		sched.metrics = metrics
@@ -193,6 +195,8 @@ func (sched *WFQScheduler) queueRequest(request Request) (admitted bool, qReques
 	defer sched.lock.Unlock()
 
 	now := sched.clk.Now()
+
+	sched.lastAccess = now
 
 	if sched.manager.PreprocessRequest(now, request) {
 		return true, nil
@@ -435,6 +439,13 @@ func (sched *WFQScheduler) setRequestsGauge(v float64) {
 	if sched.metrics != nil && sched.metrics.HeapRequestsGauge != nil {
 		sched.metrics.HeapRequestsGauge.Set(v)
 	}
+}
+
+// Info returns the last access time and number of requests that are currently in the queue.
+func (sched *WFQScheduler) Info() (time.Time, int) {
+	sched.lock.Lock()
+	defer sched.lock.Unlock()
+	return sched.lastAccess, sched.requests.Len()
 }
 
 // GetPendingFlows returns the number of flows in the scheduler.

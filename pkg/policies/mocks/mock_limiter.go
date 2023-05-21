@@ -242,31 +242,31 @@ func (mr *MockRateLimiterMockRecorder) TakeIfAvailable(labels, count interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeIfAvailable", reflect.TypeOf((*MockRateLimiter)(nil).TakeIfAvailable), labels, count)
 }
 
-// MockLoadScheduler is a mock of LoadScheduler interface.
-type MockLoadScheduler struct {
+// MockScheduler is a mock of Scheduler interface.
+type MockScheduler struct {
 	ctrl     *gomock.Controller
-	recorder *MockLoadSchedulerMockRecorder
+	recorder *MockSchedulerMockRecorder
 }
 
-// MockLoadSchedulerMockRecorder is the mock recorder for MockLoadScheduler.
-type MockLoadSchedulerMockRecorder struct {
-	mock *MockLoadScheduler
+// MockSchedulerMockRecorder is the mock recorder for MockScheduler.
+type MockSchedulerMockRecorder struct {
+	mock *MockScheduler
 }
 
-// NewMockLoadScheduler creates a new mock instance.
-func NewMockLoadScheduler(ctrl *gomock.Controller) *MockLoadScheduler {
-	mock := &MockLoadScheduler{ctrl: ctrl}
-	mock.recorder = &MockLoadSchedulerMockRecorder{mock}
+// NewMockScheduler creates a new mock instance.
+func NewMockScheduler(ctrl *gomock.Controller) *MockScheduler {
+	mock := &MockScheduler{ctrl: ctrl}
+	mock.recorder = &MockSchedulerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockLoadScheduler) EXPECT() *MockLoadSchedulerMockRecorder {
+func (m *MockScheduler) EXPECT() *MockSchedulerMockRecorder {
 	return m.recorder
 }
 
 // Decide mocks base method.
-func (m *MockLoadScheduler) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockScheduler) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", ctx, labels)
 	ret0, _ := ret[0].(*checkv1.LimiterDecision)
@@ -274,13 +274,13 @@ func (m *MockLoadScheduler) Decide(ctx context.Context, labels map[string]string
 }
 
 // Decide indicates an expected call of Decide.
-func (mr *MockLoadSchedulerMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+func (mr *MockSchedulerMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockLoadScheduler)(nil).Decide), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockScheduler)(nil).Decide), ctx, labels)
 }
 
 // GetLatencyObserver mocks base method.
-func (m *MockLoadScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+func (m *MockScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLatencyObserver", labels)
 	ret0, _ := ret[0].(prometheus.Observer)
@@ -288,13 +288,13 @@ func (m *MockLoadScheduler) GetLatencyObserver(labels map[string]string) prometh
 }
 
 // GetLatencyObserver indicates an expected call of GetLatencyObserver.
-func (mr *MockLoadSchedulerMockRecorder) GetLatencyObserver(labels interface{}) *gomock.Call {
+func (mr *MockSchedulerMockRecorder) GetLatencyObserver(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatencyObserver", reflect.TypeOf((*MockLoadScheduler)(nil).GetLatencyObserver), labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatencyObserver", reflect.TypeOf((*MockScheduler)(nil).GetLatencyObserver), labels)
 }
 
 // GetLimiterID mocks base method.
-func (m *MockLoadScheduler) GetLimiterID() iface.LimiterID {
+func (m *MockScheduler) GetLimiterID() iface.LimiterID {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLimiterID")
 	ret0, _ := ret[0].(iface.LimiterID)
@@ -302,13 +302,13 @@ func (m *MockLoadScheduler) GetLimiterID() iface.LimiterID {
 }
 
 // GetLimiterID indicates an expected call of GetLimiterID.
-func (mr *MockLoadSchedulerMockRecorder) GetLimiterID() *gomock.Call {
+func (mr *MockSchedulerMockRecorder) GetLimiterID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockLoadScheduler)(nil).GetLimiterID))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLimiterID", reflect.TypeOf((*MockScheduler)(nil).GetLimiterID))
 }
 
 // GetPolicyName mocks base method.
-func (m *MockLoadScheduler) GetPolicyName() string {
+func (m *MockScheduler) GetPolicyName() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPolicyName")
 	ret0, _ := ret[0].(string)
@@ -316,13 +316,13 @@ func (m *MockLoadScheduler) GetPolicyName() string {
 }
 
 // GetPolicyName indicates an expected call of GetPolicyName.
-func (mr *MockLoadSchedulerMockRecorder) GetPolicyName() *gomock.Call {
+func (mr *MockSchedulerMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockLoadScheduler)(nil).GetPolicyName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockScheduler)(nil).GetPolicyName))
 }
 
 // GetRequestCounter mocks base method.
-func (m *MockLoadScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
+func (m *MockScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRequestCounter", labels)
 	ret0, _ := ret[0].(prometheus.Counter)
@@ -330,13 +330,13 @@ func (m *MockLoadScheduler) GetRequestCounter(labels map[string]string) promethe
 }
 
 // GetRequestCounter indicates an expected call of GetRequestCounter.
-func (mr *MockLoadSchedulerMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
+func (mr *MockSchedulerMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockLoadScheduler)(nil).GetRequestCounter), labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockScheduler)(nil).GetRequestCounter), labels)
 }
 
 // GetSelectors mocks base method.
-func (m *MockLoadScheduler) GetSelectors() []*languagev1.Selector {
+func (m *MockScheduler) GetSelectors() []*languagev1.Selector {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSelectors")
 	ret0, _ := ret[0].([]*languagev1.Selector)
@@ -344,19 +344,19 @@ func (m *MockLoadScheduler) GetSelectors() []*languagev1.Selector {
 }
 
 // GetSelectors indicates an expected call of GetSelectors.
-func (mr *MockLoadSchedulerMockRecorder) GetSelectors() *gomock.Call {
+func (mr *MockSchedulerMockRecorder) GetSelectors() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelectors", reflect.TypeOf((*MockLoadScheduler)(nil).GetSelectors))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelectors", reflect.TypeOf((*MockScheduler)(nil).GetSelectors))
 }
 
 // Revert mocks base method.
-func (m *MockLoadScheduler) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockScheduler) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Revert", labels, decision)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockLoadSchedulerMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
+func (mr *MockSchedulerMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockLoadScheduler)(nil).Revert), labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockScheduler)(nil).Revert), labels, decision)
 }

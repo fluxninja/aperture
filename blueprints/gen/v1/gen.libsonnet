@@ -120,6 +120,7 @@
   PulseGenerator: import 'pulsegenerator.libsonnet',
   PulseGeneratorOuts: import 'pulsegeneratorouts.libsonnet',
   Query: import 'query.libsonnet',
+  QuotaScheduler: import 'quotascheduler.libsonnet',
   RateLimiter: import 'ratelimiter.libsonnet',
   RateLimiterIns: import 'ratelimiterins.libsonnet',
   RateLimiterParameters: import 'ratelimiterparameters.libsonnet',

@@ -144,7 +144,7 @@ func (tbls *LoadMultiplierTokenBucket) Take(now time.Time, tokens float64) (time
 func (tbls *LoadMultiplierTokenBucket) Return(tokens float64) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
-	tbls.tbb.addTokens(tokens)
+	tbls.tbb.returnTokens(tokens)
 }
 
 func (tbls *LoadMultiplierTokenBucket) setLMGauge(v float64) {

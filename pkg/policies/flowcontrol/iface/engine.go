@@ -25,9 +25,9 @@ type Engine interface {
 
 	GetAgentInfo() *agentinfo.AgentInfo
 
-	RegisterLoadScheduler(ls LoadScheduler) error
-	UnregisterLoadScheduler(ls LoadScheduler) error
-	GetLoadScheduler(limiterID LimiterID) LoadScheduler
+	RegisterScheduler(ls Scheduler) error
+	UnregisterScheduler(ls Scheduler) error
+	GetScheduler(limiterID LimiterID) Scheduler
 
 	RegisterFluxMeter(fm FluxMeter) error
 	UnregisterFluxMeter(fm FluxMeter) error

@@ -43,8 +43,7 @@ func NewLazySyncRateLimiter(limiter ratelimiter.RateLimiter,
 	job := jobs.NewBasicJob(lsl.name, lsl.audit)
 	// register job with job group
 	err := lsl.jobGroup.RegisterJob(job, jobs.JobConfig{
-		ExecutionPeriod:  config.MakeDuration(syncDuration * 4),
-		ExecutionTimeout: config.MakeDuration(syncDuration * 4),
+		ExecutionPeriod: config.MakeDuration(syncDuration * 4),
 	})
 	if err != nil {
 		return nil, err
@@ -149,6 +148,9 @@ func (lsl *LazySyncRateLimiter) TakeIfAvailable(label string, n float64) (bool, 
 
 // Return returns n tokens to the limiter.
 func (lsl *LazySyncRateLimiter) Return(label string, n float64) (float64, float64) {
+	if lsl.GetPassThrough() {
+		return 0, 0
+	}
 	_, remaining, current := lsl.TakeIfAvailable(label, -n)
 	return remaining, current
 }

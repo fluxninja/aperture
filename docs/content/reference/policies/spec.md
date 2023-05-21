@@ -2599,6 +2599,16 @@ _Load Scheduler_ provides service protection by creating a prioritized workload
 queue in front of the service using Weighted Fair Queuing.
 
 </dd>
+<dt>quota_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([QuotaScheduler](#quota-scheduler))
+
+<!-- vale on -->
+
+</dd>
 <dt>rate_limiter</dt>
 <dd>
 
@@ -5950,6 +5960,59 @@ Query components that are query databases such as Prometheus.
 <!-- vale on -->
 
 Periodically runs a Prometheus query in the background and emits the result.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### QuotaScheduler {#quota-scheduler}
+
+<!-- vale on -->
+
+Schedules the traffic based on token-bucket based quotas.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterIns](#rate-limiter-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterParameters](#rate-limiter-parameters))
+
+<!-- vale on -->
+
+</dd>
+<dt>scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([Scheduler](#scheduler))
+
+<!-- vale on -->
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
 
 </dd>
 </dl>

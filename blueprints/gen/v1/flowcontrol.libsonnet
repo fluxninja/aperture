@@ -25,6 +25,12 @@
   withLoadSchedulerMixin(load_scheduler):: {
     load_scheduler+: load_scheduler,
   },
+  withQuotaScheduler(quota_scheduler):: {
+    quota_scheduler: quota_scheduler,
+  },
+  withQuotaSchedulerMixin(quota_scheduler):: {
+    quota_scheduler+: quota_scheduler,
+  },
   withRateLimiter(rate_limiter):: {
     rate_limiter: rate_limiter,
   },

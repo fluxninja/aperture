@@ -20,7 +20,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		t              GinkgoTestReporter
 		mockCtrl       *gomock.Controller
-		mockConLimiter *mocks.MockLoadScheduler
+		mockConLimiter *mocks.MockScheduler
 		mockFluxmeter  *mocks.MockFluxMeter
 
 		selectors   []*policylangv1.Selector
@@ -32,7 +32,7 @@ var _ = Describe("Dataplane Engine", func() {
 	BeforeEach(func() {
 		t = GinkgoTestReporter{}
 		mockCtrl = gomock.NewController(t)
-		mockConLimiter = mocks.NewMockLoadScheduler(mockCtrl)
+		mockConLimiter = mocks.NewMockScheduler(mockCtrl)
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
 		engine = NewEngine(agentinfo.NewAgentInfo(metrics.DefaultAgentGroup))
@@ -71,25 +71,25 @@ var _ = Describe("Dataplane Engine", func() {
 		})
 
 		It("Registers Load Scheduler", func() {
-			err := engine.RegisterLoadScheduler(mockConLimiter)
+			err := engine.RegisterScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("Registers Load Scheduler second time", func() {
-			err := engine.RegisterLoadScheduler(mockConLimiter)
-			err2 := engine.RegisterLoadScheduler(mockConLimiter)
+			err := engine.RegisterScheduler(mockConLimiter)
+			err2 := engine.RegisterScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(err2).To(HaveOccurred())
 		})
 
 		It("Unregisters not registered Load Scheduler", func() {
-			err := engine.UnregisterLoadScheduler(mockConLimiter)
+			err := engine.UnregisterScheduler(mockConLimiter)
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("Unregisters existing Load Scheduler", func() {
-			err := engine.RegisterLoadScheduler(mockConLimiter)
-			err2 := engine.UnregisterLoadScheduler(mockConLimiter)
+			err := engine.RegisterScheduler(mockConLimiter)
+			err2 := engine.UnregisterScheduler(mockConLimiter)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(err2).NotTo(HaveOccurred())
 		})
@@ -161,7 +161,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		It("Return nothing for not compatible service", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
-			_ = engine.RegisterLoadScheduler(mockConLimiter)
+			_ = engine.RegisterScheduler(mockConLimiter)
 
 			controlPoint := "ingress"
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
@@ -169,12 +169,12 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).To(BeEmpty())
-			Expect(mmr.loadSchedulers).To(BeEmpty())
+			Expect(mmr.schedulers).To(BeEmpty())
 		})
 
 		It("Return matched Load Schedulers and Flux Meters", func() {
 			_ = engine.RegisterFluxMeter(mockFluxmeter)
-			_ = engine.RegisterLoadScheduler(mockConLimiter)
+			_ = engine.RegisterScheduler(mockConLimiter)
 
 			controlPoint := "ingress"
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
@@ -182,7 +182,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).NotTo(BeEmpty())
-			Expect(mmr.loadSchedulers).NotTo(BeEmpty())
+			Expect(mmr.schedulers).NotTo(BeEmpty())
 		})
 	})
 })

@@ -31,7 +31,7 @@ var _ = Describe("Metrics Processor", func() {
 		processor         *metricsProcessor
 		engine            *mocks.MockEngine
 		clasEngine        *mocks.MockClassificationEngine
-		loadScheduler     *mocks.MockLoadScheduler
+		scheduler         *mocks.MockScheduler
 		rateLimiter       *mocks.MockRateLimiter
 		classifier        *mocks.MockClassifier
 		summaryVec        *prometheus.SummaryVec
@@ -53,7 +53,7 @@ var _ = Describe("Metrics Processor", func() {
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
 		clasEngine = mocks.NewMockClassificationEngine(ctrl)
-		loadScheduler = mocks.NewMockLoadScheduler(ctrl)
+		scheduler = mocks.NewMockScheduler(ctrl)
 		rateLimiter = mocks.NewMockRateLimiter(ctrl)
 		classifier = mocks.NewMockClassifier(ctrl)
 		expectedLabels = make(map[string]interface{})
@@ -114,8 +114,8 @@ var _ = Describe("Metrics Processor", func() {
 					PolicyHash:  "foo-hash",
 					ComponentId: "1",
 					Dropped:     true,
-					Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
-						LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+					Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+						LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
 							WorkloadIndex: "0",
 						},
 					},
@@ -140,7 +140,7 @@ var _ = Describe("Metrics Processor", func() {
 			m.ComponentIDLabel:   "2",
 			m.WorkloadIndexLabel: "2",
 		}
-		engine.EXPECT().GetLoadScheduler(gomock.Any()).Return(loadScheduler).AnyTimes()
+		engine.EXPECT().GetScheduler(gomock.Any()).Return(scheduler).AnyTimes()
 		engine.EXPECT().GetRateLimiter(gomock.Any()).Return(rateLimiter).AnyTimes()
 		clasEngine.EXPECT().GetClassifier(gomock.Any()).Return(classifier).AnyTimes()
 	})
@@ -248,7 +248,7 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 
 		counter, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		loadScheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
+		scheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
 
 		labels := map[string]string{
 			m.PolicyNameLabel:     "foo",
@@ -285,7 +285,7 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 
 		counter, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		loadScheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
+		scheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
 	})
 
 	It("Processes logs for two policies - ingress", func() {
@@ -295,8 +295,8 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 				PolicyHash:  "fizz-hash",
 				ComponentId: "1",
 				Dropped:     true,
-				Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
-					LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+				Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+					LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
 						WorkloadIndex: "1",
 					},
 				},
@@ -306,8 +306,8 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 				PolicyHash:  "fizz-hash",
 				ComponentId: "2",
 				Dropped:     false,
-				Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
-					LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+				Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+					LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
 						WorkloadIndex: "2",
 					},
 				},
@@ -345,21 +345,21 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 
 		counterFoo, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		loadScheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counterFoo).Times(1)
+		scheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counterFoo).Times(1)
 
 		labelsFizz1WithReject := insertRejectLabel(labelsFizz1)
 		labelsFizz1WithRejectAndDropped := insertDroppedLabel(labelsFizz1WithReject, true)
 
 		counterFizz1, err := counterVec.GetMetricWith(labelsFizz1WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		loadScheduler.EXPECT().GetRequestCounter(labelsFizz1WithRejectAndDropped).Return(counterFizz1).Times(1)
+		scheduler.EXPECT().GetRequestCounter(labelsFizz1WithRejectAndDropped).Return(counterFizz1).Times(1)
 
 		labelsFizz2WithReject := insertRejectLabel(labelsFizz2)
 		labelsFizz2WithRejectAndDropped := insertDroppedLabel(labelsFizz2WithReject, false)
 
 		counterFizz2, err := counterVec.GetMetricWith(labelsFizz2WithReject)
 		Expect(err).NotTo(HaveOccurred())
-		loadScheduler.EXPECT().GetRequestCounter(labelsFizz2WithRejectAndDropped).Return(counterFizz2).Times(1)
+		scheduler.EXPECT().GetRequestCounter(labelsFizz2WithRejectAndDropped).Return(counterFizz2).Times(1)
 	})
 })
 

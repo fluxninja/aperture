@@ -158,7 +158,7 @@ func setupRateLimiterFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(rateLimiterFactory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister rate_limiter_counter_total metric")
+				err2 := fmt.Errorf("failed to unregister metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()
@@ -186,10 +186,10 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
 		return fx.Options(), err
 	}
 
-	lbProto := wrapperMessage.RateLimiter
+	rlProto := wrapperMessage.RateLimiter
 	lb := &rateLimiter{
 		Component: wrapperMessage.GetCommonAttributes(),
-		lbProto:   lbProto,
+		lbProto:   rlProto,
 		lbFactory: rlFactory,
 		registry:  reg,
 	}
@@ -372,19 +372,19 @@ func (rl *rateLimiter) Revert(labels map[string]string, decision *flowcontrolv1.
 
 // TakeIfAvailable takes n tokens from the limiter.
 func (rl *rateLimiter) TakeIfAvailable(labels map[string]string, n float64) (label string, ok bool, remaining float64, current float64) {
+	if rl.limiter.GetPassThrough() {
+		return label, true, 0, 0
+	}
+
 	labelKey := rl.lbProto.Parameters.GetLabelKey()
 	var labelValue string
 	if val, found := labels[labelKey]; found {
 		labelValue = val
 	} else {
-		return "", true, -1, -1
+		return "", true, 0, 0
 	}
 
 	label = labelKey + ":" + labelValue
-
-	if rl.limiter.GetPassThrough() {
-		return label, true, -1, -1
-	}
 
 	ok, remaining, current = rl.limiter.TakeIfAvailable(label, n)
 	return

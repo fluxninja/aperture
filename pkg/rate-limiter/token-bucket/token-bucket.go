@@ -183,6 +183,9 @@ func (lbrl *TokenBucketRateLimiter) Take(label string, n float64) (bool, time.Du
 
 // Return returns n tokens to the bucket.
 func (lbrl *TokenBucketRateLimiter) Return(label string, n float64) (float64, float64) {
+	if lbrl.GetPassThrough() {
+		return 0, 0
+	}
 	_, remaining, current := lbrl.TakeIfAvailable(label, -n)
 	return remaining, current
 }
