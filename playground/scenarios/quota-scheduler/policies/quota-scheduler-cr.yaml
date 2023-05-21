@@ -12,7 +12,7 @@ spec:
           in_ports:
             bucket_capacity:
               constant_signal:
-                value: 25
+                value: 500
             fill_amount:
               constant_signal:
                 value: 25

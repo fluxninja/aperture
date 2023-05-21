@@ -22,13 +22,13 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
+	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/global-token-bucket"
 	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
-	tokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, interval time.Duration) (ratelimiter.RateLimiter, error) {
-	limiter, err := tokenbucket.NewTokenBucket(distCache, "Limiter", interval, time.Hour, true)
+	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", interval, time.Hour, true)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
@@ -248,11 +248,11 @@ func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, 
 }
 
 // createLazySyncLimiters creates a set of lazy-sync-limiters.
-func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, syncDuration time.Duration) []ratelimiter.RateLimiter {
+func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, interval time.Duration, numSyncs uint32) []ratelimiter.RateLimiter {
 	var lazySyncLimiters []ratelimiter.RateLimiter
 	for _, limiter := range limiters {
 		jobGroup := createJobGroup(limiter)
-		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, syncDuration, jobGroup)
+		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, interval, numSyncs, jobGroup)
 		if err != nil {
 			t.Logf("Error creating lazy sync limiter: %v", err)
 			t.FailNow()
@@ -319,7 +319,7 @@ type testConfig struct {
 	interval              time.Duration
 	tolerance             float64
 	duration              time.Duration
-	syncDuration          time.Duration
+	numSyncs              uint32
 	enableLazySyncLimiter bool
 }
 
@@ -338,7 +338,7 @@ func baseOfLimiterTest(config testConfig) {
 	limiters := createOlricLimiters(t, cl, config.limit, config.interval)
 
 	if config.enableLazySyncLimiter {
-		limiters = createLazySyncLimiters(t, limiters, config.syncDuration)
+		limiters = createLazySyncLimiters(t, limiters, config.interval, config.numSyncs)
 	}
 
 	t.Log("Starting flows...")
@@ -418,7 +418,7 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 		flows:                 flows,
 		duration:              time.Second * 10,
 		enableLazySyncLimiter: true,
-		syncDuration:          time.Millisecond * 100,
+		numSyncs:              10,
 		tolerance:             0.2,
 	})
 }
