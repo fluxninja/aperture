@@ -8,78 +8,6 @@ import "aperture/policy/language/v1/std_components.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
 
-// Selects flows based on control point, flow labels, agent group and the service
-// that the [flow control component](/concepts/flow-control/flow-control.md#components)
-// will operate on.
-//
-// :::info
-//
-// See also [Selector overview](/concepts/flow-control/selector.md).
-//
-// :::
-//
-// Example:
-// ```yaml
-// control_point: ingress
-// label_matcher:
-//   match_labels:
-//     user_tier: gold
-//   match_expressions:
-//     - key: query
-//       operator: In
-//       values:
-//         - insert
-//         - delete
-//   expression:
-//     label_matches:
-//         - label: user_agent
-//           regex: ^(?!.*Chrome).*Safari
-// ```
-message Selector {
-  // [Control Point](/concepts/flow-control/selector.md#control-point)
-  // identifies location within services where policies can act on flows.
-  // For an SDK based insertion,
-  // a _Control Point_ can represent a particular feature or execution
-  // block within a service. In case of service mesh or middleware insertion, a
-  // _Control Point_ can identify ingress or egress calls or distinct listeners
-  // or filter chains.
-  string control_point = 1; // @gotags: validate:"required"
-
-  // [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
-  // selector applies to.
-  //
-  // :::info
-  //
-  // Agent Groups are used to scope policies to a subset of agents connected to the same controller.
-  // The agents within an agent group receive exact same policy configuration and
-  // form a peer to peer cluster to constantly share state.
-  //
-  // :::
-  string agent_group = 2; // @gotags: default:"default"
-
-  // The Fully Qualified Domain Name of the
-  // [service](/concepts/flow-control/selector.md) to select.
-  //
-  // In Kubernetes, this is the FQDN of the Service object.
-  //
-  // :::info
-  //
-  // `any` matches all services.
-  //
-  // :::
-  //
-  // :::info
-  //
-  // An entity (for example, Kubernetes pod) might belong to multiple services.
-  //
-  // :::
-  string service = 3; // @gotags: default:"any"
-
-  // [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
-  // can be used to match flows based on flow labels.
-  LabelMatcher label_matcher = 4;
-}
-
 // FlowControl Resources
 message FlowControlResources {
   // Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
@@ -90,6 +18,483 @@ message FlowControlResources {
   //
   // The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
   repeated Classifier classifiers = 2; // @gotags: validate:"dive"
+}
+
+// _Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
+message FlowControl {
+  oneof component {
+    QuotaScheduler quota_scheduler = 1;
+
+    // _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
+    RateLimiter rate_limiter = 6;
+
+    // _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
+    LoadScheduler load_scheduler = 7;
+
+    // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+    AdaptiveLoadScheduler adaptive_load_scheduler = 8;
+
+    // Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+    Regulator regulator = 9;
+
+    // _Load Ramp_ smoothly regulates the flow of requests over specified steps.
+    LoadRamp load_ramp = 10;
+
+    // _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
+    LoadRampSeries load_ramp_series = 11;
+
+    // Extends flow control with private components.
+    google.protobuf.Any private = 1000;
+  }
+}
+
+// Schedules the traffic based on token-bucket based quotas.
+message QuotaScheduler {
+  RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
+
+  RateLimiter.Parameters parameters = 2; // @gotags: validate:"required"
+
+  Scheduler scheduler = 3; // @gotags: validate:"required"
+
+  repeated Selector selectors = 4; // @gotags: validate:"required,gt=0,dive"
+}
+
+// Limits the traffic on a control point to specified rate
+//
+// :::info
+//
+// See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+//
+// :::
+//
+// RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
+message RateLimiter {
+  message Parameters {
+    message LazySync {
+      // Enables lazy sync
+      bool enabled = 1; // @gotags: default:"false"
+
+      // Number of times to lazy sync within the `interval`.
+      uint32 num_sync = 2; // @gotags: default:"4" validate:"gt=0"
+    }
+    // Specifies which label the rate limiter should be keyed by.
+    //
+    // Rate limiting is done independently for each value of the
+    // [label](/concepts/flow-control/flow-label.md) with given key.
+    // For example, to give each user a separate limit, assuming you
+    // have a _user_ flow
+    // label set up, set `label_key: "user"`.
+    // If `label_key` is not specified, then all requests are rate limited
+    // that match the selectors.
+    string label_key = 1;
+
+    // Flow label key that will be used to override the number of tokens
+    // for this request.
+    // This is an optional parameter and takes highest precedence
+    // when assigning tokens to a request.
+    // The label value must be a valid uint64 number.
+    string tokens_label_key = 2; // @gotags: default:"tokens"
+
+    // Interval defines the time interval in which the token bucket
+    // will fill tokens specified by `fill_amount` signal.
+    google.protobuf.Duration interval = 3; // @gotags: validate:"required"
+
+    // Continuous fill determines whether the token bucket should be filled
+    // continuously or only on discrete intervals.
+    bool continuous_fill = 4; // @gotags: default:"true"
+
+    // Max idle time before token bucket state for a label is removed.
+    // If set to 0, the state is never removed.
+    google.protobuf.Duration max_idle_time = 5; // @gotags: default:"7200s"
+
+    // Configuration of lazy-syncing behavior of rate limiter
+    LazySync lazy_sync = 6;
+  }
+
+  // Inputs for the RateLimiter component
+  message Ins {
+    // Capacity of the bucket.
+    InPort bucket_capacity = 1; // @gotags: validate:"required"
+    // Number of tokens to fill within an `interval`.
+    InPort fill_amount = 2; // @gotags: validate:"required"
+    // PassThrough port determines whether all requests
+    InPort pass_through = 3;
+  }
+
+  // Input ports for the RateLimiter component
+  Ins in_ports = 1; // @gotags: validate:"required"
+
+  // Parameters for the RateLimiter component
+  Parameters parameters = 2; // @gotags: validate:"required"
+
+  // Selectors for the component.
+  repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+}
+
+// _Load Scheduler_ is an actuator component that regulates flows to provide active service protection
+//
+// :::info
+//
+// See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+//
+// :::
+//
+// It's based on the actuation strategy (for example, load actuator) and workload scheduling
+// which is based on Weighted Fair Queuing principles.
+// It measures and controls the incoming tokens per second, which can translate
+// to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
+//
+// LoadScheduler configuration is split into two parts: An actuation
+// strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+message LoadScheduler {
+  // Parameters for _Load Scheduler_ component
+  message Parameters {
+    // Automatically estimate the size flows within each workload, based on
+    // historical latency. Each workload's `tokens` will be set to average
+    // latency of flows in that workload during the last few seconds (exact duration
+    // of this average can change).
+    // This setting is useful in concurrency limiting use-case, where the
+    // concurrency is calculated as ``(avg. latency \* in-flight flows)`.
+    //
+    // The value of tokens estimated takes a lower precedence
+    // than the value of `tokens` specified in the workload definition
+    // and `tokens` explicitly specified in the flow labels.
+    bool workload_latency_based_tokens = 1; // @gotags: default:"true"
+
+    // Configuration of Weighted Fair Queuing-based workload scheduler.
+    //
+    // Contains configuration of per-agent scheduler
+    Scheduler scheduler = 2;
+
+    // Selectors for the component.
+    repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+  }
+
+  // Dynamic Configuration for the LoadScheduler component.
+  message DynamicConfig {
+    // Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
+    // Useful for observing the behavior of actuator without disrupting any real traffic.
+    bool dry_run = 1;
+  }
+
+  // Input for the LoadScheduler component.
+  message Ins {
+    // Load multiplier is proportion of incoming
+    // token rate that needs to be accepted.
+    InPort load_multiplier = 1;
+    // When true, pass through the requests skipping the scheduler.
+    InPort pass_through = 2;
+  }
+
+  // Output for the LoadScheduler component.
+  message Outs {
+    // Observed load multiplier is the proportion of incoming token rate that is being accepted.
+    OutPort observed_load_multiplier = 1;
+  }
+
+  // Input ports for the LoadScheduler component.
+  Ins in_ports = 1; // @gotags: validate:"required"
+
+  // Output ports for the LoadScheduler component.
+  Outs out_ports = 2;
+
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 3;
+
+  // Default configuration.
+  DynamicConfig default_config = 4;
+
+  Parameters parameters = 5; // @gotags: validate:"required"
+}
+
+// Weighted Fair Queuing-based workload scheduler
+//
+// :::note
+//
+// Each Agent instantiates an independent copy of the scheduler, but output
+// signals for accepted and incoming token rate are aggregated across all agents.
+//
+// :::
+message Scheduler {
+  // Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
+  message Workload {
+    // Parameters such as priority, tokens and fairness key that
+    // are applicable to flows within a workload.
+    message Parameters {
+      // Describes priority level of the flows within the workload.
+      // Priority level ranges from 0 to 255.
+      // Higher numbers means higher priority level.
+      // Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+      //
+      // $$
+      // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+      // $$
+      //
+      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255" default:"0"
+
+      // Tokens determines the cost of admitting a single flow in the workload,
+      // which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
+      // simply equal to 1 if the resource being accessed is constrained by the
+      // number of flows (3rd party rate limiters).
+      // This override is applicable only if tokens for the flow aren't specified
+      // in the flow labels.
+      uint64 tokens = 2;
+
+      // Fairness key is a label key that can be used to provide fairness within a workload.
+      // Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
+      // you have a classifier that sets `user` flow label, you might want to set
+      // `fairness_key = "user"`.
+      string fairness_key = 3;
+    }
+
+    // Parameters associated with flows matching the label matcher.
+    Parameters parameters = 1;
+
+    // Label Matcher to select a Workload based on
+    // [flow labels](/concepts/flow-control/flow-label.md).
+    LabelMatcher label_matcher = 2; // @gotags: validate:"required"
+  }
+
+  // List of workloads to be used in scheduler.
+  //
+  // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+  // allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
+  // There are two aspects of this "intelligence":
+  // * Scheduler can more precisely calculate concurrency if it understands
+  //   that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
+  // * Setting different priorities to different workloads lets the scheduler
+  //   avoid dropping important traffic during overload.
+  //
+  // Each workload in this list specifies also a matcher that is used to
+  // determine which flow will be categorized into which workload.
+  // In case of multiple matching workloads, the first matching one will be used.
+  // If none of workloads match, `default_workload` will be used.
+  //
+  // :::info
+  //
+  // See also [workload definition in the concepts
+  // section](/concepts/flow-control/components/load-scheduler.md#workload).
+  //
+  // :::
+  repeated Workload workloads = 1; // @gotags: validate:"dive"
+
+  // Parameters to be used if none of workloads specified in `workloads` match.
+  Workload.Parameters default_workload_parameters = 2;
+
+  // Decision deadline margin is the amount of time that the scheduler will
+  // subtract from the request deadline to determine the deadline for the
+  // decision. This is to ensure that the scheduler has enough time to
+  // make a decision before the request deadline happens, accounting for
+  // processing delays.
+  // The request deadline is based on the
+  // [gRPC deadline](https://grpc.io/blog/deadlines) or the
+  // [`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+  //
+  // Fail-open logic is use for flow control APIs, so if the gRPC deadline
+  // reaches, the flow will end up being unconditionally allowed while
+  // it is still waiting on the scheduler.
+  google.protobuf.Duration decision_deadline_margin = 6; // @gotags: default:"0.01s"
+
+  // * Key for a flow label that can be used to override the default number of tokens for this flow.
+  // * The value associated with this key must be a valid uint64 number.
+  // * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+  string tokens_label_key = 7; // @gotags: default:"tokens"
+}
+
+// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+message AdaptiveLoadScheduler {
+  // Parameters for the _Adaptive Load Scheduler_ component.
+  message Parameters {
+    // Parameters for the _Load Scheduler_.
+    LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
+
+    // Parameters for the _Gradient Controller_.
+    GradientController.Parameters gradient = 2; // @gotags: validate:"required"
+
+    // The maximum load multiplier that can be reached during recovery from an overload state.
+    // - Helps protect the service from request bursts while the system is still recovering.
+    // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+    // - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
+    double max_load_multiplier = 3; // @gotags: default:"2.0"
+
+    // Linear increment to load multiplier in each execution tick when the system is
+    // not in the overloaded state, up until the `max_load_multiplier` is reached.
+    double load_multiplier_linear_increment = 4; // @gotags: default:"0.0025"
+
+    // Configuration parameters for the embedded Alerter.
+    Alerter.Parameters alerter = 5; // @gotags: validate:"required"
+  }
+
+  // Input ports for the _Adaptive Load Scheduler_ component.
+  message Ins {
+    // The input signal to the controller.
+    InPort signal = 1; // @gotags: validate:"required"
+    // The setpoint input to the controller.
+    InPort setpoint = 2; // @gotags: validate:"required"
+    // The `overload_confirmation` port provides additional criteria to determine overload state which
+    // results in _Flow_ throttling at the service.
+    InPort overload_confirmation = 3;
+  }
+
+  // Output ports for the _Adaptive Load Scheduler_ component.
+  message Outs {
+    // A Boolean signal that indicates whether the service is in overload state.
+    OutPort is_overload = 1;
+    // Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+    OutPort desired_load_multiplier = 2;
+    // Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+    OutPort observed_load_multiplier = 3;
+  }
+
+  // Collection of input ports for the _Adaptive Load Scheduler_ component.
+  Ins in_ports = 1; // @gotags: validate:"required"
+
+  // Collection of output ports for the _Adaptive Load Scheduler_ component.
+  Outs out_ports = 2;
+
+  // Parameters for the _Adaptive Load Scheduler_ component.
+  Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Dynamic configuration key for load actuation.
+  string dynamic_config_key = 4;
+
+  // Default dynamic configuration for load actuation.
+  LoadScheduler.DynamicConfig default_config = 5;
+}
+
+// _Regulator_ is a component that regulates the load at a
+// [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
+// flows at random or by sticky sessions.
+//
+// :::info
+//
+// See also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+//
+// :::
+message Regulator {
+  // Dynamic Configuration for _Regulator_
+  message DynamicConfig {
+    // Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+    repeated string enable_label_values = 1;
+  }
+
+  message Parameters {
+    // The flow label key for identifying sessions.
+    // - When label key is specified, _Regulator_ acts as a sticky filter.
+    //   The series of flows with the same value of label key get the same
+    //   decision provided that the `accept_percentage` is same or higher.
+    // - When label key is not specified, _Regulator_ acts as a stateless filter.
+    //   Percentage of flows are selected randomly for rejection.
+    string label_key = 2;
+
+    // Selectors for the component.
+    repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+  }
+
+  message Ins {
+    // The percentage of requests to accept.
+    InPort accept_percentage = 1;
+  }
+
+  // Input ports for the _Regulator_.
+  Ins in_ports = 1;
+
+  // Parameters for the _Regulator_.
+  Parameters parameters = 2;
+
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 3;
+
+  // Default configuration.
+  DynamicConfig default_config = 4;
+}
+
+// The _Load Ramp_ produces a smooth and continuous traffic load
+// that changes progressively over time, based on the specified steps.
+//
+// Each step is defined by two parameters:
+// - The `target_accept_percentage`.
+// - The `duration` for the signal to change from the
+//   previous step's `target_accept_percentage` to the current step's
+//   `target_accept_percentage`.
+//
+// The percentage of requests accepted starts at the `target_accept_percentage`
+// defined in the first step and gradually ramps up or down linearly from
+// the previous step's `target_accept_percentage` to the next
+// `target_accept_percentage`, over the `duration` specified for each step.
+message LoadRamp {
+  // Parameters for the _Load Ramp_ component.
+  message Parameters {
+    message Step {
+      // The value of the step.
+      double target_accept_percentage = 1; // @gotags: validate:"gte=0,lte=100"
+      // Duration for which the step is active.
+      google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+    }
+
+    // Parameters for the _Regulator_.
+    Regulator.Parameters regulator = 1;
+
+    repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
+  }
+
+  // Inputs for the _Load Ramp_ component.
+  message Ins {
+    // Whether to progress the _Load Ramp_ towards the next step.
+    InPort forward = 1;
+    // Whether to progress the _Load Ramp_ towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the _Load Ramp_ to the first step.
+    InPort reset = 3;
+  }
+  // Outputs for the _Load Ramp_ component.
+  message Outs {
+    // The percentage of flows being accepted by the _Load Ramp_.
+    OutPort accept_percentage = 1;
+    // A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation.
+    OutPort at_start = 2;
+    // A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation.
+    OutPort at_end = 3;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Dynamic configuration key for flow regulator.
+  string dynamic_config_key = 9;
+
+  // Default configuration.
+  Regulator.DynamicConfig default_config = 10;
+}
+
+// _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
+message LoadRampSeries {
+  message LoadRampInstance {
+    // The load ramp.
+    LoadRamp.Parameters load_ramp = 1; // @gotags: validate:"required"
+    LoadRamp.Outs out_ports = 2;
+  }
+  // Parameters for the _LoadRampSeries_ component.
+  message Parameters {
+    // An ordered list of load ramps that get applied in order.
+    repeated LoadRampInstance load_ramps = 1; // @gotags: validate:"required,dive"
+  }
+
+  // Inputs for the _LoadRampSeries_ component.
+  message Ins {
+    // Whether to progress the load ramp series towards the next step.
+    InPort forward = 1;
+    // Whether to progress the load ramp series towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the load ramp series to the first step.
+    InPort reset = 3;
+  }
+
+  Ins in_ports = 1;
+
+  Parameters parameters = 2; // @gotags: validate:"required"
 }
 
 // Flux Meter gathers metrics for the traffic that matches its selector.
@@ -449,464 +854,74 @@ message PathTemplateMatcher {
   map<string, string> template_values = 1; // @gotags: validate:"gt=0,dive,keys,required,endkeys,required"
 }
 
-// _Flow Control_ encompasses components that manage the flow of requests or access to features within a service.
-message FlowControl {
-  oneof component {
-    // _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
-    RateLimiter rate_limiter = 6;
-
-    // _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
-    LoadScheduler load_scheduler = 7;
-
-    // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
-    AdaptiveLoadScheduler adaptive_load_scheduler = 8;
-
-    // Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
-    Regulator regulator = 9;
-
-    // _Load Ramp_ smoothly regulates the flow of requests over specified steps.
-    LoadRamp load_ramp = 10;
-
-    // _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
-    LoadRampSeries load_ramp_series = 11;
-
-    // Extends flow control with private components.
-    google.protobuf.Any private = 1000;
-  }
-}
-
-// Limits the traffic on a control point to specified rate
+// Selects flows based on control point, flow labels, agent group and the service
+// that the [flow control component](/concepts/flow-control/flow-control.md#components)
+// will operate on.
 //
 // :::info
 //
-// See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+// See also [Selector overview](/concepts/flow-control/selector.md).
 //
 // :::
 //
-// RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
-message RateLimiter {
-  message Parameters {
-    message LazySync {
-      // Enables lazy sync
-      bool enabled = 1; // @gotags: default:"false"
+// Example:
+// ```yaml
+// control_point: ingress
+// label_matcher:
+//   match_labels:
+//     user_tier: gold
+//   match_expressions:
+//     - key: query
+//       operator: In
+//       values:
+//         - insert
+//         - delete
+//   expression:
+//     label_matches:
+//         - label: user_agent
+//           regex: ^(?!.*Chrome).*Safari
+// ```
+message Selector {
+  // [Control Point](/concepts/flow-control/selector.md#control-point)
+  // identifies location within services where policies can act on flows.
+  // For an SDK based insertion,
+  // a _Control Point_ can represent a particular feature or execution
+  // block within a service. In case of service mesh or middleware insertion, a
+  // _Control Point_ can identify ingress or egress calls or distinct listeners
+  // or filter chains.
+  string control_point = 1; // @gotags: validate:"required"
 
-      // Number of times to lazy sync within the `interval`.
-      uint32 num_sync = 2; // @gotags: default:"4" validate:"gt=0"
-    }
-    // Specifies which label the rate limiter should be keyed by.
-    //
-    // Rate limiting is done independently for each value of the
-    // [label](/concepts/flow-control/flow-label.md) with given key.
-    // For example, to give each user a separate limit, assuming you
-    // have a _user_ flow
-    // label set up, set `label_key: "user"`.
-    string label_key = 1; // @gotags: validate:"required"
-
-    // Flow label key that will be used to override the number of tokens
-    // for this request.
-    // This is an optional parameter and takes highest precedence
-    // when assigning tokens to a request.
-    // The label value must be a valid uint64 number.
-    string tokens_label_key = 2; // @gotags: default:"tokens"
-
-    // Interval defines the time interval in which the token bucket
-    // will fill tokens specified by `fill_amount` signal.
-    google.protobuf.Duration interval = 3; // @gotags: validate:"required"
-
-    // Continuous fill determines whether the token bucket should be filled
-    // continuously or only on discrete intervals.
-    bool continuous_fill = 4; // @gotags: default:"true"
-
-    // Max idle time before token bucket state for a label is removed.
-    // If set to 0, the state is never removed.
-    google.protobuf.Duration max_idle_time = 5; // @gotags: default:"7200s"
-
-    // Configuration of lazy-syncing behavior of rate limiter
-    LazySync lazy_sync = 6;
-  }
-
-  // Inputs for the RateLimiter component
-  message Ins {
-    // Capacity of the bucket.
-    InPort bucket_capacity = 1; // @gotags: validate:"required"
-    // Number of tokens to fill within an `interval`.
-    InPort fill_amount = 2; // @gotags: validate:"required"
-    // PassThrough port determines whether all requests
-    InPort pass_through = 3;
-  }
-
-  // Input ports for the RateLimiter component
-  Ins in_ports = 1; // @gotags: validate:"required"
-
-  // Parameters for the RateLimiter component
-  Parameters parameters = 2; // @gotags: validate:"required"
-
-  // Selectors for the component.
-  repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
-}
-
-// _Load Scheduler_ is an actuator component that regulates flows to provide active service protection
-//
-// :::info
-//
-// See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
-//
-// :::
-//
-// It's based on the actuation strategy (for example, load actuator) and workload scheduling
-// which is based on Weighted Fair Queuing principles.
-// It measures and controls the incoming tokens per second, which can translate
-// to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
-//
-// LoadScheduler configuration is split into two parts: An actuation
-// strategy and a scheduler. At this time, only `load_actuator` strategy is available.
-message LoadScheduler {
-  // Parameters for _Load Scheduler_ component
-  message Parameters {
-    // Automatically estimate the size flows within each workload, based on
-    // historical latency. Each workload's `tokens` will be set to average
-    // latency of flows in that workload during the last few seconds (exact duration
-    // of this average can change).
-    // This setting is useful in concurrency limiting use-case, where the
-    // concurrency is calculated as ``(avg. latency \* in-flight flows)`.
-    //
-    // The value of tokens estimated takes a lower precedence
-    // than the value of `tokens` specified in the workload definition
-    // and `tokens` explicitly specified in the flow labels.
-    bool workload_latency_based_tokens = 1; // @gotags: default:"true"
-
-    // Configuration of Weighted Fair Queuing-based workload scheduler.
-    //
-    // Contains configuration of per-agent scheduler
-    Scheduler scheduler = 2;
-
-    // Selectors for the component.
-    repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
-  }
-
-  // Dynamic Configuration for the LoadScheduler component.
-  message DynamicConfig {
-    // Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
-    // Useful for observing the behavior of actuator without disrupting any real traffic.
-    bool dry_run = 1;
-  }
-
-  // Input for the LoadScheduler component.
-  message Ins {
-    // Load multiplier is proportion of incoming
-    // token rate that needs to be accepted.
-    InPort load_multiplier = 1;
-    // When true, pass through the requests skipping the scheduler.
-    InPort pass_through = 2;
-  }
-
-  // Output for the LoadScheduler component.
-  message Outs {
-    // Observed load multiplier is the proportion of incoming token rate that is being accepted.
-    OutPort observed_load_multiplier = 1;
-  }
-
-  // Input ports for the LoadScheduler component.
-  Ins in_ports = 1; // @gotags: validate:"required"
-
-  // Output ports for the LoadScheduler component.
-  Outs out_ports = 2;
-
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 3;
-
-  // Default configuration.
-  DynamicConfig default_config = 4;
-
-  Parameters parameters = 5; // @gotags: validate:"required"
-}
-
-// Weighted Fair Queuing-based workload scheduler
-//
-// :::note
-//
-// Each Agent instantiates an independent copy of the scheduler, but output
-// signals for accepted and incoming token rate are aggregated across all agents.
-//
-// :::
-message Scheduler {
-  // Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
-  message Workload {
-    // Parameters such as priority, tokens and fairness key that
-    // are applicable to flows within a workload.
-    message Parameters {
-      // Describes priority level of the flows within the workload.
-      // Priority level ranges from 0 to 255.
-      // Higher numbers means higher priority level.
-      // Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
-      //
-      // $$
-      // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
-      // $$
-      //
-      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255" default:"0"
-
-      // Tokens determines the cost of admitting a single flow in the workload,
-      // which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
-      // simply equal to 1 if the resource being accessed is constrained by the
-      // number of flows (3rd party rate limiters).
-      // This override is applicable only if tokens for the flow aren't specified
-      // in the flow labels.
-      uint64 tokens = 2;
-
-      // Fairness key is a label key that can be used to provide fairness within a workload.
-      // Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
-      // you have a classifier that sets `user` flow label, you might want to set
-      // `fairness_key = "user"`.
-      string fairness_key = 3;
-    }
-
-    // Parameters associated with flows matching the label matcher.
-    Parameters parameters = 1; // @gotags: validate:"required"
-
-    // Label Matcher to select a Workload based on
-    // [flow labels](/concepts/flow-control/flow-label.md).
-    LabelMatcher label_matcher = 2; // @gotags: validate:"required"
-  }
-
-  // List of workloads to be used in scheduler.
-  //
-  // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-  // allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
-  // There are two aspects of this "intelligence":
-  // * Scheduler can more precisely calculate concurrency if it understands
-  //   that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
-  // * Setting different priorities to different workloads lets the scheduler
-  //   avoid dropping important traffic during overload.
-  //
-  // Each workload in this list specifies also a matcher that is used to
-  // determine which flow will be categorized into which workload.
-  // In case of multiple matching workloads, the first matching one will be used.
-  // If none of workloads match, `default_workload` will be used.
+  // [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
+  // selector applies to.
   //
   // :::info
   //
-  // See also [workload definition in the concepts
-  // section](/concepts/flow-control/components/load-scheduler.md#workload).
+  // Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+  // The agents within an agent group receive exact same policy configuration and
+  // form a peer to peer cluster to constantly share state.
   //
   // :::
-  repeated Workload workloads = 1; // @gotags: validate:"dive"
+  string agent_group = 2; // @gotags: default:"default"
 
-  // Parameters to be used if none of workloads specified in `workloads` match.
-  Workload.Parameters default_workload_parameters = 2;
-
-  // Decision deadline margin is the amount of time that the scheduler will
-  // subtract from the request deadline to determine the deadline for the
-  // decision. This is to ensure that the scheduler has enough time to
-  // make a decision before the request deadline happens, accounting for
-  // processing delays.
-  // The request deadline is based on the
-  // [gRPC deadline](https://grpc.io/blog/deadlines) or the
-  // [`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+  // The Fully Qualified Domain Name of the
+  // [service](/concepts/flow-control/selector.md) to select.
   //
-  // Fail-open logic is use for flow control APIs, so if the gRPC deadline
-  // reaches, the flow will end up being unconditionally allowed while
-  // it is still waiting on the scheduler.
-  google.protobuf.Duration decision_deadline_margin = 6; // @gotags: default:"0.01s"
+  // In Kubernetes, this is the FQDN of the Service object.
+  //
+  // :::info
+  //
+  // `any` matches all services.
+  //
+  // :::
+  //
+  // :::info
+  //
+  // An entity (for example, Kubernetes pod) might belong to multiple services.
+  //
+  // :::
+  string service = 3; // @gotags: default:"any"
 
-  // * Key for a flow label that can be used to override the default number of tokens for this flow.
-  // * The value associated with this key must be a valid uint64 number.
-  // * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
-  string tokens_label_key = 7; // @gotags: default:"tokens"
-}
-
-// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
-message AdaptiveLoadScheduler {
-  // Parameters for the _Adaptive Load Scheduler_ component.
-  message Parameters {
-    // Parameters for the _Load Scheduler_.
-    LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
-
-    // Parameters for the _Gradient Controller_.
-    GradientController.Parameters gradient = 2; // @gotags: validate:"required"
-
-    // The maximum load multiplier that can be reached during recovery from an overload state.
-    // - Helps protect the service from request bursts while the system is still recovering.
-    // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-    // - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
-    double max_load_multiplier = 3; // @gotags: default:"2.0"
-
-    // Linear increment to load multiplier in each execution tick when the system is
-    // not in the overloaded state, up until the `max_load_multiplier` is reached.
-    double load_multiplier_linear_increment = 4; // @gotags: default:"0.0025"
-
-    // Configuration parameters for the embedded Alerter.
-    Alerter.Parameters alerter = 5; // @gotags: validate:"required"
-  }
-
-  // Input ports for the _Adaptive Load Scheduler_ component.
-  message Ins {
-    // The input signal to the controller.
-    InPort signal = 1; // @gotags: validate:"required"
-    // The setpoint input to the controller.
-    InPort setpoint = 2; // @gotags: validate:"required"
-    // The `overload_confirmation` port provides additional criteria to determine overload state which
-    // results in _Flow_ throttling at the service.
-    InPort overload_confirmation = 3;
-  }
-
-  // Output ports for the _Adaptive Load Scheduler_ component.
-  message Outs {
-    // A Boolean signal that indicates whether the service is in overload state.
-    OutPort is_overload = 1;
-    // Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
-    OutPort desired_load_multiplier = 2;
-    // Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
-    OutPort observed_load_multiplier = 3;
-  }
-
-  // Collection of input ports for the _Adaptive Load Scheduler_ component.
-  Ins in_ports = 1; // @gotags: validate:"required"
-
-  // Collection of output ports for the _Adaptive Load Scheduler_ component.
-  Outs out_ports = 2;
-
-  // Parameters for the _Adaptive Load Scheduler_ component.
-  Parameters parameters = 3; // @gotags: validate:"required"
-
-  // Dynamic configuration key for load actuation.
-  string dynamic_config_key = 4;
-
-  // Default dynamic configuration for load actuation.
-  LoadScheduler.DynamicConfig default_config = 5;
-}
-
-// _Regulator_ is a component that regulates the load at a
-// [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
-// flows at random or by sticky sessions.
-//
-// :::info
-//
-// See also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).
-//
-// :::
-message Regulator {
-  // Dynamic Configuration for _Regulator_
-  message DynamicConfig {
-    // Specify certain label values to be accepted by this flow filter regardless of accept percentage.
-    repeated string enable_label_values = 1;
-  }
-
-  message Parameters {
-    // The flow label key for identifying sessions.
-    // - When label key is specified, _Regulator_ acts as a sticky filter.
-    //   The series of flows with the same value of label key get the same
-    //   decision provided that the `accept_percentage` is same or higher.
-    // - When label key is not specified, _Regulator_ acts as a stateless filter.
-    //   Percentage of flows are selected randomly for rejection.
-    string label_key = 2;
-
-    // Selectors for the component.
-    repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
-  }
-
-  message Ins {
-    // The percentage of requests to accept.
-    InPort accept_percentage = 1;
-  }
-
-  // Input ports for the _Regulator_.
-  Ins in_ports = 1;
-
-  // Parameters for the _Regulator_.
-  Parameters parameters = 2;
-
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 3;
-
-  // Default configuration.
-  DynamicConfig default_config = 4;
-}
-
-// The _Load Ramp_ produces a smooth and continuous traffic load
-// that changes progressively over time, based on the specified steps.
-//
-// Each step is defined by two parameters:
-// - The `target_accept_percentage`.
-// - The `duration` for the signal to change from the
-//   previous step's `target_accept_percentage` to the current step's
-//   `target_accept_percentage`.
-//
-// The percentage of requests accepted starts at the `target_accept_percentage`
-// defined in the first step and gradually ramps up or down linearly from
-// the previous step's `target_accept_percentage` to the next
-// `target_accept_percentage`, over the `duration` specified for each step.
-message LoadRamp {
-  // Parameters for the _Load Ramp_ component.
-  message Parameters {
-    message Step {
-      // The value of the step.
-      double target_accept_percentage = 1; // @gotags: validate:"gte=0,lte=100"
-      // Duration for which the step is active.
-      google.protobuf.Duration duration = 2; // @gotags: validate:"required"
-    }
-
-    // Parameters for the _Regulator_.
-    Regulator.Parameters regulator = 1;
-
-    repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
-  }
-
-  // Inputs for the _Load Ramp_ component.
-  message Ins {
-    // Whether to progress the _Load Ramp_ towards the next step.
-    InPort forward = 1;
-    // Whether to progress the _Load Ramp_ towards the previous step.
-    InPort backward = 2;
-    // Whether to reset the _Load Ramp_ to the first step.
-    InPort reset = 3;
-  }
-  // Outputs for the _Load Ramp_ component.
-  message Outs {
-    // The percentage of flows being accepted by the _Load Ramp_.
-    OutPort accept_percentage = 1;
-    // A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation.
-    OutPort at_start = 2;
-    // A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation.
-    OutPort at_end = 3;
-  }
-
-  Ins in_ports = 1;
-  Outs out_ports = 2;
-
-  Parameters parameters = 3; // @gotags: validate:"required"
-
-  // Dynamic configuration key for flow regulator.
-  string dynamic_config_key = 9;
-
-  // Default configuration.
-  Regulator.DynamicConfig default_config = 10;
-}
-
-// _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
-message LoadRampSeries {
-  message LoadRampInstance {
-    // The load ramp.
-    LoadRamp.Parameters load_ramp = 1; // @gotags: validate:"required"
-    LoadRamp.Outs out_ports = 2;
-  }
-  // Parameters for the _LoadRampSeries_ component.
-  message Parameters {
-    // An ordered list of load ramps that get applied in order.
-    repeated LoadRampInstance load_ramps = 1; // @gotags: validate:"required,dive"
-  }
-
-  // Inputs for the _LoadRampSeries_ component.
-  message Ins {
-    // Whether to progress the load ramp series towards the next step.
-    InPort forward = 1;
-    // Whether to progress the load ramp series towards the previous step.
-    InPort backward = 2;
-    // Whether to reset the load ramp series to the first step.
-    InPort reset = 3;
-  }
-
-  Ins in_ports = 1;
-
-  Parameters parameters = 2; // @gotags: validate:"required"
+  // [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
+  // can be used to match flows based on flow labels.
+  LabelMatcher label_matcher = 4;
 }

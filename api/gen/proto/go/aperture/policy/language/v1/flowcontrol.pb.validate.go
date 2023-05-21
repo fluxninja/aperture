@@ -35,140 +35,6 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on Selector with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *Selector) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Selector with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in SelectorMultiError, or nil
-// if none found.
-func (m *Selector) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Selector) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for ControlPoint
-
-	// no validation rules for AgentGroup
-
-	// no validation rules for Service
-
-	if all {
-		switch v := interface{}(m.GetLabelMatcher()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SelectorValidationError{
-					field:  "LabelMatcher",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, SelectorValidationError{
-					field:  "LabelMatcher",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetLabelMatcher()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return SelectorValidationError{
-				field:  "LabelMatcher",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return SelectorMultiError(errors)
-	}
-
-	return nil
-}
-
-// SelectorMultiError is an error wrapping multiple validation errors returned
-// by Selector.ValidateAll() if the designated constraints aren't met.
-type SelectorMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m SelectorMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m SelectorMultiError) AllErrors() []error { return m }
-
-// SelectorValidationError is the validation error returned by
-// Selector.Validate if the designated constraints aren't met.
-type SelectorValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e SelectorValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e SelectorValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e SelectorValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e SelectorValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e SelectorValidationError) ErrorName() string { return "SelectorValidationError" }
-
-// Error satisfies the builtin error interface
-func (e SelectorValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sSelector.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = SelectorValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = SelectorValidationError{}
-
 // Validate checks the field values on FlowControlResources with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -350,6 +216,2044 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = FlowControlResourcesValidationError{}
+
+// Validate checks the field values on FlowControl with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *FlowControl) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FlowControl with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in FlowControlMultiError, or
+// nil if none found.
+func (m *FlowControl) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FlowControl) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Component.(type) {
+	case *FlowControl_QuotaScheduler:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetQuotaScheduler()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "QuotaScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "QuotaScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetQuotaScheduler()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "QuotaScheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_RateLimiter:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRateLimiter()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "RateLimiter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "RateLimiter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRateLimiter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "RateLimiter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_LoadScheduler:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLoadScheduler()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLoadScheduler()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "LoadScheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_AdaptiveLoadScheduler:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAdaptiveLoadScheduler()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "AdaptiveLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "AdaptiveLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAdaptiveLoadScheduler()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "AdaptiveLoadScheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_Regulator:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRegulator()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "Regulator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "Regulator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRegulator()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "Regulator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_LoadRamp:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLoadRamp()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRamp",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRamp",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLoadRamp()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "LoadRamp",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_LoadRampSeries:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLoadRampSeries()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRampSeries",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "LoadRampSeries",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLoadRampSeries()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "LoadRampSeries",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_Private:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetPrivate()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "Private",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "Private",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPrivate()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "Private",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return FlowControlMultiError(errors)
+	}
+
+	return nil
+}
+
+// FlowControlMultiError is an error wrapping multiple validation errors
+// returned by FlowControl.ValidateAll() if the designated constraints aren't met.
+type FlowControlMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FlowControlMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FlowControlMultiError) AllErrors() []error { return m }
+
+// FlowControlValidationError is the validation error returned by
+// FlowControl.Validate if the designated constraints aren't met.
+type FlowControlValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FlowControlValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FlowControlValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FlowControlValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FlowControlValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FlowControlValidationError) ErrorName() string { return "FlowControlValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FlowControlValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFlowControl.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FlowControlValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FlowControlValidationError{}
+
+// Validate checks the field values on QuotaScheduler with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *QuotaScheduler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QuotaScheduler with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in QuotaSchedulerMultiError,
+// or nil if none found.
+func (m *QuotaScheduler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QuotaScheduler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuotaSchedulerValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuotaSchedulerValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetScheduler()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScheduler()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuotaSchedulerValidationError{
+				field:  "Scheduler",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, QuotaSchedulerValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, QuotaSchedulerValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return QuotaSchedulerValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return QuotaSchedulerMultiError(errors)
+	}
+
+	return nil
+}
+
+// QuotaSchedulerMultiError is an error wrapping multiple validation errors
+// returned by QuotaScheduler.ValidateAll() if the designated constraints
+// aren't met.
+type QuotaSchedulerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QuotaSchedulerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QuotaSchedulerMultiError) AllErrors() []error { return m }
+
+// QuotaSchedulerValidationError is the validation error returned by
+// QuotaScheduler.Validate if the designated constraints aren't met.
+type QuotaSchedulerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QuotaSchedulerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QuotaSchedulerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QuotaSchedulerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QuotaSchedulerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QuotaSchedulerValidationError) ErrorName() string { return "QuotaSchedulerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e QuotaSchedulerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQuotaScheduler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QuotaSchedulerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QuotaSchedulerValidationError{}
+
+// Validate checks the field values on RateLimiter with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RateLimiter) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimiter with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RateLimiterMultiError, or
+// nil if none found.
+func (m *RateLimiter) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimiter) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiterValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiterValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimiterValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimiterValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimiterValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return RateLimiterMultiError(errors)
+	}
+
+	return nil
+}
+
+// RateLimiterMultiError is an error wrapping multiple validation errors
+// returned by RateLimiter.ValidateAll() if the designated constraints aren't met.
+type RateLimiterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimiterMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimiterMultiError) AllErrors() []error { return m }
+
+// RateLimiterValidationError is the validation error returned by
+// RateLimiter.Validate if the designated constraints aren't met.
+type RateLimiterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimiterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimiterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimiterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimiterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimiterValidationError) ErrorName() string { return "RateLimiterValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RateLimiterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimiter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimiterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimiterValidationError{}
+
+// Validate checks the field values on LoadScheduler with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadScheduler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadScheduler with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LoadSchedulerMultiError, or
+// nil if none found.
+func (m *LoadScheduler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadScheduler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadSchedulerValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadSchedulerValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadSchedulerValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadSchedulerValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadSchedulerMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadSchedulerMultiError is an error wrapping multiple validation errors
+// returned by LoadScheduler.ValidateAll() if the designated constraints
+// aren't met.
+type LoadSchedulerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadSchedulerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadSchedulerMultiError) AllErrors() []error { return m }
+
+// LoadSchedulerValidationError is the validation error returned by
+// LoadScheduler.Validate if the designated constraints aren't met.
+type LoadSchedulerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadSchedulerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadSchedulerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadSchedulerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadSchedulerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadSchedulerValidationError) ErrorName() string { return "LoadSchedulerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadSchedulerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadScheduler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadSchedulerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadSchedulerValidationError{}
+
+// Validate checks the field values on Scheduler with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Scheduler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Scheduler with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SchedulerMultiError, or nil
+// if none found.
+func (m *Scheduler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Scheduler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetWorkloads() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SchedulerValidationError{
+						field:  fmt.Sprintf("Workloads[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SchedulerValidationError{
+						field:  fmt.Sprintf("Workloads[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SchedulerValidationError{
+					field:  fmt.Sprintf("Workloads[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if all {
+		switch v := interface{}(m.GetDefaultWorkloadParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SchedulerValidationError{
+					field:  "DefaultWorkloadParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SchedulerValidationError{
+					field:  "DefaultWorkloadParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultWorkloadParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SchedulerValidationError{
+				field:  "DefaultWorkloadParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDecisionDeadlineMargin()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SchedulerValidationError{
+					field:  "DecisionDeadlineMargin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SchedulerValidationError{
+					field:  "DecisionDeadlineMargin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDecisionDeadlineMargin()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SchedulerValidationError{
+				field:  "DecisionDeadlineMargin",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for TokensLabelKey
+
+	if len(errors) > 0 {
+		return SchedulerMultiError(errors)
+	}
+
+	return nil
+}
+
+// SchedulerMultiError is an error wrapping multiple validation errors returned
+// by Scheduler.ValidateAll() if the designated constraints aren't met.
+type SchedulerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SchedulerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SchedulerMultiError) AllErrors() []error { return m }
+
+// SchedulerValidationError is the validation error returned by
+// Scheduler.Validate if the designated constraints aren't met.
+type SchedulerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SchedulerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SchedulerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SchedulerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SchedulerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SchedulerValidationError) ErrorName() string { return "SchedulerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SchedulerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sScheduler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SchedulerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SchedulerValidationError{}
+
+// Validate checks the field values on AdaptiveLoadScheduler with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AdaptiveLoadScheduler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AdaptiveLoadScheduler with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AdaptiveLoadSchedulerMultiError, or nil if none found.
+func (m *AdaptiveLoadScheduler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AdaptiveLoadScheduler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdaptiveLoadSchedulerValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdaptiveLoadSchedulerValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdaptiveLoadSchedulerValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AdaptiveLoadSchedulerValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdaptiveLoadSchedulerValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AdaptiveLoadSchedulerMultiError(errors)
+	}
+
+	return nil
+}
+
+// AdaptiveLoadSchedulerMultiError is an error wrapping multiple validation
+// errors returned by AdaptiveLoadScheduler.ValidateAll() if the designated
+// constraints aren't met.
+type AdaptiveLoadSchedulerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AdaptiveLoadSchedulerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AdaptiveLoadSchedulerMultiError) AllErrors() []error { return m }
+
+// AdaptiveLoadSchedulerValidationError is the validation error returned by
+// AdaptiveLoadScheduler.Validate if the designated constraints aren't met.
+type AdaptiveLoadSchedulerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AdaptiveLoadSchedulerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AdaptiveLoadSchedulerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AdaptiveLoadSchedulerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AdaptiveLoadSchedulerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AdaptiveLoadSchedulerValidationError) ErrorName() string {
+	return "AdaptiveLoadSchedulerValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AdaptiveLoadSchedulerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAdaptiveLoadScheduler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AdaptiveLoadSchedulerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AdaptiveLoadSchedulerValidationError{}
+
+// Validate checks the field values on Regulator with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Regulator) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Regulator with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RegulatorMultiError, or nil
+// if none found.
+func (m *Regulator) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Regulator) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RegulatorValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RegulatorValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RegulatorValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RegulatorValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RegulatorValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RegulatorValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RegulatorValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RegulatorValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RegulatorValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return RegulatorMultiError(errors)
+	}
+
+	return nil
+}
+
+// RegulatorMultiError is an error wrapping multiple validation errors returned
+// by Regulator.ValidateAll() if the designated constraints aren't met.
+type RegulatorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegulatorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegulatorMultiError) AllErrors() []error { return m }
+
+// RegulatorValidationError is the validation error returned by
+// Regulator.Validate if the designated constraints aren't met.
+type RegulatorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegulatorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegulatorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegulatorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegulatorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegulatorValidationError) ErrorName() string { return "RegulatorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RegulatorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegulator.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegulatorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegulatorValidationError{}
+
+// Validate checks the field values on LoadRamp with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadRamp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRamp with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LoadRampMultiError, or nil
+// if none found.
+func (m *LoadRamp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRamp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRampMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRampMultiError is an error wrapping multiple validation errors returned
+// by LoadRamp.ValidateAll() if the designated constraints aren't met.
+type LoadRampMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRampMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRampMultiError) AllErrors() []error { return m }
+
+// LoadRampValidationError is the validation error returned by
+// LoadRamp.Validate if the designated constraints aren't met.
+type LoadRampValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRampValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRampValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRampValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRampValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRampValidationError) ErrorName() string { return "LoadRampValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadRampValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRamp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRampValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRampValidationError{}
+
+// Validate checks the field values on LoadRampSeries with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LoadRampSeries) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadRampSeries with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LoadRampSeriesMultiError,
+// or nil if none found.
+func (m *LoadRampSeries) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadRampSeries) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeriesValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadRampSeriesValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadRampSeriesValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LoadRampSeriesMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadRampSeriesMultiError is an error wrapping multiple validation errors
+// returned by LoadRampSeries.ValidateAll() if the designated constraints
+// aren't met.
+type LoadRampSeriesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadRampSeriesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadRampSeriesMultiError) AllErrors() []error { return m }
+
+// LoadRampSeriesValidationError is the validation error returned by
+// LoadRampSeries.Validate if the designated constraints aren't met.
+type LoadRampSeriesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadRampSeriesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadRampSeriesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadRampSeriesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadRampSeriesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadRampSeriesValidationError) ErrorName() string { return "LoadRampSeriesValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadRampSeriesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadRampSeries.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadRampSeriesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadRampSeriesValidationError{}
 
 // Validate checks the field values on FluxMeter with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -1848,935 +3752,76 @@ var _ interface {
 	ErrorName() string
 } = PathTemplateMatcherValidationError{}
 
-// Validate checks the field values on FlowControl with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *FlowControl) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FlowControl with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in FlowControlMultiError, or
-// nil if none found.
-func (m *FlowControl) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FlowControl) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	switch v := m.Component.(type) {
-	case *FlowControl_RateLimiter:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetRateLimiter()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "RateLimiter",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "RateLimiter",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetRateLimiter()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "RateLimiter",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *FlowControl_LoadScheduler:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetLoadScheduler()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetLoadScheduler()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "LoadScheduler",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *FlowControl_AdaptiveLoadScheduler:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetAdaptiveLoadScheduler()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "AdaptiveLoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "AdaptiveLoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetAdaptiveLoadScheduler()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "AdaptiveLoadScheduler",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *FlowControl_Regulator:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetRegulator()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "Regulator",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "Regulator",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetRegulator()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "Regulator",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *FlowControl_LoadRamp:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetLoadRamp()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LoadRamp",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LoadRamp",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetLoadRamp()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "LoadRamp",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *FlowControl_LoadRampSeries:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetLoadRampSeries()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LoadRampSeries",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "LoadRampSeries",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetLoadRampSeries()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "LoadRampSeries",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *FlowControl_Private:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetPrivate()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "Private",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "Private",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetPrivate()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "Private",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-
-	if len(errors) > 0 {
-		return FlowControlMultiError(errors)
-	}
-
-	return nil
-}
-
-// FlowControlMultiError is an error wrapping multiple validation errors
-// returned by FlowControl.ValidateAll() if the designated constraints aren't met.
-type FlowControlMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FlowControlMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FlowControlMultiError) AllErrors() []error { return m }
-
-// FlowControlValidationError is the validation error returned by
-// FlowControl.Validate if the designated constraints aren't met.
-type FlowControlValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e FlowControlValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e FlowControlValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e FlowControlValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e FlowControlValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e FlowControlValidationError) ErrorName() string { return "FlowControlValidationError" }
-
-// Error satisfies the builtin error interface
-func (e FlowControlValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sFlowControl.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = FlowControlValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = FlowControlValidationError{}
-
-// Validate checks the field values on RateLimiter with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *RateLimiter) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on RateLimiter with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in RateLimiterMultiError, or
-// nil if none found.
-func (m *RateLimiter) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *RateLimiter) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiterValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiterValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	for idx, item := range m.GetSelectors() {
-		_, _ = idx, item
-
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, RateLimiterValidationError{
-						field:  fmt.Sprintf("Selectors[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, RateLimiterValidationError{
-						field:  fmt.Sprintf("Selectors[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RateLimiterValidationError{
-					field:  fmt.Sprintf("Selectors[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	if len(errors) > 0 {
-		return RateLimiterMultiError(errors)
-	}
-
-	return nil
-}
-
-// RateLimiterMultiError is an error wrapping multiple validation errors
-// returned by RateLimiter.ValidateAll() if the designated constraints aren't met.
-type RateLimiterMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RateLimiterMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RateLimiterMultiError) AllErrors() []error { return m }
-
-// RateLimiterValidationError is the validation error returned by
-// RateLimiter.Validate if the designated constraints aren't met.
-type RateLimiterValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RateLimiterValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RateLimiterValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RateLimiterValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RateLimiterValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RateLimiterValidationError) ErrorName() string { return "RateLimiterValidationError" }
-
-// Error satisfies the builtin error interface
-func (e RateLimiterValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRateLimiter.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RateLimiterValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RateLimiterValidationError{}
-
-// Validate checks the field values on LoadScheduler with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *LoadScheduler) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LoadScheduler with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in LoadSchedulerMultiError, or
-// nil if none found.
-func (m *LoadScheduler) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LoadScheduler) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadSchedulerValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOutPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadSchedulerValidationError{
-				field:  "OutPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadSchedulerValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadSchedulerValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return LoadSchedulerMultiError(errors)
-	}
-
-	return nil
-}
-
-// LoadSchedulerMultiError is an error wrapping multiple validation errors
-// returned by LoadScheduler.ValidateAll() if the designated constraints
-// aren't met.
-type LoadSchedulerMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LoadSchedulerMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LoadSchedulerMultiError) AllErrors() []error { return m }
-
-// LoadSchedulerValidationError is the validation error returned by
-// LoadScheduler.Validate if the designated constraints aren't met.
-type LoadSchedulerValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LoadSchedulerValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LoadSchedulerValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LoadSchedulerValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LoadSchedulerValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LoadSchedulerValidationError) ErrorName() string { return "LoadSchedulerValidationError" }
-
-// Error satisfies the builtin error interface
-func (e LoadSchedulerValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLoadScheduler.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LoadSchedulerValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LoadSchedulerValidationError{}
-
-// Validate checks the field values on Scheduler with the rules defined in the
+// Validate checks the field values on Selector with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *Scheduler) Validate() error {
+func (m *Selector) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Scheduler with the rules defined in
+// ValidateAll checks the field values on Selector with the rules defined in
 // the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in SchedulerMultiError, or nil
+// result is a list of violation errors wrapped in SelectorMultiError, or nil
 // if none found.
-func (m *Scheduler) ValidateAll() error {
+func (m *Selector) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Scheduler) validate(all bool) error {
+func (m *Selector) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	for idx, item := range m.GetWorkloads() {
-		_, _ = idx, item
+	// no validation rules for ControlPoint
 
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, SchedulerValidationError{
-						field:  fmt.Sprintf("Workloads[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, SchedulerValidationError{
-						field:  fmt.Sprintf("Workloads[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return SchedulerValidationError{
-					field:  fmt.Sprintf("Workloads[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
+	// no validation rules for AgentGroup
 
-	}
+	// no validation rules for Service
 
 	if all {
-		switch v := interface{}(m.GetDefaultWorkloadParameters()).(type) {
+		switch v := interface{}(m.GetLabelMatcher()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SchedulerValidationError{
-					field:  "DefaultWorkloadParameters",
+				errors = append(errors, SelectorValidationError{
+					field:  "LabelMatcher",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, SchedulerValidationError{
-					field:  "DefaultWorkloadParameters",
+				errors = append(errors, SelectorValidationError{
+					field:  "LabelMatcher",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetDefaultWorkloadParameters()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetLabelMatcher()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return SchedulerValidationError{
-				field:  "DefaultWorkloadParameters",
+			return SelectorValidationError{
+				field:  "LabelMatcher",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
-
-	if all {
-		switch v := interface{}(m.GetDecisionDeadlineMargin()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SchedulerValidationError{
-					field:  "DecisionDeadlineMargin",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, SchedulerValidationError{
-					field:  "DecisionDeadlineMargin",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDecisionDeadlineMargin()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return SchedulerValidationError{
-				field:  "DecisionDeadlineMargin",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for TokensLabelKey
 
 	if len(errors) > 0 {
-		return SchedulerMultiError(errors)
+		return SelectorMultiError(errors)
 	}
 
 	return nil
 }
 
-// SchedulerMultiError is an error wrapping multiple validation errors returned
-// by Scheduler.ValidateAll() if the designated constraints aren't met.
-type SchedulerMultiError []error
+// SelectorMultiError is an error wrapping multiple validation errors returned
+// by Selector.ValidateAll() if the designated constraints aren't met.
+type SelectorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m SchedulerMultiError) Error() string {
+func (m SelectorMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2785,11 +3830,11 @@ func (m SchedulerMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m SchedulerMultiError) AllErrors() []error { return m }
+func (m SelectorMultiError) AllErrors() []error { return m }
 
-// SchedulerValidationError is the validation error returned by
-// Scheduler.Validate if the designated constraints aren't met.
-type SchedulerValidationError struct {
+// SelectorValidationError is the validation error returned by
+// Selector.Validate if the designated constraints aren't met.
+type SelectorValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2797,22 +3842,22 @@ type SchedulerValidationError struct {
 }
 
 // Field function returns field value.
-func (e SchedulerValidationError) Field() string { return e.field }
+func (e SelectorValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e SchedulerValidationError) Reason() string { return e.reason }
+func (e SelectorValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e SchedulerValidationError) Cause() error { return e.cause }
+func (e SelectorValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e SchedulerValidationError) Key() bool { return e.key }
+func (e SelectorValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e SchedulerValidationError) ErrorName() string { return "SchedulerValidationError" }
+func (e SelectorValidationError) ErrorName() string { return "SelectorValidationError" }
 
 // Error satisfies the builtin error interface
-func (e SchedulerValidationError) Error() string {
+func (e SelectorValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2824,14 +3869,14 @@ func (e SchedulerValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sScheduler.%s: %s%s",
+		"invalid %sSelector.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = SchedulerValidationError{}
+var _ error = SelectorValidationError{}
 
 var _ interface {
 	Field() string
@@ -2839,1324 +3884,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = SchedulerValidationError{}
-
-// Validate checks the field values on AdaptiveLoadScheduler with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AdaptiveLoadScheduler) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on AdaptiveLoadScheduler with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// AdaptiveLoadSchedulerMultiError, or nil if none found.
-func (m *AdaptiveLoadScheduler) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AdaptiveLoadScheduler) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadSchedulerValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOutPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadSchedulerValidationError{
-				field:  "OutPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadSchedulerValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadSchedulerValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return AdaptiveLoadSchedulerMultiError(errors)
-	}
-
-	return nil
-}
-
-// AdaptiveLoadSchedulerMultiError is an error wrapping multiple validation
-// errors returned by AdaptiveLoadScheduler.ValidateAll() if the designated
-// constraints aren't met.
-type AdaptiveLoadSchedulerMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AdaptiveLoadSchedulerMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AdaptiveLoadSchedulerMultiError) AllErrors() []error { return m }
-
-// AdaptiveLoadSchedulerValidationError is the validation error returned by
-// AdaptiveLoadScheduler.Validate if the designated constraints aren't met.
-type AdaptiveLoadSchedulerValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AdaptiveLoadSchedulerValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AdaptiveLoadSchedulerValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AdaptiveLoadSchedulerValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AdaptiveLoadSchedulerValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AdaptiveLoadSchedulerValidationError) ErrorName() string {
-	return "AdaptiveLoadSchedulerValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e AdaptiveLoadSchedulerValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAdaptiveLoadScheduler.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AdaptiveLoadSchedulerValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AdaptiveLoadSchedulerValidationError{}
-
-// Validate checks the field values on Regulator with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *Regulator) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Regulator with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in RegulatorMultiError, or nil
-// if none found.
-func (m *Regulator) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Regulator) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RegulatorValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RegulatorValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RegulatorValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return RegulatorMultiError(errors)
-	}
-
-	return nil
-}
-
-// RegulatorMultiError is an error wrapping multiple validation errors returned
-// by Regulator.ValidateAll() if the designated constraints aren't met.
-type RegulatorMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RegulatorMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RegulatorMultiError) AllErrors() []error { return m }
-
-// RegulatorValidationError is the validation error returned by
-// Regulator.Validate if the designated constraints aren't met.
-type RegulatorValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RegulatorValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RegulatorValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RegulatorValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RegulatorValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RegulatorValidationError) ErrorName() string { return "RegulatorValidationError" }
-
-// Error satisfies the builtin error interface
-func (e RegulatorValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRegulator.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RegulatorValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RegulatorValidationError{}
-
-// Validate checks the field values on LoadRamp with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *LoadRamp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LoadRamp with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in LoadRampMultiError, or nil
-// if none found.
-func (m *LoadRamp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LoadRamp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadRampValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOutPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "OutPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadRampValidationError{
-				field:  "OutPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadRampValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadRampValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return LoadRampMultiError(errors)
-	}
-
-	return nil
-}
-
-// LoadRampMultiError is an error wrapping multiple validation errors returned
-// by LoadRamp.ValidateAll() if the designated constraints aren't met.
-type LoadRampMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LoadRampMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LoadRampMultiError) AllErrors() []error { return m }
-
-// LoadRampValidationError is the validation error returned by
-// LoadRamp.Validate if the designated constraints aren't met.
-type LoadRampValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LoadRampValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LoadRampValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LoadRampValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LoadRampValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LoadRampValidationError) ErrorName() string { return "LoadRampValidationError" }
-
-// Error satisfies the builtin error interface
-func (e LoadRampValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLoadRamp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LoadRampValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LoadRampValidationError{}
-
-// Validate checks the field values on LoadRampSeries with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *LoadRampSeries) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LoadRampSeries with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in LoadRampSeriesMultiError,
-// or nil if none found.
-func (m *LoadRampSeries) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LoadRampSeries) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRampSeriesValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRampSeriesValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadRampSeriesValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRampSeriesValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRampSeriesValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadRampSeriesValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return LoadRampSeriesMultiError(errors)
-	}
-
-	return nil
-}
-
-// LoadRampSeriesMultiError is an error wrapping multiple validation errors
-// returned by LoadRampSeries.ValidateAll() if the designated constraints
-// aren't met.
-type LoadRampSeriesMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LoadRampSeriesMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LoadRampSeriesMultiError) AllErrors() []error { return m }
-
-// LoadRampSeriesValidationError is the validation error returned by
-// LoadRampSeries.Validate if the designated constraints aren't met.
-type LoadRampSeriesValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LoadRampSeriesValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LoadRampSeriesValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LoadRampSeriesValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LoadRampSeriesValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LoadRampSeriesValidationError) ErrorName() string { return "LoadRampSeriesValidationError" }
-
-// Error satisfies the builtin error interface
-func (e LoadRampSeriesValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLoadRampSeries.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LoadRampSeriesValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LoadRampSeriesValidationError{}
-
-// Validate checks the field values on FluxMeter_StaticBuckets with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *FluxMeter_StaticBuckets) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FluxMeter_StaticBuckets with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FluxMeter_StaticBucketsMultiError, or nil if none found.
-func (m *FluxMeter_StaticBuckets) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FluxMeter_StaticBuckets) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return FluxMeter_StaticBucketsMultiError(errors)
-	}
-
-	return nil
-}
-
-// FluxMeter_StaticBucketsMultiError is an error wrapping multiple validation
-// errors returned by FluxMeter_StaticBuckets.ValidateAll() if the designated
-// constraints aren't met.
-type FluxMeter_StaticBucketsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FluxMeter_StaticBucketsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FluxMeter_StaticBucketsMultiError) AllErrors() []error { return m }
-
-// FluxMeter_StaticBucketsValidationError is the validation error returned by
-// FluxMeter_StaticBuckets.Validate if the designated constraints aren't met.
-type FluxMeter_StaticBucketsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e FluxMeter_StaticBucketsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e FluxMeter_StaticBucketsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e FluxMeter_StaticBucketsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e FluxMeter_StaticBucketsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e FluxMeter_StaticBucketsValidationError) ErrorName() string {
-	return "FluxMeter_StaticBucketsValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e FluxMeter_StaticBucketsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sFluxMeter_StaticBuckets.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = FluxMeter_StaticBucketsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = FluxMeter_StaticBucketsValidationError{}
-
-// Validate checks the field values on FluxMeter_LinearBuckets with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *FluxMeter_LinearBuckets) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FluxMeter_LinearBuckets with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FluxMeter_LinearBucketsMultiError, or nil if none found.
-func (m *FluxMeter_LinearBuckets) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FluxMeter_LinearBuckets) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Start
-
-	// no validation rules for Width
-
-	// no validation rules for Count
-
-	if len(errors) > 0 {
-		return FluxMeter_LinearBucketsMultiError(errors)
-	}
-
-	return nil
-}
-
-// FluxMeter_LinearBucketsMultiError is an error wrapping multiple validation
-// errors returned by FluxMeter_LinearBuckets.ValidateAll() if the designated
-// constraints aren't met.
-type FluxMeter_LinearBucketsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FluxMeter_LinearBucketsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FluxMeter_LinearBucketsMultiError) AllErrors() []error { return m }
-
-// FluxMeter_LinearBucketsValidationError is the validation error returned by
-// FluxMeter_LinearBuckets.Validate if the designated constraints aren't met.
-type FluxMeter_LinearBucketsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e FluxMeter_LinearBucketsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e FluxMeter_LinearBucketsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e FluxMeter_LinearBucketsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e FluxMeter_LinearBucketsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e FluxMeter_LinearBucketsValidationError) ErrorName() string {
-	return "FluxMeter_LinearBucketsValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e FluxMeter_LinearBucketsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sFluxMeter_LinearBuckets.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = FluxMeter_LinearBucketsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = FluxMeter_LinearBucketsValidationError{}
-
-// Validate checks the field values on FluxMeter_ExponentialBuckets with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *FluxMeter_ExponentialBuckets) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FluxMeter_ExponentialBuckets with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FluxMeter_ExponentialBucketsMultiError, or nil if none found.
-func (m *FluxMeter_ExponentialBuckets) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FluxMeter_ExponentialBuckets) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Start
-
-	// no validation rules for Factor
-
-	// no validation rules for Count
-
-	if len(errors) > 0 {
-		return FluxMeter_ExponentialBucketsMultiError(errors)
-	}
-
-	return nil
-}
-
-// FluxMeter_ExponentialBucketsMultiError is an error wrapping multiple
-// validation errors returned by FluxMeter_ExponentialBuckets.ValidateAll() if
-// the designated constraints aren't met.
-type FluxMeter_ExponentialBucketsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FluxMeter_ExponentialBucketsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FluxMeter_ExponentialBucketsMultiError) AllErrors() []error { return m }
-
-// FluxMeter_ExponentialBucketsValidationError is the validation error returned
-// by FluxMeter_ExponentialBuckets.Validate if the designated constraints
-// aren't met.
-type FluxMeter_ExponentialBucketsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e FluxMeter_ExponentialBucketsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e FluxMeter_ExponentialBucketsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e FluxMeter_ExponentialBucketsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e FluxMeter_ExponentialBucketsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e FluxMeter_ExponentialBucketsValidationError) ErrorName() string {
-	return "FluxMeter_ExponentialBucketsValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e FluxMeter_ExponentialBucketsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sFluxMeter_ExponentialBuckets.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = FluxMeter_ExponentialBucketsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = FluxMeter_ExponentialBucketsValidationError{}
-
-// Validate checks the field values on FluxMeter_ExponentialBucketsRange with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the first error encountered is returned, or nil if there are
-// no violations.
-func (m *FluxMeter_ExponentialBucketsRange) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FluxMeter_ExponentialBucketsRange
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the result is a list of violation errors wrapped in
-// FluxMeter_ExponentialBucketsRangeMultiError, or nil if none found.
-func (m *FluxMeter_ExponentialBucketsRange) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FluxMeter_ExponentialBucketsRange) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Min
-
-	// no validation rules for Max
-
-	// no validation rules for Count
-
-	if len(errors) > 0 {
-		return FluxMeter_ExponentialBucketsRangeMultiError(errors)
-	}
-
-	return nil
-}
-
-// FluxMeter_ExponentialBucketsRangeMultiError is an error wrapping multiple
-// validation errors returned by
-// FluxMeter_ExponentialBucketsRange.ValidateAll() if the designated
-// constraints aren't met.
-type FluxMeter_ExponentialBucketsRangeMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FluxMeter_ExponentialBucketsRangeMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FluxMeter_ExponentialBucketsRangeMultiError) AllErrors() []error { return m }
-
-// FluxMeter_ExponentialBucketsRangeValidationError is the validation error
-// returned by FluxMeter_ExponentialBucketsRange.Validate if the designated
-// constraints aren't met.
-type FluxMeter_ExponentialBucketsRangeValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e FluxMeter_ExponentialBucketsRangeValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e FluxMeter_ExponentialBucketsRangeValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e FluxMeter_ExponentialBucketsRangeValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e FluxMeter_ExponentialBucketsRangeValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e FluxMeter_ExponentialBucketsRangeValidationError) ErrorName() string {
-	return "FluxMeter_ExponentialBucketsRangeValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e FluxMeter_ExponentialBucketsRangeValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sFluxMeter_ExponentialBucketsRange.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = FluxMeter_ExponentialBucketsRangeValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = FluxMeter_ExponentialBucketsRangeValidationError{}
-
-// Validate checks the field values on Rego_LabelProperties with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *Rego_LabelProperties) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Rego_LabelProperties with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// Rego_LabelPropertiesMultiError, or nil if none found.
-func (m *Rego_LabelProperties) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Rego_LabelProperties) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Telemetry
-
-	if len(errors) > 0 {
-		return Rego_LabelPropertiesMultiError(errors)
-	}
-
-	return nil
-}
-
-// Rego_LabelPropertiesMultiError is an error wrapping multiple validation
-// errors returned by Rego_LabelProperties.ValidateAll() if the designated
-// constraints aren't met.
-type Rego_LabelPropertiesMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m Rego_LabelPropertiesMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m Rego_LabelPropertiesMultiError) AllErrors() []error { return m }
-
-// Rego_LabelPropertiesValidationError is the validation error returned by
-// Rego_LabelProperties.Validate if the designated constraints aren't met.
-type Rego_LabelPropertiesValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e Rego_LabelPropertiesValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e Rego_LabelPropertiesValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e Rego_LabelPropertiesValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e Rego_LabelPropertiesValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e Rego_LabelPropertiesValidationError) ErrorName() string {
-	return "Rego_LabelPropertiesValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e Rego_LabelPropertiesValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRego_LabelProperties.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = Rego_LabelPropertiesValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = Rego_LabelPropertiesValidationError{}
+} = SelectorValidationError{}
 
 // Validate checks the field values on RateLimiter_Parameters with the rules
 // defined in the proto definition for this message. If any rules are
@@ -7578,3 +7306,537 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadRampSeries_InsValidationError{}
+
+// Validate checks the field values on FluxMeter_StaticBuckets with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *FluxMeter_StaticBuckets) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FluxMeter_StaticBuckets with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// FluxMeter_StaticBucketsMultiError, or nil if none found.
+func (m *FluxMeter_StaticBuckets) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FluxMeter_StaticBuckets) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return FluxMeter_StaticBucketsMultiError(errors)
+	}
+
+	return nil
+}
+
+// FluxMeter_StaticBucketsMultiError is an error wrapping multiple validation
+// errors returned by FluxMeter_StaticBuckets.ValidateAll() if the designated
+// constraints aren't met.
+type FluxMeter_StaticBucketsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FluxMeter_StaticBucketsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FluxMeter_StaticBucketsMultiError) AllErrors() []error { return m }
+
+// FluxMeter_StaticBucketsValidationError is the validation error returned by
+// FluxMeter_StaticBuckets.Validate if the designated constraints aren't met.
+type FluxMeter_StaticBucketsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FluxMeter_StaticBucketsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FluxMeter_StaticBucketsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FluxMeter_StaticBucketsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FluxMeter_StaticBucketsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FluxMeter_StaticBucketsValidationError) ErrorName() string {
+	return "FluxMeter_StaticBucketsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FluxMeter_StaticBucketsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFluxMeter_StaticBuckets.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FluxMeter_StaticBucketsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FluxMeter_StaticBucketsValidationError{}
+
+// Validate checks the field values on FluxMeter_LinearBuckets with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *FluxMeter_LinearBuckets) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FluxMeter_LinearBuckets with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// FluxMeter_LinearBucketsMultiError, or nil if none found.
+func (m *FluxMeter_LinearBuckets) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FluxMeter_LinearBuckets) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Start
+
+	// no validation rules for Width
+
+	// no validation rules for Count
+
+	if len(errors) > 0 {
+		return FluxMeter_LinearBucketsMultiError(errors)
+	}
+
+	return nil
+}
+
+// FluxMeter_LinearBucketsMultiError is an error wrapping multiple validation
+// errors returned by FluxMeter_LinearBuckets.ValidateAll() if the designated
+// constraints aren't met.
+type FluxMeter_LinearBucketsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FluxMeter_LinearBucketsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FluxMeter_LinearBucketsMultiError) AllErrors() []error { return m }
+
+// FluxMeter_LinearBucketsValidationError is the validation error returned by
+// FluxMeter_LinearBuckets.Validate if the designated constraints aren't met.
+type FluxMeter_LinearBucketsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FluxMeter_LinearBucketsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FluxMeter_LinearBucketsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FluxMeter_LinearBucketsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FluxMeter_LinearBucketsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FluxMeter_LinearBucketsValidationError) ErrorName() string {
+	return "FluxMeter_LinearBucketsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FluxMeter_LinearBucketsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFluxMeter_LinearBuckets.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FluxMeter_LinearBucketsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FluxMeter_LinearBucketsValidationError{}
+
+// Validate checks the field values on FluxMeter_ExponentialBuckets with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *FluxMeter_ExponentialBuckets) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FluxMeter_ExponentialBuckets with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// FluxMeter_ExponentialBucketsMultiError, or nil if none found.
+func (m *FluxMeter_ExponentialBuckets) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FluxMeter_ExponentialBuckets) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Start
+
+	// no validation rules for Factor
+
+	// no validation rules for Count
+
+	if len(errors) > 0 {
+		return FluxMeter_ExponentialBucketsMultiError(errors)
+	}
+
+	return nil
+}
+
+// FluxMeter_ExponentialBucketsMultiError is an error wrapping multiple
+// validation errors returned by FluxMeter_ExponentialBuckets.ValidateAll() if
+// the designated constraints aren't met.
+type FluxMeter_ExponentialBucketsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FluxMeter_ExponentialBucketsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FluxMeter_ExponentialBucketsMultiError) AllErrors() []error { return m }
+
+// FluxMeter_ExponentialBucketsValidationError is the validation error returned
+// by FluxMeter_ExponentialBuckets.Validate if the designated constraints
+// aren't met.
+type FluxMeter_ExponentialBucketsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FluxMeter_ExponentialBucketsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FluxMeter_ExponentialBucketsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FluxMeter_ExponentialBucketsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FluxMeter_ExponentialBucketsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FluxMeter_ExponentialBucketsValidationError) ErrorName() string {
+	return "FluxMeter_ExponentialBucketsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FluxMeter_ExponentialBucketsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFluxMeter_ExponentialBuckets.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FluxMeter_ExponentialBucketsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FluxMeter_ExponentialBucketsValidationError{}
+
+// Validate checks the field values on FluxMeter_ExponentialBucketsRange with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *FluxMeter_ExponentialBucketsRange) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FluxMeter_ExponentialBucketsRange
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// FluxMeter_ExponentialBucketsRangeMultiError, or nil if none found.
+func (m *FluxMeter_ExponentialBucketsRange) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FluxMeter_ExponentialBucketsRange) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Min
+
+	// no validation rules for Max
+
+	// no validation rules for Count
+
+	if len(errors) > 0 {
+		return FluxMeter_ExponentialBucketsRangeMultiError(errors)
+	}
+
+	return nil
+}
+
+// FluxMeter_ExponentialBucketsRangeMultiError is an error wrapping multiple
+// validation errors returned by
+// FluxMeter_ExponentialBucketsRange.ValidateAll() if the designated
+// constraints aren't met.
+type FluxMeter_ExponentialBucketsRangeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FluxMeter_ExponentialBucketsRangeMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FluxMeter_ExponentialBucketsRangeMultiError) AllErrors() []error { return m }
+
+// FluxMeter_ExponentialBucketsRangeValidationError is the validation error
+// returned by FluxMeter_ExponentialBucketsRange.Validate if the designated
+// constraints aren't met.
+type FluxMeter_ExponentialBucketsRangeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FluxMeter_ExponentialBucketsRangeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FluxMeter_ExponentialBucketsRangeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FluxMeter_ExponentialBucketsRangeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FluxMeter_ExponentialBucketsRangeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FluxMeter_ExponentialBucketsRangeValidationError) ErrorName() string {
+	return "FluxMeter_ExponentialBucketsRangeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FluxMeter_ExponentialBucketsRangeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFluxMeter_ExponentialBucketsRange.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FluxMeter_ExponentialBucketsRangeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FluxMeter_ExponentialBucketsRangeValidationError{}
+
+// Validate checks the field values on Rego_LabelProperties with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *Rego_LabelProperties) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Rego_LabelProperties with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// Rego_LabelPropertiesMultiError, or nil if none found.
+func (m *Rego_LabelProperties) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Rego_LabelProperties) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Telemetry
+
+	if len(errors) > 0 {
+		return Rego_LabelPropertiesMultiError(errors)
+	}
+
+	return nil
+}
+
+// Rego_LabelPropertiesMultiError is an error wrapping multiple validation
+// errors returned by Rego_LabelProperties.ValidateAll() if the designated
+// constraints aren't met.
+type Rego_LabelPropertiesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Rego_LabelPropertiesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Rego_LabelPropertiesMultiError) AllErrors() []error { return m }
+
+// Rego_LabelPropertiesValidationError is the validation error returned by
+// Rego_LabelProperties.Validate if the designated constraints aren't met.
+type Rego_LabelPropertiesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Rego_LabelPropertiesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Rego_LabelPropertiesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Rego_LabelPropertiesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Rego_LabelPropertiesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Rego_LabelPropertiesValidationError) ErrorName() string {
+	return "Rego_LabelPropertiesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Rego_LabelPropertiesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRego_LabelProperties.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Rego_LabelPropertiesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Rego_LabelPropertiesValidationError{}

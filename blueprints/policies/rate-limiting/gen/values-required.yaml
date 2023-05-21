@@ -27,10 +27,9 @@ policy:
     # Parameters.
     # Type: aperture.spec.v1.RateLimiterParameters
     parameters:
-      # Flow label to use for rate limiting.
+      # Flow label key to use for rate limiting. If not specified, then all requests matching the selector will be rate limited.
       # Type: string
-      # Required: True
-      label_key: __REQUIRED_FIELD__
+      label_key: ""
       # Fill interval e.g. "1s".
       # Type: string
       # Required: True

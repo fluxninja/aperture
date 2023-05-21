@@ -3,58 +3,78 @@ import { check, sleep } from "k6";
 import { vu } from "k6/execution";
 import http from "k6/http";
 
-export let vuStages = [
+export let vuStages1 = [
   { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
-  { duration: "1m", target: 30 },
-  { duration: "2m", target: 30 },
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
+  { duration: "120m", target: 5 },
+];
+
+export let vuStages2 = [
+  { duration: "10s", target: 10 },
+  { duration: "120m", target: 10 },
 ];
 
 export let options = {
   discardResponseBodies: true,
   scenarios: {
-    guests: {
+    guests_api_key1: {
       executor: "ramping-vus",
-      stages: vuStages,
-      env: { USER_TYPE: "guest" },
+      stages: vuStages1,
+      env: {
+        USER_TYPE: "guest",
+        API_KEY: "key1",
+      },
     },
-    subscribers: {
+    subscribers_api_key1: {
       executor: "ramping-vus",
-      stages: vuStages,
-      env: { USER_TYPE: "subscriber" },
+      stages: vuStages1,
+      env: {
+        USER_TYPE: "subscriber",
+        API_KEY: "key1",
+      },
     },
-    crawlers: {
+    guests_api_key2: {
       executor: "ramping-vus",
-      stages: vuStages,
-      env: { USER_TYPE: "crawler" },
+      stages: vuStages2,
+      env: {
+        USER_TYPE: "guest",
+        API_KEY: "key2",
+      },
+    },
+    subscribers_api_key2: {
+      executor: "ramping-vus",
+      stages: vuStages2,
+      env: {
+        USER_TYPE: "subscriber",
+        API_KEY: "key2",
+      },
     },
   },
 };
 
 export default function () {
   let userType = __ENV.USER_TYPE;
+  let apiKey = __ENV.API_KEY;
   let userId = vu.idInTest;
-  const url = "http://nginx-server.demoapp.svc.cluster.local/service1";
+  const url = "http://service1-demo-app.demoapp.svc.cluster.local/request";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
       "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
     "User-Type": userType,
     "User-Id": userId,
+    "Api-Key": apiKey,
   };
   const body = {
     request: [
       [
         {
-          destination: "nginx-server.demoapp.svc.cluster.local/service1",
+          destination: "service1-demo-app.demoapp.svc.cluster.local/request",
         },
         {
-          destination: "nginx-server.demoapp.svc.cluster.local/service2",
+          destination: "service2-demo-app.demoapp.svc.cluster.local/request",
         },
         {
-          destination: "nginx-server.demoapp.svc.cluster.local/service3",
+          destination: "service3-demo-app.demoapp.svc.cluster.local/request",
         },
       ],
     ],

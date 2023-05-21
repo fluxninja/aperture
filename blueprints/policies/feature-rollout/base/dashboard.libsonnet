@@ -48,7 +48,7 @@ function(cfg) {
 
   local dashboardDef =
     dashboard.new(
-      title='Feature Rollout',
+      title='Aperture Feature Rollout',
       schemaVersion=36,
       editable=true,
       refresh=refresh,

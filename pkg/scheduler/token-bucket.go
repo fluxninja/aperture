@@ -74,6 +74,13 @@ func (tbb *tokenBucketBase) addTokens(toAdd float64) {
 	tbb.setAvailableTokensGauge(tbb.availableTokens)
 }
 
+// return tokens.
+func (tbb *tokenBucketBase) returnTokens(toReturn float64) {
+	if !tbb.passThrough {
+		tbb.addTokens(toReturn)
+	}
+}
+
 func (tbb *tokenBucketBase) take(now time.Time, tokens float64) (time.Duration, bool) {
 	// if tokens aren't coming do not provide any more tokens
 	if tbb.fillRate == 0 {
@@ -156,7 +163,7 @@ func (btb *BasicTokenBucket) Take(now time.Time, tokens float64) (time.Duration,
 func (btb *BasicTokenBucket) Return(tokens float64) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
-	btb.tbb.addTokens(tokens)
+	btb.tbb.returnTokens(tokens)
 }
 
 // PreprocessRequest decides whether to proactively accept a request.

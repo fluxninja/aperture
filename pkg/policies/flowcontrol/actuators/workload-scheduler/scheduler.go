@@ -26,6 +26,11 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
+// Module provides the fx options for the workload scheduler.
+func Module() fx.Option {
+	return fx.Provide(newFactory)
+}
+
 // MetricLabelKeys is an array of Label Keys for WFQ and Token Bucket Metrics.
 var MetricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 
@@ -44,8 +49,8 @@ type Factory struct {
 	workloadCounterVec        *prometheus.CounterVec
 }
 
-// NewFactory sets up the load scheduler module in the main fx app.
-func NewFactory(
+// newFactory sets up the load scheduler module in the main fx app.
+func newFactory(
 	lifecycle fx.Lifecycle,
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
@@ -173,26 +178,102 @@ func NewFactory(
 	return wsFactory, nil
 }
 
-// multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
-type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_Workload_Parameters
-}
-
-// multiMatcher is MultiMatcher instantiation used in this package.
-type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
-
-type workloadMatcher struct {
-	workloadProto *policylangv1.Scheduler_Workload
-	workloadIndex int
-}
-
-func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
-	// mmr.matchedWorkloads is nil on first match.
-	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload_Parameters)
+// GetLatencyObserver returns a latency observer for a given workload.
+func (wsFactory *Factory) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+	latencySummary, err := wsFactory.workloadLatencySummaryVec.GetMetricWith(labels)
+	if err != nil {
+		log.Warn().Err(err).Msg("Getting latency histogram")
+		return nil
 	}
-	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetParameters()
-	return mmr
+
+	return latencySummary
+}
+
+// GetRequestCounter returns a request counter for a given workload.
+func (wsFactory *Factory) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	counter, err := wsFactory.workloadCounterVec.GetMetricWith(labels)
+	if err != nil {
+		log.Warn().Err(err).Msg("Getting counter")
+		return nil
+	}
+
+	return counter
+}
+
+// SchedulerMetrics is a struct that holds all metrics for Scheduler.
+type SchedulerMetrics struct {
+	incomingTokensCounter prometheus.Counter
+	acceptedTokensCounter prometheus.Counter
+	wfqMetrics            *scheduler.WFQMetrics
+	metricLabels          prometheus.Labels
+	wsFactory             *Factory
+}
+
+// NewSchedulerMetrics creates a new SchedulerMetrics instance.
+func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*SchedulerMetrics, error) {
+	wfqFlowsGauge, err := wsFactory.wfqFlowsGaugeVec.GetMetricWith(metricLabels)
+	if err != nil {
+		return nil, fmt.Errorf("%w: failed to get wfq flows gauge", err)
+	}
+
+	wfqRequestsGauge, err := wsFactory.wfqRequestsGaugeVec.GetMetricWith(metricLabels)
+	if err != nil {
+		return nil, fmt.Errorf("%w: failed to get wfq requests gauge", err)
+	}
+
+	wfqMetrics := &scheduler.WFQMetrics{
+		FlowsGauge:        wfqFlowsGauge,
+		HeapRequestsGauge: wfqRequestsGauge,
+	}
+
+	incomingTokensCounter, err := wsFactory.incomingTokensCounterVec.GetMetricWith(metricLabels)
+	if err != nil {
+		return nil, err
+	}
+	acceptedTokensCounter, err := wsFactory.acceptedTokensCounterVec.GetMetricWith(metricLabels)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SchedulerMetrics{
+		incomingTokensCounter: incomingTokensCounter,
+		acceptedTokensCounter: acceptedTokensCounter,
+		wfqMetrics:            wfqMetrics,
+		metricLabels:          metricLabels,
+		wsFactory:             wsFactory,
+	}, nil
+}
+
+// Delete removes all metrics from metric vectors.
+func (metrics *SchedulerMetrics) Delete() error {
+	var merr error
+
+	// Remove metrics from metric vectors
+	deleted := metrics.wsFactory.wfqFlowsGaugeVec.Delete(metrics.metricLabels)
+	if !deleted {
+		merr = multierr.Append(merr, errors.New("failed to delete wfq_flows gauge from its metric vector"))
+	}
+	deleted = metrics.wsFactory.wfqRequestsGaugeVec.Delete(metrics.metricLabels)
+	if !deleted {
+		merr = multierr.Append(merr, errors.New("failed to delete wfq_requests gauge from its metric vector"))
+	}
+	deleted = metrics.wsFactory.incomingTokensCounterVec.Delete(metrics.metricLabels)
+	if !deleted {
+		merr = multierr.Append(merr, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
+	}
+	deleted = metrics.wsFactory.acceptedTokensCounterVec.Delete(metrics.metricLabels)
+	if !deleted {
+		merr = multierr.Append(merr, errors.New("failed to delete accepted_tokens_total counter from its metric vector"))
+	}
+	deletedCount := metrics.wsFactory.workloadLatencySummaryVec.DeletePartialMatch(metrics.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_latency_ms summary from its metric vector. No traffic to generate metrics?")
+	}
+	deletedCount = metrics.wsFactory.workloadCounterVec.DeletePartialMatch(metrics.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
+	}
+	return merr
 }
 
 // Scheduler implements load scheduler on the flowcontrol side.
@@ -201,13 +282,10 @@ type Scheduler struct {
 	component             iface.Component
 	scheduler             scheduler.Scheduler
 	registry              status.Registry
-	incomingTokensCounter prometheus.Counter
-	acceptedTokensCounter prometheus.Counter
 	proto                 *policylangv1.Scheduler
-	wsFactory             *Factory
 	workloadMultiMatcher  *multiMatcher
 	tokensByWorkloadIndex map[string]uint64
-	metricLabels          prometheus.Labels
+	metrics               *SchedulerMetrics
 }
 
 // NewScheduler returns fx options for the load scheduler fx app.
@@ -217,7 +295,7 @@ func (wsFactory *Factory) NewScheduler(
 	component iface.Component,
 	tokenManger scheduler.TokenManager,
 	clock clockwork.Clock,
-	metricLabels prometheus.Labels,
+	metrics *SchedulerMetrics,
 ) (*Scheduler, error) {
 	if proto == nil {
 		p := &policylangv1.Scheduler{}
@@ -239,6 +317,12 @@ func (wsFactory *Factory) NewScheduler(
 		if err != nil {
 			return nil, err
 		}
+		if workloadProto.GetParameters() == nil {
+			p := &policylangv1.Scheduler_Workload_Parameters{}
+			config.SetDefaults(p)
+			workloadProto.Parameters = p
+		}
+
 		wm := &workloadMatcher{
 			workloadIndex: workloadIndex,
 			workloadProto: workloadProto,
@@ -252,74 +336,20 @@ func (wsFactory *Factory) NewScheduler(
 	ws := &Scheduler{
 		proto:                proto,
 		registry:             registry,
-		wsFactory:            wsFactory,
 		workloadMultiMatcher: mm,
-		metricLabels:         metricLabels,
 		component:            component,
+		metrics:              metrics,
 	}
 
-	wfqFlowsGauge, err := wsFactory.wfqFlowsGaugeVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get wfq flows gauge", err)
-	}
-
-	wfqRequestsGauge, err := wsFactory.wfqRequestsGaugeVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get wfq requests gauge", err)
-	}
-
-	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqRequestsGauge,
+	var wfqMetrics *scheduler.WFQMetrics
+	if metrics != nil {
+		wfqMetrics = metrics.wfqMetrics
 	}
 
 	// setup scheduler
 	ws.scheduler = scheduler.NewWFQScheduler(tokenManger, clock, wfqMetrics)
 
-	ws.incomingTokensCounter, err = wsFactory.incomingTokensCounterVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, err
-	}
-	ws.acceptedTokensCounter, err = wsFactory.acceptedTokensCounterVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, err
-	}
-
 	return ws, nil
-}
-
-// Close closes the scheduler.
-func (ws *Scheduler) Close() error {
-	var merr error
-
-	// Remove metrics from metric vectors
-	deleted := ws.wsFactory.wfqFlowsGaugeVec.Delete(ws.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete wfq_flows gauge from its metric vector"))
-	}
-	deleted = ws.wsFactory.wfqRequestsGaugeVec.Delete(ws.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete wfq_requests gauge from its metric vector"))
-	}
-	deleted = ws.wsFactory.incomingTokensCounterVec.Delete(ws.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
-	}
-	deleted = ws.wsFactory.acceptedTokensCounterVec.Delete(ws.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete accepted_tokens_total counter from its metric vector"))
-	}
-	deletedCount := ws.wsFactory.workloadLatencySummaryVec.DeletePartialMatch(ws.metricLabels)
-	if deletedCount == 0 {
-		log.Warn().Msg("Could not delete workload_latency_ms summary from its metric vector. No traffic to generate metrics?")
-	}
-	deletedCount = ws.wsFactory.workloadCounterVec.DeletePartialMatch(ws.metricLabels)
-	if deletedCount == 0 {
-		log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
-	}
-
-	ws.registry.SetStatus(status.NewStatus(nil, merr))
-	return merr
 }
 
 // Decide processes a single flow by load scheduler in a blocking manner.
@@ -411,10 +441,10 @@ func (ws *Scheduler) Decide(ctx context.Context,
 	}
 
 	// update load scheduler metrics and decisionType
-	ws.incomingTokensCounter.Add(float64(req.Tokens) / 1000)
+	ws.metrics.incomingTokensCounter.Add(float64(req.Tokens) / 1000)
 
 	if accepted {
-		ws.acceptedTokensCounter.Add(float64(req.Tokens) / 1000)
+		ws.metrics.acceptedTokensCounter.Add(float64(req.Tokens) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{
@@ -422,8 +452,8 @@ func (ws *Scheduler) Decide(ctx context.Context,
 		PolicyHash:  ws.component.GetPolicyHash(),
 		ComponentId: ws.component.GetComponentId(),
 		Dropped:     !accepted,
-		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
-			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
 				WorkloadIndex:  matchedWorkloadIndex,
 				TokensConsumed: tokensConsumed,
 			},
@@ -433,7 +463,7 @@ func (ws *Scheduler) Decide(ctx context.Context,
 
 // Revert reverts the decision made by the limiter.
 func (ws *Scheduler) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
-	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo_); ok {
+	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
 		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
 		if tokens > 0 {
 			ws.scheduler.Revert(tokens)
@@ -443,24 +473,12 @@ func (ws *Scheduler) Revert(labels map[string]string, decision *flowcontrolv1.Li
 
 // GetLatencyObserver returns histogram for specific workload.
 func (ws *Scheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
-	latencySummary, err := ws.wsFactory.workloadLatencySummaryVec.GetMetricWith(labels)
-	if err != nil {
-		log.Warn().Err(err).Msg("Getting latency histogram")
-		return nil
-	}
-
-	return latencySummary
+	return ws.metrics.wsFactory.GetLatencyObserver(labels)
 }
 
 // GetRequestCounter returns request counter for specific workload.
 func (ws *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
-	counter, err := ws.wsFactory.workloadCounterVec.GetMetricWith(labels)
-	if err != nil {
-		log.Warn().Err(err).Msg("Getting counter")
-		return nil
-	}
-
-	return counter
+	return ws.metrics.wsFactory.GetRequestCounter(labels)
 }
 
 // GetEstimatedTokens returns estimated tokens for specific workload.
@@ -476,4 +494,31 @@ func (ws *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]uint64)
 	ws.mutex.Lock()
 	defer ws.mutex.Unlock()
 	ws.tokensByWorkloadIndex = tokensByWorkloadIndex
+}
+
+// Info returns information about the scheduler.
+func (ws *Scheduler) Info() (time.Time, int) {
+	return ws.scheduler.Info()
+}
+
+// multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
+type multiMatchResult struct {
+	matchedWorkloads map[int]*policylangv1.Scheduler_Workload_Parameters
+}
+
+// multiMatcher is MultiMatcher instantiation used in this package.
+type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
+
+type workloadMatcher struct {
+	workloadProto *policylangv1.Scheduler_Workload
+	workloadIndex int
+}
+
+func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
+	// mmr.matchedWorkloads is nil on first match.
+	if mmr.matchedWorkloads == nil {
+		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload_Parameters)
+	}
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetParameters()
+	return mmr
 }

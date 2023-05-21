@@ -158,7 +158,7 @@ func setupRateLimiterFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(rateLimiterFactory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister rate_limiter_counter_total metric")
+				err2 := fmt.Errorf("failed to unregister metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()
@@ -186,10 +186,10 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
 		return fx.Options(), err
 	}
 
-	lbProto := wrapperMessage.RateLimiter
+	rlProto := wrapperMessage.RateLimiter
 	lb := &rateLimiter{
 		Component: wrapperMessage.GetCommonAttributes(),
-		lbProto:   lbProto,
+		lbProto:   rlProto,
 		lbFactory: rlFactory,
 		registry:  reg,
 	}
@@ -239,7 +239,6 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.PolicyNameLabel] = rl.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = rl.GetPolicyHash()
 	metricLabels[metrics.ComponentIDLabel] = rl.GetComponentId()
-	rateCounterVec := rl.lbFactory.counterVector
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -288,7 +287,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
-			deleted := rateCounterVec.DeletePartialMatch(metricLabels)
+			deleted := rl.lbFactory.counterVector.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
@@ -372,18 +371,19 @@ func (rl *rateLimiter) Revert(labels map[string]string, decision *flowcontrolv1.
 
 // TakeIfAvailable takes n tokens from the limiter.
 func (rl *rateLimiter) TakeIfAvailable(labels map[string]string, n float64) (label string, ok bool, remaining float64, current float64) {
-	labelKey := rl.lbProto.Parameters.GetLabelKey()
-	var labelValue string
-	if val, found := labels[labelKey]; found {
-		labelValue = val
-	} else {
-		return "", true, -1, -1
+	if rl.limiter.GetPassThrough() {
+		return label, true, 0, 0
 	}
 
-	label = labelKey + ":" + labelValue
-
-	if rl.limiter.GetPassThrough() {
-		return label, true, -1, -1
+	labelKey := rl.lbProto.Parameters.GetLabelKey()
+	if labelKey == "" {
+		label = "default"
+	} else {
+		labelValue, found := labels[labelKey]
+		if !found {
+			return "", true, 0, 0
+		}
+		label = labelKey + ":" + labelValue
 	}
 
 	ok, remaining, current = rl.limiter.TakeIfAvailable(label, n)

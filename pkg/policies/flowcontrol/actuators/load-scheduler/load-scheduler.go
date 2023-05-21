@@ -87,6 +87,7 @@ func setupLoadSchedulerFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	wsFactory *workloadscheduler.Factory,
 ) error {
 	reg := registry.Child("component", "load_scheduler")
 
@@ -96,15 +97,6 @@ func setupLoadSchedulerFactory(
 	etcdDecisionsPath := path.Join(paths.LoadSchedulerDecisionsPath,
 		paths.AgentGroupPrefix(agentGroup))
 	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdDecisionsPath)
-	if err != nil {
-		return err
-	}
-
-	wsFactory, err := workloadscheduler.NewFactory(
-		lifecycle,
-		reg,
-		prometheusRegistry,
-	)
 	if err != nil {
 		return err
 	}
@@ -256,6 +248,7 @@ type loadScheduler struct {
 	loadSchedulerFactory *loadSchedulerFactory
 	clock                clockwork.Clock
 	tokenBucket          *scheduler.LoadMultiplierTokenBucket
+	schedulerMetrics     *workloadscheduler.SchedulerMetrics
 }
 
 // Make sure LoadScheduler implements the iface.LoadScheduler.
@@ -331,6 +324,11 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			// Initialize the token bucket (non continuous tracking mode)
 			ls.tokenBucket = scheduler.NewLoadMultiplierTokenBucket(ls.clock.Now(), 10, time.Second, tokenBucketMetrics)
 
+			ls.schedulerMetrics, err = wsFactory.NewSchedulerMetrics(metricLabels)
+			if err != nil {
+				return retErr(err)
+			}
+
 			// Create a new scheduler
 			ls.Scheduler, err = wsFactory.NewScheduler(
 				ls.registry,
@@ -338,7 +336,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				ls,
 				ls.tokenBucket,
 				ls.clock,
-				metricLabels,
+				ls.schedulerMetrics,
 			)
 			if err != nil {
 				return retErr(err)
@@ -349,7 +347,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				return retErr(err)
 			}
 
-			err = engineAPI.RegisterLoadScheduler(ls)
+			err = engineAPI.RegisterScheduler(ls)
 			if err != nil {
 				return retErr(err)
 			}
@@ -359,7 +357,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 		OnStop: func(context.Context) error {
 			var errMulti error
 
-			err := engineAPI.UnregisterLoadScheduler(ls)
+			err := engineAPI.UnregisterScheduler(ls)
 			if err != nil {
 				errMulti = multierr.Append(errMulti, err)
 			}
@@ -369,10 +367,12 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				errMulti = multierr.Append(errMulti, protoErr)
 			}
 
-			// Stop the scheduler
-			err = ls.Close()
-			if err != nil {
-				errMulti = multierr.Append(errMulti, err)
+			// delete the metrics
+			if ls.schedulerMetrics != nil {
+				err = ls.schedulerMetrics.Delete()
+				if err != nil {
+					errMulti = multierr.Append(errMulti, err)
+				}
 			}
 
 			deleted := lsFactory.tokenBucketLMGaugeVec.Delete(metricLabels)

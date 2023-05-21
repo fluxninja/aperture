@@ -2599,6 +2599,16 @@ _Load Scheduler_ provides service protection by creating a prioritized workload
 queue in front of the service using Weighted Fair Queuing.
 
 </dd>
+<dt>quota_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([QuotaScheduler](#quota-scheduler))
+
+<!-- vale on -->
+
+</dd>
 <dt>rate_limiter</dt>
 <dd>
 
@@ -5958,6 +5968,59 @@ Periodically runs a Prometheus query in the background and emits the result.
 
 <!-- vale off -->
 
+### QuotaScheduler {#quota-scheduler}
+
+<!-- vale on -->
+
+Schedules the traffic based on token-bucket based quotas.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterIns](#rate-limiter-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterParameters](#rate-limiter-parameters))
+
+<!-- vale on -->
+
+</dd>
+<dt>scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([Scheduler](#scheduler))
+
+<!-- vale on -->
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### RateLimiter {#rate-limiter}
 
 <!-- vale on -->
@@ -6102,7 +6165,7 @@ specified by `fill_amount` signal.
 
 <!-- vale off -->
 
-(string, **required**)
+(string)
 
 <!-- vale on -->
 
@@ -6111,7 +6174,8 @@ Specifies which label the rate limiter should be keyed by.
 Rate limiting is done independently for each value of the
 [label](/concepts/flow-control/flow-label.md) with given key. For example, to
 give each user a separate limit, assuming you have a _user_ flow label set up,
-set `label_key: "user"`.
+set `label_key: "user"`. If `label_key` is not specified, then all requests are
+rate limited that match the selectors.
 
 </dd>
 <dt>lazy_sync</dt>

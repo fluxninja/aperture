@@ -22,6 +22,8 @@ type Scheduler interface {
 	// other scheduler and the tokens are returned
 	// back to the scheduler.
 	Revert(tokens uint64)
+	// Info returns the last access time and number of requests that are currently in the queue.
+	Info() (time.Time, int)
 }
 
 // TokenManager : Interface for token managers.

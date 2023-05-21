@@ -1267,16 +1267,19 @@ definitions:
           workload queue in front of the service using Weighted Fair Queuing.
         x-order: 3
         $ref: '#/definitions/LoadScheduler'
+      quota_scheduler:
+        x-order: 4
+        $ref: '#/definitions/QuotaScheduler'
       rate_limiter:
         description: _Rate Limiter_ provides service protection by applying rate limits
           using the token bucket algorithm.
-        x-order: 4
+        x-order: 5
         $ref: '#/definitions/RateLimiter'
       regulator:
         description: Regulator is a component that regulates the flow of requests
           to the service by allowing only the specified percentage of requests or
           sticky sessions.
-        x-order: 5
+        x-order: 6
         $ref: '#/definitions/Regulator'
   FlowControlResources:
     type: object
@@ -2877,6 +2880,32 @@ definitions:
           the result.
         x-order: 0
         $ref: '#/definitions/PromQL'
+  QuotaScheduler:
+    description: Schedules the traffic based on token-bucket based quotas.
+    type: object
+    required:
+    - selectors
+    properties:
+      in_ports:
+        x-go-tag-validate: required
+        x-order: 0
+        $ref: '#/definitions/RateLimiterIns'
+      parameters:
+        x-go-tag-validate: required
+        x-order: 1
+        $ref: '#/definitions/RateLimiterParameters'
+      scheduler:
+        x-go-tag-validate: required
+        x-order: 2
+        $ref: '#/definitions/Scheduler'
+      selectors:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required,gt=0,dive
+        x-order: 3
   RateLimiter:
     description: |-
       :::info
@@ -2938,7 +2967,6 @@ definitions:
     type: object
     required:
     - interval
-    - label_key
     properties:
       continuous_fill:
         description: |+
@@ -2958,7 +2986,7 @@ definitions:
         x-go-tag-validate: required
         x-order: 1
       label_key:
-        description: |+
+        description: |-
           Specifies which label the rate limiter should be keyed by.
 
           Rate limiting is done independently for each value of the
@@ -2966,9 +2994,9 @@ definitions:
           For example, to give each user a separate limit, assuming you
           have a _user_ flow
           label set up, set `label_key: "user"`.
-
+          If `label_key` is not specified, then all requests are rate limited
+          that match the selectors.
         type: string
-        x-go-tag-validate: required
         x-order: 2
       lazy_sync:
         title: Configuration of lazy-syncing behavior of rate limiter
@@ -3423,10 +3451,7 @@ definitions:
         x-order: 0
         $ref: '#/definitions/LabelMatcher'
       parameters:
-        description: |+
-          Parameters associated with flows matching the label matcher.
-
-        x-go-tag-validate: required
+        description: Parameters associated with flows matching the label matcher.
         x-order: 1
         $ref: '#/definitions/SchedulerWorkloadParameters'
   SchedulerWorkloadParameters:

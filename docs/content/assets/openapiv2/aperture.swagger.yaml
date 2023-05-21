@@ -1390,6 +1390,8 @@ definitions:
             load_scheduler:
                 $ref: '#/definitions/LoadScheduler'
                 description: _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
+            quota_scheduler:
+                $ref: '#/definitions/QuotaScheduler'
             rate_limiter:
                 $ref: '#/definitions/RateLimiter'
                 description: _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
@@ -2215,11 +2217,13 @@ definitions:
             dropped:
                 type: boolean
             load_scheduler_info:
-                $ref: '#/definitions/LimiterDecisionLoadSchedulerInfo'
+                $ref: '#/definitions/LimiterDecisionSchedulerInfo'
             policy_hash:
                 type: string
             policy_name:
                 type: string
+            quota_scheduler_info:
+                $ref: '#/definitions/LimiterDecisionQuotaSchedulerInfo'
             rate_limiter_info:
                 $ref: '#/definitions/LimiterDecisionRateLimiterInfo'
             reason:
@@ -2233,13 +2237,12 @@ definitions:
             - LIMITER_REASON_UNSPECIFIED
             - LIMITER_REASON_KEY_NOT_FOUND
         type: string
-    LimiterDecisionLoadSchedulerInfo:
+    LimiterDecisionQuotaSchedulerInfo:
         properties:
-            tokens_consumed:
-                format: uint64
+            label:
                 type: string
-            workload_index:
-                type: string
+            scheduler_info:
+                $ref: '#/definitions/LimiterDecisionSchedulerInfo'
         type: object
     LimiterDecisionRateLimiterInfo:
         properties:
@@ -2258,6 +2261,14 @@ definitions:
     LimiterDecisionRegulatorInfo:
         properties:
             label:
+                type: string
+        type: object
+    LimiterDecisionSchedulerInfo:
+        properties:
+            tokens_consumed:
+                format: uint64
+                type: string
+            workload_index:
                 type: string
         type: object
     ListAgentsResponse:
@@ -3173,6 +3184,28 @@ definitions:
                 $ref: '#/definitions/PromQL'
                 description: Periodically runs a Prometheus query in the background and emits the result.
         type: object
+    QuotaScheduler:
+        description: Schedules the traffic based on token-bucket based quotas.
+        properties:
+            in_ports:
+                $ref: '#/definitions/RateLimiterIns'
+                x-go-tag-validate: required
+            parameters:
+                $ref: '#/definitions/RateLimiterParameters'
+                x-go-tag-validate: required
+            scheduler:
+                $ref: '#/definitions/Scheduler'
+                x-go-tag-validate: required
+            selectors:
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                minItems: 1
+                type: array
+                x-go-tag-validate: required,gt=0,dive
+        required:
+            - selectors
+        type: object
     RateLimiter:
         description: |-
             :::info
@@ -3242,7 +3275,7 @@ definitions:
                 type: string
                 x-go-tag-validate: required
             label_key:
-                description: |+
+                description: |-
                     Specifies which label the rate limiter should be keyed by.
 
                     Rate limiting is done independently for each value of the
@@ -3250,9 +3283,9 @@ definitions:
                     For example, to give each user a separate limit, assuming you
                     have a _user_ flow
                     label set up, set `label_key: "user"`.
-
+                    If `label_key` is not specified, then all requests are rate limited
+                    that match the selectors.
                 type: string
-                x-go-tag-validate: required
             lazy_sync:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behavior of rate limiter
@@ -3277,7 +3310,6 @@ definitions:
                 x-go-tag-default: tokens
         required:
             - interval
-            - label_key
         type: object
     RateLimiterParametersLazySync:
         properties:
@@ -3727,10 +3759,7 @@ definitions:
                 x-go-tag-validate: required
             parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
-                description: |+
-                    Parameters associated with flows matching the label matcher.
-
-                x-go-tag-validate: required
+                description: Parameters associated with flows matching the label matcher.
         type: object
     SchedulerWorkloadParameters:
         description: |-

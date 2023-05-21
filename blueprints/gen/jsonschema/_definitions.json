@@ -1183,15 +1183,19 @@
           "description": "_Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.",
           "x-order": 3
         },
+        "quota_scheduler": {
+          "$ref": "#/definitions/QuotaScheduler",
+          "x-order": 4
+        },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
           "description": "_Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.",
-          "x-order": 4
+          "x-order": 5
         },
         "regulator": {
           "$ref": "#/definitions/Regulator",
           "description": "Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
-          "x-order": 5
+          "x-order": 6
         }
       },
       "type": "object",
@@ -2751,6 +2755,39 @@
       "type": "object",
       "additionalProperties": false
     },
+    "QuotaScheduler": {
+      "description": "Schedules the traffic based on token-bucket based quotas.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/RateLimiterIns",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "parameters": {
+          "$ref": "#/definitions/RateLimiterParameters",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
+        "scheduler": {
+          "$ref": "#/definitions/Scheduler",
+          "x-go-tag-validate": "required",
+          "x-order": 2
+        },
+        "selectors": {
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array",
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 3
+        }
+      },
+      "required": ["selectors"],
+      "type": "object",
+      "additionalProperties": false
+    },
     "RateLimiter": {
       "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.",
       "properties": {
@@ -2823,9 +2860,8 @@
           "x-order": 1
         },
         "label_key": {
-          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
+          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf `label_key` is not specified, then all requests are rate limited\nthat match the selectors.",
           "type": "string",
-          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "lazy_sync": {
@@ -2848,7 +2884,7 @@
           "x-order": 5
         }
       },
-      "required": ["interval", "label_key"],
+      "required": ["interval"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3205,8 +3241,7 @@
         },
         "parameters": {
           "$ref": "#/definitions/SchedulerWorkloadParameters",
-          "description": "Parameters associated with flows matching the label matcher.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "Parameters associated with flows matching the label matcher.",
           "x-order": 1
         }
       },

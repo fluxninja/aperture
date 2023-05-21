@@ -46,7 +46,7 @@ func (limiterSync *rateLimiterSync) ShortDescription() string {
 // IsActuator implements runtime.Component.
 func (*rateLimiterSync) IsActuator() bool { return true }
 
-// NewRateLimiterAndOptions creates fx options for RateLimiter and also returns agent group name associated with it.
+// NewRateLimiterAndOptions creates fx options for RateLimiter.
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
 	componentID runtime.ComponentID,

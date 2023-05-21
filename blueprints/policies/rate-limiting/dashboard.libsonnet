@@ -15,7 +15,7 @@ function(cfg) {
 
   local rateLimiterPanel =
     graphPanel.new(
-      title='Rate Limiter',
+      title='Aperture Rate Limiter',
       datasource=dsName,
       labelY1='Decisions',
       formatY1='reqps',
@@ -29,7 +29,7 @@ function(cfg) {
 
   local dashboardDef =
     dashboard.new(
-      title='Jsonnet / FluxNinja - Rate Limiter',
+      title='Aperture Rate Limiter',
       editable=true,
       schemaVersion=18,
       refresh=params.dashboard.refresh_interval,
