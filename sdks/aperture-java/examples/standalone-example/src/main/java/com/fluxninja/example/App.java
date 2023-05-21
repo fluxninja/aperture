@@ -110,7 +110,7 @@ public class App {
         } else {
             // Flow has been rejected by Aperture Agent.
             try {
-                res.status(403);
+                res.status(flow.rejectReason());
                 flow.end(FlowStatus.Error);
             } catch (ApertureSDKException e) {
                 e.printStackTrace();

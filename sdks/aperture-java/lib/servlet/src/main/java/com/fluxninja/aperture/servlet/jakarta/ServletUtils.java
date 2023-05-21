@@ -26,10 +26,8 @@ public class ServletUtils {
         }
 
         int code = 403;
-        if (flow.checkResponse() != null
-                && flow.checkResponse().hasDeniedResponse()
-                && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
-            code = flow.checkResponse().getDeniedResponse().getStatus();
+        if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
+            code = flow.rejectReason();
             Map<String, String> headers = flow.checkResponse().getDeniedResponse().getHeadersMap();
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 response.setHeader(entry.getKey(), entry.getValue());
