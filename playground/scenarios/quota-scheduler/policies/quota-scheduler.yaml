@@ -11,6 +11,7 @@ policy:
       - service: service1-demo-app.demoapp.svc.cluster.local
         control_point: ingress
     parameters:
+      label_key: http.request.header.api_key
       interval: 1s
     scheduler:
       workloads:

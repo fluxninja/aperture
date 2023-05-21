@@ -18,7 +18,7 @@ spec:
                 value: 25
           parameters:
             interval: 1s
-            label_key: ""
+            label_key: http.request.header.api_key
           scheduler:
             workloads:
             - label_matcher:
