@@ -384,7 +384,7 @@ func (qs *quotaScheduler) getLabelKey(labels map[string]string) (string, bool) {
 // Decide runs the limiter.
 func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
-	ok := true
+	dropped := false
 	label := ""
 	schedulerInfo := &flowcontrolv1.LimiterDecision_SchedulerInfo{
 		WorkloadIndex: metrics.DefaultWorkloadIndex,
@@ -395,7 +395,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 			PolicyName:  qs.GetPolicyName(),
 			PolicyHash:  qs.GetPolicyHash(),
 			ComponentId: qs.GetComponentId(),
-			Dropped:     !ok,
+			Dropped:     dropped,
 			Reason:      reason,
 			Details: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_{
 				QuotaSchedulerInfo: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo{
@@ -442,6 +442,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 
 	schedulerDecision := s.Decide(ctx, labels)
 	schedulerInfo = schedulerDecision.GetLoadSchedulerInfo()
+	dropped = schedulerDecision.GetDropped()
 
 	return returnDecision()
 }
