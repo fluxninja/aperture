@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
+	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/stdr"
 	"github.com/gorilla/mux"
@@ -26,24 +28,25 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-
-	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
 	StartFlow(ctx context.Context, controlPoint string, labels map[string]string) (Flow, error)
+	StartHTTPFlow(ctx context.Context, request *flowcontrolhttp.CheckHTTPRequest) (HTTPFlow, error)
 	Shutdown(ctx context.Context) error
 	HTTPMiddleware(controlPoint string, labels map[string]string) mux.MiddlewareFunc
 	GRPCUnaryInterceptor(controlPoint string, labels map[string]string) grpc.UnaryServerInterceptor
+	GetLogger() logr.Logger
 }
 
 type apertureClient struct {
-	flowControlClient flowcontrol.FlowControlServiceClient
-	tracer            trace.Tracer
-	timeout           time.Duration
-	exporter          *otlptrace.Exporter
-	log               logr.Logger
+	flowControlClient     flowcontrol.FlowControlServiceClient
+	flowControlHTTPClient flowcontrolhttp.FlowControlServiceHTTPClient
+	tracer                trace.Tracer
+	timeout               time.Duration
+	exporter              *otlptrace.Exporter
+	log                   logr.Logger
 }
 
 // Options that the user can pass to Aperture in order to receive a new Client.
@@ -79,8 +82,6 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 
 	tracer := tracerProvider.Tracer(libraryName)
 
-	fcClient := flowcontrol.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
-
 	var logger logr.Logger
 	if opts.Logger != nil {
 		logger = *opts.Logger
@@ -88,14 +89,41 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		logger = stdr.New(log.Default()).WithName("aperture-go-sdk")
 	}
 
+	fcClient := flowcontrol.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
+	fcHTTPClient := flowcontrolhttp.NewFlowControlServiceHTTPClient(opts.ApertureAgentGRPCClientConn)
+
 	c := &apertureClient{
-		flowControlClient: fcClient,
-		tracer:            tracer,
-		timeout:           opts.CheckTimeout,
-		exporter:          exporter,
-		log:               logger,
+		flowControlClient:     fcClient,
+		flowControlHTTPClient: fcHTTPClient,
+		tracer:                tracer,
+		timeout:               opts.CheckTimeout,
+		exporter:              exporter,
+		log:                   logger,
 	}
 	return c, nil
+}
+
+// getSpan constructs new flow tracer span.
+func (c *apertureClient) getSpan(ctx context.Context) trace.Span {
+	_, span := c.tracer.Start(ctx, "Aperture Check", trace.WithAttributes(
+		attribute.Int64(flowStartTimestampLabel, time.Now().UnixNano()),
+		attribute.String(sourceLabel, "sdk"),
+	))
+	return span
+}
+
+// LabelsFromCtx extracts baggage labels from context.
+func LabelsFromCtx(ctx context.Context) map[string]string {
+	labels := make(map[string]string)
+	baggageCtx := baggage.FromContext(ctx)
+	for _, member := range baggageCtx.Members() {
+		value, err := url.QueryUnescape(member.Value())
+		if err != nil {
+			continue
+		}
+		labels[member.Key()] = value
+	}
+	return labels
 }
 
 // StartFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
@@ -110,17 +138,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		defer cancel()
 	}
 
-	labels := make(map[string]string)
-
-	// Inherit labels from baggage
-	baggageCtx := baggage.FromContext(ctx)
-	for _, member := range baggageCtx.Members() {
-		value, err := url.QueryUnescape(member.Value())
-		if err != nil {
-			continue
-		}
-		labels[member.Key()] = value
-	}
+	labels := LabelsFromCtx(ctx)
 
 	// Explicit labels override baggage
 	for key, value := range explicitLabels {
@@ -132,10 +150,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		Labels:       labels,
 	}
 
-	_, span := c.tracer.Start(ctx, "Aperture Check", trace.WithAttributes(
-		attribute.Int64(flowStartTimestampLabel, time.Now().UnixNano()),
-		attribute.String(sourceLabel, "sdk"),
-	))
+	span := c.getSpan(ctx)
 
 	f := &flow{
 		span: span,
@@ -155,7 +170,36 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 	return f, nil
 }
 
+// StartHTTPFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolhttp.CheckHTTP call.
+// Return value is a HTTPFlow.
+// The call returns immediately in case connection with Aperture Agent is not established.
+// The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.Accepted() on returned HTTPFlow returns as true.
+func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *flowcontrolhttp.CheckHTTPRequest) (HTTPFlow, error) {
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+
+	span := c.getSpan(ctx)
+
+	f := &httpflow{
+		span: span,
+	}
+
+	res, err := c.flowControlHTTPClient.CheckHTTP(ctx, request)
+	if err != nil {
+		f.checkResponse = nil
+	} else {
+		f.checkResponse = res
+	}
+
+	span.SetAttributes(
+		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
+	)
+
+	return f, nil
+}
+
 // HTTPMiddleware takes a control point name, labels and timeout and creates a Middleware which can be used with HTTP server.
+// Deprecated: 2.3.0 Use middlewares.HTTPMiddleware instead.
 func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -166,7 +210,7 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 				newLabels[key] = strings.Join(value, ",")
 			}
 
-			flow, err := c.StartFlow(r.Context(), controlPoint, labels)
+			flow, err := c.StartFlow(r.Context(), controlPoint, newLabels)
 			if err != nil {
 				c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
 			}
@@ -198,6 +242,7 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 }
 
 // GRPCUnaryInterceptor takes a control point name, labels and timeout and creates a UnaryInterceptor which can be used with gRPC server.
+// Deprecated: 2.3.0 Use middlewares.GRPCUnaryInterceptor instead.
 func (c *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[string]string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		newLabels := make(map[string]string, len(labels))
@@ -260,4 +305,9 @@ func newResource() (*resource.Resource, error) {
 		return nil, err
 	}
 	return r, nil
+}
+
+// GetLogger returns the logger used by the aperture client.
+func (c *apertureClient) GetLogger() logr.Logger {
+	return c.log
 }

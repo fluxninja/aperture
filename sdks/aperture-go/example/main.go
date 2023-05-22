@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-logr/stdr"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -17,6 +18,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
+	aperturemiddlewares "github.com/fluxninja/aperture-go/v2/sdk/middlewares"
 )
 
 const (
@@ -57,6 +59,8 @@ func main() {
 		log.Fatalf("failed to create flow control client: %v", err)
 	}
 
+	stdr.SetVerbosity(2)
+
 	opts := aperture.Options{
 		ApertureAgentGRPCClientConn: apertureAgentGRPCClient,
 		CheckTimeout:                200 * time.Millisecond,
@@ -80,21 +84,18 @@ func main() {
 		grpcClient:     apertureAgentGRPCClient,
 	}
 
-	// do some business logic to collect labels
-	labels := map[string]string{
-		"user": "kenobi",
-	}
-
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(a.apertureClient.HTTPMiddleware("awesomeFeature", labels))
+	superRouter.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil).Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	log.Printf("Starting example server")
 
 	go func() {
 		if err := a.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

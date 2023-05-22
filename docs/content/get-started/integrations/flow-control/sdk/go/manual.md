@@ -65,4 +65,22 @@ The created instance can then be used to start a flow:
 For more context on using Aperture Go SDK to set feature control points, refer
 to the [example app][example] available in the repository.
 
+## HTTP Middleware
+
+You can also automatically set middleware for your HTTP server using the SDK. To
+do so, after creating an instance of ApertureClient, use the middleware on your
+router:
+
+```go
+  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil))
+```
+
+For simplicity, you can also pass a list of regexp patterns to match against the
+request path, for which the middleware will pass through. This is especially
+useful for endpoints like `/healthz`:
+
+```go
+  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", []regexp.Regexp{regexp.MustCompile("/health.*")}))
+```
+
 [example]: https://github.com/fluxninja/aperture-go/tree/v1.0.0/example

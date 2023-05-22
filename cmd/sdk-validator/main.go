@@ -329,7 +329,9 @@ func startTraffic(url string, requests int) int {
 		if err != nil {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
 		}
-		res.Body.Close()
+		if res.Body != nil {
+			res.Body.Close()
+		}
 		if (res.StatusCode > 400 && res.StatusCode < 500) || (res.StatusCode > 500 && res.StatusCode < 600) {
 			rejected += 1
 		}
