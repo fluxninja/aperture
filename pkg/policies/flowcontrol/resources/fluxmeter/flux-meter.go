@@ -10,7 +10,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
@@ -176,7 +176,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})
 			fluxMeter.invalidFluxMeterTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-				Name:        metrics.InvalidFluxMeterTotal,
+				Name:        metrics.InvalidFluxMeterTotalMetricName,
 				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
 				Help:        "The number of invalid readings from a Flux Meter",
 			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})

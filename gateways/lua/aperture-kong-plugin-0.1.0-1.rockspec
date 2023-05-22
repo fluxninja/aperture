@@ -21,5 +21,6 @@ build = {
       ["kong.plugins.aperture-plugin.handler"] = "kong/handler.lua",
       ["kong.plugins.aperture-plugin.schema"] = "kong/schema.lua",
       ["kong.plugins.aperture-plugin.log"] = "aperture-plugin/log.lua",
+      ["kong.plugins.aperture-plugin.headers"] = "aperture-plugin/headers.lua",
    },
 }

@@ -318,7 +318,7 @@ function(cfg) {
   ),
 
   local userRolloutControlComponent = spec.v1.Component.withBoolVariable(
-    spec.v1.BoolVariable.withValue(false) +
+    spec.v1.BoolVariable.withConstantOutput(false) +
     spec.v1.BoolVariable.withConfigKey('rollout') +
     spec.v1.BoolVariable.withOutPorts({
       output: spec.v1.Port.withSignalName('USER_ROLLOUT_CONTROL'),
@@ -326,7 +326,7 @@ function(cfg) {
   ),
 
   local userResetControlComponent = spec.v1.Component.withBoolVariable(
-    spec.v1.BoolVariable.withValue(false) +
+    spec.v1.BoolVariable.withConstantOutput(false) +
     spec.v1.BoolVariable.withConfigKey('reset') +
     spec.v1.BoolVariable.withOutPorts({
       output: spec.v1.Port.withSignalName('USER_RESET_CONTROL'),

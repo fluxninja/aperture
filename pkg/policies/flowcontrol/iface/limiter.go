@@ -37,11 +37,11 @@ type Limiter interface {
 // RateLimiter interface.
 type RateLimiter interface {
 	Limiter
-	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
+	TakeIfAvailable(labels map[string]string, count float64) (label string, ok bool, remaining float64, current float64)
 }
 
-// LoadScheduler interface.
-type LoadScheduler interface {
+// Scheduler interface.
+type Scheduler interface {
 	Limiter
 	GetLatencyObserver(labels map[string]string) prometheus.Observer
 }

@@ -5,6 +5,10 @@ local config = import './config.libsonnet';
 
 local scaleOutController = spec.v1.ScaleOutController;
 local scaleOutControllerController = spec.v1.ScaleOutControllerController;
+local scaleInController = spec.v1.ScaleInController;
+local scaleInControllerController = spec.v1.ScaleInControllerController;
+local periodicDecrease = spec.v1.PeriodicDecrease;
+local periodicDecreaseParameters = spec.v1.PeriodicDecreaseParameters;
 local increasingGradient = spec.v1.IncreasingGradient;
 local increasingGradientInPort = spec.v1.IncreasingGradientIns;
 local increasingGradientParameters = spec.v1.IncreasingGradientParameters;
@@ -18,6 +22,7 @@ function(cfg) {
     policy+: params.policy.auto_scaling {
       policy_name: params.policy.policy_name,
       promql_scale_out_controllers: [],
+      promql_scale_in_controllers: [],
       scaling_backend: {
         kubernetes_replicas: params.policy.auto_scaling.kubernetes_replicas,
       },
@@ -27,11 +32,23 @@ function(cfg) {
   local baseServiceProtectionPolicy = baseServiceProtectionPolicyFn(params).policyDef,
   local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingParams).policyDef,
 
+  local scaleInControllers = [
+    scaleInController.new()
+    + scaleInController.withAlerter(
+      alerterParameters.new()
+      + alerterParameters.withAlertName('Gradient controller intends to scale in')
+    )
+    + scaleInController.withController(
+      scaleInControllerController.new()
+      + scaleInControllerController.withPeriodic(params.policy.auto_scaling.periodic_decrease)
+    ),
+  ],
+
   local scaleOutControllers = [
     scaleOutController.new()
     + scaleOutController.withAlerter(
       alerterParameters.new()
-      + alerterParameters.withAlertName('Scale Out Alerter')
+      + alerterParameters.withAlertName('Gradient controller intends to scale out')
     )
     + scaleOutController.withController(
       scaleOutControllerController.new()
@@ -58,6 +75,7 @@ function(cfg) {
             auto_scale+: {
               auto_scaler+: {
                 scale_out_controllers: scaleOutControllers,
+                scale_in_controllers: if !params.policy.auto_scaling.disable_periodic_scale_in then scaleInControllers else [],
               },
             },
           }

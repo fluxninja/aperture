@@ -8,7 +8,6 @@ var (
 	all            bool
 	onlyRequired   bool
 	skipPull       bool
-	dynamicConfig  bool
 	noYAMLModeline bool
 	noValidate     bool
 	overwrite      bool

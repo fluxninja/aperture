@@ -123,6 +123,7 @@ return function(destination_hostname, destination_port, control_point)
       end
     elseif response_json.denied_response ~= nil then
       code = response_json.denied_response.status
+      ngx.ctx.denied_response_headers = response_json.denied_response.headers
     else
       code = 200
     end

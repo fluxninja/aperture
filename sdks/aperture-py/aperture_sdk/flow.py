@@ -13,6 +13,12 @@ from google.protobuf import json_format
 from opentelemetry import trace
 
 
+class FlowResult(enum.Enum):
+    Accepted = enum.auto()
+    Rejected = enum.auto()
+    Unreachable = enum.auto()
+
+
 class FlowStatus(enum.Enum):
     OK = enum.auto()
     Error = enum.auto()
@@ -30,17 +36,19 @@ class Flow(AbstractContextManager):
         self._ended = False
 
     @property
-    def accepted(self) -> bool:
-        if not self.check_response:
-            return True
-        return (
+    def result(self) -> FlowResult:
+        if self.check_response is None:
+            return FlowResult.Unreachable
+        if (
             self.check_response.decision_type
             == check_pb2.CheckResponse.DECISION_TYPE_ACCEPTED
-        )
+        ):
+            return FlowResult.Accepted
+        return FlowResult.Rejected
 
     @property
     def success(self) -> bool:
-        return self.check_response is not None
+        return self.result != FlowResult.Unreachable
 
     @property
     def check_response(self) -> Optional[check_pb2.CheckResponse]:

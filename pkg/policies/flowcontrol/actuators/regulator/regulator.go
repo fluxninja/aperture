@@ -16,9 +16,9 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
-	"github.com/fluxninja/aperture/v2/pkg/distcache"
+	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -105,7 +105,7 @@ func setupRegulatorFactory(
 	reg := statusRegistry.Child("component", regulatorStatusRoot)
 	counterVector := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.RegulatorCounterMetricName,
+			Name: metrics.RegulatorCounterTotalMetricName,
 			Help: "Total number of decisions made by load regulators.",
 		},
 		metricLabelKeys,
@@ -146,7 +146,7 @@ func setupRegulatorFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(factory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister load_regulator_counter metric")
+				err2 := fmt.Errorf("failed to unregister regulator_counter_total metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()

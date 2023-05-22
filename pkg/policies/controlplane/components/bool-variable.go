@@ -12,9 +12,9 @@ import (
 
 // BoolVariable is a dynamically configurable boolean variable signal.
 type BoolVariable struct {
-	policyReadAPI iface.Policy
-	variableProto *policylangv1.BoolVariable
-	value         bool
+	policyReadAPI  iface.Policy
+	variableProto  *policylangv1.BoolVariable
+	constantOutput bool
 }
 
 // Name returns the name of the BoolVariable component.
@@ -34,9 +34,9 @@ func (*BoolVariable) IsActuator() bool { return false }
 // NewBoolVariableAndOptions creates a new BoolVariable component and its fx options.
 func NewBoolVariableAndOptions(variableProto *policylangv1.BoolVariable, _ runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	boolVariable := &BoolVariable{
-		policyReadAPI: policyReadAPI,
-		variableProto: variableProto,
-		value:         variableProto.GetValue(),
+		policyReadAPI:  policyReadAPI,
+		variableProto:  variableProto,
+		constantOutput: variableProto.GetConstantOutput(),
 	}
 
 	return boolVariable, fx.Options(), nil
@@ -45,12 +45,12 @@ func NewBoolVariableAndOptions(variableProto *policylangv1.BoolVariable, _ runti
 // Execute executes the BoolVariable component and emits the current boolean value.
 func (v *BoolVariable) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	return runtime.PortToReading{
-		"output": []runtime.Reading{runtime.NewBoolReading(v.value)},
+		"output": []runtime.Reading{runtime.NewBoolReading(v.constantOutput)},
 	}, nil
 }
 
 // DynamicConfigUpdate updates the boolean value when the configuration changes.
 func (v *BoolVariable) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	key := v.variableProto.GetConfigKey()
-	v.value = config.GetBoolValue(unmarshaller, key, v.variableProto.GetValue())
+	v.constantOutput = config.GetBoolValue(unmarshaller, key, v.variableProto.GetConstantOutput())
 }

@@ -37,7 +37,7 @@ import (
 	. "github.com/fluxninja/aperture/v2/operator/controllers"
 	"github.com/fluxninja/aperture/v2/operator/controllers/testutils"
 	"github.com/fluxninja/aperture/v2/pkg/config"
-	distcacheconfig "github.com/fluxninja/aperture/v2/pkg/distcache/config"
+	distcacheconfig "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"github.com/fluxninja/aperture/v2/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"

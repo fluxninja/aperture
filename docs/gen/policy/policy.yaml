@@ -504,7 +504,10 @@ definitions:
         x-go-tag-default: "10"
         x-order: 2
       scale_in_alerter:
-        description: Configuration for scale-in Alerter.
+        description: |+
+          Configuration for scale-in Alerter.
+
+        x-go-tag-validate: required
         x-order: 3
         $ref: '#/definitions/AlerterParameters'
       scale_in_cooldown:
@@ -516,7 +519,10 @@ definitions:
         x-go-tag-default: 120s
         x-order: 4
       scale_out_alerter:
-        description: Configuration for scale-out Alerter.
+        description: |+
+          Configuration for scale-out Alerter.
+
+        x-go-tag-validate: required
         x-order: 5
         $ref: '#/definitions/AlerterParameters'
       scale_out_cooldown:
@@ -537,15 +543,15 @@ definitions:
           config.
         type: string
         x-order: 0
-      out_ports:
-        description: Output ports for the BoolVariable component.
-        x-order: 1
-        $ref: '#/definitions/BoolVariableOuts'
-      value:
+      constant_output:
         description: The constant bool signal emitted by this component. The value
           of the constant bool can be overridden at runtime via dynamic config.
         type: boolean
+        x-order: 1
+      out_ports:
+        description: Output ports for the BoolVariable component.
         x-order: 2
+        $ref: '#/definitions/BoolVariableOuts'
   BoolVariableOuts:
     description: Outputs for the BoolVariable component.
     type: object
@@ -1296,15 +1302,19 @@ definitions:
           workload queue in front of the service using Weighted Fair Queuing.
         x-order: 3
         $ref: '#/definitions/LoadScheduler'
-      rate_limiter:
-        description: _Rate Limiter_ provides service protection by applying rate limits.
+      quota_scheduler:
         x-order: 4
+        $ref: '#/definitions/QuotaScheduler'
+      rate_limiter:
+        description: _Rate Limiter_ provides service protection by applying rate limits
+          using the token bucket algorithm.
+        x-order: 5
         $ref: '#/definitions/RateLimiter'
       regulator:
         description: Regulator is a component that regulates the flow of requests
           to the service by allowing only the specified percentage of requests or
           sticky sessions.
-        x-order: 5
+        x-order: 6
         $ref: '#/definitions/Regulator'
   FlowControlResources:
     type: object
@@ -2295,7 +2305,6 @@ definitions:
       to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
       The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
-      The signal at port `pass_through` makes the _Load Scheduler_ pass through all incoming tokens.
     type: object
     title: _Load Scheduler_ creates a queue for flows in front of a service to provide
       active service protection
@@ -2335,10 +2344,6 @@ definitions:
           token rate that needs to be accepted.
         x-order: 0
         $ref: '#/definitions/InPort'
-      pass_through:
-        description: When true, pass through the requests skipping the scheduler.
-        x-order: 1
-        $ref: '#/definitions/InPort'
   LoadSchedulerOuts:
     description: Output for the LoadScheduler component.
     type: object
@@ -2363,7 +2368,7 @@ definitions:
         $ref: '#/definitions/Scheduler'
       selectors:
         description: |+
-          Selectors for flows that will be scheduled by this _Load Scheduler_.
+          Selectors for the component.
 
         type: array
         minItems: 1
@@ -2704,12 +2709,6 @@ definitions:
     description: PeriodicDecrease defines a controller for scaling in based on a periodic
       timer.
     type: object
-    properties:
-      parameters:
-        x-order: 0
-        $ref: '#/definitions/PeriodicDecreaseParameters'
-  PeriodicDecreaseParameters:
-    type: object
     required:
     - period
     - scale_in_percentage
@@ -2894,6 +2893,32 @@ definitions:
           the result.
         x-order: 0
         $ref: '#/definitions/PromQL'
+  QuotaScheduler:
+    description: Schedules the traffic based on token-bucket based quotas.
+    type: object
+    required:
+    - selectors
+    properties:
+      in_ports:
+        x-go-tag-validate: required
+        x-order: 0
+        $ref: '#/definitions/RateLimiterIns'
+      rate_limiter:
+        x-go-tag-validate: required
+        x-order: 1
+        $ref: '#/definitions/RateLimiterParameters'
+      scheduler:
+        x-go-tag-validate: required
+        x-order: 2
+        $ref: '#/definitions/Scheduler'
+      selectors:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          $ref: '#/definitions/Selector'
+        x-go-tag-validate: required,gt=0,dive
+        x-order: 3
   RateLimiter:
     description: |-
       :::info
@@ -2902,111 +2927,25 @@ definitions:
 
       :::
 
-      RateLimiting is done on per-label-value basis. Use `label_key`
-      to select which label should be used as key.
+      RateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.
     type: object
     title: Limits the traffic on a control point to specified rate
+    required:
+    - selectors
     properties:
-      custom_limits:
-        description: |+
-          Allows to specify different limits for particular label values.
-
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/RateLimiterCustomLimit'
-        x-go-tag-validate: dive
-        x-order: 0
-      custom_limits_config_key:
-        description: Configuration key for overriding custom_limits setting through
-          dynamic config.
-        type: string
-        x-order: 1
       in_ports:
         title: Input ports for the RateLimiter component
         x-go-tag-validate: required
-        x-order: 2
+        x-order: 0
         $ref: '#/definitions/RateLimiterIns'
       parameters:
         title: Parameters for the RateLimiter component
         x-go-tag-validate: required
-        x-order: 3
+        x-order: 1
         $ref: '#/definitions/RateLimiterParameters'
-  RateLimiterCustomLimit:
-    type: object
-    required:
-    - label_value
-    properties:
-      label_value:
-        description: |+
-          Value of the label for which the custom limit should be applied.
-
-        type: string
-        x-go-tag-validate: required
-        x-order: 0
-      limit_scale_factor:
-        description: |+
-          Amount by which the `in_ports.limit` should be multiplied for
-          this label value.
-
-        type: number
-        format: double
-        default: 1
-        x-go-tag-default: "1.0"
-        x-order: 1
-  RateLimiterIns:
-    type: object
-    title: Inputs for the RateLimiter component
-    properties:
-      limit:
-        description: |+
-          Number of flows allowed per `limit_reset_interval` per each label.
-          Negative values disable the rate limiter.
-
-          :::tip
-
-          Negative limit can be useful to _conditionally_ enable the rate limiter
-          under certain circumstances. [Decider](#decider) might be helpful.
-
-          :::
-
-        x-go-tag-validate: required
-        x-order: 0
-        $ref: '#/definitions/InPort'
-  RateLimiterParameters:
-    type: object
-    required:
-    - label_key
-    - selectors
-    properties:
-      label_key:
-        description: |+
-          Specifies which label the rate limiter should be keyed by.
-
-          Rate limiting is done independently for each value of the
-          [label](/concepts/flow-control/flow-label.md) with given key.
-          For example, to give each user a separate limit, assuming you
-          have a _user_ flow
-          label set up, set `label_key: "user"`.
-
-        type: string
-        x-go-tag-validate: required
-        x-order: 0
-      lazy_sync:
-        title: Configuration of lazy-syncing behavior of rate limiter
-        x-order: 1
-        $ref: '#/definitions/RateLimiterParametersLazySync'
-      limit_reset_interval:
-        description: |+
-          Time after which the limit for a given label value will be reset.
-
-        type: string
-        default: 60s
-        x-go-tag-default: 60s
-        x-order: 2
       selectors:
         description: |+
-          Selectors for flows that will be rate limited by this _Rate Limiter_.
+          Selectors for the component.
 
         type: array
         minItems: 1
@@ -3014,7 +2953,77 @@ definitions:
           type: object
           $ref: '#/definitions/Selector'
         x-go-tag-validate: required,gt=0,dive
+        x-order: 2
+  RateLimiterIns:
+    type: object
+    title: Inputs for the RateLimiter component
+    properties:
+      bucket_capacity:
+        description: |+
+          Capacity of the bucket.
+
+        x-go-tag-validate: required
+        x-order: 0
+        $ref: '#/definitions/InPort'
+      fill_amount:
+        description: |+
+          Number of tokens to fill within an `interval`.
+
+        x-go-tag-validate: required
+        x-order: 1
+        $ref: '#/definitions/InPort'
+      pass_through:
+        title: PassThrough port determines whether all requests
+        x-order: 2
+        $ref: '#/definitions/InPort'
+  RateLimiterParameters:
+    type: object
+    required:
+    - interval
+    properties:
+      continuous_fill:
+        description: |+
+          Continuous fill determines whether the token bucket should be filled
+          continuously or only on discrete intervals.
+
+        type: boolean
+        default: true
+        x-go-tag-default: "true"
+        x-order: 0
+      interval:
+        description: |+
+          Interval defines the time interval in which the token bucket
+          will fill tokens specified by `fill_amount` signal.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 1
+      label_key:
+        description: |-
+          Specifies which label the rate limiter should be keyed by.
+
+          Rate limiting is done independently for each value of the
+          [label](/concepts/flow-control/flow-label.md) with given key.
+          For example, to give each user a separate limit, assuming you
+          have a _user_ flow
+          label set up, set `label_key: "user"`.
+          If no label key is specified, then all requests matching the
+          selectors will be rate limited based on the global bucket.
+        type: string
+        x-order: 2
+      lazy_sync:
+        title: Configuration of lazy-syncing behavior of rate limiter
         x-order: 3
+        $ref: '#/definitions/RateLimiterParametersLazySync'
+      max_idle_time:
+        description: |+
+          Max idle time before token bucket state for a label is removed.
+          If set to 0, the state is never removed.
+
+        type: string
+        default: 7200s
+        x-go-tag-default: 7200s
+        x-order: 4
       tokens_label_key:
         description: |+
           Flow label key that will be used to override the number of tokens
@@ -3026,7 +3035,7 @@ definitions:
         type: string
         default: tokens
         x-go-tag-default: tokens
-        x-order: 4
+        x-order: 5
   RateLimiterParametersLazySync:
     type: object
     properties:
@@ -3038,14 +3047,14 @@ definitions:
         x-order: 0
       num_sync:
         description: |+
-          Number of times to lazy sync within the `limit_reset_interval`.
+          Number of times to lazy sync within the `interval`.
 
         type: integer
         format: int64
-        default: 5
+        default: 4
         minimum: 0
         exclusiveMinimum: true
-        x-go-tag-default: "5"
+        x-go-tag-default: "4"
         x-go-tag-validate: gt=0
         x-order: 1
   Rego:
@@ -3190,7 +3199,7 @@ definitions:
         x-order: 0
       selectors:
         description: |+
-          Selectors for flows that will be regulated by this _Flow Regulator_.
+          Selectors for the component.
 
         type: array
         minItems: 1
@@ -3318,7 +3327,10 @@ definitions:
     type: object
     properties:
       alerter:
-        description: Configuration for embedded Alerter.
+        description: |+
+          Configuration for embedded Alerter.
+
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/AlerterParameters'
       controller:
@@ -3339,7 +3351,10 @@ definitions:
     type: object
     properties:
       alerter:
-        description: Configuration for embedded Alerter.
+        description: |+
+          Configuration for embedded Alerter.
+
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/AlerterParameters'
       controller:
@@ -3442,10 +3457,7 @@ definitions:
         x-order: 0
         $ref: '#/definitions/LabelMatcher'
       parameters:
-        description: |+
-          Parameters associated with flows matching the label matcher.
-
-        x-go-tag-validate: required
+        description: Parameters associated with flows matching the label matcher.
         x-order: 1
         $ref: '#/definitions/SchedulerWorkloadParameters'
   SchedulerWorkloadParameters:
@@ -3742,7 +3754,7 @@ definitions:
           secretpassword\n\t            username: admin\n\t        per_agent_group:
           true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying
           it to the\nproduction cluster.\nIncorrect configuration will get rejected
-          at the agents and may cause\nshutdown of the agent(s).\n\n:::"
+          at the agents and might cause\nshutdown of the agent(s).\n\n:::"
         type: object
         additionalProperties:
           $ref: '#/definitions/InfraMeter'
@@ -3880,17 +3892,17 @@ definitions:
           config.
         type: string
         x-order: 0
-      out_ports:
-        description: Output ports for the Variable component.
-        x-order: 1
-        $ref: '#/definitions/VariableOuts'
-      value:
+      constant_output:
         description: |+
           The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
 
         x-go-tag-validate: required
-        x-order: 2
+        x-order: 1
         $ref: '#/definitions/ConstantSignal'
+      out_ports:
+        description: Output ports for the Variable component.
+        x-order: 2
+        $ref: '#/definitions/VariableOuts'
   VariableOuts:
     description: Outputs for the Variable component.
     type: object

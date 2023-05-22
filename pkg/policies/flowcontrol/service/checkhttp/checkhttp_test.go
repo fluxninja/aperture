@@ -14,14 +14,14 @@ import (
 	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 

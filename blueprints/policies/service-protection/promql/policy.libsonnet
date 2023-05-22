@@ -23,7 +23,7 @@ function(cfg) {
         ),
         spec.v1.Component.withVariable(
           spec.v1.Variable.new()
-          + spec.v1.Variable.withValue(
+          + spec.v1.Variable.withConstantOutput(
             local s = params.policy.setpoint;
             spec.v1.ConstantSignal.new()
             + spec.v1.ConstantSignal.withValue(s)

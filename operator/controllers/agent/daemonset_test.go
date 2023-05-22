@@ -32,7 +32,7 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/v2/operator/api/common"
 	. "github.com/fluxninja/aperture/v2/operator/controllers"
-	distcacheconfig "github.com/fluxninja/aperture/v2/pkg/distcache/config"
+	distcacheconfig "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 )

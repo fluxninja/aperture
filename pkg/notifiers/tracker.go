@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 )
 
 //go:generate mockgen -source tracker.go -package mocks -aux_files github.com/fluxninja/aperture/v2/pkg/notifiers=./watcher.go -destination ../mocks/mock-trackers.go

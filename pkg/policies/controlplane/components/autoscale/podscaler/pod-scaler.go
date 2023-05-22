@@ -99,8 +99,8 @@ func ParsePodScaler(
 			{
 				Component: &policylangv1.Component_BoolVariable{
 					BoolVariable: &policylangv1.BoolVariable{
-						Value:     podScaler.GetDryRun(),
-						ConfigKey: podScaler.GetDryRunConfigKey(),
+						ConstantOutput: podScaler.GetDryRun(),
+						ConfigKey:      podScaler.GetDryRunConfigKey(),
 						OutPorts: &policylangv1.BoolVariable_Outs{
 							Output: &policylangv1.OutPort{
 								SignalName: "DRY_RUN",

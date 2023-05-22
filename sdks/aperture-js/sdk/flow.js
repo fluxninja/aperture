@@ -9,6 +9,12 @@ export const FlowStatus = Object.freeze({
   Error: "Error",
 });
 
+export const FlowResult = Object.freeze({
+  Accepted: "Accepted",
+  Rejected: "Rejected",
+  Unreachable: "Unreachable",
+})
+
 export class Flow {
   constructor(span, checkResponse = null) {
     this.span = span;
@@ -16,14 +22,14 @@ export class Flow {
     this.checkResponse = checkResponse;
   }
 
-  Accepted() {
+  Result() {
     if (this.checkResponse === undefined) {
-      return true;
+      return FlowResult.Unreachable;
     }
     if (this.checkResponse.decisionType === "DECISION_TYPE_ACCEPTED") {
-      return true;
+      return FlowResult.Accepted;
     }
-    return false;
+    return FlowResult.Rejected;
   }
 
   End(flowStatus) {

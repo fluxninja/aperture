@@ -155,36 +155,32 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 				PolicyHash:  decision.PolicyHash,
 				ComponentID: decision.ComponentId,
 			}
+			labels := map[string]string{
+				metrics.PolicyNameLabel:  decision.PolicyName,
+				metrics.PolicyHashLabel:  decision.PolicyHash,
+				metrics.ComponentIDLabel: decision.ComponentId,
+			}
 
+			// All the infos are mutually exclusive.
 			// Update load scheduler metrics.
 			if cl := decision.GetLoadSchedulerInfo(); cl != nil {
-				labels := map[string]string{
-					metrics.PolicyNameLabel:    decision.PolicyName,
-					metrics.PolicyHashLabel:    decision.PolicyHash,
-					metrics.ComponentIDLabel:   decision.ComponentId,
-					metrics.WorkloadIndexLabel: cl.GetWorkloadIndex(),
-				}
+				labels[metrics.WorkloadIndexLabel] = cl.GetWorkloadIndex()
+				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
+			}
 
+			// Update quota scheduler metrics.
+			if qs := decision.GetQuotaSchedulerInfo(); qs != nil {
+				labels[metrics.WorkloadIndexLabel] = qs.GetSchedulerInfo().GetWorkloadIndex()
 				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
 			}
 
 			// Update rate limiter metrics.
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
-				labels := map[string]string{
-					metrics.PolicyNameLabel:  decision.PolicyName,
-					metrics.PolicyHashLabel:  decision.PolicyHash,
-					metrics.ComponentIDLabel: decision.ComponentId,
-				}
 				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
 
 			// Update flow regulator metrics.
 			if fr := decision.GetRegulatorInfo(); fr != nil {
-				labels := map[string]string{
-					metrics.PolicyNameLabel:  decision.PolicyName,
-					metrics.PolicyHashLabel:  decision.PolicyHash,
-					metrics.ComponentIDLabel: decision.ComponentId,
-				}
 				p.updateMetricsForRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
 		}
@@ -217,7 +213,7 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 }
 
 func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
-	loadScheduler := p.cfg.engine.GetLoadScheduler(limiterID)
+	loadScheduler := p.cfg.engine.GetScheduler(limiterID)
 	if loadScheduler == nil {
 		log.Sample(noLoadSchedulerSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).

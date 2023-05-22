@@ -1,0 +1,4 @@
+blueprint: Quota Scheduler Policy
+sources:
+  dashboard: policies/quota-scheduler/dashboard.libsonnet
+  policy: policies/quota-scheduler/policy.libsonnet

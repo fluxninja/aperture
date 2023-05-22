@@ -5,10 +5,12 @@ local autoScalingDefaults = import '../base/config-defaults.libsonnet';
 * @schema (promql_scale_out_controller.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
 * @schema (promql_scale_out_controller.threshold: float64 required) Threshold for the controller.
 * @schema (promql_scale_out_controller.gradient: aperture.spec.v1.IncreasingGradientParameters required) Gradient parameters for the controller.
+* @schema (promql_scale_out_controller.alerter: aperture.spec.v1.AlerterParameters required) Alerter parameters for the controller.
 * @param (policy.promql_scale_out_controllers: []promql_scale_out_controller required) List of scale out controllers.
 * @schema (promql_scale_in_controller.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
 * @schema (promql_scale_in_controller.threshold: float64 required) Threshold for the controller.
 * @schema (promql_scale_in_controller.gradient: aperture.spec.v1.DecreasingGradientParameters required) Gradient parameters for the controller.
+* @schema (promql_scale_in_controller.alerter: aperture.spec.v1.AlerterParameters required) Alerter parameters for the controller.
 * @param (policy.promql_scale_in_controllers: []promql_scale_in_controller required) List of scale in controllers.
 * @param (policy.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
 * @param (policy.scaling_backend: aperture.spec.v1.AutoScalerScalingBackend required) Scaling backend for the policy.

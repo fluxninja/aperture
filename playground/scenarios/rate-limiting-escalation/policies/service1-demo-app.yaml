@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: service1-demo-app
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components:
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: DESIRED_LOAD_MULTIPLIER
+          rhs:
+            constant_signal:
+              value: 1.0
+        out_ports:
+          output:
+            signal_name: IS_CRAWLER_ESCALATION
+        operator: lt
+        true_for: 30s
+    - switcher:
+        in_ports:
+          switch:
+            signal_name: IS_CRAWLER_ESCALATION
+          on_signal:
+            constant_signal:
+              value: 0.0
+          off_signal:
+            constant_signal:
+              value: 10.0
+        out_ports:
+          output:
+            signal_name: RATE_LIMIT
+    - flow_control:
+        rate_limiter:
+          selectors:
+            - service: service1-demo-app.demoapp.svc.cluster.local
+              control_point: ingress
+              label_matcher:
+                match_labels:
+                  "http.request.header.user_type": "crawler"
+          in_ports:
+            bucket_capacity:
+              signal_name: RATE_LIMIT
+            fill_amount:
+              signal_name: RATE_LIMIT
+          parameters:
+            interval: "1s"
+            label_key: http.request.header.user_id
+            lazy_sync:
+              enabled: true
+              num_sync: 4
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers:
+        - selectors:
+            - service: service1-demo-app.demoapp.svc.cluster.local
+              control_point: ingress
+          rules:
+            user_type:
+              extractor:
+                from: request.http.headers.user-type
+
+  service_protection_core:
+    adaptive_load_scheduler:
+      load_scheduler:
+        # The selectors determine the flows that are protected by this policy.
+        # Type: []aperture.spec.v1.Selector
+        # Required: True
+        selectors:
+          - service: service1-demo-app.demoapp.svc.cluster.local
+            control_point: ingress
+        # Scheduler parameters.
+        # Type: aperture.spec.v1.SchedulerParameters
+        scheduler:
+          workloads:
+            - parameters:
+                priority: 50
+              label_matcher:
+                match_labels:
+                  user_type: guest
+            - parameters:
+                priority: 200
+              label_matcher:
+                match_labels:
+                  http.request.header.user_type: subscriber
+      # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
+      # Type: float64
+      load_multiplier_linear_increment: 0.0025
+
+  latency_baseliner:
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - control_point: ingress
+          service: service3-demo-app.demoapp.svc.cluster.local

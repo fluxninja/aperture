@@ -23,15 +23,14 @@ aperturectl blueprints values [flags]
 ### Examples
 
 ```
-aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml
+aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml
 
-aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required
+aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml --only-required
 ```
 
 ### Options
 
 ```
-      --dynamic-config       Show dynamic config values instead
   -h, --help                 help for values
       --name string          Name of the Aperture Blueprint to provide values file for
       --no-yaml-modeline     Do not add YAML language server modeline to generated YAML files

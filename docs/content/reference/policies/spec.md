@@ -1064,19 +1064,7 @@ configuration.
 Configuration key for overriding value setting through dynamic config.
 
 </dd>
-<dt>out_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([BoolVariableOuts](#bool-variable-outs))
-
-<!-- vale on -->
-
-Output ports for the BoolVariable component.
-
-</dd>
-<dt>value</dt>
+<dt>constant_output</dt>
 <dd>
 
 <!-- vale off -->
@@ -1087,6 +1075,18 @@ Output ports for the BoolVariable component.
 
 The constant bool signal emitted by this component. The value of the constant
 bool can be overridden at runtime via dynamic config.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([BoolVariableOuts](#bool-variable-outs))
+
+<!-- vale on -->
+
+Output ports for the BoolVariable component.
 
 </dd>
 </dl>
@@ -2692,6 +2692,16 @@ _Load Scheduler_ provides service protection by creating a prioritized workload
 queue in front of the service using Weighted Fair Queuing.
 
 </dd>
+<dt>quota_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([QuotaScheduler](#quota-scheduler))
+
+<!-- vale on -->
+
+</dd>
 <dt>rate_limiter</dt>
 <dd>
 
@@ -2701,7 +2711,8 @@ queue in front of the service using Weighted Fair Queuing.
 
 <!-- vale on -->
 
-_Rate Limiter_ provides service protection by applying rate limits.
+_Rate Limiter_ provides service protection by applying rate limits using the
+token bucket algorithm.
 
 </dd>
 <dt>regulator</dt>
@@ -4673,8 +4684,7 @@ per second, which can translate to (avg. latency \* in-flight requests)
 (Little's Law) in concurrency limiting use-case.
 
 The signal at port `load_multiplier` determines the fraction of incoming tokens
-that get admitted. The signal at port `pass_through` makes the _Load Scheduler_
-pass through all incoming tokens.
+that get admitted.
 
 <dl>
 <dt>dry_run</dt>
@@ -4763,18 +4773,6 @@ Input for the LoadScheduler component.
 Load multiplier is proportion of incoming token rate that needs to be accepted.
 
 </dd>
-<dt>pass_through</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-When true, pass through the requests skipping the scheduler.
-
-</dd>
 </dl>
 
 ---
@@ -4837,7 +4835,7 @@ Contains configuration of per-agent scheduler
 
 <!-- vale on -->
 
-Selectors for flows that will be scheduled by this _Load Scheduler_.
+Selectors for the component.
 
 </dd>
 <dt>workload_latency_based_tokens</dt>
@@ -5581,27 +5579,6 @@ Example:
 PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 
 <dl>
-<dt>parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([PeriodicDecreaseParameters](#periodic-decrease-parameters))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### PeriodicDecreaseParameters {#periodic-decrease-parameters}
-
-<!-- vale on -->
-
-<dl>
 <dt>period</dt>
 <dd>
 
@@ -6015,6 +5992,59 @@ Periodically runs a Prometheus query in the background and emits the result.
 
 <!-- vale off -->
 
+### QuotaScheduler {#quota-scheduler}
+
+<!-- vale on -->
+
+Schedules the traffic based on token-bucket based quotas.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterIns](#rate-limiter-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>rate_limiter</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterParameters](#rate-limiter-parameters))
+
+<!-- vale on -->
+
+</dd>
+<dt>scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([Scheduler](#scheduler))
+
+<!-- vale on -->
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### RateLimiter {#rate-limiter}
 
 <!-- vale on -->
@@ -6028,34 +6058,10 @@ See also
 
 :::
 
-RateLimiting is done on per-label-value basis. Use `label_key` to select which
-label should be used as key.
+RateLimiting is done on per-label-value (`label_key`) basis and it uses the
+_Token Bucket Algorithm_.
 
 <dl>
-<dt>custom_limits</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]RateLimiterCustomLimit](#rate-limiter-custom-limit))
-
-<!-- vale on -->
-
-Allows to specify different limits for particular label values.
-
-</dd>
-<dt>custom_limits_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for overriding custom_limits setting through dynamic config.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -6080,39 +6086,16 @@ Input ports for the RateLimiter component
 Parameters for the RateLimiter component
 
 </dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RateLimiterCustomLimit {#rate-limiter-custom-limit}
-
-<!-- vale on -->
-
-<dl>
-<dt>label_value</dt>
+<dt>selectors</dt>
 <dd>
 
 <!-- vale off -->
 
-(string, **required**)
+([[]Selector](#selector), **required**)
 
 <!-- vale on -->
 
-Value of the label for which the custom limit should be applied.
-
-</dd>
-<dt>limit_scale_factor</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `1`)
-
-<!-- vale on -->
-
-Amount by which the `in_ports.limit` should be multiplied for this label value.
+Selectors for the component.
 
 </dd>
 </dl>
@@ -6128,7 +6111,7 @@ Amount by which the `in_ports.limit` should be multiplied for this label value.
 Inputs for the RateLimiter component
 
 <dl>
-<dt>limit</dt>
+<dt>bucket_capacity</dt>
 <dd>
 
 <!-- vale off -->
@@ -6137,15 +6120,31 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Number of flows allowed per `limit_reset_interval` per each label. Negative
-values disable the rate limiter.
+Capacity of the bucket.
 
-:::tip
+</dd>
+<dt>fill_amount</dt>
+<dd>
 
-Negative limit can be useful to _conditionally_ enable the rate limiter under
-certain circumstances. [Decider](#decider) might be helpful.
+<!-- vale off -->
 
-:::
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Number of tokens to fill within an `interval`.
+
+</dd>
+<dt>pass_through</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+PassThrough port determines whether all requests
 
 </dd>
 </dl>
@@ -6159,7 +6158,20 @@ certain circumstances. [Decider](#decider) might be helpful.
 <!-- vale on -->
 
 <dl>
-<dt>label_key</dt>
+<dt>continuous_fill</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Continuous fill determines whether the token bucket should be filled
+continuously or only on discrete intervals.
+
+</dd>
+<dt>interval</dt>
 <dd>
 
 <!-- vale off -->
@@ -6168,12 +6180,26 @@ certain circumstances. [Decider](#decider) might be helpful.
 
 <!-- vale on -->
 
+Interval defines the time interval in which the token bucket will fill tokens
+specified by `fill_amount` signal.
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
 Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
 [label](/concepts/flow-control/flow-label.md) with given key. For example, to
 give each user a separate limit, assuming you have a _user_ flow label set up,
-set `label_key: "user"`.
+set `label_key: "user"`. If no label key is specified, then all requests
+matching the selectors will be rate limited based on the global bucket.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -6188,28 +6214,17 @@ set `label_key: "user"`.
 Configuration of lazy-syncing behavior of rate limiter
 
 </dd>
-<dt>limit_reset_interval</dt>
+<dt>max_idle_time</dt>
 <dd>
 
 <!-- vale off -->
 
-(string, default: `"60s"`)
+(string, default: `"7200s"`)
 
 <!-- vale on -->
 
-Time after which the limit for a given label value will be reset.
-
-</dd>
-<dt>selectors</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]Selector](#selector), **required**)
-
-<!-- vale on -->
-
-Selectors for flows that will be rate limited by this _Rate Limiter_.
+Max idle time before token bucket state for a label is removed. If set to 0, the
+state is never removed.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -6254,11 +6269,11 @@ Enables lazy sync
 
 <!-- vale off -->
 
-(int64, minimum: `0`, default: `5`)
+(int64, minimum: `0`, default: `4`)
 
 <!-- vale on -->
 
-Number of times to lazy sync within the `limit_reset_interval`.
+Number of times to lazy sync within the `interval`.
 
 </dd>
 </dl>
@@ -6510,7 +6525,7 @@ The flow label key for identifying sessions.
 
 <!-- vale on -->
 
-Selectors for flows that will be regulated by this _Flow Regulator_.
+Selectors for the component.
 
 </dd>
 </dl>
@@ -7593,7 +7608,7 @@ Example:
 :::caution
 
 Validate the OTel configuration before applying it to the production cluster.
-Incorrect configuration will get rejected at the agents and may cause shutdown
+Incorrect configuration will get rejected at the agents and might cause shutdown
 of the agent(s).
 
 :::
@@ -7771,19 +7786,7 @@ dynamic configuration.
 Configuration key for overriding value setting through dynamic config.
 
 </dd>
-<dt>out_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([VariableOuts](#variable-outs))
-
-<!-- vale on -->
-
-Output ports for the Variable component.
-
-</dd>
-<dt>value</dt>
+<dt>constant_output</dt>
 <dd>
 
 <!-- vale off -->
@@ -7794,6 +7797,18 @@ Output ports for the Variable component.
 
 The constant signal emitted by this component. The value of the constant signal
 can be overridden at runtime via dynamic config.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([VariableOuts](#variable-outs))
+
+<!-- vale on -->
+
+Output ports for the Variable component.
 
 </dd>
 </dl>

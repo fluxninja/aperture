@@ -77,19 +77,24 @@ message ClassifierInfo {
 // LimiterDecision describes details for each limiter.
 message LimiterDecision {
   message RateLimiterInfo {
-    int64 remaining = 1;
-    int64 current = 2;
+    double remaining = 1;
+    double current = 2;
     string label = 3;
-    uint64 tokens_consumed = 4;
+    double tokens_consumed = 4;
   }
 
-  message LoadSchedulerInfo {
+  message SchedulerInfo {
     string workload_index = 1;
     uint64 tokens_consumed = 2;
   }
 
   message RegulatorInfo {
     string label = 1;
+  }
+
+  message QuotaSchedulerInfo {
+    string label = 1;
+    SchedulerInfo scheduler_info = 2;
   }
 
   enum LimiterReason {
@@ -104,8 +109,9 @@ message LimiterDecision {
   LimiterReason reason = 5;
   oneof details {
     RateLimiterInfo rate_limiter_info = 6;
-    LoadSchedulerInfo load_scheduler_info = 7;
+    SchedulerInfo load_scheduler_info = 7;
     RegulatorInfo regulator_info = 8;
+    QuotaSchedulerInfo quota_scheduler_info = 9;
   }
 }
 

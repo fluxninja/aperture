@@ -21,7 +21,7 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='rate(regulator_counter{policy_name="%(policy_name)s"}[$__rate_interval])' % {
+        expr='rate(regulator_counter_total{policy_name="%(policy_name)s"}[$__rate_interval])' % {
           policy_name: policyName,
         },
         intervalFactor=1,
@@ -48,7 +48,7 @@ function(cfg) {
 
   local dashboardDef =
     dashboard.new(
-      title='Feature Rollout',
+      title='Aperture Feature Rollout',
       schemaVersion=36,
       editable=true,
       refresh=refresh,

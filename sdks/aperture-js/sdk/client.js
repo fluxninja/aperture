@@ -14,7 +14,10 @@ import {
   URL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
-import { Flow } from "./flow.js";
+import {
+  Flow,
+  FlowResult
+} from "./flow.js";
 import { fcs } from "./utils.js";
 
 export class ApertureClient {
@@ -58,12 +61,17 @@ export class ApertureClient {
       span.setAttribute(SOURCE_LABEL, "sdk");
       let flow = new Flow(span);
 
+      let checkParams = {};
+      if (this.timeout != null && this.timeout != 0) {
+        checkParams.deadline = Date.now() + this.timeout;
+      }
+
       this.fcsClient.Check(
         {
           control_point: controlPointArg,
           labels: mergedLabels,
         },
-        { deadline: Date.now() + this.timeout },
+        checkParams,
         (err, response) => {
           span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
 

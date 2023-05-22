@@ -20,7 +20,7 @@ message RateLimiterDecisionWrapper {
 }
 
 message RateLimiterDecision {
-  double limit = 1;
-  // CustomLimits dynamic config
-  repeated policy.language.v1.RateLimiter.CustomLimit custom_limits = 2;
+  double bucket_capacity = 1;
+  double fill_amount = 2;
+  bool pass_through = 3;
 }

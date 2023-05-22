@@ -15,7 +15,7 @@ const fn_port = process.env.FN_AGENT_PORT ? process.env.FN_AGENT_PORT : "8089";
 export const URL = fn_host + ":" + fn_port;
 
 export const LIBRARY_NAME = "aperture-js";
-export const LIBRARY_VERSION = "v0.1.0";
+export const LIBRARY_VERSION = "v2.1.0";
 
 // Label to hold source of flow.
 export const SOURCE_LABEL = "aperture.source";

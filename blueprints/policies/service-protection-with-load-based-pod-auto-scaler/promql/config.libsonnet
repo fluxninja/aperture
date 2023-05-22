@@ -15,9 +15,12 @@ local promqlServiceProtection = import '../../service-protection/promql/config.l
 * @param (policy.auto_scaling.kubernetes_replicas.kubernetes_object_selector: aperture.spec.v1.KubernetesObjectSelector required) Kubernetes object selector.
 * @param (policy.auto_scaling.kubernetes_replicas.min_replicas: string required) Minimum number of replicas.
 * @param (policy.auto_scaling.kubernetes_replicas.max_replicas: string required) Maximum number of replicas.
-* @param (policy.auto_scaling.promql_scale_in_controllers: []policies/auto-scaling/pod-auto-scaler:schema:promql_scale_in_controller required) List of scale in controllers.
 * @param (policy.auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.
 * @param (policy.auto_scaling.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
+* @param (policy.auto_scaling.disable_periodic_scale_in: bool) Disable periodic scale in.
+* @param (policy.auto_scaling.periodic_decrease: aperture.spec.v1.PeriodicDecreaseParameters) Parameters for periodic scale in.
+* @param (policy.auto_scaling.periodic_decrease.period: string) Period for periodic scale in.
+* @param (policy.auto_scaling.periodic_decrease.scale_in_percentage: float64) Percentage of replicas to scale in.
 */
 
 /**
@@ -31,7 +34,6 @@ local promqlServiceProtection = import '../../service-protection/promql/config.l
 promqlServiceProtection {
   policy+: {
     auto_scaling: {
-      promql_scale_in_controllers: autoScalingDefaults.policy.promql_scale_in_controllers,
       dry_run: autoScalingDefaults.policy.dry_run,
       kubernetes_replicas+: {
         kubernetes_object_selector: '__REQUIRED_FIELD__',
@@ -39,6 +41,11 @@ promqlServiceProtection {
         max_replicas: '__REQUIRED_FIELD__',
       },
       scaling_parameters: autoScalingDefaults.policy.scaling_parameters,
+      disable_periodic_scale_in: false,
+      periodic_decrease: {
+        period: '60s',
+        scale_in_percentage: 10,
+      },
     },
   },
 }

@@ -1,6 +1,6 @@
 local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet';
 
-local StaticRateLimiting = aperture.policies.StaticRateLimiting.policy;
+local RateLimiting = aperture.policies.RateLimiting.policy;
 
 local selector = aperture.spec.v1.Selector;
 local classifier = aperture.spec.v1.Classifier;
@@ -12,14 +12,17 @@ local svcSelectors = [
   + selector.withService('service-graphql-demo-app.demoapp.svc.cluster.local'),
 ];
 
-local policyResource = StaticRateLimiting({
+local policyResource = RateLimiting({
   policy+: {
-    policy_name: 'graphql-static-rate-limiting',
-    rate_limit: 10.0,
+    policy_name: 'graphql-rate-limiting',
     rate_limiter+: {
       selectors: svcSelectors,
-      label_key: 'user_id',
-      limit_reset_interval: '1s',
+      bucket_capacity: 40,
+      fill_amount: 2,
+      parameters+: {
+        label_key: 'user_id',
+        interval: '1s',
+      },
     },
     resources: {
       flow_control: {

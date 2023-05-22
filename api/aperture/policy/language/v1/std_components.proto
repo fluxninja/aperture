@@ -353,7 +353,7 @@ message Variable {
   Outs out_ports = 1;
 
   // The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
-  ConstantSignal value = 2; // @gotags: validate:"required"
+  ConstantSignal constant_output = 2; // @gotags: validate:"required"
 
   // Configuration key for overriding value setting through dynamic config.
   string config_key = 3;
@@ -371,7 +371,7 @@ message BoolVariable {
   Outs out_ports = 1;
 
   // The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
-  bool value = 2;
+  bool constant_output = 2;
 
   // Configuration key for overriding value setting through dynamic config.
   string config_key = 3;

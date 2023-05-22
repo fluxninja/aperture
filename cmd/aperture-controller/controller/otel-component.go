@@ -21,7 +21,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	"github.com/fluxninja/aperture/v2/pkg/alertmanager"
+	alertmanager "github.com/fluxninja/aperture/v2/pkg/alert-manager"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsreceiver"

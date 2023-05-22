@@ -42,7 +42,7 @@ APERTURE_PYTHON_EXAMPLE_NS = "aperture-python-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ISTIO_NS = "istio-system"
-DEFAULT_TEST_SCENARIO = "scenarios/java_rate_limiting_escalation"
+DEFAULT_TEST_SCENARIO = "scenarios/java-rate-limiting-escalation"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 TANKA_DEPS_HANDLED = []
@@ -893,7 +893,7 @@ def process_aperture_scenario(scenario_path):
 
 
     # Load k6 configuration and process it for inclusion into a yaml file
-    wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
+    wavepool_js = str(read_file(scenario_path + "/" + "load-generator/test.js"))
     lines = wavepool_js.replace("\"", "\\\"").split("\n")
     wavepool_js = "\\n".join(lines)
     wavepool = {

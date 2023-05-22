@@ -22,10 +22,7 @@ function(cfg) {
 
   local scale_in_controllers = [
     scaleInController.new()
-    + scaleOutController.withAlerter(
-      alerterParameters.new()
-      + alerterParameters.withAlertName('Scale In Alerter')
-    )
+    + scaleInController.withAlerter(params.policy.promql_scale_in_controllers[controller_idx].alerter)
     + scaleInController.withController(
       scaleInControllerController.new()
       + scaleInControllerController.withGradient(
@@ -43,10 +40,7 @@ function(cfg) {
 
   local scale_out_controllers = [
     scaleOutController.new()
-    + scaleOutController.withAlerter(
-      alerterParameters.new()
-      + alerterParameters.withAlertName('Scale Out Alerter')
-    )
+    + scaleOutController.withAlerter(params.policy.promql_scale_out_controllers[controller_idx].alerter)
     + scaleOutController.withController(
       scaleOutControllerController.new()
       + scaleOutControllerController.withGradient(

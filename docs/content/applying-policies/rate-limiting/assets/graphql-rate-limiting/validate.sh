@@ -8,7 +8,8 @@ git_root=$(git rev-parse --show-toplevel)
 source "$git_root"/docs/tools/aperturectl/validate_common.sh
 
 generate_compare \
-	policies/static-rate-limiting \
+	policies/rate-limiting \
 	values.yaml \
-	tmp/policies/graphql-static-rate-limiting-cr.yaml \
+	tmp/policies/graphql-rate-limiting-cr.yaml \
 	graphql-rate-limiting-jwt.yaml
+

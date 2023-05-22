@@ -5,6 +5,7 @@ import static com.fluxninja.aperture.sdk.Constants.*;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.api.trace.Span;
+import org.apache.http.HttpStatus;
 
 public final class Flow {
     private final CheckResponse checkResponse;
@@ -45,6 +46,29 @@ public final class Flow {
 
     public CheckResponse checkResponse() {
         return this.checkResponse;
+    }
+
+    /**
+     * Returns Aperture Agent's reason for rejecting the flow. Reason is represented by an
+     * appropriate HTTP code. If the flow was not rejected, an IllegalStateException will be thrown.
+     *
+     * @return HTTP code of rejection reason
+     */
+    public int rejectReason() {
+        if (this.result() == FlowResult.Rejected) {
+            switch (this.checkResponse.getRejectReason()) {
+                case REJECT_REASON_RATE_LIMITED:
+                    return HttpStatus.SC_TOO_MANY_REQUESTS;
+                case REJECT_REASON_NO_TOKENS:
+                    return HttpStatus.SC_SERVICE_UNAVAILABLE;
+                case REJECT_REASON_REGULATED:
+                    return HttpStatus.SC_FORBIDDEN;
+                default:
+                    return HttpStatus.SC_FORBIDDEN;
+            }
+        } else {
+            throw new IllegalStateException("Flow not rejected");
+        }
     }
 
     public void end(FlowStatus statusCode) throws ApertureSDKException {

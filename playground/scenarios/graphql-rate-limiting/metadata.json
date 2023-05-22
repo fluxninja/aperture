@@ -1,0 +1,27 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/graphql-example-1",
+  "aperture_policies": [
+    {
+      "blueprint_name": "policies/rate-limiting",
+      "policy_name": "graphql-rate-limiting",
+      "values_file": "policies/graphql-rate-limiting.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "graphql-demo-app",
+      "context": "playground/resources/graphql-demo-app",
+      "ssh": "default"
+    }
+  ],
+  "needs": ["istio"],
+  "child_resources": [
+    {
+      "workload": "service-graphql-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service-graphql-demo-app:serviceaccount"]
+    }
+  ]
+}

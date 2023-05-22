@@ -1,10 +1,16 @@
 {
   new():: {
   },
-  withParameters(parameters):: {
-    parameters: parameters,
+  withPeriod(period):: {
+    period: period,
   },
-  withParametersMixin(parameters):: {
-    parameters+: parameters,
+  withPeriodMixin(period):: {
+    period+: period,
+  },
+  withScaleInPercentage(scale_in_percentage):: {
+    scale_in_percentage: scale_in_percentage,
+  },
+  withScaleInPercentageMixin(scale_in_percentage):: {
+    scale_in_percentage+: scale_in_percentage,
   },
 }

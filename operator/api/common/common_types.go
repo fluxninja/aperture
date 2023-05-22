@@ -20,7 +20,7 @@ package common
 import (
 	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
 	sentry "github.com/fluxninja/aperture/v2/extensions/sentry/config"
-	alertmgrconfig "github.com/fluxninja/aperture/v2/pkg/alertmanager/config"
+	alertmgrconfig "github.com/fluxninja/aperture/v2/pkg/alert-manager/config"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	kubernetes "github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config"
 	static "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"

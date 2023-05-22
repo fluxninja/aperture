@@ -473,7 +473,8 @@
         },
         "scale_in_alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-in Alerter.",
+          "description": "Configuration for scale-in Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 3
         },
         "scale_in_cooldown": {
@@ -485,7 +486,8 @@
         },
         "scale_out_alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale-out Alerter.",
+          "description": "Configuration for scale-out Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 5
         },
         "scale_out_cooldown": {
@@ -507,14 +509,14 @@
           "type": "string",
           "x-order": 0
         },
+        "constant_output": {
+          "description": "The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.",
+          "type": "boolean",
+          "x-order": 1
+        },
         "out_ports": {
           "$ref": "#/definitions/BoolVariableOuts",
           "description": "Output ports for the BoolVariable component.",
-          "x-order": 1
-        },
-        "value": {
-          "description": "The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.",
-          "type": "boolean",
           "x-order": 2
         }
       },
@@ -1220,15 +1222,19 @@
           "description": "_Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.",
           "x-order": 3
         },
+        "quota_scheduler": {
+          "$ref": "#/definitions/QuotaScheduler",
+          "x-order": 4
+        },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
-          "description": "_Rate Limiter_ provides service protection by applying rate limits.",
-          "x-order": 4
+          "description": "_Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.",
+          "x-order": 5
         },
         "regulator": {
           "$ref": "#/definitions/Regulator",
           "description": "Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
-          "x-order": 5
+          "x-order": 6
         }
       },
       "type": "object",
@@ -2135,7 +2141,7 @@
       "additionalProperties": false
     },
     "LoadScheduler": {
-      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nIn order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n_Load Scheduler_ measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.\nThe signal at port `pass_through` makes the _Load Scheduler_ pass through all incoming tokens.",
+      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nIn order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n_Load Scheduler_ measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -2175,11 +2181,6 @@
           "$ref": "#/definitions/InPort",
           "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted.",
           "x-order": 0
-        },
-        "pass_through": {
-          "$ref": "#/definitions/InPort",
-          "description": "When true, pass through the requests skipping the scheduler.",
-          "x-order": 1
         }
       },
       "type": "object",
@@ -2205,7 +2206,7 @@
           "x-order": 0
         },
         "selectors": {
-          "description": "Selectors for flows that will be scheduled by this _Load Scheduler_.\n\n",
+          "description": "Selectors for the component.\n\n",
           "items": {
             "$ref": "#/definitions/Selector",
             "type": "object"
@@ -2576,16 +2577,6 @@
     "PeriodicDecrease": {
       "description": "PeriodicDecrease defines a controller for scaling in based on a periodic timer.",
       "properties": {
-        "parameters": {
-          "$ref": "#/definitions/PeriodicDecreaseParameters",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "PeriodicDecreaseParameters": {
-      "properties": {
         "period": {
           "description": "The period of the timer.\n\n",
           "type": "string",
@@ -2770,97 +2761,25 @@
       "type": "object",
       "additionalProperties": false
     },
-    "RateLimiter": {
-      "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value basis. Use `label_key`\nto select which label should be used as key.",
+    "QuotaScheduler": {
+      "description": "Schedules the traffic based on token-bucket based quotas.",
       "properties": {
-        "custom_limits": {
-          "description": "Allows to specify different limits for particular label values.\n\n",
-          "items": {
-            "$ref": "#/definitions/RateLimiterCustomLimit",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
-        },
-        "custom_limits_config_key": {
-          "description": "Configuration key for overriding custom_limits setting through dynamic config.",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
-          "title": "Input ports for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-order": 0
         },
-        "parameters": {
+        "rate_limiter": {
           "$ref": "#/definitions/RateLimiterParameters",
-          "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 3
-        }
-      },
-      "title": "Limits the traffic on a control point to specified rate",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RateLimiterCustomLimit": {
-      "properties": {
-        "label_value": {
-          "description": "Value of the label for which the custom limit should be applied.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "limit_scale_factor": {
-          "default": 1,
-          "description": "Amount by which the `in_ports.limit` should be multiplied for\nthis label value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "1.0",
-          "x-order": 1
-        }
-      },
-      "required": ["label_value"],
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RateLimiterIns": {
-      "properties": {
-        "limit": {
-          "$ref": "#/definitions/InPort",
-          "description": "Number of flows allowed per `limit_reset_interval` per each label.\nNegative values disable the rate limiter.\n\n:::tip\n\nNegative limit can be useful to _conditionally_ enable the rate limiter\nunder certain circumstances. [Decider](#decider) might be helpful.\n\n:::\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        }
-      },
-      "title": "Inputs for the RateLimiter component",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RateLimiterParameters": {
-      "properties": {
-        "label_key": {
-          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
-        },
-        "lazy_sync": {
-          "$ref": "#/definitions/RateLimiterParametersLazySync",
-          "title": "Configuration of lazy-syncing behavior of rate limiter",
           "x-order": 1
         },
-        "limit_reset_interval": {
-          "default": "60s",
-          "description": "Time after which the limit for a given label value will be reset.\n\n",
-          "type": "string",
-          "x-go-tag-default": "60s",
+        "scheduler": {
+          "$ref": "#/definitions/Scheduler",
+          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "selectors": {
-          "description": "Selectors for flows that will be rate limited by this _Rate Limiter_.\n\n",
           "items": {
             "$ref": "#/definitions/Selector",
             "type": "object"
@@ -2869,16 +2788,109 @@
           "type": "array",
           "x-go-tag-validate": "required,gt=0,dive",
           "x-order": 3
+        }
+      },
+      "required": ["selectors"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RateLimiter": {
+      "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/RateLimiterIns",
+          "title": "Input ports for the RateLimiter component",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "parameters": {
+          "$ref": "#/definitions/RateLimiterParameters",
+          "title": "Parameters for the RateLimiter component",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
+        "selectors": {
+          "description": "Selectors for the component.\n\n",
+          "items": {
+            "$ref": "#/definitions/Selector",
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array",
+          "x-go-tag-validate": "required,gt=0,dive",
+          "x-order": 2
+        }
+      },
+      "required": ["selectors"],
+      "title": "Limits the traffic on a control point to specified rate",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RateLimiterIns": {
+      "properties": {
+        "bucket_capacity": {
+          "$ref": "#/definitions/InPort",
+          "description": "Capacity of the bucket.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 0
+        },
+        "fill_amount": {
+          "$ref": "#/definitions/InPort",
+          "description": "Number of tokens to fill within an `interval`.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
+        "pass_through": {
+          "$ref": "#/definitions/InPort",
+          "title": "PassThrough port determines whether all requests",
+          "x-order": 2
+        }
+      },
+      "title": "Inputs for the RateLimiter component",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RateLimiterParameters": {
+      "properties": {
+        "continuous_fill": {
+          "default": true,
+          "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",
+          "type": "boolean",
+          "x-go-tag-default": "true",
+          "x-order": 0
+        },
+        "interval": {
+          "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        },
+        "label_key": {
+          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf no label key is specified, then all requests matching the\nselectors will be rate limited based on the global bucket.",
+          "type": "string",
+          "x-order": 2
+        },
+        "lazy_sync": {
+          "$ref": "#/definitions/RateLimiterParametersLazySync",
+          "title": "Configuration of lazy-syncing behavior of rate limiter",
+          "x-order": 3
+        },
+        "max_idle_time": {
+          "default": "7200s",
+          "description": "Max idle time before token bucket state for a label is removed.\nIf set to 0, the state is never removed.\n\n",
+          "type": "string",
+          "x-go-tag-default": "7200s",
+          "x-order": 4
         },
         "tokens_label_key": {
           "default": "tokens",
           "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
           "type": "string",
           "x-go-tag-default": "tokens",
-          "x-order": 4
+          "x-order": 5
         }
       },
-      "required": ["label_key", "selectors"],
+      "required": ["interval"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2892,12 +2904,12 @@
           "x-order": 0
         },
         "num_sync": {
-          "default": 5,
-          "description": "Number of times to lazy sync within the `limit_reset_interval`.\n\n",
+          "default": 4,
+          "description": "Number of times to lazy sync within the `interval`.\n\n",
           "exclusiveMinimum": 0,
           "format": "int64",
           "type": "integer",
-          "x-go-tag-default": "5",
+          "x-go-tag-default": "4",
           "x-go-tag-validate": "gt=0",
           "x-order": 1
         }
@@ -2992,7 +3004,7 @@
           "x-order": 0
         },
         "selectors": {
-          "description": "Selectors for flows that will be regulated by this _Flow Regulator_.\n\n",
+          "description": "Selectors for the component.\n\n",
           "items": {
             "$ref": "#/definitions/Selector",
             "type": "object"
@@ -3119,7 +3131,8 @@
       "properties": {
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for embedded Alerter.",
+          "description": "Configuration for embedded Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "controller": {
@@ -3150,7 +3163,8 @@
       "properties": {
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for embedded Alerter.",
+          "description": "Configuration for embedded Alerter.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "controller": {
@@ -3221,8 +3235,7 @@
         },
         "parameters": {
           "$ref": "#/definitions/SchedulerWorkloadParameters",
-          "description": "Parameters associated with flows matching the label matcher.\n\n",
-          "x-go-tag-validate": "required",
+          "description": "Parameters associated with flows matching the label matcher.",
           "x-order": 1
         }
       },
@@ -3457,7 +3470,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/InfraMeter"
           },
-          "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n   - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t          batch:\n\t            send_batch_size: 10\n\t            timeout: 10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval: 10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password: secretpassword\n\t            username: admin\n\t        per_agent_group: true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying it to the\nproduction cluster.\nIncorrect configuration will get rejected at the agents and may cause\nshutdown of the agent(s).\n\n:::",
+          "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n   - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t          batch:\n\t            send_batch_size: 10\n\t            timeout: 10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval: 10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password: secretpassword\n\t            username: admin\n\t        per_agent_group: true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying it to the\nproduction cluster.\nIncorrect configuration will get rejected at the agents and might cause\nshutdown of the agent(s).\n\n:::",
           "type": "object",
           "x-order": 1
         }
@@ -3562,15 +3575,15 @@
           "type": "string",
           "x-order": 0
         },
-        "out_ports": {
-          "$ref": "#/definitions/VariableOuts",
-          "description": "Output ports for the Variable component.",
-          "x-order": 1
-        },
-        "value": {
+        "constant_output": {
           "$ref": "#/definitions/ConstantSignal",
           "description": "The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.\n\n",
           "x-go-tag-validate": "required",
+          "x-order": 1
+        },
+        "out_ports": {
+          "$ref": "#/definitions/VariableOuts",
+          "description": "Output ports for the Variable component.",
           "x-order": 2
         }
       },

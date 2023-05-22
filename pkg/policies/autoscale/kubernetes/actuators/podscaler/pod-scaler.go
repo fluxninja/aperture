@@ -19,7 +19,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
@@ -102,6 +102,10 @@ func setupPodScalerFactory(
 ) error {
 	if !cfg.Enabled {
 		log.Info().Msg("Kubernetes AutoScaler is disabled")
+		return nil
+	}
+	if k8sClient == nil {
+		log.Info().Msg("Not in Kubernetes cluster, omitting AutoScaler")
 		return nil
 	}
 
