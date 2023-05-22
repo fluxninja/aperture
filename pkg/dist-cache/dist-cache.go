@@ -62,9 +62,7 @@ func (dc *DistCache) DeleteDMap(name string) error {
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
 	defer delete(dc.config.DMaps.Custom, name)
-	// don't destroy the dmap as this may be a normal shutdown scenario
-	// TODO: Perhaps controller should signal DMap destruction at the leader
-	return nil
+	return dc.olric.DeleteDMap(name)
 }
 
 func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
