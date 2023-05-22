@@ -266,7 +266,7 @@ type QuotaScheduler struct {
 	InPorts     *RateLimiter_Ins        `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"`             // @gotags: validate:"required"
 	Selectors   []*Selector             `protobuf:"bytes,2,rep,name=selectors,proto3" json:"selectors,omitempty" validate:"required,gt=0,dive"`                        // @gotags: validate:"required,gt=0,dive"
 	RateLimiter *RateLimiter_Parameters `protobuf:"bytes,3,opt,name=rate_limiter,json=rateLimiter,proto3" json:"rate_limiter,omitempty" validate:"required"` // @gotags: validate:"required"
-	Scheduler   *Scheduler              `protobuf:"bytes,4,opt,name=scheduler,proto3" json:"scheduler,omitempty" validate:"required"`                        // @gotags: validate:"required"
+	Scheduler   *Scheduler              `protobuf:"bytes,4,opt,name=scheduler,proto3" json:"scheduler,omitempty"`
 }
 
 func (x *QuotaScheduler) Reset() {

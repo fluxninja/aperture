@@ -39,7 +39,7 @@ spec:
             signal_name: RESET_0
     - bool_variable:
         config_key: rollout
-        constant_output: false
+        constant_output: true
         out_ports:
           output:
             signal_name: USER_ROLLOUT_CONTROL

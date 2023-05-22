@@ -297,30 +297,12 @@ func (wsFactory *Factory) NewScheduler(
 	clock clockwork.Clock,
 	metrics *SchedulerMetrics,
 ) (*Scheduler, error) {
-	if proto == nil {
-		p := &policylangv1.Scheduler{}
-		config.SetDefaults(p)
-		proto = p
-	}
-
-	// default workload params is not a required param so it can be nil
-	if proto.DefaultWorkloadParameters == nil {
-		p := &policylangv1.Scheduler_Workload_Parameters{}
-		config.SetDefaults(p)
-		proto.DefaultWorkloadParameters = p
-	}
-
 	mm := multimatcher.New[int, multiMatchResult]()
 	// Loop through the workloads
 	for workloadIndex, workloadProto := range proto.Workloads {
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
 		if err != nil {
 			return nil, err
-		}
-		if workloadProto.GetParameters() == nil {
-			p := &policylangv1.Scheduler_Workload_Parameters{}
-			config.SetDefaults(p)
-			workloadProto.Parameters = p
 		}
 
 		wm := &workloadMatcher{
@@ -521,4 +503,30 @@ func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult 
 	}
 	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetParameters()
 	return mmr
+}
+
+// SanitizeSchedulerProto sanitizes the scheduler proto.
+func SanitizeSchedulerProto(proto *policylangv1.Scheduler) *policylangv1.Scheduler {
+	if proto == nil {
+		p := &policylangv1.Scheduler{}
+		config.SetDefaults(p)
+		proto = p
+	}
+
+	// default workload params is not a required param so it can be nil
+	if proto.DefaultWorkloadParameters == nil {
+		p := &policylangv1.Scheduler_Workload_Parameters{}
+		config.SetDefaults(p)
+		proto.DefaultWorkloadParameters = p
+	}
+
+	// Loop through the workloads
+	for _, workloadProto := range proto.Workloads {
+		if workloadProto.GetParameters() == nil {
+			p := &policylangv1.Scheduler_Workload_Parameters{}
+			config.SetDefaults(p)
+			workloadProto.Parameters = p
+		}
+	}
+	return proto
 }

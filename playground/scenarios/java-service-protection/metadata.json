@@ -4,8 +4,8 @@
   "aperture_policies": [
     {
       "blueprint_name": "policies/service-protection/average-latency",
-      "policy_name": "rate-limit-escalation",
-      "values_file": "policies/rate-limit-escalation.yaml",
+      "policy_name": "service-protection",
+      "values_file": "policies/service-protection.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

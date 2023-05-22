@@ -56,7 +56,7 @@ message QuotaScheduler {
 
   RateLimiter.Parameters rate_limiter = 3; // @gotags: validate:"required"
 
-  Scheduler scheduler = 4; // @gotags: validate:"required"
+  Scheduler scheduler = 4;
 }
 
 // Limits the traffic on a control point to specified rate
