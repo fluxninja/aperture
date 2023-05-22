@@ -534,18 +534,19 @@ definitions:
         x-go-tag-default: 30s
         x-order: 6
   BoolVariable:
-    description: Component that emits a constant bool which can be changed at runtime
-      via dynamic configuration.
+    description: Component that emits a constant Boolean signal which can be changed
+      at runtime through dynamic configuration.
     type: object
     properties:
       config_key:
         description: Configuration key for overriding value setting through dynamic
-          config.
+          configuration.
         type: string
         x-order: 0
       constant_output:
-        description: The constant bool signal emitted by this component. The value
-          of the constant bool can be overridden at runtime via dynamic config.
+        description: The constant Boolean signal emitted by this component. The value
+          of the constant Boolean signal can be overridden at runtime through dynamic
+          configuration.
         type: boolean
         x-order: 1
       out_ports:
@@ -711,7 +712,7 @@ definitions:
         x-order: 3
         $ref: '#/definitions/AutoScale'
       bool_variable:
-        description: BoolVariable emits a constant bool signal which can be changed
+        description: BoolVariable emits a constant Boolean signal which can be changed
           at runtime via dynamic configuration.
         x-order: 4
         $ref: '#/definitions/BoolVariable'
@@ -1554,12 +1555,13 @@ definitions:
       manual_mode:
         description: In manual mode, the controller does not adjust the control variable.
           It emits the same output as the control variable input. This setting can
-          be adjusted at runtime via dynamic config without restarting the policy.
+          be adjusted at runtime through dynamic configuration without restarting
+          the policy.
         type: boolean
         x-order: 1
       manual_mode_config_key:
-        description: Configuration key for overriding manual_mode setting through
-          dynamic config.
+        description: Configuration key for overriding `manual_mode` setting through
+          dynamic configuration.
         type: string
         x-order: 2
       out_ports:
@@ -2154,7 +2156,7 @@ definitions:
           type: string
         x-order: 3
       pass_through_label_values_config_key:
-        description: Configuration key for setting label value to pass through through
+        description: Configuration key for setting pass through label values through
           dynamic configuration.
         type: string
         x-order: 4
@@ -2298,7 +2300,7 @@ definitions:
 
       :::
 
-      In order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+      To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
       A workload determines the priority and cost of admitting each Flow that belongs to it.
       Scheduling of Flows is based on Weighted Fair Queuing principles.
       _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
@@ -2316,7 +2318,7 @@ definitions:
         type: boolean
         x-order: 0
       dry_run_config_key:
-        description: Configuration key for setting dry run mode through dynamic config.
+        description: Configuration key for setting dry run mode through dynamic configuration.
         type: string
         x-order: 1
       in_ports:
@@ -3171,7 +3173,7 @@ definitions:
           type: string
         x-order: 2
       pass_through_label_values_config_key:
-        description: Configuration key for setting label value to pass through through
+        description: Configuration key for setting pass through label values through
           dynamic configuration.
         type: string
         x-order: 3
@@ -3884,17 +3886,17 @@ definitions:
         $ref: '#/definitions/OutPort'
   Variable:
     description: Component that emits a constant signal which can be changed at runtime
-      via dynamic configuration.
+      through dynamic configuration.
     type: object
     properties:
       config_key:
         description: Configuration key for overriding value setting through dynamic
-          config.
+          configuration.
         type: string
         x-order: 0
       constant_output:
         description: |+
-          The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
+          The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.
 
         x-go-tag-validate: required
         x-order: 1

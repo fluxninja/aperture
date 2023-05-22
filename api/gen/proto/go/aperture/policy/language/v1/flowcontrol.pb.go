@@ -412,7 +412,7 @@ func (x *RateLimiter) GetSelectors() []*Selector {
 //
 // :::
 //
-// In order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+// To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
 // A workload determines the priority and cost of admitting each Flow that belongs to it.
 // Scheduling of Flows is based on Weighted Fair Queuing principles.
 // _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
@@ -432,7 +432,7 @@ type LoadScheduler struct {
 	// Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
 	// It is useful for observing the behavior of load scheduler without disrupting any real traffic.
 	DryRun bool `protobuf:"varint,6,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`
-	// Configuration key for setting dry run mode through dynamic config.
+	// Configuration key for setting dry run mode through dynamic configuration.
 	DryRunConfigKey string `protobuf:"bytes,7,opt,name=dry_run_config_key,json=dryRunConfigKey,proto3" json:"dry_run_config_key,omitempty"`
 }
 
@@ -725,7 +725,7 @@ type Regulator struct {
 	Parameters *Regulator_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
 	// Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.
 	PassThroughLabelValues []string `protobuf:"bytes,5,rep,name=pass_through_label_values,json=passThroughLabelValues,proto3" json:"pass_through_label_values,omitempty"`
-	// Configuration key for setting label value to pass through through dynamic configuration.
+	// Configuration key for setting pass through label values through dynamic configuration.
 	PassThroughLabelValuesConfigKey string `protobuf:"bytes,6,opt,name=pass_through_label_values_config_key,json=passThroughLabelValuesConfigKey,proto3" json:"pass_through_label_values_config_key,omitempty"`
 }
 
@@ -812,7 +812,7 @@ type LoadRamp struct {
 	Parameters *LoadRamp_Parameters `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.
 	PassThroughLabelValues []string `protobuf:"bytes,4,rep,name=pass_through_label_values,json=passThroughLabelValues,proto3" json:"pass_through_label_values,omitempty"`
-	// Configuration key for setting label value to pass through through dynamic configuration.
+	// Configuration key for setting pass through label values through dynamic configuration.
 	PassThroughLabelValuesConfigKey string `protobuf:"bytes,5,opt,name=pass_through_label_values_config_key,json=passThroughLabelValuesConfigKey,proto3" json:"pass_through_label_values_config_key,omitempty"`
 }
 

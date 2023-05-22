@@ -117,10 +117,10 @@ message GradientController {
   // Gradient Parameters.
   Parameters parameters = 3; // @gotags: validate:"required"
 
-  // In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime via dynamic config without restarting the policy.
+  // In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.
   bool manual_mode = 4;
 
-  // Configuration key for overriding manual_mode setting through dynamic config.
+  // Configuration key for overriding `manual_mode` setting through dynamic configuration.
   string manual_mode_config_key = 5;
 }
 
@@ -341,7 +341,7 @@ message Switcher {
   Outs out_ports = 2;
 }
 
-// Component that emits a constant signal which can be changed at runtime via dynamic configuration.
+// Component that emits a constant signal which can be changed at runtime through dynamic configuration.
 message Variable {
   // Outputs for the Variable component.
   message Outs {
@@ -352,14 +352,14 @@ message Variable {
   // Output ports for the Variable component.
   Outs out_ports = 1;
 
-  // The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
+  // The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.
   ConstantSignal constant_output = 2; // @gotags: validate:"required"
 
-  // Configuration key for overriding value setting through dynamic config.
+  // Configuration key for overriding value setting through dynamic configuration.
   string config_key = 3;
 }
 
-// Component that emits a constant bool which can be changed at runtime via dynamic configuration.
+// Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
 message BoolVariable {
   // Outputs for the BoolVariable component.
   message Outs {
@@ -370,10 +370,10 @@ message BoolVariable {
   // Output ports for the BoolVariable component.
   Outs out_ports = 1;
 
-  // The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
+  // The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.
   bool constant_output = 2;
 
-  // Configuration key for overriding value setting through dynamic config.
+  // Configuration key for overriding value setting through dynamic configuration.
   string config_key = 3;
 }
 

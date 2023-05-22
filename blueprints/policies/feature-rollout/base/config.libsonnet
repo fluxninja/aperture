@@ -93,6 +93,8 @@ local rollout_policy_base_defaults = {
 
   drivers: {},
 
+  rollout: false,
+
   components: [],
 
   resources: {
@@ -172,6 +174,7 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   * @schema (rollout_policy.drivers.average_latency_drivers: []average_latency_driver) List of drivers that compare average latency against forward, backward and reset thresholds.
   * @schema (rollout_policy.drivers.percentile_latency_drivers: []percentile_latency_driver) List of drivers that compare percentile latency against forward, backward and reset thresholds.
   * @schema (rollout_policy.drivers.ema_latency_drivers: []ema_latency_driver) List of drivers that compare trend latency against forward, backward and reset thresholds.
+  * @schema (rollout_policy.rollout: bool) Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
   */
   rollout_policy: rollout_policy_defaults,
   /**

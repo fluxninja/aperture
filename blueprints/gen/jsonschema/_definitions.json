@@ -502,15 +502,15 @@
       "additionalProperties": false
     },
     "BoolVariable": {
-      "description": "Component that emits a constant bool which can be changed at runtime via dynamic configuration.",
+      "description": "Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.",
       "properties": {
         "config_key": {
-          "description": "Configuration key for overriding value setting through dynamic config.",
+          "description": "Configuration key for overriding value setting through dynamic configuration.",
           "type": "string",
           "x-order": 0
         },
         "constant_output": {
-          "description": "The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.",
+          "description": "The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.",
           "type": "boolean",
           "x-order": 1
         },
@@ -619,7 +619,7 @@
         },
         "bool_variable": {
           "$ref": "#/definitions/BoolVariable",
-          "description": "BoolVariable emits a constant bool signal which can be changed at runtime via dynamic configuration.",
+          "description": "BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.",
           "x-order": 4
         },
         "decider": {
@@ -1419,12 +1419,12 @@
           "x-order": 0
         },
         "manual_mode": {
-          "description": "In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime via dynamic config without restarting the policy.",
+          "description": "In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.",
           "type": "boolean",
           "x-order": 1
         },
         "manual_mode_config_key": {
-          "description": "Configuration key for overriding manual_mode setting through dynamic config.",
+          "description": "Configuration key for overriding `manual_mode` setting through dynamic configuration.",
           "type": "string",
           "x-order": 2
         },
@@ -1971,7 +1971,7 @@
           "x-order": 3
         },
         "pass_through_label_values_config_key": {
-          "description": "Configuration key for setting label value to pass through through dynamic configuration.",
+          "description": "Configuration key for setting pass through label values through dynamic configuration.",
           "type": "string",
           "x-order": 4
         }
@@ -2141,7 +2141,7 @@
       "additionalProperties": false
     },
     "LoadScheduler": {
-      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nIn order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n_Load Scheduler_ measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.",
+      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nTo make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n_Load Scheduler_ measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -2149,7 +2149,7 @@
           "x-order": 0
         },
         "dry_run_config_key": {
-          "description": "Configuration key for setting dry run mode through dynamic config.",
+          "description": "Configuration key for setting dry run mode through dynamic configuration.",
           "type": "string",
           "x-order": 1
         },
@@ -2977,7 +2977,7 @@
           "x-order": 2
         },
         "pass_through_label_values_config_key": {
-          "description": "Configuration key for setting label value to pass through through dynamic configuration.",
+          "description": "Configuration key for setting pass through label values through dynamic configuration.",
           "type": "string",
           "x-order": 3
         }
@@ -3568,16 +3568,16 @@
       "additionalProperties": false
     },
     "Variable": {
-      "description": "Component that emits a constant signal which can be changed at runtime via dynamic configuration.",
+      "description": "Component that emits a constant signal which can be changed at runtime through dynamic configuration.",
       "properties": {
         "config_key": {
-          "description": "Configuration key for overriding value setting through dynamic config.",
+          "description": "Configuration key for overriding value setting through dynamic configuration.",
           "type": "string",
           "x-order": 0
         },
         "constant_output": {
           "$ref": "#/definitions/ConstantSignal",
-          "description": "The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.\n\n",
+          "description": "The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.\n\n",
           "x-go-tag-validate": "required",
           "x-order": 1
         },

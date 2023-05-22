@@ -52,7 +52,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Parameters for the Feature Rollout policy.'
     type='Object (rollout_policy)'
     reference='#rollout-policy'
-    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"regulator": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}}'
+    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"regulator": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "rollout": false}'
 />
 
 <!-- vale on -->
@@ -639,6 +639,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     type='string'
     reference=''
     value='"1s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="rollout-policy-rollout"></a>
+
+<ParameterDescription
+    name='rollout'
+    description='Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.'
+    type='Boolean'
+    reference=''
+    value='false'
 />
 
 <!-- vale on -->

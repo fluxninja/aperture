@@ -55,9 +55,9 @@ type GradientController struct {
 	OutPorts *GradientController_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Gradient Parameters.
 	Parameters *GradientController_Parameters `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
-	// In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime via dynamic config without restarting the policy.
+	// In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.
 	ManualMode bool `protobuf:"varint,4,opt,name=manual_mode,json=manualMode,proto3" json:"manual_mode,omitempty"`
-	// Configuration key for overriding manual_mode setting through dynamic config.
+	// Configuration key for overriding `manual_mode` setting through dynamic configuration.
 	ManualModeConfigKey string `protobuf:"bytes,5,opt,name=manual_mode_config_key,json=manualModeConfigKey,proto3" json:"manual_mode_config_key,omitempty"`
 }
 
@@ -515,7 +515,7 @@ func (x *Switcher) GetOutPorts() *Switcher_Outs {
 	return nil
 }
 
-// Component that emits a constant signal which can be changed at runtime via dynamic configuration.
+// Component that emits a constant signal which can be changed at runtime through dynamic configuration.
 type Variable struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -523,9 +523,9 @@ type Variable struct {
 
 	// Output ports for the Variable component.
 	OutPorts *Variable_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
+	// The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.
 	ConstantOutput *ConstantSignal `protobuf:"bytes,2,opt,name=constant_output,json=constantOutput,proto3" json:"constant_output,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Configuration key for overriding value setting through dynamic config.
+	// Configuration key for overriding value setting through dynamic configuration.
 	ConfigKey string `protobuf:"bytes,3,opt,name=config_key,json=configKey,proto3" json:"config_key,omitempty"`
 }
 
@@ -582,7 +582,7 @@ func (x *Variable) GetConfigKey() string {
 	return ""
 }
 
-// Component that emits a constant bool which can be changed at runtime via dynamic configuration.
+// Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
 type BoolVariable struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -590,9 +590,9 @@ type BoolVariable struct {
 
 	// Output ports for the BoolVariable component.
 	OutPorts *BoolVariable_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
+	// The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.
 	ConstantOutput bool `protobuf:"varint,2,opt,name=constant_output,json=constantOutput,proto3" json:"constant_output,omitempty"`
-	// Configuration key for overriding value setting through dynamic config.
+	// Configuration key for overriding value setting through dynamic configuration.
 	ConfigKey string `protobuf:"bytes,3,opt,name=config_key,json=configKey,proto3" json:"config_key,omitempty"`
 }
 

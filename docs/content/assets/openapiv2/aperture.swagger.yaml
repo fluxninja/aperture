@@ -458,13 +458,13 @@ definitions:
                 x-go-tag-default: 30s
         type: object
     BoolVariable:
-        description: Component that emits a constant bool which can be changed at runtime via dynamic configuration.
+        description: Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
         properties:
             config_key:
-                description: Configuration key for overriding value setting through dynamic config.
+                description: Configuration key for overriding value setting through dynamic configuration.
                 type: string
             constant_output:
-                description: The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
+                description: The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.
                 type: boolean
             out_ports:
                 $ref: '#/definitions/BoolVariableOuts'
@@ -805,7 +805,7 @@ definitions:
                 description: AutoScale components are used to scale the service.
             bool_variable:
                 $ref: '#/definitions/BoolVariable'
-                description: BoolVariable emits a constant bool signal which can be changed at runtime via dynamic configuration.
+                description: BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
             decider:
                 $ref: '#/definitions/Decider'
                 description: Decider emits the binary result of comparison operator on two operands.
@@ -1695,10 +1695,10 @@ definitions:
                 $ref: '#/definitions/GradientControllerIns'
                 description: Input ports of the Gradient Controller.
             manual_mode:
-                description: In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime via dynamic config without restarting the policy.
+                description: In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.
                 type: boolean
             manual_mode_config_key:
-                description: Configuration key for overriding manual_mode setting through dynamic config.
+                description: Configuration key for overriding `manual_mode` setting through dynamic configuration.
                 type: string
             out_ports:
                 $ref: '#/definitions/GradientControllerOuts'
@@ -2370,7 +2370,7 @@ definitions:
                     type: string
                 type: array
             pass_through_label_values_config_key:
-                description: Configuration key for setting label value to pass through through dynamic configuration.
+                description: Configuration key for setting pass through label values through dynamic configuration.
                 type: string
         type: object
     LoadRampIns:
@@ -2491,7 +2491,7 @@ definitions:
 
             :::
 
-            In order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+            To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
             A workload determines the priority and cost of admitting each Flow that belongs to it.
             Scheduling of Flows is based on Weighted Fair Queuing principles.
             _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
@@ -2505,7 +2505,7 @@ definitions:
                     It is useful for observing the behavior of load scheduler without disrupting any real traffic.
                 type: boolean
             dry_run_config_key:
-                description: Configuration key for setting dry run mode through dynamic config.
+                description: Configuration key for setting dry run mode through dynamic configuration.
                 type: string
             in_ports:
                 $ref: '#/definitions/LoadSchedulerIns'
@@ -3438,7 +3438,7 @@ definitions:
                     type: string
                 type: array
             pass_through_label_values_config_key:
-                description: Configuration key for setting label value to pass through through dynamic configuration.
+                description: Configuration key for setting pass through label values through dynamic configuration.
                 type: string
         type: object
     RegulatorIns:
@@ -4282,15 +4282,15 @@ definitions:
                 description: Output signal.
         type: object
     Variable:
-        description: Component that emits a constant signal which can be changed at runtime via dynamic configuration.
+        description: Component that emits a constant signal which can be changed at runtime through dynamic configuration.
         properties:
             config_key:
-                description: Configuration key for overriding value setting through dynamic config.
+                description: Configuration key for overriding value setting through dynamic configuration.
                 type: string
             constant_output:
                 $ref: '#/definitions/ConstantSignal'
                 description: |+
-                    The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
+                    The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.
 
                 x-go-tag-validate: required
             out_ports:
@@ -4617,7 +4617,7 @@ paths:
                   name: body
                   required: true
                   schema:
-                    description: PostDynamicConfigRequest is a request to patch dynamic config for Policy.
+                    description: PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
                     properties:
                         dynamic_config:
                             type: object
@@ -4633,7 +4633,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            summary: PostDynamicConfig creates/updates dynamic config based on the provided request.
+            summary: PostDynamicConfig creates/updates dynamic configuration based on the provided request.
             tags:
                 - aperture-controller
     /v1/flowcontrol/checkhttp:

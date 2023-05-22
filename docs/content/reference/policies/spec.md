@@ -1048,8 +1048,8 @@ scale-in operation.
 
 <!-- vale on -->
 
-Component that emits a constant bool which can be changed at runtime via dynamic
-configuration.
+Component that emits a constant Boolean signal which can be changed at runtime
+through dynamic configuration.
 
 <dl>
 <dt>config_key</dt>
@@ -1061,7 +1061,7 @@ configuration.
 
 <!-- vale on -->
 
-Configuration key for overriding value setting through dynamic config.
+Configuration key for overriding value setting through dynamic configuration.
 
 </dd>
 <dt>constant_output</dt>
@@ -1073,8 +1073,8 @@ Configuration key for overriding value setting through dynamic config.
 
 <!-- vale on -->
 
-The constant bool signal emitted by this component. The value of the constant
-bool can be overridden at runtime via dynamic config.
+The constant Boolean signal emitted by this component. The value of the constant
+Boolean signal can be overridden at runtime through dynamic configuration.
 
 </dd>
 <dt>out_ports</dt>
@@ -1350,7 +1350,7 @@ AutoScale components are used to scale the service.
 
 <!-- vale on -->
 
-BoolVariable emits a constant bool signal which can be changed at runtime via
+BoolVariable emits a constant Boolean signal which can be changed at runtime via
 dynamic configuration.
 
 </dd>
@@ -3128,7 +3128,7 @@ Input ports of the Gradient Controller.
 
 In manual mode, the controller does not adjust the control variable. It emits
 the same output as the control variable input. This setting can be adjusted at
-runtime via dynamic config without restarting the policy.
+runtime through dynamic configuration without restarting the policy.
 
 </dd>
 <dt>manual_mode_config_key</dt>
@@ -3140,7 +3140,8 @@ runtime via dynamic config without restarting the policy.
 
 <!-- vale on -->
 
-Configuration key for overriding manual_mode setting through dynamic config.
+Configuration key for overriding `manual_mode` setting through dynamic
+configuration.
 
 </dd>
 <dt>out_ports</dt>
@@ -4341,7 +4342,7 @@ of accept percentage.
 
 <!-- vale on -->
 
-Configuration key for setting label value to pass through through dynamic
+Configuration key for setting pass through label values through dynamic
 configuration.
 
 </dd>
@@ -4676,12 +4677,12 @@ See also
 
 :::
 
-In order to make scheduling decisions the Flows are mapped into Workloads by
-providing match rules. A workload determines the priority and cost of admitting
-each Flow that belongs to it. Scheduling of Flows is based on Weighted Fair
-Queuing principles. _Load Scheduler_ measures and controls the incoming tokens
-per second, which can translate to (avg. latency \* in-flight requests)
-(Little's Law) in concurrency limiting use-case.
+To make scheduling decisions the Flows are mapped into Workloads by providing
+match rules. A workload determines the priority and cost of admitting each Flow
+that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
+principles. _Load Scheduler_ measures and controls the incoming tokens per
+second, which can translate to (avg. latency \* in-flight requests) (Little's
+Law) in concurrency limiting use-case.
 
 The signal at port `load_multiplier` determines the fraction of incoming tokens
 that get admitted.
@@ -4711,7 +4712,7 @@ traffic.
 
 <!-- vale on -->
 
-Configuration key for setting dry run mode through dynamic config.
+Configuration key for setting dry run mode through dynamic configuration.
 
 </dd>
 <dt>in_ports</dt>
@@ -6460,7 +6461,7 @@ regardless of accept percentage.
 
 <!-- vale on -->
 
-Configuration key for setting label value to pass through through dynamic
+Configuration key for setting pass through label values through dynamic
 configuration.
 
 </dd>
@@ -7770,7 +7771,7 @@ Output signal.
 
 <!-- vale on -->
 
-Component that emits a constant signal which can be changed at runtime via
+Component that emits a constant signal which can be changed at runtime through
 dynamic configuration.
 
 <dl>
@@ -7783,7 +7784,7 @@ dynamic configuration.
 
 <!-- vale on -->
 
-Configuration key for overriding value setting through dynamic config.
+Configuration key for overriding value setting through dynamic configuration.
 
 </dd>
 <dt>constant_output</dt>
@@ -7796,7 +7797,7 @@ Configuration key for overriding value setting through dynamic config.
 <!-- vale on -->
 
 The constant signal emitted by this component. The value of the constant signal
-can be overridden at runtime via dynamic config.
+can be overridden at runtime through dynamic configuration.
 
 </dd>
 <dt>out_ports</dt>

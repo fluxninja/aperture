@@ -188,7 +188,7 @@ func (x *UpsertPolicyRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
-// PostDynamicConfigRequest is a request to patch dynamic config for Policy.
+// PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
 type PostDynamicConfigRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1021,7 +1021,7 @@ type Component_SignalGenerator struct {
 }
 
 type Component_BoolVariable struct {
-	// BoolVariable emits a constant bool signal which can be changed at runtime via dynamic configuration.
+	// BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
 	BoolVariable *BoolVariable `protobuf:"bytes,28,opt,name=bool_variable,json=boolVariable,proto3,oneof"`
 }
 

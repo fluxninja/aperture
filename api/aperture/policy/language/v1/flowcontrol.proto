@@ -140,7 +140,7 @@ message RateLimiter {
 //
 // :::
 //
-// In order to make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+// To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
 // A workload determines the priority and cost of admitting each Flow that belongs to it.
 // Scheduling of Flows is based on Weighted Fair Queuing principles.
 // _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
@@ -196,7 +196,7 @@ message LoadScheduler {
   // It is useful for observing the behavior of load scheduler without disrupting any real traffic.
   bool dry_run = 6;
 
-  // Configuration key for setting dry run mode through dynamic config.
+  // Configuration key for setting dry run mode through dynamic configuration.
   string dry_run_config_key = 7;
 }
 
@@ -393,7 +393,7 @@ message Regulator {
   // Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.
   repeated string pass_through_label_values = 5;
 
-  // Configuration key for setting label value to pass through through dynamic configuration.
+  // Configuration key for setting pass through label values through dynamic configuration.
   string pass_through_label_values_config_key = 6;
 }
 
@@ -453,7 +453,7 @@ message LoadRamp {
   // Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.
   repeated string pass_through_label_values = 4;
 
-  // Configuration key for setting label value to pass through through dynamic configuration.
+  // Configuration key for setting pass through label values through dynamic configuration.
   string pass_through_label_values_config_key = 5;
 }
 
