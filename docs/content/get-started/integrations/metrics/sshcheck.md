@@ -37,15 +37,6 @@ policy:
         infra_meters:
           sshcheck:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - sshcheck
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               sshcheck: [sshcheckreceiver configuration here]
 ```

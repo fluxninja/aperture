@@ -37,15 +37,6 @@ policy:
         infra_meters:
           statsd:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - statsd
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               statsd: [statsdreceiver configuration here]
 ```

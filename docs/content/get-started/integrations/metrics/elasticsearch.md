@@ -37,15 +37,6 @@ policy:
         infra_meters:
           elasticsearch:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - elasticsearch
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               elasticsearch: [elasticsearchreceiver configuration here]
 ```

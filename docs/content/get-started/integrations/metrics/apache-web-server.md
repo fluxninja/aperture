@@ -37,15 +37,6 @@ policy:
         infra_meters:
           apache:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - apache
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               apache: [apachereceiver configuration here]
 ```

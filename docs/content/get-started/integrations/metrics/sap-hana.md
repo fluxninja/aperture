@@ -37,15 +37,6 @@ policy:
         infra_meters:
           saphana:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - saphana
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               saphana: [saphanareceiver configuration here]
 ```

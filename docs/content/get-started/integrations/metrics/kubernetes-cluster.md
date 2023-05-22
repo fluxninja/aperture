@@ -37,15 +37,6 @@ policy:
         infra_meters:
           k8s_cluster:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - k8s_cluster
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               k8s_cluster: [k8sclusterreceiver configuration here]
 ```

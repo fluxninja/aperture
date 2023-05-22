@@ -37,15 +37,6 @@ policy:
         infra_meters:
           memcached:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - memcached
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               memcached: [memcachedreceiver configuration here]
 ```

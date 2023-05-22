@@ -37,15 +37,6 @@ policy:
         infra_meters:
           expvar:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - expvar
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               expvar: [expvarreceiver configuration here]
 ```

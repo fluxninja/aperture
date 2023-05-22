@@ -37,15 +37,6 @@ policy:
         infra_meters:
           haproxy:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - haproxy
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               haproxy: [haproxyreceiver configuration here]
 ```

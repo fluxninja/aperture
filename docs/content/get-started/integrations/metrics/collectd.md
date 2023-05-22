@@ -37,15 +37,6 @@ policy:
         infra_meters:
           collectd:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - collectd
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               collectd: [collectdreceiver configuration here]
 ```

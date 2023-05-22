@@ -37,15 +37,6 @@ policy:
         infra_meters:
           awscontainerinsightreceiver:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - awscontainerinsightreceiver
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               awscontainerinsightreceiver:
                 [awscontainerinsightreceiver configuration here]

@@ -37,15 +37,6 @@ policy:
         infra_meters:
           azureeventhub:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - azureeventhub
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               azureeventhub: [azureeventhubreceiver configuration here]
 ```
