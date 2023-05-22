@@ -47,7 +47,6 @@ func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (*olric.DMap,
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
 	dc.config.DMaps.Custom[name] = config
-	defer delete(dc.config.DMaps.Custom, name)
 	d, err := dc.olric.NewDMap(name)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to create new DMap: %s, shutting down", name)
@@ -56,6 +55,14 @@ func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (*olric.DMap,
 		return nil, err
 	}
 	return d, nil
+}
+
+// DeleteDMap deletes a DMap.
+func (dc *DistCache) DeleteDMap(name string) error {
+	dc.lock.Lock()
+	defer dc.lock.Unlock()
+	defer delete(dc.config.DMaps.Custom, name)
+	return dc.olric.DeleteDMap(name)
 }
 
 func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {

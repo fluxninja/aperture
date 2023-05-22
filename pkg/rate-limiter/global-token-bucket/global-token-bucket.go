@@ -29,6 +29,7 @@ type GlobalTokenBucket struct {
 	interval       time.Duration
 	continuousFill bool
 	passThrough    bool
+	dc             *distcache.DistCache
 }
 
 // NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
@@ -43,6 +44,7 @@ func NewGlobalTokenBucket(dc *distcache.DistCache,
 		interval:       interval,
 		passThrough:    true,
 		continuousFill: continuousFill,
+		dc:             dc,
 	}
 
 	dmapConfig := config.DMap{
@@ -92,7 +94,7 @@ func (gtb *GlobalTokenBucket) Name() string {
 func (gtb *GlobalTokenBucket) Close() error {
 	gtb.mu.Lock()
 	defer gtb.mu.Unlock()
-	err := gtb.dMap.Destroy()
+	err := gtb.dc.DeleteDMap(gtb.name)
 	if err != nil {
 		return err
 	}
