@@ -40,19 +40,22 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 		md, ok := metadata.FromIncomingContext(ctx)
 		authority := ""
 		scheme := ""
+		method := ""
 
 		if ok {
 			for key, value := range md {
 				labels[key] = strings.Join(value, ",")
 			}
-			authorityValues := md.Get(":authority")
-			if len(authorityValues) > 0 {
-				authority = authorityValues[0]
+			getMetaValue := func(key string) string {
+				values := md.Get(key)
+				if len(values) > 0 {
+					return values[0]
+				}
+				return ""
 			}
-			schemeValues := md.Get(":scheme")
-			if len(schemeValues) > 0 {
-				scheme = schemeValues[0]
-			}
+			authority = getMetaValue(":authority")
+			scheme = getMetaValue(":scheme")
+			method = getMetaValue(":method")
 		}
 
 		var sourceSocket *flowcontrolhttp.SocketAddress
@@ -75,7 +78,7 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 			Destination:  destinationSocket,
 			ControlPoint: controlPoint,
 			Request: &flowcontrolhttp.CheckHTTPRequest_HttpRequest{
-				Method:   "POST",
+				Method:   method,
 				Path:     info.FullMethod,
 				Host:     authority,
 				Headers:  labels,
@@ -91,22 +94,21 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServ
 			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
 		}
 
-		if flow.Accepted() {
-			// Simulate work being done
-			resp, err := handler(ctx, req)
+		defer func() {
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
 			// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
 			// The second argument is error message for further diagnosis.
-			flowErr := flow.End(aperture.OK)
-			if flowErr != nil {
-				c.GetLogger().Info("Aperture flow control end got error.", "error", err)
-			}
-			return resp, err
-		} else {
 			err := flow.End(aperture.OK)
 			if err != nil {
 				c.GetLogger().Info("Aperture flow control end got error.", "error", err)
 			}
+		}()
+
+		if flow.Accepted() {
+			// Simulate work being done
+			resp, err := handler(ctx, req)
+			return resp, err
+		} else {
 			rejectResp := flow.CheckResponse().GetDeniedResponse()
 			return nil, status.Error(
 				convertHTTPStatusToGRPC(rejectResp.GetStatus()),

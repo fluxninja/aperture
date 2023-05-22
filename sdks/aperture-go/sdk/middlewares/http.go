@@ -95,9 +95,7 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			m.client.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
 		}
 
-		if flow.Accepted() {
-			// Simulate work being done
-			next.ServeHTTP(w, r)
+		defer func() {
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
 			// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
 			// The second argument is error message for further diagnosis.
@@ -105,6 +103,11 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			if err != nil {
 				m.client.GetLogger().Info("Aperture flow control end got error.", "error", err)
 			}
+		}()
+
+		if flow.Accepted() {
+			// Simulate work being done
+			next.ServeHTTP(w, r)
 		} else {
 			resp := flow.CheckResponse().GetDeniedResponse()
 			// If there was connection error, the response will be nil.
@@ -119,10 +122,6 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 				if err != nil {
 					m.client.GetLogger().Info("Aperture flow control respond body got an error.", "error", err)
 				}
-			}
-			err = flow.End(aperture.OK)
-			if err != nil {
-				m.client.GetLogger().Info("Aperture flow control end got error.", "error", err)
 			}
 		}
 	})
