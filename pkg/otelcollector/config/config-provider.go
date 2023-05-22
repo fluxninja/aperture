@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"go.opentelemetry.io/collector/confmap"
 )
 
@@ -12,8 +13,8 @@ var _ confmap.Provider = (*OTelConfigProvider)(nil)
 
 // OTelConfigProvider can be used as an OTel config map provider.
 type OTelConfigProvider struct {
-	lock      sync.Mutex
-	config    *OTelConfig
+	lock      sync.Mutex  // protects config & watchFunc
+	config    *OTelConfig // nil only after Shutdown.
 	watchFunc confmap.WatcherFunc
 	scheme    string
 }
@@ -22,6 +23,7 @@ type OTelConfigProvider struct {
 func NewOTelConfigProvider(scheme string, config *OTelConfig) *OTelConfigProvider {
 	p := &OTelConfigProvider{
 		scheme: scheme,
+		config: NewOTelConfig(),
 	}
 	p.UpdateConfig(config)
 	return p
@@ -39,6 +41,11 @@ func (u *OTelConfigProvider) Retrieve(_ context.Context, _ string, watchFn confm
 
 // Shutdown indicates the provider should close.
 func (u *OTelConfigProvider) Shutdown(ctx context.Context) error {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+	// Prevent UpdatesConfig to run after Shutdown.
+	u.watchFunc = nil
+	u.config = nil
 	return nil
 }
 
@@ -53,6 +60,10 @@ func (u *OTelConfigProvider) UpdateConfig(config *OTelConfig) {
 	defer u.lock.Unlock()
 	if config == nil {
 		config = NewOTelConfig()
+	}
+	if u.config == nil {
+		log.Warn().Msg("OtelConfigProvider.UpdateConfig called after Shutdown")
+		return
 	}
 	u.config = config
 	if u.watchFunc != nil {
