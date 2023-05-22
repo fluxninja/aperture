@@ -199,7 +199,7 @@ func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *flowcontrol
 }
 
 // HTTPMiddleware takes a control point name, labels and timeout and creates a Middleware which can be used with HTTP server.
-// Deprecated: 2.10.0 Use middlewares.HTTPMiddleware instead.
+// Deprecated: 2.3.0 Use middlewares.HTTPMiddleware instead.
 func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -242,7 +242,7 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 }
 
 // GRPCUnaryInterceptor takes a control point name, labels and timeout and creates a UnaryInterceptor which can be used with gRPC server.
-// Deprecated: 2.10.0 Use middlewares.GRPCUnaryInterceptor instead.
+// Deprecated: 2.3.0 Use middlewares.GRPCUnaryInterceptor instead.
 func (c *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[string]string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		newLabels := make(map[string]string, len(labels))
