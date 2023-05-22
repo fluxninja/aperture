@@ -3,13 +3,13 @@
     "AdaptiveLoadScheduler": {
       "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/LoadSchedulerDynamicConfig",
-          "description": "Default dynamic configuration for load actuation.",
+        "dry_run": {
+          "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
+          "type": "boolean",
           "x-order": 0
         },
-        "dynamic_config_key": {
-          "description": "Dynamic configuration key for load actuation.",
+        "dry_run_config_key": {
+          "description": "Configuration key for setting dry run mode through dynamic configuration.",
           "type": "string",
           "x-order": 1
         },
@@ -334,7 +334,7 @@
       "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is Useful for observing the behavior of auto scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is useful for observing the behavior of auto scaler without disrupting any real deployment.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },
@@ -501,6 +501,40 @@
       "type": "object",
       "additionalProperties": false
     },
+    "BoolVariable": {
+      "description": "Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.",
+      "properties": {
+        "config_key": {
+          "description": "Configuration key for overriding value setting through dynamic configuration.",
+          "type": "string",
+          "x-order": 0
+        },
+        "constant_output": {
+          "description": "The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.",
+          "type": "boolean",
+          "x-order": 1
+        },
+        "out_ports": {
+          "$ref": "#/definitions/BoolVariableOuts",
+          "description": "Output ports for the BoolVariable component.",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "BoolVariableOuts": {
+      "description": "Outputs for the BoolVariable component.",
+      "properties": {
+        "output": {
+          "$ref": "#/definitions/OutPort",
+          "description": "The value is emitted to the output port.",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
     "Circuit": {
       "description": "Circuit is graph of inter-connected signal processing components.\n\n:::info\n\nSee also [Circuit overview](/concepts/policy/circuit.md).\n\n:::\n\nSignals flow between components through ports.\nAs signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).\nCircuit is evaluated periodically to respond to changes in signal readings.\n\n:::info Signals\n\nSignals are floating point values.\n\nA signal can also have a special **Invalid** value. It's usually used to\ncommunicate that signal does not have a meaningful value at the moment, for example,\n[PromQL](#prom-q-l) emits such a value if it cannot execute a query.\nComponents know when their input signals are invalid and can act\naccordingly. They can either propagate the invalid signal, by making their\noutput itself invalid (for example,\n[ArithmeticCombinator](#arithmetic-combinator)) or use some different\nlogic, for example, [Extrapolator](#extrapolator). Refer to a component's\ndocs on how exactly it handles invalid inputs.\n\n:::",
       "properties": {
@@ -583,120 +617,125 @@
           "description": "AutoScale components are used to scale the service.",
           "x-order": 3
         },
+        "bool_variable": {
+          "$ref": "#/definitions/BoolVariable",
+          "description": "BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.",
+          "x-order": 4
+        },
         "decider": {
           "$ref": "#/definitions/Decider",
           "description": "Decider emits the binary result of comparison operator on two operands.",
-          "x-order": 4
+          "x-order": 5
         },
         "differentiator": {
           "$ref": "#/definitions/Differentiator",
           "description": "Differentiator calculates rate of change per tick.",
-          "x-order": 5
+          "x-order": 6
         },
         "ema": {
           "$ref": "#/definitions/EMA",
           "description": "Exponential Moving Average filter.",
-          "x-order": 6
+          "x-order": 7
         },
         "extrapolator": {
           "$ref": "#/definitions/Extrapolator",
           "description": "Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.",
-          "x-order": 7
+          "x-order": 8
         },
         "first_valid": {
           "$ref": "#/definitions/FirstValid",
           "description": "Picks the first valid input signal and emits it.",
-          "x-order": 8
+          "x-order": 9
         },
         "flow_control": {
           "$ref": "#/definitions/FlowControl",
           "description": "FlowControl components are used to regulate requests flow.",
-          "x-order": 9
+          "x-order": 10
         },
         "gradient_controller": {
           "$ref": "#/definitions/GradientController",
           "description": "Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.\nThis controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.",
-          "x-order": 10
+          "x-order": 11
         },
         "holder": {
           "$ref": "#/definitions/Holder",
           "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold.",
-          "x-order": 11
+          "x-order": 12
         },
         "integrator": {
           "$ref": "#/definitions/Integrator",
           "description": "Accumulates sum of signal every tick.",
-          "x-order": 12
+          "x-order": 13
         },
         "inverter": {
           "$ref": "#/definitions/Inverter",
           "description": "Logical NOT.",
-          "x-order": 13
+          "x-order": 14
         },
         "max": {
           "$ref": "#/definitions/Max",
           "description": "Emits the maximum of the input signals.",
-          "x-order": 14
+          "x-order": 15
         },
         "min": {
           "$ref": "#/definitions/Min",
           "description": "Emits the minimum of the input signals.",
-          "x-order": 15
+          "x-order": 16
         },
         "nested_circuit": {
           "$ref": "#/definitions/NestedCircuit",
           "description": "Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.",
-          "x-order": 16
+          "x-order": 17
         },
         "nested_signal_egress": {
           "$ref": "#/definitions/NestedSignalEgress",
           "description": "Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.",
-          "x-order": 17
+          "x-order": 18
         },
         "nested_signal_ingress": {
           "$ref": "#/definitions/NestedSignalIngress",
           "description": "Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.",
-          "x-order": 18
+          "x-order": 19
         },
         "or": {
           "$ref": "#/definitions/Or",
           "description": "Logical OR.",
-          "x-order": 19
+          "x-order": 20
         },
         "pulse_generator": {
           "$ref": "#/definitions/PulseGenerator",
           "description": "Generates 0 and 1 in turns.",
-          "x-order": 20
+          "x-order": 21
         },
         "query": {
           "$ref": "#/definitions/Query",
           "description": "Query components that are query databases such as Prometheus.",
-          "x-order": 21
+          "x-order": 22
         },
         "signal_generator": {
           "$ref": "#/definitions/SignalGenerator",
           "description": "Generates the specified signal.",
-          "x-order": 22
+          "x-order": 23
         },
         "sma": {
           "$ref": "#/definitions/SMA",
           "description": "Simple Moving Average filter.",
-          "x-order": 23
+          "x-order": 24
         },
         "switcher": {
           "$ref": "#/definitions/Switcher",
           "description": "Switcher acts as a switch that emits one of the two signals based on third signal.",
-          "x-order": 24
+          "x-order": 25
         },
         "unary_operator": {
           "$ref": "#/definitions/UnaryOperator",
           "description": "Takes an input signal and emits the square root of the input signal.",
-          "x-order": 25
+          "x-order": 26
         },
         "variable": {
           "$ref": "#/definitions/Variable",
-          "description": "Emits a variable signal which can be set to invalid.",
-          "x-order": 26
+          "description": "Emits a variable signal which can be changed at runtime via dynamic configuration.",
+          "x-order": 27
         }
       },
       "title": "Computational block that forms the circuit",
@@ -1250,7 +1289,7 @@
           "x-order": 3
         },
         "selectors": {
-          "description": "Selectors for the component.\n\n",
+          "description": "Selectors for flows that will be metered by this _Flux Meter_.\n\n",
           "items": {
             "$ref": "#/definitions/Selector",
             "type": "object"
@@ -1374,19 +1413,19 @@
     "GradientController": {
       "description": "The `gradient` describes a corrective factor that should be applied to the\ncontrol variable to get the signal closer to the setpoint. It's computed as follows:\n\n$$\n\\text{gradient} = \\left(\\frac{\\text{signal}}{\\text{setpoint}}\\right)^{\\text{slope}}\n$$\n\n`gradient` is then clamped to `[min_gradient, max_gradient]` range.\n\nThe output of gradient controller is computed as follows:\n$$\n\\text{output} = \\text{gradient}_{\\text{clamped}} \\cdot \\text{control\\_variable} + \\text{optimize}.\n$$\n\nNote the additional `optimize` signal, that can be used to \"nudge\" the\ncontroller into desired idle state.\n\nThe output can be _optionally_ clamped to desired range using `max` and\n`min` input.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/GradientControllerDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "title": "Configuration key for DynamicConfig",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/GradientControllerIns",
           "description": "Input ports of the Gradient Controller.",
+          "x-order": 0
+        },
+        "manual_mode": {
+          "description": "In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.",
+          "type": "boolean",
+          "x-order": 1
+        },
+        "manual_mode_config_key": {
+          "description": "Configuration key for overriding `manual_mode` setting through dynamic configuration.",
+          "type": "string",
           "x-order": 2
         },
         "out_ports": {
@@ -1402,20 +1441,6 @@
         }
       },
       "title": "Gradient controller is a type of controller which tries to adjust the\ncontrol variable proportionally to the relative difference between setpoint\nand actual value of the signal",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "GradientControllerDynamicConfig": {
-      "properties": {
-        "manual_mode": {
-          "default": false,
-          "description": "Decides whether the controller runs in `manual_mode`.\nIn manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.\n\n",
-          "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 0
-        }
-      },
-      "title": "Dynamic Configuration for a Controller",
       "type": "object",
       "additionalProperties": false
     },
@@ -1437,20 +1462,15 @@
           "description": "Minimum value to limit the output signal.",
           "x-order": 2
         },
-        "optimize": {
-          "$ref": "#/definitions/InPort",
-          "description": "Optimize signal is added to the output of the gradient calculation.",
-          "x-order": 3
-        },
         "setpoint": {
           "$ref": "#/definitions/InPort",
           "description": "Setpoint to be used for the gradient computation.",
-          "x-order": 4
+          "x-order": 3
         },
         "signal": {
           "$ref": "#/definitions/InPort",
           "description": "Signal to be used for the gradient computation.",
-          "x-order": 5
+          "x-order": 4
         }
       },
       "type": "object",
@@ -1929,27 +1949,30 @@
     "LoadRamp": {
       "description": "The _Load Ramp_ produces a smooth and continuous traffic load\nthat changes progressively over time, based on the specified steps.\n\nEach step is defined by two parameters:\n- The `target_accept_percentage`.\n- The `duration` for the signal to change from the\n  previous step's `target_accept_percentage` to the current step's\n  `target_accept_percentage`.\n\nThe percentage of requests accepted starts at the `target_accept_percentage`\ndefined in the first step and gradually ramps up or down linearly from\nthe previous step's `target_accept_percentage` to the next\n`target_accept_percentage`, over the `duration` specified for each step.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RegulatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Dynamic configuration key for flow regulator.",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/LoadRampIns",
-          "x-order": 2
+          "x-order": 0
         },
         "out_ports": {
           "$ref": "#/definitions/LoadRampOuts",
-          "x-order": 3
+          "x-order": 1
         },
         "parameters": {
           "$ref": "#/definitions/LoadRampParameters",
           "x-go-tag-validate": "required",
+          "x-order": 2
+        },
+        "pass_through_label_values": {
+          "description": "Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "x-order": 3
+        },
+        "pass_through_label_values_config_key": {
+          "description": "Configuration key for setting pass through label values through dynamic configuration.",
+          "type": "string",
           "x-order": 4
         }
       },
@@ -2118,15 +2141,15 @@
       "additionalProperties": false
     },
     "LoadScheduler": {
-      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling\nwhich is based on Weighted Fair Queuing principles.\nIt measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nLoadScheduler configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
+      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).\n\n:::\n\nTo make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n_Load Scheduler_ measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/LoadSchedulerDynamicConfig",
-          "description": "Default configuration.",
+        "dry_run": {
+          "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
+          "type": "boolean",
           "x-order": 0
         },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
+        "dry_run_config_key": {
+          "description": "Configuration key for setting dry run mode through dynamic configuration.",
           "type": "string",
           "x-order": 1
         },
@@ -2147,19 +2170,7 @@
           "x-order": 4
         }
       },
-      "title": "_Load Scheduler_ is an actuator component that regulates flows to provide active service protection",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "LoadSchedulerDynamicConfig": {
-      "description": "Dynamic Configuration for the LoadScheduler component.",
-      "properties": {
-        "dry_run": {
-          "description": "Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.\nUseful for observing the behavior of actuator without disrupting any real traffic.",
-          "type": "boolean",
-          "x-order": 0
-        }
-      },
+      "title": "_Load Scheduler_ creates a queue for flows in front of a service to provide active service protection",
       "type": "object",
       "additionalProperties": false
     },
@@ -2170,11 +2181,6 @@
           "$ref": "#/definitions/InPort",
           "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted.",
           "x-order": 0
-        },
-        "pass_through": {
-          "$ref": "#/definitions/InPort",
-          "description": "When true, pass through the requests skipping the scheduler.",
-          "x-order": 1
         }
       },
       "type": "object",
@@ -2595,7 +2601,7 @@
       "description": "Component for scaling pods based on a signal.",
       "properties": {
         "dry_run": {
-          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is Useful for observing the behavior of pod scaler without disrupting any real traffic.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
+          "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is useful for observing the behavior of pod scaler without disrupting any real deployment.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
           "type": "boolean",
           "x-order": 0
         },
@@ -2763,7 +2769,7 @@
           "x-go-tag-validate": "required",
           "x-order": 0
         },
-        "parameters": {
+        "rate_limiter": {
           "$ref": "#/definitions/RateLimiterParameters",
           "x-go-tag-validate": "required",
           "x-order": 1
@@ -2859,7 +2865,7 @@
           "x-order": 1
         },
         "label_key": {
-          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf `label_key` is not specified, then all requests are rate limited\nthat match the selectors.",
+          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf no label key is specified, then all requests matching the\nselectors will be rate limited based on the global bucket.",
           "type": "string",
           "x-order": 2
         },
@@ -2951,42 +2957,30 @@
     "Regulator": {
       "description": "_Regulator_ is a component that regulates the load at a\n[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).\n\n:::",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/RegulatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
-          "type": "string",
-          "x-order": 1
-        },
         "in_ports": {
           "$ref": "#/definitions/RegulatorIns",
           "description": "Input ports for the _Regulator_.",
-          "x-order": 2
+          "x-order": 0
         },
         "parameters": {
           "$ref": "#/definitions/RegulatorParameters",
           "description": "Parameters for the _Regulator_.",
-          "x-order": 3
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "RegulatorDynamicConfig": {
-      "properties": {
-        "enable_label_values": {
-          "description": "Specify certain label values to be accepted by this flow filter regardless of accept percentage.",
+          "x-order": 1
+        },
+        "pass_through_label_values": {
+          "description": "Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.",
           "items": {
             "type": "string"
           },
           "type": "array",
-          "x-order": 0
+          "x-order": 2
+        },
+        "pass_through_label_values_config_key": {
+          "description": "Configuration key for setting pass through label values through dynamic configuration.",
+          "type": "string",
+          "x-order": 3
         }
       },
-      "title": "Dynamic Configuration for _Regulator_",
       "type": "object",
       "additionalProperties": false
     },
@@ -3573,34 +3567,23 @@
       "additionalProperties": false
     },
     "Variable": {
-      "description": "Component that emits a variable value as an output signal, can be defined in dynamic configuration.",
+      "description": "Component that emits a constant signal which can be changed at runtime through dynamic configuration.",
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/VariableDynamicConfig",
-          "description": "Default configuration.\n\n",
-          "x-go-tag-validate": "required",
+        "config_key": {
+          "description": "Configuration key for overriding value setting through dynamic configuration.",
+          "type": "string",
           "x-order": 0
         },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
-          "type": "string",
+        "constant_output": {
+          "$ref": "#/definitions/ConstantSignal",
+          "description": "The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 1
         },
         "out_ports": {
           "$ref": "#/definitions/VariableOuts",
           "description": "Output ports for the Variable component.",
           "x-order": 2
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "VariableDynamicConfig": {
-      "properties": {
-        "constant_signal": {
-          "$ref": "#/definitions/ConstantSignal",
-          "x-go-tag-validate": "required",
-          "x-order": 0
         }
       },
       "type": "object",

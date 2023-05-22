@@ -14,9 +14,7 @@ function(cfg) {
   local params = config + cfg,
   local policyDef =
     policy.new()
-    + policy.withResources(resources.new()
-                           + resources.withFlowControl(flowControlResources.new()
-                                                       + flowControlResources.withClassifiers(params.policy.classifiers)))
+    + policy.withResources(params.policy.resources)
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')
@@ -30,7 +28,7 @@ function(cfg) {
               fill_amount: port.withConstantSignal(params.policy.quota_scheduler.fill_amount),
             })
             + quotaScheduler.withSelectors(params.policy.quota_scheduler.selectors)
-            + quotaScheduler.withParameters(params.policy.quota_scheduler.parameters)
+            + quotaScheduler.withRateLimiter(params.policy.quota_scheduler.rate_limiter)
             + quotaScheduler.withScheduler(params.policy.quota_scheduler.scheduler)
           ),
         ),

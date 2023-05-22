@@ -1,8 +1,8 @@
-local variableouts = import './variableouts.libsonnet';
+local boolvariableouts = import './boolvariableouts.libsonnet';
 {
   new():: {
   },
-  outPorts:: variableouts,
+  outPorts:: boolvariableouts,
   withConfigKey(config_key):: {
     config_key: config_key,
   },

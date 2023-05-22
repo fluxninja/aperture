@@ -317,6 +317,28 @@ function(cfg) {
     driverAccumulatorStep3
   ),
 
+  local userRolloutControlComponent = spec.v1.Component.withBoolVariable(
+    spec.v1.BoolVariable.withConstantOutput(params.policy.rollout) +
+    spec.v1.BoolVariable.withConfigKey('rollout') +
+    spec.v1.BoolVariable.withOutPorts({
+      output: spec.v1.Port.withSignalName('USER_ROLLOUT_CONTROL'),
+    }),
+  ),
+
+  local userResetControlComponent = spec.v1.Component.withBoolVariable(
+    spec.v1.BoolVariable.withConstantOutput(false) +
+    spec.v1.BoolVariable.withConfigKey('reset') +
+    spec.v1.BoolVariable.withOutPorts({
+      output: spec.v1.Port.withSignalName('USER_RESET_CONTROL'),
+    }),
+  ),
+
+  local allwaysForward =
+    if std.length(driverAccumulator.forward_signals) > 0 then
+      false
+    else
+      true,
+
   local forwardIntentComponent = spec.v1.Component.withOr(
     spec.v1.Or.withInPorts({
       inputs: [
@@ -346,6 +368,8 @@ function(cfg) {
       inputs: [
         spec.v1.Port.withSignalName(signal)
         for signal in driverAccumulator.reset_signals
+      ] + [
+        spec.v1.Port.withSignalName('USER_RESET_CONTROL'),
       ],
     })
     + spec.v1.Or.withOutPorts({
@@ -380,11 +404,19 @@ function(cfg) {
 
   local forwardCriteriaComponent = spec.v1.Component.withAnd(
     spec.v1.And.withInPorts({
-      inputs: [
-        spec.v1.Port.withSignalName('FORWARD_INTENT'),
-        spec.v1.Port.withSignalName('NOT_BACKWARD'),
-        spec.v1.Port.withSignalName('NOT_RESET'),
-      ],
+      inputs:
+        [
+          spec.v1.Port.withSignalName('NOT_BACKWARD'),
+          spec.v1.Port.withSignalName('NOT_RESET'),
+          spec.v1.Port.withSignalName('USER_ROLLOUT_CONTROL'),
+        ]
+        +
+        (
+          if allwaysForward then
+            []
+          else
+            [spec.v1.Port.withSignalName('FORWARD_INTENT')]
+        ),
     })
     + spec.v1.And.withOutPorts({
       output: spec.v1.Port.withSignalName('FORWARD'),
@@ -411,7 +443,7 @@ function(cfg) {
         reset: spec.v1.Port.withSignalName('RESET'),
       })
       + spec.v1.LoadRamp.withParameters(params.policy.load_ramp)
-      + spec.v1.LoadRamp.withDynamicConfigKey('regulator'),
+      + spec.v1.LoadRamp.withPassThroughLabelValuesConfigKey('pass_through_label_values'),
     ),
   ),
 
@@ -429,10 +461,15 @@ function(cfg) {
       + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
       + spec.v1.Circuit.withComponents(
         driverAccumulator.components + [
-          forwardIntentComponent,
+          userRolloutControlComponent,
+          userResetControlComponent,
           backwardIntentComponent,
           resetIntentComponent,
-        ] + notBackwardIntentComponents + notResetComponents + [
+        ] +
+        (if allwaysForward
+         then []
+         else [forwardIntentComponent]) +
+        notBackwardIntentComponents + notResetComponents + [
           forwardCriteriaComponent,
           backwardCriteriaComponent,
           loadRamp,

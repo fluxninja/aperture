@@ -12,13 +12,6 @@ message RegulatorWrapper {
   policy.language.v1.Regulator regulator = 2;
 }
 
-message RegulatorDynamicConfigWrapper {
-  // CommonAttributes
-  CommonAttributes common_attributes = 1;
-  // RegulatorDynamicConfig is the dynamic configuration for the  Regulator.
-  policy.language.v1.Regulator.DynamicConfig regulator_dynamic_config = 2;
-}
-
 message RegulatorDecisionWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
@@ -28,4 +21,6 @@ message RegulatorDecisionWrapper {
 
 message RegulatorDecision {
   double accept_percentage = 1;
+  // PassThroughLabelValues dynamic config.
+  repeated string pass_through_label_values = 2;
 }

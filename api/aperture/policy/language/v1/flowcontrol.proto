@@ -52,11 +52,11 @@ message FlowControl {
 message QuotaScheduler {
   RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
 
-  RateLimiter.Parameters parameters = 2; // @gotags: validate:"required"
+  repeated Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
 
-  Scheduler scheduler = 3;
+  RateLimiter.Parameters rate_limiter = 3; // @gotags: validate:"required"
 
-  repeated Selector selectors = 4; // @gotags: validate:"required,gt=0,dive"
+  Scheduler scheduler = 4;
 }
 
 // Limits the traffic on a control point to specified rate
@@ -77,6 +77,7 @@ message RateLimiter {
       // Number of times to lazy sync within the `interval`.
       uint32 num_sync = 2; // @gotags: default:"4" validate:"gt=0"
     }
+
     // Specifies which label the rate limiter should be keyed by.
     //
     // Rate limiting is done independently for each value of the
@@ -84,8 +85,8 @@ message RateLimiter {
     // For example, to give each user a separate limit, assuming you
     // have a _user_ flow
     // label set up, set `label_key: "user"`.
-    // If `label_key` is not specified, then all requests are rate limited
-    // that match the selectors.
+    // If no label key is specified, then all requests matching the
+    // selectors will be rate limited based on the global bucket.
     string label_key = 1;
 
     // Flow label key that will be used to override the number of tokens
@@ -131,7 +132,7 @@ message RateLimiter {
   repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
 }
 
-// _Load Scheduler_ is an actuator component that regulates flows to provide active service protection
+// _Load Scheduler_ creates a queue for flows in front of a service to provide active service protection
 //
 // :::info
 //
@@ -139,13 +140,13 @@ message RateLimiter {
 //
 // :::
 //
-// It's based on the actuation strategy (for example, load actuator) and workload scheduling
-// which is based on Weighted Fair Queuing principles.
-// It measures and controls the incoming tokens per second, which can translate
+// To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+// A workload determines the priority and cost of admitting each Flow that belongs to it.
+// Scheduling of Flows is based on Weighted Fair Queuing principles.
+// _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
 // to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 //
-// LoadScheduler configuration is split into two parts: An actuation
-// strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+// The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
 message LoadScheduler {
   // Parameters for _Load Scheduler_ component
   message Parameters {
@@ -170,20 +171,11 @@ message LoadScheduler {
     repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
   }
 
-  // Dynamic Configuration for the LoadScheduler component.
-  message DynamicConfig {
-    // Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
-    // Useful for observing the behavior of actuator without disrupting any real traffic.
-    bool dry_run = 1;
-  }
-
   // Input for the LoadScheduler component.
   message Ins {
     // Load multiplier is proportion of incoming
     // token rate that needs to be accepted.
     InPort load_multiplier = 1;
-    // When true, pass through the requests skipping the scheduler.
-    InPort pass_through = 2;
   }
 
   // Output for the LoadScheduler component.
@@ -198,13 +190,14 @@ message LoadScheduler {
   // Output ports for the LoadScheduler component.
   Outs out_ports = 2;
 
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 3;
-
-  // Default configuration.
-  DynamicConfig default_config = 4;
-
   Parameters parameters = 5; // @gotags: validate:"required"
+
+  // Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+  // It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+  bool dry_run = 6;
+
+  // Configuration key for setting dry run mode through dynamic configuration.
+  string dry_run_config_key = 7;
 }
 
 // Weighted Fair Queuing-based workload scheduler
@@ -355,11 +348,12 @@ message AdaptiveLoadScheduler {
   // Parameters for the _Adaptive Load Scheduler_ component.
   Parameters parameters = 3; // @gotags: validate:"required"
 
-  // Dynamic configuration key for load actuation.
-  string dynamic_config_key = 4;
+  // Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+  // It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+  bool dry_run = 6;
 
-  // Default dynamic configuration for load actuation.
-  LoadScheduler.DynamicConfig default_config = 5;
+  // Configuration key for setting dry run mode through dynamic configuration.
+  string dry_run_config_key = 7;
 }
 
 // _Regulator_ is a component that regulates the load at a
@@ -372,12 +366,6 @@ message AdaptiveLoadScheduler {
 //
 // :::
 message Regulator {
-  // Dynamic Configuration for _Regulator_
-  message DynamicConfig {
-    // Specify certain label values to be accepted by this flow filter regardless of accept percentage.
-    repeated string enable_label_values = 1;
-  }
-
   message Parameters {
     // The flow label key for identifying sessions.
     // - When label key is specified, _Regulator_ acts as a sticky filter.
@@ -402,11 +390,11 @@ message Regulator {
   // Parameters for the _Regulator_.
   Parameters parameters = 2;
 
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 3;
+  // Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.
+  repeated string pass_through_label_values = 5;
 
-  // Default configuration.
-  DynamicConfig default_config = 4;
+  // Configuration key for setting pass through label values through dynamic configuration.
+  string pass_through_label_values_config_key = 6;
 }
 
 // The _Load Ramp_ produces a smooth and continuous traffic load
@@ -462,11 +450,11 @@ message LoadRamp {
 
   Parameters parameters = 3; // @gotags: validate:"required"
 
-  // Dynamic configuration key for flow regulator.
-  string dynamic_config_key = 9;
+  // Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.
+  repeated string pass_through_label_values = 4;
 
-  // Default configuration.
-  Regulator.DynamicConfig default_config = 10;
+  // Configuration key for setting pass through label values through dynamic configuration.
+  string pass_through_label_values_config_key = 5;
 }
 
 // _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
@@ -581,7 +569,7 @@ message FluxMeter {
   //
   string attribute_key = 6; // @gotags: default:"workload_duration_ms"
 
-  // Selectors for the component.
+  // Selectors for flows that will be metered by this _Flux Meter_.
   repeated Selector selectors = 7; // @gotags: validate:"required,gt=0,dive"
 }
 

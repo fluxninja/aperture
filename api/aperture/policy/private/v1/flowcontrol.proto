@@ -10,7 +10,6 @@ message LoadActuator {
     // Load multiplier is proportion of incoming
     // token rate that needs to be accepted.
     aperture.policy.language.v1.InPort load_multiplier = 1;
-    aperture.policy.language.v1.InPort pass_through = 2;
   }
 
   Ins in_ports = 1;
@@ -19,9 +18,5 @@ message LoadActuator {
 
   repeated aperture.policy.language.v1.Selector selectors = 3;
 
-  aperture.policy.language.v1.LoadScheduler.DynamicConfig default_config = 4;
-
-  string dynamic_config_key = 5;
-
-  bool workload_latency_based_tokens = 6;
+  bool workload_latency_based_tokens = 4;
 }

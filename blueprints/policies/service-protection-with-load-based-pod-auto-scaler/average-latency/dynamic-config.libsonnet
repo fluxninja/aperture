@@ -1,9 +1,6 @@
-local autoScalingDynamicConfig = import '../../auto-scaling/base/dynamic-config.libsonnet';
-local serviceProtectionDynamicConfig = import '../../service-protection/base/dynamic-config.libsonnet';
-
 /**
-* @param (load_scheduler: aperture.spec.v1.LoadSchedulerDynamicConfig required) Default configuration for load scheduler that can be updated at the runtime without shutting down the policy.
-* @param (auto_scaling: bool required) Dry run mode ensures that no scaling is invoked by this auto scaler.
+* @param (dry_run: bool) Dynamic configuration for setting dry run mode at runtime without restarting this policy. In dry run mode the scheduler acts as pass through to all flow and does not queue flows. The Auto Scaler does not perform any scaling in dry mode. This mode is useful for observing the behavior of load scheduler and auto scaler without disrupting any real deployment or traffic.
 */
-
-serviceProtectionDynamicConfig + autoScalingDynamicConfig
+{
+  dry_run: '__REQUIRED_FIELD__',
+}

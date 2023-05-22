@@ -37,17 +37,17 @@ policy:
             signal_name: RATE_LIMIT
     - flow_control:
         rate_limiter:
+          in_ports:
+            bucket_capacity:
+              signal_name: RATE_LIMIT
+            fill_amount:
+              signal_name: RATE_LIMIT
           selectors:
             - service: service1-demo-app.demoapp.svc.cluster.local
               control_point: awesomeFeature
               label_matcher:
                 match_labels:
                   user_type: crawler
-          in_ports:
-            bucket_capacity:
-              signal_name: RATE_LIMIT
-            fill_amount:
-              signal_name: RATE_LIMIT
           parameters:
             label_key: user_id
             interval: 1s

@@ -37,7 +37,7 @@ type PolicyServiceClient interface {
 	GetPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPoliciesResponse, error)
 	// UpsertPolicy creates/updates policy based on the provided request.
 	UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// PostDynamicConfig creates/updates dynamic config based on the provided request.
+	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(ctx context.Context, in *PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -106,7 +106,7 @@ type PolicyServiceServer interface {
 	GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error)
 	// UpsertPolicy creates/updates policy based on the provided request.
 	UpsertPolicy(context.Context, *UpsertPolicyRequest) (*emptypb.Empty, error)
-	// PostDynamicConfig creates/updates dynamic config based on the provided request.
+	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error)

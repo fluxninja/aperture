@@ -1,8 +1,3 @@
 # Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
-
-# Default configuration for load scheduler that can be updated at the runtime without shutting down the policy.
-# Type: aperture.spec.v1.LoadSchedulerDynamicConfig
-# Required: True
-load_scheduler: __REQUIRED_FIELD__

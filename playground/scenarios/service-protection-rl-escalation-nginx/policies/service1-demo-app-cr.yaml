@@ -9,9 +9,8 @@ spec:
     components:
     - flow_control:
         adaptive_load_scheduler:
-          default_config:
-            dry_run: false
-          dynamic_config_key: load_scheduler
+          dry_run: false
+          dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
               constant_signal:

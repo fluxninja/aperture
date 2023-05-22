@@ -124,14 +124,9 @@
               "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackendKubernetesReplicas"
             },
             "dry_run": {
-              "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
+              "description": "Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.",
               "default": false,
               "type": "boolean"
-            },
-            "dry_run_config_key": {
-              "description": "Configuration key for overriding dry run setting through dynamic configuration.",
-              "default": "auto_scaling",
-              "type": "string"
             },
             "scaling_parameters": {
               "description": "Parameters that define the scaling behavior.",

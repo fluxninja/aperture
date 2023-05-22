@@ -16,7 +16,7 @@ spec:
             fill_amount:
               constant_signal:
                 value: 25
-          parameters:
+          rate_limiter:
             interval: 1s
             label_key: http.request.header.api_key
             lazy_sync:

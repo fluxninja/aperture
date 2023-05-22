@@ -28,12 +28,14 @@ definitions:
       on the deviation of the input signal from the setpoint.
     type: object
     properties:
-      default_config:
-        description: Default dynamic configuration for load actuation.
+      dry_run:
+        description: |-
+          Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+          It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+        type: boolean
         x-order: 0
-        $ref: '#/definitions/LoadSchedulerDynamicConfig'
-      dynamic_config_key:
-        description: Dynamic configuration key for load actuation.
+      dry_run_config_key:
+        description: Configuration key for setting dry run mode through dynamic configuration.
         type: string
         x-order: 1
       in_ports:
@@ -373,7 +375,7 @@ definitions:
       dry_run:
         description: |-
           Dry run mode ensures that no scaling is invoked by this auto scaler.
-          This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+          This is useful for observing the behavior of auto scaler without disrupting any real deployment.
           This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
         type: boolean
         x-order: 0
@@ -531,6 +533,34 @@ definitions:
         default: 30s
         x-go-tag-default: 30s
         x-order: 6
+  BoolVariable:
+    description: Component that emits a constant Boolean signal which can be changed
+      at runtime through dynamic configuration.
+    type: object
+    properties:
+      config_key:
+        description: Configuration key for overriding value setting through dynamic
+          configuration.
+        type: string
+        x-order: 0
+      constant_output:
+        description: The constant Boolean signal emitted by this component. The value
+          of the constant Boolean signal can be overridden at runtime through dynamic
+          configuration.
+        type: boolean
+        x-order: 1
+      out_ports:
+        description: Output ports for the BoolVariable component.
+        x-order: 2
+        $ref: '#/definitions/BoolVariableOuts'
+  BoolVariableOuts:
+    description: Outputs for the BoolVariable component.
+    type: object
+    properties:
+      output:
+        description: The value is emitted to the output port.
+        x-order: 0
+        $ref: '#/definitions/OutPort'
   Circuit:
     description: |-
       Circuit is graph of inter-connected signal processing components.
@@ -681,108 +711,114 @@ definitions:
         description: AutoScale components are used to scale the service.
         x-order: 3
         $ref: '#/definitions/AutoScale'
+      bool_variable:
+        description: BoolVariable emits a constant Boolean signal which can be changed
+          at runtime via dynamic configuration.
+        x-order: 4
+        $ref: '#/definitions/BoolVariable'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
-        x-order: 4
+        x-order: 5
         $ref: '#/definitions/Decider'
       differentiator:
         description: Differentiator calculates rate of change per tick.
-        x-order: 5
+        x-order: 6
         $ref: '#/definitions/Differentiator'
       ema:
         description: Exponential Moving Average filter.
-        x-order: 6
+        x-order: 7
         $ref: '#/definitions/EMA'
       extrapolator:
         description: Takes an input signal and emits the extrapolated value; either
           mirroring the input value or repeating the last known value up to the maximum
           extrapolation interval.
-        x-order: 7
+        x-order: 8
         $ref: '#/definitions/Extrapolator'
       first_valid:
         description: Picks the first valid input signal and emits it.
-        x-order: 8
+        x-order: 9
         $ref: '#/definitions/FirstValid'
       flow_control:
         description: FlowControl components are used to regulate requests flow.
-        x-order: 9
+        x-order: 10
         $ref: '#/definitions/FlowControl'
       gradient_controller:
         description: |-
           Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
-        x-order: 10
+        x-order: 11
         $ref: '#/definitions/GradientController'
       holder:
         description: Holds the last valid signal value for the specified duration
           then waits for next valid value to hold.
-        x-order: 11
+        x-order: 12
         $ref: '#/definitions/Holder'
       integrator:
         description: Accumulates sum of signal every tick.
-        x-order: 12
+        x-order: 13
         $ref: '#/definitions/Integrator'
       inverter:
         description: Logical NOT.
-        x-order: 13
+        x-order: 14
         $ref: '#/definitions/Inverter'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 14
+        x-order: 15
         $ref: '#/definitions/Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 15
+        x-order: 16
         $ref: '#/definitions/Min'
       nested_circuit:
         description: Nested circuit defines a sub-circuit as a high-level component.
           It consists of a list of components and a map of input and output ports.
-        x-order: 16
+        x-order: 17
         $ref: '#/definitions/NestedCircuit'
       nested_signal_egress:
         description: Nested signal egress is a special type of component that allows
           to extract a signal from a nested circuit.
-        x-order: 17
+        x-order: 18
         $ref: '#/definitions/NestedSignalEgress'
       nested_signal_ingress:
         description: Nested signal ingress is a special type of component that allows
           to inject a signal into a nested circuit.
-        x-order: 18
+        x-order: 19
         $ref: '#/definitions/NestedSignalIngress'
       or:
         description: Logical OR.
-        x-order: 19
+        x-order: 20
         $ref: '#/definitions/Or'
       pulse_generator:
         description: Generates 0 and 1 in turns.
-        x-order: 20
+        x-order: 21
         $ref: '#/definitions/PulseGenerator'
       query:
         description: Query components that are query databases such as Prometheus.
-        x-order: 21
+        x-order: 22
         $ref: '#/definitions/Query'
       signal_generator:
         description: Generates the specified signal.
-        x-order: 22
+        x-order: 23
         $ref: '#/definitions/SignalGenerator'
       sma:
         description: Simple Moving Average filter.
-        x-order: 23
+        x-order: 24
         $ref: '#/definitions/SMA'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 24
+        x-order: 25
         $ref: '#/definitions/Switcher'
       unary_operator:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 25
+        x-order: 26
         $ref: '#/definitions/UnaryOperator'
       variable:
-        description: Emits a variable signal which can be set to invalid.
-        x-order: 26
+        description: Emits a variable signal which can be changed at runtime via dynamic
+          configuration.
+        x-order: 27
         $ref: '#/definitions/Variable'
   ConstantSignal:
     description: Special constant input for ports and Variable component. Can provide
@@ -1358,7 +1394,7 @@ definitions:
         $ref: '#/definitions/FluxMeterLinearBuckets'
       selectors:
         description: |+
-          Selectors for the component.
+          Selectors for flows that will be metered by this _Flux Meter_.
 
         type: array
         minItems: 1
@@ -1512,18 +1548,22 @@ definitions:
       control variable proportionally to the relative difference between setpoint
       and actual value of the signal
     properties:
-      default_config:
-        description: Default configuration.
-        x-order: 0
-        $ref: '#/definitions/GradientControllerDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-        x-order: 1
       in_ports:
         description: Input ports of the Gradient Controller.
-        x-order: 2
+        x-order: 0
         $ref: '#/definitions/GradientControllerIns'
+      manual_mode:
+        description: In manual mode, the controller does not adjust the control variable.
+          It emits the same output as the control variable input. This setting can
+          be adjusted at runtime through dynamic configuration without restarting
+          the policy.
+        type: boolean
+        x-order: 1
+      manual_mode_config_key:
+        description: Configuration key for overriding `manual_mode` setting through
+          dynamic configuration.
+        type: string
+        x-order: 2
       out_ports:
         description: Output ports of the Gradient Controller.
         x-order: 3
@@ -1535,19 +1575,6 @@ definitions:
         x-go-tag-validate: required
         x-order: 4
         $ref: '#/definitions/GradientControllerParameters'
-  GradientControllerDynamicConfig:
-    type: object
-    title: Dynamic Configuration for a Controller
-    properties:
-      manual_mode:
-        description: |+
-          Decides whether the controller runs in `manual_mode`.
-          In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
-
-        type: boolean
-        default: false
-        x-go-tag-default: "false"
-        x-order: 0
   GradientControllerIns:
     description: Inputs for the Gradient Controller component.
     type: object
@@ -1567,17 +1594,13 @@ definitions:
         description: Minimum value to limit the output signal.
         x-order: 2
         $ref: '#/definitions/InPort'
-      optimize:
-        description: Optimize signal is added to the output of the gradient calculation.
-        x-order: 3
-        $ref: '#/definitions/InPort'
       setpoint:
         description: Setpoint to be used for the gradient computation.
-        x-order: 4
+        x-order: 3
         $ref: '#/definitions/InPort'
       signal:
         description: Signal to be used for the gradient computation.
-        x-order: 5
+        x-order: 4
         $ref: '#/definitions/InPort'
   GradientControllerOuts:
     description: Outputs for the Gradient Controller component.
@@ -2115,24 +2138,28 @@ definitions:
       `target_accept_percentage`, over the `duration` specified for each step.
     type: object
     properties:
-      default_config:
-        description: Default configuration.
-        x-order: 0
-        $ref: '#/definitions/RegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Dynamic configuration key for flow regulator.
-        type: string
-        x-order: 1
       in_ports:
-        x-order: 2
+        x-order: 0
         $ref: '#/definitions/LoadRampIns'
       out_ports:
-        x-order: 3
+        x-order: 1
         $ref: '#/definitions/LoadRampOuts'
       parameters:
         x-go-tag-validate: required
-        x-order: 4
+        x-order: 2
         $ref: '#/definitions/LoadRampParameters'
+      pass_through_label_values:
+        description: Specify certain label values to be always accepted by the _Regulator_
+          regardless of accept percentage.
+        type: array
+        items:
+          type: string
+        x-order: 3
+      pass_through_label_values_config_key:
+        description: Configuration key for setting pass through label values through
+          dynamic configuration.
+        type: string
+        x-order: 4
   LoadRampIns:
     description: Inputs for the _Load Ramp_ component.
     type: object
@@ -2273,23 +2300,25 @@ definitions:
 
       :::
 
-      It's based on the actuation strategy (for example, load actuator) and workload scheduling
-      which is based on Weighted Fair Queuing principles.
-      It measures and controls the incoming tokens per second, which can translate
+      To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+      A workload determines the priority and cost of admitting each Flow that belongs to it.
+      Scheduling of Flows is based on Weighted Fair Queuing principles.
+      _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
       to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
-      LoadScheduler configuration is split into two parts: An actuation
-      strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+      The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
     type: object
-    title: _Load Scheduler_ is an actuator component that regulates flows to provide
+    title: _Load Scheduler_ creates a queue for flows in front of a service to provide
       active service protection
     properties:
-      default_config:
-        description: Default configuration.
+      dry_run:
+        description: |-
+          Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+          It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+        type: boolean
         x-order: 0
-        $ref: '#/definitions/LoadSchedulerDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
+      dry_run_config_key:
+        description: Configuration key for setting dry run mode through dynamic configuration.
         type: string
         x-order: 1
       in_ports:
@@ -2307,16 +2336,6 @@ definitions:
         x-go-tag-validate: required
         x-order: 4
         $ref: '#/definitions/LoadSchedulerParameters'
-  LoadSchedulerDynamicConfig:
-    description: Dynamic Configuration for the LoadScheduler component.
-    type: object
-    properties:
-      dry_run:
-        description: |-
-          Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
-          Useful for observing the behavior of actuator without disrupting any real traffic.
-        type: boolean
-        x-order: 0
   LoadSchedulerIns:
     description: Input for the LoadScheduler component.
     type: object
@@ -2326,10 +2345,6 @@ definitions:
           Load multiplier is proportion of incoming
           token rate that needs to be accepted.
         x-order: 0
-        $ref: '#/definitions/InPort'
-      pass_through:
-        description: When true, pass through the requests skipping the scheduler.
-        x-order: 1
         $ref: '#/definitions/InPort'
   LoadSchedulerOuts:
     description: Output for the LoadScheduler component.
@@ -2724,7 +2739,7 @@ definitions:
       dry_run:
         description: |-
           Dry run mode ensures that no scaling is invoked by this pod scaler.
-          This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
+          This is useful for observing the behavior of pod scaler without disrupting any real deployment.
           This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
         type: boolean
         x-order: 0
@@ -2890,7 +2905,7 @@ definitions:
         x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/RateLimiterIns'
-      parameters:
+      rate_limiter:
         x-go-tag-validate: required
         x-order: 1
         $ref: '#/definitions/RateLimiterParameters'
@@ -2993,8 +3008,8 @@ definitions:
           For example, to give each user a separate limit, assuming you
           have a _user_ flow
           label set up, set `label_key: "user"`.
-          If `label_key` is not specified, then all requests are rate limited
-          that match the selectors.
+          If no label key is specified, then all requests matching the
+          selectors will be rate limited based on the global bucket.
         type: string
         x-order: 2
       lazy_sync:
@@ -3141,33 +3156,26 @@ definitions:
       :::
     type: object
     properties:
-      default_config:
-        description: Default configuration.
-        x-order: 0
-        $ref: '#/definitions/RegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
-        type: string
-        x-order: 1
       in_ports:
         description: Input ports for the _Regulator_.
-        x-order: 2
+        x-order: 0
         $ref: '#/definitions/RegulatorIns'
       parameters:
         description: Parameters for the _Regulator_.
-        x-order: 3
+        x-order: 1
         $ref: '#/definitions/RegulatorParameters'
-  RegulatorDynamicConfig:
-    type: object
-    title: Dynamic Configuration for _Regulator_
-    properties:
-      enable_label_values:
-        description: Specify certain label values to be accepted by this flow filter
+      pass_through_label_values:
+        description: Specify certain label values to be always accepted by this _Regulator_
           regardless of accept percentage.
         type: array
         items:
           type: string
-        x-order: 0
+        x-order: 2
+      pass_through_label_values_config_key:
+        description: Configuration key for setting pass through label values through
+          dynamic configuration.
+        type: string
+        x-order: 3
   RegulatorIns:
     type: object
     properties:
@@ -3876,32 +3884,26 @@ definitions:
         x-order: 0
         $ref: '#/definitions/OutPort'
   Variable:
-    description: Component that emits a variable value as an output signal, can be
-      defined in dynamic configuration.
+    description: Component that emits a constant signal which can be changed at runtime
+      through dynamic configuration.
     type: object
     properties:
-      default_config:
+      config_key:
+        description: Configuration key for overriding value setting through dynamic
+          configuration.
+        type: string
+        x-order: 0
+      constant_output:
         description: |+
-          Default configuration.
+          The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.
 
         x-go-tag-validate: required
-        x-order: 0
-        $ref: '#/definitions/VariableDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
-        type: string
         x-order: 1
+        $ref: '#/definitions/ConstantSignal'
       out_ports:
         description: Output ports for the Variable component.
         x-order: 2
         $ref: '#/definitions/VariableOuts'
-  VariableDynamicConfig:
-    type: object
-    properties:
-      constant_signal:
-        x-go-tag-validate: required
-        x-order: 0
-        $ref: '#/definitions/ConstantSignal'
   VariableOuts:
     description: Outputs for the Variable component.
     type: object

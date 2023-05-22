@@ -57,11 +57,6 @@ message PodScaler {
     OutPort configured_replicas = 2;
   }
 
-  // Dynamic Configuration for PodScaler
-  message DynamicConfig {
-    bool dry_run = 1; // @gotags: default:"false"
-  }
-
   // Input ports for the PodScaler component.
   Ins in_ports = 1;
 
@@ -69,7 +64,7 @@ message PodScaler {
   Outs out_ports = 2;
 
   // Dry run mode ensures that no scaling is invoked by this pod scaler.
-  // This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
+  // This is useful for observing the behavior of pod scaler without disrupting any real deployment.
   // This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
   bool dry_run = 3;
 
@@ -231,7 +226,7 @@ message AutoScaler {
   ScalingParameters scaling_parameters = 4; // @gotags: validate:"required"
 
   // Dry run mode ensures that no scaling is invoked by this auto scaler.
-  // This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+  // This is useful for observing the behavior of auto scaler without disrupting any real deployment.
   // This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
   bool dry_run = 5;
 

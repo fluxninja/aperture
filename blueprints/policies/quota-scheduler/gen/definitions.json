@@ -15,19 +15,29 @@
           "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
-        "classifiers": {
-          "description": "List of classification rules.",
+        "components": {
+          "description": "List of additional circuit components.",
           "default": [],
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
         "quota_scheduler": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["bucket_capacity", "fill_amount", "parameters"],
+          "required": ["bucket_capacity", "fill_amount"],
           "properties": {
             "bucket_capacity": {
               "description": "Bucket capacity.",
@@ -55,8 +65,8 @@
                 "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
               }
             },
-            "parameters": {
-              "description": "Parameters.",
+            "rate_limiter": {
+              "description": "Rate Limiter Parameters.",
               "default": {
                 "interval": "__REQUIRED_FIELD__",
                 "label_key": ""

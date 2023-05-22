@@ -36,7 +36,7 @@ function(cfg) {
       spec.v1.FirstValid.withInPorts({
         inputs: [
           spec.v1.Port.withSignalName(confirmationSignal),
-          spec.v1.Port.withConstantSignal(0),
+          spec.v1.Port.withConstantSignal(0),  // overload confirmation is assumed false if no confirmation signal is received
         ],
       })
       + spec.v1.FirstValid.withOutPorts({
@@ -80,12 +80,8 @@ function(cfg) {
       local adaptiveLoadScheduler = params.policy.service_protection_core.adaptive_load_scheduler;
       spec.v1.AdaptiveLoadScheduler.new()
       + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
-      + spec.v1.AdaptiveLoadScheduler.withDynamicConfigKey('load_scheduler')
-      + spec.v1.AdaptiveLoadScheduler.withDefaultConfig(
-        {
-          dry_run: params.policy.service_protection_core.dry_run,
-        },
-      )
+      + spec.v1.AdaptiveLoadScheduler.withDryRunConfigKey('dry_run')
+      + spec.v1.AdaptiveLoadScheduler.withDryRun(params.policy.service_protection_core.dry_run)
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
         overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
         signal: spec.v1.Port.withSignalName('SIGNAL'),

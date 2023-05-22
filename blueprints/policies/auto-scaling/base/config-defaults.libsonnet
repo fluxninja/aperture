@@ -59,8 +59,6 @@ local auto_scaling_defaults = auto_scaling_base_defaults {
   scaling_backend: '__REQUIRED_FIELD__',
 
   dry_run: false,
-
-  dry_run_config_key: 'auto_scaling',
 };
 
 {

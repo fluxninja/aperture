@@ -3,13 +3,24 @@
   "type": "object",
   "title": "policies/feature-rollout/base blueprint",
   "additionalProperties": false,
-  "required": ["regulator"],
   "properties": {
-    "regulator": {
-      "description": "Default configuration for _Regulator_ that can be updated at the runtime without shutting down the policy.",
-      "default": "__REQUIRED_FIELD__",
-      "type": "object",
-      "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/RegulatorDynamicConfig"
+    "pass_through_label_values": {
+      "description": "Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.",
+      "default": ["__REQUIRED_FIELD__"],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rollout": {
+      "description": "Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.",
+      "default": false,
+      "type": "boolean"
+    },
+    "reset": {
+      "description": "Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.",
+      "default": false,
+      "type": "boolean"
     }
   },
   "$defs": null

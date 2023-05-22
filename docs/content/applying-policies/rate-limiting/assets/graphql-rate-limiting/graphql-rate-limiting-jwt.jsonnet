@@ -24,46 +24,50 @@ local policyResource = RateLimiting({
         interval: '1s',
       },
     },
-    classifiers: [
-      classifier.new()
-      + classifier.withSelectors(svcSelectors)
-      + classifier.withRego(
-        local module = |||
-          package graphql_example
-          import future.keywords.if
-          query_ast := graphql.parse_query(input.parsed_body.query)
-          claims := payload if {
-            io.jwt.verify_hs256(bearer_token, "secret")
-            [_, payload, _] := io.jwt.decode(bearer_token)
-          }
-          bearer_token := t if {
-            v := input.attributes.request.http.headers.authorization
-            startswith(v, "Bearer ")
-            t := substring(v, count("Bearer "), -1)
-          }
-          queryIsCreateTodo if {
-            some operation
-            walk(query_ast, [_, operation])
-            operation.Name == "createTodo"
-            count(operation.SelectionSet) > 0
-            some selection
-            walk(operation.SelectionSet, [_, selection])
-            selection.Name == "createTodo"
-          }
-          user_id := u if {
-            queryIsCreateTodo
-            u := claims.userID
-          }
-        |||;
-        rego.new()
-        + rego.withLabels({
-          user_id: {
-            telemetry: true,
-          },
-        })
-        + rego.withModule(module),
-      ),
-    ],
+    resources: {
+      flow_control: {
+        classifiers: [
+          classifier.new()
+          + classifier.withSelectors(svcSelectors)
+          + classifier.withRego(
+            local module = |||
+              package graphql_example
+              import future.keywords.if
+              query_ast := graphql.parse_query(input.parsed_body.query)
+              claims := payload if {
+                io.jwt.verify_hs256(bearer_token, "secret")
+                [_, payload, _] := io.jwt.decode(bearer_token)
+              }
+              bearer_token := t if {
+                v := input.attributes.request.http.headers.authorization
+                startswith(v, "Bearer ")
+                t := substring(v, count("Bearer "), -1)
+              }
+              queryIsCreateTodo if {
+                some operation
+                walk(query_ast, [_, operation])
+                operation.Name == "createTodo"
+                count(operation.SelectionSet) > 0
+                some selection
+                walk(operation.SelectionSet, [_, selection])
+                selection.Name == "createTodo"
+              }
+              user_id := u if {
+                queryIsCreateTodo
+                u := claims.userID
+              }
+            |||;
+            rego.new()
+            + rego.withLabels({
+              user_id: {
+                telemetry: true,
+              },
+            })
+            + rego.withModule(module),
+          ),
+        ],
+      },
+    },
   },
 }).policyResource;
 

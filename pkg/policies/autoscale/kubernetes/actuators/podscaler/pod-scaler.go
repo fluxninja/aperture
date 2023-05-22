@@ -80,7 +80,6 @@ func provideConfigWatcher(
 type podScalerFactory struct {
 	registry             status.Registry
 	decisionsWatcher     notifiers.Watcher
-	dynamicConfigWatcher notifiers.Watcher
 	controlPointTrackers notifiers.Trackers
 	electionTrackers     notifiers.Trackers
 	k8sClient            k8s.K8sClient
@@ -117,19 +116,12 @@ func setupPodScalerFactory(
 		return err
 	}
 
-	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		paths.PodScalerDynamicConfigPath)
-	if err != nil {
-		return err
-	}
-
 	reg := statusRegistry.Child("component", podScalerStatusRoot)
 	// logger := reg.GetLogger()
 
 	psFactory := &podScalerFactory{
 		controlPointTrackers: controlPointTrackers,
 		decisionsWatcher:     decisionsWatcher,
-		dynamicConfigWatcher: dynamicConfigWatcher,
 		agentGroup:           agentGroup,
 		registry:             reg,
 		etcdClient:           etcdClient,
@@ -150,18 +142,10 @@ func setupPodScalerFactory(
 			if err != nil {
 				return err
 			}
-			err = dynamicConfigWatcher.Start()
-			if err != nil {
-				return err
-			}
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
 			var err, merr error
-			err = dynamicConfigWatcher.Stop()
-			if err != nil {
-				merr = multierror.Append(merr, err)
-			}
 			err = decisionsWatcher.Stop()
 			if err != nil {
 				merr = multierror.Append(merr, err)
@@ -230,7 +214,6 @@ type podScaler struct {
 	scaleWaitGroup    *conc.WaitGroup
 	controlPoint      discovery.AutoScaleControlPoint
 	statusEtcdPath    string
-	dryRun            bool
 	isLeader          bool
 }
 
@@ -258,19 +241,6 @@ func (ps *podScaler) setup(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaler,
 		ps.decisionUpdateCallback,
-	)
-	if err != nil {
-		return err
-	}
-	// dynamic config notifier
-	dynamicConfigUnmarshaler, err := config.NewProtobufUnmarshaller(nil)
-	if err != nil {
-		return err
-	}
-	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(etcdKey),
-		dynamicConfigUnmarshaler,
-		ps.dynamicConfigUpdateCallback,
 	)
 	if err != nil {
 		return err
@@ -306,7 +276,6 @@ func (ps *podScaler) setup(
 			var err error
 			ps.statusWriter = etcdwriter.NewWriter(ps.etcdClient, true)
 			ps.ctx, ps.cancel = context.WithCancel(context.Background())
-			ps.setDefaultDryRun()
 
 			// add election notifier
 			err = ps.podScalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
@@ -319,11 +288,6 @@ func (ps *podScaler) setup(
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
 				return err
-			}
-			// add dynamic config notifier
-			err = ps.podScalerFactory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to add dynamic config notifier")
 			}
 			// add control point notifier
 			err = ps.podScalerFactory.controlPointTrackers.AddKeyNotifier(controlPointNotifier)
@@ -339,12 +303,6 @@ func (ps *podScaler) setup(
 			err = ps.podScalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove election notifier")
-				merr = multierror.Append(merr, err)
-			}
-			// remove dynamic config notifier
-			err = ps.podScalerFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to remove dynamic config notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove decisions notifier
@@ -386,39 +344,6 @@ func (ps *podScaler) electionResultCallback(_ notifiers.Event) {
 	ps.isLeader = true
 }
 
-func (ps *podScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := ps.registry.GetLogger()
-	if event.Type == notifiers.Remove {
-		logger.Debug().Msg("Dynamic config removed")
-		// revert to default config
-		ps.setDefaultDryRun()
-		return
-	}
-
-	var wrapperMessage policysyncv1.PodScalerDynamicConfigWrapper
-	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil {
-		return
-	}
-	commonAttributes := wrapperMessage.GetCommonAttributes()
-	if commonAttributes == nil {
-		log.Error().Msg("Common attributes not found")
-		return
-	}
-	if commonAttributes.PolicyHash != ps.GetPolicyHash() {
-		return
-	}
-	ps.setDryRun(wrapperMessage.DryRun)
-}
-
-func (ps *podScaler) setDryRun(dryRun bool) {
-	ps.dryRun = dryRun
-}
-
-func (ps *podScaler) setDefaultDryRun() {
-	ps.dryRun = ps.podScalerProto.DryRun
-}
-
 func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	ps.stateMutex.Lock()
 	defer ps.stateMutex.Unlock()
@@ -444,17 +369,15 @@ func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 		return
 	}
 	scaleDecision := wrapperMessage.ScaleDecision
-	if !ps.dryRun {
-		ps.lastScaleDecision = scaleDecision
-		if ps.isLeader {
-			ps.scale(scaleDecision)
-		}
+	ps.lastScaleDecision = scaleDecision
+	if ps.isLeader {
+		ps.scale(scaleDecision)
 	}
 }
 
 // scale scales the associated Kubernetes object. NOTE: not thread safe, needs to be called under podScaler.scaleMutex.
 func (ps *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
-	// Take mutex to prevent concurrent scale operations
+	// This is called under stateMutex to prevent concurrent scale operations
 	replicas := scaleDecision.GetDesiredReplicas()
 
 	// Cancel any existing scale operation
