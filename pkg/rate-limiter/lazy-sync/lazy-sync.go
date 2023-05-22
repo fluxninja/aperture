@@ -13,10 +13,12 @@ import (
 )
 
 type counter struct {
-	lock      sync.Mutex
-	nextSync  time.Time
+	lock     sync.Mutex
+	nextSync time.Time
+	credit   float64
+	// snapshot
+	current   float64
 	available float64
-	credit    float64
 }
 
 // LazySyncRateLimiter is a limiter that syncs its state lazily with another limiter.
@@ -119,56 +121,47 @@ func (lsl *LazySyncRateLimiter) takeN(label string, n float64, canWait bool) (bo
 		}
 
 		if ok && !canWait {
-			// try to take n from the remaining
-			if n > remaining {
-				ok = false
-			} else {
+			if n < 0 || n < remaining {
 				c.credit = n
 				remaining -= n
 				current += n
+			} else {
+				ok = false
 			}
 		}
 		c.available = remaining
+		c.current = current
 		return ok, waitTime, remaining, current
 	}
 
 	checkLimit := func(c *counter) (bool, time.Duration, float64, float64) {
 		c.lock.Lock()
 		defer c.lock.Unlock()
-		// check if we need to sync
-		if now.After(c.nextSync) {
-			return syncRemote(c, n)
-		}
 
-		waitTime := time.Duration(0)
-
-		if c.credit+n > c.available {
-			if canWait {
-				// need accurate wait time
+		if n > 0 {
+			// check if we need to sync
+			if now.After(c.nextSync) {
 				return syncRemote(c, n)
 			}
-			waitTime = c.nextSync.Sub(now)
-			return false, waitTime, math.Max(0, c.available-c.credit), c.credit
+			if c.credit+n > c.available {
+				if canWait {
+					// need accurate wait time
+					return syncRemote(c, n)
+				}
+				waitTime := c.nextSync.Sub(now)
+				return false, waitTime, math.Max(0, c.available-c.credit), c.current + c.credit
+			}
 		}
 		c.credit += n
-		return true, waitTime, math.Max(0, c.available-c.credit), c.credit
+		return true, 0, math.Max(0, c.available-c.credit), c.current + c.credit
 	}
 
-	// check if the counter exists in the map
-	if v, ok := lsl.counters.Load(label); ok {
-		c := v.(*counter)
-		return checkLimit(c)
-	}
-	// fallback to using the underlying limiter
 	c := &counter{}
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	existing, loaded := lsl.counters.LoadOrStore(label, c)
 	if loaded {
-		ce := existing.(*counter)
-		return checkLimit(ce)
+		c = existing.(*counter)
 	}
-	return syncRemote(c, n)
+	return checkLimit(c)
 }
 
 // TakeIfAvailable takes n tokens from the limiter if they are available.
@@ -184,9 +177,6 @@ func (lsl *LazySyncRateLimiter) Take(label string, n float64) (bool, time.Durati
 
 // Return returns n tokens to the limiter.
 func (lsl *LazySyncRateLimiter) Return(label string, n float64) (float64, float64) {
-	if lsl.GetPassThrough() {
-		return 0, 0
-	}
 	_, remaining, current := lsl.TakeIfAvailable(label, -n)
 	return remaining, current
 }

@@ -10,6 +10,7 @@ import (
 // ServiceDiscovery holds fields needed to implement Olric's Service Discovery interface.
 type ServiceDiscovery struct {
 	discovery *peers.PeerDiscovery
+	addr      string
 }
 
 // Initialize initializes the plugin: registers some internal data structures, clients etc.
@@ -49,11 +50,17 @@ func (s *ServiceDiscovery) DiscoverPeers() ([]string, error) {
 
 // Register registers this node to a service discovery directory.
 // This method is not implemented.
-func (s *ServiceDiscovery) Register() error { return nil }
+func (s *ServiceDiscovery) Register() error {
+	s.discovery.RegisterService(olricMemberlistServiceName, s.addr)
+	return nil
+}
 
 // Deregister removes this node from a service discovery directory.
 // This method is not implemented.
-func (s *ServiceDiscovery) Deregister() error { return nil }
+func (s *ServiceDiscovery) Deregister() error {
+	s.discovery.DeregisterService(olricMemberlistServiceName)
+	return nil
+}
 
 // Close stops underlying goroutines, if there is any. It should be a blocking call.
 // This method is not implemented.

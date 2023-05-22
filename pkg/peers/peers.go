@@ -190,7 +190,6 @@ func (pd *PeerDiscovery) RegisterSelf(ctx context.Context, advertiseAddr string)
 	pd.lock.Lock()
 	defer pd.lock.Unlock()
 
-	var err error
 	hostname := info.Hostname
 
 	pd.peers.SelfPeer.Address = advertiseAddr
@@ -200,6 +199,10 @@ func (pd *PeerDiscovery) RegisterSelf(ctx context.Context, advertiseAddr string)
 
 	// register
 	log.Debug().Str("key", pd.selfKey).Msg("self registering in peer discovery table")
+	return pd.uploadSelfPeer(ctx)
+}
+
+func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 	bjson, err := json.Marshal(pd.peers.SelfPeer)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to marshal peer info")
@@ -279,6 +282,22 @@ func (pd *PeerDiscovery) RegisterService(name string, address string) {
 	defer pd.lock.Unlock()
 
 	pd.peers.SelfPeer.Services[name] = address
+	err := pd.uploadSelfPeer(context.TODO())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to upload self peer")
+	}
+}
+
+// DeregisterService accepts a name and removes the service from the list of services in PeerDiscovery.
+func (pd *PeerDiscovery) DeregisterService(name string) {
+	pd.lock.Lock()
+	defer pd.lock.Unlock()
+
+	delete(pd.peers.SelfPeer.Services, name)
+	err := pd.uploadSelfPeer(context.TODO())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to upload self peer")
+	}
 }
 
 // addPeer adds a peer info to the PeerDiscovery peers map.

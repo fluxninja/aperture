@@ -38,9 +38,6 @@ func NewGlobalTokenBucket(dc *distcache.DistCache,
 	maxIdleDuration time.Duration,
 	continuousFill bool,
 ) (*GlobalTokenBucket, error) {
-	dc.Mutex.Lock()
-	defer dc.Mutex.Unlock()
-
 	gtb := &GlobalTokenBucket{
 		name:           name,
 		interval:       interval,
@@ -55,12 +52,10 @@ func NewGlobalTokenBucket(dc *distcache.DistCache,
 		},
 	}
 
-	dc.AddDMapCustomConfig(name, dmapConfig)
-	dMap, err := dc.Olric.NewDMap(name)
+	dMap, err := dc.NewDMap(name, dmapConfig)
 	if err != nil {
 		return nil, err
 	}
-	dc.RemoveDMapCustomConfig(name)
 
 	gtb.dMap = dMap
 
@@ -128,7 +123,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, fl
 
 	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Errorf("error taking from token bucket: %v", err)
+		log.Error().Err(err).Msg("error taking from token bucket")
 		return true, 0, 0
 	}
 
@@ -191,14 +186,6 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 
 // Return returns n tokens to the bucket.
 func (gtb *GlobalTokenBucket) Return(label string, n float64) (float64, float64) {
-	if gtb.GetPassThrough() {
-		return 0, 0
-	}
-
-	if gtb.GetBucketCapacity() == 0 {
-		return 0, 0
-	}
-
 	_, remaining, current := gtb.TakeIfAvailable(label, -n)
 	return remaining, current
 }
@@ -250,18 +237,23 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 	}
 
 	state.Available -= arg.Want
-	if math.Signbit(state.Available) != math.Signbit(gtb.bucketCapacity) {
-		if gtb.fillAmount != 0 {
-			waitTime := time.Duration(math.Abs(state.Available) / math.Abs(gtb.fillAmount) * float64(gtb.interval))
-			availableAt := now.Add(waitTime)
-			result.AvailableAt = availableAt
+
+	if arg.Want > 0 {
+		if state.Available < 0 {
+			if gtb.fillAmount != 0 {
+				waitTime := time.Duration(math.Abs(state.Available) / math.Abs(gtb.fillAmount) * float64(gtb.interval))
+				availableAt := now.Add(waitTime)
+				result.AvailableAt = availableAt
+			}
+			result.Ok = arg.CanWait
+			// return the tokens to the bucket if the request is not ok
+			if !result.Ok {
+				state.Available += arg.Want
+			}
 		}
-		result.Ok = arg.CanWait
-		// return the tokens to the bucket if the request is not ok
-		if !result.Ok {
-			state.Available += arg.Want
-		}
-	} else if math.Abs(state.Available) > math.Abs(gtb.bucketCapacity) {
+	}
+
+	if state.Available > gtb.bucketCapacity {
 		state.Available = gtb.bucketCapacity
 	}
 
@@ -316,8 +308,7 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte)
 		// Fill the calculated amount
 		state.Available += fillAmount
 
-		if math.Signbit(state.Available) == math.Signbit(gtb.bucketCapacity) &&
-			math.Abs(state.Available) > math.Abs(gtb.bucketCapacity) {
+		if state.Available > gtb.bucketCapacity {
 			state.Available = gtb.bucketCapacity
 		}
 	}
