@@ -33,7 +33,8 @@
           "flow_control": {
             "classifiers": []
           }
-        }
+        },
+        "rollout": false
       },
       "type": "object",
       "$ref": "#/$defs/rollout_policy"
@@ -539,6 +540,11 @@
               }
             }
           }
+        },
+        "rollout": {
+          "description": "Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.",
+          "default": false,
+          "type": "boolean"
         }
       }
     }

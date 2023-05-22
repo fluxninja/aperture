@@ -13,8 +13,9 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/controller"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate"
+	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
+	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/regulator"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -55,6 +56,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Variable:
 		ctor = mkCtor(config.Variable, components.NewVariableAndOptions)
+	case *policylangv1.Component_BoolVariable:
+		ctor = mkCtor(config.BoolVariable, components.NewBoolVariableAndOptions)
 	case *policylangv1.Component_Decider:
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
@@ -102,8 +105,10 @@ func NewComponentAndOptions(
 	case *policylangv1.Component_FlowControl:
 		flowControl := componentProto.GetFlowControl()
 		switch flowControlConfig := flowControl.Component.(type) {
+		case *policylangv1.FlowControl_QuotaScheduler:
+			ctor = mkCtor(flowControlConfig.QuotaScheduler, quotascheduler.NewQuotaSchedulerAndOptions)
 		case *policylangv1.FlowControl_RateLimiter:
-			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+			ctor = mkCtor(flowControlConfig.RateLimiter, ratelimiter.NewRateLimiterAndOptions)
 		case *policylangv1.FlowControl_Regulator:
 			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
 		case *policylangv1.FlowControl_Private:

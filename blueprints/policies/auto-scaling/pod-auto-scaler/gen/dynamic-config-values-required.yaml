@@ -1,8 +1,3 @@
 # Generated values file for policies/auto-scaling/pod-auto-scaler blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/auto-scaling/pod-auto-scaler
-
-# Dry run mode ensures that no scaling is invoked by this auto scaler.
-# Type: bool
-# Required: True
-auto_scaling: __REQUIRED_FIELD__

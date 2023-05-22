@@ -8,6 +8,7 @@ import com.google.protobuf.Value;
 import com.google.protobuf.util.JsonFormat;
 import com.google.rpc.Code;
 import io.opentelemetry.api.trace.Span;
+import org.apache.http.HttpStatus;
 
 public class TrafficFlow {
     private final CheckHTTPResponse checkResponse;
@@ -59,6 +60,25 @@ public class TrafficFlow {
 
     public CheckHTTPResponse checkResponse() {
         return this.checkResponse;
+    }
+
+    /**
+     * Returns Aperture Agent's reason for rejecting the flow. Reason is represented by an
+     * appropriate HTTP code. If the flow was not rejected, an IllegalStateException will be thrown.
+     *
+     * @return HTTP code of rejection reason
+     */
+    public int rejectReason() {
+        if (this.result() == FlowResult.Rejected) {
+            if (this.checkResponse().hasDeniedResponse()
+                    && this.checkResponse().getDeniedResponse().getStatus() != 0) {
+                return this.checkResponse.getDeniedResponse().getStatus();
+            } else {
+                return HttpStatus.SC_FORBIDDEN;
+            }
+        } else {
+            throw new IllegalStateException("Flow not rejected");
+        }
     }
 
     public void end(FlowStatus statusCode) throws ApertureSDKException {

@@ -3,6 +3,25 @@
   "type": "object",
   "title": "policies/feature-rollout/average-latency blueprint",
   "additionalProperties": false,
-  "properties": null,
+  "properties": {
+    "pass_through_label_values": {
+      "description": "Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.",
+      "default": ["__REQUIRED_FIELD__"],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rollout": {
+      "description": "Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.",
+      "default": false,
+      "type": "boolean"
+    },
+    "reset": {
+      "description": "Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.",
+      "default": false,
+      "type": "boolean"
+    }
+  },
   "$defs": null
 }

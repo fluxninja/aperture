@@ -26,11 +26,10 @@ type regulatorSync struct {
 	RegulatorProto         *policylangv1.Regulator
 	decision               *policysyncv1.RegulatorDecision
 	decisionWriter         *etcdwriter.Writer
-	dynamicConfigWriter    *etcdwriter.Writer
 	componentID            string
 	configEtcdPaths        []string
 	decisionEtcdPaths      []string
-	dynamicConfigEtcdPaths []string
+	passThroughLabelValues []string
 }
 
 // Name implements runtime.Component.
@@ -57,7 +56,7 @@ func NewRegulatorAndOptions(
 
 	agentGroups := selectors.UniqueAgentGroups(s)
 
-	var configEtcdPaths, decisionEtcdPaths, dynamicConfigEtcdPaths []string
+	var configEtcdPaths, decisionEtcdPaths []string
 
 	for _, agentGroup := range agentGroups {
 		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
@@ -65,18 +64,15 @@ func NewRegulatorAndOptions(
 		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
 		decisionEtcdPath := path.Join(paths.RegulatorDecisionsPath, etcdKey)
 		decisionEtcdPaths = append(decisionEtcdPaths, decisionEtcdPath)
-		dynamicConfigEtcdPath := path.Join(paths.RegulatorDynamicConfigPath, etcdKey)
-		dynamicConfigEtcdPaths = append(dynamicConfigEtcdPaths, dynamicConfigEtcdPath)
 	}
 
 	regulatorSync := &regulatorSync{
-		RegulatorProto:         regulatorProto,
-		decision:               &policysyncv1.RegulatorDecision{},
-		policyReadAPI:          policyReadAPI,
-		configEtcdPaths:        configEtcdPaths,
-		decisionEtcdPaths:      decisionEtcdPaths,
-		dynamicConfigEtcdPaths: dynamicConfigEtcdPaths,
-		componentID:            componentID.String(),
+		RegulatorProto:    regulatorProto,
+		decision:          &policysyncv1.RegulatorDecision{},
+		policyReadAPI:     policyReadAPI,
+		configEtcdPaths:   configEtcdPaths,
+		decisionEtcdPaths: decisionEtcdPaths,
+		componentID:       componentID.String(),
 	}
 	return regulatorSync, fx.Options(
 		fx.Invoke(
@@ -112,11 +108,9 @@ func (regulatorSync *regulatorSync) setupSync(etcdClient *etcdclient.Client, lif
 				}
 			}
 			regulatorSync.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
-			regulatorSync.dynamicConfigWriter = etcdwriter.NewWriter(etcdClient, true)
 			return merr
 		},
 		OnStop: func(ctx context.Context) error {
-			regulatorSync.dynamicConfigWriter.Close()
 			regulatorSync.decisionWriter.Close()
 			deleteEtcdPath := func(paths []string) error {
 				var merr error
@@ -132,7 +126,6 @@ func (regulatorSync *regulatorSync) setupSync(etcdClient *etcdclient.Client, lif
 
 			merr := deleteEtcdPath(regulatorSync.configEtcdPaths)
 			merr = multierr.Append(merr, deleteEtcdPath(regulatorSync.decisionEtcdPaths))
-			merr = multierr.Append(merr, deleteEtcdPath(regulatorSync.dynamicConfigEtcdPaths))
 			return merr
 		},
 	})
@@ -166,7 +159,8 @@ func (regulatorSync *regulatorSync) publishAcceptPercentage(acceptPercentageValu
 	logger.Debug().Float64("flux", acceptPercentageValue).Msg("publishing flux regulator decision")
 	wrapper := &policysyncv1.RegulatorDecisionWrapper{
 		RegulatorDecision: &policysyncv1.RegulatorDecision{
-			AcceptPercentage: acceptPercentageValue,
+			AcceptPercentage:       acceptPercentageValue,
+			PassThroughLabelValues: regulatorSync.passThroughLabelValues,
 		},
 		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName:  regulatorSync.policyReadAPI.GetPolicyName(),
@@ -192,38 +186,17 @@ func (regulatorSync *regulatorSync) publishAcceptPercentage(acceptPercentageValu
 // DynamicConfigUpdate handles overrides.
 func (regulatorSync *regulatorSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := regulatorSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	publishDynamicConfig := func(dynamicConfig *policylangv1.Regulator_DynamicConfig) {
-		wrapper := &policysyncv1.RegulatorDynamicConfigWrapper{
-			RegulatorDynamicConfig: dynamicConfig,
-			CommonAttributes: &policysyncv1.CommonAttributes{
-				PolicyName:  regulatorSync.policyReadAPI.GetPolicyName(),
-				PolicyHash:  regulatorSync.policyReadAPI.GetPolicyHash(),
-				ComponentId: regulatorSync.componentID,
-			},
-		}
-		dat, err := proto.Marshal(wrapper)
-		if err != nil {
-			logger.Error().Err(err).Msg("failed to marshal dynamic config")
-			return
-		}
-		if regulatorSync.dynamicConfigWriter == nil {
-			logger.Panic().Msg("dynamic config writer is nil")
-		}
-		for _, dynamicConfigEtcdPath := range regulatorSync.dynamicConfigEtcdPaths {
-			regulatorSync.dynamicConfigWriter.Write(dynamicConfigEtcdPath, dat)
-		}
-		logger.Info().Msg("regulator dynamic config updated")
+	key := regulatorSync.RegulatorProto.GetPassThroughLabelValuesConfigKey()
+	passThroughLabelValues := []string{}
+	if !unmarshaller.IsSet(key) {
+		regulatorSync.passThroughLabelValues = regulatorSync.RegulatorProto.GetPassThroughLabelValues()
+		return
 	}
-	dynamicConfig := &policylangv1.Regulator_DynamicConfig{}
-	key := regulatorSync.RegulatorProto.GetDynamicConfigKey()
-	// read dynamic config
-	if unmarshaller.IsSet(key) {
-		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
-			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
-			return
-		}
-		publishDynamicConfig(dynamicConfig)
-	} else {
-		publishDynamicConfig(regulatorSync.RegulatorProto.GetDefaultConfig())
+	err := unmarshaller.UnmarshalKey(key, passThroughLabelValues)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
+		regulatorSync.passThroughLabelValues = regulatorSync.RegulatorProto.GetPassThroughLabelValues()
+		return
 	}
+	regulatorSync.passThroughLabelValues = passThroughLabelValues
 }

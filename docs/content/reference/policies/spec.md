@@ -36,19 +36,22 @@ The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
 deviation of the input signal from the setpoint.
 
 <dl>
-<dt>default_config</dt>
+<dt>dry_run</dt>
 <dd>
 
 <!-- vale off -->
 
-([LoadSchedulerDynamicConfig](#load-scheduler-dynamic-config))
+(bool)
 
 <!-- vale on -->
 
-Default dynamic configuration for load actuation.
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
 
 </dd>
-<dt>dynamic_config_key</dt>
+<dt>dry_run_config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -57,7 +60,7 @@ Default dynamic configuration for load actuation.
 
 <!-- vale on -->
 
-Dynamic configuration key for load actuation.
+Configuration key for setting dry run mode through dynamic configuration.
 
 </dd>
 <dt>in_ports</dt>
@@ -743,9 +746,9 @@ such as Kubernetes to perform auto-scale.
 <!-- vale on -->
 
 Dry run mode ensures that no scaling is invoked by this auto scaler. This is
-Useful for observing the behavior of auto scaler without disrupting any real
-traffic. This parameter sets the default value of dry run setting which can be
-overridden at runtime using dynamic configuration.
+useful for observing the behavior of auto scaler without disrupting any real
+deployment. This parameter sets the default value of dry run setting which can
+be overridden at runtime using dynamic configuration.
 
 </dd>
 <dt>dry_run_config_key</dt>
@@ -1041,6 +1044,82 @@ scale-in operation.
 
 <!-- vale off -->
 
+### BoolVariable {#bool-variable}
+
+<!-- vale on -->
+
+Component that emits a constant Boolean signal which can be changed at runtime
+through dynamic configuration.
+
+<dl>
+<dt>config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for overriding value setting through dynamic configuration.
+
+</dd>
+<dt>constant_output</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+The constant Boolean signal emitted by this component. The value of the constant
+Boolean signal can be overridden at runtime through dynamic configuration.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([BoolVariableOuts](#bool-variable-outs))
+
+<!-- vale on -->
+
+Output ports for the BoolVariable component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### BoolVariableOuts {#bool-variable-outs}
+
+<!-- vale on -->
+
+Outputs for the BoolVariable component.
+
+<dl>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The value is emitted to the output port.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### Circuit {#circuit}
 
 <!-- vale on -->
@@ -1260,6 +1339,19 @@ Applies the given operator on input operands (signals) and emits the result.
 <!-- vale on -->
 
 AutoScale components are used to scale the service.
+
+</dd>
+<dt>bool_variable</dt>
+<dd>
+
+<!-- vale off -->
+
+([BoolVariable](#bool-variable))
+
+<!-- vale on -->
+
+BoolVariable emits a constant Boolean signal which can be changed at runtime via
+dynamic configuration.
 
 </dd>
 <dt>decider</dt>
@@ -1545,7 +1637,8 @@ Takes an input signal and emits the square root of the input signal.
 
 <!-- vale on -->
 
-Emits a variable signal which can be set to invalid.
+Emits a variable signal which can be changed at runtime via dynamic
+configuration.
 
 </dd>
 </dl>
@@ -2599,6 +2692,16 @@ _Load Scheduler_ provides service protection by creating a prioritized workload
 queue in front of the service using Weighted Fair Queuing.
 
 </dd>
+<dt>quota_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([QuotaScheduler](#quota-scheduler))
+
+<!-- vale on -->
+
+</dd>
 <dt>rate_limiter</dt>
 <dd>
 
@@ -2608,7 +2711,8 @@ queue in front of the service using Weighted Fair Queuing.
 
 <!-- vale on -->
 
-_Rate Limiter_ provides service protection by applying rate limits.
+_Rate Limiter_ provides service protection by applying rate limits using the
+token bucket algorithm.
 
 </dd>
 <dt>regulator</dt>
@@ -2771,7 +2875,7 @@ For list of available attributes in Envoy access logs, refer
 
 <!-- vale on -->
 
-Selectors for the component.
+Selectors for flows that will be metered by this _Flux Meter_.
 
 </dd>
 <dt>static_buckets</dt>
@@ -3001,30 +3105,6 @@ The output can be _optionally_ clamped to desired range using `max` and `min`
 input.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([GradientControllerDynamicConfig](#gradient-controller-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -3035,6 +3115,33 @@ Configuration key for DynamicConfig
 <!-- vale on -->
 
 Input ports of the Gradient Controller.
+
+</dd>
+<dt>manual_mode</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+In manual mode, the controller does not adjust the control variable. It emits
+the same output as the control variable input. This setting can be adjusted at
+runtime through dynamic configuration without restarting the policy.
+
+</dd>
+<dt>manual_mode_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for overriding `manual_mode` setting through dynamic
+configuration.
 
 </dd>
 <dt>out_ports</dt>
@@ -3059,33 +3166,6 @@ Output ports of the Gradient Controller.
 <!-- vale on -->
 
 Gradient Parameters.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### GradientControllerDynamicConfig {#gradient-controller-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for a Controller
-
-<dl>
-<dt>manual_mode</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool, default: `false`)
-
-<!-- vale on -->
-
-Decides whether the controller runs in `manual_mode`. In manual mode, the
-controller does not adjust the control variable It emits the same output as the
-control variable input.
 
 </dd>
 </dl>
@@ -3137,18 +3217,6 @@ Maximum value to limit the output signal.
 <!-- vale on -->
 
 Minimum value to limit the output signal.
-
-</dd>
-<dt>optimize</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Optimize signal is added to the output of the gradient calculation.
 
 </dd>
 <dt>setpoint</dt>
@@ -4222,30 +4290,6 @@ previous step's `target_accept_percentage` to the next
 `target_accept_percentage`, over the `duration` specified for each step.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([RegulatorDynamicConfig](#regulator-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Dynamic configuration key for flow regulator.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -4274,6 +4318,32 @@ Dynamic configuration key for flow regulator.
 ([LoadRampParameters](#load-ramp-parameters))
 
 <!-- vale on -->
+
+</dd>
+<dt>pass_through_label_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+Specify certain label values to be always accepted by the _Regulator_ regardless
+of accept percentage.
+
+</dd>
+<dt>pass_through_label_values_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting pass through label values through dynamic
+configuration.
 
 </dd>
 </dl>
@@ -4597,8 +4667,8 @@ An ordered list of load ramps that get applied in order.
 
 <!-- vale on -->
 
-_Load Scheduler_ is an actuator component that regulates flows to provide active
-service protection
+_Load Scheduler_ creates a queue for flows in front of a service to provide
+active service protection
 
 :::info
 
@@ -4607,28 +4677,33 @@ See also
 
 :::
 
-It's based on the actuation strategy (for example, load actuator) and workload
-scheduling which is based on Weighted Fair Queuing principles. It measures and
-controls the incoming tokens per second, which can translate to (avg. latency \*
-in-flight requests) (Little's Law) in concurrency limiting use-case.
+To make scheduling decisions the Flows are mapped into Workloads by providing
+match rules. A workload determines the priority and cost of admitting each Flow
+that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
+principles. _Load Scheduler_ measures and controls the incoming tokens per
+second, which can translate to (avg. latency \* in-flight requests) (Little's
+Law) in concurrency limiting use-case.
 
-LoadScheduler configuration is split into two parts: An actuation strategy and a
-scheduler. At this time, only `load_actuator` strategy is available.
+The signal at port `load_multiplier` determines the fraction of incoming tokens
+that get admitted.
 
 <dl>
-<dt>default_config</dt>
+<dt>dry_run</dt>
 <dd>
 
 <!-- vale off -->
 
-([LoadSchedulerDynamicConfig](#load-scheduler-dynamic-config))
+(bool)
 
 <!-- vale on -->
 
-Default configuration.
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
 
 </dd>
-<dt>dynamic_config_key</dt>
+<dt>dry_run_config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -4637,7 +4712,7 @@ Default configuration.
 
 <!-- vale on -->
 
-Configuration key for DynamicConfig.
+Configuration key for setting dry run mode through dynamic configuration.
 
 </dd>
 <dt>in_ports</dt>
@@ -4680,33 +4755,6 @@ Output ports for the LoadScheduler component.
 
 <!-- vale off -->
 
-### LoadSchedulerDynamicConfig {#load-scheduler-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for the LoadScheduler component.
-
-<dl>
-<dt>dry_run</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool)
-
-<!-- vale on -->
-
-Decides whether to run the actuator in dry-run mode. Dry run mode ensures that
-no traffic gets dropped by this actuator. Useful for observing the behavior of
-actuator without disrupting any real traffic.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### LoadSchedulerIns {#load-scheduler-ins}
 
 <!-- vale on -->
@@ -4724,18 +4772,6 @@ Input for the LoadScheduler component.
 <!-- vale on -->
 
 Load multiplier is proportion of incoming token rate that needs to be accepted.
-
-</dd>
-<dt>pass_through</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-When true, pass through the requests skipping the scheduler.
 
 </dd>
 </dl>
@@ -5591,9 +5627,9 @@ Component for scaling pods based on a signal.
 <!-- vale on -->
 
 Dry run mode ensures that no scaling is invoked by this pod scaler. This is
-Useful for observing the behavior of pod scaler without disrupting any real
-traffic. This parameter sets the default value of dry run setting which can be
-overridden at runtime using dynamic configuration.
+useful for observing the behavior of pod scaler without disrupting any real
+deployment. This parameter sets the default value of dry run setting which can
+be overridden at runtime using dynamic configuration.
 
 </dd>
 <dt>dry_run_config_key</dt>
@@ -5957,6 +5993,59 @@ Periodically runs a Prometheus query in the background and emits the result.
 
 <!-- vale off -->
 
+### QuotaScheduler {#quota-scheduler}
+
+<!-- vale on -->
+
+Schedules the traffic based on token-bucket based quotas.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterIns](#rate-limiter-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>rate_limiter</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterParameters](#rate-limiter-parameters))
+
+<!-- vale on -->
+
+</dd>
+<dt>scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([Scheduler](#scheduler))
+
+<!-- vale on -->
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### RateLimiter {#rate-limiter}
 
 <!-- vale on -->
@@ -5970,34 +6059,10 @@ See also
 
 :::
 
-RateLimiting is done on per-label-value basis. Use `label_key` to select which
-label should be used as key.
+RateLimiting is done on per-label-value (`label_key`) basis and it uses the
+_Token Bucket Algorithm_.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([RateLimiterDynamicConfig](#rate-limiter-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -6040,31 +6105,6 @@ Selectors for the component.
 
 <!-- vale off -->
 
-### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for the rate limiter
-
-<dl>
-<dt>overrides</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]RateLimiterOverride](#rate-limiter-override))
-
-<!-- vale on -->
-
-Allows to specify different limits for particular label values.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### RateLimiterIns {#rate-limiter-ins}
 
 <!-- vale on -->
@@ -6072,7 +6112,7 @@ Allows to specify different limits for particular label values.
 Inputs for the RateLimiter component
 
 <dl>
-<dt>limit</dt>
+<dt>bucket_capacity</dt>
 <dd>
 
 <!-- vale off -->
@@ -6081,50 +6121,31 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Number of flows allowed per `limit_reset_interval` per each label. Negative
-values disable the rate limiter.
-
-:::tip
-
-Negative limit can be useful to _conditionally_ enable the rate limiter under
-certain circumstances. [Decider](#decider) might be helpful.
-
-:::
+Capacity of the bucket.
 
 </dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RateLimiterOverride {#rate-limiter-override}
-
-<!-- vale on -->
-
-<dl>
-<dt>label_value</dt>
+<dt>fill_amount</dt>
 <dd>
 
 <!-- vale off -->
 
-(string, **required**)
+([InPort](#in-port))
 
 <!-- vale on -->
 
-Value of the label for which the override should be applied.
+Number of tokens to fill within an `interval`.
 
 </dd>
-<dt>limit_scale_factor</dt>
+<dt>pass_through</dt>
 <dd>
 
 <!-- vale off -->
 
-(float64, default: `1`)
+([InPort](#in-port))
 
 <!-- vale on -->
 
-Amount by which the `in_ports.limit` should be multiplied for this label value.
+PassThrough port determines whether all requests
 
 </dd>
 </dl>
@@ -6138,7 +6159,20 @@ Amount by which the `in_ports.limit` should be multiplied for this label value.
 <!-- vale on -->
 
 <dl>
-<dt>label_key</dt>
+<dt>continuous_fill</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Continuous fill determines whether the token bucket should be filled
+continuously or only on discrete intervals.
+
+</dd>
+<dt>interval</dt>
 <dd>
 
 <!-- vale off -->
@@ -6147,12 +6181,26 @@ Amount by which the `in_ports.limit` should be multiplied for this label value.
 
 <!-- vale on -->
 
+Interval defines the time interval in which the token bucket will fill tokens
+specified by `fill_amount` signal.
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
 Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
 [label](/concepts/flow-control/flow-label.md) with given key. For example, to
 give each user a separate limit, assuming you have a _user_ flow label set up,
-set `label_key: "user"`.
+set `label_key: "user"`. If no label key is specified, then all requests
+matching the selectors will be rate limited based on the global bucket.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -6167,16 +6215,17 @@ set `label_key: "user"`.
 Configuration of lazy-syncing behavior of rate limiter
 
 </dd>
-<dt>limit_reset_interval</dt>
+<dt>max_idle_time</dt>
 <dd>
 
 <!-- vale off -->
 
-(string, default: `"60s"`)
+(string, default: `"7200s"`)
 
 <!-- vale on -->
 
-Time after which the limit for a given label value will be reset.
+Max idle time before token bucket state for a label is removed. If set to 0, the
+state is never removed.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -6221,11 +6270,11 @@ Enables lazy sync
 
 <!-- vale off -->
 
-(int64, minimum: `0`, default: `5`)
+(int64, minimum: `0`, default: `4`)
 
 <!-- vale on -->
 
-Number of times to lazy sync within the `limit_reset_interval`.
+Number of times to lazy sync within the `interval`.
 
 </dd>
 </dl>
@@ -6366,30 +6415,6 @@ See also
 :::
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([RegulatorDynamicConfig](#regulator-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for DynamicConfig.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -6414,20 +6439,7 @@ Input ports for the _Regulator_.
 Parameters for the _Regulator_.
 
 </dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RegulatorDynamicConfig {#regulator-dynamic-config}
-
-<!-- vale on -->
-
-Dynamic Configuration for _Regulator_
-
-<dl>
-<dt>enable_label_values</dt>
+<dt>pass_through_label_values</dt>
 <dd>
 
 <!-- vale off -->
@@ -6436,8 +6448,21 @@ Dynamic Configuration for _Regulator_
 
 <!-- vale on -->
 
-Specify certain label values to be accepted by this flow filter regardless of
-accept percentage.
+Specify certain label values to be always accepted by this _Regulator_
+regardless of accept percentage.
+
+</dd>
+<dt>pass_through_label_values_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting pass through label values through dynamic
+configuration.
 
 </dd>
 </dl>
@@ -7746,23 +7771,11 @@ Output signal.
 
 <!-- vale on -->
 
-Component that emits a variable value as an output signal, can be defined in
+Component that emits a constant signal which can be changed at runtime through
 dynamic configuration.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-<!-- vale off -->
-
-([VariableDynamicConfig](#variable-dynamic-config))
-
-<!-- vale on -->
-
-Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
+<dt>config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -7771,7 +7784,20 @@ Default configuration.
 
 <!-- vale on -->
 
-Configuration key for DynamicConfig.
+Configuration key for overriding value setting through dynamic configuration.
+
+</dd>
+<dt>constant_output</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConstantSignal](#constant-signal))
+
+<!-- vale on -->
+
+The constant signal emitted by this component. The value of the constant signal
+can be overridden at runtime through dynamic configuration.
 
 </dd>
 <dt>out_ports</dt>
@@ -7784,27 +7810,6 @@ Configuration key for DynamicConfig.
 <!-- vale on -->
 
 Output ports for the Variable component.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### VariableDynamicConfig {#variable-dynamic-config}
-
-<!-- vale on -->
-
-<dl>
-<dt>constant_signal</dt>
-<dd>
-
-<!-- vale off -->
-
-([ConstantSignal](#constant-signal))
-
-<!-- vale on -->
 
 </dd>
 </dl>

@@ -26,6 +26,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-logging:1.18.0")
     implementation("io.grpc:grpc-protobuf:1.44.0")
     implementation("io.grpc:grpc-stub:1.44.0")
+    implementation("org.apache.httpcomponents:httpcore:4.4.16")
     implementation("org.slf4j:slf4j-simple:1.7.0")
 
     runtimeOnly("io.grpc:grpc-netty-shaded:1.49.0")

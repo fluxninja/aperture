@@ -48,7 +48,7 @@ local dashboardWithPanels(dashboardParams, policyName) =
   local desiredScaleFrequency = signalFrequencyPanel('Desired Scale Validity (Frequency)', dsName, 'DESIRED_SCALE', policyName);
 
   dashboard.new(
-    title='Jsonnet / FluxNinja',
+    title='Aperture Auto-scale',
     editable=true,
     schemaVersion=18,
     refresh=dashboardParams.refresh_interval,

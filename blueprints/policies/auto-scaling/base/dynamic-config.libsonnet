@@ -1,3 +1,3 @@
 {
-  auto_scaling: '__REQUIRED_FIELD__',
+  dry_run: '__REQUIRED_FIELD__',
 }

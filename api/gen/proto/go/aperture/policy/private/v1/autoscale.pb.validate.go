@@ -86,10 +86,6 @@ func (m *PodScaleActuator) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DryRun
-
-	// no validation rules for DryRunConfigKey
-
 	// no validation rules for PodScalerComponentId
 
 	// no validation rules for AgentGroup

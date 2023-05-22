@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/flowcontrol.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message QuotaSchedulerWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // Quota Scheduler
+  policy.language.v1.QuotaScheduler quota_scheduler = 2;
+}

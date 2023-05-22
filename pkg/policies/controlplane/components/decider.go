@@ -25,7 +25,7 @@ const (
 // ComparisonOperator is the type of comparison operator.
 type ComparisonOperator int8
 
-//go:generate enumer -type=ComparisonOperator -output=decider-comparison-operator-string.go
+//go:generate enumer -type=ComparisonOperator -transform=lower -output=decider-comparison-operator-string.go
 const (
 	UnknownComparison ComparisonOperator = iota
 	GT

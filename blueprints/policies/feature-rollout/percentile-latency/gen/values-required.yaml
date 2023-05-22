@@ -48,3 +48,4 @@ policy:
   resources:
     flow_control:
       classifiers: []
+  rollout: false

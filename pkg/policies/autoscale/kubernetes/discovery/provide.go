@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"

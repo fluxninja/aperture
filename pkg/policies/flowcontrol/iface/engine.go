@@ -4,7 +4,7 @@ import (
 	"context"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 )
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
@@ -25,9 +25,9 @@ type Engine interface {
 
 	GetAgentInfo() *agentinfo.AgentInfo
 
-	RegisterLoadScheduler(ls LoadScheduler) error
-	UnregisterLoadScheduler(ls LoadScheduler) error
-	GetLoadScheduler(limiterID LimiterID) LoadScheduler
+	RegisterScheduler(ls Scheduler) error
+	UnregisterScheduler(ls Scheduler) error
+	GetScheduler(limiterID LimiterID) Scheduler
 
 	RegisterFluxMeter(fm FluxMeter) error
 	UnregisterFluxMeter(fm FluxMeter) error

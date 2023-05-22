@@ -15,7 +15,7 @@ import (
 // ArithmeticOperator is the type of arithmetic operation.
 type ArithmeticOperator int8
 
-//go:generate enumer -type=ArithmeticOperator -output=arithmetic-operator-string.go
+//go:generate enumer -type=ArithmeticOperator -transform=lower -output=arithmetic-operator-string.go
 const (
 	UnknownArithmetic ArithmeticOperator = iota
 	Add

@@ -25,9 +25,9 @@ header in the HTTP traffic. Envoy proxy provides this header under the label key
 `http.request.header.user_id` (see
 [Flow Labels](/concepts/flow-control/flow-label.md) for more information).
 
-This configuration limits each user to at most `120 requests` in a `60s` period
-using the rate limiter. Additionally, the rate limiter applies these limits to
-`ingress` traffic on the Kubernetes service
+This configuration limits each user to a burst of `40 requests` and `2 requests`
+every `1s` period using the rate limiter. Additionally, the rate limiter applies
+these limits to `ingress` traffic on the Kubernetes service
 `service1-demo-app.demoapp.svc.cluster.local`.
 
 ```mdx-code-block
@@ -73,8 +73,8 @@ for this policy.
 
 ### Playground
 
-When the policy above is loaded in the playground, no more than 120 requests are
-accepted in a 60-second period and the rest of the requests are rejected.
+When the policy above is loaded in the playground, no more than 2 requests per
+second period (after an initial burst of 40 requests) are accepted.
 
 <Zoom>
 

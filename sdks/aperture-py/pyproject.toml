@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aperture-sdk"
-version = "0.1.0"
+version = "2.1.0"
 description = "SDK to interact with the Aperture Agent"
 authors = ["FluxNinja <support@fluxninja.com>"]
 readme = "README.md"

@@ -74,8 +74,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 					PolicyHash:  "foo-hash",
 					ComponentId: "1",
 					Dropped:     true,
-					Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo_{
-						LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+					Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+						LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
 							WorkloadIndex: "0",
 						},
 					},

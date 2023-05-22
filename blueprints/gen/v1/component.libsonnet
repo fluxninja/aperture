@@ -25,6 +25,12 @@
   withAutoScaleMixin(auto_scale):: {
     auto_scale+: auto_scale,
   },
+  withBoolVariable(bool_variable):: {
+    bool_variable: bool_variable,
+  },
+  withBoolVariableMixin(bool_variable):: {
+    bool_variable+: bool_variable,
+  },
   withDecider(decider):: {
     decider: decider,
   },

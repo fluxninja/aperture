@@ -15,7 +15,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperture-controller/controller"
-	"github.com/fluxninja/aperture/v2/pkg/agentfunctions/agents"
+	"github.com/fluxninja/aperture/v2/pkg/agent-functions/agents"
 	"github.com/fluxninja/aperture/v2/pkg/cmd"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"

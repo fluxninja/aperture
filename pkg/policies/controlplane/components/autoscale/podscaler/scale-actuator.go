@@ -28,7 +28,6 @@ type ScaleActuator struct {
 	decisionsEtcdPath    string
 	agentGroupName       string
 	podScalerComponentID string
-	dryRun               bool
 }
 
 // Name implements runtime.Component.
@@ -59,7 +58,6 @@ func NewScaleActuatorAndOptions(
 		podScalerComponentID: podScalerComponentID,
 		decisionsEtcdPath:    decisionsEtcdPath,
 		scaleActuatorProto:   scaleActuatorProto,
-		dryRun:               scaleActuatorProto.GetDryRun(),
 	}
 
 	return sa, fx.Options(
@@ -107,10 +105,8 @@ func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToReading, tickInfo 
 	return nil, nil
 }
 
-// DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
+// DynamicConfigUpdate implements runtime.Component.DynamicConfigUpdate.
 func (sa *ScaleActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	key := sa.scaleActuatorProto.GetDryRunConfigKey()
-	sa.dryRun = config.GetBoolValue(unmarshaller, key, sa.scaleActuatorProto.GetDryRun())
 }
 
 func (sa *ScaleActuator) publishDefaultDecision() {
@@ -119,10 +115,6 @@ func (sa *ScaleActuator) publishDefaultDecision() {
 }
 
 func (sa *ScaleActuator) publishDecision(desiredReplicas float64) error {
-	if sa.dryRun {
-		sa.publishDefaultDecision()
-		return nil
-	}
 	logger := sa.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Save desired replicas in decision message
 	decision := &policysyncv1.ScaleDecision{

@@ -1,5 +1,5 @@
 ---
-title: GraphQL Query Static Rate Limiting
+title: GraphQL Query Rate Limiting
 keywords:
   - policies
   - ratelimit
@@ -15,7 +15,7 @@ import Zoom from 'react-medium-image-zoom';
 
 This tutorial demonstrates how to use the [_Classifier_][rego-rules] to
 implement
-[static rate limiting](/reference/policies/bundled-blueprints/policies/static-rate-limiting.md)
+[rate-limiting](/reference/policies/bundled-blueprints/policies/rate-limiting.md)
 for a GraphQL query.
 
 ## Policy
@@ -110,7 +110,7 @@ each `userID`.
 
 In this example, the traffic generator is configured to generate
 `50 requests/second` for 2-minutes. When loading the above policy in the
-playground, you can observe that it accepts no more than `10 requests/second` at
+playground, you can observe that it accepts no more than `2 requests/second` at
 any given time, and rejects the rest of the requests.
 
 <Zoom>

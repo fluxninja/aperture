@@ -12,7 +12,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	mm "github.com/fluxninja/aperture/v2/pkg/multimatcher"
+	mm "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 )

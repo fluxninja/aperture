@@ -354,7 +354,7 @@ case, the latest images will be pulled from DockerHub and used instead.
 rate_limiting_escalation
 ├── dashboards
 │  └── main.jsonnet
-├── load_generator
+├── load-generator
 │  └── test.js
 ├── metadata.json
 └── policies
@@ -370,7 +370,7 @@ load generator configuration:
   `Tiltfile`, for examples of how to prepare this file.
 - `policies/service1-demo-app.yaml` is a values.yaml file for the given policy
   listed in `metadata.json` under `aperture_policies` key.
-- `load_generator/test.js` is configuration for the K6 load generator.
+- `load-generator/test.js` is configuration for the K6 load generator.
 
 ## FAQs
 

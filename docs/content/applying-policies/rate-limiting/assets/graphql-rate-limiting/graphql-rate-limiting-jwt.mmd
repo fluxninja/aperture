@@ -2,8 +2,11 @@ flowchart LR
 subgraph root.0[<center>RateLimiter<br/>1 selectors</center>]
 subgraph root.0_inports[ ]
 style root.0_inports fill:none,stroke:none
-root.0limit[limit]
+root.0bucket_capacity[bucket_capacity]
+root.0fill_amount[fill_amount]
 end
 end
-root.0_limit_FakeConstantout((10.00))
-root.0_limit_FakeConstantout --> root.0limit
+root.0_bucket_capacity_FakeConstantout((40.00))
+root.0_fill_amount_FakeConstantout((2.00))
+root.0_bucket_capacity_FakeConstantout --> root.0bucket_capacity
+root.0_fill_amount_FakeConstantout --> root.0fill_amount

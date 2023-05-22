@@ -41,7 +41,7 @@ var ApplyPolicyCmd = &cobra.Command{
 	Short:         "Apply Aperture Policy to the cluster",
 	Long:          `Use this command to apply the Aperture Policy to the cluster.`,
 	SilenceErrors: true,
-	Example: `aperturectl apply policy --file=policies/static-rate-limiting.yaml
+	Example: `aperturectl apply policy --file=policies/rate-limiting.yaml
 
 aperturectl apply policy --dir=policies`,
 	RunE: func(_ *cobra.Command, _ []string) error {
