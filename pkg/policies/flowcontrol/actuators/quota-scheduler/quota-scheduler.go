@@ -175,6 +175,8 @@ func (qsFactory *quotaSchedulerFactory) newQuotaSchedulerOptions(
 	}
 
 	qsProto := wrapperMessage.QuotaScheduler
+	qsProto.Scheduler = workloadscheduler.SanitizeSchedulerProto(qsProto.Scheduler)
+
 	qs := &quotaScheduler{
 		Component: wrapperMessage.GetCommonAttributes(),
 		proto:     qsProto,

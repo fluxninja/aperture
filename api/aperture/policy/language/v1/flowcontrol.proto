@@ -54,7 +54,7 @@ message QuotaScheduler {
 
   RateLimiter.Parameters parameters = 2; // @gotags: validate:"required"
 
-  Scheduler scheduler = 3; // @gotags: validate:"required"
+  Scheduler scheduler = 3;
 
   repeated Selector selectors = 4; // @gotags: validate:"required,gt=0,dive"
 }

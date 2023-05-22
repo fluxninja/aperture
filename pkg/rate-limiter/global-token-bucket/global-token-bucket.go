@@ -123,7 +123,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, fl
 
 	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Error().Err(err).Msg("error taking from token bucket")
+		log.Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0
 	}
 
@@ -162,7 +162,7 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 
 	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Errorf("error taking from token bucket: %v", err)
+		log.Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0, 0
 	}
 
