@@ -5,23 +5,23 @@ local gradientcontrollerouts = import './gradientcontrollerouts.libsonnet';
   },
   inPorts:: gradientcontrollerins,
   outPorts:: gradientcontrollerouts,
-  withDefaultConfig(default_config):: {
-    default_config: default_config,
-  },
-  withDefaultConfigMixin(default_config):: {
-    default_config+: default_config,
-  },
-  withDynamicConfigKey(dynamic_config_key):: {
-    dynamic_config_key: dynamic_config_key,
-  },
-  withDynamicConfigKeyMixin(dynamic_config_key):: {
-    dynamic_config_key+: dynamic_config_key,
-  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
+  },
+  withManualMode(manual_mode):: {
+    manual_mode: manual_mode,
+  },
+  withManualModeMixin(manual_mode):: {
+    manual_mode+: manual_mode,
+  },
+  withManualModeConfigKey(manual_mode_config_key):: {
+    manual_mode_config_key: manual_mode_config_key,
+  },
+  withManualModeConfigKeyMixin(manual_mode_config_key):: {
+    manual_mode_config_key+: manual_mode_config_key,
   },
   withOutPorts(out_ports):: {
     out_ports: out_ports,

@@ -69,12 +69,9 @@ policy:
       # Type: string
       # Required: True
       max_replicas: __REQUIRED_FIELD__
-    # Dry run mode ensures that no scaling is invoked by this auto scaler.
+    # Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.
     # Type: bool
     dry_run: false
-    # Configuration key for overriding dry run setting through dynamic configuration.
-    # Type: string
-    dry_run_config_key: "auto_scaling"
     # Parameters that define the scaling behavior.
     # Type: aperture.spec.v1.AutoScalerScalingParameters
     # Required: True

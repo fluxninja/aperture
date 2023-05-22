@@ -11,13 +11,9 @@ message PodScaleActuator {
 
   Ins in_ports = 1;
 
-  bool dry_run = 2;
+  string pod_scaler_component_id = 2;
 
-  string dry_run_config_key = 3;
-
-  string pod_scaler_component_id = 4;
-
-  string agent_group = 5;
+  string agent_group = 3;
 }
 
 message PodScaleReporter {

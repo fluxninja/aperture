@@ -14,9 +14,7 @@ function(cfg) {
   local params = config + cfg,
   local policyDef =
     policy.new()
-    + policy.withResources(resources.new()
-                           + resources.withFlowControl(flowControlResources.new()
-                                                       + flowControlResources.withClassifiers(params.policy.classifiers)))
+    + policy.withResources(params.policy.resources)
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')

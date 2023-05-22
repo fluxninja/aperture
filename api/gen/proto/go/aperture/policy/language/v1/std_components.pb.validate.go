@@ -144,36 +144,9 @@ func (m *GradientController) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DynamicConfigKey
+	// no validation rules for ManualMode
 
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GradientControllerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GradientControllerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GradientControllerValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for ManualModeConfigKey
 
 	if len(errors) > 0 {
 		return GradientControllerMultiError(errors)
@@ -1211,14 +1184,12 @@ func (m *Variable) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DynamicConfigKey
-
 	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		switch v := interface{}(m.GetConstantOutput()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, VariableValidationError{
-					field:  "DefaultConfig",
+					field:  "ConstantOutput",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -1226,21 +1197,23 @@ func (m *Variable) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, VariableValidationError{
-					field:  "DefaultConfig",
+					field:  "ConstantOutput",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetConstantOutput()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return VariableValidationError{
-				field:  "DefaultConfig",
+				field:  "ConstantOutput",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
+
+	// no validation rules for ConfigKey
 
 	if len(errors) > 0 {
 		return VariableMultiError(errors)
@@ -1318,6 +1291,138 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = VariableValidationError{}
+
+// Validate checks the field values on BoolVariable with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *BoolVariable) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BoolVariable with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in BoolVariableMultiError, or
+// nil if none found.
+func (m *BoolVariable) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BoolVariable) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BoolVariableValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BoolVariableValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BoolVariableValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ConstantOutput
+
+	// no validation rules for ConfigKey
+
+	if len(errors) > 0 {
+		return BoolVariableMultiError(errors)
+	}
+
+	return nil
+}
+
+// BoolVariableMultiError is an error wrapping multiple validation errors
+// returned by BoolVariable.ValidateAll() if the designated constraints aren't met.
+type BoolVariableMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BoolVariableMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BoolVariableMultiError) AllErrors() []error { return m }
+
+// BoolVariableValidationError is the validation error returned by
+// BoolVariable.Validate if the designated constraints aren't met.
+type BoolVariableValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BoolVariableValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BoolVariableValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BoolVariableValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BoolVariableValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BoolVariableValidationError) ErrorName() string { return "BoolVariableValidationError" }
+
+// Error satisfies the builtin error interface
+func (e BoolVariableValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBoolVariable.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BoolVariableValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BoolVariableValidationError{}
 
 // Validate checks the field values on UnaryOperator with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -4039,113 +4144,6 @@ var _ interface {
 	ErrorName() string
 } = GradientController_ParametersValidationError{}
 
-// Validate checks the field values on GradientController_DynamicConfig with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the first error encountered is returned, or nil if there are
-// no violations.
-func (m *GradientController_DynamicConfig) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GradientController_DynamicConfig with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// GradientController_DynamicConfigMultiError, or nil if none found.
-func (m *GradientController_DynamicConfig) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GradientController_DynamicConfig) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for ManualMode
-
-	if len(errors) > 0 {
-		return GradientController_DynamicConfigMultiError(errors)
-	}
-
-	return nil
-}
-
-// GradientController_DynamicConfigMultiError is an error wrapping multiple
-// validation errors returned by
-// GradientController_DynamicConfig.ValidateAll() if the designated
-// constraints aren't met.
-type GradientController_DynamicConfigMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GradientController_DynamicConfigMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GradientController_DynamicConfigMultiError) AllErrors() []error { return m }
-
-// GradientController_DynamicConfigValidationError is the validation error
-// returned by GradientController_DynamicConfig.Validate if the designated
-// constraints aren't met.
-type GradientController_DynamicConfigValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GradientController_DynamicConfigValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GradientController_DynamicConfigValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GradientController_DynamicConfigValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GradientController_DynamicConfigValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GradientController_DynamicConfigValidationError) ErrorName() string {
-	return "GradientController_DynamicConfigValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GradientController_DynamicConfigValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGradientController_DynamicConfig.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GradientController_DynamicConfigValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GradientController_DynamicConfigValidationError{}
-
 // Validate checks the field values on GradientController_Ins with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -4220,35 +4218,6 @@ func (m *GradientController_Ins) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return GradientController_InsValidationError{
 				field:  "Setpoint",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOptimize()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GradientController_InsValidationError{
-					field:  "Optimize",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GradientController_InsValidationError{
-					field:  "Optimize",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOptimize()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GradientController_InsValidationError{
-				field:  "Optimize",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -6307,137 +6276,6 @@ var _ interface {
 	ErrorName() string
 } = Switcher_OutsValidationError{}
 
-// Validate checks the field values on Variable_DynamicConfig with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *Variable_DynamicConfig) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Variable_DynamicConfig with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// Variable_DynamicConfigMultiError, or nil if none found.
-func (m *Variable_DynamicConfig) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Variable_DynamicConfig) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetConstantSignal()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Variable_DynamicConfigValidationError{
-					field:  "ConstantSignal",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, Variable_DynamicConfigValidationError{
-					field:  "ConstantSignal",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetConstantSignal()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Variable_DynamicConfigValidationError{
-				field:  "ConstantSignal",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return Variable_DynamicConfigMultiError(errors)
-	}
-
-	return nil
-}
-
-// Variable_DynamicConfigMultiError is an error wrapping multiple validation
-// errors returned by Variable_DynamicConfig.ValidateAll() if the designated
-// constraints aren't met.
-type Variable_DynamicConfigMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m Variable_DynamicConfigMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m Variable_DynamicConfigMultiError) AllErrors() []error { return m }
-
-// Variable_DynamicConfigValidationError is the validation error returned by
-// Variable_DynamicConfig.Validate if the designated constraints aren't met.
-type Variable_DynamicConfigValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e Variable_DynamicConfigValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e Variable_DynamicConfigValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e Variable_DynamicConfigValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e Variable_DynamicConfigValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e Variable_DynamicConfigValidationError) ErrorName() string {
-	return "Variable_DynamicConfigValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e Variable_DynamicConfigValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sVariable_DynamicConfig.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = Variable_DynamicConfigValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = Variable_DynamicConfigValidationError{}
-
 // Validate checks the field values on Variable_Outs with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -6566,6 +6404,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Variable_OutsValidationError{}
+
+// Validate checks the field values on BoolVariable_Outs with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *BoolVariable_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BoolVariable_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BoolVariable_OutsMultiError, or nil if none found.
+func (m *BoolVariable_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BoolVariable_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BoolVariable_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BoolVariable_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BoolVariable_OutsValidationError{
+				field:  "Output",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return BoolVariable_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// BoolVariable_OutsMultiError is an error wrapping multiple validation errors
+// returned by BoolVariable_Outs.ValidateAll() if the designated constraints
+// aren't met.
+type BoolVariable_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BoolVariable_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BoolVariable_OutsMultiError) AllErrors() []error { return m }
+
+// BoolVariable_OutsValidationError is the validation error returned by
+// BoolVariable_Outs.Validate if the designated constraints aren't met.
+type BoolVariable_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BoolVariable_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BoolVariable_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BoolVariable_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BoolVariable_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BoolVariable_OutsValidationError) ErrorName() string {
+	return "BoolVariable_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BoolVariable_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBoolVariable_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BoolVariable_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BoolVariable_OutsValidationError{}
 
 // Validate checks the field values on UnaryOperator_Ins with the rules defined
 // in the proto definition for this message. If any rules are violated, the

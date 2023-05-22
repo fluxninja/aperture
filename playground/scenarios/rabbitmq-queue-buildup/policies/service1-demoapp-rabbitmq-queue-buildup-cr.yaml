@@ -9,9 +9,8 @@ spec:
     components:
     - flow_control:
         adaptive_load_scheduler:
-          default_config:
-            dry_run: false
-          dynamic_config_key: load_scheduler
+          dry_run: false
+          dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
               constant_signal:
@@ -47,9 +46,8 @@ spec:
               signal_name: SIGNAL
           query_string: sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})
     - variable:
-        default_config:
-          constant_signal:
-            value: 1000
+        constant_output:
+          value: 1000
         out_ports:
           output:
             signal_name: SETPOINT

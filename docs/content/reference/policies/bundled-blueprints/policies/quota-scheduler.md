@@ -53,14 +53,28 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale off -->
 
-<a id="policy-classifiers"></a>
+<a id="policy-components"></a>
 
 <ParameterDescription
-    name='policy.classifiers'
-    description='List of classification rules.'
-    type='Array of Object (aperture.spec.v1.Classifier)'
-    reference='../../spec#classifier'
+    name='policy.components'
+    description='List of additional circuit components.'
+    type='Array of Object (aperture.spec.v1.Component)'
+    reference='../../spec#component'
     value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-resources"></a>
+
+<ParameterDescription
+    name='policy.resources'
+    description='Additional resources.'
+    type='Object (aperture.spec.v1.Resources)'
+    reference='../../spec#resources'
+    value='{"flow_control": {"classifiers": []}}'
 />
 
 <!-- vale on -->
@@ -115,11 +129,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale off -->
 
-<a id="policy-quota-scheduler-parameters"></a>
+<a id="policy-quota-scheduler-rate-limiter"></a>
 
 <ParameterDescription
-    name='policy.quota_scheduler.parameters'
-    description='Parameters.'
+    name='policy.quota_scheduler.rate_limiter'
+    description='Rate Limiter Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../spec#rate-limiter-parameters'
     value='{"interval": "__REQUIRED_FIELD__", "label_key": ""}'

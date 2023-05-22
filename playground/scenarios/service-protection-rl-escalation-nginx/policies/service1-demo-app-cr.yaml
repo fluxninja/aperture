@@ -9,9 +9,8 @@ spec:
     components:
     - flow_control:
         adaptive_load_scheduler:
-          default_config:
-            dry_run: false
-          dynamic_config_key: load_scheduler
+          dry_run: false
+          dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
               constant_signal:
@@ -47,8 +46,7 @@ spec:
                   parameters:
                     priority: 200
               selectors:
-              - control_point: ingress
-                service: service1-demo-app.demoapp.svc.cluster.local
+              - control_point: service1-demo-app
             max_load_multiplier: 2
     - decider:
         in_ports:
@@ -85,15 +83,11 @@ spec:
           parameters:
             interval: 1s
             label_key: http.request.header.user_id
-            lazy_sync:
-              enabled: true
-              num_sync: 4
           selectors:
-          - control_point: ingress
+          - control_point: service1-demo-app
             label_matcher:
               match_labels:
                 http.request.header.user_type: crawler
-            service: service1-demo-app.demoapp.svc.cluster.local
     - query:
         promql:
           evaluation_interval: 1s
@@ -146,10 +140,8 @@ spec:
             extractor:
               from: request.http.headers.user-type
         selectors:
-        - control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+        - control_point: service1-demo-app
       flux_meters:
         service1-demo-app:
           selectors:
-          - control_point: ingress
-            service: service3-demo-app.demoapp.svc.cluster.local
+          - control_point: service3-demo-app

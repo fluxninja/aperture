@@ -56,10 +56,10 @@ func ParseAdaptiveLoadScheduler(
 		}
 	}
 
-	isOverloadDeciderOperator := "gt"
+	overloadDeciderOperator := components.GT.String()
 	// if slope is greater than 0 then we want to use less than operator
 	if adaptiveLoadScheduler.Parameters.Gradient.Slope > 0 {
-		isOverloadDeciderOperator = "lt"
+		overloadDeciderOperator = components.LT.String()
 	}
 
 	alerterLabels := adaptiveLoadScheduler.Parameters.Alerter.Labels
@@ -76,70 +76,6 @@ func ParseAdaptiveLoadScheduler(
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
-				Component: &policylangv1.Component_GradientController{
-					GradientController: &policylangv1.GradientController{
-						Parameters: adaptiveLoadScheduler.Parameters.Gradient,
-						InPorts: &policylangv1.GradientController_Ins{
-							ControlVariable: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "OBSERVED_LOAD_MULTIPLIER",
-								},
-							},
-							Max: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_Value{
-											Value: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
-										},
-									},
-								},
-							},
-							Optimize: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER_INCREMENT",
-								},
-							},
-							Setpoint: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SETPOINT",
-								},
-							},
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SIGNAL",
-								},
-							},
-						},
-						OutPorts: &policylangv1.GradientController_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "CONTROLLER_ADJUSTED_LOAD_MULTIPLIER",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Extrapolator{
-					Extrapolator: &policylangv1.Extrapolator{
-						Parameters: &policylangv1.Extrapolator_Parameters{
-							MaxExtrapolationInterval: durationpb.New(time.Second * 5),
-						},
-						InPorts: &policylangv1.Extrapolator_Ins{
-							Input: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "CONTROLLER_ADJUSTED_LOAD_MULTIPLIER",
-								},
-							},
-						},
-						OutPorts: &policylangv1.Extrapolator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "DESIRED_LOAD_MULTIPLIER",
-							},
-						},
-					},
-				},
-			},
-			{
 				Component: &policylangv1.Component_FirstValid{
 					FirstValid: &policylangv1.FirstValid{
 						InPorts: &policylangv1.FirstValid_Ins{
@@ -153,7 +89,7 @@ func ParseAdaptiveLoadScheduler(
 									Value: &policylangv1.InPort_ConstantSignal{
 										ConstantSignal: &policylangv1.ConstantSignal{
 											Const: &policylangv1.ConstantSignal_Value{
-												Value: 1, // OVERLOAD_CONFIRMATION is true by default
+												Value: 1, // Overload confirmation is assumed true by default. This makes the same circuit work in case overload confirmation is not provided. If the required behavior is to assume false by default then the policy needs to make sure to provide a valid signal with desired defaults.
 											},
 										},
 									},
@@ -171,107 +107,7 @@ func ParseAdaptiveLoadScheduler(
 			{
 				Component: &policylangv1.Component_Decider{
 					Decider: &policylangv1.Decider{
-						Operator: "gte",
-						InPorts: &policylangv1.Decider_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_LOAD_MULTIPLIER",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_Value{
-											Value: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
-										},
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.Decider_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "PASS_THROUGH",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_FlowControl{
-					FlowControl: &policylangv1.FlowControl{
-						Component: &policylangv1.FlowControl_LoadScheduler{
-							LoadScheduler: &policylangv1.LoadScheduler{
-								InPorts: &policylangv1.LoadScheduler_Ins{
-									LoadMultiplier: &policylangv1.InPort{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: "DESIRED_LOAD_MULTIPLIER",
-										},
-									},
-									PassThrough: &policylangv1.InPort{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: "PASS_THROUGH",
-										},
-									},
-								},
-								OutPorts: &policylangv1.LoadScheduler_Outs{
-									ObservedLoadMultiplier: &policylangv1.OutPort{
-										SignalName: "OBSERVED_LOAD_MULTIPLIER",
-									},
-								},
-								DynamicConfigKey: adaptiveLoadScheduler.DynamicConfigKey,
-								DefaultConfig:    adaptiveLoadScheduler.DefaultConfig,
-								Parameters:       adaptiveLoadScheduler.Parameters.LoadScheduler,
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Decider{
-					Decider: &policylangv1.Decider{
-						InPorts: &policylangv1.Decider_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_LOAD_MULTIPLIER",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_Value{
-											Value: 1,
-										},
-									},
-								},
-							},
-						},
-						Operator: "lt",
-						OutPorts: &policylangv1.Decider_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "LOAD_MULTIPLIER_ALERT",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Alerter{
-					Alerter: &policylangv1.Alerter{
-						Parameters: adaptiveLoadScheduler.Parameters.Alerter,
-						InPorts: &policylangv1.Alerter_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER_ALERT",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Decider{
-					Decider: &policylangv1.Decider{
-						Operator: isOverloadDeciderOperator,
+						Operator: overloadDeciderOperator,
 						TrueFor:  durationpb.New(0),
 						FalseFor: durationpb.New(0),
 						InPorts: &policylangv1.Decider_Ins{
@@ -320,6 +156,56 @@ func ParseAdaptiveLoadScheduler(
 				},
 			},
 			{
+				Component: &policylangv1.Component_GradientController{
+					GradientController: &policylangv1.GradientController{
+						Parameters: adaptiveLoadScheduler.Parameters.Gradient,
+						InPorts: &policylangv1.GradientController_Ins{
+							ControlVariable: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "OBSERVED_LOAD_MULTIPLIER",
+								},
+							},
+							Setpoint: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "SETPOINT",
+								},
+							},
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "SIGNAL",
+								},
+							},
+						},
+						OutPorts: &policylangv1.GradientController_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "CONTROLLER_ADJUSTED_LOAD_MULTIPLIER",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Extrapolator{
+					Extrapolator: &policylangv1.Extrapolator{
+						Parameters: &policylangv1.Extrapolator_Parameters{
+							MaxExtrapolationInterval: durationpb.New(time.Second * 5),
+						},
+						InPorts: &policylangv1.Extrapolator_Ins{
+							Input: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "CONTROLLER_ADJUSTED_LOAD_MULTIPLIER",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Extrapolator_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_IF_OVERLOAD",
+							},
+						},
+					},
+				},
+			},
+			{
 				Component: &policylangv1.Component_Integrator{
 					Integrator: &policylangv1.Integrator{
 						InitialValue: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
@@ -350,7 +236,186 @@ func ParseAdaptiveLoadScheduler(
 						},
 						OutPorts: &policylangv1.Integrator_Outs{
 							Output: &policylangv1.OutPort{
-								SignalName: "LOAD_MULTIPLIER_INCREMENT",
+								SignalName: "LOAD_MULTIPLIER_OPTIMIZATION",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_ArithmeticCombinator{
+					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
+						Operator: components.Add.String(),
+						InPorts: &policylangv1.ArithmeticCombinator_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "OBSERVED_LOAD_MULTIPLIER",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_OPTIMIZATION",
+								},
+							},
+						},
+						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_IF_NORMAL",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Switcher{
+					Switcher: &policylangv1.Switcher{
+						InPorts: &policylangv1.Switcher_Ins{
+							Switch: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "IS_OVERLOAD",
+								},
+							},
+							OnSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_IF_OVERLOAD",
+								},
+							},
+							OffSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_IF_NORMAL",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Switcher_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_MUX",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						Operator: components.GTE.String(),
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_MUX",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
+										},
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "PASS_THROUGH",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Switcher{
+					Switcher: &policylangv1.Switcher{
+						InPorts: &policylangv1.Switcher_Ins{
+							Switch: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "PASS_THROUGH",
+								},
+							},
+							OnSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_SpecialValue{
+											SpecialValue: "NaN",
+										},
+									},
+								},
+							},
+							OffSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_MUX",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Switcher_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "DESIRED_LOAD_MULTIPLIER",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_FlowControl{
+					FlowControl: &policylangv1.FlowControl{
+						Component: &policylangv1.FlowControl_LoadScheduler{
+							LoadScheduler: &policylangv1.LoadScheduler{
+								InPorts: &policylangv1.LoadScheduler_Ins{
+									LoadMultiplier: &policylangv1.InPort{
+										Value: &policylangv1.InPort_SignalName{
+											SignalName: "DESIRED_LOAD_MULTIPLIER",
+										},
+									},
+								},
+								OutPorts: &policylangv1.LoadScheduler_Outs{
+									ObservedLoadMultiplier: &policylangv1.OutPort{
+										SignalName: "OBSERVED_LOAD_MULTIPLIER",
+									},
+								},
+								DryRunConfigKey: adaptiveLoadScheduler.DryRunConfigKey,
+								DryRun:          adaptiveLoadScheduler.DryRun,
+								Parameters:      adaptiveLoadScheduler.Parameters.LoadScheduler,
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_LOAD_MULTIPLIER",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: 1,
+										},
+									},
+								},
+							},
+						},
+						Operator: components.LT.String(),
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_ALERT",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Alerter{
+					Alerter: &policylangv1.Alerter{
+						Parameters: adaptiveLoadScheduler.Parameters.Alerter,
+						InPorts: &policylangv1.Alerter_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_ALERT",
+								},
 							},
 						},
 					},

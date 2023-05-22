@@ -5,14 +5,17 @@
 policy:
   policy_name: quota-scheduler
   quota_scheduler:
-    bucket_capacity: 25
+    bucket_capacity: 500
     fill_amount: 25
     selectors:
       - service: service1-demo-app.demoapp.svc.cluster.local
         control_point: ingress
-    parameters:
+    rate_limiter:
       label_key: http.request.header.api_key
       interval: 1s
+      lazy_sync:
+        enabled: false
+        num_sync: 4
     scheduler:
       workloads:
         - label_matcher:

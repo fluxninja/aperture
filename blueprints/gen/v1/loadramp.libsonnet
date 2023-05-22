@@ -5,18 +5,6 @@ local loadrampouts = import './loadrampouts.libsonnet';
   },
   inPorts:: loadrampins,
   outPorts:: loadrampouts,
-  withDefaultConfig(default_config):: {
-    default_config: default_config,
-  },
-  withDefaultConfigMixin(default_config):: {
-    default_config+: default_config,
-  },
-  withDynamicConfigKey(dynamic_config_key):: {
-    dynamic_config_key: dynamic_config_key,
-  },
-  withDynamicConfigKeyMixin(dynamic_config_key):: {
-    dynamic_config_key+: dynamic_config_key,
-  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
@@ -34,5 +22,20 @@ local loadrampouts = import './loadrampouts.libsonnet';
   },
   withParametersMixin(parameters):: {
     parameters+: parameters,
+  },
+  withPassThroughLabelValues(pass_through_label_values):: {
+    pass_through_label_values:
+      if std.isArray(pass_through_label_values)
+      then pass_through_label_values
+      else [pass_through_label_values],
+  },
+  withPassThroughLabelValuesMixin(pass_through_label_values):: {
+    pass_through_label_values+: pass_through_label_values,
+  },
+  withPassThroughLabelValuesConfigKey(pass_through_label_values_config_key):: {
+    pass_through_label_values_config_key: pass_through_label_values_config_key,
+  },
+  withPassThroughLabelValuesConfigKeyMixin(pass_through_label_values_config_key):: {
+    pass_through_label_values_config_key+: pass_through_label_values_config_key,
   },
 }

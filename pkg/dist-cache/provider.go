@@ -6,24 +6,21 @@ import (
 	stdlog "log"
 	"net"
 	"strconv"
-	"sync"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
-	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/protobuf/proto"
 
+	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	dcconfig "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/peers"
@@ -40,86 +37,9 @@ const (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(DistCacheConstructor{ConfigKey: defaultKey}.ProvideDistCache),
-		fx.Provide(RegisterDistCacheService),
 		grpcgateway.RegisterHandler{Handler: distcachev1.RegisterDistCacheServiceHandlerFromEndpoint}.Annotate(),
-		fx.Invoke(Register),
+		fx.Invoke(RegisterDistCacheService),
 	)
-}
-
-// DistCache is a peer to peer distributed cache.
-type DistCache struct {
-	sync.Mutex
-	Config  *olricconfig.Config
-	Olric   *olric.Olric
-	Metrics *DistCacheMetrics
-}
-
-// AddDMapCustomConfig adds a named DMap config into DistCache's config.
-// If a custom config with the name does not exist, it is added. If it already exists, it is overwritten.
-func (dc *DistCache) AddDMapCustomConfig(name string, dmapConfig olricconfig.DMap) {
-	dc.Config.DMaps.Custom[name] = dmapConfig
-}
-
-// RemoveDMapCustomConfig removes a named DMap config from DistCache's config.
-func (dc *DistCache) RemoveDMapCustomConfig(name string) {
-	delete(dc.Config.DMaps.Custom, name)
-}
-
-func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
-	stats, err := dc.Olric.Stats()
-	if err != nil {
-		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
-		return nil, err
-	}
-
-	memberID := stats.Member.ID
-	memberName := stats.Member.Name
-	metricLabels := make(prometheus.Labels)
-	metricLabels[metrics.DistCacheMemberIDLabel] = strconv.FormatUint(memberID, 10)
-	metricLabels[metrics.DistCacheMemberNameLabel] = memberName
-
-	entriesTotalGauge, err := dc.Metrics.EntriesTotal.GetMetricWith(metricLabels)
-	if err != nil {
-		log.Debug().Msgf("Could not extract entries total gauge metric from olric instance: %v", err)
-	} else {
-		entriesTotalGauge.Set(float64(stats.DMaps.EntriesTotal))
-	}
-
-	deleteHitsGauge, err := dc.Metrics.DeleteHits.GetMetricWith(metricLabels)
-	if err != nil {
-		log.Debug().Msgf("Could not extract delete hits gauge metric from olric instance: %v", err)
-	} else {
-		deleteHitsGauge.Set(float64(stats.DMaps.DeleteHits))
-	}
-
-	deleteMissesGauge, err := dc.Metrics.DeleteMisses.GetMetricWith(metricLabels)
-	if err != nil {
-		log.Debug().Msgf("Could not extract delete misses gauge metric from olric instance: %v", err)
-	} else {
-		deleteMissesGauge.Set(float64(stats.DMaps.DeleteMisses))
-	}
-
-	getMissesGauge, err := dc.Metrics.GetMisses.GetMetricWith(metricLabels)
-	if err != nil {
-		log.Debug().Msgf("Could not extract get misses gauge metric from olric instance: %v", err)
-	} else {
-		getMissesGauge.Set(float64(stats.DMaps.GetMisses))
-	}
-
-	getHitsGauge, err := dc.Metrics.GetHits.GetMetricWith(metricLabels)
-	if err != nil {
-		log.Debug().Msgf("Could not extract get hits gauge metric from olric instance: %v", err)
-	} else {
-		getHitsGauge.Set(float64(stats.DMaps.GetHits))
-	}
-
-	evictedTotalGauge, err := dc.Metrics.EvictedTotal.GetMetricWith(metricLabels)
-	if err != nil {
-		log.Debug().Msgf("Could not extract evicted total gauge metric from olric instance: %v", err)
-	} else {
-		evictedTotalGauge.Set(float64(stats.DMaps.EvictedTotal))
-	}
-	return nil, nil
 }
 
 // DistCacheConstructorIn holds parameters of ProvideDistCache.
@@ -151,11 +71,6 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	memberlistEnv := "lan"
 	oc := olricconfig.New(memberlistEnv)
-	oc.ServiceDiscovery = map[string]interface{}{
-		"plugin": &ServiceDiscovery{
-			discovery: in.PeerDiscovery,
-		},
-	}
 	oc.ReplicaCount = defaultConfig.ReplicaCount
 	oc.WriteQuorum = 1
 	oc.ReadQuorum = 1
@@ -201,8 +116,12 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		oc.MemberlistConfig.AdvertisePort = advertisePort
 		memberlistAddr = defaultConfig.MemberlistAdvertiseAddr
 	}
-
-	in.PeerDiscovery.RegisterService(olricMemberlistServiceName, memberlistAddr)
+	oc.ServiceDiscovery = map[string]interface{}{
+		"plugin": &ServiceDiscovery{
+			discovery: in.PeerDiscovery,
+			addr:      memberlistAddr,
+		},
+	}
 
 	startChan := make(chan struct{})
 	oc.Started = func() {
@@ -215,24 +134,20 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		return nil, err
 	}
 
-	dc := &DistCache{
-		Config:  oc,
-		Olric:   o,
-		Metrics: newDistCacheMetrics(),
-	}
+	dc := NewDistCache(oc, o, newDistCacheMetrics(), in.Shutdowner)
 
 	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			// Register metrics with Prometheus.
-			err := dc.Metrics.registerMetrics(in.PrometheusRegistry)
+			err := dc.metrics.registerMetrics(in.PrometheusRegistry)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to register distcache metrics with Prometheus registry")
 				return err
 			}
 
 			panichandler.Go(func() {
-				startErr := dc.Olric.Start()
+				startErr := dc.olric.Start()
 				if startErr != nil {
 					log.Error().Err(startErr).Msg("Failed to start distcache")
 				}
@@ -244,6 +159,12 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				return errors.New("olric failed to start")
 			case <-startChan:
 			}
+			_, err = dc.olric.Stats()
+			if err != nil {
+				return err
+			}
+
+			log.Info().Msg("DistCache started")
 
 			err = in.LivenessMultiJob.RegisterJob(job)
 			if err != nil {
@@ -259,13 +180,13 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				return err
 			}
 
-			err = dc.Olric.Shutdown(ctx)
+			err = dc.olric.Shutdown(ctx)
 			if err != nil {
 				return err
 			}
 
 			// Unregister metrics with Prometheus.
-			err = dc.Metrics.unregisterMetrics(in.PrometheusRegistry)
+			err = dc.metrics.unregisterMetrics(in.PrometheusRegistry)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to unregister distcache metrics with Prometheus registry")
 				return err
@@ -277,8 +198,8 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	return dc, nil
 }
 
-// Register registers the handler on grpc.Server.
-func Register(handler *DistCacheService,
+// RegisterDistCacheService registers the handler on grpc.Server.
+func RegisterDistCacheService(handler *DistCache,
 	server *grpc.Server,
 	healthsrv *health.Server,
 ) error {

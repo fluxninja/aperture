@@ -3,7 +3,6 @@ package controller
 import (
 	"math"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -20,14 +19,14 @@ type ControllerComponent struct {
 	// Control variable's last reading
 	controlVariable runtime.Reading
 	// Controller output's last reading
-	output           runtime.Reading
-	policyReadAPI    iface.Policy
-	defaultConfig    *policylangv1.GradientController_DynamicConfig
-	dynamicConfigKey string
-	componentName    string
-	shortDescription string
-	componentID      string
-	manualMode       bool
+	output            runtime.Reading
+	policyReadAPI     iface.Policy
+	dynamicConfigKey  string
+	componentName     string
+	shortDescription  string
+	componentID       string
+	defaultManualMode bool
+	manualMode        bool
 }
 
 // NewControllerComponent creates a new ControllerComponent.
@@ -38,22 +37,22 @@ func NewControllerComponent(
 	componentID string,
 	policyReadAPI iface.Policy,
 	dynamicConfigKey string,
-	defaultConfig *policylangv1.GradientController_DynamicConfig,
+	manualMode bool,
 ) *ControllerComponent {
 	cc := &ControllerComponent{
-		signal:           runtime.InvalidReading(),
-		setpoint:         runtime.InvalidReading(),
-		controlVariable:  runtime.InvalidReading(),
-		output:           runtime.InvalidReading(),
-		controller:       controller,
-		componentName:    componentName,
-		shortDescription: shortDescription,
-		componentID:      componentID,
-		policyReadAPI:    policyReadAPI,
-		dynamicConfigKey: dynamicConfigKey,
-		defaultConfig:    defaultConfig,
+		signal:            runtime.InvalidReading(),
+		setpoint:          runtime.InvalidReading(),
+		controlVariable:   runtime.InvalidReading(),
+		output:            runtime.InvalidReading(),
+		controller:        controller,
+		componentName:     componentName,
+		shortDescription:  shortDescription,
+		componentID:       componentID,
+		policyReadAPI:     policyReadAPI,
+		dynamicConfigKey:  dynamicConfigKey,
+		defaultManualMode: manualMode,
+		manualMode:        manualMode,
 	}
-	cc.setConfig(defaultConfig)
 	return cc
 }
 
@@ -164,26 +163,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tic
 
 // DynamicConfigUpdate handles setting of controller.ControllerMode.
 func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := cc.policyReadAPI.GetStatusRegistry().GetLogger()
-	dynamicConfig := &policylangv1.GradientController_DynamicConfig{}
-	if unmarshaller.IsSet(cc.dynamicConfigKey) {
-		err := unmarshaller.UnmarshalKey(cc.dynamicConfigKey, dynamicConfig)
-		if err != nil {
-			logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
-			return
-		}
-		cc.setConfig(dynamicConfig)
-	} else {
-		cc.setConfig(cc.defaultConfig)
-	}
-}
-
-func (cc *ControllerComponent) setConfig(config *policylangv1.GradientController_DynamicConfig) {
-	if config != nil {
-		cc.manualMode = config.ManualMode
-	} else {
-		cc.manualMode = false
-	}
+	cc.manualMode = config.GetBoolValue(unmarshaller, cc.dynamicConfigKey, cc.defaultManualMode)
 }
 
 // GetSignal returns the signal's last reading.

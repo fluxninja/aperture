@@ -36,6 +36,7 @@ policy:
   resources:
     flow_control:
       classifiers: []
+  rollout: false
 
 # Configuration for the Grafana dashboard accompanying this policy.
 # Type: policies/feature-rollout/base:param:dashboard

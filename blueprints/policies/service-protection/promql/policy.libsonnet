@@ -23,13 +23,10 @@ function(cfg) {
         ),
         spec.v1.Component.withVariable(
           spec.v1.Variable.new()
-          + spec.v1.Variable.withDefaultConfig(
-            spec.v1.VariableDynamicConfig.new()
-            + spec.v1.VariableDynamicConfig.withConstantSignal(
-              local s = params.policy.setpoint;
-              spec.v1.ConstantSignal.new()
-              + spec.v1.ConstantSignal.withValue(s)
-            )
+          + spec.v1.Variable.withConstantOutput(
+            local s = params.policy.setpoint;
+            spec.v1.ConstantSignal.new()
+            + spec.v1.ConstantSignal.withValue(s)
           )
           + spec.v1.Variable.withOutPorts({ output: spec.v1.Port.withSignalName('SETPOINT') }),
         ),
