@@ -93,7 +93,7 @@ spec:
     - flow_control:
         adaptive_load_scheduler:
           dry_run: false
-          dynamic_config_key: load_scheduler
+          dry_run_config_key: load_scheduler
           in_ports:
             overload_confirmation:
               constant_signal:
