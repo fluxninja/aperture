@@ -1052,20 +1052,7 @@ Component that emits a constant bool which can be changed at runtime via dynamic
 configuration.
 
 <dl>
-<dt>constant_bool</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool)
-
-<!-- vale on -->
-
-Constant bool emitted by this component. The value of the constant bool can be
-overridden at runtime via dynamic config.
-
-</dd>
-<dt>constant_bool_config_key</dt>
+<dt>config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -1074,7 +1061,7 @@ overridden at runtime via dynamic config.
 
 <!-- vale on -->
 
-Configuration key for overriding constant_bool setting through dynamic config.
+Configuration key for overriding value setting through dynamic config.
 
 </dd>
 <dt>out_ports</dt>
@@ -1087,6 +1074,19 @@ Configuration key for overriding constant_bool setting through dynamic config.
 <!-- vale on -->
 
 Output ports for the BoolVariable component.
+
+</dd>
+<dt>value</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+The constant bool signal emitted by this component. The value of the constant
+bool can be overridden at runtime via dynamic config.
 
 </dd>
 </dl>
@@ -3205,18 +3205,6 @@ Maximum value to limit the output signal.
 <!-- vale on -->
 
 Minimum value to limit the output signal.
-
-</dd>
-<dt>optimize</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Optimize signal is added to the output of the gradient calculation.
 
 </dd>
 <dt>setpoint</dt>
@@ -7771,20 +7759,7 @@ Component that emits a constant signal which can be changed at runtime via
 dynamic configuration.
 
 <dl>
-<dt>constant_signal</dt>
-<dd>
-
-<!-- vale off -->
-
-([ConstantSignal](#constant-signal))
-
-<!-- vale on -->
-
-Constant signal emitted by this component. The value of the constant signal can
-be overridden at runtime via dynamic config.
-
-</dd>
-<dt>constant_signal_config_key</dt>
+<dt>config_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -7793,7 +7768,7 @@ be overridden at runtime via dynamic config.
 
 <!-- vale on -->
 
-Configuration key for overriding constant_signal setting through dynamic config.
+Configuration key for overriding value setting through dynamic config.
 
 </dd>
 <dt>out_ports</dt>
@@ -7806,6 +7781,19 @@ Configuration key for overriding constant_signal setting through dynamic config.
 <!-- vale on -->
 
 Output ports for the Variable component.
+
+</dd>
+<dt>value</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConstantSignal](#constant-signal))
+
+<!-- vale on -->
+
+The constant signal emitted by this component. The value of the constant signal
+can be overridden at runtime via dynamic config.
 
 </dd>
 </dl>

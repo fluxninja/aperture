@@ -454,15 +454,15 @@ definitions:
     BoolVariable:
         description: Component that emits a constant bool which can be changed at runtime via dynamic configuration.
         properties:
-            constant_bool:
-                description: Constant bool emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
-                type: boolean
-            constant_bool_config_key:
-                description: Configuration key for overriding constant_bool setting through dynamic config.
+            config_key:
+                description: Configuration key for overriding value setting through dynamic config.
                 type: string
             out_ports:
                 $ref: '#/definitions/BoolVariableOuts'
                 description: Output ports for the BoolVariable component.
+            value:
+                description: The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
+                type: boolean
         type: object
     BoolVariableOuts:
         description: Outputs for the BoolVariable component.
@@ -1721,9 +1721,6 @@ definitions:
             min:
                 $ref: '#/definitions/InPort'
                 description: Minimum value to limit the output signal.
-            optimize:
-                $ref: '#/definitions/InPort'
-                description: Optimize signal is added to the output of the gradient calculation.
             setpoint:
                 $ref: '#/definitions/InPort'
                 description: Setpoint to be used for the gradient computation.
@@ -4269,18 +4266,18 @@ definitions:
     Variable:
         description: Component that emits a constant signal which can be changed at runtime via dynamic configuration.
         properties:
-            constant_signal:
-                $ref: '#/definitions/ConstantSignal'
-                description: |+
-                    Constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
-
-                x-go-tag-validate: required
-            constant_signal_config_key:
-                description: Configuration key for overriding constant_signal setting through dynamic config.
+            config_key:
+                description: Configuration key for overriding value setting through dynamic config.
                 type: string
             out_ports:
                 $ref: '#/definitions/VariableOuts'
                 description: Output ports for the Variable component.
+            value:
+                $ref: '#/definitions/ConstantSignal'
+                description: |+
+                    The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
+
+                x-go-tag-validate: required
         type: object
     VariableOuts:
         description: Outputs for the Variable component.

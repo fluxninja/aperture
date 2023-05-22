@@ -3,22 +3,22 @@ local variableouts = import './variableouts.libsonnet';
   new():: {
   },
   outPorts:: variableouts,
-  withConstantSignal(constant_signal):: {
-    constant_signal: constant_signal,
+  withConfigKey(config_key):: {
+    config_key: config_key,
   },
-  withConstantSignalMixin(constant_signal):: {
-    constant_signal+: constant_signal,
-  },
-  withConstantSignalConfigKey(constant_signal_config_key):: {
-    constant_signal_config_key: constant_signal_config_key,
-  },
-  withConstantSignalConfigKeyMixin(constant_signal_config_key):: {
-    constant_signal_config_key+: constant_signal_config_key,
+  withConfigKeyMixin(config_key):: {
+    config_key+: config_key,
   },
   withOutPorts(out_ports):: {
     out_ports: out_ports,
   },
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
+  },
+  withValue(value):: {
+    value: value,
+  },
+  withValueMixin(value):: {
+    value+: value,
   },
 }

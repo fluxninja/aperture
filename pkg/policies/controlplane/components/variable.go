@@ -12,9 +12,9 @@ import (
 
 // Variable is a dynamically configurable variable signal.
 type Variable struct {
-	constantSignal *runtime.ConstantSignal
-	policyReadAPI  iface.Policy
-	variableProto  *policylangv1.Variable
+	value         *runtime.ConstantSignal
+	policyReadAPI iface.Policy
+	variableProto *policylangv1.Variable
 }
 
 // Name implements runtime.Component.
@@ -25,7 +25,7 @@ func (*Variable) Type() runtime.ComponentType { return runtime.ComponentTypeSour
 
 // ShortDescription implements runtime.Component.
 func (v *Variable) ShortDescription() string {
-	return v.constantSignal.Description()
+	return v.value.Description()
 }
 
 // IsActuator implements runtime.Component.
@@ -34,7 +34,7 @@ func (*Variable) IsActuator() bool { return false }
 // NewConstantSignal creates a variable component with a value that is always valid.
 func NewConstantSignal(value float64) runtime.Component {
 	return &Variable{
-		constantSignal: &runtime.ConstantSignal{
+		value: &runtime.ConstantSignal{
 			Value: value,
 		},
 	}
@@ -46,7 +46,7 @@ func NewVariableAndOptions(variableProto *policylangv1.Variable, _ runtime.Compo
 		policyReadAPI: policyReadAPI,
 		variableProto: variableProto,
 	}
-	variable.constantSignal = runtime.ConstantSignalFromProto(variableProto.GetConstantSignal())
+	variable.value = runtime.ConstantSignalFromProto(variableProto.GetValue())
 
 	return variable, fx.Options(), nil
 }
@@ -55,23 +55,23 @@ func NewVariableAndOptions(variableProto *policylangv1.Variable, _ runtime.Compo
 func (v *Variable) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	// Always emit the value.
 	return runtime.PortToReading{
-		"output": []runtime.Reading{runtime.NewReading(v.constantSignal.Float())},
+		"output": []runtime.Reading{runtime.NewReading(v.value.Float())},
 	}, nil
 }
 
 // DynamicConfigUpdate finds the dynamic config and syncs the constant value.
 func (v *Variable) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := v.policyReadAPI.GetStatusRegistry().GetLogger()
-	key := v.variableProto.GetConstantSignalConfigKey()
+	key := v.variableProto.GetConfigKey()
 	// read dynamic config
 	if !unmarshaller.IsSet(key) {
-		v.constantSignal = runtime.ConstantSignalFromProto(v.variableProto.GetConstantSignal())
+		v.value = runtime.ConstantSignalFromProto(v.variableProto.GetValue())
 	}
 	constantSignalProto := &policylangv1.ConstantSignal{}
 	if err := unmarshaller.UnmarshalKey(key, constantSignalProto); err != nil {
 		logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
-		v.constantSignal = runtime.ConstantSignalFromProto(v.variableProto.GetConstantSignal())
+		v.value = runtime.ConstantSignalFromProto(v.variableProto.GetValue())
 		return
 	}
-	v.constantSignal = runtime.ConstantSignalFromProto(constantSignalProto)
+	v.value = runtime.ConstantSignalFromProto(constantSignalProto)
 }

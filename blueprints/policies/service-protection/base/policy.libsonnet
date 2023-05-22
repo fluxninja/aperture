@@ -36,7 +36,7 @@ function(cfg) {
       spec.v1.FirstValid.withInPorts({
         inputs: [
           spec.v1.Port.withSignalName(confirmationSignal),
-          spec.v1.Port.withConstantSignal(0),
+          spec.v1.Port.withConstantSignal(0),  // overload confirmation is assumed false if no confirmation signal is received
         ],
       })
       + spec.v1.FirstValid.withOutPorts({

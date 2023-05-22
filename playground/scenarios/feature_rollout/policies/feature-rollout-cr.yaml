@@ -38,17 +38,17 @@ spec:
           output:
             signal_name: RESET_0
     - bool_variable:
-        constant_bool: false
-        constant_bool_config_key: rollout
+        config_key: rollout
         out_ports:
           output:
             signal_name: USER_ROLLOUT_CONTROL
+        value: false
     - bool_variable:
-        constant_bool: false
-        constant_bool_config_key: reset
+        config_key: reset
         out_ports:
           output:
             signal_name: USER_RESET_CONTROL
+        value: false
     - or:
         in_ports:
           inputs: []

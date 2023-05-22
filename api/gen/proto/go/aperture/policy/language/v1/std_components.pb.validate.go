@@ -1185,11 +1185,11 @@ func (m *Variable) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetConstantSignal()).(type) {
+		switch v := interface{}(m.GetValue()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, VariableValidationError{
-					field:  "ConstantSignal",
+					field:  "Value",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -1197,23 +1197,23 @@ func (m *Variable) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, VariableValidationError{
-					field:  "ConstantSignal",
+					field:  "Value",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetConstantSignal()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return VariableValidationError{
-				field:  "ConstantSignal",
+				field:  "Value",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	// no validation rules for ConstantSignalConfigKey
+	// no validation rules for ConfigKey
 
 	if len(errors) > 0 {
 		return VariableMultiError(errors)
@@ -1343,9 +1343,9 @@ func (m *BoolVariable) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for ConstantBool
+	// no validation rules for Value
 
-	// no validation rules for ConstantBoolConfigKey
+	// no validation rules for ConfigKey
 
 	if len(errors) > 0 {
 		return BoolVariableMultiError(errors)
@@ -4218,35 +4218,6 @@ func (m *GradientController_Ins) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return GradientController_InsValidationError{
 				field:  "Setpoint",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOptimize()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GradientController_InsValidationError{
-					field:  "Optimize",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GradientController_InsValidationError{
-					field:  "Optimize",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOptimize()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GradientController_InsValidationError{
-				field:  "Optimize",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

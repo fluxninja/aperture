@@ -90,19 +90,16 @@ message GradientController {
     // Setpoint to be used for the gradient computation.
     InPort setpoint = 2;
 
-    // Optimize signal is added to the output of the gradient calculation.
-    InPort optimize = 3;
-
     // Maximum value to limit the output signal.
-    InPort max = 4;
+    InPort max = 3;
 
     // Minimum value to limit the output signal.
-    InPort min = 5;
+    InPort min = 4;
 
     // Actual current value of the control variable.
     //
     // This signal is multiplied by the gradient to produce the output.
-    InPort control_variable = 6;
+    InPort control_variable = 5;
   }
 
   // Outputs for the Gradient Controller component.
@@ -355,11 +352,11 @@ message Variable {
   // Output ports for the Variable component.
   Outs out_ports = 1;
 
-  // Constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
-  ConstantSignal constant_signal = 2; // @gotags: validate:"required"
+  // The constant signal emitted by this component. The value of the constant signal can be overridden at runtime via dynamic config.
+  ConstantSignal value = 2; // @gotags: validate:"required"
 
-  // Configuration key for overriding constant_signal setting through dynamic config.
-  string constant_signal_config_key = 3;
+  // Configuration key for overriding value setting through dynamic config.
+  string config_key = 3;
 }
 
 // Component that emits a constant bool which can be changed at runtime via dynamic configuration.
@@ -373,11 +370,11 @@ message BoolVariable {
   // Output ports for the BoolVariable component.
   Outs out_ports = 1;
 
-  // Constant bool emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
-  bool constant_bool = 2;
+  // The constant bool signal emitted by this component. The value of the constant bool can be overridden at runtime via dynamic config.
+  bool value = 2;
 
-  // Configuration key for overriding constant_bool setting through dynamic config.
-  string constant_bool_config_key = 3;
+  // Configuration key for overriding value setting through dynamic config.
+  string config_key = 3;
 }
 
 // Takes an input signal and emits the output after applying the specified unary operator

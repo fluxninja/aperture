@@ -46,11 +46,11 @@ spec:
               signal_name: SIGNAL
           query_string: sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})
     - variable:
-        constant_signal:
-          value: 1000
         out_ports:
           output:
             signal_name: SETPOINT
+        value:
+          value: 1000
     evaluation_interval: 1s
   resources:
     flow_control:

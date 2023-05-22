@@ -21,7 +21,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime/tristate"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	prometheusmodel "github.com/prometheus/common/model"
@@ -35,7 +34,6 @@ type Actuator struct {
 	tokensQuery              *promql.TaggedQuery
 	loadSchedulerComponentID string
 	etcdPaths                []string
-	dryRun                   bool
 }
 
 // Name implements runtime.Component.
@@ -74,14 +72,11 @@ func NewActuatorAndOptions(
 		etcdPaths = append(etcdPaths, etcdPath)
 	}
 
-	dryRun := actuatorProto.GetDryRun()
-
 	lsa := &Actuator{
 		policyReadAPI:            policyReadAPI,
 		loadSchedulerComponentID: loadSchedulerComponentID,
 		etcdPaths:                etcdPaths,
 		actuatorProto:            actuatorProto,
-		dryRun:                   dryRun,
 	}
 
 	// Prepare parameters for prometheus queries
@@ -192,27 +187,19 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 
 	lmValue := inPortReadings.ReadSingleReadingPort("load_multiplier")
 	if !lmValue.Valid() {
-		return retErr(fmt.Errorf("invalid load_multiplier reading"))
-	}
-	lm = lmValue.Value()
-	if lm <= 0 {
-		lm = 0
-	}
-
-	ptBool := tristate.FromReading(inPortReadings.ReadSingleReadingPort("pass_through"))
-
-	if ptBool.IsTrue() {
 		pt = true
+	} else {
+		lm = lmValue.Value()
+		if lm <= 0 {
+			lm = 0
+		}
 	}
 
 	return nil, la.publishDecision(tickInfo, lm, pt, tokensByWorkload)
 }
 
-// DynamicConfigUpdate finds the dynamic config and syncs the decision to agent.
+// DynamicConfigUpdate implements runtime.Component.DynamicConfigUpdate.
 func (la *Actuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	key := la.actuatorProto.GetDryRunConfigKey()
-	// read dynamic config
-	la.dryRun = config.GetBoolValue(unmarshaller, key, la.actuatorProto.GetDryRun())
 }
 
 func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
@@ -220,9 +207,6 @@ func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
 }
 
 func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool, tokensByWorkload map[string]uint64) error {
-	if la.dryRun {
-		passThrough = true
-	}
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Save load multiplier in decision message
 	decision := &policysyncv1.LoadDecision{
