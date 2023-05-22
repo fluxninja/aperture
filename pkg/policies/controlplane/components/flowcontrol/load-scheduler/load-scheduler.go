@@ -15,7 +15,6 @@ import (
 
 const (
 	inputLoadMultiplierPortName          = "load_multiplier"
-	inputPassThroughPortName             = "pass_through"
 	outputObservedLoadMultiplierPortName = "observed_load_multiplier"
 )
 
@@ -32,10 +31,6 @@ func ParseLoadScheduler(
 		loadMultiplierPort := inPorts.LoadMultiplier
 		if loadMultiplierPort != nil {
 			nestedInPortsMap[inputLoadMultiplierPortName] = loadMultiplierPort
-		}
-		passThroughPort := inPorts.PassThrough
-		if passThroughPort != nil {
-			nestedInPortsMap[inputPassThroughPortName] = passThroughPort
 		}
 	}
 
@@ -74,15 +69,8 @@ func ParseLoadScheduler(
 						SignalName: "LOAD_MULTIPLIER",
 					},
 				},
-				PassThrough: &policylangv1.InPort{
-					Value: &policylangv1.InPort_SignalName{
-						SignalName: "PASS_THROUGH",
-					},
-				},
 			},
 			LoadSchedulerComponentId:   componentID.String(),
-			DefaultConfig:              loadScheduler.GetDefaultConfig(),
-			DynamicConfigKey:           loadScheduler.GetDynamicConfigKey(),
 			WorkloadLatencyBasedTokens: loadScheduler.Parameters.GetWorkloadLatencyBasedTokens(),
 			Selectors:                  loadScheduler.Parameters.GetSelectors(),
 		})
@@ -96,6 +84,51 @@ func ParseLoadScheduler(
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
+			{
+				Component: &policylangv1.Component_BoolVariable{
+					BoolVariable: &policylangv1.BoolVariable{
+						ConstantOutput: loadScheduler.GetDryRun(),
+						ConfigKey:      loadScheduler.GetDryRunConfigKey(),
+						OutPorts: &policylangv1.BoolVariable_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "DRY_RUN",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Switcher{
+					Switcher: &policylangv1.Switcher{
+						InPorts: &policylangv1.Switcher_Ins{
+							Switch: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DRY_RUN",
+								},
+							},
+							OnSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_SpecialValue{
+											SpecialValue: "NaN",
+										},
+									},
+								},
+							},
+							OffSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_INPUT",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Switcher_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER",
+							},
+						},
+					},
+				},
+			},
 			{
 				Component: &policylangv1.Component_FlowControl{
 					FlowControl: &policylangv1.FlowControl{
@@ -142,7 +175,7 @@ func ParseLoadScheduler(
 			{
 				Component: &policylangv1.Component_ArithmeticCombinator{
 					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: "div",
+						Operator: components.Div.String(),
 						InPorts: &policylangv1.ArithmeticCombinator_Ins{
 							Lhs: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -166,8 +199,7 @@ func ParseLoadScheduler(
 		},
 	}
 
-	components.AddNestedIngress(nestedCircuit, inputLoadMultiplierPortName, "LOAD_MULTIPLIER")
-	components.AddNestedIngress(nestedCircuit, inputPassThroughPortName, "PASS_THROUGH")
+	components.AddNestedIngress(nestedCircuit, inputLoadMultiplierPortName, "LOAD_MULTIPLIER_INPUT")
 	components.AddNestedEgress(nestedCircuit, outputObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
 
 	return nestedCircuit, nil

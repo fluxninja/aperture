@@ -11,13 +11,6 @@ message PodScalerWrapper {
   policy.language.v1.PodScaler pod_scaler = 2;
 }
 
-message PodScalerDynamicConfigWrapper {
-  // CommonAttributes
-  CommonAttributes common_attributes = 1;
-  // Dynamic override for dry run setting.
-  bool dry_run = 2;
-}
-
 message ScaleStatusWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;

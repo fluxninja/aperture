@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=file:/home/gillh/Work/fluxninja/aperture/blueprints/policies/rate-limiting/gen/definitions.json
+# yaml-language-server: $schema=../../../../../blueprints/policies/rate-limiting/gen/definitions.json
 # Generated values file for policies/rate-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/rate-limiting
@@ -8,9 +8,14 @@ policy:
   # Type: string
   # Required: True
   policy_name: rate-limiting
-  # List of classification rules.
-  # Type: []aperture.spec.v1.Classifier
-  classifiers: []
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   rate_limiter:
     # Bucket capacity.
     # Type: float64

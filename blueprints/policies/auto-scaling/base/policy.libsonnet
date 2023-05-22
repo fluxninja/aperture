@@ -97,7 +97,7 @@ function(cfg) {
             autoScale.new()
             + autoScale.withAutoScaler(
               autoScaler.new()
-              + autoScaler.withDryRunConfigKey(params.policy.dry_run_config_key)
+              + autoScaler.withDryRunConfigKey('dry_run')
               + autoScaler.withDryRun(params.policy.dry_run)
               + autoScaler.withScalingBackend(params.policy.scaling_backend)
               + autoScaler.withScalingParameters(params.policy.scaling_parameters)

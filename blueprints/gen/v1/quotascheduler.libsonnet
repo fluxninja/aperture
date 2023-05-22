@@ -9,11 +9,11 @@ local quotaschedulerins = import './quotaschedulerins.libsonnet';
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
   },
-  withParameters(parameters):: {
-    parameters: parameters,
+  withRateLimiter(rate_limiter):: {
+    rate_limiter: rate_limiter,
   },
-  withParametersMixin(parameters):: {
-    parameters+: parameters,
+  withRateLimiterMixin(rate_limiter):: {
+    rate_limiter+: rate_limiter,
   },
   withScheduler(scheduler):: {
     scheduler: scheduler,

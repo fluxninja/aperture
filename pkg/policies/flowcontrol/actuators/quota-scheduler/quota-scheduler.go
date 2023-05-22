@@ -235,7 +235,7 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 		OnStart: func(context.Context) error {
 			var err error
 
-			idleDuration := qs.proto.Parameters.GetMaxIdleTime().AsDuration()
+			idleDuration := qs.proto.RateLimiter.GetMaxIdleTime().AsDuration()
 			job := jobs.NewBasicJob(qs.name, qs.audit)
 			// register job with job group
 			err = qs.qsFactory.auditJobGroup.RegisterJob(job, jobs.JobConfig{
@@ -254,9 +254,9 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 			qs.inner, err = globaltokenbucket.NewGlobalTokenBucket(
 				qs.qsFactory.distCache,
 				qs.name,
-				qs.proto.Parameters.GetInterval().AsDuration(),
-				qs.proto.Parameters.GetMaxIdleTime().AsDuration(),
-				qs.proto.Parameters.GetContinuousFill(),
+				qs.proto.RateLimiter.GetInterval().AsDuration(),
+				qs.proto.RateLimiter.GetMaxIdleTime().AsDuration(),
+				qs.proto.RateLimiter.GetContinuousFill(),
 			)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
@@ -265,10 +265,10 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 			qs.limiter = qs.inner
 
 			// check whether lazy limiter is enabled
-			if lazySyncConfig := qs.proto.Parameters.GetLazySync(); lazySyncConfig != nil {
+			if lazySyncConfig := qs.proto.RateLimiter.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
 					qs.limiter, err = lazysync.NewLazySyncRateLimiter(qs.limiter,
-						qs.proto.Parameters.GetInterval().AsDuration(),
+						qs.proto.RateLimiter.GetInterval().AsDuration(),
 						lazySyncConfig.GetNumSync(),
 						qs.qsFactory.auditJobGroup)
 					if err != nil {
@@ -339,7 +339,7 @@ func (qs *quotaScheduler) GetSelectors() []*policylangv1.Selector {
 }
 
 func (qs *quotaScheduler) getLabelKey(labels map[string]string) (string, bool) {
-	labelKey := qs.proto.Parameters.GetLabelKey()
+	labelKey := qs.proto.RateLimiter.GetLabelKey()
 	var label string
 	if labelKey == "" {
 		label = "default"
@@ -442,7 +442,7 @@ func (qs *quotaScheduler) audit(ctx context.Context) (proto.Message, error) {
 		lastAccess, size := s.Info()
 
 		// if this counter has not synced in a while, then remove it from the map
-		if now.After(lastAccess.Add(qs.proto.Parameters.MaxIdleTime.AsDuration())) &&
+		if now.After(lastAccess.Add(qs.proto.RateLimiter.MaxIdleTime.AsDuration())) &&
 			size == 0 {
 			qs.schedulers.Delete(label)
 			return true

@@ -7,9 +7,14 @@ policy:
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  # List of classification rules.
-  # Type: []aperture.spec.v1.Classifier
-  classifiers: []
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   quota_scheduler:
     # Bucket capacity.
     # Type: float64
@@ -24,16 +29,11 @@ policy:
     selectors:
       - control_point: __REQUIRED_FIELD__
         service: __REQUIRED_FIELD__
-    # Parameters.
+    # Rate Limiter Parameters.
     # Type: aperture.spec.v1.RateLimiterParameters
-    parameters:
-      # Flow label key to use for quota limiting. If no label key is specified, then all requests matching the selectors will be scheduled based on the global quota.
-      # Type: string
-      label_key: ""
-      # Fill interval e.g. "1s".
-      # Type: string
-      # Required: True
+    rate_limiter:
       interval: __REQUIRED_FIELD__
+      label_key: ""
     # Scheduler configuration.
     # Type: aperture.spec.v1.Scheduler
     scheduler:

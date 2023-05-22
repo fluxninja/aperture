@@ -22,6 +22,7 @@ policy:
   resources:
     flow_control:
       classifiers: []
+  rollout: false
 
 dashboard:
   # Refresh interval for dashboard panels.

@@ -37,13 +37,18 @@ spec:
         out_ports:
           output:
             signal_name: RESET_0
-    - or:
-        in_ports:
-          inputs:
-          - signal_name: FORWARD_0
+    - bool_variable:
+        config_key: rollout
+        constant_output: true
         out_ports:
           output:
-            signal_name: FORWARD_INTENT
+            signal_name: USER_ROLLOUT_CONTROL
+    - bool_variable:
+        config_key: reset
+        constant_output: false
+        out_ports:
+          output:
+            signal_name: USER_RESET_CONTROL
     - or:
         in_ports:
           inputs: []
@@ -54,9 +59,17 @@ spec:
         in_ports:
           inputs:
           - signal_name: RESET_0
+          - signal_name: USER_RESET_CONTROL
         out_ports:
           output:
             signal_name: RESET
+    - or:
+        in_ports:
+          inputs:
+          - signal_name: FORWARD_0
+        out_ports:
+          output:
+            signal_name: FORWARD_INTENT
     - inverter:
         in_ports:
           input:
@@ -92,9 +105,10 @@ spec:
     - and:
         in_ports:
           inputs:
-          - signal_name: FORWARD_INTENT
           - signal_name: NOT_BACKWARD
           - signal_name: NOT_RESET
+          - signal_name: USER_ROLLOUT_CONTROL
+          - signal_name: FORWARD_INTENT
         out_ports:
           output:
             signal_name: FORWARD
@@ -108,7 +122,6 @@ spec:
             signal_name: BACKWARD
     - flow_control:
         load_ramp:
-          dynamic_config_key: regulator
           in_ports:
             backward:
               signal_name: BACKWARD
@@ -127,6 +140,7 @@ spec:
               target_accept_percentage: 1
             - duration: 300s
               target_accept_percentage: 100
+          pass_through_label_values_config_key: pass_through_label_values
     evaluation_interval: 1s
   resources:
     flow_control:

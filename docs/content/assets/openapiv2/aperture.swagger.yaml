@@ -4,11 +4,13 @@ definitions:
     AdaptiveLoadScheduler:
         description: The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
         properties:
-            default_config:
-                $ref: '#/definitions/LoadSchedulerDynamicConfig'
-                description: Default dynamic configuration for load actuation.
-            dynamic_config_key:
-                description: Dynamic configuration key for load actuation.
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
                 type: string
             in_ports:
                 $ref: '#/definitions/AdaptiveLoadSchedulerIns'
@@ -318,7 +320,7 @@ definitions:
             dry_run:
                 description: |-
                     Dry run mode ensures that no scaling is invoked by this auto scaler.
-                    This is Useful for observing the behavior of auto scaler without disrupting any real traffic.
+                    This is useful for observing the behavior of auto scaler without disrupting any real deployment.
                     This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
                 type: boolean
             dry_run_config_key:
@@ -454,6 +456,26 @@ definitions:
 
                 type: string
                 x-go-tag-default: 30s
+        type: object
+    BoolVariable:
+        description: Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
+        properties:
+            config_key:
+                description: Configuration key for overriding value setting through dynamic configuration.
+                type: string
+            constant_output:
+                description: The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.
+                type: boolean
+            out_ports:
+                $ref: '#/definitions/BoolVariableOuts'
+                description: Output ports for the BoolVariable component.
+        type: object
+    BoolVariableOuts:
+        description: Outputs for the BoolVariable component.
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+                description: The value is emitted to the output port.
         type: object
     CheckHTTPRequest:
         properties:
@@ -781,6 +803,9 @@ definitions:
             auto_scale:
                 $ref: '#/definitions/AutoScale'
                 description: AutoScale components are used to scale the service.
+            bool_variable:
+                $ref: '#/definitions/BoolVariable'
+                description: BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
             decider:
                 $ref: '#/definitions/Decider'
                 description: Decider emits the binary result of comparison operator on two operands.
@@ -851,7 +876,7 @@ definitions:
                 description: Takes an input signal and emits the square root of the input signal.
             variable:
                 $ref: '#/definitions/Variable'
-                description: Emits a variable signal which can be set to invalid.
+                description: Emits a variable signal which can be changed at runtime via dynamic configuration.
         title: Computational block that forms the circuit
         type: object
     ConstantSignal:
@@ -1484,7 +1509,7 @@ definitions:
                 $ref: '#/definitions/FluxMeterLinearBuckets'
             selectors:
                 description: |+
-                    Selectors for the component.
+                    Selectors for flows that will be metered by this _Flux Meter_.
 
                 items:
                     $ref: '#/definitions/Selector'
@@ -1666,15 +1691,15 @@ definitions:
             The output can be _optionally_ clamped to desired range using `max` and
             `min` input.
         properties:
-            default_config:
-                $ref: '#/definitions/GradientControllerDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                title: Configuration key for DynamicConfig
-                type: string
             in_ports:
                 $ref: '#/definitions/GradientControllerIns'
                 description: Input ports of the Gradient Controller.
+            manual_mode:
+                description: In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.
+                type: boolean
+            manual_mode_config_key:
+                description: Configuration key for overriding `manual_mode` setting through dynamic configuration.
+                type: string
             out_ports:
                 $ref: '#/definitions/GradientControllerOuts'
                 description: Output ports of the Gradient Controller.
@@ -1688,18 +1713,6 @@ definitions:
             Gradient controller is a type of controller which tries to adjust the
             control variable proportionally to the relative difference between setpoint
             and actual value of the signal
-        type: object
-    GradientControllerDynamicConfig:
-        properties:
-            manual_mode:
-                default: false
-                description: |+
-                    Decides whether the controller runs in `manual_mode`.
-                    In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
-
-                type: boolean
-                x-go-tag-default: "false"
-        title: Dynamic Configuration for a Controller
         type: object
     GradientControllerIns:
         description: Inputs for the Gradient Controller component.
@@ -1716,9 +1729,6 @@ definitions:
             min:
                 $ref: '#/definitions/InPort'
                 description: Minimum value to limit the output signal.
-            optimize:
-                $ref: '#/definitions/InPort'
-                description: Optimize signal is added to the output of the gradient calculation.
             setpoint:
                 $ref: '#/definitions/InPort'
                 description: Setpoint to be used for the gradient computation.
@@ -2347,12 +2357,6 @@ definitions:
             the previous step's `target_accept_percentage` to the next
             `target_accept_percentage`, over the `duration` specified for each step.
         properties:
-            default_config:
-                $ref: '#/definitions/RegulatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                description: Dynamic configuration key for flow regulator.
-                type: string
             in_ports:
                 $ref: '#/definitions/LoadRampIns'
             out_ports:
@@ -2360,6 +2364,14 @@ definitions:
             parameters:
                 $ref: '#/definitions/LoadRampParameters'
                 x-go-tag-validate: required
+            pass_through_label_values:
+                description: Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.
+                items:
+                    type: string
+                type: array
+            pass_through_label_values_config_key:
+                description: Configuration key for setting pass through label values through dynamic configuration.
+                type: string
         type: object
     LoadRampIns:
         description: Inputs for the _Load Ramp_ component.
@@ -2479,19 +2491,21 @@ definitions:
 
             :::
 
-            It's based on the actuation strategy (for example, load actuator) and workload scheduling
-            which is based on Weighted Fair Queuing principles.
-            It measures and controls the incoming tokens per second, which can translate
+            To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
+            A workload determines the priority and cost of admitting each Flow that belongs to it.
+            Scheduling of Flows is based on Weighted Fair Queuing principles.
+            _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
             to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
-            LoadScheduler configuration is split into two parts: An actuation
-            strategy and a scheduler. At this time, only `load_actuator` strategy is available.
+            The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
         properties:
-            default_config:
-                $ref: '#/definitions/LoadSchedulerDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                description: Configuration key for DynamicConfig.
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
                 type: string
             in_ports:
                 $ref: '#/definitions/LoadSchedulerIns'
@@ -2505,16 +2519,7 @@ definitions:
             parameters:
                 $ref: '#/definitions/LoadSchedulerParameters'
                 x-go-tag-validate: required
-        title: _Load Scheduler_ is an actuator component that regulates flows to provide active service protection
-        type: object
-    LoadSchedulerDynamicConfig:
-        description: Dynamic Configuration for the LoadScheduler component.
-        properties:
-            dry_run:
-                description: |-
-                    Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator.
-                    Useful for observing the behavior of actuator without disrupting any real traffic.
-                type: boolean
+        title: _Load Scheduler_ creates a queue for flows in front of a service to provide active service protection
         type: object
     LoadSchedulerIns:
         description: Input for the LoadScheduler component.
@@ -2524,9 +2529,6 @@ definitions:
                 description: |-
                     Load multiplier is proportion of incoming
                     token rate that needs to be accepted.
-            pass_through:
-                $ref: '#/definitions/InPort'
-                description: When true, pass through the requests skipping the scheduler.
         type: object
     LoadSchedulerOuts:
         description: Output for the LoadScheduler component.
@@ -2965,7 +2967,7 @@ definitions:
             dry_run:
                 description: |-
                     Dry run mode ensures that no scaling is invoked by this pod scaler.
-                    This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
+                    This is useful for observing the behavior of pod scaler without disrupting any real deployment.
                     This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.
                 type: boolean
             dry_run_config_key:
@@ -3190,7 +3192,7 @@ definitions:
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
                 x-go-tag-validate: required
-            parameters:
+            rate_limiter:
                 $ref: '#/definitions/RateLimiterParameters'
                 x-go-tag-validate: required
             scheduler:
@@ -3282,8 +3284,8 @@ definitions:
                     For example, to give each user a separate limit, assuming you
                     have a _user_ flow
                     label set up, set `label_key: "user"`.
-                    If `label_key` is not specified, then all requests are rate limited
-                    that match the selectors.
+                    If no label key is specified, then all requests matching the
+                    selectors will be rate limited based on the global bucket.
                 type: string
             lazy_sync:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
@@ -3423,27 +3425,20 @@ definitions:
 
             :::
         properties:
-            default_config:
-                $ref: '#/definitions/RegulatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                description: Configuration key for DynamicConfig.
-                type: string
             in_ports:
                 $ref: '#/definitions/RegulatorIns'
                 description: Input ports for the _Regulator_.
             parameters:
                 $ref: '#/definitions/RegulatorParameters'
                 description: Parameters for the _Regulator_.
-        type: object
-    RegulatorDynamicConfig:
-        properties:
-            enable_label_values:
-                description: Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+            pass_through_label_values:
+                description: Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.
                 items:
                     type: string
                 type: array
-        title: Dynamic Configuration for _Regulator_
+            pass_through_label_values_config_key:
+                description: Configuration key for setting pass through label values through dynamic configuration.
+                type: string
         type: object
     RegulatorIns:
         properties:
@@ -4286,26 +4281,20 @@ definitions:
                 description: Output signal.
         type: object
     Variable:
-        description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+        description: Component that emits a constant signal which can be changed at runtime through dynamic configuration.
         properties:
-            default_config:
-                $ref: '#/definitions/VariableDynamicConfig'
+            config_key:
+                description: Configuration key for overriding value setting through dynamic configuration.
+                type: string
+            constant_output:
+                $ref: '#/definitions/ConstantSignal'
                 description: |+
-                    Default configuration.
+                    The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.
 
                 x-go-tag-validate: required
-            dynamic_config_key:
-                description: Configuration key for DynamicConfig.
-                type: string
             out_ports:
                 $ref: '#/definitions/VariableOuts'
                 description: Output ports for the Variable component.
-        type: object
-    VariableDynamicConfig:
-        properties:
-            constant_signal:
-                $ref: '#/definitions/ConstantSignal'
-                x-go-tag-validate: required
         type: object
     VariableOuts:
         description: Outputs for the Variable component.
@@ -4627,7 +4616,7 @@ paths:
                   name: body
                   required: true
                   schema:
-                    description: PostDynamicConfigRequest is a request to patch dynamic config for Policy.
+                    description: PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
                     properties:
                         dynamic_config:
                             type: object
@@ -4643,7 +4632,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            summary: PostDynamicConfig creates/updates dynamic config based on the provided request.
+            summary: PostDynamicConfig creates/updates dynamic configuration based on the provided request.
             tags:
                 - aperture-controller
     /v1/flowcontrol/checkhttp:

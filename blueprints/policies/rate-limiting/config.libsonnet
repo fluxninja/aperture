@@ -2,12 +2,16 @@
   policy: {
     /**
     * @param (policy.policy_name: string required) Name of the policy.
+    * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
+    * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
     */
     policy_name: '__REQUIRED_FIELD__',
-    /**
-    * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
-    */
-    classifiers: [],
+    components: [],
+    resources: {
+      flow_control: {
+        classifiers: [],
+      },
+    },
     /**
     * @param (policy.rate_limiter.bucket_capacity: float64 required) Bucket capacity.
     * @param (policy.rate_limiter.fill_amount: float64 required) Fill amount.

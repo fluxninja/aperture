@@ -15,14 +15,24 @@
           "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
-        "classifiers": {
-          "description": "List of classification rules.",
+        "components": {
+          "description": "List of additional circuit components.",
           "default": [],
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
         "rate_limiter": {
           "type": "object",

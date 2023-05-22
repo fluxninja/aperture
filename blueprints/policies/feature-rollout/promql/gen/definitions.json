@@ -53,7 +53,8 @@
           "flow_control": {
             "classifiers": []
           }
-        }
+        },
+        "rollout": false
       },
       "type": "object",
       "$ref": "../../../../policies/feature-rollout/base/gen/definitions.json#/$defs/rollout_policy"

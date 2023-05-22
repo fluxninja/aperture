@@ -19,12 +19,6 @@
   withMinMixin(min):: {
     min+: min,
   },
-  withOptimize(optimize):: {
-    optimize: optimize,
-  },
-  withOptimizeMixin(optimize):: {
-    optimize+: optimize,
-  },
   withSetpoint(setpoint):: {
     setpoint: setpoint,
   },

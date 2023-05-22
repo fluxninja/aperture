@@ -92,9 +92,8 @@ spec:
     components:
     - flow_control:
         adaptive_load_scheduler:
-          default_config:
-            dry_run: false
-          dynamic_config_key: load_scheduler
+          dry_run: false
+          dry_run_config_key: load_scheduler
           in_ports:
             overload_confirmation:
               constant_signal:
@@ -284,9 +283,8 @@ spec:
     evaluation_interval: "0.5s"
     components:
       - variable:
-          default_config:
-            constant_signal:
-              value: 250.0
+          constant_output:
+            value: 250.0
           out_ports:
             output:
               signal_name: "RATE_LIMIT"

@@ -56,6 +56,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Variable:
 		ctor = mkCtor(config.Variable, components.NewVariableAndOptions)
+	case *policylangv1.Component_BoolVariable:
+		ctor = mkCtor(config.BoolVariable, components.NewBoolVariableAndOptions)
 	case *policylangv1.Component_Decider:
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:

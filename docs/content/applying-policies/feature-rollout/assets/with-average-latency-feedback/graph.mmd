@@ -5,7 +5,7 @@ style root.0_outports fill:none,stroke:none
 root.0output[output]
 end
 end
-subgraph root.1[<center>Decider<br/>LT for 0s</center>]
+subgraph root.1[<center>Decider<br/>lt for 0s</center>]
 subgraph root.1_inports[ ]
 style root.1_inports fill:none,stroke:none
 root.1lhs[lhs]
@@ -16,19 +16,17 @@ style root.1_outports fill:none,stroke:none
 root.1output[output]
 end
 end
-subgraph root.10[And]
+subgraph root.10[Inverter]
 subgraph root.10_inports[ ]
 style root.10_inports fill:none,stroke:none
-root.10inputs[inputs]
-root.10inputs[inputs]
-root.10inputs[inputs]
+root.10input[input]
 end
 subgraph root.10_outports[ ]
 style root.10_outports fill:none,stroke:none
 root.10output[output]
 end
 end
-subgraph root.11[And]
+subgraph root.11[FirstValid]
 subgraph root.11_inports[ ]
 style root.11_inports fill:none,stroke:none
 root.11inputs[inputs]
@@ -39,16 +37,41 @@ style root.11_outports fill:none,stroke:none
 root.11output[output]
 end
 end
-subgraph root.12[<center>LoadRamp<br/>1 selectors</center>]
+root.11_inputs_FakeConstantout((1.00))
+subgraph root.12[And]
 subgraph root.12_inports[ ]
 style root.12_inports fill:none,stroke:none
-root.12backward[backward]
-root.12forward[forward]
-root.12reset[reset]
+root.12inputs[inputs]
+root.12inputs[inputs]
+root.12inputs[inputs]
+root.12inputs[inputs]
+end
+subgraph root.12_outports[ ]
+style root.12_outports fill:none,stroke:none
+root.12output[output]
+end
+end
+subgraph root.13[And]
+subgraph root.13_inports[ ]
+style root.13_inports fill:none,stroke:none
+root.13inputs[inputs]
+root.13inputs[inputs]
+end
+subgraph root.13_outports[ ]
+style root.13_outports fill:none,stroke:none
+root.13output[output]
+end
+end
+subgraph root.14[<center>LoadRamp<br/>1 selectors</center>]
+subgraph root.14_inports[ ]
+style root.14_inports fill:none,stroke:none
+root.14backward[backward]
+root.14forward[forward]
+root.14reset[reset]
 end
 end
 root.1_rhs_FakeConstantout((75.00))
-subgraph root.2[<center>Decider<br/>GT for 0s</center>]
+subgraph root.2[<center>Decider<br/>gt for 0s</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
 root.2lhs[lhs]
@@ -60,46 +83,38 @@ root.2output[output]
 end
 end
 root.2_rhs_FakeConstantout((75.00))
-subgraph root.3[Or]
-subgraph root.3_inports[ ]
-style root.3_inports fill:none,stroke:none
-root.3inputs[inputs]
-end
+subgraph root.3[<center>BoolVariable<br/>Boolean Variable</center>]
 subgraph root.3_outports[ ]
 style root.3_outports fill:none,stroke:none
 root.3output[output]
 end
 end
-subgraph root.4[Or]
+subgraph root.4[<center>BoolVariable<br/>Boolean Variable</center>]
 subgraph root.4_outports[ ]
 style root.4_outports fill:none,stroke:none
 root.4output[output]
 end
 end
 subgraph root.5[Or]
-subgraph root.5_inports[ ]
-style root.5_inports fill:none,stroke:none
-root.5inputs[inputs]
-end
 subgraph root.5_outports[ ]
 style root.5_outports fill:none,stroke:none
 root.5output[output]
 end
 end
-subgraph root.6[Inverter]
+subgraph root.6[Or]
 subgraph root.6_inports[ ]
 style root.6_inports fill:none,stroke:none
-root.6input[input]
+root.6inputs[inputs]
+root.6inputs[inputs]
 end
 subgraph root.6_outports[ ]
 style root.6_outports fill:none,stroke:none
 root.6output[output]
 end
 end
-subgraph root.7[FirstValid]
+subgraph root.7[Or]
 subgraph root.7_inports[ ]
 style root.7_inports fill:none,stroke:none
-root.7inputs[inputs]
 root.7inputs[inputs]
 end
 subgraph root.7_outports[ ]
@@ -107,7 +122,6 @@ style root.7_outports fill:none,stroke:none
 root.7output[output]
 end
 end
-root.7_inputs_FakeConstantout((1.00))
 subgraph root.8[Inverter]
 subgraph root.8_inports[ ]
 style root.8_inports fill:none,stroke:none
@@ -132,21 +146,23 @@ end
 root.9_inputs_FakeConstantout((1.00))
 root.0output --> |AVERAGE_LATENCY_0| root.1lhs
 root.0output --> |AVERAGE_LATENCY_0| root.2lhs
-root.10output --> |FORWARD| root.12forward
-root.11output --> |BACKWARD| root.12backward
-root.1output --> |FORWARD_0| root.3inputs
+root.10output --> |INVERTED_RESET| root.11inputs
+root.11_inputs_FakeConstantout --> root.11inputs
+root.11output --> |NOT_RESET| root.12inputs
+root.11output --> |NOT_RESET| root.13inputs
+root.12output --> |FORWARD| root.14forward
+root.13output --> |BACKWARD| root.14backward
+root.1output --> |FORWARD_0| root.7inputs
 root.1_rhs_FakeConstantout --> root.1rhs
-root.2output --> |RESET_0| root.5inputs
+root.2output --> |RESET_0| root.6inputs
 root.2_rhs_FakeConstantout --> root.2rhs
-root.3output --> |FORWARD_INTENT| root.10inputs
-root.4output --> |BACKWARD_INTENT| root.11inputs
-root.4output --> |BACKWARD_INTENT| root.6input
-root.5output --> |RESET| root.12reset
-root.5output --> |RESET| root.8input
-root.6output --> |INVERTED_BACKWARD_INTENT| root.7inputs
-root.7_inputs_FakeConstantout --> root.7inputs
-root.7output --> |NOT_BACKWARD| root.10inputs
-root.8output --> |INVERTED_RESET| root.9inputs
+root.3output --> |USER_ROLLOUT_CONTROL| root.12inputs
+root.4output --> |USER_RESET_CONTROL| root.6inputs
+root.5output --> |BACKWARD_INTENT| root.13inputs
+root.5output --> |BACKWARD_INTENT| root.8input
+root.6output --> |RESET| root.10input
+root.6output --> |RESET| root.14reset
+root.7output --> |FORWARD_INTENT| root.12inputs
+root.8output --> |INVERTED_BACKWARD_INTENT| root.9inputs
 root.9_inputs_FakeConstantout --> root.9inputs
-root.9output --> |NOT_RESET| root.10inputs
-root.9output --> |NOT_RESET| root.11inputs
+root.9output --> |NOT_BACKWARD| root.12inputs

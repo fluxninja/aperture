@@ -700,12 +700,46 @@ func (m *QuotaScheduler) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, QuotaSchedulerValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, QuotaSchedulerValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return QuotaSchedulerValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
+		switch v := interface{}(m.GetRateLimiter()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, QuotaSchedulerValidationError{
-					field:  "Parameters",
+					field:  "RateLimiter",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -713,16 +747,16 @@ func (m *QuotaScheduler) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, QuotaSchedulerValidationError{
-					field:  "Parameters",
+					field:  "RateLimiter",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetRateLimiter()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return QuotaSchedulerValidationError{
-				field:  "Parameters",
+				field:  "RateLimiter",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -756,40 +790,6 @@ func (m *QuotaScheduler) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	for idx, item := range m.GetSelectors() {
-		_, _ = idx, item
-
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, QuotaSchedulerValidationError{
-						field:  fmt.Sprintf("Selectors[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, QuotaSchedulerValidationError{
-						field:  fmt.Sprintf("Selectors[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return QuotaSchedulerValidationError{
-					field:  fmt.Sprintf("Selectors[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	if len(errors) > 0 {
@@ -1141,37 +1141,6 @@ func (m *LoadScheduler) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadSchedulerValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if all {
 		switch v := interface{}(m.GetParameters()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1200,6 +1169,10 @@ func (m *LoadScheduler) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for DryRun
+
+	// no validation rules for DryRunConfigKey
 
 	if len(errors) > 0 {
 		return LoadSchedulerMultiError(errors)
@@ -1581,36 +1554,9 @@ func (m *AdaptiveLoadScheduler) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DynamicConfigKey
+	// no validation rules for DryRun
 
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadSchedulerValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadSchedulerValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for DryRunConfigKey
 
 	if len(errors) > 0 {
 		return AdaptiveLoadSchedulerMultiError(errors)
@@ -1772,36 +1718,7 @@ func (m *Regulator) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RegulatorValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RegulatorValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for PassThroughLabelValuesConfigKey
 
 	if len(errors) > 0 {
 		return RegulatorMultiError(errors)
@@ -1989,36 +1906,7 @@ func (m *LoadRamp) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadRampValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadRampValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for PassThroughLabelValuesConfigKey
 
 	if len(errors) > 0 {
 		return LoadRampMultiError(errors)
@@ -4542,111 +4430,6 @@ var _ interface {
 	ErrorName() string
 } = LoadScheduler_ParametersValidationError{}
 
-// Validate checks the field values on LoadScheduler_DynamicConfig with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *LoadScheduler_DynamicConfig) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LoadScheduler_DynamicConfig with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// LoadScheduler_DynamicConfigMultiError, or nil if none found.
-func (m *LoadScheduler_DynamicConfig) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LoadScheduler_DynamicConfig) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for DryRun
-
-	if len(errors) > 0 {
-		return LoadScheduler_DynamicConfigMultiError(errors)
-	}
-
-	return nil
-}
-
-// LoadScheduler_DynamicConfigMultiError is an error wrapping multiple
-// validation errors returned by LoadScheduler_DynamicConfig.ValidateAll() if
-// the designated constraints aren't met.
-type LoadScheduler_DynamicConfigMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LoadScheduler_DynamicConfigMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LoadScheduler_DynamicConfigMultiError) AllErrors() []error { return m }
-
-// LoadScheduler_DynamicConfigValidationError is the validation error returned
-// by LoadScheduler_DynamicConfig.Validate if the designated constraints
-// aren't met.
-type LoadScheduler_DynamicConfigValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LoadScheduler_DynamicConfigValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LoadScheduler_DynamicConfigValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LoadScheduler_DynamicConfigValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LoadScheduler_DynamicConfigValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LoadScheduler_DynamicConfigValidationError) ErrorName() string {
-	return "LoadScheduler_DynamicConfigValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e LoadScheduler_DynamicConfigValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLoadScheduler_DynamicConfig.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LoadScheduler_DynamicConfigValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LoadScheduler_DynamicConfigValidationError{}
-
 // Validate checks the field values on LoadScheduler_Ins with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -4692,35 +4475,6 @@ func (m *LoadScheduler_Ins) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return LoadScheduler_InsValidationError{
 				field:  "LoadMultiplier",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetPassThrough()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LoadScheduler_InsValidationError{
-					field:  "PassThrough",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LoadScheduler_InsValidationError{
-					field:  "PassThrough",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetPassThrough()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadScheduler_InsValidationError{
-				field:  "PassThrough",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -5780,108 +5534,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AdaptiveLoadScheduler_OutsValidationError{}
-
-// Validate checks the field values on Regulator_DynamicConfig with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *Regulator_DynamicConfig) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Regulator_DynamicConfig with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// Regulator_DynamicConfigMultiError, or nil if none found.
-func (m *Regulator_DynamicConfig) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Regulator_DynamicConfig) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return Regulator_DynamicConfigMultiError(errors)
-	}
-
-	return nil
-}
-
-// Regulator_DynamicConfigMultiError is an error wrapping multiple validation
-// errors returned by Regulator_DynamicConfig.ValidateAll() if the designated
-// constraints aren't met.
-type Regulator_DynamicConfigMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m Regulator_DynamicConfigMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m Regulator_DynamicConfigMultiError) AllErrors() []error { return m }
-
-// Regulator_DynamicConfigValidationError is the validation error returned by
-// Regulator_DynamicConfig.Validate if the designated constraints aren't met.
-type Regulator_DynamicConfigValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e Regulator_DynamicConfigValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e Regulator_DynamicConfigValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e Regulator_DynamicConfigValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e Regulator_DynamicConfigValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e Regulator_DynamicConfigValidationError) ErrorName() string {
-	return "Regulator_DynamicConfigValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e Regulator_DynamicConfigValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRegulator_DynamicConfig.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = Regulator_DynamicConfigValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = Regulator_DynamicConfigValidationError{}
 
 // Validate checks the field values on Regulator_Parameters with the rules
 // defined in the proto definition for this message. If any rules are

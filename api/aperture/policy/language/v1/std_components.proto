@@ -82,13 +82,6 @@ message GradientController {
     double max_gradient = 3; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
   }
 
-  // Dynamic Configuration for a Controller
-  message DynamicConfig {
-    // Decides whether the controller runs in `manual_mode`.
-    // In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
-    bool manual_mode = 1; // @gotags: default:"false"
-  }
-
   // Inputs for the Gradient Controller component.
   message Ins {
     // Signal to be used for the gradient computation.
@@ -97,19 +90,16 @@ message GradientController {
     // Setpoint to be used for the gradient computation.
     InPort setpoint = 2;
 
-    // Optimize signal is added to the output of the gradient calculation.
-    InPort optimize = 3;
-
     // Maximum value to limit the output signal.
-    InPort max = 4;
+    InPort max = 3;
 
     // Minimum value to limit the output signal.
-    InPort min = 5;
+    InPort min = 4;
 
     // Actual current value of the control variable.
     //
     // This signal is multiplied by the gradient to produce the output.
-    InPort control_variable = 6;
+    InPort control_variable = 5;
   }
 
   // Outputs for the Gradient Controller component.
@@ -127,11 +117,11 @@ message GradientController {
   // Gradient Parameters.
   Parameters parameters = 3; // @gotags: validate:"required"
 
-  // Configuration key for DynamicConfig
-  string dynamic_config_key = 4;
+  // In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.
+  bool manual_mode = 4;
 
-  // Default configuration.
-  DynamicConfig default_config = 5;
+  // Configuration key for overriding `manual_mode` setting through dynamic configuration.
+  string manual_mode_config_key = 5;
 }
 
 // Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
@@ -351,11 +341,8 @@ message Switcher {
   Outs out_ports = 2;
 }
 
-// Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+// Component that emits a constant signal which can be changed at runtime through dynamic configuration.
 message Variable {
-  message DynamicConfig {
-    ConstantSignal constant_signal = 1; // @gotags: validate:"required"
-  }
   // Outputs for the Variable component.
   message Outs {
     // The value is emitted to the output port.
@@ -365,11 +352,29 @@ message Variable {
   // Output ports for the Variable component.
   Outs out_ports = 1;
 
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 2;
+  // The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.
+  ConstantSignal constant_output = 2; // @gotags: validate:"required"
 
-  // Default configuration.
-  DynamicConfig default_config = 3; // @gotags: validate:"required"
+  // Configuration key for overriding value setting through dynamic configuration.
+  string config_key = 3;
+}
+
+// Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
+message BoolVariable {
+  // Outputs for the BoolVariable component.
+  message Outs {
+    // The value is emitted to the output port.
+    OutPort output = 1;
+  }
+
+  // Output ports for the BoolVariable component.
+  Outs out_ports = 1;
+
+  // The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.
+  bool constant_output = 2;
+
+  // Configuration key for overriding value setting through dynamic configuration.
+  string config_key = 3;
 }
 
 // Takes an input signal and emits the output after applying the specified unary operator

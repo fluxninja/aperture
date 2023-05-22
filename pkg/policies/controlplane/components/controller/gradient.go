@@ -45,8 +45,8 @@ func NewGradientControllerAndOptions(
 		fmt.Sprintf("slope: %v, min: %v, max: %v", gradientParameters.Slope, gradientParameters.MinGradient, gradientParameters.MaxGradient),
 		componentID.String(),
 		policyReadAPI,
-		gradientControllerProto.DynamicConfigKey,
-		gradientControllerProto.DefaultConfig,
+		gradientControllerProto.ManualModeConfigKey,
+		gradientControllerProto.ManualMode,
 	)
 
 	return controller, fx.Options(), nil
