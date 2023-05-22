@@ -37,15 +37,6 @@ policy:
         infra_meters:
           influxdb:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - influxdb
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               influxdb: [influxdbreceiver configuration here]
 ```

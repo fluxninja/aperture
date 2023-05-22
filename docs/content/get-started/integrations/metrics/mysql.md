@@ -36,15 +36,6 @@ policy:
         infra_meters:
           mysql:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - mysql
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               mysql: [mysqlreceiver configuration here]
 ```

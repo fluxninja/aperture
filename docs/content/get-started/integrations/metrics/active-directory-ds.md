@@ -37,15 +37,6 @@ policy:
         infra_meters:
           active_directory_ds:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - active_directory_ds
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               active_directory_ds:
                 [activedirectorydsreceiver configuration here]

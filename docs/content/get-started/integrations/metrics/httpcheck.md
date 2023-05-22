@@ -37,15 +37,6 @@ policy:
         infra_meters:
           httpcheck:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - httpcheck
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               httpcheck: [httpcheckreceiver configuration here]
 ```
