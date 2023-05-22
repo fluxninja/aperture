@@ -6,7 +6,6 @@ import (
 	stdlog "log"
 	"net"
 	"strconv"
-	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -160,21 +159,12 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				return errors.New("olric failed to start")
 			case <-startChan:
 			}
-			// Olric may not have bootstrapped yet, make a call to Stats
-			// every 100ms until it succeeds or context is canceled.
-			for {
-				_, err = dc.olric.Stats()
-				if err == nil {
-					break
-				}
-				timer := time.NewTimer(100 * time.Millisecond)
-				select {
-				case <-ctx.Done():
-					timer.Stop()
-					return errors.New("olric failed to start")
-				case <-timer.C:
-				}
+			_, err = dc.olric.Stats()
+			if err != nil {
+				return err
 			}
+
+			log.Info().Msg("DistCache started")
 
 			err = in.LivenessMultiJob.RegisterJob(job)
 			if err != nil {
