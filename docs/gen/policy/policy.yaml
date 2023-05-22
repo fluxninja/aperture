@@ -2895,7 +2895,6 @@ definitions:
         x-order: 1
         $ref: '#/definitions/RateLimiterParameters'
       scheduler:
-        x-go-tag-validate: required
         x-order: 2
         $ref: '#/definitions/Scheduler'
       selectors:

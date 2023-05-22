@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: rate-limit-escalation
+  name: service-protection
 spec:
   circuit:
     components:
@@ -97,8 +97,8 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="rate-limit-escalation"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="rate-limit-escalation"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service-protection"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service-protection"}[5s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -146,7 +146,7 @@ spec:
         - control_point: awesomeFeature
           service: service1-demo-app.demoapp.svc.cluster.local
       flux_meters:
-        rate-limit-escalation:
+        service-protection:
           selectors:
           - control_point: awesomeFeature
             service: service3-demo-app.demoapp.svc.cluster.local

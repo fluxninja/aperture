@@ -28,8 +28,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
+	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/global-token-bucket"
 	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
-	tokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
@@ -175,6 +175,8 @@ func (qsFactory *quotaSchedulerFactory) newQuotaSchedulerOptions(
 	}
 
 	qsProto := wrapperMessage.QuotaScheduler
+	qsProto.Scheduler = workloadscheduler.SanitizeSchedulerProto(qsProto.Scheduler)
+
 	qs := &quotaScheduler{
 		Component: wrapperMessage.GetCommonAttributes(),
 		proto:     qsProto,
@@ -199,7 +201,7 @@ type quotaScheduler struct {
 	limiter          ratelimiter.RateLimiter
 	clock            clockwork.Clock
 	qsFactory        *quotaSchedulerFactory
-	inner            *tokenbucket.TokenBucketRateLimiter
+	inner            *globaltokenbucket.GlobalTokenBucket
 	proto            *policylangv1.QuotaScheduler
 	schedulerMetrics *workloadscheduler.SchedulerMetrics
 	name             string
@@ -249,7 +251,7 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 
-			qs.inner, err = tokenbucket.NewTokenBucket(
+			qs.inner, err = globaltokenbucket.NewGlobalTokenBucket(
 				qs.qsFactory.distCache,
 				qs.name,
 				qs.proto.Parameters.GetInterval().AsDuration(),
@@ -265,9 +267,9 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 			// check whether lazy limiter is enabled
 			if lazySyncConfig := qs.proto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					lazySyncInterval := time.Duration(int64(qs.proto.Parameters.GetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
 					qs.limiter, err = lazysync.NewLazySyncRateLimiter(qs.limiter,
-						lazySyncInterval,
+						qs.proto.Parameters.GetInterval().AsDuration(),
+						lazySyncConfig.GetNumSync(),
 						qs.qsFactory.auditJobGroup)
 					if err != nil {
 						logger.Error().Err(err).Msg("Failed to create lazy limiter")
@@ -391,7 +393,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 	// lookup the scheduler
 	existing, found := qs.schedulers.Load(label)
 	if !found {
-		tokenBucket := scheduler.NewRateLimiterTokenBucket(label, qs.limiter)
+		tokenBucket := scheduler.NewGlobalTokenBucket(label, qs.limiter)
 		s, err := qs.qsFactory.wsFactory.NewScheduler(
 			qs.registry,
 			qs.proto.Scheduler,

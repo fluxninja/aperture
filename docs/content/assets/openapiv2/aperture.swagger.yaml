@@ -3195,7 +3195,6 @@ definitions:
                 x-go-tag-validate: required
             scheduler:
                 $ref: '#/definitions/Scheduler'
-                x-go-tag-validate: required
             selectors:
                 items:
                     $ref: '#/definitions/Selector'

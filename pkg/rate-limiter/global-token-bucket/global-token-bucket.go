@@ -1,7 +1,6 @@
-package tokenbucket
+package globaltokenbucket
 
 import (
-	"math"
 	"sync"
 	"time"
 
@@ -19,8 +18,8 @@ const (
 	TakeNFunction = "TakeN"
 )
 
-// TokenBucketRateLimiter implements Limiter.
-type TokenBucketRateLimiter struct {
+// GlobalTokenBucket implements Limiter.
+type GlobalTokenBucket struct {
 	mu             sync.RWMutex
 	dMap           *olric.DMap
 	name           string
@@ -29,75 +28,72 @@ type TokenBucketRateLimiter struct {
 	interval       time.Duration
 	continuousFill bool
 	passThrough    bool
+	dc             *distcache.DistCache
 }
 
-// NewTokenBucket creates a new instance of DistCacheRateTracker.
-func NewTokenBucket(dc *distcache.DistCache,
+// NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
+func NewGlobalTokenBucket(dc *distcache.DistCache,
 	name string,
 	interval time.Duration,
 	maxIdleDuration time.Duration,
 	continuousFill bool,
-) (*TokenBucketRateLimiter, error) {
-	dc.Mutex.Lock()
-	defer dc.Mutex.Unlock()
-
-	lbrl := &TokenBucketRateLimiter{
+) (*GlobalTokenBucket, error) {
+	gtb := &GlobalTokenBucket{
 		name:           name,
 		interval:       interval,
 		passThrough:    true,
 		continuousFill: continuousFill,
+		dc:             dc,
 	}
 
 	dmapConfig := config.DMap{
 		MaxIdleDuration: maxIdleDuration,
 		Functions: map[string]config.Function{
-			TakeNFunction: lbrl.takeN,
+			TakeNFunction: gtb.takeN,
 		},
 	}
 
-	dc.AddDMapCustomConfig(name, dmapConfig)
-	dMap, err := dc.Olric.NewDMap(name)
+	dMap, err := dc.NewDMap(name, dmapConfig)
 	if err != nil {
 		return nil, err
 	}
-	dc.RemoveDMapCustomConfig(name)
 
-	lbrl.dMap = dMap
+	gtb.dMap = dMap
 
-	return lbrl, nil
+	return gtb, nil
 }
 
 // SetBucketCapacity sets the rate limit for the rate limiter.
-func (lbrl *TokenBucketRateLimiter) SetBucketCapacity(bucketCapacity float64) {
-	lbrl.mu.Lock()
-	defer lbrl.mu.Unlock()
-	lbrl.bucketCapacity = bucketCapacity
+func (gtb *GlobalTokenBucket) SetBucketCapacity(bucketCapacity float64) {
+	gtb.mu.Lock()
+	defer gtb.mu.Unlock()
+	gtb.bucketCapacity = bucketCapacity
 }
 
 // GetBucketCapacity returns the rate limit for the rate limiter.
-func (lbrl *TokenBucketRateLimiter) GetBucketCapacity() float64 {
-	lbrl.mu.RLock()
-	defer lbrl.mu.RUnlock()
-	return lbrl.bucketCapacity
+func (gtb *GlobalTokenBucket) GetBucketCapacity() float64 {
+	gtb.mu.RLock()
+	defer gtb.mu.RUnlock()
+	return gtb.bucketCapacity
 }
 
 // SetFillAmount sets the default fill amount for the rate limiter.
-func (lbrl *TokenBucketRateLimiter) SetFillAmount(fillAmount float64) {
-	lbrl.mu.Lock()
-	defer lbrl.mu.Unlock()
-	lbrl.fillAmount = fillAmount
+func (gtb *GlobalTokenBucket) SetFillAmount(fillAmount float64) {
+	gtb.mu.Lock()
+	defer gtb.mu.Unlock()
+	gtb.fillAmount = fillAmount
 }
 
 // Name returns the name of the DistCacheRateTracker.
-func (lbrl *TokenBucketRateLimiter) Name() string {
-	return lbrl.name
+func (gtb *GlobalTokenBucket) Name() string {
+	return gtb.name
 }
 
 // Close cleans up DMap held within the DistCacheRateTracker.
-func (lbrl *TokenBucketRateLimiter) Close() error {
-	lbrl.mu.Lock()
-	defer lbrl.mu.Unlock()
-	err := lbrl.dMap.Destroy()
+func (gtb *GlobalTokenBucket) Close() error {
+	gtb.mu.Lock()
+	defer gtb.mu.Unlock()
+	err := gtb.dc.DeleteDMap(gtb.name)
 	if err != nil {
 		return err
 	}
@@ -106,9 +102,13 @@ func (lbrl *TokenBucketRateLimiter) Close() error {
 
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (lbrl *TokenBucketRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
-	if lbrl.GetPassThrough() {
+func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
+	if gtb.GetPassThrough() {
 		return true, 0, 0
+	}
+
+	if gtb.GetBucketCapacity() == 0 {
+		return false, 0, 0
 	}
 
 	req := takeNRequest{
@@ -122,9 +122,9 @@ func (lbrl *TokenBucketRateLimiter) TakeIfAvailable(label string, n float64) (bo
 		return true, 0, 0
 	}
 
-	resultBytes, err := lbrl.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Errorf("error taking from token bucket: %v", err)
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0
 	}
 
@@ -141,9 +141,13 @@ func (lbrl *TokenBucketRateLimiter) TakeIfAvailable(label string, n float64) (bo
 
 // Take increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // It also returns the wait time at which the tokens will be available.
-func (lbrl *TokenBucketRateLimiter) Take(label string, n float64) (bool, time.Duration, float64, float64) {
-	if lbrl.GetPassThrough() {
+func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration, float64, float64) {
+	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
+	}
+
+	if gtb.GetBucketCapacity() == 0 {
+		return false, 0, 0, 0
 	}
 
 	req := takeNRequest{
@@ -157,9 +161,9 @@ func (lbrl *TokenBucketRateLimiter) Take(label string, n float64) (bool, time.Du
 		return true, 0, 0, 0
 	}
 
-	resultBytes, err := lbrl.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Errorf("error taking from token bucket: %v", err)
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0, 0
 	}
 
@@ -182,11 +186,8 @@ func (lbrl *TokenBucketRateLimiter) Take(label string, n float64) (bool, time.Du
 }
 
 // Return returns n tokens to the bucket.
-func (lbrl *TokenBucketRateLimiter) Return(label string, n float64) (float64, float64) {
-	if lbrl.GetPassThrough() {
-		return 0, 0
-	}
-	_, remaining, current := lbrl.TakeIfAvailable(label, -n)
+func (gtb *GlobalTokenBucket) Return(label string, n float64) (float64, float64) {
+	_, remaining, current := gtb.TakeIfAvailable(label, -n)
 	return remaining, current
 }
 
@@ -209,14 +210,14 @@ type takeNResponse struct {
 }
 
 // takeN takes a number of tokens from the bucket.
-func (lbrl *TokenBucketRateLimiter) takeN(key string, stateBytes, argBytes []byte) ([]byte, []byte, error) {
-	lbrl.mu.RLock()
-	defer lbrl.mu.RUnlock()
+func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]byte, []byte, error) {
+	gtb.mu.RLock()
+	defer gtb.mu.RUnlock()
 
 	// Decode currentState from gob encoded currentStateBytes
 	now := time.Now()
 
-	state, err := lbrl.fastForwardState(now, stateBytes)
+	state, err := gtb.fastForwardState(now, stateBytes)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -237,23 +238,28 @@ func (lbrl *TokenBucketRateLimiter) takeN(key string, stateBytes, argBytes []byt
 	}
 
 	state.Available -= arg.Want
-	if math.Signbit(state.Available) != math.Signbit(lbrl.bucketCapacity) {
-		if lbrl.fillAmount != 0 {
-			waitTime := time.Duration(math.Abs(state.Available) / math.Abs(lbrl.fillAmount) * float64(lbrl.interval))
-			availableAt := now.Add(waitTime)
-			result.AvailableAt = availableAt
+
+	if arg.Want > 0 {
+		if state.Available < 0 {
+			if gtb.fillAmount != 0 {
+				waitTime := time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
+				availableAt := now.Add(waitTime)
+				result.AvailableAt = availableAt
+			}
+			result.Ok = arg.CanWait
+			// return the tokens to the bucket if the request is not ok
+			if !result.Ok {
+				state.Available += arg.Want
+			}
 		}
-		result.Ok = arg.CanWait
-		// return the tokens to the bucket if the request is not ok
-		if !result.Ok {
-			state.Available += arg.Want
-		}
-	} else if math.Abs(state.Available) > math.Abs(lbrl.bucketCapacity) {
-		state.Available = lbrl.bucketCapacity
+	}
+
+	if state.Available > gtb.bucketCapacity {
+		state.Available = gtb.bucketCapacity
 	}
 
 	result.Remaining = state.Available
-	result.Current = lbrl.bucketCapacity - state.Available
+	result.Current = gtb.bucketCapacity - state.Available
 
 	// Encode result to gob encoded resultBytes
 	resultBytes, err := utils.MarshalGob(result)
@@ -272,7 +278,7 @@ func (lbrl *TokenBucketRateLimiter) takeN(key string, stateBytes, argBytes []byt
 	return newStateBytes, resultBytes, nil
 }
 
-func (lbrl *TokenBucketRateLimiter) fastForwardState(now time.Time, stateBytes []byte) (*tokenBucketState, error) {
+func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte) (*tokenBucketState, error) {
 	var state tokenBucketState
 
 	if stateBytes != nil {
@@ -283,47 +289,46 @@ func (lbrl *TokenBucketRateLimiter) fastForwardState(now time.Time, stateBytes [
 		}
 	} else {
 		state.LastFill = now
-		state.Available = lbrl.bucketCapacity
+		state.Available = gtb.bucketCapacity
 	}
 
-	if lbrl.fillAmount != 0 {
+	if gtb.fillAmount != 0 {
 		// Calculate the time passed since the last fill
 		sinceLastFill := now.Sub(state.LastFill)
 		fillAmount := 0.0
-		if lbrl.continuousFill {
-			fillAmount = lbrl.fillAmount * float64(sinceLastFill) / float64(lbrl.interval)
+		if gtb.continuousFill {
+			fillAmount = gtb.fillAmount * float64(sinceLastFill) / float64(gtb.interval)
 			state.LastFill = now
-		} else if sinceLastFill >= lbrl.interval {
-			fills := int(sinceLastFill / lbrl.interval)
+		} else if sinceLastFill >= gtb.interval {
+			fills := int(sinceLastFill / gtb.interval)
 			if fills > 0 {
-				fillAmount = lbrl.fillAmount * float64(fills)
-				state.LastFill = state.LastFill.Add(time.Duration(fills) * lbrl.interval)
+				fillAmount = gtb.fillAmount * float64(fills)
+				state.LastFill = state.LastFill.Add(time.Duration(fills) * gtb.interval)
 			}
 		}
 		// Fill the calculated amount
 		state.Available += fillAmount
 
-		if math.Signbit(state.Available) == math.Signbit(lbrl.bucketCapacity) &&
-			math.Abs(state.Available) > math.Abs(lbrl.bucketCapacity) {
-			state.Available = lbrl.bucketCapacity
+		if state.Available > gtb.bucketCapacity {
+			state.Available = gtb.bucketCapacity
 		}
 	}
 	return &state, nil
 }
 
 // SetPassThrough sets the pass through flag.
-func (lbrl *TokenBucketRateLimiter) SetPassThrough(passThrough bool) {
-	lbrl.mu.Lock()
-	defer lbrl.mu.Unlock()
-	lbrl.passThrough = passThrough
+func (gtb *GlobalTokenBucket) SetPassThrough(passThrough bool) {
+	gtb.mu.Lock()
+	defer gtb.mu.Unlock()
+	gtb.passThrough = passThrough
 }
 
 // GetPassThrough returns the pass through flag.
-func (lbrl *TokenBucketRateLimiter) GetPassThrough() bool {
-	lbrl.mu.RLock()
-	defer lbrl.mu.RUnlock()
-	return lbrl.passThrough
+func (gtb *GlobalTokenBucket) GetPassThrough() bool {
+	gtb.mu.RLock()
+	defer gtb.mu.RUnlock()
+	return gtb.passThrough
 }
 
 // Make sure TokenBucketRateTracker implements Limiter interface.
-var _ ratelimiter.RateLimiter = (*TokenBucketRateLimiter)(nil)
+var _ ratelimiter.RateLimiter = (*GlobalTokenBucket)(nil)

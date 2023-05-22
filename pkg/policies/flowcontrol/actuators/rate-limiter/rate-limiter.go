@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path"
 	"strconv"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -26,8 +25,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
+	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/global-token-bucket"
 	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
-	tokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
@@ -208,7 +207,7 @@ type rateLimiter struct {
 	registry  status.Registry
 	lbFactory *rateLimiterFactory
 	limiter   ratelimiter.RateLimiter
-	inner     *tokenbucket.TokenBucketRateLimiter
+	inner     *globaltokenbucket.GlobalTokenBucket
 	lbProto   *policylangv1.RateLimiter
 	name      string
 }
@@ -243,7 +242,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			rl.inner, err = tokenbucket.NewTokenBucket(
+			rl.inner, err = globaltokenbucket.NewGlobalTokenBucket(
 				rl.lbFactory.distCache,
 				rl.name,
 				rl.lbProto.Parameters.GetInterval().AsDuration(),
@@ -258,9 +257,9 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			// check whether lazy limiter is enabled
 			if lazySyncConfig := rl.lbProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					lazySyncInterval := time.Duration(int64(rl.lbProto.Parameters.GetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
 					rl.limiter, err = lazysync.NewLazySyncRateLimiter(rl.limiter,
-						lazySyncInterval,
+						rl.lbProto.Parameters.GetInterval().AsDuration(),
+						lazySyncConfig.GetNumSync(),
 						rl.lbFactory.lazySyncJobGroup)
 					if err != nil {
 						logger.Error().Err(err).Msg("Failed to create lazy limiter")

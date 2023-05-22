@@ -12,13 +12,16 @@ spec:
           in_ports:
             bucket_capacity:
               constant_signal:
-                value: 25
+                value: 500
             fill_amount:
               constant_signal:
                 value: 25
           parameters:
             interval: 1s
             label_key: http.request.header.api_key
+            lazy_sync:
+              enabled: false
+              num_sync: 4
           scheduler:
             workloads:
             - label_matcher:

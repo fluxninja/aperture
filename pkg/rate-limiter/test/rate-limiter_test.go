@@ -1,34 +1,26 @@
 package ratelimiter
 
 import (
-	"context"
 	"fmt"
-	stdlog "log"
 	"math"
 	"math/rand"
-	"net"
-	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
-
-	"github.com/buraksezer/olric"
-	olricconfig "github.com/buraksezer/olric/config"
-	"github.com/hashicorp/memberlist"
 
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
+	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/global-token-bucket"
 	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
-	tokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/token-bucket"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, interval time.Duration) (ratelimiter.RateLimiter, error) {
-	limiter, err := tokenbucket.NewTokenBucket(distCache, "Limiter", interval, time.Hour, true)
+	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", interval, time.Hour, true)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
@@ -39,131 +31,6 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64,
 
 	t.Logf("Successfully created new Limiter")
 	return limiter, nil
-}
-
-func newTestDistCacheWithConfig(t *testing.T, c *olricconfig.Config) (*distcache.DistCache, error) {
-	distCache := &distcache.DistCache{}
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	if c != nil {
-		distCache.Config = c
-	} else {
-		oc := olricconfig.New("local")
-
-		err := oc.DMaps.Sanitize()
-		if err != nil {
-			t.Errorf("Failed to sanitize olric config: %v", err)
-		}
-		err = oc.DMaps.Validate()
-		if err != nil {
-			t.Errorf("Failed to validate olric config: %v", err)
-		}
-		distCache.Config = oc
-	}
-
-	distCache.Config.Started = func() {
-		t.Log("Started olric server")
-		cancel()
-	}
-
-	o, err := olric.New(distCache.Config)
-	if err != nil {
-		return nil, err
-	}
-
-	distCache.Olric = o
-
-	go func() {
-		t.Log("Starting DistCacheLimiter")
-		err = distCache.Olric.Start()
-		if err != nil {
-			t.Errorf("Failed to start olric: %v", err)
-		}
-	}()
-
-	select {
-	case <-time.After(time.Second):
-		t.Fatal("DistCache cannot be started in one second")
-	case <-ctx.Done():
-		// everything is fine
-	}
-
-	return distCache, nil
-}
-
-type testDistCacheCluster struct {
-	mu      sync.Mutex
-	members map[string]*distcache.DistCache
-}
-
-func newTestOlricConfig() *olricconfig.Config {
-	c := olricconfig.New("local")
-	mc := memberlist.DefaultLocalConfig()
-	mc.BindAddr = "127.0.0.1"
-	mc.BindPort = 0
-	c.MemberlistConfig = mc
-	c.Logger = stdlog.New(&distcache.OlricLogWriter{Logger: log.GetGlobalLogger()}, "", 0)
-
-	port, err := getFreePort()
-	if err != nil {
-		panic(fmt.Sprintf("GetFreePort returned an error: %v", err))
-	}
-	c.BindAddr = "127.0.0.1"
-	c.BindPort = port
-	c.MemberlistConfig.Name = net.JoinHostPort(c.BindAddr, strconv.Itoa(c.BindPort))
-	if err := c.Sanitize(); err != nil {
-		panic(fmt.Sprintf("failed to sanitize default config: %v", err))
-	}
-	return c
-}
-
-func getFreePort() (int, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:0")
-	if err != nil {
-		return 0, err
-	}
-
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return 0, err
-	}
-	port := l.Addr().(*net.TCPAddr).Port
-	if err := l.Close(); err != nil {
-		return 0, err
-	}
-	return port, nil
-}
-
-func (cl *testDistCacheCluster) addDistCacheWithConfig(t *testing.T, c *olricconfig.Config) error {
-	cl.mu.Lock()
-	defer cl.mu.Unlock()
-
-	if c == nil {
-		c = newTestOlricConfig()
-	}
-
-	for _, member := range cl.members {
-		c.Peers = append(c.Peers, fmt.Sprintf("%s:%d", member.Config.MemberlistConfig.BindAddr, member.Config.MemberlistConfig.BindPort))
-	}
-
-	dc, err := newTestDistCacheWithConfig(t, c)
-	if err != nil {
-		return err
-	}
-	cl.members[dc.Config.MemberlistConfig.Name] = dc
-	return nil
-}
-
-func newTestDistCacheCluster(t *testing.T, n int) *testDistCacheCluster {
-	cl := &testDistCacheCluster{
-		members: make(map[string]*distcache.DistCache, n),
-	}
-	for i := 0; i < n; i++ {
-		t.Log("Adding cluster member")
-		_ = cl.addDistCacheWithConfig(t, nil)
-	}
-	return cl
 }
 
 type flow struct {
@@ -234,9 +101,11 @@ func createJobGroup(_ ratelimiter.RateLimiter) *jobs.JobGroup {
 }
 
 // createOlricLimiters creates a set of Olric limiters.
-func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, interval time.Duration) []ratelimiter.RateLimiter {
+func createOlricLimiters(t *testing.T, cl *distcache.TestDistCacheCluster, limit float64, interval time.Duration) []ratelimiter.RateLimiter {
+	cl.Lock.Lock()
+	defer cl.Lock.Unlock()
 	var limiters []ratelimiter.RateLimiter
-	for _, distCache := range cl.members {
+	for _, distCache := range cl.Members {
 		limiter, err := newTestLimiter(t, distCache, limit, interval)
 		if err != nil {
 			t.Logf("Error creating limiter: %v", err)
@@ -248,11 +117,11 @@ func createOlricLimiters(t *testing.T, cl *testDistCacheCluster, limit float64, 
 }
 
 // createLazySyncLimiters creates a set of lazy-sync-limiters.
-func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, syncDuration time.Duration) []ratelimiter.RateLimiter {
+func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, interval time.Duration, numSyncs uint32) []ratelimiter.RateLimiter {
 	var lazySyncLimiters []ratelimiter.RateLimiter
 	for _, limiter := range limiters {
 		jobGroup := createJobGroup(limiter)
-		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, syncDuration, jobGroup)
+		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, interval, numSyncs, jobGroup)
 		if err != nil {
 			t.Logf("Error creating lazy sync limiter: %v", err)
 			t.FailNow()
@@ -297,20 +166,6 @@ func closeLimiters(t *testing.T, limiters []ratelimiter.RateLimiter) {
 	}
 }
 
-// closeTestDistCacheCluster closes the test dist cache cluster.
-func closeTestDistCacheCluster(t *testing.T, cl *testDistCacheCluster) {
-	cl.mu.Lock()
-	defer cl.mu.Unlock()
-	for _, member := range cl.members {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		err := member.Olric.Shutdown(ctx)
-		if err != nil {
-			t.Log("Failed to shutdown olric")
-		}
-	}
-}
-
 type testConfig struct {
 	t                     *testing.T
 	flows                 []*flow
@@ -319,7 +174,7 @@ type testConfig struct {
 	interval              time.Duration
 	tolerance             float64
 	duration              time.Duration
-	syncDuration          time.Duration
+	numSyncs              uint32
 	enableLazySyncLimiter bool
 }
 
@@ -328,17 +183,17 @@ func baseOfLimiterTest(config testConfig) {
 	var fr *flowRunner
 	var lazySyncLimiters []ratelimiter.RateLimiter
 	t := config.t
-	cl := newTestDistCacheCluster(t, config.numOlrics)
+	cl := distcache.NewTestDistCacheCluster(t, config.numOlrics)
 
-	if len(cl.members) != config.numOlrics {
-		t.Logf("Expected %d members, got %d", config.numOlrics, len(cl.members))
+	if len(cl.Members) != config.numOlrics {
+		t.Logf("Expected %d members, got %d", config.numOlrics, len(cl.Members))
 		t.FailNow()
 	}
 
 	limiters := createOlricLimiters(t, cl, config.limit, config.interval)
 
 	if config.enableLazySyncLimiter {
-		limiters = createLazySyncLimiters(t, limiters, config.syncDuration)
+		limiters = createLazySyncLimiters(t, limiters, config.interval, config.numSyncs)
 	}
 
 	t.Log("Starting flows...")
@@ -364,7 +219,7 @@ func baseOfLimiterTest(config testConfig) {
 	}
 
 	closeLimiters(t, limiters)
-	closeTestDistCacheCluster(t, cl)
+	distcache.CloseTestDistCacheCluster(t, cl)
 }
 
 // TestOlricLimiterWithBasicLimit tests the basic limit functionality of the limiter and if it accepts the limit of requests sent within interval.
@@ -418,7 +273,7 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 		flows:                 flows,
 		duration:              time.Second * 10,
 		enableLazySyncLimiter: true,
-		syncDuration:          time.Millisecond * 100,
+		numSyncs:              10,
 		tolerance:             0.2,
 	})
 }

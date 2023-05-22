@@ -2770,7 +2770,6 @@
         },
         "scheduler": {
           "$ref": "#/definitions/Scheduler",
-          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "selectors": {

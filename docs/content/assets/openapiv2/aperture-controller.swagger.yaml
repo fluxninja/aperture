@@ -2836,7 +2836,6 @@ definitions:
         x-go-tag-validate: required
         $ref: '#/definitions/RateLimiterParameters'
       scheduler:
-        x-go-tag-validate: required
         $ref: '#/definitions/Scheduler'
       selectors:
         type: array
