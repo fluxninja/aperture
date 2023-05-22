@@ -9,6 +9,7 @@ local application = {
     namespace: 'demoapp',
   },
   values:: {
+    replicaCount: 2,
   },
   service1:
     helm.template('service1', 'charts/java-demo-app', {
