@@ -45,23 +45,23 @@ var _ = Describe("Circuit", func() {
 			`
 			components:
 			- variable:
-        constant_output:
-          value: 42
+				constant_output:
+					value: 42
 				out_ports:
 					output: { signal_name: VAR }
 			- variable:
-        constant_output:
-          special_value: NaN
+				constant_output:
+					special_value: NaN
 				out_ports:
 					output: { signal_name: VAR2 }
 			- variable:
-        constant_output:
-          special_value: +Inf
+				constant_output:
+					special_value: +Inf
 				out_ports:
 					output: { signal_name: VAR3 }
 			- variable:
-        constant_output:
-          special_value: -Inf
+				constant_output:
+					special_value: -Inf
 				out_ports:
 					output: { signal_name: VAR4 }
 			`,
