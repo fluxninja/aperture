@@ -155,13 +155,21 @@ func (lsl *LazySyncRateLimiter) takeN(label string, n float64, canWait bool) (bo
 
 		waitTime := time.Duration(0)
 
-		if canWait && c.waiting {
+		if c.waiting && !canWait {
+			return ret(false, 0)
+		}
+
+		if c.waiting {
 			waitTime = c.nextSync.Sub(now)
 		}
 
 		if c.credit+n <= c.available {
 			c.credit += n
 			return ret(true, waitTime)
+		}
+
+		if canWait && !c.waiting {
+			return syncRemote(c, n)
 		}
 
 		return ret(false, waitTime)
