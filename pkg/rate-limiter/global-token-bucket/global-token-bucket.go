@@ -1,7 +1,6 @@
 package globaltokenbucket
 
 import (
-	"math"
 	"sync"
 	"time"
 
@@ -243,7 +242,7 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 	if arg.Want > 0 {
 		if state.Available < 0 {
 			if gtb.fillAmount != 0 {
-				waitTime := time.Duration(math.Abs(state.Available) / math.Abs(gtb.fillAmount) * float64(gtb.interval))
+				waitTime := time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
 				availableAt := now.Add(waitTime)
 				result.AvailableAt = availableAt
 			}

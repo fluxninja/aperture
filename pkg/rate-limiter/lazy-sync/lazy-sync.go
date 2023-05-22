@@ -2,7 +2,6 @@ package lazysync
 
 import (
 	"context"
-	"math"
 	"sync"
 	"time"
 
@@ -19,6 +18,7 @@ type counter struct {
 	// snapshot
 	current   float64
 	available float64
+	waiting   bool
 }
 
 // LazySyncRateLimiter is a limiter that syncs its state lazily with another limiter.
@@ -108,20 +108,22 @@ func (lsl *LazySyncRateLimiter) takeN(label string, n float64, canWait bool) (bo
 
 	now := time.Now()
 	syncRemote := func(c *counter, n float64) (bool, time.Duration, float64, float64) {
-		toCheck := c.credit
+		tokens := c.credit
 		if canWait {
-			toCheck += n
+			tokens += n
 		}
-		ok, waitTime, remaining, current := lsl.limiter.Take(label, toCheck)
+		ok, waitTime, remaining, current := lsl.limiter.Take(label, tokens)
 		c.credit = 0
 		if waitTime > 0 {
+			c.waiting = true
 			c.nextSync = now.Add(waitTime)
 		} else {
+			c.waiting = false
 			c.nextSync = now.Add(lsl.syncInterval)
 		}
 
 		if ok && !canWait {
-			if n < 0 || n < remaining {
+			if n <= remaining {
 				c.credit = n
 				remaining -= n
 				current += n
@@ -138,22 +140,31 @@ func (lsl *LazySyncRateLimiter) takeN(label string, n float64, canWait bool) (bo
 		c.lock.Lock()
 		defer c.lock.Unlock()
 
-		if n > 0 {
-			// check if we need to sync
-			if now.After(c.nextSync) {
-				return syncRemote(c, n)
-			}
-			if c.credit+n > c.available {
-				if canWait {
-					// need accurate wait time
-					return syncRemote(c, n)
-				}
-				waitTime := c.nextSync.Sub(now)
-				return false, waitTime, math.Max(0, c.available-c.credit), c.current + c.credit
-			}
+		ret := func(ok bool, waitTime time.Duration) (bool, time.Duration, float64, float64) {
+			return ok, waitTime, c.available - c.credit, c.current + c.credit
 		}
-		c.credit += n
-		return true, 0, math.Max(0, c.available-c.credit), c.current + c.credit
+
+		if n <= 0 {
+			c.credit += n
+			return ret(true, 0)
+		}
+
+		if now.After(c.nextSync) {
+			return syncRemote(c, n)
+		}
+
+		waitTime := time.Duration(0)
+
+		if canWait && c.waiting {
+			waitTime = c.nextSync.Sub(now)
+		}
+
+		if c.credit+n <= c.available {
+			c.credit += n
+			return ret(true, waitTime)
+		}
+
+		return ret(false, waitTime)
 	}
 
 	c := &counter{}
@@ -177,7 +188,7 @@ func (lsl *LazySyncRateLimiter) Take(label string, n float64) (bool, time.Durati
 
 // Return returns n tokens to the limiter.
 func (lsl *LazySyncRateLimiter) Return(label string, n float64) (float64, float64) {
-	_, remaining, current := lsl.TakeIfAvailable(label, -n)
+	_, _, remaining, current := lsl.takeN(label, -n, false)
 	return remaining, current
 }
 
