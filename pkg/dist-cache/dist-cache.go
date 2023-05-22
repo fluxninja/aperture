@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -19,21 +20,25 @@ import (
 // DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	distcachev1.UnimplementedDistCacheServiceServer
-	lock    sync.Mutex
-	config  *olricconfig.Config
-	olric   *olric.Olric
-	metrics *DistCacheMetrics
+	lock              sync.Mutex
+	config            *olricconfig.Config
+	olric             *olric.Olric
+	metrics           *DistCacheMetrics
+	shutDowner        fx.Shutdowner
+	statsFailureCount uint8
 }
 
 // NewDistCache creates a new instance of DistCache.
 func NewDistCache(config *olricconfig.Config,
 	olric *olric.Olric,
 	metrics *DistCacheMetrics,
+	shutDowner fx.Shutdowner,
 ) *DistCache {
 	return &DistCache{
-		config:  config,
-		olric:   olric,
-		metrics: metrics,
+		config:     config,
+		olric:      olric,
+		metrics:    metrics,
+		shutDowner: shutDowner,
 	}
 }
 
@@ -43,15 +48,29 @@ func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (*olric.DMap,
 	defer dc.lock.Unlock()
 	dc.config.DMaps.Custom[name] = config
 	defer delete(dc.config.DMaps.Custom, name)
-	return dc.olric.NewDMap(name)
+	d, err := dc.olric.NewDMap(name)
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed to create new DMap: %s, shutting down", name)
+		// shutdown
+		_ = dc.shutDowner.Shutdown()
+		return nil, err
+	}
+	return d, nil
 }
 
 func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
 	stats, err := dc.olric.Stats()
 	if err != nil {
+		dc.statsFailureCount++
+		if dc.statsFailureCount > 10 {
+			log.Error().Err(err).Msgf("Failed to scrape Olric statistics 10 times in a row, shutting down")
+			_ = dc.shutDowner.Shutdown()
+		}
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
 		return nil, err
 	}
+
+	dc.statsFailureCount = 0
 
 	memberID := stats.Member.ID
 	memberName := stats.Member.Name

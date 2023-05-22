@@ -135,7 +135,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		return nil, err
 	}
 
-	dc := NewDistCache(oc, o, newDistCacheMetrics())
+	dc := NewDistCache(oc, o, newDistCacheMetrics(), in.Shutdowner)
 
 	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
