@@ -1,12 +1,12 @@
 ---
-title: Generating and Applying Policies
+title: Your First Policy
 description: How to generate and apply policies in Aperture
 keywords:
   - policy
   - jsonnet
   - grafana
   - policy
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 ```mdx-code-block
@@ -28,7 +28,7 @@ customizations.
 
 To manage blueprints and generate policies, you can use the `aperturectl`
 [CLI tool](/reference/aperturectl/aperturectl.md), by following the
-[installation steps](/get-started/aperture-cli/aperture-cli.md#installation)
+[installation steps](../../get-started/installation/aperture-cli/aperture-cli.md#installation)
 first.
 
 Advanced users can learn about designing new policies by following the example

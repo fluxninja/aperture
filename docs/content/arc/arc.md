@@ -1,6 +1,6 @@
 ---
 title: FluxNinja ARC
-sidebar_position: 6
+sidebar_position: 10
 keywords:
   - cloud
   - enterprise

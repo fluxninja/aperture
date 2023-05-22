@@ -10,8 +10,8 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
-import {DownloadScript} from '../installation/agent/bare_metal.md';
+import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {DownloadScript} from '../../installation/agent/bare_metal.md';
 ```
 
 ```mdx-code-block

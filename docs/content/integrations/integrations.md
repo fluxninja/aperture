@@ -1,13 +1,13 @@
 ---
-title: Setup Integrations
+title: Integrations
 keywords:
   - flow-control
   - service-mesh
   - envoy
   - middleware
   - sdk
-sidebar_position: 3
-sidebar_label: Setup Integrations
+sidebar_position: 5
+sidebar_label: Integrations
 ---
 
 Aperture provides several built-in integrations for reliability automation. This
