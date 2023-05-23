@@ -17,8 +17,7 @@ local averageLatencyServiceProtection = import '../../service-protection/average
 * @param (policy.auto_scaling.kubernetes_replicas.kubernetes_object_selector: aperture.spec.v1.KubernetesObjectSelector required) Kubernetes object selector.
 * @param (policy.auto_scaling.kubernetes_replicas.min_replicas: string required) Minimum number of replicas.
 * @param (policy.auto_scaling.kubernetes_replicas.max_replicas: string required) Maximum number of replicas.
-* @param (policy.auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler.
-* @param (policy.auto_scaling.dry_run_config_key: string) Configuration key for overriding dry run setting through dynamic configuration.
+* @param (policy.auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.
 * @param (policy.auto_scaling.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
 * @param (policy.auto_scaling.disable_periodic_scale_in: bool) Disable periodic scale in.
 * @param (policy.auto_scaling.periodic_decrease.period: string) Period for periodic scale in.
@@ -37,7 +36,6 @@ averageLatencyServiceProtection {
   policy+: {
     auto_scaling: {
       dry_run: autoScalingDefaults.policy.dry_run,
-      dry_run_config_key: autoScalingDefaults.policy.dry_run_config_key,
       kubernetes_replicas+: {
         kubernetes_object_selector: '__REQUIRED_FIELD__',
         min_replicas: '__REQUIRED_FIELD__',

@@ -48,7 +48,7 @@ service PolicyService {
     };
   }
 
-  // PostDynamicConfig creates/updates dynamic config based on the provided request.
+  // PostDynamicConfig creates/updates dynamic configuration based on the provided request.
   rpc PostDynamicConfig(PostDynamicConfigRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/dynamic-configs/{policy_name}"
@@ -86,7 +86,7 @@ message UpsertPolicyRequest {
   google.protobuf.FieldMask update_mask = 3;
 }
 
-// PostDynamicConfigRequest is a request to patch dynamic config for Policy.
+// PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
 message PostDynamicConfigRequest {
   string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
   google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
@@ -213,7 +213,7 @@ message Component {
     // Simple Moving Average filter.
     SMA sma = 6;
 
-    // Emits a variable signal which can be set to invalid.
+    // Emits a variable signal which can be changed at runtime via dynamic configuration.
     Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
@@ -266,6 +266,9 @@ message Component {
 
     // Generates the specified signal.
     SignalGenerator signal_generator = 27;
+
+    // BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
+    BoolVariable bool_variable = 28;
 
     // Query components that are query databases such as Prometheus.
     Query query = 100;

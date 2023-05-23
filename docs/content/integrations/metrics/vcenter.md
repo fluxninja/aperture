@@ -37,15 +37,6 @@ policy:
         infra_meters:
           vcenter:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - vcenter
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               vcenter: [vcenterreceiver configuration here]
 ```

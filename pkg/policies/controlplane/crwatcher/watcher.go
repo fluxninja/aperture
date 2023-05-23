@@ -25,7 +25,7 @@ import (
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 )
 
 // watcher holds the state of the watcher.

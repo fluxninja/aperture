@@ -11,5 +11,9 @@ spec:
       targetPort: srvhttp
       protocol: TCP
       name: http
+    - port: {{ .Values.service.metricsPort }}
+      targetPort: metrics
+      protocol: TCP
+      name: http-metrics
   selector:
     {{- include "demo-app.selectorLabels" . | nindent 4 }}

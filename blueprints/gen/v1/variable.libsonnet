@@ -3,17 +3,17 @@ local variableouts = import './variableouts.libsonnet';
   new():: {
   },
   outPorts:: variableouts,
-  withDefaultConfig(default_config):: {
-    default_config: default_config,
+  withConfigKey(config_key):: {
+    config_key: config_key,
   },
-  withDefaultConfigMixin(default_config):: {
-    default_config+: default_config,
+  withConfigKeyMixin(config_key):: {
+    config_key+: config_key,
   },
-  withDynamicConfigKey(dynamic_config_key):: {
-    dynamic_config_key: dynamic_config_key,
+  withConstantOutput(constant_output):: {
+    constant_output: constant_output,
   },
-  withDynamicConfigKeyMixin(dynamic_config_key):: {
-    dynamic_config_key+: dynamic_config_key,
+  withConstantOutputMixin(constant_output):: {
+    constant_output+: constant_output,
   },
   withOutPorts(out_ports):: {
     out_ports: out_ports,

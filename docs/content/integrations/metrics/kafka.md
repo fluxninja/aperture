@@ -37,15 +37,6 @@ policy:
         infra_meters:
           kafkametrics:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - kafkametrics
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               kafkametrics: [kafkametricsreceiver configuration here]
 ```

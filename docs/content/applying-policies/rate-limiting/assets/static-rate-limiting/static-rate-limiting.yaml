@@ -9,16 +9,16 @@ spec:
     components:
       - flow_control:
           rate_limiter:
-            default_config:
-              overrides: []
-            dynamic_config_key: rate_limiter
             in_ports:
-              limit:
+              bucket_capacity:
                 constant_signal:
-                  value: 120
+                  value: 40
+              fill_amount:
+                constant_signal:
+                  value: 2
             parameters:
+              interval: 1s
               label_key: http.request.header.user_id
-              limit_reset_interval: 60s
             selectors:
               - agent_group: default
                 control_point: ingress

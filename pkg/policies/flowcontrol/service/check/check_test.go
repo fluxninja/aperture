@@ -11,14 +11,14 @@ import (
 
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/platform"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 )
 
 var (

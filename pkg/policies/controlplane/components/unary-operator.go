@@ -16,7 +16,7 @@ import (
 // UnaryOp is the type of unary operation.
 type UnaryOp int8
 
-//go:generate enumer -type=UnaryOp -output=unary-op-string.go
+//go:generate enumer -type=UnaryOp -transform=lower -output=unary-op-string.go
 const (
 	UnknownUnary UnaryOp = iota
 	Abs

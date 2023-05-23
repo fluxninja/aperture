@@ -23,7 +23,7 @@ var DeletePolicyCmd = &cobra.Command{
 	Short:         "Delete Aperture Policy from the cluster",
 	Long:          `Use this command to delete the Aperture Policy from the cluster.`,
 	SilenceErrors: true,
-	Example:       `aperturectl delete policy --policy=static-rate-limiting`,
+	Example:       `aperturectl delete policy --policy=rate-limiting`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		return deletePolicy()
 	},

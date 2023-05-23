@@ -10,8 +10,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 )
 
 // Module provides flowcontrol HTTP handler.

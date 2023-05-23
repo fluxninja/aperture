@@ -37,15 +37,6 @@ policy:
         infra_meters:
           purefb:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - purefb
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               purefb: [purefbreceiver configuration here]
 ```

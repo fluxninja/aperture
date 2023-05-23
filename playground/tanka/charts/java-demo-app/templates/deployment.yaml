@@ -46,6 +46,9 @@ spec:
             - name: srvhttp
               containerPort: 8099
               protocol: TCP
+            - name: metrics
+              containerPort: 8087
+              protocol: TCP
           env:
             - name: SIMPLE_SERVICE_PORT
               value: "8099"

@@ -13,8 +13,8 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/playground/resources/demo-app/app"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 type rabbitMQEnvVar string

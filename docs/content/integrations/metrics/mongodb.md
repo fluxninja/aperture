@@ -37,15 +37,6 @@ policy:
         infra_meters:
           mongodb:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - mongodb
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               mongodb: [mongodbreceiver configuration here]
 ```

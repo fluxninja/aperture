@@ -1,6 +1,9 @@
 import express from "express";
 import { ApertureClient } from "../../sdk/client.js";
-import { FlowStatus } from "../../sdk/flow.js";
+import {
+  FlowStatus,
+  FlowResult,
+} from "../../sdk/flow.js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient();
@@ -15,7 +18,7 @@ apertureRoute.get("/", function (req, res) {
     .StartFlow("awesome-feature", labelsMap)
     .then((flow) => {
       // See whether flow was accepted by Aperture Agent.
-      if (flow.Accepted()) {
+      if (flow.Result() != FlowResult.Rejected) {
         // Simulate work being done
         sleep(2000).then(() => {
           console.log("Work done!");

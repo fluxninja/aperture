@@ -23,7 +23,7 @@ aperturectl delete policy [flags]
 ### Examples
 
 ```
-aperturectl delete policy --policy=static-rate-limiting
+aperturectl delete policy --policy=rate-limiting
 ```
 
 ### Options

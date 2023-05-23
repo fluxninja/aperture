@@ -20,12 +20,12 @@ import (
 type Alerter struct {
 	alerterIface   alerts.Alerter
 	policyReadAPI  iface.Policy
+	labels         map[string]string
 	name           string
 	severity       string
-	alertChannels  []string
 	componentID    string
+	alertChannels  []string
 	resolveTimeout time.Duration
-	labels         map[string]string
 }
 
 // Name implements runtime.Component.

@@ -30,8 +30,10 @@ var (
 	RateLimiterConfigPath = path.Join(ConfigPrefix, "rate_limiter")
 	// RateLimiterDecisionsPath is decision path in etcd for rate limiter decisions.
 	RateLimiterDecisionsPath = path.Join(DecisionsPrefix, "rate_limiter")
-	// RateLimiterDynamicConfigPath is config path in etcd for dynamic config of rate limiter.
-	RateLimiterDynamicConfigPath = path.Join(ConfigPrefix, "rate_limiter_dynamic_config")
+	// QuotaSchedulerConfigPath is config path in etcd for quota scheduler.
+	QuotaSchedulerConfigPath = path.Join(ConfigPrefix, "quota_scheduler")
+	// QuotaSchedulerDecisionsPath is decision path in etcd for quota scheduler decisions.
+	QuotaSchedulerDecisionsPath = path.Join(DecisionsPrefix, "quota_scheduler")
 	// FluxMeterConfigPath is config path in etcd for flux meters.
 	FluxMeterConfigPath = path.Join(ConfigPrefix, "flux_meter")
 	// TelemetryCollectorConfigPath is config path in etcd for telemetry collector.
@@ -42,14 +44,10 @@ var (
 	PodScalerDecisionsPath = path.Join(DecisionsPrefix, "pod_scaler")
 	// PodScalerStatusPath is decision path in etcd for pod scaler status.
 	PodScalerStatusPath = path.Join(StatusPrefix, "pod_scaler")
-	// PodScalerDynamicConfigPath is config path in etcd for dynamic config of pod scaler.
-	PodScalerDynamicConfigPath = path.Join(ConfigPrefix, "pod_scaler_dynamic_config")
 	// RegulatorConfigPath is config path in etcd for load regulator.
 	RegulatorConfigPath = path.Join(ConfigPrefix, "regulator")
 	// RegulatorDecisionsPath is decision path in etcd for load regulator decisions.
 	RegulatorDecisionsPath = path.Join(DecisionsPrefix, "regulator")
-	// RegulatorDynamicConfigPath is config path in etcd for dynamic config of load regulator.
-	RegulatorDynamicConfigPath = path.Join(ConfigPrefix, "regulator_dynamic_config")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.

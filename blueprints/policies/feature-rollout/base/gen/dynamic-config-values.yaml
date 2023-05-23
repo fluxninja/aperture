@@ -2,7 +2,15 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/base
 
-# Default configuration for _Regulator_ that can be updated at the runtime without shutting down the policy.
-# Type: aperture.spec.v1.RegulatorDynamicConfig
-# Required: True
-regulator: __REQUIRED_FIELD__
+# Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.
+# Type: []string
+pass_through_label_values:
+  - __REQUIRED_FIELD__
+
+# Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.
+# Type: bool
+rollout: false
+
+# Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.
+# Type: bool
+reset: false

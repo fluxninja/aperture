@@ -10,6 +10,7 @@ local istioInjectLabels = {
   extraLabels+: {
     'sidecar.istio.io/inject': 'true',
   },
+  replicaCount: 2,
 };
 
 local commonValues = if std.objectHas(demoappValues, 'common') then demoappValues.common else {};

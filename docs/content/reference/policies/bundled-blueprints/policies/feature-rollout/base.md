@@ -52,7 +52,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Parameters for the Feature Rollout policy.'
     type='Object (rollout_policy)'
     reference='#rollout-policy'
-    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"regulator": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}}'
+    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"regulator": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "rollout": false}'
 />
 
 <!-- vale on -->
@@ -645,6 +645,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
+<a id="rollout-policy-rollout"></a>
+
+<ParameterDescription
+    name='rollout'
+    description='Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### drivers {#rollout-policy-drivers}
 
 <!-- vale on -->
@@ -721,14 +735,46 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="regulator"></a>
+<a id="pass-through-label-values"></a>
 
 <ParameterDescription
-    name='regulator'
-    description='Default configuration for _Regulator_ that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.RegulatorDynamicConfig)'
-    reference='../../../spec#regulator-dynamic-config'
-    value='"__REQUIRED_FIELD__"'
+    name='pass_through_label_values'
+    description='Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.'
+    type='Array of string'
+    reference=''
+    value='["__REQUIRED_FIELD__"]'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+<a id="rollout"></a>
+
+<ParameterDescription
+    name='rollout'
+    description='Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+<a id="reset"></a>
+
+<ParameterDescription
+    name='reset'
+    description='Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.'
+    type='Boolean'
+    reference=''
+    value='false'
 />
 
 <!-- vale on -->

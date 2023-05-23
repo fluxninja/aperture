@@ -12,7 +12,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 )
 
 // Module is a set of default providers for flowcontrol components

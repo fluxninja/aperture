@@ -13,8 +13,9 @@ import (
 	"time"
 
 	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
 
 	"google.golang.org/grpc/credentials"
@@ -34,7 +35,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
@@ -329,7 +329,9 @@ func startTraffic(url string, requests int) int {
 		if err != nil {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
 		}
-		res.Body.Close()
+		if res.Body != nil {
+			res.Body.Close()
+		}
 		if (res.StatusCode > 400 && res.StatusCode < 500) || (res.StatusCode > 500 && res.StatusCode < 600) {
 			rejected += 1
 		}

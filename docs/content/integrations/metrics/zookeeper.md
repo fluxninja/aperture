@@ -37,15 +37,6 @@ policy:
         infra_meters:
           zookeeper:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - zookeeper
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               zookeeper: [zookeeperreceiver configuration here]
 ```

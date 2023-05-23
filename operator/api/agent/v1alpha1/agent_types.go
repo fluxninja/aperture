@@ -22,9 +22,9 @@ import (
 	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	"github.com/fluxninja/aperture/v2/operator/api/common"
-	agentfunctions "github.com/fluxninja/aperture/v2/pkg/agentfunctions/config"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
-	distcache "github.com/fluxninja/aperture/v2/pkg/distcache/config"
+	afconfig "github.com/fluxninja/aperture/v2/pkg/agent-functions/config"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
 	peers "github.com/fluxninja/aperture/v2/pkg/peers/config"
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
@@ -96,7 +96,7 @@ type AgentConfigSpec struct {
 
 	// Agent functions configuration.
 	//+kubebuilder:validation:Optional
-	AgentFunctions agentfunctions.AgentFunctionsConfig `json:"agent_functions"`
+	AgentFunctions afconfig.AgentFunctionsConfig `json:"agent_functions"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.

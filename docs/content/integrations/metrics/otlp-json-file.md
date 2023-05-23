@@ -37,15 +37,6 @@ policy:
         infra_meters:
           otlpjsonfile:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - otlpjsonfile
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               otlpjsonfile: [otlpjsonfilereceiver configuration here]
 ```

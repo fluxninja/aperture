@@ -15,10 +15,10 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
-	"github.com/fluxninja/aperture/v2/pkg/agentfunctions"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentfunctions "github.com/fluxninja/aperture/v2/pkg/agent-functions"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/discovery"
-	"github.com/fluxninja/aperture/v2/pkg/distcache"
+	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"

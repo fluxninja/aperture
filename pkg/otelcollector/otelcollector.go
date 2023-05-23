@@ -23,7 +23,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/v2/pkg/panichandler"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 )

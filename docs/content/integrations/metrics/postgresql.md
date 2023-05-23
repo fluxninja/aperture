@@ -37,15 +37,6 @@ policy:
         infra_meters:
           postgresql:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - postgresql
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               postgresql: [postgresqlreceiver configuration here]
 ```

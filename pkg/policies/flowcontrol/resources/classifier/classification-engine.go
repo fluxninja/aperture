@@ -12,10 +12,10 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
-	"github.com/fluxninja/aperture/v2/pkg/multimatcher"
+	multimatcher "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"

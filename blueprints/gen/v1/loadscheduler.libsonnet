@@ -5,17 +5,17 @@ local loadschedulerouts = import './loadschedulerouts.libsonnet';
   },
   inPorts:: loadschedulerins,
   outPorts:: loadschedulerouts,
-  withDefaultConfig(default_config):: {
-    default_config: default_config,
+  withDryRun(dry_run):: {
+    dry_run: dry_run,
   },
-  withDefaultConfigMixin(default_config):: {
-    default_config+: default_config,
+  withDryRunMixin(dry_run):: {
+    dry_run+: dry_run,
   },
-  withDynamicConfigKey(dynamic_config_key):: {
-    dynamic_config_key: dynamic_config_key,
+  withDryRunConfigKey(dry_run_config_key):: {
+    dry_run_config_key: dry_run_config_key,
   },
-  withDynamicConfigKeyMixin(dynamic_config_key):: {
-    dynamic_config_key+: dynamic_config_key,
+  withDryRunConfigKeyMixin(dry_run_config_key):: {
+    dry_run_config_key+: dry_run_config_key,
   },
   withInPorts(in_ports):: {
     in_ports: in_ports,

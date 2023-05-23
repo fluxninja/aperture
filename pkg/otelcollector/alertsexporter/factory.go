@@ -3,11 +3,10 @@ package alertsexporter
 import (
 	"context"
 
+	alertmanager "github.com/fluxninja/aperture/v2/pkg/alert-manager"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
-
-	"github.com/fluxninja/aperture/v2/pkg/alertmanager"
 )
 
 const (

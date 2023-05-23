@@ -36,15 +36,6 @@ policy:
         infra_meters:
           METRIC_NAME:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - METRIC_NAME
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               METRIC_NAME: [RECEIVER_NAME configuration here]
 ```

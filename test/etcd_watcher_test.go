@@ -10,8 +10,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	etcdnotifier "github.com/fluxninja/aperture/v2/pkg/etcd/notifier"
-	"github.com/fluxninja/aperture/v2/pkg/filesystem"
-	fsnotifier "github.com/fluxninja/aperture/v2/pkg/filesystem/notifier"
+	filesystem "github.com/fluxninja/aperture/v2/pkg/file-system"
+	fsnotifier "github.com/fluxninja/aperture/v2/pkg/file-system/notifier"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 )
 

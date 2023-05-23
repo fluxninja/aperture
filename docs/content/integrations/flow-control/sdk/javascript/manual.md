@@ -33,7 +33,7 @@ var labelsMap = new Map().set("key", "value");
 apertureClient
   .StartFlow("feature-name", labelsMap)
   .then((flow) => {
-    if (flow.Accepted()) {
+    if (flow.Result() != FlowResult.Rejected) {
       // Do actual work
       flow.End(FlowStatus.Ok);
     } else {

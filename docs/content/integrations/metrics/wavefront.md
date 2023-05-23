@@ -37,15 +37,6 @@ policy:
         infra_meters:
           wavefront:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - wavefront
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               wavefront: [wavefrontreceiver configuration here]
 ```

@@ -37,15 +37,6 @@ policy:
         infra_meters:
           cloudfoundry:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - cloudfoundry
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               cloudfoundry: [cloudfoundryreceiver configuration here]
 ```

@@ -26,10 +26,10 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
 	authz_baggage "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy/baggage"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/servicegetter"
 )
 
 // NewHandler creates new authorization handler for authz api

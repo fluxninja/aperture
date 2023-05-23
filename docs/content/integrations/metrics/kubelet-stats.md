@@ -37,15 +37,6 @@ policy:
         infra_meters:
           kubeletstats:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - kubeletstats
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               kubeletstats: [kubeletstatsreceiver configuration here]
 ```

@@ -2,7 +2,7 @@ package preview
 
 import (
 	flowpreviewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 )

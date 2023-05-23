@@ -50,15 +50,20 @@ public final class CheckProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor;
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_fieldAccessorTable;
+      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor;
   static final 
@@ -116,7 +121,7 @@ public final class CheckProto {
       "ROR_NONE\020\000\022\025\n\021ERROR_EVAL_FAILED\020\001\022\031\n\025ERR" +
       "OR_EMPTY_RESULTSET\020\002\022\035\n\031ERROR_AMBIGUOUS_" +
       "RESULTSET\020\003\022\032\n\026ERROR_MULTI_EXPRESSION\020\004\022" +
-      "\034\n\030ERROR_EXPRESSION_NOT_MAP\020\005\"\244\007\n\017Limite" +
+      "\034\n\030ERROR_EXPRESSION_NOT_MAP\020\005\"\245\t\n\017Limite" +
       "rDecision\022\037\n\013policy_name\030\001 \001(\tR\npolicyNa" +
       "me\022\037\n\013policy_hash\030\002 \001(\tR\npolicyHash\022!\n\014c" +
       "omponent_id\030\003 \001(\tR\013componentId\022\030\n\007droppe" +
@@ -125,34 +130,40 @@ public final class CheckProto {
       ".LimiterReasonR\006reason\022l\n\021rate_limiter_i" +
       "nfo\030\006 \001(\0132>.aperture.flowcontrol.check.v" +
       "1.LimiterDecision.RateLimiterInfoH\000R\017rat" +
-      "eLimiterInfo\022r\n\023load_scheduler_info\030\007 \001(" +
-      "\0132@.aperture.flowcontrol.check.v1.Limite" +
-      "rDecision.LoadSchedulerInfoH\000R\021loadSched" +
-      "ulerInfo\022e\n\016regulator_info\030\010 \001(\0132<.apert" +
-      "ure.flowcontrol.check.v1.LimiterDecision" +
-      ".RegulatorInfoH\000R\rregulatorInfo\032\210\001\n\017Rate" +
-      "LimiterInfo\022\034\n\tremaining\030\001 \001(\001R\tremainin" +
-      "g\022\030\n\007current\030\002 \001(\001R\007current\022\024\n\005label\030\003 \001" +
-      "(\tR\005label\022\'\n\017tokens_consumed\030\004 \001(\001R\016toke" +
-      "nsConsumed\032c\n\021LoadSchedulerInfo\022%\n\016workl" +
-      "oad_index\030\001 \001(\tR\rworkloadIndex\022\'\n\017tokens" +
-      "_consumed\030\002 \001(\004R\016tokensConsumed\032%\n\rRegul" +
-      "atorInfo\022\024\n\005label\030\001 \001(\tR\005label\"Q\n\rLimite" +
-      "rReason\022\036\n\032LIMITER_REASON_UNSPECIFIED\020\000\022" +
-      " \n\034LIMITER_REASON_KEY_NOT_FOUND\020\001B\t\n\007det" +
-      "ails\"7\n\rFluxMeterInfo\022&\n\017flux_meter_name" +
-      "\030\001 \001(\tR\rfluxMeterName2z\n\022FlowControlServ" +
-      "ice\022d\n\005Check\022+.aperture.flowcontrol.chec" +
-      "k.v1.CheckRequest\032,.aperture.flowcontrol" +
-      ".check.v1.CheckResponse\"\000B\263\002\n5com.fluxni" +
-      "nja.generated.aperture.flowcontrol.check" +
-      ".v1B\nCheckProtoP\001ZWgithub.com/fluxninja/" +
-      "aperture/v2/api/gen/proto/go/aperture/fl" +
-      "owcontrol/check/v1;checkv1\242\002\003AFC\252\002\035Apert" +
-      "ure.Flowcontrol.Check.V1\312\002\035Aperture\\Flow" +
-      "control\\Check\\V1\342\002)Aperture\\Flowcontrol\\" +
-      "Check\\V1\\GPBMetadata\352\002 Aperture::Flowcon" +
-      "trol::Check::V1b\006proto3"
+      "eLimiterInfo\022n\n\023load_scheduler_info\030\007 \001(" +
+      "\0132<.aperture.flowcontrol.check.v1.Limite" +
+      "rDecision.SchedulerInfoH\000R\021loadScheduler" +
+      "Info\022e\n\016regulator_info\030\010 \001(\0132<.aperture." +
+      "flowcontrol.check.v1.LimiterDecision.Reg" +
+      "ulatorInfoH\000R\rregulatorInfo\022u\n\024quota_sch" +
+      "eduler_info\030\t \001(\0132A.aperture.flowcontrol" +
+      ".check.v1.LimiterDecision.QuotaScheduler" +
+      "InfoH\000R\022quotaSchedulerInfo\032\210\001\n\017RateLimit" +
+      "erInfo\022\034\n\tremaining\030\001 \001(\001R\tremaining\022\030\n\007" +
+      "current\030\002 \001(\001R\007current\022\024\n\005label\030\003 \001(\tR\005l" +
+      "abel\022\'\n\017tokens_consumed\030\004 \001(\001R\016tokensCon" +
+      "sumed\032_\n\rSchedulerInfo\022%\n\016workload_index" +
+      "\030\001 \001(\tR\rworkloadIndex\022\'\n\017tokens_consumed" +
+      "\030\002 \001(\004R\016tokensConsumed\032%\n\rRegulatorInfo\022" +
+      "\024\n\005label\030\001 \001(\tR\005label\032\217\001\n\022QuotaScheduler" +
+      "Info\022\024\n\005label\030\001 \001(\tR\005label\022c\n\016scheduler_" +
+      "info\030\002 \001(\0132<.aperture.flowcontrol.check." +
+      "v1.LimiterDecision.SchedulerInfoR\rschedu" +
+      "lerInfo\"Q\n\rLimiterReason\022\036\n\032LIMITER_REAS" +
+      "ON_UNSPECIFIED\020\000\022 \n\034LIMITER_REASON_KEY_N" +
+      "OT_FOUND\020\001B\t\n\007details\"7\n\rFluxMeterInfo\022&" +
+      "\n\017flux_meter_name\030\001 \001(\tR\rfluxMeterName2z" +
+      "\n\022FlowControlService\022d\n\005Check\022+.aperture" +
+      ".flowcontrol.check.v1.CheckRequest\032,.ape" +
+      "rture.flowcontrol.check.v1.CheckResponse" +
+      "\"\000B\263\002\n5com.fluxninja.generated.aperture." +
+      "flowcontrol.check.v1B\nCheckProtoP\001ZWgith" +
+      "ub.com/fluxninja/aperture/v2/api/gen/pro" +
+      "to/go/aperture/flowcontrol/check/v1;chec" +
+      "kv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.Check.V" +
+      "1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342\002)Aper" +
+      "ture\\Flowcontrol\\Check\\V1\\GPBMetadata\352\002 " +
+      "Aperture::Flowcontrol::Check::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -194,18 +205,18 @@ public final class CheckProto {
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor,
-        new java.lang.String[] { "PolicyName", "PolicyHash", "ComponentId", "Dropped", "Reason", "RateLimiterInfo", "LoadSchedulerInfo", "RegulatorInfo", "Details", });
+        new java.lang.String[] { "PolicyName", "PolicyHash", "ComponentId", "Dropped", "Reason", "RateLimiterInfo", "LoadSchedulerInfo", "RegulatorInfo", "QuotaSchedulerInfo", "Details", });
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_descriptor =
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(0);
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo_descriptor,
         new java.lang.String[] { "Remaining", "Current", "Label", "TokensConsumed", });
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor =
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo_descriptor =
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(1);
-    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_fieldAccessorTable = new
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_aperture_flowcontrol_check_v1_LimiterDecision_LoadSchedulerInfo_descriptor,
+        internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo_descriptor,
         new java.lang.String[] { "WorkloadIndex", "TokensConsumed", });
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor =
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(2);
@@ -213,6 +224,12 @@ public final class CheckProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_RegulatorInfo_descriptor,
         new java.lang.String[] { "Label", });
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_descriptor =
+      internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(3);
+    internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_descriptor,
+        new java.lang.String[] { "Label", "SchedulerInfo", });
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_fieldAccessorTable = new

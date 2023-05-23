@@ -37,15 +37,6 @@ policy:
         infra_meters:
           flinkmetrics:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - flinkmetrics
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               flinkmetrics: [flinkmetricsreceiver configuration here]
 ```

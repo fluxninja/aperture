@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/v2/pkg/agentinfo"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"

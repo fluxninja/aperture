@@ -189,24 +189,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.auto_scaling.dry_run'
-    description='Dry run mode ensures that no scaling is invoked by this auto scaler.'
+    description='Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.'
     type='Boolean'
     reference=''
     value='false'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-auto-scaling-dry-run-config-key"></a>
-
-<ParameterDescription
-    name='policy.auto_scaling.dry_run_config_key'
-    description='Configuration key for overriding dry run setting through dynamic configuration.'
-    type='string'
-    reference=''
-    value='"auto_scaling"'
 />
 
 <!-- vale on -->
@@ -353,27 +339,11 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="load-scheduler"></a>
+<a id="dry-run"></a>
 
 <ParameterDescription
-    name='load_scheduler'
-    description='Default configuration for load scheduler that can be updated at the runtime without shutting down the policy.'
-    type='Object (aperture.spec.v1.LoadSchedulerDynamicConfig)'
-    reference='../../../spec#load-scheduler-dynamic-config'
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-<a id="auto-scaling"></a>
-
-<ParameterDescription
-    name='auto_scaling'
-    description='Dry run mode ensures that no scaling is invoked by this auto scaler.'
+    name='dry_run'
+    description='Dynamic configuration for setting dry run mode at runtime without restarting this policy. In dry run mode the scheduler acts as pass through to all flow and does not queue flows. The Auto Scaler does not perform any scaling in dry mode. This mode is useful for observing the behavior of load scheduler and auto scaler without disrupting any real deployment or traffic.'
     type='Boolean'
     reference=''
     value='"__REQUIRED_FIELD__"'
