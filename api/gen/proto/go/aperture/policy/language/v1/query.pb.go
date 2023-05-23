@@ -117,7 +117,7 @@ type PromQL struct {
 	//
 	// :::info Usage with OpenTelemetry Metrics
 	//
-	// Aperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.
+	// Aperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/metrics.md) for more details.
 	//
 	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`
