@@ -103,7 +103,7 @@ You can then run the following command to generate the blueprint:
 </TabItem>
 </Tabs>
 
-## Generating Blueprints
+## Generating Policies and Dashboards
 
 Once the `values.yaml` file is ready, you can generate the blueprint using the
 following command:
