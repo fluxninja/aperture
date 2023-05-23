@@ -11,7 +11,7 @@ import { Cards } from '@site/src/components/Cards';
 ```
 
 Control points are used to define where you want to act in code or at service
-level. It's important to understand what control points are, because you will be
+level. It's important to understand what control points are because you will be
 using them many times in your code.
 
 <!-- vale off -->
@@ -35,7 +35,7 @@ response to an issue or error.
 <!-- vale on -->
 
 Let's create a feature control point manually in java code. To begin with, you
-need to configure Aperture Java SDK for your application. You can configure
+need to configure the Aperture Java SDK for your application. You can configure
 Aperture SDK as follows:
 
 ```java
