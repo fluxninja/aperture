@@ -28,7 +28,7 @@ prioritized and managed under quota limits.
 ## Policy
 
 This policy uses the
-[`Quota Schedular`](reference/policies/bundled-blueprints/policies/quota-scheduler.md)
+[`Quota Schedular`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
 blueprint that enables quota scheduling for workloads. In this example, we will
 create a policy that will do quota based scheduling for external API and while
 do so, it will also do the workload prioritization. We will continuously monitor
