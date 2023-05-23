@@ -1,7 +1,6 @@
 ---
 title: Using instrumentation agent to automatically set control points
 sidebar_position: 2
-slug: using-instrumentation-agent-to-automatically-set-control-points-using-java-sdk
 keywords:
   - java
   - sdk
