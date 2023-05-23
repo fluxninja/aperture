@@ -2831,7 +2831,7 @@ meter is read.
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
+[Envoy Filter](/integrations/flow-control/envoy/istio.md#envoy-filter)
 
 :::
 
@@ -3645,7 +3645,7 @@ configuration using format `${ENV_VAR_NAME}`.
 :::info
 
 See also
-[Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+[Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).
 
 :::
 
@@ -5860,7 +5860,7 @@ such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
 :::info Usage with OpenTelemetry Metrics
 
 Aperture supports OpenTelemetry metrics. See
-[reference](/get-started/integrations/metrics/metrics.md) for more details.
+[reference](/integrations/metrics/metrics.md) for more details.
 
 :::
 

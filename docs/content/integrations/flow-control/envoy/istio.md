@@ -13,7 +13,7 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
 ```
 
 ## Envoy Filter {#envoy-filter}
@@ -285,7 +285,7 @@ More information about the extracted values can be found on
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
