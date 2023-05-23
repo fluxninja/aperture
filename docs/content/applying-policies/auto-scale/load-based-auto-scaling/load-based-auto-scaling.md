@@ -91,7 +91,7 @@ At a high level, this policy consists of:
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](playground/playground.md), it can be observed that as the response
+[Playground](/playground/playground.md), it can be observed that as the response
 latency increases, the service protection policy queues a proportion of
 requests. The _Auto Scaler_ makes a scale-out decision as the
 `OBSERVED_LOAD_MULTIPLIER` becomes less than 1. As replicas get added to the

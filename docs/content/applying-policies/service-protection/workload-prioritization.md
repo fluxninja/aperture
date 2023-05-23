@@ -91,7 +91,7 @@ policy.
 
 ### Playground
 
-The traffic generator in the [playground](playground/playground.md) is
+The traffic generator in the [playground](/playground/playground.md) is
 configured to generate similar traffic pattern (number of concurrent users) for
 2 types of users - subscribers and guests.
 

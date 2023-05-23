@@ -83,7 +83,7 @@ moment.
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](playground/playground.md), the various signal metrics collected
+[Playground](/playground/playground.md), the various signal metrics collected
 from the execution of the policy can be visualized:
 
 <Zoom>
