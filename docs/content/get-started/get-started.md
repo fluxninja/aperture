@@ -18,13 +18,13 @@ application.
 
    Using Aperture SDKs, it is easier to manually set feature control points in
    your application. There are SDKs available for multiple languages. You can
-   find the list of SDKs [here](./integrations/flow-control/sdk/sdk.md).
+   find the list of SDKs [here](integrations/flow-control/sdk/sdk.md).
 
 2. Middleware Insertions
 
    To make it easier to integrate Aperture in your application, we have created
    middleware for popular frameworks like Spring Boot, Netty, Armeria
-   [see available middleware](./integrations/flow-control/sdk/sdk.md). With help
+   [see available middleware](integrations/flow-control/sdk/sdk.md). With help
    of middleware there isn't much code changes required in your application.
    Some middleware doesn't require any code change at all.
 

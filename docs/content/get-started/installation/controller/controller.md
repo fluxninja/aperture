@@ -35,7 +35,7 @@ process variables and maintain their values within the optimal range.
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
