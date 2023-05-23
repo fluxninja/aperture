@@ -95,6 +95,12 @@ This is how you can create a manual feature control point in your code. Complete
 code snippet is available
 [here](https://github.com/fluxninja/aperture/blob/main/sdks/aperture-java/examples/standalone-example/src/main/java/com/fluxninja/example/App.java).
 
+<div class="alert alert--info shadow--md" role="alert">
+  Aperture SDKs are available for multiple languages, you choose the one that fits your needs. <a href="/integrations/flow-control/sdk/setup-control-points-using-sdks-libraries"> See all SDKs.</a>
+</div>
+
+<p>&nbsp;</p>
+
 ## What's next?
 
 Once the feature control point is set in code, head over to install Aperture.
