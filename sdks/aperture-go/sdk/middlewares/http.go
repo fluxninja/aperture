@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strings"
 
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
@@ -43,52 +41,7 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			}
 		}
 
-		labels := aperture.LabelsFromCtx(r.Context())
-
-		for key, value := range r.Header {
-			if strings.HasPrefix(key, ":") {
-				continue
-			}
-			labels[key] = strings.Join(value, ",")
-		}
-
-		// We know that the protocol is TCP because Golang's http package doesn't support UDP
-		// TODO: Should we support `httpu`?
-		protocol := flowcontrolhttp.SocketAddress_TCP
-
-		sourceHost, sourcePort := splitAddress(m.client.GetLogger(), r.RemoteAddr)
-		// TODO: Figure out if we can narrow down the port or figure out the host in a better way
-		destinationPort := uint32(0)
-		destinationHost := getLocalIP(m.client.GetLogger())
-
-		bodyBytes, err := readClonedBody(r)
-		if err != nil {
-			m.client.GetLogger().V(2).Info("Error reading body", "error", err)
-		}
-
-		req := &flowcontrolhttp.CheckHTTPRequest{
-			Source: &flowcontrolhttp.SocketAddress{
-				Address:  sourceHost,
-				Protocol: protocol,
-				Port:     sourcePort,
-			},
-			Destination: &flowcontrolhttp.SocketAddress{
-				Address:  destinationHost,
-				Protocol: protocol,
-				Port:     destinationPort,
-			},
-			ControlPoint: m.controlPoint,
-			Request: &flowcontrolhttp.CheckHTTPRequest_HttpRequest{
-				Method:   r.Method,
-				Path:     r.URL.Path,
-				Host:     r.Host,
-				Headers:  labels,
-				Scheme:   r.URL.Scheme,
-				Size:     r.ContentLength,
-				Protocol: r.Proto,
-				Body:     string(bodyBytes),
-			},
-		}
+		req := PrepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint)
 
 		flow, err := m.client.StartHTTPFlow(r.Context(), req)
 		if err != nil {
