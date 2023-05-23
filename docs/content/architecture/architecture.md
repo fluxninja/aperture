@@ -34,6 +34,7 @@ reliability.
 ```
 
 </Zoom>
+
 ### Aperture Controller
 
 The Aperture Controller is the central component of the platform. The controller
