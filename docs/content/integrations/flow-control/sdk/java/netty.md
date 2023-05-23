@@ -84,4 +84,4 @@ the [example app][netty-example] available in the repository.
 [netty-example]:
   https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/netty-example
 [javaagent]:
-  /get-started/integrations/flow-control/sdk/java/using-instrumentation-agent-to-automatically-set-control-points-using-java-sdk
+  /integrations/flow-control/sdk/java/using-instrumentation-agent-to-automatically-set-control-points-using-java-sdk
