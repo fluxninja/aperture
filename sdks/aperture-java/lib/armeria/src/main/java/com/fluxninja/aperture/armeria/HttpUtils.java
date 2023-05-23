@@ -22,10 +22,8 @@ class HttpUtils {
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
-        if (flow.checkResponse() != null
-                && flow.checkResponse().hasDeniedResponse()
-                && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
-            int httpStatusCode = flow.checkResponse().getDeniedResponse().getStatus();
+        if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
+            int httpStatusCode = flow.rejectReason();
             HttpResponseBuilder resBuilder = HttpResponse.builder();
             resBuilder.status(httpStatusCode);
             for (Map.Entry<String, String> entry :
