@@ -15,7 +15,7 @@ generate-jsonnet:
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
 	@echo generating mermaid diagrams
-	@./tools/mermaid/generate_mermaid.sh
+	@./tools/mermaid/generate_all.sh
 
 generate-aperturectl-docs:
 	@echo generating aperturectl
@@ -26,6 +26,6 @@ generate-aperturectl-docs:
 generate-otel-docs:
 	@echo generating metrics docs
 	@./tools/otel_collectors/generate_otel_docs.sh
-	@git add ./content/get-started/integrations/metrics
+	@git add ./content/integrations/metrics
 
 .PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs generate-otel-docs
