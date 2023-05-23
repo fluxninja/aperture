@@ -14,17 +14,25 @@ Control points are used to define where you want to act in code or at service
 level. It's important to understand what control points are, because you will be
 using them many times in your code.
 
+<!-- vale off -->
+
 ## What is a Manual Feature Control point?
+
+<!-- vale on -->
 
 A manual feature control point is essentially a specific point in the codebase
 where the execution flow can be controlled manually using feature flags. Feature
 flags, also known as feature toggles, are a programming technique that allows
 developers to enable or disable features of their software even after the code
 has been deployed to production. This can be extremely useful for testing new
-features, performing A/B testing, or quickly disabling a feature in response to
-an issue or error.
+features, performing Blue Green testing, or quickly disabling a feature in
+response to an issue or error.
+
+<!-- vale off -->
 
 ## How to create a Manual Feature Control point?
+
+<!-- vale on -->
 
 Let's create a feature control point manually in java code. To being with you
 need to configure Aperture Java SDK for your application. You can configure
@@ -101,7 +109,11 @@ code snippet is available
 
 <p>&nbsp;</p>
 
+<!-- vale off -->
+
 ## What's next?
+
+<!-- vale on -->
 
 Once the feature control point is set in code, head over to install Aperture.
 

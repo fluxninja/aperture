@@ -13,14 +13,22 @@ import { Cards } from '@site/src/components/Cards';
 Aperture supports inserting middleware into the request pipeline which make it
 easy integrate with less code changes.
 
+<!-- vale off -->
+
 ## What is a Middleware Insertion?
+
+<!-- vale on -->
 
 It is a way to add a new layer of functionality to the request pipeline. It is a
 piece of code that can be executed before or after the request is processed by
 the application. Allowing you to add new functionality to the request pipeline
 without changing the application code.
 
-## How to add a Middleware Insertion?
+<!-- vale off -->
+
+## How to add a Middleware?
+
+<!-- vale of -->
 
 There are multiple ways to add a middleware, and it depends on the language and
 framework you are using. For example, in Spring Boot, you can register a Spring
@@ -28,7 +36,11 @@ Boot Filter, in Armeria you can register a decorator, in Netty, you can register
 an Aperture Handler. Let's examine how to add a middleware insertion in Spring
 Boot.
 
-## How to add a Middleware Insertion in Spring Boot?
+<!-- vale off -->
+
+## How to add a Middleware in Spring Boot?
+
+<!-- vale on -->
 
 In Spring Boot, you can register a Aperture Filter which automatically set the
 feature control points. Here is an example:
@@ -73,7 +85,11 @@ public class AppController {
 
 <p>&nbsp;</p>
 
+<!-- vale off -->
+
 ## What's next?
+
+<!-- vale on -->
 
 Once the middleware insertion is done, head over to install Aperture.
 
