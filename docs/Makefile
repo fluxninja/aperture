@@ -15,7 +15,7 @@ generate-jsonnet:
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
 	@echo generating mermaid diagrams
-	@./tools/mermaid/generate_mermaid.sh
+	@./tools/mermaid/generate_all.sh
 
 generate-aperturectl-docs:
 	@echo generating aperturectl
