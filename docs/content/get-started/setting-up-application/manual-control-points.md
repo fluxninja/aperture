@@ -34,7 +34,7 @@ response to an issue or error.
 
 <!-- vale on -->
 
-Let's create a feature control point manually in java code. To being with you
+Let's create a feature control point manually in java code. To begin with, you
 need to configure Aperture Java SDK for your application. You can configure
 Aperture SDK as follows:
 
@@ -60,8 +60,8 @@ wherever you want in your code. For example, there is a function called
 `handleSuperAPI` which is called when a user hits a specific API. Before
 executing the business logic, you want to create a feature control point so that
 you can control the execution flow of the API and can reject the request based
-on the policy defined in Aperture. You will see in upcoming section how to
-define policy in Aperture. For now, remember we added some labels in the code
+on the policy defined in Aperture. You will see in the upcoming section how to
+define policy in Aperture. For now, remember, we added some labels in the code
 snippet below. These labels will be used while defining a policy.
 
 Let's create a feature control point in the following code snippet.
@@ -99,8 +99,8 @@ Let's create a feature control point in the following code snippet.
     }
 ```
 
-This is how you can create a manual feature control point in your code. Complete
-code snippet is available
+This is how you can create a manual feature control point in your code. The
+complete code snippet is available
 [here](https://github.com/fluxninja/aperture/blob/main/sdks/aperture-java/examples/standalone-example/src/main/java/com/fluxninja/example/App.java).
 
 <div class="alert alert--info shadow--md" role="alert">

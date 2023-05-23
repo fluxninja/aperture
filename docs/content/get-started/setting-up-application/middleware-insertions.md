@@ -10,8 +10,8 @@ sidebar_label: Middleware Insertions
 import { Cards } from '@site/src/components/Cards';
 ```
 
-Aperture supports inserting middleware into the request pipeline which make it
-easy integrate with less code changes.
+Aperture supports inserting middleware into the request pipeline which makes it
+easy to integrate with less code changes.
 
 <!-- vale off -->
 
@@ -31,7 +31,7 @@ without changing the application code.
 <!-- vale of -->
 
 There are multiple ways to add a middleware, and it depends on the language and
-framework you are using. For example, in Spring Boot, you can register a Spring
+framework you are using. For example, in Spring Boot, you can register an Spring
 Boot Filter, in Armeria you can register a decorator, in Netty, you can register
 an Aperture Handler. Let's examine how to add a middleware insertion in Spring
 Boot.
@@ -42,7 +42,7 @@ Boot.
 
 <!-- vale on -->
 
-In Spring Boot, you can register a Aperture Filter which automatically set the
+In Spring Boot, you can register an Aperture Filter which automatically sets the
 feature control points. Here is an example:
 
 ```java
