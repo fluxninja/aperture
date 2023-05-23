@@ -88,7 +88,7 @@ ensure the reliability and stability of applications, and include:
   },
   {
     title: "Quota Scheduler",
-    description: "It is an important feature of Aperture, as it helps manage and allocate quotas for API requests. This feature enables teams to manage costs effectively and prevent exceeding API rate limits. By using quota scheduler, you can ensure that your application stays within the limits of the API and prevent being perceived as a bad actor by the API provider.",
+    description: "It is an important feature of Aperture, as it helps manage and allocate quotas for API requests. This feature enables teams to manage costs effectively and prevent exceeding these limits. By using quota scheduler, you can ensure that your application stays within the allowed usage and prevent being perceived as a bad actor by the API provider.",
     url: "/applying-policies/quota-scheduler/",
   },
   {
