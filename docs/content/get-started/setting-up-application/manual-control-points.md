@@ -101,13 +101,12 @@ Let's create a feature control point in the following code snippet.
 
 This is how you can create a manual feature control point in your code. The
 complete code snippet is available
-[here](https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/standalone-example).
+[here](https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v2.1.0/examples/standalone-example).
 
 :::info
 
 Aperture SDKs are available for multiple languages, you choose the one that fits
-your needs.
-[See all SDKs](/integrations/flow-control/sdk/setup-control-points-using-sdks-libraries).
+your needs. [See all SDKs](/integrations/flow-control/sdk/sdk.md).
 
 :::
 
