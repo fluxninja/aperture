@@ -78,12 +78,13 @@ public class AppController {
 }
 ```
 
-<div class="alert alert--info shadow--md" role="alert">
-  Aperture provide different middlewares for different java frameworks, which you can check out in
-<a href="/integrations/flow-control/sdk/java"> the Java section</a>. There are example available for each framework.
-</div>
+:::info
 
-<p>&nbsp;</p>
+Aperture provides different middlewares for different java frameworks, which you
+can check out in the [Java section](/integrations/flow-control/sdk/java). There
+are examples available for each framework.
+
+:::
 
 <!-- vale off -->
 

@@ -24,7 +24,7 @@ Linkerd, and Kong.
 Aperture, supports integration to EnvoyProxy and Istio. With the help
 `aperturectl` which is a CLI tool provided by Aperture you can easily integrate
 Aperture. Check out the complete installation guide in
-[Service Mesh Integration](/integrations/flow-control/envoy/).
+[Service Mesh Integration](/integrations/flow-control/envoy/envoy.md).
 
 <!-- vale off -->
 
