@@ -18,24 +18,26 @@ application.
 
    Using Aperture SDKs, it is easier to manually set feature control points in
    your application. There are SDKs available for multiple languages. You can
-   find the list of SDKs [here](integrations/flow-control/sdk/sdk.md).
+   find the list of SDKs [here](/integrations/flow-control/sdk/sdk.md).
 
 2. Middleware Insertions
 
    To make it easier to integrate Aperture in your application, we have created
    middleware for popular frameworks like Spring Boot, Netty, Armeria
-   [see available middleware](integrations/flow-control/sdk/sdk.md). With help
+   [see available middleware](/integrations/flow-control/sdk/sdk.md). With help
    of middleware there isn't much code changes required in your application.
    Some middleware doesn't require any code change at all.
 
-3. Service Meshes (Istio, Envoy)
+3. Service Meshes (Istio, Envoy) & API Gateways
 
    Aperture can be integrated with service meshes like Istio and Envoy. You can
-   find the list of service meshes [here](./integrations/flow-control/envoy/).
+   find the list of service meshes [here](/integrations/flow-control/envoy/).
    With help of service meshes, you can control the flow of traffic in your
    application without any code change. It is recommended to use service meshes
    for Aperture integration as it is easier to get started with and doesn't
-   require any code change.
+   require any code change. You can also integrate Aperture with API gateways,
+   checkout the supported
+   [API Gateways](/integrations/flow-control/gateway/gateway.md).
 
 ## Installing Aperture
 
@@ -47,7 +49,7 @@ application.
    traffic, and so on.
 
    Begin with Aperture installation by heading over to the
-   [Installation](../get-started/installation/installation.md) section.
+   [Installation](/get-started/installation/installation.md) section.
 
 2. Helm
 
@@ -60,4 +62,4 @@ application.
 As mentioned earlier, `aperturectl` is one of the powerful tools provided by
 Aperture. It assists in creating policies, previewing live traffic, and more.
 Let's explore how to create our first policy using `aperturectl` in the
-[Generating and Applying Policies](../get-started/policies/policies.md) section.
+[Generating and Applying Policies](/get-started/policies/policies.md) section.

@@ -5,3 +5,85 @@ keywords:
 sidebar_position: 2
 sidebar_label: Middleware Insertions
 ---
+
+```mdx-code-block
+import { Cards } from '@site/src/components/Cards';
+```
+
+Aperture supports inserting middleware into the request pipeline which make it
+easy integrate with less code changes.
+
+## What is a Middleware Insertion?
+
+It is a way to add a new layer of functionality to the request pipeline. It is a
+piece of code that can be executed before or after the request is processed by
+the application. Allowing you to add new functionality to the request pipeline
+without changing the application code.
+
+## How to add a Middleware Insertion?
+
+There are multiple ways to add a middleware, and it depends on the language and
+framework you are using. For example, in Spring Boot, you can register a Spring
+Boot Filter, in Armeria you can register a decorator, in Netty, you can register
+an Aperture Handler. Let's a look at how to add a middleware insertion in Spring
+Boot.
+
+## How to add a Middleware Insertion in Spring Boot?
+
+In Spring Boot, you can register a Aperture Filter which automatically set the
+feature control points. Here is an example:
+
+```java
+
+import com.fluxninja.aperture.servlet.jakarta.ApertureFilter;
+
+...
+
+@RestController
+public class AppController {
+
+    ...
+
+    @RequestMapping(value = "/super", method = RequestMethod.GET)
+    public String hello() {
+        return "Hello World";
+    }
+
+    ...
+
+    @Bean
+    public FilterRegistrationBean<ApertureFilter> apertureFilter(Environment env){
+        FilterRegistrationBean<ApertureFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new ApertureFilter());
+        registrationBean.addUrlPatterns("/super");
+
+        registrationBean.addInitParameter("agent_host", "localhost");
+        registrationBean.addInitParameter("agent_port", "8089");
+
+        return registrationBean;
+    }
+}
+```
+
+<div class="alert alert--info shadow--md" role="alert">
+  Aperture provide different middlewares for different java frameworks, which you can check out in
+<a href="/integrations/flow-control/sdk/java"> the Java section</a>. There are example available for each framework.
+</div>
+
+<p>&nbsp;</p>
+
+## What's next?
+
+Once the middleware insertion is done, head over to install Aperture.
+
+```mdx-code-block
+
+<Cards data={[
+  {
+    title: "Install Aperture",
+    description: "Install Controller and Agent in your environment",
+    url: "/get-started/installation/",
+  },
+  ]}/>
+```
