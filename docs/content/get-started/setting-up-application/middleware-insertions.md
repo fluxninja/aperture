@@ -25,7 +25,7 @@ without changing the application code.
 There are multiple ways to add a middleware, and it depends on the language and
 framework you are using. For example, in Spring Boot, you can register a Spring
 Boot Filter, in Armeria you can register a decorator, in Netty, you can register
-an Aperture Handler. Let's a look at how to add a middleware insertion in Spring
+an Aperture Handler. Let's examine how to add a middleware insertion in Spring
 Boot.
 
 ## How to add a Middleware Insertion in Spring Boot?

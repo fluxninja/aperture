@@ -15,12 +15,11 @@ One of the most common and easy ways to integrate Aperture into your application
 is to use a service mesh or API getaway. Aperture supports Envoy, Istio,
 Linkerd, and Kong.
 
-## How to integrate Aperture with Envoy?
+## How to integrate Aperture with Service Mesh?
 
-Aperture supports Enovy as service mesh, which make it easy to integrate with
-any service mesh built on top of EnovyProxy. Also, `aperturectl` which is a CLI
-tool provided by Aperture can be used to integrate Aperture with Envoy. You can
-checkout the complete installation guide in
+Aperture supports integration EnvoyProxy and Istio. With the help `aperturectl`
+which is a CLI tool provided by Aperture you can easily integrate Aperture.
+Checkout the complete installation guide in
 [Service Mesh Integration](/integrations/flow-control/envoy/).
 
 ## How to integrate Aperture with API Getaways?
