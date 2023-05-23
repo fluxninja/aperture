@@ -1271,7 +1271,7 @@
       "properties": {
         "attribute_key": {
           "default": "workload_duration_ms",
-          "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)\n\n:::\n\n",
+          "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/integrations/flow-control/envoy/istio.md#envoy-filter)\n\n:::\n\n",
           "type": "string",
           "x-go-tag-default": "workload_duration_ms",
           "x-order": 0
@@ -1646,7 +1646,7 @@
       "additionalProperties": false
     },
     "InfraMeter": {
-      "description": "InfraMeter is a resource that sets up OpenTelemetry pipelines.\nIt defines receivers, processors, and a single metrics pipeline\nwhich will be exported to the configured Prometheus instance.\nEnvironment variables can be used in the configuration using format `${ENV_VAR_NAME}`.\n\n:::info\n\nSee also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).\n\n:::",
+      "description": "InfraMeter is a resource that sets up OpenTelemetry pipelines.\nIt defines receivers, processors, and a single metrics pipeline\nwhich will be exported to the configured Prometheus instance.\nEnvironment variables can be used in the configuration using format `${ENV_VAR_NAME}`.\n\n:::info\n\nSee also [Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).\n\n:::",
       "properties": {
         "per_agent_group": {
           "default": false,
@@ -2691,7 +2691,7 @@
           "x-order": 1
         },
         "query_string": {
-          "description": "Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.\n\n:::note\n\nThe query must return a single value either as a scalar or as a vector with a single element.\n\n:::\n\n:::info Usage with Flux Meter\n\n[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.\nTherefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.\nThe particular Flux Meter can be identified with the `flux_meter_name` label.\nThere are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.\n\n:::\n\n:::info Usage with OpenTelemetry Metrics\n\nAperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.\n\n:::",
+          "description": "Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.\n\n:::note\n\nThe query must return a single value either as a scalar or as a vector with a single element.\n\n:::\n\n:::info Usage with Flux Meter\n\n[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.\nTherefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.\nThe particular Flux Meter can be identified with the `flux_meter_name` label.\nThere are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.\n\n:::\n\n:::info Usage with OpenTelemetry Metrics\n\nAperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/metrics.md) for more details.\n\n:::",
           "type": "string",
           "x-order": 2
         }

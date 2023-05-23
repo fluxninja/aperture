@@ -293,4 +293,4 @@ rejected.
 [load-scheduler]: ./components/load-scheduler.md
 [classifier]: ./resources/classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
-[aperturectl]: /get-started/aperture-cli/aperture-cli.md
+[aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md

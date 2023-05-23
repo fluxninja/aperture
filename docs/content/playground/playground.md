@@ -6,7 +6,7 @@ keywords:
   - poc
   - ratelimit
   - concurrencylimit
-sidebar_position: 5
+sidebar_position: 7
 ---
 
 ```mdx-code-block
@@ -63,9 +63,9 @@ Verify that nothing else is running on the [ports forwarded](#port-forwards) by
 The above command starts an Aperture Controller and an Aperture Agent on each
 worker node in the local Kubernetes cluster. Additionally, it starts a
 Java-based demo application with
-[Aperture Java SDK](/get-started/integrations/flow-control/sdk/java/java.md)
-configured to integrate with Aperture. There is an instance of Grafana running
-on the cluster as well for viewing metrics from experiments.
+[Aperture Java SDK](/integrations/flow-control/sdk/java/java.md) configured to
+integrate with Aperture. There is an instance of Grafana running on the cluster
+as well for viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
 [Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
@@ -142,7 +142,7 @@ folder to a bunch of useful panels.
 
 <Zoom>
 
-![Grafana Dashboard](../../applying-policies/service-protection/assets/workload-prioritization/dashboard.png)
+![Grafana Dashboard](../applying-policies/service-protection/assets/workload-prioritization/dashboard.png)
 
 </Zoom>
 
@@ -156,7 +156,7 @@ Grafana's dashboard browser address is
 To stop the traffic at any point of time, press the `Stop Wavepool Generator`
 button in the `DemoApplications` resource.
 
-![Stop Wavepool Generator](../../assets/img/stop-traffic.png)
+![Stop Wavepool Generator](../assets/img/stop-traffic.png)
 
 To re-start the traffic, press the `Start Wavepool Generator` button in the
 `DemoApplications` resource.

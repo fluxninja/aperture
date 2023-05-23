@@ -2,7 +2,7 @@
 title: Concepts
 keywords:
   - concepts
-sidebar_position: 5
+sidebar_position: 8
 sidebar_label: Concepts
 ---
 

@@ -12,7 +12,7 @@ sidebar_position: 3
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../../apertureVersion.js';
+import {apertureVersion} from '../../../apertureVersion.js';
 import DocCardList from '@theme/DocCardList';
 ```
 
@@ -46,7 +46,7 @@ configuration of traffic control points within your service.
 <DocCardList />
 
 [flow-control]: /concepts/flow-control/flow-control.md
-[istio]: /get-started/integrations/flow-control/envoy/istio.md
+[istio]: ../envoy/istio.md
 [golang]: ./go/manual.md
 [java]: ./java/manual.md
 [javascript]: ./javascript/manual.md
