@@ -49,6 +49,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
+  metricsPort: 8087
 
 
 resources: {}

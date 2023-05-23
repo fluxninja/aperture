@@ -48,7 +48,7 @@ The injector is configured with the following logic:
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
@@ -285,8 +285,8 @@ Kubernetes Objects which will be created by following steps are listed
       ```
 
 6. Refer to the steps on the
-   [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
-   if you do not have the
+   [Istio Configuration](/integrations/flow-control/envoy/istio.md) if you do
+   not have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 

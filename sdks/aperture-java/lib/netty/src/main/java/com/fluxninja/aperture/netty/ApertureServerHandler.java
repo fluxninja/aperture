@@ -94,12 +94,8 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             }
             HttpResponseStatus status;
             Map<String, String> headers;
-            if (flow.checkResponse() != null
-                    && flow.checkResponse().hasDeniedResponse()
-                    && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
-                status =
-                        HttpResponseStatus.valueOf(
-                                flow.checkResponse().getDeniedResponse().getStatus());
+            if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
+                status = HttpResponseStatus.valueOf(flow.rejectReason());
                 headers = flow.checkResponse().getDeniedResponse().getHeadersMap();
 
             } else {

@@ -16,6 +16,11 @@
       "ssh": "default"
     }
   ],
+  "port_forwards": {
+    "service1-demo-app": "8087:8087",
+    "service2-demo-app": "8087:8087",
+    "service3-demo-app": "8087:8087"
+  },
   "child_resources": [
     {
       "workload": "service1-demo-app",

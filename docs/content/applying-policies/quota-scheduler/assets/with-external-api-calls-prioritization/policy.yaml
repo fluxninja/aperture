@@ -1,0 +1,43 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: quota-scheduler
+spec:
+  circuit:
+    components:
+    - flow_control:
+        quota_scheduler:
+          in_ports:
+            bucket_capacity:
+              constant_signal:
+                value: 500
+            fill_amount:
+              constant_signal:
+                value: 25
+          rate_limiter:
+            interval: 1s
+            label_key: http.request.header.api_key
+            lazy_sync:
+              enabled: false
+              num_sync: 4
+          scheduler:
+            workloads:
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: guest
+              parameters:
+                priority: 50
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: subscriber
+              parameters:
+                priority: 200
+          selectors:
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []
