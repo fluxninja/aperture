@@ -1,0 +1,268 @@
+definitions:
+  BackoffConfig:
+    properties:
+      base_delay:
+        description: Base Delay
+        format: string
+        type: string
+        x-go-name: BaseDelay
+      jitter:
+        description: Jitter
+        format: double
+        type: number
+        x-go-name: Jitter
+      max_delay:
+        description: Max Delay
+        format: string
+        type: string
+        x-go-name: MaxDelay
+      multiplier:
+        description: Backoff multiplier
+        format: double
+        type: number
+        x-go-name: Multiplier
+    title: BackoffConfig holds configuration for gRPC client backoff.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
+  ClientConfig:
+    properties:
+      grpc:
+        $ref: '#/definitions/GRPCClientConfig'
+      http:
+        $ref: '#/definitions/HTTPClientConfig'
+    title: ClientConfig is the client configuration.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
+  ClientTLSConfig:
+    properties:
+      ca_file:
+        type: string
+        x-go-name: CAFile
+      cert_file:
+        type: string
+        x-go-name: CertFile
+      insecure_skip_verify:
+        type: boolean
+        x-go-name: InsecureSkipVerify
+      key_file:
+        type: string
+        x-go-name: KeyFile
+      key_log_file:
+        type: string
+        x-go-name: KeyLogWriter
+    title: ClientTLSConfig is the configuration for client TLS.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/pkg/net/tlsconfig
+  Duration:
+    description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
+    title: Duration is encoded as a string message which represents a signed span of time.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/pkg/config
+  FluxNinjaExtensionConfig:
+    properties:
+      api_key:
+        description: API Key for this agent. If this key is not set, the extension won't be enabled.
+        type: string
+        x-go-name: APIKey
+      client:
+        $ref: '#/definitions/ClientConfig'
+      endpoint:
+        description: Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
+        type: string
+        x-go-name: Endpoint
+      heartbeat_interval:
+        description: Interval between each heartbeat.
+        format: string
+        type: string
+        x-go-name: HeartbeatInterval
+      installation_mode:
+        description: Installation mode describes on which underlying platform the Agent or the Controller is being run.
+        type: string
+        x-go-name: InstallationMode
+    title: FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
+  GRPCClientConfig:
+    properties:
+      backoff:
+        $ref: '#/definitions/BackoffConfig'
+      insecure:
+        description: Disable ClientTLS
+        type: boolean
+        x-go-name: Insecure
+      min_connection_timeout:
+        description: Minimum connection timeout
+        format: string
+        type: string
+        x-go-name: MinConnectionTimeout
+      tls:
+        $ref: '#/definitions/ClientTLSConfig'
+      use_proxy:
+        description: Use HTTP CONNECT Proxy
+        type: boolean
+        x-go-name: UseProxy
+    title: GRPCClientConfig holds configuration for gRPC Client.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
+  HTTPClientConfig:
+    properties:
+      disable_compression:
+        description: Disable Compression
+        type: boolean
+        x-go-name: DisableCompression
+      disable_keep_alives:
+        description: Disable HTTP Keepalive
+        type: boolean
+        x-go-name: DisableKeepAlives
+      expect_continue_timeout:
+        description: Expect Continue Timeout. 0 = no timeout.
+        format: string
+        type: string
+        x-go-name: ExpectContinueTimeout
+      idle_connection_timeout:
+        description: Idle Connection Timeout. 0 = no timeout.
+        format: string
+        type: string
+        x-go-name: IdleConnTimeout
+      key_log_file:
+        description: SSL/TLS key log file (useful for debugging)
+        type: string
+        x-go-name: KeyLogWriter
+      max_conns_per_host:
+        description: Max Connections Per Host. 0 = no limit.
+        format: int64
+        type: integer
+        x-go-name: MaxConnsPerHost
+      max_idle_connections:
+        description: Max Idle Connections. 0 = no limit.
+        format: int64
+        type: integer
+        x-go-name: MaxIdleConns
+      max_idle_connections_per_host:
+        description: Max Idle Connections per host. 0 = no limit.
+        format: int64
+        type: integer
+        x-go-name: MaxIdleConnsPerHost
+      max_response_header_bytes:
+        description: Max Response Header Bytes. 0 = no limit.
+        format: int64
+        type: integer
+        x-go-name: MaxResponseHeaderBytes
+      network_keep_alive:
+        description: Network level keep-alive duration
+        format: string
+        type: string
+        x-go-name: NetworkKeepAlive
+      network_timeout:
+        description: Timeout for making network connection
+        format: string
+        type: string
+        x-go-name: NetworkTimeout
+      proxy_connect_header:
+        $ref: '#/definitions/Header'
+      read_buffer_size:
+        description: Read Buffer Size. 0 = 4 KB
+        format: int64
+        type: integer
+        x-go-name: ReadBufferSize
+      response_header_timeout:
+        description: Response Header Timeout. 0 = no timeout.
+        format: string
+        type: string
+        x-go-name: ResponseHeaderTimeout
+      timeout:
+        description: HTTP client timeout - Timeouts include connection time, redirects, reading the response and so on. 0 = no timeout.
+        format: string
+        type: string
+        x-go-name: Timeout
+      tls:
+        $ref: '#/definitions/ClientTLSConfig'
+      tls_handshake_timeout:
+        description: TLS Handshake Timeout. 0 = no timeout
+        format: string
+        type: string
+        x-go-name: TLSHandshakeTimeout
+      use_proxy:
+        description: Use Proxy
+        type: boolean
+        x-go-name: UseProxy
+      write_buffer_size:
+        description: Write Buffer Size. 0 = 4 KB.
+        format: int64
+        type: integer
+        x-go-name: WriteBufferSize
+    title: HTTPClientConfig holds configuration for HTTP Client.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/pkg/net/http
+  Header:
+    additionalProperties:
+      items:
+        type: string
+      type: array
+    description: |-
+      The keys should be in canonical form, as returned by
+      CanonicalHeaderKey.
+    title: A Header represents the key-value pairs in an HTTP header.
+    type: object
+    x-go-package: net/http
+  SentryConfig:
+    properties:
+      attach_stack_trace:
+        description: Configure to generate and attach stack traces to capturing message calls
+        type: boolean
+        x-go-name: AttachStacktrace
+      debug:
+        description: Debug enables printing of Sentry SDK debug messages
+        type: boolean
+        x-go-name: Debug
+      disabled:
+        description: Sentry crash report disabled
+        type: boolean
+        x-go-name: Disabled
+      dsn:
+        description: |-
+          If DSN is not set, the client is effectively disabled
+          You can set test project's DSN to send log events.
+          oss-aperture project DSN is set as default.
+        type: string
+        x-go-name: Dsn
+      environment:
+        description: Environment
+        type: string
+        x-go-name: Environment
+      sample_rate:
+        description: Sample rate for event submission
+        format: double
+        type: number
+        x-go-name: SampleRate
+      traces_sample_rate:
+        description: Sample rate for sampling traces
+        format: double
+        type: number
+        x-go-name: TracesSampleRate
+    title: SentryConfig holds configuration for Sentry.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/v2/extensions/sentry/config
+info: {}
+paths:
+  /fluxninja:
+    post:
+      operationId: FluxNinjaExtension
+      parameters:
+        - in: body
+          schema:
+            $ref: '#/definitions/FluxNinjaExtensionConfig'
+      tags:
+        - extension-configuration
+      x-fn-config-env: true
+  /sentry:
+    post:
+      operationId: SentryExtension
+      parameters:
+        - in: body
+          schema:
+            $ref: '#/definitions/SentryConfig'
+      tags:
+        - extension-configuration
+      x-fn-config-env: true
+swagger: "2.0"
