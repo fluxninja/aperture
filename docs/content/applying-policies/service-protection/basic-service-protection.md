@@ -66,11 +66,12 @@ policy.
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/playground/playground.md), it demonstrates that when latency
-spikes due to high traffic at `service1-demo-app.demoapp.svc.cluster.local`, the
-controller throttles the rate of requests admitted into the service. This
-approach helps protect the service from becoming unresponsive and maintains the
-current latency within the tolerance limit (`1.1`) of historical latency.
+[Playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md),
+it demonstrates that when latency spikes due to high traffic at
+`service1-demo-app.demoapp.svc.cluster.local`, the controller throttles the rate
+of requests admitted into the service. This approach helps protect the service
+from becoming unresponsive and maintains the current latency within the
+tolerance limit (`1.1`) of historical latency.
 
 <Zoom>
 

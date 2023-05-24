@@ -70,7 +70,7 @@ At a high-level, this policy consists of:
 ## Playground
 
 The above policy can be loaded using the `quota-scheduler` scenario in
-[Playground](/playground/playground.md)
+[Playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md)
 
 :::info
 
