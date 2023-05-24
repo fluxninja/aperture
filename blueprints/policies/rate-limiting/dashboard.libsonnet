@@ -12,6 +12,17 @@ function(cfg) {
   local policyName = params.policy.policy_name,
   local ds = params.dashboard.datasource,
   local dsName = ds.name,
+  local baseFilters = {
+    policy_name: policyName,
+  },
+  local filters = baseFilters + params.dashboard.extra_filters,
+  local stringFilters = std.join(
+    ',',
+    std.map(
+      function(key) '%(key)s:"%(value)s"' % { key: key, value: filters[key] },
+      std.objectFields(filters),
+    )
+  ),
 
   local rateLimiterPanel =
     graphPanel.new(
@@ -22,7 +33,15 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='sum by(decision_type) (rate(rate_limiter_counter_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
+        expr=|||
+          sum by(decision_type) (
+            rate(
+              rate_limiter_counter_total{
+                %(filters)s
+              }[$__rate_interval]
+            )
+          )
+        ||| % { filters: stringFilters },
         intervalFactor=1,
       )
     ),
