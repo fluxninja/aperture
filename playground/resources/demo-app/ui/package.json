@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "rm -rf ./dist && webpack --mode production && cp -r ./dist/* ../public",
+    "build": "rm -rf ./dist && webpack --mode production && rm -rf ../public/* && cp -r ./dist/* ../public",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/**/*.+(js|jsx|ts|tsx)\""
@@ -19,7 +19,9 @@
   "dependencies": {
     "@emotion/react": "11.11.0",
     "@emotion/styled": "11.11.0",
+    "@fluxninja-tools/graceful-js": "1.0.0",
     "@mui/material": "5.13.2",
+    "axios": "1.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },

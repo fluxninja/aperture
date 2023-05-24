@@ -1,3 +1,4 @@
+import { RateLimitInfo } from '@fluxninja-tools/graceful-js'
 import {
   Box,
   BoxProps,
@@ -12,6 +13,7 @@ import { FC } from 'react'
 
 export declare type RequestRecord = {
   isError: boolean
+  rateLimitInfo?: RateLimitInfo
 }
 
 export interface MonitorRequestProps {
@@ -28,48 +30,104 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
       {userType}
     </Typography>
     <Divider />
-    <Typography>Request made in 60s:</Typography>
+    <Typography>Request made by app:</Typography>
     <Box display="flex" flexDirection="row" gap={0.3} justifyContent="center">
       {requestRecord.map((record, index) => (
         <MonitorRequestItem key={index} {...record} />
       ))}
     </Box>
     <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1}>
-      <Box {...columnBoxProps}>
-        <Typography>Success rate:</Typography>
-        <SuccessRate requestRecord={requestRecord} />
-      </Box>
-      <Box {...columnBoxProps}>
-        <Typography>Retry After:</Typography>
-        <Button variant="contained" color="secondary">
-          Retry
-        </Button>
-      </Box>
+      <ColumnBoxStyled component={Paper}>
+        <InfoHeading>Success</InfoHeading>
+        <Box {...boxFlex}>
+          <SuccessRate requestRecord={requestRecord} />
+        </Box>
+      </ColumnBoxStyled>
+      <ColumnBoxStyled component={Paper}>
+        <InfoHeading>Error</InfoHeading>
+        <Box {...boxFlex}>
+          <ErrorRate requestRecord={requestRecord} />
+        </Box>
+      </ColumnBoxStyled>
+      <ColumnBoxStyled component={Paper}>
+        <InfoHeading>Reset app</InfoHeading>
+        <Box {...boxFlex}>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ alignSelf: 'center' }}
+            onClick={() => window.location.reload()}
+          >
+            Reset
+          </Button>
+        </Box>
+      </ColumnBoxStyled>
     </Box>
   </MonitorRequestWrapper>
 )
 
 export type SuccessRateProps = Pick<MonitorRequestProps, 'requestRecord'>
 
-export const SuccessRate: FC<SuccessRateProps> = ({ requestRecord }) => {
+export const findPercentage = (share: number, total: number) =>
+  (share / total) * 100
+
+export const useSuccessErrorRatePercent = (requestRecord: RequestRecord[]) => {
   const [successRate, setSuccessRate] = useState(0)
+  const [errorRate, setErrorRate] = useState(0)
 
   useEffect(() => {
     const successCount = requestRecord.filter((record) => !record.isError)
-    const percent = (successCount.length / requestRecord.length) * 100
+    const percent = findPercentage(successCount.length, requestRecord.length)
     setSuccessRate(percent)
   }, [requestRecord, setSuccessRate])
 
-  return <SuccessRateStyled>{`${successRate}%`}</SuccessRateStyled>
+  useEffect(() => {
+    const errorCount = requestRecord.filter((record) => record.isError)
+    const percent = findPercentage(errorCount.length, requestRecord.length)
+    setErrorRate(percent)
+  }, [requestRecord, setErrorRate])
+
+  return { successRate, errorRate }
 }
 
-export const columnBoxProps: BoxProps = {
+export const SuccessRate: FC<SuccessRateProps> = ({ requestRecord }) => {
+  const { successRate } = useSuccessErrorRatePercent(requestRecord)
+  return (
+    <SuccessErrorRateStyled isError={false}>
+      {successRate}%
+    </SuccessErrorRateStyled>
+  )
+}
+
+export const ErrorRate: FC<SuccessRateProps> = ({ requestRecord }) => {
+  const { errorRate } = useSuccessErrorRatePercent(requestRecord)
+  return (
+    <SuccessErrorRateStyled isError={true}>{errorRate}%</SuccessErrorRateStyled>
+  )
+}
+
+const boxFlex: BoxProps = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: 2,
+  minHeight: 100,
 }
+
+export const ColumnBoxStyled = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
+  border: `0.5px solid ${theme.palette.grey[300]}`,
+  paddingBottom: theme.spacing(1),
+  minHeight: 100,
+}))
+
+export const InfoHeading = styled(Typography)(({ theme }) => ({
+  borderBottom: `0.5px solid ${theme.palette.grey[300]}`,
+  width: '100%',
+  textAlign: 'center',
+}))
 
 export const MonitorRequestWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -79,18 +137,23 @@ export const MonitorRequestWrapper = styled(Box)(({ theme }) => ({
   maxWidth: 500,
 }))
 
-export const SuccessRateStyled = styled(Box)(({ theme }) => ({
-  background: theme.palette.primary.main,
+export const SuccessErrorRateStyled = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isError',
+})<{
+  isError: boolean
+}>(({ theme, isError }) => ({
+  background: isError ? theme.palette.error.main : theme.palette.success.main,
   color: theme.palette.common.white,
-  fontSize: 24,
+  fontSize: 18,
   fontWeight: '600',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '50%',
-  height: 150,
-  width: 150,
+  height: 75,
+  width: 75,
+  alignSelf: 'center',
 }))
 
 export const MonitorRequestItem = styled(Box, {

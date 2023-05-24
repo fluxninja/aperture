@@ -176,7 +176,8 @@ func (ss SimpleService) Run() error {
 	// server ui build pack from public folder
 	fs := http.FileServer(http.Dir("./public"))
 
-	http.Handle("/", http.StripPrefix("/", fs))
+	http.Handle("/ui/", http.StripPrefix("/ui/", fs))
+	http.HandleFunc("/api/rate-limit", rateLimitedHandler)
 
 	http.Handle("/request", handlerFunc(handler))
 
@@ -185,6 +186,34 @@ func (ss SimpleService) Run() error {
 	server := &http.Server{Addr: address}
 
 	return server.ListenAndServe()
+}
+
+type RateLimitResponseBody struct {
+	Message           string `json:"message"`
+	RetryAfter        int    `json:"retryAfter"`
+	RetryLimit        int    `json:"retryLimit"`
+	Global            bool   `json:"global"`
+	RateLimitRemaining int    `json:"rateLimitRemaining"`
+	RateLimitReset    int    `json:"rateLimitReset"`
+}
+
+func rateLimitedHandler(w http.ResponseWriter, r *http.Request) {
+	responseBody := RateLimitResponseBody{
+		Message:           "Rate limit exceeded",
+		RetryAfter:        5,
+		RetryLimit:        3,
+		Global:            false,
+		RateLimitRemaining: 5,
+		RateLimitReset:    100, //int(time.Now().Add(time.Minute).Unix()),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusTooManyRequests)
+
+	err := json.NewEncoder(w).Encode(responseBody)
+	if err != nil {
+		log.Println("Error encoding JSON:", err)
+	}
 }
 
 func getOrCreateCounter(userID, userType string) *Counter {
