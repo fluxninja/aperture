@@ -301,8 +301,6 @@ MARKDOWN_DOC_TPL = """
 {%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
 {{- 'Array of ' + render_type(param_type[2:], is_complex_type) }}
-{%- elif param_type.startswith('map[') %}
-{{- 'Map of ' + render_type(param_type[4:-1], is_complex_type) }}
 {%- elif is_complex_type %}
 {{- 'Object (' + param_type + ')' }}
 {%- elif param_type == 'bool' %}
@@ -391,8 +389,6 @@ MARKDOWN_README_TPL = """
 {%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
 {{- 'Array of ' + render_type(param_type[2:], is_complex_type) }}
-{%- elif param_type.startswith('map[') %}
-{{- 'Map of ' + render_type(param_type[4:-1], is_complex_type) }}
 {%- elif is_complex_type %}
 {{- 'Object (' + param_type + ')' }}
 {%- elif param_type == 'bool' %}
@@ -472,7 +468,7 @@ items:
   {{ render_type(param_type[2:], ref_id, is_complex_type) | indent(2) }}
 {% elif param_type.startswith('map[') %}
 type: object
-additionalProperties: {{ render_type(param_type[4:-1], ref_id, is_complex_type) }}
+additionalProperties: true
 {% elif is_complex_type %}
 type: object
 $ref: "{{- ref_id }}"
