@@ -152,12 +152,8 @@ button in the `DemoApplications` resource.
 To re-start the traffic, press the `Start Wavepool Generator` button in the
 `DemoApplications` resource.
 
-:::note
-
-To manually run the traffic, please press the `Stop Wavepool Generator` button
-first to stop the automatic runner.
-
-:::
+> 📍 To manually run the traffic, please press the `Stop Wavepool Generator`
+> button first to stop the automatic runner.
 
 ---
 
