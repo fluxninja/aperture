@@ -8,13 +8,14 @@ import (
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/clarketm/json"
-	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
-	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 )
 
 // DistCache is a peer to peer distributed cache.
@@ -23,31 +24,29 @@ type DistCache struct {
 	lock              sync.Mutex
 	config            *olricconfig.Config
 	olric             *olric.Olric
+	client            olric.Client
 	metrics           *DistCacheMetrics
 	shutDowner        fx.Shutdowner
 	statsFailureCount uint8
 }
 
 // NewDistCache creates a new instance of DistCache.
-func NewDistCache(config *olricconfig.Config,
-	olric *olric.Olric,
-	metrics *DistCacheMetrics,
-	shutDowner fx.Shutdowner,
-) *DistCache {
+func NewDistCache(config *olricconfig.Config, olric *olric.Olric, metrics *DistCacheMetrics, shutDowner fx.Shutdowner) *DistCache {
 	return &DistCache{
 		config:     config,
 		olric:      olric,
+		client:     olric.NewEmbeddedClient(),
 		metrics:    metrics,
 		shutDowner: shutDowner,
 	}
 }
 
-// NewDMap creates a new Distributed Map.
-func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (*olric.DMap, error) {
+// NewDMap creates a new DMap.
+func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (olric.DMap, error) {
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
 	dc.config.DMaps.Custom[name] = config
-	d, err := dc.olric.NewDMap(name)
+	d, err := dc.client.NewDMap(name)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to create new DMap: %s, shutting down", name)
 		// shutdown
@@ -62,11 +61,11 @@ func (dc *DistCache) DeleteDMap(name string) error {
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
 	defer delete(dc.config.DMaps.Custom, name)
-	return dc.olric.DeleteDMap(name)
+	return dc.client.DeleteDMap(name)
 }
 
-func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
-	stats, err := dc.olric.Stats()
+func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
+	stats, err := dc.client.Stats(ctx, "")
 	if err != nil {
 		dc.statsFailureCount++
 		if dc.statsFailureCount > 10 {
@@ -131,7 +130,7 @@ func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
 
 // GetStats returns stats of the current Olric member.
 func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*distcachev1.Stats, error) {
-	stats, err := dc.olric.Stats()
+	stats, err := dc.client.Stats(ctx, "")
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
 		return nil, err

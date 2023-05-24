@@ -1,6 +1,7 @@
 package globaltokenbucket
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -21,7 +22,7 @@ const (
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
 	mu             sync.RWMutex
-	dMap           *olric.DMap
+	dMap           olric.DMap
 	name           string
 	bucketCapacity float64
 	fillAmount     float64
@@ -122,7 +123,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, fl
 		return true, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(context.Background(), label, TakeNFunction, reqBytes)
 	if err != nil {
 		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0
@@ -161,7 +162,7 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 		return true, 0, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(context.Background(), label, TakeNFunction, reqBytes)
 	if err != nil {
 		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0, 0
