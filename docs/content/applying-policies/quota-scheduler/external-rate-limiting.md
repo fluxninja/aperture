@@ -14,33 +14,29 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-The Quota Scheduler is a multifunctional tool that plays a crucial role not only
-in handling requests for external APIs, but also in managing inter-service
-dialogue within a system layout. Leveraging Aperture for external rate-limiting
-allows for the prioritization and regulation of API calls in line with quota
-restrictions, ensuring these calls do not go beyond the established limit. This
-prevents potential fines or blockage by the API provider. This is a practical
-example of how the Quota Scheduler can be deployed for external rate-limiting
-while maximizing the utility of the external rate limits and keeping your
-applications within their budget constraints, therefore preventing any
-additional costs.
+External Rate Limiting is technique to limit the number of outgoing requests
+from services to external API server. Turning apps into spend aware and stay
+within quota limits to avoid cost overages. However, not all workloads are on
+same priority, based on application their priority can be different. While doing
+external rate limiting, it is important to ensure prioritized access for your
+critical workloads. This policy builds upon the
+[`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
+blueprint, which comprises components like the token bucket rate limiting to
+ensure quota limits and a
+[Weighted Fair Queuing (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
+based Workload Scheduler to assure prioritized access for critical workloads.
 
 ## Policy
 
-This policy uses the
-[`Quota Schedular`](../../reference/policies/bundled-blueprints/policies/quota-scheduler.md)
-blueprint that enables quota scheduling for workloads. In this example, we will
-create a policy that will do quota based scheduling for external API and while
-do so, it will also do the workload prioritization. We will continuously monitor
-the quota checks panel and workload decision panel to see how the policy is
-working, and workload being rejected or accepted based on the quota limits and
-priority.
+In this policy,
+[Quota Scheduler](reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
+component is configured with `bucket_capacity` and `fill_amount` and rate
+limiting is happening based on label key `api_key` extracted from request
+header. While the lazy sync of between the agent is set to false.
 
-At a high-level, this policy consists of:
-
-- Rate Limiter: Limiting the number of requests as they exceed a certain
-  threshold.
-- Workload Scheduler: Allowing workload to be scheduled based on priority.
+WFQ Scheduler is configured two workloads priorities; `guest` and `subscriber`
+with 50 and 200 respectively. Matching labels using `user_type` value from
+request header.
 
 ```mdx-code-block
 <Tabs>
