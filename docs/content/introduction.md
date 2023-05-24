@@ -27,26 +27,18 @@ import Zoom from 'react-medium-image-zoom';
 import { Cards } from '@site/src/components/Cards';
 ```
 
+## What is Aperture?
 Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
-project, an open source platform designed to empower platform and reliability
-engineering teams. The platform offers a unified controllability layer that
-simplifies the management of modern applications. It enables teams to
-effortlessly implement intelligent load management capabilities, ensuring
-optimal performance at any scale and for any infrastructure stack.
+project, an open-source Intelligent Load Management platform that seamlessly integrates into any tech stack. This innovative platform is built to empower developers, platform engineers, and reliability engineers, providing them with an advanced control mechanism dovetailed with an observability layer. Aperture streamlines the task of handling diverse traffic load intensities, spanning from low throughput instances to conditions necessitating web-scale capacities. 
 
-## Simplify cloud native load management
+Its core functionality facilitates teams to effortlessly implement intelligent load management strategies, fostering optimized performance and promoting maximal infrastructure utilization. Crucially, Aperture also ensures the maintenance of an optimal end-user experience, even during service failures. This versatility and resilience apply across all types of systems, including monolithic architectures and distributed microservices environments.
 
-With Aperture, teams can automate load management processes, including flow
-control and auto-scaling, to ensure the reliability and stability of cloud
-native applications. These capabilities improve the overall user experience,
-while optimizing resources and reducing costs.
 
-## Declarative policy language
+## Where to get help?
+If you have questions about setting up your account or how to use Aperture, feel free to reach out: 
 
-Aperture's declarative policy language allows teams to effortlessly develop and
-manage policies that dictate their applications' behavior under various
-circumstances. This offers a visual depiction of their policies, enabling them
-to grasp the system's behavior and self-correction intuitively.
+
+| [Ask the expert](https://calendly.com/desaijai/fluxninja-meeting) | [Join our Slack Community](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)  | Email: support@fluxninja.com |
 
 ## Load management capabilities
 
