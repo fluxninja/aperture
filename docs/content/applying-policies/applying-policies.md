@@ -1,6 +1,6 @@
 ---
 title: Applying Policies
-sidebar_position: 3
+sidebar_position: 4
 description:
   Explore our step-by-step tutorials on applying polices in Aperture. Learn how
   to configure policies to improve the reliability and stability of your

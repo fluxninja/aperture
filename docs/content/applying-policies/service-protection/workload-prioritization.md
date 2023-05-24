@@ -91,9 +91,10 @@ policy.
 
 ### Playground
 
-The traffic generator in the [playground](/playground/playground.md) is
-configured to generate similar traffic pattern (number of concurrent users) for
-2 types of users - subscribers and guests.
+The traffic generator in the
+[playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md)
+is configured to generate similar traffic pattern (number of concurrent users)
+for 2 types of users - subscribers and guests.
 
 Loading the policy highlighted above in the playground will reveal that, during
 overload periods, requests from `subscriber` users have a higher acceptance rate
