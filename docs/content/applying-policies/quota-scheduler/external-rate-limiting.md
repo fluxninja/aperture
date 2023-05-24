@@ -29,7 +29,7 @@ based Workload Scheduler to assure prioritized access for critical workloads.
 ## Policy
 
 In this policy,
-[Quota Scheduler](reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
+[Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
 component is configured with `bucket_capacity`, and rate limiting is configured
 based on label key `api_key` extracted from the request header. While the lazy
 sync of between the agent is set to false.
@@ -77,6 +77,6 @@ for this policy.
 
 <Zoom>
 
-![Quota Scheduler With Workload Prioritization ](./assets/with-external-api-calls-prioritization/dashboard.png)
+![External Rate Limiting With Prioritization ](./assets/with-external-api-calls-prioritization/dashboard.png)
 
 </Zoom>
