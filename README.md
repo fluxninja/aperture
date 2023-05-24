@@ -91,7 +91,7 @@ scale levels.
 ### 🎮 Playground
 
 To try Aperture in a local Kubernetes environment, refer to
-[Playground docs](https://docs.fluxninja.com/get-started/playground/).
+[Playground docs](./playground/README.md).
 
 ![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
 
