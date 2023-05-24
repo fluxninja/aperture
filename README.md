@@ -27,8 +27,7 @@
 
 # 🥷 FluxNinja Aperture
 
-Aperture is an intelligent load management platform for modern cloud
-applications.
+Aperture, an Intelligent Load Management platform, integrates seamlessly into any stack, ensuring robust scalability for any workload size.
 
 ## ⚙️ Features
 
