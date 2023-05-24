@@ -18,6 +18,12 @@ keywords:
   - auto-scale
   - load management
   - flow control
+  - dark launch
+  - workload prioritization
+  - rate limiting
+  - observability
+  - feature rollout
+  - feature flag
 ---
 
 ```mdx-code-block
@@ -27,26 +33,34 @@ import Zoom from 'react-medium-image-zoom';
 import { Cards } from '@site/src/components/Cards';
 ```
 
-Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
-project, an open source platform designed to empower platform and reliability
-engineering teams. The platform offers a unified controllability layer that
-simplifies the management of modern applications. It enables teams to
-effortlessly implement intelligent load management capabilities, ensuring
-optimal performance at any scale and for any infrastructure stack.
+## What is Aperture?
 
-## Simplify cloud native load management
+The [FluxNinja Aperture](https://github.com/fluxninja/aperture) project, an open
+source Intelligent Load Management platform that seamlessly integrates into any
+tech stack. This innovative platform is built to empower developers, platform
+engineers, and reliability engineers, providing them with an advanced control
+mechanism dovetailed with an observability layer. Aperture streamlines the task
+of handling diverse traffic load intensities, spanning from low throughput
+instances to conditions necessitating web-scale capacities.
 
-With Aperture, teams can automate load management processes, including flow
-control and auto-scaling, to ensure the reliability and stability of cloud
-native applications. These capabilities improve the overall user experience,
-while optimizing resources and reducing costs.
+Its core functionality facilitates teams to effortlessly implement intelligent
+load management strategies, fostering optimized performance and promoting
+maximal infrastructure utilization. Crucially, Aperture also ensures the
+maintenance of an optimal end-user experience, even during service failures.
+This versatility and resilience apply across all types of systems, including
+monolithic architectures and distributed microservices environments.
 
-## Declarative policy language
+<!-- vale off -->
 
-Aperture's declarative policy language allows teams to effortlessly develop and
-manage policies that dictate their applications' behavior under various
-circumstances. This offers a visual depiction of their policies, enabling them
-to grasp the system's behavior and self-correction intuitively.
+## Where to get help?
+
+<!-- vale on -->
+
+If you have questions about how to use Aperture, feel free to reach out:
+
+| [Ask the expert](https://calendly.com/desaijai/fluxninja-meeting) |
+[Join our Slack Community](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)
+| Email: [support@fluxninja.com](mailto:support@fluxninja.com) |
 
 ## Load management capabilities
 
@@ -62,7 +76,7 @@ ensure the reliability and stability of applications, and include:
     url: "/applying-policies/auto-scale",
   },
   {
-    title: "Circuit-Based Policies",
+    title: "Declarative policies",
     description: "Aperture provides a policy language that enables teams to define how to react to different situations, such as when there is a deviation from service-level objectives. These policies are expressed as a signal processing circuit that enables Aperture to go from telemetry to appropriate actions.",
     url: "/concepts/policy",
   },
@@ -77,8 +91,8 @@ ensure the reliability and stability of applications, and include:
     url: "/applying-policies/rate-limiting",
   },
   {
-    title: "Intelligent Workload Classification",
-    description: "Aperture provides a weighted fair queuing scheduler to ensure that the most critical workloads are served first based on the requirements of your application. Requirements are defined in a policy which helps Aperture to classify the workloads into different classes.",
+    title: "Workload Prioritization",
+    description: "Aperture provides a weighted fair queuing scheduler to ensure that the most critical workloads are served first based on the requirements of your application.",
     url: "/applying-policies/service-protection/workload-prioritization",
   },
   {
@@ -108,8 +122,55 @@ use cases. In flow control, the control loop is used to manage workloads and
 ensure the system remains within capacity. In auto-scaling, the control loop is
 used to adjust resource allocation based on demand and performance.
 
-Learn more about how Aperture interfaces with your application in the
-[Architecture](/architecture/architecture.md) section.
-
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
+
+## Get started
+
+```mdx-code-block
+
+<Cards data={[{
+  title: "Setting up your application",
+  url: "/getting-started/setting-up-application/",
+},
+{
+  title: "Install Aperture",
+  url: "/getting-started/installation/",
+},
+{
+  title: "Your First Policy",
+  url: "/getting-started/policies",
+},
+{
+  title: "Applying Policies",
+  url: "/applying-policies/",
+}
+]}/>
+
+```
+
+## Learn
+
+For a high-level overview that explains how Aperture works, check out the
+Concepts section:
+
+```mdx-code-block
+<Cards data={[{
+  title: "Concepts",
+  url: "/concepts",
+}
+]}/>
+```
+
+<!-- vale off -->
+
+To understand how Aperture interfaces with your application, take a look at the
+[Architecture](/architecture/architecture.md) section.
+
+```mdx-code-block
+<Cards data={[{
+  title: "Architecture",
+  url: "/architecture",
+}
+]}/>
+```
