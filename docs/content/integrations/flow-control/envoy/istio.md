@@ -366,11 +366,11 @@ into your cluster.
    </TabItem>
    </Tabs>
 
-2. If you would like to apply the Istio EnvoyFilter to specific workloads, you
-   can use the `workloadSelector` parameter. For example, if you would like to
-   apply the Istio EnvoyFilter to the pods having the label
-   `app.kubernetes.io/name=service1`, you can create or update the `values.yaml`
-   file and pass it with the `install` command:
+2. If you want to apply the Istio EnvoyFilter to specific workloads, you can use
+   the `workloadSelector` parameter. For example, if you want to apply the Istio
+   EnvoyFilter to the pods having the label `app.kubernetes.io/name=service1`,
+   you can create or update the `values.yaml` file and pass it with the
+   `install` command:
 
    ```yaml
    envoyFilter:
@@ -392,7 +392,7 @@ into your cluster.
    </TabItem>
    </Tabs>
 
-3. If you would like to modify the default parameters of the chart, for example
+3. If you want to modify the default parameters of the chart, for example
    `sidecarMode`, you can create or update the `values.yaml` file and pass it
    with `install` command:
 
