@@ -1,7 +1,7 @@
 ---
 title: FAQ
 slug: faq
-sidebar_position: 11
+sidebar_position: 9
 description: Frequently asked questions about FluxNinja Aperture.
 image: /assets/img/aperture_logo.png
 keywords:

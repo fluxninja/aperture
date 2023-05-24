@@ -1,6 +1,6 @@
 ---
 title: Architecture
-sidebar_position: 6
+sidebar_position: 5
 description:
   Discover the core components of Aperture Architecture and learn how they work
   together to provide powerful and efficient reliability automation.
