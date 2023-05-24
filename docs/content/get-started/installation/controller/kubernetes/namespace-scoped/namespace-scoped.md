@@ -13,7 +13,7 @@ sidebar_position: 2
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../../../../apertureVersion.js';
 ```
 
 Aperture Controller can be installed in a single namespace without any cluster
