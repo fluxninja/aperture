@@ -289,7 +289,7 @@ Install the tool of your choice using the following links:
 
    :::info Refer
 
-   [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
+   [aperturectl install istioconfig](/reference/aperturectl/install/istioconfig/istioconfig.md)
    to see all the available command line arguments.
 
    :::
@@ -366,7 +366,33 @@ into your cluster.
    </TabItem>
    </Tabs>
 
-2. If you want to modify the default parameters of the chart, for example
+2. If you want to apply the Istio EnvoyFilter to specific workloads, you can use
+   the `workloadSelector` parameter. For example, if you want to apply the Istio
+   EnvoyFilter to the pods having the label `app.kubernetes.io/name=service1`,
+   you can create or update the `values.yaml` file and pass it with the
+   `install` command:
+
+   ```yaml
+   envoyFilter:
+     workloadSelector:
+       labels:
+         app.kubernetes.io/name: service1
+   ```
+
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
+
+3. If you want to modify the default parameters of the chart, for example
    `sidecarMode`, you can create or update the `values.yaml` file and pass it
    with `install` command:
 
