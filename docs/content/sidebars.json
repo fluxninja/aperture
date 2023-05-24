@@ -6,6 +6,11 @@
     },
     {
       "type": "link",
+      "label": "Try Local Playground",
+      "href": "https://github.com/fluxninja/aperture/blob/main/playground/README.md"
+    },
+    {
+      "type": "link",
       "label": "FluxNinja Blog",
       "href": "https://blog.fluxninja.com/"
     },
