@@ -20,7 +20,7 @@ envoyFilter:
   packAsBytes: false
   ## @param envoyFilter.sidecarMode Aperture Agent installed using the Sidecar mode
   sidecarMode: false
-  ## @param envoyFilter.workloadSelector Workload selector for Istio EnvoyFilter. Refer https://istio.io/latest/docs/reference/config/type/workload-selector/ for more details.
+  ## @param envoyFilter.workloadSelector Workload selector for Istio EnvoyFilter. Refer to https://istio.io/latest/docs/reference/config/networking/sidecar/#WorkloadSelector for more details.
   ## Example:
   ## workloadSelector:
   ##   labels:

@@ -100,7 +100,7 @@ service3-demo-app-788857c7cc-vlchn   2/2     Running   0          7m13s
 <Zoom>
 
 ```mermaid
-{@include: ../assets/playground/playground-app.mmd}
+{@include: ../assets/diagrams/playground/playground-app.mmd}
 ```
 
 </Zoom>
