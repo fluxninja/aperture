@@ -1,5 +1,5 @@
 ---
-title: External API Calls Prioritization with Quota Scheduling
+title: External Rate Limiting
 keywords:
   - policies
   - quota
@@ -14,16 +14,16 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-The Quota scheduler is a versatile feature that can be used for managing
-requests for external API calls, but also for inter-service communication within
-a system architecture. In case of External API calls, it acts like a traffic
-controller, making sure that too many requests don't rush in at once and cause a
-traffic jam in the API, which could potentially bring it down. By utilizing
-Aperture, external API calls, can be prioritized and managed under quota limits,
-so that calls doesn't exceed the limit, causing penalty or even worse being
-blocked by the API provider. The following example shows how to use the Quota
-scheduler to manage external API calls while ensuring the api calls are
-prioritized and managed under quota limits.
+The Quota Scheduler is a multifunctional tool that plays a crucial role not only
+in handling requests for external APIs, but also in managing inter-service
+dialogue within a system layout. Leveraging Aperture for external rate limiting
+allows for the prioritization and regulation of API calls in line with quota
+restrictions, ensuring these calls don't go beyond the established limit. This
+prevents potential fines or blockage by the API provider. This is a practical
+example of how the Quota Scheduler can be deployed for external rate limiting
+while maximizing the utility of the external rate limits and keeping your
+applications within their budget constraints, thus preventing any additional
+costs.
 
 ## Policy
 

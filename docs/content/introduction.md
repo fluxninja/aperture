@@ -108,8 +108,55 @@ use cases. In flow control, the control loop is used to manage workloads and
 ensure the system remains within capacity. In auto-scaling, the control loop is
 used to adjust resource allocation based on demand and performance.
 
-Learn more about how Aperture interfaces with your application in the
-[Architecture](/architecture/architecture.md) section.
-
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
+
+## Get started
+
+```mdx-code-block
+
+<Cards data={[{
+  title: "Setting up your application",
+  url: "/getting-started/setting-up-application/",
+},
+{
+  title: "Install Aperture",
+  url: "/getting-started/installation/",
+},
+{
+  title: "Your First Policy",
+  url: "/getting-started/policies",
+},
+{
+  title: "Applying Policies",
+  url: "/applying-policies/",
+}
+]}/>
+
+```
+
+## Learn
+
+For a high-level overview that explains how Aperture works, check out the
+Concepts section:
+
+```mdx-code-block
+<Cards data={[{
+  title: "Concepts",
+  url: "/concepts",
+}
+]}/>
+```
+
+<!-- vale off -->
+
+To understand how Aperture interfaces with your application, take a look at
+[Architecture](/architecture/architecture.md) section.
+
+```mdx-code-block
+<Cards data={[{
+  title: "Architecture",
+  url: "/architecture",
+}
+]}/>
+```
