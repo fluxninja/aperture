@@ -91,13 +91,14 @@ At a high level, this policy consists of:
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/playground/playground.md), it can be observed that as the response
-latency increases, the service protection policy queues a proportion of
-requests. The _Auto Scaler_ makes a scale-out decision as the
-`OBSERVED_LOAD_MULTIPLIER` becomes less than 1. As replicas get added to the
-deployment, the `OBSERVED_LOAD_MULTIPLIER` increases to more than 1, allowing
-the service to meet increased demand. The response latency returns to a normal
-range, and the _Load Scheduler_ won't throttle any traffic.
+[Playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md),
+it can be observed that as the response latency increases, the service
+protection policy queues a proportion of requests. The _Auto Scaler_ makes a
+scale-out decision as the `OBSERVED_LOAD_MULTIPLIER` becomes less than 1. As
+replicas get added to the deployment, the `OBSERVED_LOAD_MULTIPLIER` increases
+to more than 1, allowing the service to meet increased demand. The response
+latency returns to a normal range, and the _Load Scheduler_ won't throttle any
+traffic.
 
 After the scale-out cooldown period, the scale-in based on CPU utilization gets
 triggered, which will cause the replicas to decrease. Once the traffic ramps up

@@ -70,7 +70,7 @@ At a high-level, this policy consists of:
 ## Playground
 
 The above policy can be loaded using the `feature_rollout` scenario in
-[Playground](/playground/playground.md)
+[Playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md)
 
 :::info
 
