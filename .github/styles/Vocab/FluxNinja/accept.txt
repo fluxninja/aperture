@@ -80,3 +80,4 @@ EnvoyFilter
 write_http
 Kubelet
 colocating
+[Oo]perator
