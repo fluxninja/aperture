@@ -67,3 +67,7 @@ and can result in unpredictable behavior.
 
    The Aperture Agent can be installed as a system service on any Linux system
    that is [supported](supported-platforms.md).
+
+3. [**Docker**](docker.md)
+
+   The Aperture Agent can also be installed on Docker as containers.
