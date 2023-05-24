@@ -28,14 +28,14 @@ import { Cards } from '@site/src/components/Cards';
 ```
 
 ## What is Aperture?
-Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
+The [FluxNinja Aperture](https://github.com/fluxninja/aperture)
 project, an open-source Intelligent Load Management platform that seamlessly integrates into any tech stack. This innovative platform is built to empower developers, platform engineers, and reliability engineers, providing them with an advanced control mechanism dovetailed with an observability layer. Aperture streamlines the task of handling diverse traffic load intensities, spanning from low throughput instances to conditions necessitating web-scale capacities. 
 
 Its core functionality facilitates teams to effortlessly implement intelligent load management strategies, fostering optimized performance and promoting maximal infrastructure utilization. Crucially, Aperture also ensures the maintenance of an optimal end-user experience, even during service failures. This versatility and resilience apply across all types of systems, including monolithic architectures and distributed microservices environments.
 
 
 ## Where to get help?
-If you have questions about setting up your account or how to use Aperture, feel free to reach out: 
+If you have questions about how to use Aperture, feel free to reach out: 
 
 
 | [Ask the expert](https://calendly.com/desaijai/fluxninja-meeting) | [Join our Slack Community](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)  | Email: support@fluxninja.com |
