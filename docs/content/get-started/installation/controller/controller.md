@@ -37,7 +37,7 @@ The Aperture Controller can be installed using the below options:
 1. [**Kubernetes**](kubernetes/kubernetes.md)
 
    The Aperture Controller can be installed on Kubernetes using the Kubernetes
-   Operator available for it or using namespace-scoped resources.
+   Operator available for it, or using namespace-scoped resources.
 
 2. [**Docker**](docker.md)
 
