@@ -26,12 +26,12 @@ Below are the instructions to install the Aperture Controller on Docker.
    docker network create aperture --driver bridge
    ```
 
-## Installation of Etcd
+## Installation of etcd
 
 :::info Note
 
-Etcd is required for the Aperture Controller to function. If you already have an
-Etcd cluster running, you can skip these steps.
+etcd is required for the Aperture Controller to function. If you already have an
+etcd cluster running, you can skip these steps.
 
 :::
 
