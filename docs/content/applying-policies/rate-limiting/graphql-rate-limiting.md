@@ -46,15 +46,6 @@ by live previewing them first using introspection APIs.
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet Mixin">
-```
-
-```jsonnet
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 </Tabs>
 ```
 
