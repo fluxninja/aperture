@@ -16,14 +16,14 @@ import Zoom from 'react-medium-image-zoom';
 
 The Quota Scheduler is a multifunctional tool that plays a crucial role not only
 in handling requests for external APIs, but also in managing inter-service
-dialogue within a system layout. Leveraging Aperture for external rate limiting
+dialogue within a system layout. Leveraging Aperture for external rate-limiting
 allows for the prioritization and regulation of API calls in line with quota
-restrictions, ensuring these calls don't go beyond the established limit. This
+restrictions, ensuring these calls do not go beyond the established limit. This
 prevents potential fines or blockage by the API provider. This is a practical
-example of how the Quota Scheduler can be deployed for external rate limiting
+example of how the Quota Scheduler can be deployed for external rate-limiting
 while maximizing the utility of the external rate limits and keeping your
-applications within their budget constraints, thus preventing any additional
-costs.
+applications within their budget constraints, therefore preventing any
+additional costs.
 
 ## Policy
 

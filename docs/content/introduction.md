@@ -150,7 +150,7 @@ Concepts section:
 
 <!-- vale off -->
 
-To understand how Aperture interfaces with your application, take a look at
+To understand how Aperture interfaces with your application, take a look at the
 [Architecture](/architecture/architecture.md) section.
 
 ```mdx-code-block
