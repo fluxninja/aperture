@@ -8,8 +8,6 @@ import { Box, Typography, styled } from '@mui/material'
 import { GracefulError, gracefulRequest } from '@fluxninja-tools/graceful-js'
 import { api } from '../api'
 
-// add a graceful-js error component to show error or success and add api calls to aperture configured endpoint
-
 export const HomePage: FC = () => {
   const collection = useGracefulRequest()
   return (
