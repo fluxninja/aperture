@@ -12,8 +12,9 @@ import (
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/hashicorp/memberlist"
+
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 func newTestDistCacheWithConfig(t *testing.T, c *olricconfig.Config) (*DistCache, error) {
@@ -48,6 +49,7 @@ func newTestDistCacheWithConfig(t *testing.T, c *olricconfig.Config) (*DistCache
 	}
 
 	distCache.olric = o
+	distCache.client = o.NewEmbeddedClient()
 
 	go func() {
 		t.Log("Starting DistCacheLimiter")
