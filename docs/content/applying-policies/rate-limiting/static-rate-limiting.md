@@ -41,15 +41,6 @@ these limits to `ingress` traffic on the Kubernetes service
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet Mixin">
-```
-
-```jsonnet
-{@include: ./assets/static-rate-limiting/static-rate-limiting.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 </Tabs>
 
 ```
