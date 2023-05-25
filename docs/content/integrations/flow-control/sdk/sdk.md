@@ -1,5 +1,5 @@
 ---
-title: SDKs
+title: 📦 SDKs
 description: Setup Control Points using SDK libraries
 slug: setup-control-points-using-sdks-libraries
 keywords:
@@ -9,6 +9,7 @@ keywords:
   - points
   - sdk
 sidebar_position: 3
+sidebar_label: SDKs
 ---
 
 ```mdx-code-block
@@ -17,7 +18,7 @@ import DocCardList from '@theme/DocCardList';
 ```
 
 For services to control flows with Aperture Agent, [Control
-Points][flow-control] must be set within the service.
+Points][control-point] must be set within the service.
 
 This can be achieved in the following ways:
 
@@ -40,14 +41,25 @@ Aperture SDK allows you to manually wrap any function call or code snippet
 inside the service code as a feature control point. Every invocation of the
 feature is a flow from the perspective of Aperture.
 
-Middleware for popular frameworks is also provided, enabling simple
-configuration of traffic control points within your service.
+## 🧩 Middleware
+
+Aperture includes middleware for the following frameworks, helping to set up
+control points with less code changes:
+
+- [Armeria][armeria]
+- [Netty][netty]
+- [Tomcat][tomcat]
+- [Spring Boot][spring-boot]
 
 <DocCardList />
 
-[flow-control]: /concepts/flow-control/flow-control.md
+[control-point]: /concepts/flow-control/selector.md#control-point
 [istio]: ../envoy/istio.md
 [golang]: ./go/manual.md
 [java]: ./java/manual.md
 [javascript]: ./javascript/manual.md
 [python]: ./python/manual.md
+[netty]: ./java/netty.md#netty-handler
+[tomcat]: ./java/tomcat.md#tomcat-filter
+[spring-boot]: ./java/springboot.md#spring-boot-filter
+[armeria]: ./java/armeria.md#armeria-decorators

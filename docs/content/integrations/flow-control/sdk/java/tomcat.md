@@ -60,4 +60,4 @@ For usage, you can view the [example app][tomcat-example] available in the
 repository.
 
 [tomcat-example]:
-  https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/tomcat-example
+  https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v2.1.0/examples/tomcat-example
