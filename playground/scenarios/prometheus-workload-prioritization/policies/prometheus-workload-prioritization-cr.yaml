@@ -1,6 +1,25 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
+  annotations:
+    fluxninja.com/blueprint-uri: local
+    fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
+      [{"control_point": "ingress", "service": "controller-prometheus-server.aperture-controller.svc.cluster.local"}]}},
+      "policy_name": "prometheus-workload-prioritization", "resources": {"flow_control":
+      {"classifiers": [{"rego": {"labels": {"is_demo_app": {"telemetry": true}, "is_demo_app_request_duration_micro_seconds":
+      {"telemetry": true}, "is_demo_app_requests_total": {"telemetry": true}}, "module":
+      "package prometheus_label\n\ndefault is_demo_app = false\n\nbody := input.attributes.request.http.body\n\nis_demo_app_requests_total
+      := contains(body, \"demo_app_requests_total\")\n\nis_demo_app_request_duration_micro_seconds
+      := contains(body, \"demo_app_request_duration_micro_seconds\")\n\nis_demo_app
+      {\n  is_demo_app_requests_total\n}\n\nis_demo_app {\n  is_demo_app_request_duration_micro_seconds\n}\n"},
+      "selectors": [{"agent_group": "default", "control_point": "ingress", "label_matcher":
+      {"match_labels": {"http.path": "/api/v1/write"}}, "service": "controller-prometheus-server.aperture-controller.svc.cluster.local"}]}]}},
+      "service_protection_core": {"adaptive_load_scheduler": {"load_scheduler": {"scheduler":
+      {"workloads": [{"label_matcher": {"match_labels": {"is_demo_app_requests_total":
+      "true"}}, "parameters": {"priority": 50}}, {"label_matcher": {"match_labels":
+      {"is_demo_app_request_duration_micro_seconds": "true"}}, "parameters": {"priority":
+      200}}]}, "selectors": [{"control_point": "ingress", "label_matcher": {"match_labels":
+      {"http.path": "/api/v1/write", "is_demo_app": "true"}}, "service": "controller-prometheus-server.aperture-controller.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: prometheus-workload-prioritization

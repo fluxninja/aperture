@@ -1,6 +1,18 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
+  annotations:
+    fluxninja.com/blueprint-uri: local
+    fluxninja.com/values: '{"policy": {"auto_scaling": {"dry_run": false, "kubernetes_replicas":
+      {"kubernetes_object_selector": {"agent_group": "default", "api_version": "apps/v1",
+      "kind": "Deployment", "name": "service1-demo-app", "namespace": "demoapp"},
+      "max_replicas": "10", "min_replicas": "1"}, "scaling_parameters": {"scale_in_alerter":
+      {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter":
+      {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}},
+      "latency_baseliner": {"flux_meter": {"selectors": [{"control_point": "ingress",
+      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
+      "load-based-auto-scale", "service_protection_core": {"adaptive_load_scheduler":
+      {"load_scheduler": {"selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: load-based-auto-scale

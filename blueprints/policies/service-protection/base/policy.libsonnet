@@ -1,7 +1,7 @@
 local spec = import '../../../spec.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg) {
+function(cfg, metadata={}) {
   local params = config + cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
@@ -109,6 +109,21 @@ function(cfg) {
         + params.policy.components,
       ),
     ),
-
+  local policyResource = {
+    kind: 'Policy',
+    apiVersion: 'fluxninja.com/v1alpha1',
+    metadata: {
+      name: params.policy.policy_name,
+      labels: {
+        'fluxninja.com/validate': 'true',
+      },
+      annotations: {
+        [if std.objectHas(metadata, 'values') then 'fluxninja.com/values']: metadata.values,
+        [if std.objectHas(metadata, 'blueprints_uri') then 'fluxninja.com/blueprint-uri']: metadata.blueprints_uri,
+      },
+    },
+    spec: policyDef,
+  },
   policyDef: policyDef,
+  policyResource: policyResource,
 }

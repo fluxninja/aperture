@@ -1,7 +1,7 @@
 local spec = import '../../../spec.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg) {
+function(cfg, metadata={}) {
   local params = config + cfg,
 
   local policyName = params.policy.policy_name,
@@ -484,6 +484,10 @@ function(cfg) {
       name: params.policy.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
+      },
+      annotations: {
+        [if std.objectHas(metadata, 'values') then 'fluxninja.com/values']: metadata.values,
+        [if std.objectHas(metadata, 'blueprints_uri') then 'fluxninja.com/blueprint-uri']: metadata.blueprints_uri,
       },
     },
     spec: policyDef,

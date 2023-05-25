@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"go.uber.org/fx"
+	"gopkg.in/yaml.v3"
 
 	policiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -82,13 +83,24 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 	if len(yamlSrc) == 0 {
 		return nil, nil, errors.New("empty policy")
 	}
-	policy := &policiesv1.Policy{}
 
-	err := config.UnmarshalYAML(yamlSrc, policy)
+	var yamlRaw map[string]any
+	err := yaml.Unmarshal(yamlSrc, &yamlRaw)
+	if err != nil {
+		return nil, nil, err
+	}
+	delete(yamlRaw, "metadata")
+	yamlSrc, err = yaml.Marshal(yamlRaw)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	policy := &policiesv1.Policy{}
+	err = config.UnmarshalYAML(yamlSrc, policy)
+
+	if err != nil {
+		return nil, nil, err
+	}
 	alerter := alerts.NewSimpleAlerter(100)
 	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)

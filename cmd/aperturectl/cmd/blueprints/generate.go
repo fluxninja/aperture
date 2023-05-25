@@ -3,6 +3,7 @@ package blueprints
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,6 +31,10 @@ func init() {
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
 	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 1, "Max depth of the graph when generating DOT and Mermaid files")
+}
+
+type metadata struct {
+	BlueprintsURI string `json:"blueprints_uri"`
 }
 
 var generateCmd = &cobra.Command{
@@ -117,12 +122,26 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 		})
 
 		importPath := fmt.Sprintf("%s/%s", blueprintsDir, blueprintName)
-
+		var blueprintsURIMetadata string
+		url, err := url.Parse(blueprintsURI)
+		if err != nil || url.Scheme == "" {
+			blueprintsURIMetadata = "local"
+			log.Debug().Msgf("Using local blueprints directory: %s", blueprintsURI)
+		} else {
+			blueprintsURIMetadata = blueprintsURI
+		}
+		metadata, err := json.Marshal(metadata{
+			BlueprintsURI: blueprintsURIMetadata,
+		})
+		if err != nil {
+			return err
+		}
 		bundleStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s/bundle.libsonnet';
 		local config = std.parseYaml(importstr '%s');
-    bundle(config)
-		`, importPath, valuesFile))
+		local metadata = std.parseJson('%s');
+		bundle(config, metadata)
+		`, importPath, valuesFile, metadata))
 		if err != nil {
 			return err
 		}

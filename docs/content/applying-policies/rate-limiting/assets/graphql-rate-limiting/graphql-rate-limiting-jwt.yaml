@@ -1,6 +1,22 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
+  annotations:
+    fluxninja.com/blueprint-uri: local
+    fluxninja.com/values: '{"policy": {"policy_name": "graphql-rate-limiting", "rate_limiter":
+      {"bucket_capacity": 40, "fill_amount": 2, "parameters": {"interval": "1s", "label_key":
+      "user_id"}, "selectors": [{"control_point": "ingress", "service": "service-graphql-demo-app.demoapp.svc.cluster.local"}]},
+      "resources": {"flow_control": {"classifiers": [{"rego": {"labels": {"user_id":
+      {"telemetry": true}}, "module": "package graphql_example\nimport future.keywords.if\nquery_ast
+      := graphql.parse_query(input.parsed_body.query)\nclaims := payload if {\n  io.jwt.verify_hs256(bearer_token,
+      \"secret\")\n  [_, payload, _] := io.jwt.decode(bearer_token)\n}\nbearer_token
+      := t if {\n  v := input.attributes.request.http.headers.authorization\n  startswith(v,
+      \"Bearer \")\n  t := substring(v, count(\"Bearer \"), -1)\n}\nqueryIsCreateTodo
+      if {\n  some operation\n  walk(query_ast, [_, operation])\n  operation.Name
+      == \"createTodo\"\n  count(operation.SelectionSet) > 0\n  some selection\n  walk(operation.SelectionSet,
+      [_, selection])\n  selection.Name == \"createTodo\"\n}\nuser_id := u if {\n  queryIsCreateTodo\n  u
+      := claims.userID\n}\n"}, "selectors": [{"control_point": "ingress", "service":
+      "service-graphql-demo-app.demoapp.svc.cluster.local"}]}]}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: graphql-rate-limiting
