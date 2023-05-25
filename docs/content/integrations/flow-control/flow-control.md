@@ -27,8 +27,9 @@ handle requests and prioritize workloads.
 Aperture can interface with service instances through _Service Meshes_ or
 _SDKs_:
 
-- Service Meshes: Aperture can be deployed with no changes to application code,
-  using [Envoy](https://www.envoyproxy.io/). It latches onto Envoy’s
+- [**Service Meshes**](./envoy/envoy.md): Aperture can be deployed with no
+  changes to application code, using [Envoy](https://www.envoyproxy.io/). It
+  latches onto Envoy’s
   [External Authorization API](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter)
   for control purposes and collects access logs for telemetry purposes. On each
   request, Envoy sends request metadata to the Aperture Agent for a flow control
@@ -38,15 +39,16 @@ _SDKs_:
   [OpenTelemetry](https://opentelemetry.io/) tracing protocol as it inserts flow
   classification labels into requests, enabling visualization in tracing tools
   such as [Jaeger](https://www.jaegertracing.io/).
-- Aperture SDKs: In addition to service mesh insertion, Aperture provides SDKs
-  that can be used by developers to achieve fine-grained flow control at the
-  feature level inside service code. For example, an e-commerce app might want
-  to prioritize users in the checkout flow over new sessions when the
-  application is experiencing an overload. The Aperture Controller can be
-  programmed to degrade features as an escalated recovery action when basic load
-  shedding is triggered for several minutes.
-- API Gateways: Aperture seamlessly integrates with various API gateways,
-  including [Kong](https://docs.konghq.com/gateway/latest/) and
+- [**Aperture SDKs**](./sdk/sdk.md): In addition to service mesh insertion,
+  Aperture provides SDKs that can be used by developers to achieve fine-grained
+  flow control at the feature level inside service code. For example, an
+  e-commerce app might want to prioritize users in the checkout flow over new
+  sessions when the application is experiencing an overload. The Aperture
+  Controller can be programmed to degrade features as an escalated recovery
+  action when basic load shedding is triggered for several minutes.
+- [**API Gateways**](./gateway/gateway.md): Aperture seamlessly integrates with
+  various API gateways, including
+  [Kong](https://docs.konghq.com/gateway/latest/) and
   [NGINX](https://www.nginx.com/products/nginx/api-gateway/), enabling easy
   integration with a diverse range of gateways. This integration at the gateway
   level simplifies traffic flow management before it reaches the main
