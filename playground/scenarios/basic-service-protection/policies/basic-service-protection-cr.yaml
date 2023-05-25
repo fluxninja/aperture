@@ -1,6 +1,12 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
+  annotations:
+    fluxninja.com/blueprint-uri: local
+    fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
+      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}},
+      "policy_name": "basic-service-protection", "service_protection_core": {"adaptive_load_scheduler":
+      {"load_scheduler": {"selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: basic-service-protection

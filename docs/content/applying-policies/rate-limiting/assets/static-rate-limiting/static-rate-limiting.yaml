@@ -1,6 +1,12 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
+  annotations:
+    fluxninja.com/blueprint-uri: local
+    fluxninja.com/values: '{"policy": {"policy_name": "static-rate-limiting", "rate_limiter":
+      {"bucket_capacity": 40, "fill_amount": 2, "parameters": {"interval": "1s", "label_key":
+      "http.request.header.user_id"}, "selectors": [{"agent_group": "default", "control_point":
+      "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}'
   labels:
     fluxninja.com/validate: "true"
   name: static-rate-limiting

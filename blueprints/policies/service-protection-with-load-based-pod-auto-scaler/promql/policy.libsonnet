@@ -15,7 +15,7 @@ local increasingGradientParameters = spec.v1.IncreasingGradientParameters;
 local alerterParameters = spec.v1.AlerterParameters;
 local port = spec.v1.Port;
 
-function(cfg) {
+function(cfg, metadata={}) {
   local params = config + cfg,
 
   local autoScalingParams = {
@@ -92,6 +92,10 @@ function(cfg) {
       name: params.policy.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
+      },
+      annotations: {
+        [if std.objectHas(metadata, 'values') then 'fluxninja.com/values']: metadata.values,
+        [if std.objectHas(metadata, 'blueprints_uri') then 'fluxninja.com/blueprint-uri']: metadata.blueprints_uri,
       },
     },
     spec: policyDef,
