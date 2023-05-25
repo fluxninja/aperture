@@ -1,5 +1,5 @@
 ---
-title: Quota Scheduler
+title: Quota Scheduling
 keywords:
   - tutorial
   - quota-scheduler
@@ -9,7 +9,7 @@ keywords:
   - external-api
   - prioritization
 sidebar_position: 1
-sidebar_label: Quota Scheduler
+sidebar_label: Quota Scheduling
 ---
 
 ```mdx-code-block
