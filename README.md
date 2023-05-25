@@ -55,7 +55,7 @@ applications.
   from service-level objectives and calculate recovery or escalation actions.
   Auto-scaling can be implemented as an escalation that triggers based on load
   throttling signal.
-- **Distributed rate limiting:** Safeguard APIs from potential abuse with
+- **Distributed rate-limiting:** Safeguard APIs from potential abuse with
   Aperture's high-performance, distributed rate limiter. This feature enforces
   per-key limits based on fine-grained labels, ensuring precise control and
   prevention of excessive usage.
