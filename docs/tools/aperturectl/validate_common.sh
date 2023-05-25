@@ -40,7 +40,7 @@ function generate_compare() {
 	comp=$(diff <(yq -P 'sort_keys(..)' "$yaml1") <(yq -P 'sort_keys(..)' "$yaml2"))
 	set -e
 	if [ -n "$comp" ]; then
-		echo "aperturectl generate did not match jsonnet library example"
+		echo "aperturectl generate did not match jsonnet library example (compared $yaml1" "and $yaml2))"
 		echo "$comp"
 		exit 1
 	fi

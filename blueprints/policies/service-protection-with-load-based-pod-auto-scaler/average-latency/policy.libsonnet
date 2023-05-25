@@ -92,7 +92,7 @@ function(cfg, metadata={}) {
         'fluxninja.com/validate': 'true',
       },
       annotations: {
-        [if std.objectHas(metadata, 'values') then 'fluxninja.com/values']: std.toString(metadata.values),
+        [if std.objectHas(metadata, 'values') then 'fluxninja.com/values']: metadata.values,
         [if std.objectHas(metadata, 'blueprints_uri') then 'fluxninja.com/blueprint-uri']: metadata.blueprints_uri,
       },
     },

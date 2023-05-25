@@ -61,13 +61,14 @@ Status: OK
 
 **Properties**
 
-| Name               | Type                                                                   | Go type                           | Required | Default | Description                                                             | Example |
-| ------------------ | ---------------------------------------------------------------------- | --------------------------------- | :------: | ------- | ----------------------------------------------------------------------- | ------- |
-| default_config     | [LoadSchedulerDynamicConfig](#load-scheduler-dynamic-config)           | `LoadSchedulerDynamicConfig`      |          |         | Default dynamic configuration for load actuation.                       |         |
-| dynamic_config_key | string                                                                 | `string`                          |          |         | Dynamic configuration key for load actuation.                           |         |
-| in_ports           | [AdaptiveLoadSchedulerIns](#adaptive-load-scheduler-ins)               | `AdaptiveLoadSchedulerIns`        |          |         | Collection of input ports for the _Adaptive Load Scheduler_ component.  |         |
-| out_ports          | [AdaptiveLoadSchedulerOuts](#adaptive-load-scheduler-outs)             | `AdaptiveLoadSchedulerOuts`       |          |         | Collection of output ports for the _Adaptive Load Scheduler_ component. |         |
-| parameters         | [AdaptiveLoadSchedulerParameters](#adaptive-load-scheduler-parameters) | `AdaptiveLoadSchedulerParameters` |          |         | Parameters for the _Adaptive Load Scheduler_ component.                 |         |
+| Name                                                                                           | Type                                                                   | Go type                           | Required | Default | Description                                                                                                                                         | Example |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------- | :------: | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| dry_run                                                                                        | boolean                                                                | `bool`                            |          |         | Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows. |
+| It is useful for observing the behavior of load scheduler without disrupting any real traffic. |                                                                        |
+| dry_run_config_key                                                                             | string                                                                 | `string`                          |          |         | Configuration key for setting dry run mode through dynamic configuration.                                                                           |         |
+| in_ports                                                                                       | [AdaptiveLoadSchedulerIns](#adaptive-load-scheduler-ins)               | `AdaptiveLoadSchedulerIns`        |          |         | Collection of input ports for the _Adaptive Load Scheduler_ component.                                                                              |         |
+| out_ports                                                                                      | [AdaptiveLoadSchedulerOuts](#adaptive-load-scheduler-outs)             | `AdaptiveLoadSchedulerOuts`       |          |         | Collection of output ports for the _Adaptive Load Scheduler_ component.                                                                             |         |
+| parameters                                                                                     | [AdaptiveLoadSchedulerParameters](#adaptive-load-scheduler-parameters) | `AdaptiveLoadSchedulerParameters` |          |         | Parameters for the _Adaptive Load Scheduler_ component.                                                                                             |         |
 
 ### <span id="adaptive-load-scheduler-ins"></span> AdaptiveLoadSchedulerIns
 
@@ -298,11 +299,11 @@ component. | |
 | ------- | ------- | ------- | :------: | ------- | -------------------------------------------------------------------- | ------- |
 | dry_run | boolean | `bool`  |          |         | Dry run mode ensures that no scaling is invoked by this auto scaler. |
 
-This is Useful for observing the behavior of auto scaler without disrupting any
-real traffic. This parameter sets the default value of dry run setting which can
-be overridden at runtime using dynamic configuration. | | | dry*run_config_key |
-string| `string` | | | Configuration key for overriding dry run setting through
-dynamic configuration. | | | scale_in_controllers |
+This is useful for observing the behavior of auto scaler without disrupting any
+real deployment. This parameter sets the default value of dry run setting which
+can be overridden at runtime using dynamic configuration. | | |
+dry*run_config_key | string| `string` | | | Configuration key for overriding dry
+run setting through dynamic configuration. | | | scale_in_controllers |
 [][ScaleInController](#scale-in-controller)|
 `[]*ScaleInController`| | | List of \_Controllers* for scaling in. | | | scale*out_controllers | [][ScaleOutController](#scale-out-controller)|`[]_ScaleOutController`
 | | | List of \_Controllers_ for scaling out. | | | scaling_backend |
@@ -369,6 +370,29 @@ another scale-in operation. | | | scale_out_alerter |
 Configuration for scale-out Alerter. | | | scale_out_cooldown | string| `string`
 | | `"30s"`| The amount of time to wait after a scale-out operation for another
 scale-out or scale-in operation. | |
+
+### <span id="bool-variable"></span> BoolVariable
+
+> Component that emits a constant Boolean signal which can be changed at runtime
+> through dynamic configuration.
+
+**Properties**
+
+| Name            | Type                                    | Go type            | Required | Default | Description                                                                                                                                                 | Example |
+| --------------- | --------------------------------------- | ------------------ | :------: | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| config_key      | string                                  | `string`           |          |         | Configuration key for overriding value setting through dynamic configuration.                                                                               |         |
+| constant_output | boolean                                 | `bool`             |          |         | The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration. |         |
+| out_ports       | [BoolVariableOuts](#bool-variable-outs) | `BoolVariableOuts` |          |         | Output ports for the BoolVariable component.                                                                                                                |         |
+
+### <span id="bool-variable-outs"></span> BoolVariableOuts
+
+> Outputs for the BoolVariable component.
+
+**Properties**
+
+| Name   | Type                 | Go type   | Required | Default | Description                              | Example |
+| ------ | -------------------- | --------- | :------: | ------- | ---------------------------------------- | ------- |
+| output | [OutPort](#out-port) | `OutPort` |          |         | The value is emitted to the output port. |         |
 
 ### <span id="circuit"></span> Circuit
 
@@ -462,13 +486,11 @@ classified by this _Classifier_. | |
 
 **Properties**
 
-| Name          | Type   | Go type  | Required | Default | Description                             | Example |
-| ------------- | ------ | -------- | :------: | ------- | --------------------------------------- | ------- |
-| blueprint_uri | string | `string` |          |         | The blueprint URI of the policy.        |         |
-| component_id  | string | `string` |          |         | The id of Component within the circuit. |         |
-| policy_hash   | string | `string` |          |         | Hash of the entire Policy spec.         |         |
-| policy_name   | string | `string` |          |         | Name of the Policy.                     |         |
-| values        | string | `string` |          |         | The values used for policy generation.  |         |
+| Name         | Type   | Go type  | Required | Default | Description                             | Example |
+| ------------ | ------ | -------- | :------: | ------- | --------------------------------------- | ------- |
+| component_id | string | `string` |          |         | The id of Component within the circuit. |         |
+| policy_hash  | string | `string` |          |         | Hash of the entire Policy spec.         |         |
+| policy_name  | string | `string` |          |         | Name of the Policy.                     |         |
 
 ### <span id="component"></span> Component
 
@@ -500,6 +522,7 @@ See also [Policy](#policy) for a higher-level explanation of circuits.
 | and                                                                                                            | [And](#and)                                    | `And`                  |          |         | Logical AND.                                                                                                                                                         |         |
 | arithmetic_combinator                                                                                          | [ArithmeticCombinator](#arithmetic-combinator) | `ArithmeticCombinator` |          |         | Applies the given operator on input operands (signals) and emits the result.                                                                                         |         |
 | auto_scale                                                                                                     | [AutoScale](#auto-scale)                       | `AutoScale`            |          |         | AutoScale components are used to scale the service.                                                                                                                  |         |
+| bool_variable                                                                                                  | [BoolVariable](#bool-variable)                 | `BoolVariable`         |          |         | BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.                                                              |         |
 | decider                                                                                                        | [Decider](#decider)                            | `Decider`              |          |         | Decider emits the binary result of comparison operator on two operands.                                                                                              |         |
 | differentiator                                                                                                 | [Differentiator](#differentiator)              | `Differentiator`       |          |         | Differentiator calculates rate of change per tick.                                                                                                                   |         |
 | ema                                                                                                            | [EMA](#e-m-a)                                  | `EMA`                  |          |         | Exponential Moving Average filter.                                                                                                                                   |         |
@@ -523,7 +546,7 @@ See also [Policy](#policy) for a higher-level explanation of circuits.
 | sma                                                                                                            | [SMA](#s-m-a)                                  | `SMA`                  |          |         | Simple Moving Average filter.                                                                                                                                        |         |
 | switcher                                                                                                       | [Switcher](#switcher)                          | `Switcher`             |          |         | Switcher acts as a switch that emits one of the two signals based on third signal.                                                                                   |         |
 | unary_operator                                                                                                 | [UnaryOperator](#unary-operator)               | `UnaryOperator`        |          |         | Takes an input signal and emits the square root of the input signal.                                                                                                 |         |
-| variable                                                                                                       | [Variable](#variable)                          | `Variable`             |          |         | Emits a variable signal which can be set to invalid.                                                                                                                 |         |
+| variable                                                                                                       | [Variable](#variable)                          | `Variable`             |          |         | Emits a variable signal which can be changed at runtime via dynamic configuration.                                                                                   |         |
 
 ### <span id="constant-signal"></span> ConstantSignal
 
@@ -1025,18 +1048,17 @@ attribute_key: response_duration_ms
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
+[Envoy Filter](/integrations/flow-control/envoy/istio.md#envoy-filter)
 
-::: | | | exponential_buckets |
+::: | | | exponential*buckets |
 [FluxMeterExponentialBuckets](#flux-meter-exponential-buckets)|
 `FluxMeterExponentialBuckets` | | | | | | exponential_buckets_range |
 [FluxMeterExponentialBucketsRange](#flux-meter-exponential-buckets-range)|
 `FluxMeterExponentialBucketsRange` | | | | | | linear_buckets |
 [FluxMeterLinearBuckets](#flux-meter-linear-buckets)| `FluxMeterLinearBuckets` |
-| | | | | selectors | [][Selector](#selector)| `[]*Selector` | ✓ | | Selectors
-for the component. | | | static_buckets |
-[FluxMeterStaticBuckets](#flux-meter-static-buckets)| `FluxMeterStaticBuckets` |
-| | | |
+| | | | | selectors | [][Selector](#selector)|
+`[]*Selector`| ✓ | | Selectors for flows that will be metered by this \_Flux Meter*. | | | static_buckets | [FluxMeterStaticBuckets](#flux-meter-static-buckets)|`FluxMeterStaticBuckets`
+| | | | |
 
 ### <span id="flux-meter-exponential-buckets"></span> FluxMeterExponentialBuckets
 
@@ -1118,22 +1140,13 @@ input.
 
 **Properties**
 
-| Name               | Type                                                                   | Go type                           | Required | Default | Description                              | Example |
-| ------------------ | ---------------------------------------------------------------------- | --------------------------------- | :------: | ------- | ---------------------------------------- | ------- |
-| default_config     | [GradientControllerDynamicConfig](#gradient-controller-dynamic-config) | `GradientControllerDynamicConfig` |          |         | Default configuration.                   |         |
-| dynamic_config_key | string                                                                 | `string`                          |          |         |                                          |         |
-| in_ports           | [GradientControllerIns](#gradient-controller-ins)                      | `GradientControllerIns`           |          |         | Input ports of the Gradient Controller.  |         |
-| out_ports          | [GradientControllerOuts](#gradient-controller-outs)                    | `GradientControllerOuts`          |          |         | Output ports of the Gradient Controller. |         |
-| parameters         | [GradientControllerParameters](#gradient-controller-parameters)        | `GradientControllerParameters`    |          |         | Gradient Parameters.                     |         |
-
-### <span id="gradient-controller-dynamic-config"></span> GradientControllerDynamicConfig
-
-**Properties**
-
-| Name                                                                                                                        | Type    | Go type | Required | Default | Description                                           | Example |
-| --------------------------------------------------------------------------------------------------------------------------- | ------- | ------- | :------: | ------- | ----------------------------------------------------- | ------- |
-| manual_mode                                                                                                                 | boolean | `bool`  |          |         | Decides whether the controller runs in `manual_mode`. |
-| In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input. |         |
+| Name                   | Type                                                            | Go type                        | Required | Default | Description                                                                                                                                                                                                                       | Example |
+| ---------------------- | --------------------------------------------------------------- | ------------------------------ | :------: | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| in_ports               | [GradientControllerIns](#gradient-controller-ins)               | `GradientControllerIns`        |          |         | Input ports of the Gradient Controller.                                                                                                                                                                                           |         |
+| manual_mode            | boolean                                                         | `bool`                         |          |         | In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy. |         |
+| manual_mode_config_key | string                                                          | `string`                       |          |         | Configuration key for overriding `manual_mode` setting through dynamic configuration.                                                                                                                                             |         |
+| out_ports              | [GradientControllerOuts](#gradient-controller-outs)             | `GradientControllerOuts`       |          |         | Output ports of the Gradient Controller.                                                                                                                                                                                          |         |
+| parameters             | [GradientControllerParameters](#gradient-controller-parameters) | `GradientControllerParameters` |          |         | Gradient Parameters.                                                                                                                                                                                                              |         |
 
 ### <span id="gradient-controller-ins"></span> GradientControllerIns
 
@@ -1148,11 +1161,9 @@ input.
 This signal is multiplied by the gradient to produce the output. | | | max |
 [InPort](#in-port)| `InPort` | | | Maximum value to limit the output signal. | |
 | min | [InPort](#in-port)| `InPort` | | | Minimum value to limit the output
-signal. | | | optimize | [InPort](#in-port)| `InPort` | | | Optimize signal is
-added to the output of the gradient calculation. | | | setpoint |
-[InPort](#in-port)| `InPort` | | | Setpoint to be used for the gradient
-computation. | | | signal | [InPort](#in-port)| `InPort` | | | Signal to be used
-for the gradient computation. | |
+signal. | | | setpoint | [InPort](#in-port)| `InPort` | | | Setpoint to be used
+for the gradient computation. | | | signal | [InPort](#in-port)| `InPort` | | |
+Signal to be used for the gradient computation. | |
 
 ### <span id="gradient-controller-outs"></span> GradientControllerOuts
 
@@ -1321,7 +1332,7 @@ _slope_ might not fully describe aggressiveness of the controller.
 :::info
 
 See also
-[Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+[Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).
 
 :::
 
@@ -1595,13 +1606,13 @@ previous step's `target_accept_percentage` to the next
 
 **Properties**
 
-| Name               | Type                                                | Go type                  | Required | Default | Description                                   | Example |
-| ------------------ | --------------------------------------------------- | ------------------------ | :------: | ------- | --------------------------------------------- | ------- |
-| default_config     | [RegulatorDynamicConfig](#regulator-dynamic-config) | `RegulatorDynamicConfig` |          |         | Default configuration.                        |         |
-| dynamic_config_key | string                                              | `string`                 |          |         | Dynamic configuration key for flow regulator. |         |
-| in_ports           | [LoadRampIns](#load-ramp-ins)                       | `LoadRampIns`            |          |         |                                               |         |
-| out_ports          | [LoadRampOuts](#load-ramp-outs)                     | `LoadRampOuts`           |          |         |                                               |         |
-| parameters         | [LoadRampParameters](#load-ramp-parameters)         | `LoadRampParameters`     |          |         |                                               |         |
+| Name                                 | Type                                        | Go type              | Required | Default | Description                                                                                            | Example |
+| ------------------------------------ | ------------------------------------------- | -------------------- | :------: | ------- | ------------------------------------------------------------------------------------------------------ | ------- |
+| in_ports                             | [LoadRampIns](#load-ramp-ins)               | `LoadRampIns`        |          |         |                                                                                                        |         |
+| out_ports                            | [LoadRampOuts](#load-ramp-outs)             | `LoadRampOuts`       |          |         |                                                                                                        |         |
+| parameters                           | [LoadRampParameters](#load-ramp-parameters) | `LoadRampParameters` |          |         |                                                                                                        |         |
+| pass_through_label_values            | []string                                    | `[]string`           |          |         | Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. |         |
+| pass_through_label_values_config_key | string                                      | `string`             |          |         | Configuration key for setting pass through label values through dynamic configuration.                 |         |
 
 ### <span id="load-ramp-ins"></span> LoadRampIns
 
@@ -1699,34 +1710,26 @@ See also
 
 :::
 
-It's based on the actuation strategy (for example, load actuator) and workload
-scheduling which is based on Weighted Fair Queuing principles. It measures and
-controls the incoming tokens per second, which can translate to (avg. latency \*
-in-flight requests) (Little's Law) in concurrency limiting use-case.
+To make scheduling decisions the Flows are mapped into Workloads by providing
+match rules. A workload determines the priority and cost of admitting each Flow
+that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
+principles. _Load Scheduler_ measures and controls the incoming tokens per
+second, which can translate to (avg. latency \* in-flight requests) (Little's
+Law) in concurrency limiting use-case.
 
-LoadScheduler configuration is split into two parts: An actuation strategy and a
-scheduler. At this time, only `load_actuator` strategy is available.
-
-**Properties**
-
-| Name               | Type                                                         | Go type                      | Required | Default | Description                                   | Example |
-| ------------------ | ------------------------------------------------------------ | ---------------------------- | :------: | ------- | --------------------------------------------- | ------- |
-| default_config     | [LoadSchedulerDynamicConfig](#load-scheduler-dynamic-config) | `LoadSchedulerDynamicConfig` |          |         | Default configuration.                        |         |
-| dynamic_config_key | string                                                       | `string`                     |          |         | Configuration key for DynamicConfig.          |         |
-| in_ports           | [LoadSchedulerIns](#load-scheduler-ins)                      | `LoadSchedulerIns`           |          |         | Input ports for the LoadScheduler component.  |         |
-| out_ports          | [LoadSchedulerOuts](#load-scheduler-outs)                    | `LoadSchedulerOuts`          |          |         | Output ports for the LoadScheduler component. |         |
-| parameters         | [LoadSchedulerParameters](#load-scheduler-parameters)        | `LoadSchedulerParameters`    |          |         |                                               |         |
-
-### <span id="load-scheduler-dynamic-config"></span> LoadSchedulerDynamicConfig
-
-> Dynamic Configuration for the LoadScheduler component.
+The signal at port `load_multiplier` determines the fraction of incoming tokens
+that get admitted.
 
 **Properties**
 
-| Name                                                                               | Type    | Go type | Required | Default | Description                                                                                                              | Example |
-| ---------------------------------------------------------------------------------- | ------- | ------- | :------: | ------- | ------------------------------------------------------------------------------------------------------------------------ | ------- |
-| dry_run                                                                            | boolean | `bool`  |          |         | Decides whether to run the actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this actuator. |
-| Useful for observing the behavior of actuator without disrupting any real traffic. |         |
+| Name                                                                                           | Type                                                  | Go type                   | Required | Default | Description                                                                                                                                         | Example |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------- | :------: | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| dry_run                                                                                        | boolean                                               | `bool`                    |          |         | Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows. |
+| It is useful for observing the behavior of load scheduler without disrupting any real traffic. |                                                       |
+| dry_run_config_key                                                                             | string                                                | `string`                  |          |         | Configuration key for setting dry run mode through dynamic configuration.                                                                           |         |
+| in_ports                                                                                       | [LoadSchedulerIns](#load-scheduler-ins)               | `LoadSchedulerIns`        |          |         | Input ports for the LoadScheduler component.                                                                                                        |         |
+| out_ports                                                                                      | [LoadSchedulerOuts](#load-scheduler-outs)             | `LoadSchedulerOuts`       |          |         | Output ports for the LoadScheduler component.                                                                                                       |         |
+| parameters                                                                                     | [LoadSchedulerParameters](#load-scheduler-parameters) | `LoadSchedulerParameters` |          |         |                                                                                                                                                     |         |
 
 ### <span id="load-scheduler-ins"></span> LoadSchedulerIns
 
@@ -1734,11 +1737,10 @@ scheduler. At this time, only `load_actuator` strategy is available.
 
 **Properties**
 
-| Name                                  | Type               | Go type  | Required | Default | Description                                                  | Example |
-| ------------------------------------- | ------------------ | -------- | :------: | ------- | ------------------------------------------------------------ | ------- |
-| load_multiplier                       | [InPort](#in-port) | `InPort` |          |         | Load multiplier is proportion of incoming                    |
+| Name                                  | Type               | Go type  | Required | Default | Description                               | Example |
+| ------------------------------------- | ------------------ | -------- | :------: | ------- | ----------------------------------------- | ------- |
+| load_multiplier                       | [InPort](#in-port) | `InPort` |          |         | Load multiplier is proportion of incoming |
 | token rate that needs to be accepted. |                    |
-| pass_through                          | [InPort](#in-port) | `InPort` |          |         | When true, pass through the requests skipping the scheduler. |         |
 
 ### <span id="load-scheduler-outs"></span> LoadSchedulerOuts
 
@@ -2096,7 +2098,7 @@ Example:
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | dry_run | boolean| `bool` |  | | Dry run mode ensures that no scaling is invoked by this pod scaler.
-This is Useful for observing the behavior of pod scaler without disrupting any real traffic.
+This is useful for observing the behavior of pod scaler without disrupting any real deployment.
 This parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration. |  |
 | dry_run_config_key | string| `string` |  | | Configuration key for overriding dry run setting through dynamic configuration. |  |
 | in_ports | [PodScalerIns](#pod-scaler-ins)| `PodScalerIns` |  | | Input ports for the PodScaler component. |  |
@@ -2232,7 +2234,7 @@ There are additional labels available on a Flux Meter such as `valid`, `flow_sta
 
 :::info Usage with OpenTelemetry Metrics
 
-Aperture supports OpenTelemetry metrics. See [reference](/get-started/integrations/metrics/metrics.md) for more details.
+Aperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/metrics.md) for more details.
 
 ::: |  |
 
@@ -2327,7 +2329,7 @@ Aperture supports OpenTelemetry metrics. See [reference](/get-started/integratio
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | in_ports | [RateLimiterIns](#rate-limiter-ins)| `RateLimiterIns` |  | |  |  |
-| parameters | [RateLimiterParameters](#rate-limiter-parameters)| `RateLimiterParameters` |  | |  |  |
+| rate_limiter | [RateLimiterParameters](#rate-limiter-parameters)| `RateLimiterParameters` |  | |  |  |
 | scheduler | [Scheduler](#scheduler)| `Scheduler` |  | |  |  |
 | selectors | [][Selector](#selector)| `[]*Selector` | ✓ | |  |  |
 
@@ -2398,8 +2400,8 @@ Rate limiting is done independently for each value of the
 For example, to give each user a separate limit, assuming you
 have a _user_ flow
 label set up, set `label_key: "user"`.
-If `label_key` is not specified, then all requests are rate limited
-that match the selectors. |  |
+If no label key is specified, then all requests matching the
+selectors will be rate limited based on the global bucket. |  |
 | lazy_sync | [RateLimiterParametersLazySync](#rate-limiter-parameters-lazy-sync)| `RateLimiterParametersLazySync` |  | |  |  |
 | max_idle_time | string| `string` |  | `"7200s"`| Max idle time before token bucket state for a label is removed.
 If set to 0, the state is never removed. |  |
@@ -2511,20 +2513,12 @@ See also
 
 **Properties**
 
-| Name               | Type                                                | Go type                  | Required | Default | Description                          | Example |
-| ------------------ | --------------------------------------------------- | ------------------------ | :------: | ------- | ------------------------------------ | ------- |
-| default_config     | [RegulatorDynamicConfig](#regulator-dynamic-config) | `RegulatorDynamicConfig` |          |         | Default configuration.               |         |
-| dynamic_config_key | string                                              | `string`                 |          |         | Configuration key for DynamicConfig. |         |
-| in_ports           | [RegulatorIns](#regulator-ins)                      | `RegulatorIns`           |          |         | Input ports for the _Regulator_.     |         |
-| parameters         | [RegulatorParameters](#regulator-parameters)        | `RegulatorParameters`    |          |         | Parameters for the _Regulator_.      |         |
-
-### <span id="regulator-dynamic-config"></span> RegulatorDynamicConfig
-
-**Properties**
-
-| Name                | Type     | Go type    | Required | Default | Description                                                                                      | Example |
-| ------------------- | -------- | ---------- | :------: | ------- | ------------------------------------------------------------------------------------------------ | ------- |
-| enable_label_values | []string | `[]string` |          |         | Specify certain label values to be accepted by this flow filter regardless of accept percentage. |         |
+| Name                                 | Type                                         | Go type               | Required | Default | Description                                                                                             | Example |
+| ------------------------------------ | -------------------------------------------- | --------------------- | :------: | ------- | ------------------------------------------------------------------------------------------------------- | ------- |
+| in_ports                             | [RegulatorIns](#regulator-ins)               | `RegulatorIns`        |          |         | Input ports for the _Regulator_.                                                                        |         |
+| parameters                           | [RegulatorParameters](#regulator-parameters) | `RegulatorParameters` |          |         | Parameters for the _Regulator_.                                                                         |         |
+| pass_through_label_values            | []string                                     | `[]string`            |          |         | Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage. |         |
+| pass_through_label_values_config_key | string                                       | `string`              |          |         | Configuration key for setting pass through label values through dynamic configuration.                  |         |
 
 ### <span id="regulator-ins"></span> RegulatorIns
 
@@ -3245,7 +3239,7 @@ The unary operator can be one of the following:
 ### <span id="variable"></span> Variable
 
 
-> Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+> Component that emits a constant signal which can be changed at runtime through dynamic configuration.
 
 
 
@@ -3256,24 +3250,9 @@ The unary operator can be one of the following:
 
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
-| default_config | [VariableDynamicConfig](#variable-dynamic-config)| `VariableDynamicConfig` |  | | Default configuration. |  |
-| dynamic_config_key | string| `string` |  | | Configuration key for DynamicConfig. |  |
+| config_key | string| `string` |  | | Configuration key for overriding value setting through dynamic configuration. |  |
+| constant_output | [ConstantSignal](#constant-signal)| `ConstantSignal` |  | | The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration. |  |
 | out_ports | [VariableOuts](#variable-outs)| `VariableOuts` |  | | Output ports for the Variable component. |  |
-
-
-
-### <span id="variable-dynamic-config"></span> VariableDynamicConfig
-
-
-
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| constant_signal | [ConstantSignal](#constant-signal)| `ConstantSignal` |  | |  |  |
 
 
 

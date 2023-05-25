@@ -126,6 +126,7 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 		url, err := url.Parse(blueprintsURI)
 		if err != nil || url.Scheme == "" {
 			blueprintsURIMetadata = "local"
+			log.Debug().Msgf("Using local blueprints directory: %s", blueprintsURI)
 		} else {
 			blueprintsURIMetadata = blueprintsURI
 		}
