@@ -22,8 +22,10 @@ Supported technologies:
 | Armeria   | 1.15+              |
 | Netty     | 4.1+               |
 
-The latest version of the Aperture Instrumentation Agent JAR file can be
-downloaded [here][download_link].
+<div class="alert alert--primary">
+  The latest version of the Aperture Instrumentation Agent JAR file can be <strong><a href="https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent">downloaded here</a></strong>.
+</div>
+<p>&nbsp;</p>
 
 ## Running the java agent
 
@@ -54,7 +56,14 @@ system properties or environment variables:
 
 <!-- vale on -->
 
-The priority order is `system.property` > `ENV_VARIABLE` > `properties file`.
+:::info
+
+The priority order for configuration look is `system.property` >
+`ENV_VARIABLE` > `properties file`.
+
+:::
+
+### Using command line properties
 
 Example invocation with `commandline-set` properties:
 
@@ -66,6 +75,8 @@ java -javaagent:path/to/javaagent.jar \
 -Daperture.javaagent.ignored.paths="/health,/connected" \
 -jar path/to/application.jar
 ```
+
+### Using properties file
 
 Example invocation using a properties file:
 
@@ -83,6 +94,3 @@ aperture.agent.port=12345
 aperture.control.point.name=awesomeFeature
 aperture.javaagent.ignored.paths=/health,/connected
 ```
-
-[download_link]:
-  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent
