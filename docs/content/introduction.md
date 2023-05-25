@@ -56,11 +56,12 @@ monolithic architectures and distributed microservices environments.
 
 <!-- vale on -->
 
-If you have questions about how to use Aperture, feel free to reach out:
+If you have questions about how to use Aperture, feel free to reach out. We are
+happy to help!
 
-| [Ask the expert](https://calendly.com/desaijai/fluxninja-meeting) |
-[Join our Slack Community](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)
-| Email: [support@fluxninja.com](mailto:support@fluxninja.com) |
+[**Ask the expert**](https://calendly.com/desaijai/fluxninja-meeting) |
+[**Join our Slack Community**](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)
+| Email: [**support@fluxninja.com**](mailto:support@fluxninja.com)
 
 ## Load management capabilities
 
@@ -68,50 +69,47 @@ Aperture offers a suite of intelligent load management capabilities that are
 applicable to a wide range of cloud-native applications. These capabilities
 ensure the reliability and stability of applications, and include:
 
-```mdx-code-block
-<Cards data={[
-  {
-    title: "Intelligent Auto Scaling",
-    description: "Aperture adjusts resource allocation based on demand and performance to ensure that the application can scale up or down as needed; However, it is different from traditional auto-scaling as it is based on the policies defined by the user which take multiple factors into consideration.",
-    url: "/applying-policies/auto-scale",
-  },
-  {
-    title: "Declarative policies",
-    description: "Aperture provides a policy language that enables teams to define how to react to different situations, such as when there is a deviation from service-level objectives. These policies are expressed as a signal processing circuit that enables Aperture to go from telemetry to appropriate actions.",
-    url: "/concepts/policy",
-  },
-  {
-    title: "Dark Launch (aka Feature Flag Rollout)",
-    description: "Aperture enables teams to gradually release new features to a subset of users, without impacting the rest of the system, using dark launch.",
-    url: "/applying-policies/feature-rollout",
-  },
-  {
-    title: "Distributed Rate-Limiting",
-    description: "Aperture includes a distributed rate-limiter to prevent abuse and protect the service from excessive requests by users.",
-    url: "/applying-policies/rate-limiting",
-  },
-  {
-    title: "Workload Prioritization",
-    description: "Aperture provides a weighted fair queuing scheduler to ensure that the most critical workloads are served first based on the requirements of your application.",
-    url: "/applying-policies/service-protection/workload-prioritization",
-  },
-  {
-    title: "Monitoring and Telemetry",
-    description: "Aperture continuously monitors service performance and request attributes using an in-built telemetry system, which enables the agent and controller to make informed decisions about how to handle requests and prioritize workloads.",
-    url: "/reference/observability",
-  },
-  {
-    title: "Quota Scheduler",
-    description: "It is an important feature of Aperture, as it helps manage and allocate quotas for API requests. This feature enables teams to manage costs effectively and prevent exceeding these limits. By using quota scheduler, you can ensure that your application stays within the allowed usage and prevent being perceived as a bad actor by the API provider.",
-    url: "/applying-policies/quota-scheduler/",
-  },
-  {
-    title: "Service Protection",
-    description: "The Service Protection feature with Adaptive Concurrency Limiting is a powerful mechanism designed to safeguard microservices within a distributed system. By intelligently managing the concurrency of requests, it ensures the stability, reliability, and optimal performance of individual services.",
-    url: "/applying-policies/service-protection",
-  }
-  ]}/>
-```
+- [**Intelligent Auto Scaling**](./applying-policies/auto-scale/auto-scale.md):
+  Aperture adjusts resource allocation based on demand and performance to ensure
+  that the application can scale up or down as needed; However, it is different
+  from traditional auto-scaling as it is based on the policies defined by the
+  user which take multiple factors into consideration.
+- [**Declarative policies**](./concepts/policy/policy.md): Aperture provides a
+  policy language that enables teams to define how to react to different
+  situations, such as when there is a deviation from service-level objectives.
+  These policies are expressed as a signal processing circuit that enables
+  Aperture to go from telemetry to appropriate actions.
+- [**Dark Launch (aka Feature Flag Rollout)**](./applying-policies/feature-rollout/feature-rollout.md):
+  Aperture enables teams to gradually release new features to a subset of users,
+  without impacting the rest of the system, using dark launch.
+- [**Distributed Rate-Limiting**](./applying-policies/rate-limiting/rate-limiting.md):
+  Safeguard APIs from potential abuse with Aperture's high-performance,
+  distributed rate limiter. This feature enforces per-key limits based on
+  fine-grained labels, ensuring precise control and prevention of excessive
+  usage.
+- [**Adaptive Service Protection**](./applying-policies/service-protection/basic-service-protection.md):
+  Enhance resource utilization and safeguard against abrupt service overloads
+  with an intelligent queue at the entry point of services. This queue
+  dynamically adjusts the rate of requests based on live service health, thereby
+  mitigating potential service disruptions and ensuring optimal performance
+  under all load conditions.
+- [**Workload Prioritization**](./applying-policies/service-protection/workload-prioritization.md):
+  Safeguard crucial user experience pathways and ensure prioritized access to
+  external APIs even during high-load conditions by strategically prioritizing
+  workloads. This is achieved through the use of declarative policies that label
+  and prioritize workload requests, such as API calls. By employing
+  [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
+  for scheduling, Aperture ensures a fair distribution of resources that aligns
+  with the business value and urgency of requests.
+- [**Intelligent quota management**](./applying-policies/quota-scheduler/quota-scheduler.md):
+  Maintain compliance with external API quotas with a global token bucket and
+  smart request queuing. This feature regulates requests aimed at external
+  services, ensuring that the usage remains within prescribed rate limits and
+  avoids penalties or additional costs.
+- [**Monitoring and Telemetry**](./reference/observability/observability.md):
+  Aperture continuously monitors service performance and request attributes
+  using an in-built telemetry system, which enables the agent and controller to
+  make informed decisions about how to handle requests and prioritize workloads.
 
 ## How it works
 
