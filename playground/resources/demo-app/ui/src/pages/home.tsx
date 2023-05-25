@@ -1,29 +1,40 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import {
   MonitorRequest,
   MonitorRequestProps,
   RequestRecord,
 } from '../components/monitor-request'
 import { Box, Typography, styled } from '@mui/material'
-import { GracefulError, gracefulRequest } from '@fluxninja-tools/graceful-js'
-import { api } from '../api'
+import {
+  GracefulError,
+  gracefulRequest,
+  useGraceful,
+} from '@fluxninja-tools/graceful-js'
+import { API_URL, api } from '../api'
 
 export const HomePage: FC = () => {
-  const collection = useGracefulRequest()
+  const { collection, gracefulError } = useGracefulRequestForRateLimit()
   return (
     <RequestMonitorPanel
       monitorRequestProps={{
         requestRecord: collection,
         userType: 'Subscriber',
       }}
-      isErrored={collection[collection.length - 1]?.isError}
+      isErrored={collection[collection.length - 1]?.isError && gracefulError}
     />
   )
 }
 
-export const useGracefulRequest = () => {
+export const useGracefulRequestForRateLimit = () => {
   const [requestCollection, setRequestCollection] = useState<RequestRecord[]>(
     []
+  )
+
+  const { ctx } = useGraceful()
+
+  const gracefulError = useMemo(
+    () => ctx.url === `${API_URL}/rate-limit` && ctx.isError,
+    [ctx]
   )
 
   useEffect(() => {
@@ -44,15 +55,9 @@ export const useGracefulRequest = () => {
         ])
       }
     )
-      .then(() => {
-        setRequestCollection((prev) => [...prev, { isError: false }])
-      })
-      .catch(() => {
-        setRequestCollection((prev) => [...prev, { isError: true }])
-      })
-  }, [])
+  }, [setRequestCollection])
 
-  return requestCollection
+  return { collection: requestCollection, gracefulError }
 }
 
 export interface RequestMonitorPanelProps {
