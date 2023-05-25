@@ -41,16 +41,14 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTel Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
-	Factories                otelcol.Factories
-	Lifecycle                fx.Lifecycle
-	Shutdowner               fx.Shutdowner
-	Unmarshaller             config.Unmarshaller
-	StatusRegistry           status.Registry
-	BaseConfig               *otelconfig.OTelConfigProvider `name:"base"`
-	TelemetryCollectorConfig *otelconfig.OTelConfigProvider `name:"telemetry-collector" optional:"true"`
-	Logger                   *log.Logger
-	Readiness                *jobs.MultiJob                   `name:"readiness.service"`
-	ExtensionConfigs         []*otelconfig.OTelConfigProvider `group:"extension-config"`
+	Factories      otelcol.Factories
+	Lifecycle      fx.Lifecycle
+	Shutdowner     fx.Shutdowner
+	Unmarshaller   config.Unmarshaller
+	StatusRegistry status.Registry
+	ConfigProvider *otelconfig.Provider
+	Logger         *log.Logger
+	Readiness      *jobs.MultiJob `name:"readiness.service"`
 }
 
 // setup creates and runs a new instance of OTel Collector with the passed configuration.
@@ -58,23 +56,10 @@ func setup(in ConstructorIn) error {
 	var otelService *otelcol.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			baseScheme := in.BaseConfig.Scheme()
-			uris := []string{fmt.Sprintf("%v:%v", baseScheme, baseScheme)}
+			scheme := in.ConfigProvider.Scheme()
+			uris := []string{fmt.Sprintf("%v:%v", scheme, scheme)}
 			providers := map[string]confmap.Provider{
-				baseScheme: in.BaseConfig,
-			}
-			for _, extensionConfig := range in.ExtensionConfigs {
-				if extensionConfig == nil {
-					continue
-				}
-				scheme := extensionConfig.Scheme()
-				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = extensionConfig
-			}
-			if in.TelemetryCollectorConfig != nil {
-				tcScheme := in.TelemetryCollectorConfig.Scheme()
-				uris = append(uris, fmt.Sprintf("%v:%v", tcScheme, tcScheme))
-				providers[tcScheme] = in.TelemetryCollectorConfig
+				scheme: in.ConfigProvider,
 			}
 
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{

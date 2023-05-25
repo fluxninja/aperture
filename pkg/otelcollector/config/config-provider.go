@@ -1,79 +1,128 @@
-package config
+package otelconfig
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/mitchellh/copystructure"
 	"go.opentelemetry.io/collector/confmap"
 )
 
 // comply with confmap.Provider interface.
-var _ confmap.Provider = (*OTelConfigProvider)(nil)
+var _ confmap.Provider = (*Provider)(nil)
 
-// OTelConfigProvider can be used as an OTel config map provider.
-type OTelConfigProvider struct {
-	lock      sync.Mutex  // protects config & watchFunc
-	config    *OTelConfig // nil only after Shutdown.
+// Provider is an OTel config map provider.
+//
+// It allows updating the config and registering hooks.
+type Provider struct {
+	lock      sync.Mutex // protects config, watchFunc & hooks
+	config    *Config    // nil only after Shutdown.
 	watchFunc confmap.WatcherFunc
+	hooks     []func(*Config)
 	scheme    string
 }
 
-// NewOTelConfigProvider creates a new OTelConfigUnmarshaler instance.
-func NewOTelConfigProvider(scheme string, config *OTelConfig) *OTelConfigProvider {
-	p := &OTelConfigProvider{
+// NewProvider creates a new OTelConfigProvider.
+func NewProvider(scheme string, config *Config) *Provider {
+	p := &Provider{
 		scheme: scheme,
-		config: NewOTelConfig(),
+		config: New(),
 	}
 	p.UpdateConfig(config)
 	return p
 }
 
-// Implements MapProvider interface
+// Retrieve implements confmap.Provider.
+func (p *Provider) Retrieve(
+	_ context.Context,
+	_ string,
+	watchFn confmap.WatcherFunc,
+) (*confmap.Retrieved, error) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
 
-// Retrieve returns the value to be injected in the configuration and the corresponding watcher.
-func (u *OTelConfigProvider) Retrieve(_ context.Context, _ string, watchFn confmap.WatcherFunc) (*confmap.Retrieved, error) {
-	u.lock.Lock()
-	defer u.lock.Unlock()
-	u.watchFunc = watchFn
-	return confmap.NewRetrieved(u.config.AsMap())
+	if p.config == nil {
+		log.Bug().Msg("Retrieve after Shutdown")
+		return nil, errors.New("already shut down")
+	}
+
+	p.watchFunc = watchFn
+	return confmap.NewRetrieved(p.config.AsMap())
 }
 
-// Shutdown indicates the provider should close.
-func (u *OTelConfigProvider) Shutdown(ctx context.Context) error {
-	u.lock.Lock()
-	defer u.lock.Unlock()
-	// Prevent UpdatesConfig to run after Shutdown.
-	u.watchFunc = nil
-	u.config = nil
+// Shutdown implements confmap.Provider.
+func (p *Provider) Shutdown(ctx context.Context) error {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+	// Prevent UpdateConfig to run after Shutdown.
+	p.watchFunc = nil
+	p.config = nil
 	return nil
 }
 
-// Scheme returns the scheme name, location scheme used by Retrieve.
-func (u *OTelConfigProvider) Scheme() string {
-	return u.scheme
+// Scheme implements confmap.Provider.
+func (p *Provider) Scheme() string { return p.scheme }
+
+// UpdateConfig sets the new config, replacing the old one.
+// Before new config is set, hooks are allowed to modify the config.
+// Collector update is triggered asynchronously.
+//
+// Note: Caller should not use the passed config object after calling this function.
+func (p *Provider) UpdateConfig(config *Config) {
+	if config == nil {
+		// Maintain the p.config not-nil invariant.
+		config = New()
+	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	for _, hook := range p.hooks {
+		hook(config)
+	}
+
+	p.setConfig(config)
 }
 
-// UpdateConfig sets the map to the given map.
-func (u *OTelConfigProvider) UpdateConfig(config *OTelConfig) {
-	u.lock.Lock()
-	defer u.lock.Unlock()
-	if config == nil {
-		config = NewOTelConfig()
-	}
-	if u.config == nil {
-		log.Warn().Msg("OtelConfigProvider.UpdateConfig called after Shutdown")
+func (p *Provider) setConfig(config *Config) {
+	if p.config == nil {
+		log.Warn().Msg("OtelConfigProvider: tried to update config after Shutdown")
 		return
 	}
-	u.config = config
-	if u.watchFunc != nil {
-		u.watchFunc(&confmap.ChangeEvent{})
+
+	p.config = config
+	if p.watchFunc != nil {
+		p.watchFunc(&confmap.ChangeEvent{})
 	}
 }
 
-// GetConfig returns the current config.
-func (u *OTelConfigProvider) GetConfig() *OTelConfig {
-	u.lock.Lock()
-	defer u.lock.Unlock()
-	return u.config
+// AddMutatingHook adds a hook to be run before applying config.
+//
+// The hook should treat the given config as temporary.
+// The hook will also be executed immediately, to ensure that current config
+// was passed through all the added hooks.
+func (p *Provider) AddMutatingHook(hook func(*Config)) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	if p.config == nil {
+		log.Warn().Msg("OtelConfigProvider.AddHook: already shut down")
+		return
+	}
+
+	p.hooks = append(p.hooks, hook)
+
+	// Now the config provided to collector is outdated, run the newly-added hook.
+	hook(p.config)
+	p.setConfig(p.config)
+}
+
+// MustGetConfig returns a snapshot of the current config.
+func (p *Provider) MustGetConfig() *Config {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+	// Copying to avoid concurrent modification by hooks.
+	return copystructure.Must(copystructure.Copy(p.config)).(*Config)
 }

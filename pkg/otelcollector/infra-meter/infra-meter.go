@@ -17,7 +17,7 @@ import (
 
 // AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
 func AddInfraMeters(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	infraMeters map[string]*policylangv1.InfraMeter,
 ) error {
 	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
@@ -41,7 +41,7 @@ func AddInfraMeters(
 }
 
 func addInfraMeter(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	pipelineName string,
 	infraMeter *policylangv1.InfraMeter,
 ) error {

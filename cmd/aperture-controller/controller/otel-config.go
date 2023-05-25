@@ -17,27 +17,26 @@ func provideController(
 	lis *listener.Listener,
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
-) (*otelconfig.OTelConfigProvider, error) {
+) (*otelconfig.Provider, error) {
 	var controllerCfg controllerconfig.ControllerOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
 		return nil, err
 	}
 
-	otelCfg := otelconfig.NewOTelConfig()
+	otelCfg := otelconfig.New()
 	otelCfg.SetDebugPort(&controllerCfg.CommonOTelConfig)
 	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTelConfig)
 
 	addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
 	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
 	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTelConfig)
-	baseConfigProvider := otelconfig.NewOTelConfigProvider("service", otelCfg)
 
-	return baseConfigProvider, nil
+	return otelconfig.NewProvider("service", otelCfg), nil
 }
 
 // addMetricsPipeline adds metrics to pipeline for controller OTel collector.
 func addMetricsPipeline(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	controllerConfig *controllerconfig.ControllerOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
@@ -53,7 +52,7 @@ func addMetricsPipeline(
 }
 
 func addPrometheusReceiver(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	controllerConfig *controllerconfig.ControllerOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
