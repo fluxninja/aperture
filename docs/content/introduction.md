@@ -59,9 +59,13 @@ monolithic architectures and distributed microservices environments.
 If you have questions about how to use Aperture, feel free to reach out. We are
 happy to help!
 
+<!-- vale off -->
+
 [**Ask the expert**](https://calendly.com/desaijai/fluxninja-meeting) |
 [**Join our Slack Community**](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)
 | Email: [**support@fluxninja.com**](mailto:support@fluxninja.com)
+
+<!-- vale on -->
 
 ## Load management capabilities
 
