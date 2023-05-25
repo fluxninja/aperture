@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -144,7 +145,7 @@ func NewBasicTokenBucket(now time.Time, fillRate float64, metrics *TokenBucketMe
 }
 
 // TakeIfAvailable takes tokens from the basic token bucket if available, otherwise return false.
-func (btb *BasicTokenBucket) TakeIfAvailable(now time.Time, tokens float64) bool {
+func (btb *BasicTokenBucket) TakeIfAvailable(ctx context.Context, now time.Time, tokens float64) bool {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	return btb.tbb.takeIfAvailable(now, tokens)
@@ -153,14 +154,14 @@ func (btb *BasicTokenBucket) TakeIfAvailable(now time.Time, tokens float64) bool
 // Take takes tokens from the basic token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (btb *BasicTokenBucket) Take(now time.Time, tokens float64) (time.Duration, bool) {
+func (btb *BasicTokenBucket) Take(ctx context.Context, now time.Time, tokens float64) (time.Duration, bool) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	return btb.tbb.take(now, tokens)
 }
 
 // Return returns tokens to the basic token bucket.
-func (btb *BasicTokenBucket) Return(tokens float64) {
+func (btb *BasicTokenBucket) Return(ctx context.Context, tokens float64) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	btb.tbb.returnTokens(tokens)

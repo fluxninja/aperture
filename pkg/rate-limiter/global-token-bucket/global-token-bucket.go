@@ -103,7 +103,7 @@ func (gtb *GlobalTokenBucket) Close() error {
 
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
+func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0
 	}
@@ -123,7 +123,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, fl
 		return true, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(context.Background(), label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
 		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0
@@ -142,7 +142,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, fl
 
 // Take increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // It also returns the wait time at which the tokens will be available.
-func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration, float64, float64) {
+func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
 	}
@@ -162,7 +162,7 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 		return true, 0, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(context.Background(), label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
 		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
 		return true, 0, 0, 0
@@ -187,8 +187,8 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 }
 
 // Return returns n tokens to the bucket.
-func (gtb *GlobalTokenBucket) Return(label string, n float64) (float64, float64) {
-	_, remaining, current := gtb.TakeIfAvailable(label, -n)
+func (gtb *GlobalTokenBucket) Return(ctx context.Context, label string, n float64) (float64, float64) {
+	_, remaining, current := gtb.TakeIfAvailable(ctx, label, -n)
 	return remaining, current
 }
 

@@ -444,11 +444,11 @@ func (ws *Scheduler) Decide(ctx context.Context,
 }
 
 // Revert reverts the decision made by the limiter.
-func (ws *Scheduler) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (ws *Scheduler) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
 		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
 		if tokens > 0 {
-			ws.scheduler.Revert(tokens)
+			ws.scheduler.Revert(ctx, tokens)
 		}
 	}
 }

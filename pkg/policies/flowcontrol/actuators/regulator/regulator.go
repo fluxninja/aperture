@@ -358,7 +358,7 @@ func (fr *regulator) Decide(ctx context.Context,
 }
 
 // Revert implements the Revert method of the flowcontrolv1.Regulator interface.
-func (fr *regulator) Revert(_ map[string]string, _ *flowcontrolv1.LimiterDecision) {
+func (fr *regulator) Revert(ctx context.Context, _ map[string]string, _ *flowcontrolv1.LimiterDecision) {
 	// No-op
 }
 

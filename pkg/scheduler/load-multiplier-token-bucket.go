@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -125,7 +126,7 @@ func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(now time.Time, request 
 }
 
 // TakeIfAvailable takes tokens from the token bucket if available, otherwise return false.
-func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(now time.Time, tokens float64) bool {
+func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(ctx context.Context, now time.Time, tokens float64) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	return tbls.tbb.takeIfAvailable(now, tokens)
@@ -134,14 +135,14 @@ func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(now time.Time, tokens flo
 // Take takes tokens from the token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (tbls *LoadMultiplierTokenBucket) Take(now time.Time, tokens float64) (time.Duration, bool) {
+func (tbls *LoadMultiplierTokenBucket) Take(ctx context.Context, now time.Time, tokens float64) (time.Duration, bool) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	return tbls.tbb.take(now, tokens)
 }
 
 // Return returns tokens to the token bucket.
-func (tbls *LoadMultiplierTokenBucket) Return(tokens float64) {
+func (tbls *LoadMultiplierTokenBucket) Return(ctx context.Context, tokens float64) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	tbls.tbb.returnTokens(tokens)

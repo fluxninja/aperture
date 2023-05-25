@@ -159,7 +159,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) bool {
 	}
 
 	// Unable to schedule right now, so queue the request
-	admitted, qRequest := sched.queueRequest(request)
+	admitted, qRequest := sched.queueRequest(ctx, request)
 	if admitted {
 		// scheduler is not in overload situation and the request was able to get tokens
 		return true
@@ -190,7 +190,7 @@ func (sched *WFQScheduler) flowID(fairnessLabel string, priority uint8, generati
 // If admitted == false, might return a valid heapRequest
 // If admitted == false and qRequest == nil, request was neither admitted nor
 // queued (rejected right away).
-func (sched *WFQScheduler) queueRequest(request Request) (admitted bool, qRequest *queuedRequest) {
+func (sched *WFQScheduler) queueRequest(ctx context.Context, request Request) (admitted bool, qRequest *queuedRequest) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
@@ -204,7 +204,7 @@ func (sched *WFQScheduler) queueRequest(request Request) (admitted bool, qReques
 
 	// try to schedule right now
 	if !sched.queueOpen {
-		ok := sched.manager.TakeIfAvailable(now, float64(request.Tokens))
+		ok := sched.manager.TakeIfAvailable(ctx, now, float64(request.Tokens))
 		if ok {
 			// we got the tokens, no need to queue
 			return true, nil
@@ -270,16 +270,13 @@ func (sched *WFQScheduler) queueRequest(request Request) (admitted bool, qReques
 }
 
 // adjust queue counters. Note: qRequest pointer should not be used after calling this function as it will get recycled via Pool.
-func (sched *WFQScheduler) scheduleRequest(ctx context.Context,
-	request Request,
-	qRequest *queuedRequest,
-) (allowed bool) {
+func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request Request, qRequest *queuedRequest) (allowed bool) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
 	// This request has been selected to be executed next
 	now := sched.clk.Now()
-	waitTime, allowed := sched.manager.Take(now, float64(request.Tokens))
+	waitTime, allowed := sched.manager.Take(ctx, now, float64(request.Tokens))
 	// check if we need to wait
 	if allowed && waitTime > 0 {
 		// unlock the lock before waiting
@@ -290,7 +287,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context,
 		if dl, o := ctx.Deadline(); o {
 			if dl.Sub(now) < waitTime {
 				allowed = false
-				sched.manager.Return(float64(request.Tokens))
+				sched.manager.Return(ctx, float64(request.Tokens))
 			}
 		}
 		if allowed {
@@ -301,7 +298,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context,
 			case <-ctx.Done():
 				allowed = false
 				// return the tokens
-				sched.manager.Return(float64(request.Tokens))
+				sched.manager.Return(ctx, float64(request.Tokens))
 			case <-timer.C:
 			}
 		}
@@ -425,8 +422,8 @@ func (sched *WFQScheduler) cleanup(qRequest *queuedRequest) {
 }
 
 // Revert returns tokens to the token bucket.
-func (sched *WFQScheduler) Revert(tokens uint64) {
-	sched.manager.Return(float64(tokens))
+func (sched *WFQScheduler) Revert(ctx context.Context, tokens uint64) {
+	sched.manager.Return(ctx, float64(tokens))
 }
 
 func (sched *WFQScheduler) setFlowsGauge(v float64) {
