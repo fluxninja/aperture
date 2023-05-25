@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
@@ -54,6 +55,8 @@ type ConstructorIn struct {
 // setup creates and runs a new instance of OTel Collector with the passed configuration.
 func setup(in ConstructorIn) error {
 	var otelService *otelcol.Collector
+	var wg sync.WaitGroup
+	var cancelRun context.CancelFunc // See OnStop why we need this.
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			scheme := in.ConfigProvider.Scheme()
@@ -98,8 +101,12 @@ func setup(in ConstructorIn) error {
 			}
 
 			log.Info().Msg("Starting OTel Collector")
+			var runCtx context.Context
+			runCtx, cancelRun = context.WithCancel(context.Background())
+			wg.Add(1)
 			panichandler.Go(func() {
-				err := otelService.Run(context.Background())
+				defer wg.Done()
+				err := otelService.Run(runCtx)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to run OTel Collector")
 				}
@@ -107,10 +114,27 @@ func setup(in ConstructorIn) error {
 			})
 			return nil
 		},
-		OnStop: func(context.Context) error {
+		OnStop: func(stopCtx context.Context) error {
 			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTel collector stopping"))
 			log.Info().Msg("Stopping OTel Collector")
+
+			var cancelStop context.CancelFunc
+			stopCtx, cancelStop = context.WithCancel(stopCtx)
+			defer cancelStop()
+			go func() {
+				<-stopCtx.Done()
+				// While collector can be stopped by calling Shutdown(), the
+				// context used for actual shutting down is the context passed
+				// to collector.Run(). To make sure shutdown is actually
+				// bounded by given stopCtx, we need this cancel to enforce
+				// stopCtx's deadline.
+				cancelRun()
+			}()
+
 			otelService.Shutdown()
+			// Shutdown only starts the shutdown process, we need to wait for
+			// actual shutdown to finish.
+			wg.Wait()
 			return nil
 		},
 	})
