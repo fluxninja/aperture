@@ -67,5 +67,5 @@ For more context on using Aperture Armeria Decorators to set control points,
 refer to the [example app][armeria-example] available in the repository.
 
 [armeria-example]:
-  https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v2.1.0/examples/armeria-example
+  https://github.com/fluxninja/aperture-java/blob/releases/aperture-java/v2.1.0/examples/armeria-example/src/main/java/com/fluxninja/example/ArmeriaClient.java
 [javaagent]: /integrations/flow-control/sdk/java/auto-instrumentation.md
