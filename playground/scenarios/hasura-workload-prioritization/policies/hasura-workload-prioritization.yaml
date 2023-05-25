@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
+# Generated values file for policies/service-protection/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
+policy:
+  policy_name: hasura-workload-prioritization
+  resources:
+    flow_control:
+      classifiers:
+        - selectors:
+            - service: hasura.cloud.svc.cluster.local
+              control_point: ingress
+          rego:
+            labels:
+              source:
+                telemetry: true
+            module: |
+              package hasura_example
+              source = input.attributes.source.source_fqdns[0]
+  service_protection_core:
+    dry_run: false
+    adaptive_load_scheduler:
+      alerter:
+        alert_name: "Load Throttling Event"
+      gradient:
+        max_gradient: 1
+        min_gradient: 0.1
+        slope: -1
+      load_multiplier_linear_increment: 0.0025
+      load_scheduler:
+        selectors:
+          - control_point: ingress
+            service: hasura.cloud.svc.cluster.local
+        scheduler:
+          workloads:
+            - label_matcher:
+                match_labels:
+                  source: "api-service.cloud.svc.cluster.local"
+              parameters:
+                priority: 200
+            - label_matcher:
+                match_labels:
+                  source: "agent-service.cloud.svc.cluster.local"
+              parameters:
+                priority: 50
+  latency_baseliner:
+    ema:
+      correction_factor_on_max_envelope_violation: 0.95
+      ema_window: "1500s"
+      warmup_window: "300s"
+    # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
+    # Type: float64
+    latency_tolerance_multiplier: 2.1
+    # Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
+    # Type: float64
+    latency_ema_limit_multiplier: 2
+    flux_meter:
+      selectors:
+        - control_point: ingress
+          service: hasura.cloud.svc.cluster.local
