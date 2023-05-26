@@ -100,30 +100,27 @@ Load management, at its core, consists of a control loop that observes,
 analyzes, and actuates workloads to ensure the stability and reliability of
 cloud-native applications.
 
-🔍 The observation phase incorporates
-[**Monitoring and Telemetry**](./reference/observability/observability.md).
-Here, an in-built telemetry system continuously monitors service performance and
-request attributes, allowing the agent and controller to make informed decisions
-about request handling and workload prioritization.
-
 This control loop is pivotal in both flow control and auto-scaling use cases. In
 flow control, the loop manages workloads to maintain the system within its
 capacity. In auto-scaling scenarios, the control loop adjusts resource
 allocation in response to demand and performance fluctuations.
 
-The analysis and actuation phases use 📝
-[**Declarative policies**](./concepts/policy/policy.md). This policy language
-facilitates teams in defining responses to different situations, such as
-deviations from service-level objectives. om telemetry data to appropriate
-actions.
+During the observation phase, an in-built telemetry system continuously monitors
+service performance and request attributes, allowing the agent and controller to
+make informed decisions about request handling and workload prioritization.
 
-Such policies include key components such as
-[**Control Point**](./concepts/flow-control/selector.md),
-[**Selector**](./concepts/flow-control/selector.md), and
-[**Classifier**](./concepts/flow-control/resources/classifier.md). Control
-Points guide flow control decisions, Selectors decide which flows the policy
-should consider, and Classifiers create additional Flow Labels based on request
-metadata, collectively enriching the policy's operational capability.
+The analysis and actuation phases use
+[**Declarative policies**](./concepts/policy/policy.md) that facilitates teams
+in defining responses to different situations, such as deviations from
+service-level objectives.
+
+When defining a policy these are some key components to consider:
+[**Control Point**](./concepts/flow-control/selector.md) → Needed to guide flow
+control based decisions. [**Selector**](./concepts/flow-control/selector.md) →
+Needed to select the flow that the policy should consider.
+[**Classifier**](./concepts/flow-control/resources/classifier.md). → Create
+additional Flow Labels based on request metadata, collectively enriching the
+policy's operational capability.
 
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
@@ -168,8 +165,9 @@ various integral components, explore the
 
 ## 📖 Learn
 
-For a high-level overview that explains how Aperture works, check out the
-Concepts section:
+The Concepts section provides detailed insights into essential elements of
+Aperture and Aperture policies, offering a comprehensive understanding of their
+key components.
 
 ```mdx-code-block
 <Cards data={[{

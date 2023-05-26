@@ -44,5 +44,5 @@ policy:
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/riakreceiver
 [opentelemetry-collector]: /reference/policies/spec.md#telemetry-collector
-[applying-policy]: /applying-policies/applying-policies.md
+[applying-policy]: /use-cases/use-cases.md
 [policy-resources]: /reference/policies/spec.md#resources
