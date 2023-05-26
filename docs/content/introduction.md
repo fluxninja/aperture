@@ -4,8 +4,8 @@ slug: /
 sidebar_position: 1
 sidebar_class_name: introduction
 description:
-  Introduction to FluxNinja Aperture, an open source flow control and
-  reliability management platform for modern web applications.
+  Introduction to FluxNinja Aperture, an intelligent load management platform
+  for modern cloud applications.
 image: /assets/img/aperture_logo.png
 keywords:
   - reliability
