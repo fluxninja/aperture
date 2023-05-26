@@ -17,6 +17,21 @@ policy:
             module: |
               package hasura_example
               source = input.attributes.source.source_fqdns[0]
+    telemetry_collectors:
+      - agent_group: default
+        infra_meters:
+          postgresql:
+            per_agent_group: true
+            receivers:
+              postgresql:
+                collection_interval: 1s
+                endpoint: hasura-postgresql.cloud.svc.cluster.local:5432
+                transport: tcp
+                username: postgres
+                password: DevPassword
+                tls:
+                  insecure: true
+                  insecure_skip_verify: true
   service_protection_core:
     dry_run: false
     adaptive_load_scheduler:
@@ -31,13 +46,21 @@ policy:
         selectors:
           - control_point: ingress
             service: hasura.cloud.svc.cluster.local
+            label_matcher:
+              match_labels:
+                source: "api-service.cloud.svc.cluster.local"
+          - control_point: ingress
+            service: hasura.cloud.svc.cluster.local
+            label_matcher:
+              match_labels:
+                source: "agent-service.cloud.svc.cluster.local"
         scheduler:
           workloads:
             - label_matcher:
                 match_labels:
                   source: "api-service.cloud.svc.cluster.local"
               parameters:
-                priority: 200
+                priority: 255
             - label_matcher:
                 match_labels:
                   source: "agent-service.cloud.svc.cluster.local"
@@ -47,10 +70,10 @@ policy:
     ema:
       correction_factor_on_max_envelope_violation: 0.95
       ema_window: "1500s"
-      warmup_window: "300s"
+      warmup_window: "120s"
     # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
     # Type: float64
-    latency_tolerance_multiplier: 2.1
+    latency_tolerance_multiplier: 1.1
     # Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
     # Type: float64
     latency_ema_limit_multiplier: 2
@@ -58,3 +81,6 @@ policy:
       selectors:
         - control_point: ingress
           service: hasura.cloud.svc.cluster.local
+          label_matcher:
+            match_labels:
+              source: "api-service.cloud.svc.cluster.local"

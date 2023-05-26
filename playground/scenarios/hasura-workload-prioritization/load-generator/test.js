@@ -1,15 +1,7 @@
+import { vu } from "k6/execution";
 import http from "k6/http";
 
-export let vuStagesAgent = [
-  { duration: "10s", target: 2 },
-  { duration: "2m", target: 2 },
-  { duration: "1m", target: 20 },
-  { duration: "2m", target: 20 },
-  { duration: "10s", target: 2 },
-  { duration: "2m", target: 2 },
-];
-
-export let vuStagesAPI = [
+export let vuStages = [
   { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
   { duration: "1m", target: 50 },
@@ -24,12 +16,12 @@ export let options = {
   scenarios: {
     api: {
       executor: "ramping-vus",
-      stages: vuStagesAPI,
+      stages: vuStages,
       env: { USER_TYPE: "api" },
     },
     agent: {
       executor: "ramping-vus",
-      stages: vuStagesAgent,
+      stages: vuStages,
       env: { USER_TYPE: "agent" },
     },
   },
@@ -77,7 +69,7 @@ export function agent_service_request() {
     },
     "agent_group": "default",
     "controller_info": {
-      "id": "test_controller",
+      "id": "test_controller_" + vu.idInTest,
     },
     "installation_mode": "LINUX_BARE_METAL",
   };
@@ -131,6 +123,10 @@ export function api_service_request() {
 
   console.log(res.status + " - api-service");
 };
+
+export function setup() {
+  refresh_token();
+}
 
 export default function () {
   let userType = __ENV.USER_TYPE;
