@@ -10,6 +10,9 @@ local application = {
   },
   values:: {
     replicaCount: 2,
+    simplesrv: {
+      cpuLoadPercentage: 50,
+    },
     podAnnotations: {
       'prometheus.io/scrape': 'true',
       'prometheus.io/port': '8087',

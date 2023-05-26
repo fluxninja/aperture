@@ -58,6 +58,8 @@ spec:
               value: "{{ .Values.agent.port }}"
             - name: REJECT_RATIO
               value: "{{ .Values.simplesrv.rejectRatio }}"
+            - name: CPU_LOAD
+              value: "{{ .Values.simplesrv.cpuLoadPercentage }}"
             - name: HOSTNAME
               # TODO: Don't hardcode domain
               value: "{{ include "demo-app.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
