@@ -9,12 +9,24 @@ description:
   with Aperture.
 keywords:
   - tutorial
+  - policies
+  - quota scheduler
+  - external API quotas
+  - use cases
+  - service protection
+  - rate limits
+  - auto scale
+  - load management
 ---
 
-Discover step-by-step tutorials on applying policies in Aperture. Learn how to
-configure policies to improve the reliability and stability of your web-scale
-applications. From service protection to rate limits to auto-scale, we will
-cover a wide range of policies to help you get started with Aperture.
+<!-- vale off -->
+
+Discover different use cases that leverage policies in Aperture. Learn how to
+configure policies to enhance the reliability and stability of web-scale
+applications. From rate limiting to auto-scaling, explore a wide range of
+policies to kick-start your journey with Aperture.
+
+<!-- vale on -->
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';
