@@ -69,12 +69,15 @@ dashboard:
   # Refresh interval for dashboard panels.
   # Type: string
   refresh_interval: "15s"
-  # From time of dashboard.
+  # Time from of dashboard.
   # Type: string
   time_from: "now-15m"
-  # To time of dashboard.
+  # Time to of dashboard.
   # Type: string
   time_to: "now"
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters:
   datasource:
     # Datasource name.
     # Type: string

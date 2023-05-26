@@ -1,5 +1,6 @@
 local aperture = import '../../grafana/aperture.libsonnet';
 local lib = import '../../grafana/grafana.libsonnet';
+local utils = import '../policy-utils.libsonnet';
 local baseDashboardFn = import '../service-protection/base/dashboard.libsonnet';
 local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
@@ -16,6 +17,7 @@ function(cfg) {
   local policyName = params.policy.policy_name,
   local ds = params.dashboard.datasource,
   local dsName = ds.name,
+  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { policy_name: policyName }),
 
   local quotaSchedulerPanel =
     graphPanel.new(
@@ -26,7 +28,7 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='sum by(decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
+        expr='sum by(decision_type) (rate(workload_requests_total{%(filters)s}[$__rate_interval]))' % { filters: filters },
         intervalFactor=1,
       )
     ),

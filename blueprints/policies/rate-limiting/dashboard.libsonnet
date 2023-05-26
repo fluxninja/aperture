@@ -1,5 +1,6 @@
 local aperture = import '../../grafana/aperture.libsonnet';
 local lib = import '../../grafana/grafana.libsonnet';
+local utils = import '../policy-utils.libsonnet';
 local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
@@ -12,17 +13,8 @@ function(cfg) {
   local policyName = params.policy.policy_name,
   local ds = params.dashboard.datasource,
   local dsName = ds.name,
-  local baseFilters = {
-    policy_name: policyName,
-  },
-  local filters = baseFilters + params.dashboard.extra_filters,
-  local stringFilters = std.join(
-    ',',
-    std.map(
-      function(key) '%(key)s:"%(value)s"' % { key: key, value: filters[key] },
-      std.objectFields(filters),
-    )
-  ),
+
+  local stringFilters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { policy_name: policyName }),
 
   local rateLimiterPanel =
     graphPanel.new(
