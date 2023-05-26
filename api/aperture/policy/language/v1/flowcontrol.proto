@@ -246,6 +246,9 @@ message Scheduler {
     // Label Matcher to select a Workload based on
     // [flow labels](/concepts/flow-control/flow-label.md).
     LabelMatcher label_matcher = 2; // @gotags: validate:"required"
+
+    // Name of the workload.
+    string name = 3;
   }
 
   // List of workloads to be used in scheduler.

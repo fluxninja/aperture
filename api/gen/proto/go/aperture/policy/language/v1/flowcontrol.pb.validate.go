@@ -4772,6 +4772,8 @@ func (m *Scheduler_Workload) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Name
+
 	if len(errors) > 0 {
 		return Scheduler_WorkloadMultiError(errors)
 	}
