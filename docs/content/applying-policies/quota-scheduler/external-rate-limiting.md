@@ -15,11 +15,11 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 External Rate Limiting is a technique to limit the number of outgoing requests
-from services to an external API server. Turning apps into spend aware and stay
-within quota limits to avoid cost overages. However, not all workloads are on
-same priority, based on application, their priority can be different. While
-doing external rate limiting, it is important to ensure prioritized access for
-your critical workloads. This policy builds upon the
+from services to an external API server. Turning your apps into spend aware and
+keeping them within quota limits to avoid cost overages. However, not all
+workloads are on same priority, based on application, their priority can be
+different. While doing external rate limiting, it is important to ensure
+prioritized access for critical workloads. This policy builds upon the
 [`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
 Blueprint, which comprises components like the token bucket rate limiting to
 ensure quota limits and a
