@@ -56,20 +56,20 @@ applicable to a wide range of cloud-native applications. These capabilities
 ensure the reliability and stability of applications, and include:
 
 - 🛡️
-  [**Adaptive Service Protection**](./applying-policies/service-protection/basic-service-protection.md):
+  [**Adaptive Service Protection**](./use-cases/service-protection/basic-service-protection.md):
   Enhance resource utilization and safeguard against abrupt service overloads
   with an intelligent queue at the entry point of services. This queue
   dynamically adjusts the rate of requests based on live service health, thereby
   mitigating potential service disruptions and ensuring optimal performance
   under all load conditions.
 - 📊
-  [**Intelligent Quota Management**](./applying-policies/quota-scheduler/quota-scheduler.md):
+  [**Intelligent Quota Management**](./use-cases/quota-scheduler/quota-scheduler.md):
   Maintain compliance with external API quotas with a global token bucket and
   smart request queuing. This feature regulates requests aimed at external
   services, ensuring that the usage remains within prescribed rate limits and
   avoids penalties or additional costs.
 - 🎯
-  [**Workload Prioritization**](./applying-policies/service-protection/workload-prioritization.md):
+  [**Workload Prioritization**](./use-cases/service-protection/workload-prioritization.md):
   Safeguard crucial user experience pathways and ensure prioritized access to
   external APIs even during high-load conditions by strategically prioritizing
   workloads. This is achieved through the use of declarative policies that label
@@ -77,21 +77,20 @@ ensure the reliability and stability of applications, and include:
   [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
   for scheduling, Aperture ensures a fair distribution of resources that aligns
   with the business value and urgency of requests.
-- 🔀
-  [**Load based Auto Scaling**](./applying-policies/auto-scale/auto-scale.md):
+- 🔀 [**Load based Auto Scaling**](./use-cases/auto-scale/auto-scale.md):
   Eliminate the need for costly over-provisioning and enhance efficiency with
   Aperture's load-based auto-scaling. Aperture's policies are expressed as
   circuit graphs that continuously track deviations from service-level
   objectives and calculate recovery or escalation actions. Auto-scaling can be
   implemented as an escalation that triggers based on load throttling signal.
 - ⏱️
-  [**Distributed Rate-Limiting**](./applying-policies/rate-limiting/rate-limiting.md):
+  [**Distributed Rate-Limiting**](./use-cases/rate-limiting/rate-limiting.md):
   Safeguard APIs from potential abuse with Aperture's high-performance,
   distributed rate limiter. This feature enforces per-key limits based on
   fine-grained labels, ensuring precise control and prevention of excessive
   usage.
 - 🚀
-  [**Automated Load Ramping**](./applying-policies/feature-rollout/feature-rollout.md):
+  [**Automated Load Ramping**](./use-cases/feature-rollout/feature-rollout.md):
   Aperture enables teams to gradually release new features to a subset of users,
   without impacting the rest of the system, using dark launch.
 
@@ -115,36 +114,70 @@ allocation in response to demand and performance fluctuations.
 The analysis and actuation phases use 📝
 [**Declarative policies**](./concepts/policy/policy.md). This policy language
 facilitates teams in defining responses to different situations, such as
-deviations from service-level objectives. Expressed as a signal processing
-circuit, these policies streamline action from telemetry data to appropriate
+deviations from service-level objectives. om telemetry data to appropriate
 actions.
+
+Such policies include key components such as
+[**Control Point**](./concepts/flow-control/selector.md),
+[**Selector**](./concepts/flow-control/selector.md), and
+[**Classifier**](./concepts/flow-control/resources/classifier.md). Control
+Points guide flow control decisions, Selectors decide which flows the policy
+should consider, and Classifiers create additional Flow Labels based on request
+metadata, collectively enriching the policy's operational capability.
 
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
 
-## 📖 Key concepts
+## ✨ Get started
 
-For a high-level overview that explains how Aperture policies work, following
-are some key components to be aware of:
+```mdx-code-block
 
-- [**Control point**](./concepts/flow-control/selector.md): Control Points
-  function as essential signposts in your code or data plane, analogous to
-  feature flags, that guide flow control decisions. They can be intuitively
-  established using SDKs or seamlessly incorporated during API Gateway or
-  Service Mesh integrations.
-- [**Selector**](./concepts/flow-control/selector.md): Selectors are similar to
-  filters, specifying which flows should be considered by the policy components
-  for certain operations.
-- [**Classifier**](./concepts/flow-control/resources/classifier.md): The
-  Classifier can be used to create additional Flow Labels based on request
-  metadata without any service alterations, if the existing flow labels aren't
-  sufficient.
+<Cards data={[{
+  title: "Setting up your application",
+  url: "/getting-started/setting-up-application/",
+},
+{
+  title: "Install Aperture",
+  url: "/getting-started/installation/",
+},
+{
+  title: "Your First Policy",
+  url: "/getting-started/policies",
+},
+{
+  title: "Applying Policies",
+  url: "/use-cases/",
+}
+]}/>
+
+```
 
 <!-- vale off -->
 
-Aperture's [Architecture](/architecture/architecture.md) section provides more
-information on how Aperture interfaces with applications as well as the
-different components that make up Aperture.
+For a deeper understanding of how Aperture interacts with applications and its
+various integral components, explore the
+[Architecture](/architecture/architecture.md) section.
+
+```mdx-code-block
+<Cards data={[{
+  title: "Architecture",
+  url: "/architecture",
+}
+]}/>
+```
+
+## 📖 Learn
+
+For a high-level overview that explains how Aperture works, check out the
+Concepts section:
+
+```mdx-code-block
+<Cards data={[{
+  title: "Concepts",
+  url: "/concepts",
+}
+]}/>
+```
 
 <!-- vale off -->
 
