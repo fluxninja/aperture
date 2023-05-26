@@ -85,7 +85,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/Stats'
+            type: object
         default:
           description: An unexpected error response.
           schema:
@@ -462,50 +462,6 @@ definitions:
         title: Status `OK` allows the request. Any other status indicates the request
           should be denied
         $ref: '#/definitions/googlerpcStatus'
-  DMap:
-    type: object
-    properties:
-      length:
-        type: string
-        format: int64
-      num_tables:
-        type: string
-        format: int64
-      slab_info:
-        $ref: '#/definitions/SlabInfo'
-  DMaps:
-    type: object
-    properties:
-      delete_hits:
-        type: string
-        format: int64
-      delete_misses:
-        type: string
-        format: int64
-      entries_total:
-        type: string
-        format: int64
-      evicted_total:
-        type: string
-        format: int64
-      get_hits:
-        type: string
-        format: int64
-      get_misses:
-        type: string
-        format: int64
-  DTopics:
-    type: object
-    properties:
-      current_listeners:
-        type: string
-        format: int64
-      listeners_total:
-        type: string
-        format: int64
-      published_total:
-        type: string
-        format: int64
   DeniedHttpResponse:
     description: HTTP attributes for a denied response.
     type: object
@@ -773,35 +729,6 @@ definitions:
 
         type: string
         x-go-tag-validate: required
-  Member:
-    type: object
-    properties:
-      birthdate:
-        type: string
-        format: int64
-      id:
-        type: string
-        format: uint64
-      name:
-        type: string
-  Network:
-    type: object
-    properties:
-      commands_total:
-        type: string
-        format: int64
-      connections_total:
-        type: string
-        format: int64
-      current_connections:
-        type: string
-        format: int64
-      read_bytes_total:
-        type: string
-        format: int64
-      written_bytes_total:
-        type: string
-        format: int64
   OkHttpResponse:
     description: HTTP attributes for an OK response.
     type: object
@@ -813,26 +740,6 @@ definitions:
         type: object
         additionalProperties:
           type: string
-  Partition:
-    type: object
-    properties:
-      backups:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/Member'
-      d_maps:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/DMap'
-      length:
-        type: string
-        format: int64
-      previous_owners:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/Member'
   Peer:
     description: Peer holds peer info and services.
     type: object
@@ -890,18 +797,6 @@ definitions:
         format: date-time
       uptime:
         type: string
-  SlabInfo:
-    type: object
-    properties:
-      allocated:
-        type: string
-        format: int64
-      garbage:
-        type: string
-        format: int64
-      inuse:
-        type: string
-        format: int64
   SocketAddress:
     type: object
     properties:
@@ -920,42 +815,6 @@ definitions:
     enum:
     - TCP
     - UDP
-  Stats:
-    type: object
-    properties:
-      backups:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/Partition'
-      cluster_coordinator:
-        $ref: '#/definitions/Member'
-      cluster_members:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/Member'
-      cmdline:
-        type: array
-        items:
-          type: string
-      d_maps:
-        $ref: '#/definitions/DMaps'
-      d_topics:
-        $ref: '#/definitions/DTopics'
-      member:
-        $ref: '#/definitions/Member'
-      network:
-        $ref: '#/definitions/Network'
-      partitions:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/Partition'
-      release_version:
-        type: string
-      runtime:
-        type: object
-      uptime_seconds:
-        type: string
-        format: int64
   Status:
     description: Status holds details about a status that can be reported to the registry.
     type: object

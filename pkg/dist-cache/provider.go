@@ -201,10 +201,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 }
 
 // RegisterDistCacheService registers the handler on grpc.Server.
-func RegisterDistCacheService(handler *DistCache,
-	server *grpc.Server,
-	healthsrv *health.Server,
-) error {
+func RegisterDistCacheService(handler *DistCache, server *grpc.Server, healthsrv *health.Server) error {
 	distcachev1.RegisterDistCacheServiceServer(server, handler)
 
 	healthsrv.SetServingStatus("aperture.distcache.v1.DistCacheService", grpc_health_v1.HealthCheckResponse_SERVING)

@@ -12,6 +12,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -129,7 +130,7 @@ func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
 }
 
 // GetStats returns stats of the current Olric member.
-func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*distcachev1.Stats, error) {
+func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.Struct, error) {
 	stats, err := dc.client.Stats(ctx, "")
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
@@ -142,21 +143,12 @@ func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*distcache
 		return nil, err
 	}
 
-	newStats := &distcachev1.Stats{}
-	err = json.Unmarshal(rawStats, newStats)
+	structpbStats := &structpb.Struct{}
+	err = json.Unmarshal(rawStats, structpbStats)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to unmarshal Olric statistics")
 		return nil, err
 	}
 
-	// Removing empty partitions to reduce the response size
-	partitions := make(map[uint64]*distcachev1.Partition)
-	for key, partition := range newStats.Partitions {
-		if partition.Length != 0 {
-			partitions[key] = partition
-		}
-	}
-
-	newStats.Partitions = partitions
-	return newStats, nil
+	return structpbStats, nil
 }
