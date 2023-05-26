@@ -351,8 +351,11 @@ func generateGraphs(content []byte, outputDir string, policyPath string, depth i
 		return nil
 	}
 	defer os.Remove(policyFile)
-
-	circuit, _, err := utils.CompilePolicy(policyFile)
+	policyBytes, err := os.ReadFile(policyFile)
+	if err != nil {
+		return err
+	}
+	circuit, _, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
 	if err != nil {
 		return err
 	}

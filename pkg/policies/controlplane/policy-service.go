@@ -14,6 +14,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
@@ -77,7 +78,6 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 // UpsertPolicy creates/updates policy to the system.
 func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
 	updateMask := req.UpdateMask != nil && len(req.UpdateMask.GetPaths()) > 0
-
 	policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
 	if err != nil && updateMask {
 		return nil, err
@@ -103,7 +103,22 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 	if err != nil {
 		return nil, fmt.Errorf("failed to write policy '%s' to etcd: '%s'", req.PolicyName, err)
 	}
+	// TODO do it in transaction
+	metadataBytes, err := req.PolicyMetadata.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal policy metadata '%s': '%s'", req.PolicyName, err)
+	}
 
+	_, err = s.etcdClient.Client.KV.Put(ctx, path.Join(paths.PoliciesMetadataAPIConfigPath, req.PolicyName), string(metadataBytes))
+	if err != nil {
+		return nil, fmt.Errorf("failed to write policy '%s' to etcd: '%s'", req.PolicyName, err)
+	}
+
+	resp, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesMetadataAPIConfigPath, req.PolicyName))
+	if err != nil {
+		return nil, fmt.Errorf("failed to write policy '%s' to etcd: '%s'", req.PolicyName, err)
+	}
+	log.Info().Msgf("resp: %v", resp)
 	return new(emptypb.Empty), nil
 }
 

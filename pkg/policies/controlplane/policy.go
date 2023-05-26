@@ -75,7 +75,7 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
 func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (*circuitfactory.Circuit, error) {
-	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
+	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 }
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
+func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string, metadata *policylangv1.PolicyMetadata) (*policysyncv1.PolicyWrapper, error) {
 	jsonDat, marshalErr := json.Marshal(policyMessage)
 	if marshalErr != nil {
 		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
@@ -281,5 +281,6 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 			PolicyName: policyName,
 			PolicyHash: hash,
 		},
+		PolicyMetadata: metadata,
 	}, nil
 }
