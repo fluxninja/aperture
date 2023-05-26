@@ -175,7 +175,11 @@ func (qsFactory *quotaSchedulerFactory) newQuotaSchedulerOptions(
 	}
 
 	qsProto := wrapperMessage.QuotaScheduler
-	qsProto.Scheduler = workloadscheduler.SanitizeSchedulerProto(qsProto.Scheduler)
+	qsProto.Scheduler, err = workloadscheduler.SanitizeSchedulerProto(qsProto.Scheduler)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to sanitize scheduler proto")
+		return fx.Options(), err
+	}
 
 	qs := &quotaScheduler{
 		Component: wrapperMessage.GetCommonAttributes(),
