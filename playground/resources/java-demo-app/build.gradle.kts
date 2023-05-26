@@ -22,6 +22,8 @@ dependencies {
             exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
+	implementation("org.springframework.boot:spring-boot-starter-actuator:2.7.9")
+	implementation("io.micrometer:micrometer-registry-prometheus:1.9.0")
 	implementation("org.springframework.boot:spring-boot-starter-web:2.7.9")
 	implementation("com.fluxninja.aperture:aperture-java-core:1.5.0")
 
