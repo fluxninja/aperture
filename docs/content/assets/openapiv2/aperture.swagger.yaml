@@ -3751,6 +3751,9 @@ definitions:
                     [flow labels](/concepts/flow-control/flow-label.md).
 
                 x-go-tag-validate: required
+            name:
+                description: Name of the workload.
+                type: string
             parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters associated with flows matching the label matcher.

@@ -223,7 +223,11 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 		logger.Warn().Err(err).Msg("Failed to unmarshal load scheduler config wrapper")
 		return fx.Options(), err
 	}
-	loadSchedulerProto.Parameters.Scheduler = workloadscheduler.SanitizeSchedulerProto(loadSchedulerProto.Parameters.Scheduler)
+	loadSchedulerProto.Parameters.Scheduler, err = workloadscheduler.SanitizeSchedulerProto(loadSchedulerProto.Parameters.Scheduler)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to sanitize scheduler proto")
+		return fx.Options(), err
+	}
 
 	ls := &loadScheduler{
 		Component:            wrapperMessage.GetCommonAttributes(),

@@ -9,10 +9,11 @@ metadata:
       [{"rules": {"user_type": {"extractor": {"from": "request.http.headers.user-type"}}},
       "selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}]}},
       "service_protection_core": {"adaptive_load_scheduler": {"load_scheduler": {"scheduler":
-      {"workloads": [{"label_matcher": {"match_labels": {"user_type": "guest"}}, "parameters":
-      {"priority": 50}}, {"label_matcher": {"match_labels": {"http.request.header.user_type":
-      "subscriber"}}, "parameters": {"priority": 200}}]}, "selectors": [{"control_point":
-      "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
+      {"workloads": [{"label_matcher": {"match_labels": {"user_type": "guest"}}, "name":
+      "guest", "parameters": {"priority": 50}}, {"label_matcher": {"match_labels":
+      {"http.request.header.user_type": "subscriber"}}, "name": "subscriber", "parameters":
+      {"priority": 200}}]}, "selectors": [{"control_point": "ingress", "service":
+      "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: workload-prioritization
@@ -50,11 +51,13 @@ spec:
                 - label_matcher:
                     match_labels:
                       user_type: guest
+                  name: guest
                   parameters:
                     priority: 50
                 - label_matcher:
                     match_labels:
                       http.request.header.user_type: subscriber
+                  name: subscriber
                   parameters:
                     priority: 200
               selectors:

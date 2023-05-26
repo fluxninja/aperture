@@ -3348,6 +3348,9 @@ definitions:
 
         x-go-tag-validate: required
         $ref: '#/definitions/LabelMatcher'
+      name:
+        description: Name of the workload.
+        type: string
       parameters:
         description: Parameters associated with flows matching the label matcher.
         $ref: '#/definitions/SchedulerWorkloadParameters'

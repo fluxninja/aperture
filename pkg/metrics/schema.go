@@ -52,7 +52,6 @@ const (
 	WorkloadLatencySumMetricName = "workload_latency_ms_sum"
 	// WorkloadLatencyCountMetricName - metric from workload histogram.
 	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
-
 	// WorkloadCounterMetricName - metric used for counting workload requests.
 	WorkloadCounterMetricName = "workload_requests_total"
 
