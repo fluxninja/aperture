@@ -1,7 +1,9 @@
+import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
+import { check, sleep } from "k6";
 import { vu } from "k6/execution";
 import http from "k6/http";
 
-export let vuStages = [
+export let vuStagesAPI = [
   { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
   { duration: "1m", target: 50 },
@@ -16,12 +18,12 @@ export let options = {
   scenarios: {
     api: {
       executor: "ramping-vus",
-      stages: vuStages,
+      stages: vuStagesAPI,
       env: { USER_TYPE: "api" },
     },
     agent: {
       executor: "ramping-vus",
-      stages: vuStages,
+      stages: vuStagesAPI,
       env: { USER_TYPE: "agent" },
     },
   },
@@ -30,6 +32,7 @@ export let options = {
 export let token = "";
 
 export function refresh_token() {
+  console.log("refreshing token");
   const url = "http://authn.cloud/login/basic-jwt?orgId=dcde9fb7-6cec-4a4a-b015-114795a65ed0";
   const body = "email=ann.place@placeholder.com&password=ann.place";
 
@@ -78,7 +81,13 @@ export function agent_service_request() {
     headers: agent_service_headers,
   });
 
-  console.log(res.status + " - agent-service");
+  const ret = check(res, {
+    "http status was 200": res.status === 200,
+  });
+  if (!ret) {
+    // sleep for 10ms to 25ms
+    sleep(randomIntBetween(0.01, 0.025));
+  }
 };
 
 export function api_service_request() {
@@ -121,7 +130,13 @@ export function api_service_request() {
     api_service_request();
   }
 
-  console.log(res.status + " - api-service");
+  const ret = check(res, {
+    "http status was 200": res.status === 200,
+  });
+  if (!ret) {
+    // sleep for 10ms to 25ms
+    sleep(randomIntBetween(0.01, 0.025));
+  }
 };
 
 export function setup() {

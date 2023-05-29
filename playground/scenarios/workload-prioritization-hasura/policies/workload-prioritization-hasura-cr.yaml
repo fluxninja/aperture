@@ -6,30 +6,28 @@ metadata:
     fluxninja.com/values: '{"policy": {"latency_baseliner": {"ema": {"correction_factor_on_max_envelope_violation":
       0.94999999999999996, "ema_window": "1500s", "warmup_window": "120s"}, "flux_meter":
       {"selectors": [{"control_point": "ingress", "label_matcher": {"match_labels":
-      {"source": "api-service.cloud.svc.cluster.local"}}, "service": "hasura.cloud.svc.cluster.local"}]},
+      {"operation": "mutation"}}, "service": "hasura.cloud.svc.cluster.local"}]},
       "latency_ema_limit_multiplier": 2, "latency_tolerance_multiplier": 1.1000000000000001},
-      "policy_name": "hasura-workload-prioritization", "resources": {"flow_control":
-      {"classifiers": [{"rego": {"labels": {"source": {"telemetry": true}}, "module":
-      "package hasura_example\nsource = input.attributes.source.source_fqdns[0]\n"},
+      "policy_name": "workload-prioritization-hasura", "resources": {"flow_control":
+      {"classifiers": [{"rego": {"labels": {"operation": {"telemetry": true}, "source":
+      {"telemetry": true}}, "module": "package hasura_example\nsource = input.attributes.source.source_fqdns[0]\noperation
+      = graphql.parse_query(input.parsed_body.query).Operations[_].Operation\n"},
       "selectors": [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}]},
-      "telemetry_collectors": [{"agent_group": "default", "infra_meters": {"postgresql":
-      {"per_agent_group": true, "receivers": {"postgresql": {"collection_interval":
-      "1s", "endpoint": "hasura-postgresql.cloud.svc.cluster.local:5432", "password":
-      "DevPassword", "tls": {"insecure": true, "insecure_skip_verify": true}, "transport":
-      "tcp", "username": "postgres"}}}}}]}, "service_protection_core": {"adaptive_load_scheduler":
-      {"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient":
-      1, "min_gradient": 0.10000000000000001, "slope": -1}, "load_multiplier_linear_increment":
-      0.0025000000000000001, "load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
-      {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}}, "parameters":
-      {"priority": 255}}, {"label_matcher": {"match_labels": {"source": "agent-service.cloud.svc.cluster.local"}},
-      "parameters": {"priority": 50}}]}, "selectors": [{"control_point": "ingress",
-      "label_matcher": {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}},
-      "service": "hasura.cloud.svc.cluster.local"}, {"control_point": "ingress", "label_matcher":
-      {"match_labels": {"source": "agent-service.cloud.svc.cluster.local"}}, "service":
-      "hasura.cloud.svc.cluster.local"}]}}, "dry_run": false}}}'
+      "telemetry_collectors": [{"agent_group": "default", "infra_meters": {"prometheus_simple":
+      {"per_agent_group": true, "receivers": {"prometheus_simple": {"collection_interval":
+      "1s", "endpoint": "hasura-postgresql-metrics.cloud.svc.cluster.local:9187",
+      "tls": {"insecure_skip_verify": true}, "use_service_account": true}}}}}]}, "service_protection_core":
+      {"adaptive_load_scheduler": {"alerter": {"alert_name": "Load Throttling Event"},
+      "gradient": {"max_gradient": 1, "min_gradient": 0.10000000000000001, "slope":
+      -1}, "load_multiplier_linear_increment": 0.0025000000000000001, "load_scheduler":
+      {"scheduler": {"workloads": [{"label_matcher": {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}},
+      "parameters": {"priority": 200}}, {"label_matcher": {"match_labels": {"source":
+      "agent-service.cloud.svc.cluster.local"}}, "parameters": {"priority": 50}}]},
+      "selectors": [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}},
+      "dry_run": false}}}'
   labels:
     fluxninja.com/validate: "true"
-  name: hasura-workload-prioritization
+  name: workload-prioritization-hasura
 spec:
   circuit:
     components:
@@ -65,7 +63,7 @@ spec:
                     match_labels:
                       source: api-service.cloud.svc.cluster.local
                   parameters:
-                    priority: 255
+                    priority: 200
                 - label_matcher:
                     match_labels:
                       source: agent-service.cloud.svc.cluster.local
@@ -73,14 +71,6 @@ spec:
                     priority: 50
               selectors:
               - control_point: ingress
-                label_matcher:
-                  match_labels:
-                    source: api-service.cloud.svc.cluster.local
-                service: hasura.cloud.svc.cluster.local
-              - control_point: ingress
-                label_matcher:
-                  match_labels:
-                    source: agent-service.cloud.svc.cluster.local
                 service: hasura.cloud.svc.cluster.local
             max_load_multiplier: 2
     - query:
@@ -89,8 +79,8 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="hasura-workload-prioritization"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="hasura-workload-prioritization"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization-hasura"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="workload-prioritization-hasura"}[5s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -132,34 +122,34 @@ spec:
       classifiers:
       - rego:
           labels:
+            operation:
+              telemetry: true
             source:
               telemetry: true
           module: |
             package hasura_example
             source = input.attributes.source.source_fqdns[0]
+            operation = graphql.parse_query(input.parsed_body.query).Operations[_].Operation
         selectors:
         - control_point: ingress
           service: hasura.cloud.svc.cluster.local
       flux_meters:
-        hasura-workload-prioritization:
+        workload-prioritization-hasura:
           selectors:
           - control_point: ingress
             label_matcher:
               match_labels:
-                source: api-service.cloud.svc.cluster.local
+                operation: mutation
             service: hasura.cloud.svc.cluster.local
     telemetry_collectors:
     - agent_group: default
       infra_meters:
-        postgresql:
+        prometheus_simple:
           per_agent_group: true
           receivers:
-            postgresql:
+            prometheus_simple:
               collection_interval: 1s
-              endpoint: hasura-postgresql.cloud.svc.cluster.local:5432
-              password: DevPassword
+              endpoint: hasura-postgresql-metrics.cloud.svc.cluster.local:9187
               tls:
-                insecure: true
                 insecure_skip_verify: true
-              transport: tcp
-              username: postgres
+              use_service_account: true

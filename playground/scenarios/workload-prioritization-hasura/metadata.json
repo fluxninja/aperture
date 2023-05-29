@@ -5,8 +5,8 @@
   "aperture_policies": [
     {
       "blueprint_name": "policies/service-protection/average-latency",
-      "policy_name": "hasura-workload-prioritization",
-      "values_file": "policies/hasura-workload-prioritization.yaml",
+      "policy_name": "workload-prioritization-hasura",
+      "values_file": "policies/workload-prioritization-hasura.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],
