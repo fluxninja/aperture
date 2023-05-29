@@ -58,9 +58,7 @@ func injectOtelConfig(
 	configProvider *otelconfig.Provider,
 ) {
 	if extensionConfig.APIKey == "" {
-		if false {
-			return
-		}
+		return
 	}
 
 	lifecycle.Append(fx.StartHook(func() {
@@ -69,8 +67,7 @@ func injectOtelConfig(
 		configProvider.AddMutatingHook(func(config *otelconfig.Config) {
 			addFluxNinjaExporter(config, extensionConfig, grpcClientConfig, httpClientConfig)
 
-			controllerID := "XXX no heartbeats?"
-			// controllerID := heartbeats.ControllerInfo.Id
+			controllerID := heartbeats.ControllerInfo.Id
 
 			addAttributesProcessor(config, controllerID)
 			addResourceAttributesProcessor(config, controllerID)
