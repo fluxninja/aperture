@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/mitchellh/copystructure"
 	"go.opentelemetry.io/collector/confmap"
 )
 
@@ -86,6 +85,7 @@ func (p *Provider) UpdateConfig(config *Config) {
 	p.setConfig(config)
 }
 
+// Set post-hooks config and trigger update, assuming p.lock locked.
 func (p *Provider) setConfig(config *Config) {
 	if p.config == nil {
 		log.Warn().Msg("OtelConfigProvider: tried to update config after Shutdown")
@@ -124,5 +124,5 @@ func (p *Provider) MustGetConfig() *Config {
 	p.lock.Lock()
 	defer p.lock.Unlock()
 	// Copying to avoid concurrent modification by hooks.
-	return copystructure.Must(copystructure.Copy(p.config)).(*Config)
+	return p.config.MustCopy()
 }

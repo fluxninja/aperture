@@ -126,12 +126,12 @@ func (o *Config) AddBatchProcessor(
 //
 // This should error only in pathological cases.
 func (o *Config) Copy() (*Config, error) {
-	copyInferface, err := copystructure.Copy(o)
+	copyInterface, err := copystructure.Copy(o)
 	if err != nil {
 		return nil, err
 	}
 
-	copy, ok := copyInferface.(*Config)
+	copy, ok := copyInterface.(*Config)
 	if !ok {
 		return nil, errors.New("copy has wrong type")
 	}
