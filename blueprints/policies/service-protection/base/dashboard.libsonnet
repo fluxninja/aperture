@@ -1,3 +1,4 @@
+local utils = import '../../policy-utils.libsonnet';
 local config = import './config-defaults.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
@@ -108,21 +109,21 @@ local newStatPanel(graphTitle, datasource, graphQuery) =
     },
   };
 
-local dashboardWithPanels(dashboardParams, policyName) =
+local dashboardWithPanels(dashboardParams, filters) =
   local datasource = dashboardParams.datasource;
   local dsName = datasource.name;
 
   local WFQSchedulerFlows =
-    newBarGaugePanel('WFQ Scheduler Flows', dsName, 'avg(wfq_flows_total{policy_name="%(policy_name)s"})' % { policy_name: policyName });
+    newBarGaugePanel('WFQ Scheduler Flows', dsName, 'avg(wfq_flows_total{%(filters)s})' % { filters: filters });
 
   local WFQSchedulerHeapRequests =
-    newBarGaugePanel('WFQ Scheduler Heap Requests', dsName, 'avg(wfq_requests_total{policy_name="%(policy_name)s"})' % { policy_name: policyName });
+    newBarGaugePanel('WFQ Scheduler Heap Requests', dsName, 'avg(wfq_requests_total{%(filters)s})' % { filters: filters });
 
   local TotalBucketLoadSchedFactor =
-    newStatPanel('Average Load Multiplier', dsName, 'avg(token_bucket_lm_ratio{policy_name="%(policy_name)s"})' % { policy_name: policyName });
+    newStatPanel('Average Load Multiplier', dsName, 'avg(token_bucket_lm_ratio{%(filters)s})' % { filters: filters });
 
   local TokenBucketBucketCapacity =
-    newStatPanel('Token Bucket Bucket Capacity', dsName, 'avg(token_bucket_capacity_total{policy_name="%(policy_name)s"})' % { policy_name: policyName })
+    newStatPanel('Token Bucket Bucket Capacity', dsName, 'avg(token_bucket_capacity_total{%(filters)s})' % { filters: filters })
     + {
       options+: {
         orientation: 'auto',
@@ -130,7 +131,7 @@ local dashboardWithPanels(dashboardParams, policyName) =
     };
 
   local TokenBucketBucketFillRate =
-    newStatPanel('Token Bucket Bucket FillRate', dsName, 'avg(token_bucket_fill_rate{policy_name="%(policy_name)s"})' % { policy_name: policyName }) +
+    newStatPanel('Token Bucket Bucket FillRate', dsName, 'avg(token_bucket_fill_rate{%(filters)s})' % { filters: filters }) +
     {
       options+: {
         orientation: 'auto',
@@ -138,7 +139,7 @@ local dashboardWithPanels(dashboardParams, policyName) =
     };
 
   local TokenBucketAvailableTokens =
-    newStatPanel('Token Bucket Available Tokens', dsName, 'avg(token_bucket_available_tokens_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }) +
+    newStatPanel('Token Bucket Available Tokens', dsName, 'avg(token_bucket_available_tokens_total{%(filters)s})' % { filters: filters }) +
     {
       options+: {
         orientation: 'auto',
@@ -146,19 +147,19 @@ local dashboardWithPanels(dashboardParams, policyName) =
     };
 
   local IncomingConcurrency =
-    newGraphPanel('Incoming Token Rate', dsName, 'sum(rate(incoming_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none');
+    newGraphPanel('Incoming Token Rate', dsName, 'sum(rate(incoming_tokens_total{%(filters)s}[$__rate_interval]))' % { filters: filters }, 'Concurrency', 'none');
 
   local AcceptedConcurrency =
-    newGraphPanel('Accepted Token Rate', dsName, 'sum(rate(accepted_tokens_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none');
+    newGraphPanel('Accepted Token Rate', dsName, 'sum(rate(accepted_tokens_total{%(filters)s}[$__rate_interval]))' % { filters: filters }, 'Concurrency', 'none');
 
   local WorkloadDecisionsAccepted =
-    newGraphPanel('Workload Decisions (accepted)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_ACCEPTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps');
+    newGraphPanel('Workload Decisions (accepted)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{%(filters)s,decision_type="DECISION_TYPE_ACCEPTED"}[$__rate_interval]))' % { filters: filters }, 'Decisions', 'reqps');
 
   local WorkloadDecisionsRejected =
-    newGraphPanel('Workload Decisions (rejected)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_REJECTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps');
+    newGraphPanel('Workload Decisions (rejected)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{%(filters)s,decision_type="DECISION_TYPE_REJECTED"}[$__rate_interval]))' % { filters: filters }, 'Decisions', 'reqps');
 
   local WorkloadLatency =
-    newGraphPanel('Workload Latency', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms');
+    newGraphPanel('Workload Latency', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{%(filters)s}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{%(filters)s}[$__rate_interval])))' % { filters: filters }, 'Latency', 'ms');
 
   dashboard.new(
     title='Aperture Service Protection',
@@ -200,8 +201,9 @@ local dashboardWithPanels(dashboardParams, policyName) =
 function(cfg) {
   local params = config + cfg,
   local policyName = params.policy.policy_name,
+  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { policy_name: policyName }),
 
-  local dashboardDef = dashboardWithPanels(params.dashboard, policyName),
+  local dashboardDef = dashboardWithPanels(params.dashboard, filters),
 
   dashboard: dashboardDef,
 }

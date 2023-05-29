@@ -77,7 +77,6 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 // UpsertPolicy creates/updates policy to the system.
 func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
 	updateMask := req.UpdateMask != nil && len(req.UpdateMask.GetPaths()) > 0
-
 	policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
 	if err != nil && updateMask {
 		return nil, err
@@ -103,7 +102,6 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 	if err != nil {
 		return nil, fmt.Errorf("failed to write policy '%s' to etcd: '%s'", req.PolicyName, err)
 	}
-
 	return new(emptypb.Empty), nil
 }
 
