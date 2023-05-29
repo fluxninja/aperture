@@ -14,7 +14,7 @@
     std.join(
       ',',
       std.map(
-        function(key) '%(key)s:"%(value)s"' % { key: key, value: $.serializeValue(dict[key]) },
+        function(key) '%(key)s=%(value)s' % { key: key, value: $.serializeValue(dict[key]) },
         std.objectFields(dict),
       )
     ),
