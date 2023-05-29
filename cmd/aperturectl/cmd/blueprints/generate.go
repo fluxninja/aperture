@@ -35,6 +35,7 @@ func init() {
 
 type metadata struct {
 	BlueprintsURI string `json:"blueprints_uri"`
+	BlueprintName string `json:"blueprint_name"`
 }
 
 var generateCmd = &cobra.Command{
@@ -132,6 +133,7 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 		}
 		metadata, err := json.Marshal(metadata{
 			BlueprintsURI: blueprintsURIMetadata,
+			BlueprintName: blueprintName,
 		})
 		if err != nil {
 			return err
@@ -351,8 +353,11 @@ func generateGraphs(content []byte, outputDir string, policyPath string, depth i
 		return nil
 	}
 	defer os.Remove(policyFile)
-
-	circuit, _, err := utils.CompilePolicy(policyFile)
+	policyBytes, err := os.ReadFile(policyFile)
+	if err != nil {
+		return err
+	}
+	circuit, _, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
 	if err != nil {
 		return err
 	}

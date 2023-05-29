@@ -10,6 +10,8 @@ message PolicyWrapper {
   CommonAttributes common_attributes = 1;
   // Policy
   policy.language.v1.Policy policy = 2;
+  // Policy Metadata
+  policy.language.v1.PolicyMetadata policy_metadata = 3;
 }
 
 message PolicyWrappers {

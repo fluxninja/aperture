@@ -7019,6 +7019,18 @@ Label Matcher to select a Workload based on
 [flow labels](/concepts/flow-control/flow-label.md).
 
 </dd>
+<dt>name</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Name of the workload.
+
+</dd>
 <dt>parameters</dt>
 <dd>
 

@@ -27,6 +27,7 @@ local promqlServiceProtection = import '../../service-protection/promql/config.l
 * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
 * @param (dashboard.time_from: string) From time of dashboard.
 * @param (dashboard.time_to: string) To time of dashboard.
+* @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
 * @param (dashboard.datasource.name: string) Datasource name.
 * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
 */
