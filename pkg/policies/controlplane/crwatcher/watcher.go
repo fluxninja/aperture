@@ -222,6 +222,7 @@ func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.
 		PolicyMetadata: &languagev1.PolicyMetadata{
 			Values:        annotations["fluxninja.com/values"],
 			BlueprintsUri: annotations["fluxninja.com/blueprints-uri"],
+			BlueprintName: annotations["fluxninja.com/blueprint-name"],
 		},
 	}
 	bytes, err := yaml.Marshal(policyMessage)

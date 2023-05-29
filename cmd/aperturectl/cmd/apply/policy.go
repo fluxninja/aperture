@@ -162,6 +162,7 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy, metadata *lang
 		if metadata != nil {
 			policyCR.Annotations["fluxninja.com/values"] = metadata.Values
 			policyCR.Annotations["fluxninja.com/blueprints-uri"] = metadata.BlueprintsUri
+			policyCR.Annotations["fluxninja.com/blueprint-name"] = metadata.BlueprintName
 		}
 		err = kubeClient.Create(context.Background(), policyCR)
 		if err != nil {
@@ -252,6 +253,7 @@ func updatePolicyCR(name string, policy *policyv1alpha1.Policy, metadata *langua
 	if metadata != nil {
 		existingPolicy.Annotations["fluxninja.com/values"] = metadata.Values
 		existingPolicy.Annotations["fluxninja.com/blueprints-uri"] = metadata.BlueprintsUri
+		existingPolicy.Annotations["fluxninja.com/blueprint-name"] = metadata.BlueprintName
 	}
 
 	err = kubeClient.Update(context.Background(), existingPolicy)
