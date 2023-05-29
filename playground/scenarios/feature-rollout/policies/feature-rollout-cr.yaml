@@ -2,7 +2,8 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-uri: local
+    fluxninja.com/blueprint-name: policies/feature-rollout/average-latency
+    fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"dashboard": {"datasource": {"filter_regex": "", "name":
       "$datasource"}, "refresh_interval": "5s", "time_from": "now-15m", "time_to":
       "now"}, "policy": {"components": [ ], "drivers": {"average_latency_drivers":

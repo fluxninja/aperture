@@ -164,6 +164,8 @@ paths:
             policy:
               x-go-tag-validate: required
               $ref: '#/definitions/Policy'
+            policy_metadata:
+              $ref: '#/definitions/PolicyMetadata'
             update_mask:
               description: The paths to update.
               type: string
@@ -197,6 +199,8 @@ paths:
             policy:
               x-go-tag-validate: required
               $ref: '#/definitions/Policy'
+            policy_metadata:
+              $ref: '#/definitions/PolicyMetadata'
             update_mask:
               description: The paths to update.
               type: string

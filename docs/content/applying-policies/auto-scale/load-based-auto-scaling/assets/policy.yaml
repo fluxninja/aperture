@@ -2,7 +2,8 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-uri: local
+    fluxninja.com/blueprint-name: policies/service-protection-with-load-based-pod-auto-scaler/average-latency
+    fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"auto_scaling": {"dry_run": false, "kubernetes_replicas":
       {"kubernetes_object_selector": {"agent_group": "default", "api_version": "apps/v1",
       "kind": "Deployment", "name": "service1-demo-app", "namespace": "demoapp"},
