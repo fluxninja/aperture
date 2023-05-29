@@ -5,7 +5,11 @@ keywords:
   - quota
   - prioritization
   - external-api
-sidebar_position: 1
+  - tutorial
+  - quota-scheduler
+  - scheduling
+  - external-api
+sidebar_position: 3
 ---
 
 ```mdx-code-block

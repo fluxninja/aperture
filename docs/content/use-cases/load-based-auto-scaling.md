@@ -1,6 +1,7 @@
 ---
 title: Load-based Auto Scaling
-sidebar_position: 1
+sidebar_position: 6
+description: Learn how to use Aperture to scale a service based on load.
 keywords:
   - scaling
   - auto-scaler
@@ -13,6 +14,13 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
+
+<!-- Here are a few example policies for performing auto-scale.
+[_Auto Scaler_](/reference/policies/spec.md#auto-scaler) is the high-level
+component for performing auto-scale in Aperture. Multiple Controllers can be
+defined on the _Auto Scaler_ for performing scale-out or scale-in. The _Auto
+Scaler_ can interface with infrastructure APIs such as Kubernetes to perform
+auto-scale. -->
 
 Load-based auto-scaling is a technique used to dynamically adjust the number of
 instances or resources allocated to a service based on workload demands. This
@@ -84,7 +92,8 @@ At a high level, this policy consists of:
 
 :::info
 
-[Circuit Diagram](./assets/graph.mmd.svg) for this policy.
+[Circuit Diagram](./assets/load-based-auto-scaling/graph.mmd.svg) for this
+policy.
 
 :::
 
@@ -106,6 +115,6 @@ again, the above cycle continues.
 
 <Zoom>
 
-![Auto Scale](./assets/dashboard.png)
+![Auto Scale](./assets/load-based-auto-scaling/dashboard.png)
 
 </Zoom>

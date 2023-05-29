@@ -3,7 +3,7 @@ title: Workload Prioritization
 keywords:
   - policies
   - scheduler
-sidebar_position: 2
+sidebar_position: 4
 ---
 
 ```mdx-code-block

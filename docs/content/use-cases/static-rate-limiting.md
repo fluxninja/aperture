@@ -3,7 +3,7 @@ title: Static Rate Limiting
 keywords:
   - policies
   - ratelimit
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 ```mdx-code-block

@@ -1,10 +1,11 @@
 ---
 title: Detecting Overload
+description: Learn how to use Aperture to express complex alerting criteria.
 keywords:
   - policies
   - signals
   - circuit
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 ```mdx-code-block

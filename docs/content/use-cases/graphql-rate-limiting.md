@@ -4,7 +4,7 @@ keywords:
   - policies
   - ratelimit
   - graphql
-sidebar_position: 2
+sidebar_position: 7
 ---
 
 ```mdx-code-block

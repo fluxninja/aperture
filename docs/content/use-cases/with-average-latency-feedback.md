@@ -5,7 +5,7 @@ keywords:
   - rollout
   - latency
   - feature-flags
-sidebar_position: 1
+sidebar_position: 8
 ---
 
 ```mdx-code-block
