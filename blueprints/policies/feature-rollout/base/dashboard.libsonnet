@@ -1,3 +1,4 @@
+local utils = import '../../policy-utils.libsonnet';
 local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
@@ -13,6 +14,9 @@ function(cfg) {
   local refresh = params.dashboard.refresh_interval,
   local time_from = params.dashboard.time_from,
   local time_to = params.dashboard.time_to,
+  local base_filters = params.dashboard.extra_filters { policy_name: policyName },
+  local throughput_filters = utils.dictToPrometheusFilter(base_filters),
+  local acceptPercentage_filters = utils.dictToPrometheusFilter(base_filters { signal_name: 'ACCEPT_PERCENTAGE' }),
 
   local throughputPanel =
     graphPanel.new(
@@ -21,8 +25,8 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='rate(regulator_counter_total{policy_name="%(policy_name)s"}[$__rate_interval])' % {
-          policy_name: policyName,
+        expr='rate(regulator_counter_total{%(filters)s}[$__rate_interval])' % {
+          filters: throughput_filters,
         },
         intervalFactor=1,
       ),
@@ -36,11 +40,11 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr=(
-          'increase(signal_reading_sum{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])' +
-          '/' +
-          'increase(signal_reading_count{policy_name="' + policyName + '",signal_name="ACCEPT_PERCENTAGE"}[$__rate_interval])'
-        ),
+        expr=|||
+          increase(signal_reading_sum{%(filters)s}[$__rate_interval])
+          /
+          increase(signal_reading_count{%(filters)s}[$__rate_interval])
+        ||| % { filters: acceptPercentage_filters },
         intervalFactor=1,
       ),
     ),

@@ -1,5 +1,6 @@
 local aperture = import '../../grafana/aperture.libsonnet';
 local lib = import '../../grafana/grafana.libsonnet';
+local utils = import '../policy-utils.libsonnet';
 local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
@@ -13,6 +14,8 @@ function(cfg) {
   local ds = params.dashboard.datasource,
   local dsName = ds.name,
 
+  local stringFilters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { policy_name: policyName }),
+
   local rateLimiterPanel =
     graphPanel.new(
       title='Aperture Rate Limiter',
@@ -22,7 +25,15 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='sum by(decision_type) (rate(rate_limiter_counter_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
+        expr=|||
+          sum by(decision_type) (
+            rate(
+              rate_limiter_counter_total{
+                %(filters)s
+              }[$__rate_interval]
+            )
+          )
+        ||| % { filters: stringFilters },
         intervalFactor=1,
       )
     ),
