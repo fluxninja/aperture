@@ -46,14 +46,6 @@ policy:
         selectors:
           - control_point: ingress
             service: hasura.cloud.svc.cluster.local
-          #   label_matcher:
-          #     match_labels:
-          #       source: "api-service.cloud.svc.cluster.local"
-          # - control_point: ingress
-          #   service: hasura.cloud.svc.cluster.local
-          #   label_matcher:
-          #     match_labels:
-          #       source: "agent-service.cloud.svc.cluster.local"
         scheduler:
           workloads:
             - label_matcher:
@@ -61,11 +53,13 @@ policy:
                   source: "api-service.cloud.svc.cluster.local"
               parameters:
                 priority: 200
+              name: "api-service"
             - label_matcher:
                 match_labels:
                   source: "agent-service.cloud.svc.cluster.local"
               parameters:
                 priority: 50
+              name: "agent-service"
   latency_baseliner:
     ema:
       correction_factor_on_max_envelope_violation: 0.95

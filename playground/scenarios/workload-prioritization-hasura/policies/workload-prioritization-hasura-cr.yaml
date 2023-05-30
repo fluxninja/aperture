@@ -2,7 +2,8 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-uri: local
+    fluxninja.com/blueprint-name: policies/service-protection/average-latency
+    fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"latency_baseliner": {"ema": {"correction_factor_on_max_envelope_violation":
       0.94999999999999996, "ema_window": "1500s", "warmup_window": "120s"}, "flux_meter":
       {"selectors": [{"control_point": "ingress", "label_matcher": {"match_labels":
@@ -21,10 +22,10 @@ metadata:
       "gradient": {"max_gradient": 1, "min_gradient": 0.10000000000000001, "slope":
       -1}, "load_multiplier_linear_increment": 0.0025000000000000001, "load_scheduler":
       {"scheduler": {"workloads": [{"label_matcher": {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}},
-      "parameters": {"priority": 200}}, {"label_matcher": {"match_labels": {"source":
-      "agent-service.cloud.svc.cluster.local"}}, "parameters": {"priority": 50}}]},
-      "selectors": [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}},
-      "dry_run": false}}}'
+      "name": "api-service", "parameters": {"priority": 200}}, {"label_matcher": {"match_labels":
+      {"source": "agent-service.cloud.svc.cluster.local"}}, "name": "agent-service",
+      "parameters": {"priority": 50}}]}, "selectors": [{"control_point": "ingress",
+      "service": "hasura.cloud.svc.cluster.local"}]}}, "dry_run": false}}}'
   labels:
     fluxninja.com/validate: "true"
   name: workload-prioritization-hasura
@@ -62,11 +63,13 @@ spec:
                 - label_matcher:
                     match_labels:
                       source: api-service.cloud.svc.cluster.local
+                  name: api-service
                   parameters:
                     priority: 200
                 - label_matcher:
                     match_labels:
                       source: agent-service.cloud.svc.cluster.local
+                  name: agent-service
                   parameters:
                     priority: 50
               selectors:
