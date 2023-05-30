@@ -57,12 +57,12 @@ type Heartbeats struct {
 	statusRegistry            status.Registry
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints
 	policyFactory             *controlplane.PolicyFactory
-	ControllerInfo            *heartbeatv1.ControllerInfo
+	ControllerInfo            *heartbeatv1.ControllerInfo // set in OnStart
 	jobGroup                  *jobs.JobGroup
-	clientConn                *grpc.ClientConn
+	clientConn                *grpc.ClientConn // set in OnStart
 	peersWatcher              *peers.PeerDiscovery
 	entities                  *entities.Entities
-	clientHTTP                *http.Client
+	clientHTTP                *http.Client // set in OnStart
 	interval                  config.Duration
 	flowControlPoints         *cache.Cache[selectors.TypedControlPointID]
 	agentInfo                 *agentinfo.AgentInfo

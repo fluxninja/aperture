@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"path"
 
-	"go.uber.org/fx"
-
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
@@ -21,40 +19,39 @@ func ProvidePeersPrefix(agentInfo *agentinfo.AgentInfo) (peers.PeerDiscoveryPref
 	return peers.PeerDiscoveryPrefix(prefix), nil
 }
 
-// FxIn is the input for the AddAgentInfoAttribute function.
-type FxIn struct {
-	fx.In
-	BaseConfig *otelconfig.OTelConfigProvider `name:"base"`
-	AgentInfo  *agentinfo.AgentInfo
-}
-
 // AddAgentInfoAttribute adds the agent group and instance labels to OTel config.
-func AddAgentInfoAttribute(in FxIn) {
-	cfg := in.BaseConfig.GetConfig()
-	cfg.AddProcessor(otelconsts.ProcessorAgentGroup, map[string]interface{}{
-		"actions": []map[string]interface{}{
+func AddAgentInfoAttribute(
+	agentInfo *agentinfo.AgentInfo,
+	otelConfigProvider *otelconfig.Provider,
+) {
+	// Note: This hook is added before starting the collector, so there's no
+	// risk of collector seeing config with missing processors.
+	otelConfigProvider.AddMutatingHook(func(cfg *otelconfig.Config) {
+		cfg.AddProcessor(otelconsts.ProcessorAgentGroup, map[string]interface{}{
+			"actions": []map[string]interface{}{
+				{
+					"key":    otelconsts.AgentGroupLabel,
+					"action": "insert",
+					"value":  agentInfo.GetAgentGroup(),
+				},
+			},
+		})
+		transformStatements := []map[string]interface{}{
 			{
-				"key":    otelconsts.AgentGroupLabel,
-				"action": "insert",
-				"value":  in.AgentInfo.GetAgentGroup(),
+				"context": "resource",
+				"statements": []string{
+					fmt.Sprintf(`set(attributes["%v"], "%v")`,
+						otelconsts.AgentGroupLabel, agentInfo.GetAgentGroup()),
+					fmt.Sprintf(`set(attributes["%v"], "%v")`,
+						otelconsts.InstanceLabel, info.Hostname),
+					fmt.Sprintf(`set(attributes["%v"], "%v")`,
+						metrics.ProcessUUIDLabel, info.UUID),
+				},
 			},
-		},
-	})
-	transformStatements := []map[string]interface{}{
-		{
-			"context": "resource",
-			"statements": []string{
-				fmt.Sprintf(`set(attributes["%v"], "%v")`,
-					otelconsts.AgentGroupLabel, in.AgentInfo.GetAgentGroup()),
-				fmt.Sprintf(`set(attributes["%v"], "%v")`,
-					otelconsts.InstanceLabel, info.Hostname),
-				fmt.Sprintf(`set(attributes["%v"], "%v")`,
-					metrics.ProcessUUIDLabel, info.UUID),
-			},
-		},
-	}
-	cfg.AddProcessor(otelconsts.ProcessorAgentResourceLabels, map[string]interface{}{
-		"log_statements":    transformStatements,
-		"metric_statements": transformStatements,
+		}
+		cfg.AddProcessor(otelconsts.ProcessorAgentResourceLabels, map[string]interface{}{
+			"log_statements":    transformStatements,
+			"metric_statements": transformStatements,
+		})
 	})
 }
