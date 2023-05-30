@@ -7,7 +7,7 @@ keywords:
   - fairness
   - queuing
   - actuators
-sidebar_position: 6
+sidebar_position: 5
 ---
 
 :::info
@@ -50,7 +50,7 @@ user experience or revenue.
 
 ### Workload {#workload}
 
-Workloads are groups of flows based on common [_Flow Labels_](../flow-label.md).
+Workloads are groups of flows based on common [_Flow Labels_](./flow-label.md).
 Workloads are expressed by [label matcher][label-matcher] rules in Aperture.
 Aperture Agents schedule workloads based on their priorities and by (auto)
 estimating their [tokens](#tokens).
@@ -142,5 +142,5 @@ during overload scenarios.
 
 :::
 
-[label-matcher]: ../selector.md#label-matcher
+[label-matcher]: ./selector.md#label-matcher
 [policies]: /concepts/policy/policy.md

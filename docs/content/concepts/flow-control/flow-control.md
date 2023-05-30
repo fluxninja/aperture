@@ -95,8 +95,8 @@ you need to install integrations that will communicate with the Aperture Agent.
 [load-scheduler]: ./components/load-scheduler.md
 [regulator]: ./components/regulator.md
 [rate-limiter]: ./components/rate-limiter.md
-[flux-meter]: ./resources/flux-meter.md
-[classifier]: ./resources/classifier.md
+[flux-meter]: ./flux-meter.md
+[classifier]: ./classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [istio]: /integrations/flow-control/envoy/istio.md
 [ext-authz]:

@@ -1,6 +1,6 @@
 ---
 title: Flux Meter
-sidebar_position: 2
+sidebar_position: 4
 keywords:
   - fluxmeter
   - histograms
@@ -114,7 +114,7 @@ user compared to guest user).
 
 [reference]: /reference/policies/spec.md#flux-meter
 [flow-selectors]: /concepts/flow-control/selector.md
-[flow-control-insertion]: ../flow-control.md#insertion
+[flow-control-insertion]: ./flow-control.md#insertion
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]:

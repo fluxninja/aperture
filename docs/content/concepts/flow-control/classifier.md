@@ -1,6 +1,6 @@
 ---
 title: Classifier
-sidebar_position: 1
+sidebar_position: 3
 ---
 
 :::info
@@ -222,17 +222,17 @@ See [full example in reference][reference]
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
 [label]: /concepts/flow-control/flow-label.md
 [baggage]: /concepts/flow-control/flow-label.md#baggage
-[request-labels]: ../flow-label.md#request-labels
+[request-labels]: ./flow-label.md#request-labels
 [reference]: /reference/policies/spec.md#classifier
 [rule]: /reference/policies/spec.md#rule
 [extractor]: /reference/policies/spec.md#extractor
 [rego-rule]: /reference/policies/spec.md#rule-rego
 [arc]: /arc/extension.md
-[label-matcher]: ../selector.md#label-matcher
+[label-matcher]: ./selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ../selector.md#control-point
+[control-point]: ./selector.md#control-point
 [install-istio]: /integrations/flow-control/envoy/istio.md
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md

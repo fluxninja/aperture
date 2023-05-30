@@ -1,6 +1,6 @@
 ---
 title: Flow Label
-sidebar_position: 1
+sidebar_position: 8
 ---
 
 :::info what's a flow?
@@ -194,11 +194,11 @@ For _Classifier_ created labels, you can disable this behavior by setting
 :::
 
 [selectors]: ./selector.md
-[classifier]: ./resources/classifier.md
+[classifier]: ./classifier.md
 [workload]: ./components/load-scheduler.md#workload
 [ratelimiter]: ./components/rate-limiter.md
 [scheduler]: ./components/load-scheduler.md#scheduler
-[flux-meter]: ./resources/flux-meter.md
+[flux-meter]: ./flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces

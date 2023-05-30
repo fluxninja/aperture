@@ -37,8 +37,7 @@ service than guest users. Two alternative methods will be used to provide the
   `subscriber`, since all HTTP headers are directly available as flow labels
   within the scheduler.
 - Guests: To identify guest users, a classification rule will be used that
-  utilizes an
-  [extractor](/concepts/flow-control/resources/classifier.md#extractors) to
+  utilizes an [extractor](/concepts/flow-control/classifier.md#extractors) to
   assign the header value to the `user-type` flow label key. The `user_type`
   label key will then be used in the scheduler to match the request against the
   `guest` value to identify the workload.
@@ -46,7 +45,7 @@ service than guest users. Two alternative methods will be used to provide the
 :::tip
 
 Classification rules can be written for
-[HTTP requests](/concepts/flow-control/resources/classifier.md#live-previewing-requests),
+[HTTP requests](/concepts/flow-control/classifier.md#live-previewing-requests),
 and scheduler priorities can be defined for
 [Flow Labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first using introspection APIs.

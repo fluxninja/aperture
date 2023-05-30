@@ -28,7 +28,7 @@ request's Authorization header and then rate limit unique users based on that
 :::tip
 
 You can write classification rules on
-[HTTP requests](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
+[HTTP requests](/concepts/flow-control/classifier.md#live-previewing-requests)
 and define scheduler priorities on
 [Flow Labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first using introspection APIs.
@@ -110,6 +110,6 @@ any given time, and rejects the rest of the requests.
 
 </Zoom>
 
-[rego-rules]: /concepts/flow-control/resources/classifier.md#rego
+[rego-rules]: /concepts/flow-control/classifier.md#rego
 [flow-label]: /concepts/flow-control/flow-label.md
-[classifier]: /concepts/flow-control/resources/classifier.md
+[classifier]: /concepts/flow-control/classifier.md
