@@ -13,4 +13,8 @@ collected for telemetry.
 import DocCardList from '@theme/DocCardList';
 ```
 
+![Istio](./assets/istio-dark.svg#gh-dark-mode-only)
+
+![Istio](./assets/istio-light.svg#gh-light-mode-only)
+
 <DocCardList />

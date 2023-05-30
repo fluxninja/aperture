@@ -41,7 +41,11 @@ Aperture SDK allows you to manually wrap any function call or code snippet
 inside the service code as a feature control point. Every invocation of the
 feature is a flow from the perspective of Aperture.
 
-## 🧩 Middleware
+![SDK](./assets/sdk-dark.svg#gh-dark-mode-only)
+
+![SDK](./assets/sdk-light.svg#gh-light-mode-only)
+
+### 🧩 Middleware
 
 Aperture includes middleware for the following frameworks, helping to set up
 control points with less code changes:
