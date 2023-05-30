@@ -23,7 +23,7 @@ import java.util.List;
 
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
-    private Duration timeout;
+    private Duration flowTimeout;
     private String host;
     private int port;
     private boolean useHttpsInOtlpExporter = false;
@@ -52,8 +52,8 @@ public final class ApertureSDKBuilder {
      * @param timeout timeout for connection to Aperture Agent.
      * @return the builder object.
      */
-    public ApertureSDKBuilder setDuration(Duration timeout) {
-        this.timeout = timeout;
+    public ApertureSDKBuilder setFlowTimeout(Duration timeout) {
+        this.flowTimeout = timeout;
         return this;
     }
 
@@ -175,9 +175,9 @@ public final class ApertureSDKBuilder {
             OtlpSpanExporterProtocol = "https";
         }
 
-        Duration timeout = this.timeout;
-        if (timeout == null) {
-            timeout = DEFAULT_RPC_TIMEOUT;
+        Duration flowTimeout = this.flowTimeout;
+        if (flowTimeout == null) {
+            flowTimeout = DEFAULT_RPC_TIMEOUT;
         }
 
         ChannelCredentials creds;
@@ -230,7 +230,7 @@ public final class ApertureSDKBuilder {
                 flowControlClient,
                 httpFlowControlClient,
                 tracer,
-                timeout,
+                flowTimeout,
                 ignoredPaths,
                 ignoredPathsMatchRegex);
     }

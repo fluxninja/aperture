@@ -27,7 +27,7 @@ public final class ApertureSDK {
     private final FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub
             httpFlowControlClient;
     private final Tracer tracer;
-    private final Duration timeout;
+    private final Duration flowTimeout;
     private final List<String> ignoredPaths;
     private final boolean ignoredPathsMatchRegex;
 
@@ -35,12 +35,12 @@ public final class ApertureSDK {
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
             FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient,
             Tracer tracer,
-            Duration timeout,
+            Duration flowTimeout,
             List<String> ignoredPaths,
             boolean ignoredPathsMatchRegex) {
         this.flowControlClient = flowControlClient;
         this.tracer = tracer;
-        this.timeout = timeout;
+        this.flowTimeout = flowTimeout;
         this.httpFlowControlClient = httpFlowControlClient;
         this.ignoredPaths = ignoredPaths;
         this.ignoredPathsMatchRegex = ignoredPathsMatchRegex;
@@ -90,12 +90,12 @@ public final class ApertureSDK {
 
         CheckResponse res = null;
         try {
-            if (timeout.isZero()) {
+            if (flowTimeout.isZero()) {
                 res = this.flowControlClient.check(req);
             } else {
                 res =
                         this.flowControlClient
-                                .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
                                 .check(req);
             }
         } catch (StatusRuntimeException e) {
@@ -120,12 +120,12 @@ public final class ApertureSDK {
 
         CheckHTTPResponse res = null;
         try {
-            if (timeout.isZero()) {
+            if (flowTimeout.isZero()) {
                 res = this.httpFlowControlClient.checkHTTP(req);
             } else {
                 res =
                         this.httpFlowControlClient
-                                .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
                                 .checkHTTP(req);
             }
         } catch (StatusRuntimeException e) {

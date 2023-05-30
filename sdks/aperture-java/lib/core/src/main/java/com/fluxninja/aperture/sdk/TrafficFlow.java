@@ -32,11 +32,11 @@ public class TrafficFlow {
     /**
      * Returns 'true' if flow was accepted by Aperture Agent, or if the agent did not respond.
      *
-     * @deprecated This method assumes fail-open behavior. Use {@link #result} instead
+     * @deprecated This method assumes fail-open behavior. Use {@link #getDecision} instead
      * @return Whether the flow was accepted.
      */
     public boolean accepted() {
-        return result() == FlowResult.Unreachable || result() == FlowResult.Accepted;
+        return getDecision() == FlowDecision.Unreachable || getDecision() == FlowDecision.Accepted;
     }
 
     /**
@@ -44,14 +44,14 @@ public class TrafficFlow {
      *
      * @return Result of Check query
      */
-    public FlowResult result() {
+    public FlowDecision getDecision() {
         if (this.checkResponse == null) {
-            return FlowResult.Unreachable;
+            return FlowDecision.Unreachable;
         }
         if (this.checkResponse.getStatus().getCode() == Code.OK_VALUE) {
-            return FlowResult.Accepted;
+            return FlowDecision.Accepted;
         }
-        return FlowResult.Rejected;
+        return FlowDecision.Rejected;
     }
 
     public boolean ignored() {
@@ -68,8 +68,8 @@ public class TrafficFlow {
      *
      * @return HTTP code of rejection reason
      */
-    public int rejectReason() {
-        if (this.result() == FlowResult.Rejected) {
+    public int getRejectionHttpStatusCode() {
+        if (this.getDecision() == FlowDecision.Rejected) {
             if (this.checkResponse().hasDeniedResponse()
                     && this.checkResponse().getDeniedResponse().getStatus() != 0) {
                 return this.checkResponse.getDeniedResponse().getStatus();

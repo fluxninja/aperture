@@ -56,7 +56,7 @@ public class App {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setDuration(Duration.ofMillis(1000))
+                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -91,9 +91,9 @@ public class App {
         // Flow.
         Flow flow = this.apertureSDK.startFlow(this.featureName, labels);
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         // See whether flow was accepted by Aperture Agent.
-        if (flowResult != FlowResult.Rejected) {
+        if (flowDecision != FlowDecision.Rejected) {
             // Simulate work being done
             try {
                 res.status(202);
@@ -110,7 +110,7 @@ public class App {
         } else {
             // Flow has been rejected by Aperture Agent.
             try {
-                res.status(flow.rejectReason());
+                res.status(flow.getRejectionHttpStatusCode());
                 flow.end(FlowStatus.Error);
             } catch (ApertureSDKException e) {
                 e.printStackTrace();
