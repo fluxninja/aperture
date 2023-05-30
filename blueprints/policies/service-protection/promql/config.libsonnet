@@ -12,6 +12,11 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 * @schema (overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`
 * @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters required) Parameters for Adaptive Load Scheduler.
 * @param (policy.service_protection_core.dry_run: bool) Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
+* @schema (auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.
+* @schema (auto_scaling.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
+* @schema (auto_scaling.periodic_decrease.period: string) Period for periodic scale in.
+* @schema (auto_scaling.periodic_decrease.scale_in_percentage: float64) Percentage of replicas to scale in.
+* @schema (auto_scaling.scaling_backend: aperture.spec.v1.AutoScalerScalingBackend required) Scaling backend for the policy.
 */
 
 serviceProtectionDefaults {

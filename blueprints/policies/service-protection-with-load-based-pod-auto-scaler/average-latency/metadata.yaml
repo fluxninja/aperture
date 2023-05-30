@@ -1,6 +1,6 @@
 blueprint:
-  Service Protection Policy with load-based Pod auto-scaler based on feedback of average feature duration or
-  response latency.
+  Service Protection Policy with load-based Pod auto-scaler based on feedback of
+  average feature duration or response latency.
 sources:
-  dashboard: policies/service-protection-with-load-based-pod-auto-scaler/average-latency/dashboard.libsonnet
-  policy: policies/service-protection-with-load-based-pod-auto-scaler/average-latency/policy.libsonnet
+  dashboard: policies/service-protection/average-latency/dashboard.libsonnet
+  policy: policies/service-protection/average-latency/policy.libsonnet
