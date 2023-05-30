@@ -12,7 +12,7 @@ import { Cards } from '@site/src/components/Cards';
 ```
 
 One of the most common and easy ways to integrate Aperture into your application
-is to use a service mesh or API gateways. Aperture supports Envoy, Istio, Nginx
+is to use a service mesh or API gateway. Aperture supports Envoy, Istio, Nginx
 Gateway, and Kong Gateway.
 
 <!-- vale off -->
