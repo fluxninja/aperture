@@ -34,7 +34,7 @@ first.
 Advanced users can learn about designing new policies by following the example
 circuit created in
 
-<!-- [detecting overload](../../use-cases/alerting/detecting-overload.md) tutorial. -->
+[Detecting overload](../../use-cases/alerting/detecting-overload.md) tutorial.
 
 <Zoom>
 
