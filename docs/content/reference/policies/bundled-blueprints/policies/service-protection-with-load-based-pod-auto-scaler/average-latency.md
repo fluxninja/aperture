@@ -62,7 +62,7 @@ used within this blueprint.
 :::info
 
 See tutorials on
-[Load-based Auto Scaling](/applying-policies/auto-scale/load-based-auto-scaling/load-based-auto-scaling.md)
+[Load-based Auto Scaling](/use-cases/auto-scale/load-based-auto-scaling/load-based-auto-scaling.md)
 to see this blueprint in use.
 
 :::
