@@ -1,4 +1,4 @@
-package config
+package otelconfig
 
 import (
 	"crypto/tls"
@@ -12,7 +12,7 @@ import (
 )
 
 // AddAlertsPipeline adds reusable alerts pipeline.
-func AddAlertsPipeline(config *OTelConfig, cfg CommonOTelConfig, extraProcessors ...string) {
+func AddAlertsPipeline(config *Config, cfg CommonOTelConfig, extraProcessors ...string) {
 	config.AddReceiver(otelconsts.ReceiverAlerts, map[string]any{})
 	config.AddProcessor(otelconsts.ProcessorAlertsNamespace, map[string]interface{}{
 		"actions": []map[string]interface{}{
@@ -45,7 +45,7 @@ func AddAlertsPipeline(config *OTelConfig, cfg CommonOTelConfig, extraProcessors
 
 // AddPrometheusRemoteWriteExporter adds Prometheus remote write exporter which
 // writes to controller Prometheus instance.
-func AddPrometheusRemoteWriteExporter(config *OTelConfig, promClient promapi.Client) {
+func AddPrometheusRemoteWriteExporter(config *Config, promClient promapi.Client) {
 	endpoint := promClient.URL("api/v1/write", nil)
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTel. Need to use bare maps instead.
