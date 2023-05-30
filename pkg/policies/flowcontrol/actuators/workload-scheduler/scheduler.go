@@ -337,10 +337,8 @@ func (wsFactory *Factory) NewScheduler(
 // Decide processes a single flow by load scheduler in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (ws *Scheduler) Decide(ctx context.Context,
-	labels map[string]string,
-) *flowcontrolv1.LimiterDecision {
-	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
+func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var matchedWorkloadIndex string
 	// match labels against ws.workloadMultiMatcher
 	mmr := ws.workloadMultiMatcher.Match(multimatcher.Labels(labels))
@@ -353,17 +351,22 @@ func (ws *Scheduler) Decide(ctx context.Context,
 				smallestWorkloadIndex = workloadIndex
 			}
 		}
-		matchedWorkloadProto = mmr.matchedWorkloads[smallestWorkloadIndex]
-		matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
+		matchedWorkload := mmr.matchedWorkloads[smallestWorkloadIndex]
+		matchedWorkloadParametersProto = matchedWorkload.GetParameters()
+		if matchedWorkload.GetName() != "" {
+			matchedWorkloadIndex = matchedWorkload.GetName()
+		} else {
+			matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
+		}
 	} else {
 		// no match, return default workload
-		matchedWorkloadProto = ws.proto.DefaultWorkloadParameters
+		matchedWorkloadParametersProto = ws.proto.DefaultWorkloadParameters
 		matchedWorkloadIndex = metrics.DefaultWorkloadIndex
 	}
 
 	fairnessLabel := "workload:" + matchedWorkloadIndex
 
-	if val, ok := labels[matchedWorkloadProto.FairnessKey]; ok {
+	if val, ok := labels[matchedWorkloadParametersProto.FairnessKey]; ok {
 		fairnessLabel = fairnessLabel + "," + val
 	}
 
@@ -376,8 +379,8 @@ func (ws *Scheduler) Decide(ctx context.Context,
 		tokens = tokensEstimated
 	}
 
-	if matchedWorkloadProto.Tokens != 0 {
-		tokens = matchedWorkloadProto.Tokens
+	if matchedWorkloadParametersProto.Tokens != 0 {
+		tokens = matchedWorkloadParametersProto.Tokens
 	}
 
 	if ws.proto.TokensLabelKey != "" {
@@ -411,7 +414,7 @@ func (ws *Scheduler) Decide(ctx context.Context,
 
 	req := scheduler.Request{
 		FairnessLabel: fairnessLabel,
-		Priority:      uint8(matchedWorkloadProto.Priority),
+		Priority:      uint8(matchedWorkloadParametersProto.Priority),
 		Tokens:        tokens,
 	}
 
@@ -485,7 +488,7 @@ func (ws *Scheduler) Info() (time.Time, int) {
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_Workload_Parameters
+	matchedWorkloads map[int]*policylangv1.Scheduler_Workload
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -499,14 +502,14 @@ type workloadMatcher struct {
 func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
 	// mmr.matchedWorkloads is nil on first match.
 	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload_Parameters)
+		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload)
 	}
-	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetParameters()
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto
 	return mmr
 }
 
 // SanitizeSchedulerProto sanitizes the scheduler proto.
-func SanitizeSchedulerProto(proto *policylangv1.Scheduler) *policylangv1.Scheduler {
+func SanitizeSchedulerProto(proto *policylangv1.Scheduler) (*policylangv1.Scheduler, error) {
 	if proto == nil {
 		p := &policylangv1.Scheduler{}
 		config.SetDefaults(p)
@@ -520,13 +523,26 @@ func SanitizeSchedulerProto(proto *policylangv1.Scheduler) *policylangv1.Schedul
 		proto.DefaultWorkloadParameters = p
 	}
 
+	workloadNames := make(map[string]bool)
+	workloadNames[metrics.DefaultWorkloadIndex] = true
+
 	// Loop through the workloads
-	for _, workloadProto := range proto.Workloads {
+	for workloadIndex, workloadProto := range proto.Workloads {
+		workloadIndexStr := strconv.Itoa(workloadIndex)
+		workloadNames[workloadIndexStr] = true
+		if workloadProto.GetName() != "" {
+			if workloadNames[workloadProto.GetName()] {
+				return nil, fmt.Errorf("duplicate workload name %s at %d", workloadProto.Name, workloadIndex)
+			}
+			workloadNames[workloadProto.Name] = true
+		}
+
 		if workloadProto.GetParameters() == nil {
 			p := &policylangv1.Scheduler_Workload_Parameters{}
 			config.SetDefaults(p)
 			workloadProto.Parameters = p
 		}
 	}
-	return proto
+
+	return proto, nil
 }

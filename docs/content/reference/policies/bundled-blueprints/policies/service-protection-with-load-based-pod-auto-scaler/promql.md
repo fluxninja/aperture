@@ -291,6 +291,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### dashboard.datasource {#dashboard-datasource}
 
 <!-- vale on -->

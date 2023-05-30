@@ -3030,6 +3030,15 @@ definitions:
                 $ref: '#/definitions/Resources'
                 description: Resources (such as Flux Meters, Classifiers) to setup.
         type: object
+    PolicyMetadata:
+        properties:
+            blueprint_name:
+                type: string
+            blueprints_uri:
+                type: string
+            values:
+                type: string
+        type: object
     PolicyWrapper:
         properties:
             common_attributes:
@@ -3038,6 +3047,9 @@ definitions:
             policy:
                 $ref: '#/definitions/Policy'
                 title: Policy
+            policy_metadata:
+                $ref: '#/definitions/PolicyMetadata'
+                title: Policy Metadata
         type: object
     PolicyWrappers:
         properties:
@@ -3751,6 +3763,9 @@ definitions:
                     [flow labels](/concepts/flow-control/flow-label.md).
 
                 x-go-tag-validate: required
+            name:
+                description: Name of the workload.
+                type: string
             parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters associated with flows matching the label matcher.
@@ -4968,6 +4983,8 @@ paths:
                         policy:
                             $ref: '#/definitions/Policy'
                             x-go-tag-validate: required
+                        policy_metadata:
+                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string
@@ -5002,6 +5019,8 @@ paths:
                         policy:
                             $ref: '#/definitions/Policy'
                             x-go-tag-validate: required
+                        policy_metadata:
+                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string

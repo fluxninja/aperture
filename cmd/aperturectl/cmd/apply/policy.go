@@ -16,6 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
@@ -82,7 +83,7 @@ func getPolicies(policyDir string) ([]string, error) {
 		}
 		fileBase := info.Name()[:len(info.Name())-len(filepath.Ext(info.Name()))]
 		if filepath.Ext(info.Name()) == ".yaml" && !strings.HasSuffix(fileBase, "-cr") {
-			_, err := getPolicy(path)
+			_, _, err := getPolicy(path)
 			if err != nil {
 				return err
 			}
@@ -92,12 +93,24 @@ func getPolicies(policyDir string) ([]string, error) {
 	})
 }
 
-func getPolicy(policyFile string) (*languagev1.Policy, error) {
-	_, policy, err := utils.CompilePolicy(policyFile)
+func getPolicy(policyFile string) (*languagev1.Policy, *languagev1.PolicyMetadata, error) {
+	policyBytes, err := os.ReadFile(policyFile)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return policy, nil
+	_, policy, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
+	if err != nil {
+		return nil, nil, err
+	}
+	type content struct {
+		Metadata *languagev1.PolicyMetadata `json:"metadata"`
+	}
+	var c content
+	if err := yaml.Unmarshal(policyBytes, &c); err != nil {
+		return nil, nil, err
+	}
+
+	return policy, c.Metadata, nil
 }
 
 // applyPolicy applies a policy to the cluster.
@@ -105,15 +118,15 @@ func applyPolicy(policyFile string) error {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
-	policy, err := getPolicy(policyFile)
+	policy, metadata, err := getPolicy(policyFile)
 	if err != nil {
 		return err
 	}
 
-	return createAndApplyPolicy(policy, policyName)
+	return createAndApplyPolicy(policyName, policy, metadata)
 }
 
-func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
+func createAndApplyPolicy(name string, policy *languagev1.Policy, metadata *languagev1.PolicyMetadata) error {
 	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return err
@@ -146,11 +159,16 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 		policyCR.Annotations = map[string]string{
 			"fluxninja.com/validate": "true",
 		}
+		if metadata != nil {
+			policyCR.Annotations["fluxninja.com/values"] = metadata.Values
+			policyCR.Annotations["fluxninja.com/blueprints-uri"] = metadata.BlueprintsUri
+			policyCR.Annotations["fluxninja.com/blueprint-name"] = metadata.BlueprintName
+		}
 		err = kubeClient.Create(context.Background(), policyCR)
 		if err != nil {
 			if apimeta.IsNoMatchError(err) {
 				var isUpdated bool
-				isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
+				isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy, metadata)
 				if !isUpdated {
 					return updatePolicyUsingAPIErr
 				}
@@ -164,7 +182,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 					log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
 					return nil
 				}
-				updatePolicyCRErr := updatePolicyCR(name, policyCR, kubeClient)
+				updatePolicyCRErr := updatePolicyCR(name, policyCR, metadata, kubeClient)
 				if updatePolicyCRErr != nil {
 					return updatePolicyCRErr
 				}
@@ -174,7 +192,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 		}
 
 	} else {
-		isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
+		isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy, metadata)
 		if !isUpdated {
 			return updatePolicyUsingAPIErr
 		}
@@ -185,10 +203,11 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 }
 
 // updatePolicyUsingAPI updates the policy using the API.
-func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) {
+func updatePolicyUsingAPI(name string, policy *languagev1.Policy, metadata *languagev1.PolicyMetadata) (bool, error) {
 	request := languagev1.UpsertPolicyRequest{
-		PolicyName: name,
-		Policy:     policy,
+		PolicyName:     name,
+		Policy:         policy,
+		PolicyMetadata: metadata,
 	}
 	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
@@ -219,7 +238,7 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) 
 }
 
 // updatePolicyCR updates the policy CR.
-func updatePolicyCR(name string, policy *policyv1alpha1.Policy, kubeClient k8sclient.Client) error {
+func updatePolicyCR(name string, policy *policyv1alpha1.Policy, metadata *languagev1.PolicyMetadata, kubeClient k8sclient.Client) error {
 	existingPolicy := &policyv1alpha1.Policy{}
 	err := kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: controllerNs}, existingPolicy)
 	if err != nil {
@@ -231,10 +250,15 @@ func updatePolicyCR(name string, policy *policyv1alpha1.Policy, kubeClient k8scl
 		existingPolicy.Annotations = map[string]string{}
 	}
 	existingPolicy.Annotations["fluxninja.com/validate"] = "true"
+	if metadata != nil {
+		existingPolicy.Annotations["fluxninja.com/values"] = metadata.Values
+		existingPolicy.Annotations["fluxninja.com/blueprints-uri"] = metadata.BlueprintsUri
+		existingPolicy.Annotations["fluxninja.com/blueprint-name"] = metadata.BlueprintName
+	}
 
 	err = kubeClient.Update(context.Background(), existingPolicy)
 	if err != nil && apierrors.IsConflict(err) {
-		return updatePolicyCR(name, policy, kubeClient)
+		return updatePolicyCR(name, policy, metadata, kubeClient)
 	}
 	return err
 }

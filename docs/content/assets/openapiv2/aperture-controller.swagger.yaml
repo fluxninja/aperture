@@ -164,6 +164,8 @@ paths:
             policy:
               x-go-tag-validate: required
               $ref: '#/definitions/Policy'
+            policy_metadata:
+              $ref: '#/definitions/PolicyMetadata'
             update_mask:
               description: The paths to update.
               type: string
@@ -197,6 +199,8 @@ paths:
             policy:
               x-go-tag-validate: required
               $ref: '#/definitions/Policy'
+            policy_metadata:
+              $ref: '#/definitions/PolicyMetadata'
             update_mask:
               description: The paths to update.
               type: string
@@ -3348,6 +3352,9 @@ definitions:
 
         x-go-tag-validate: required
         $ref: '#/definitions/LabelMatcher'
+      name:
+        description: Name of the workload.
+        type: string
       parameters:
         description: Parameters associated with flows matching the label matcher.
         $ref: '#/definitions/SchedulerWorkloadParameters'

@@ -68,7 +68,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Configuration for the Grafana dashboard accompanying this policy.'
     type='Object (policies/feature-rollout/base:param:dashboard)'
     reference='../../../bundled-blueprints/policies/feature-rollout/base#dashboard'
-    value='{"datasource": {"filter_regex": "", "name": "$datasource"}, "refresh_interval": "5s", "time_from": "now-15m", "time_to": "now"}'
+    value='{"datasource": {"filter_regex": "", "name": "$datasource"}, "extra_filters": {}, "refresh_interval": "5s", "time_from": "now-15m", "time_to": "now"}'
 />
 
 <!-- vale on -->

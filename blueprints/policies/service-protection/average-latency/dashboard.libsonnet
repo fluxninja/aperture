@@ -1,3 +1,4 @@
+local utils = import '../../policy-utils.libsonnet';
 local baseDashboardFn = import '../base/dashboard.libsonnet';
 local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
@@ -9,6 +10,7 @@ function(cfg) {
   local params = config + cfg,
   local policyName = params.policy.policy_name,
   local variantName = params.dashboard.variant_name,
+  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { flux_meter_name: policyName, flow_status: 'OK' }),
 
   local baseDashboard = baseDashboardFn(params),
 
@@ -21,9 +23,9 @@ function(cfg) {
     ).addTarget(
       prometheus.target(
         expr=|||
-          sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
-          / sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
-        ||| % { policy_name: policyName },
+          sum(increase(flux_meter_sum{%(filters)s}[$__rate_interval]))
+          / sum(increase(flux_meter_count{%(filters)s}[$__rate_interval]))
+        ||| % { filters: filters },
         intervalFactor=1,
       )
     ),

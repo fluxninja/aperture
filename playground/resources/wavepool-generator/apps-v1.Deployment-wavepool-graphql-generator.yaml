@@ -13,6 +13,8 @@ spec:
       labels:
         app.kubernetes.io/component: wavepool-generator
         sidecar.istio.io/inject: "false"
+      annotations:
+        prometheus.io/scrape: "false"
     spec:
       containers:
         - args:

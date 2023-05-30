@@ -2,7 +2,8 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-uri: local
+    fluxninja.com/blueprint-name: policies/service-protection/average-latency
+    fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
       [{"control_point": "ingress", "service": "controller-prometheus-server.aperture-controller.svc.cluster.local"}]}},
       "policy_name": "prometheus-workload-prioritization", "resources": {"flow_control":

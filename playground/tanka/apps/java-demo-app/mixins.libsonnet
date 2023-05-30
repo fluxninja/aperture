@@ -10,6 +10,10 @@ local application = {
   },
   values:: {
     replicaCount: 2,
+    podAnnotations: {
+      'prometheus.io/scrape': 'true',
+      'prometheus.io/port': '8087',
+    },
   },
   service1:
     helm.template('service1', 'charts/java-demo-app', {
