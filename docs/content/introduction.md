@@ -33,7 +33,11 @@ import Zoom from 'react-medium-image-zoom';
 import { Cards } from '@site/src/components/Cards';
 ```
 
+<!-- vale off -->
+
 ## What is Aperture?
+
+<!-- vale on -->
 
 The [FluxNinja Aperture](https://github.com/fluxninja/aperture) project, an open
 source Intelligent Load Management platform that seamlessly integrates into any
@@ -149,8 +153,6 @@ policy's operational capability.
 
 ```
 
-<!-- vale off -->
-
 For a deeper understanding of how Aperture interacts with applications and its
 various integral components, explore the
 [Architecture](/architecture/architecture.md) section.
@@ -165,7 +167,7 @@ various integral components, explore the
 
 ## 📖 Learn
 
-The Concepts section provides detailed insights into essential elements of
+The Concept's section provides detailed insights into essential elements of
 Aperture and Aperture policies, offering a comprehensive understanding of their
 key components.
 
@@ -177,11 +179,7 @@ key components.
 ]}/>
 ```
 
-<!-- vale off -->
-
 ## Additional Support
-
-<!-- vale on -->
 
 Navigating Aperture's capabilities might bring up questions, and we understand
 that. Don't hesitate to engage with us for any queries or clarifications. We are
