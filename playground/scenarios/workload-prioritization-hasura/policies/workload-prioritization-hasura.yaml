@@ -1,9 +1,9 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
-# Generated values file for policies/service-protection/average-latency blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/promql/gen/definitions.json
 policy:
   policy_name: workload-prioritization-hasura
+  promql_query: 'pg_db_queries_per_second{db="hasura"}'
+  setpoint: 3500
+  evaluation_interval: "1s"
   resources:
     flow_control:
       classifiers:
@@ -33,15 +33,7 @@ policy:
                 tls:
                   insecure_skip_verify: true
   service_protection_core:
-    dry_run: false
     adaptive_load_scheduler:
-      alerter:
-        alert_name: "Load Throttling Event"
-      gradient:
-        max_gradient: 1
-        min_gradient: 0.1
-        slope: -1
-      load_multiplier_linear_increment: 0.0025
       load_scheduler:
         selectors:
           - control_point: ingress
@@ -60,21 +52,3 @@ policy:
               parameters:
                 priority: 50
               name: "agent-service"
-  latency_baseliner:
-    ema:
-      correction_factor_on_max_envelope_violation: 0.95
-      ema_window: "1500s"
-      warmup_window: "120s"
-    # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
-    # Type: float64
-    latency_tolerance_multiplier: 1.1
-    # Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
-    # Type: float64
-    latency_ema_limit_multiplier: 2
-    flux_meter:
-      selectors:
-        - control_point: ingress
-          service: hasura.cloud.svc.cluster.local
-          label_matcher:
-            match_labels:
-              operation: "mutation"

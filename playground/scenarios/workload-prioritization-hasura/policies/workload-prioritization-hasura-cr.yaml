@@ -2,30 +2,24 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-name: policies/service-protection/average-latency
+    fluxninja.com/blueprint-name: policies/service-protection/promql
     fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"latency_baseliner": {"ema": {"correction_factor_on_max_envelope_violation":
-      0.94999999999999996, "ema_window": "1500s", "warmup_window": "120s"}, "flux_meter":
-      {"selectors": [{"control_point": "ingress", "label_matcher": {"match_labels":
-      {"operation": "mutation"}}, "service": "hasura.cloud.svc.cluster.local"}]},
-      "latency_ema_limit_multiplier": 2, "latency_tolerance_multiplier": 1.1000000000000001},
-      "policy_name": "workload-prioritization-hasura", "resources": {"flow_control":
-      {"classifiers": [{"rego": {"labels": {"operation": {"telemetry": true}, "source":
-      {"telemetry": true}}, "module": "package hasura_example\nsource = input.attributes.source.source_fqdns[0]\noperation
-      = graphql.parse_query(input.parsed_body.query).Operations[_].Operation\n"},
+    fluxninja.com/values: '{"policy": {"evaluation_interval": "1s", "policy_name":
+      "workload-prioritization-hasura", "promql_query": "pg_db_queries_per_second{db=\"hasura\"}",
+      "resources": {"flow_control": {"classifiers": [{"rego": {"labels": {"operation":
+      {"telemetry": true}, "source": {"telemetry": true}}, "module": "package hasura_example\nsource
+      = input.attributes.source.source_fqdns[0]\noperation = graphql.parse_query(input.parsed_body.query).Operations[_].Operation\n"},
       "selectors": [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}]},
       "telemetry_collectors": [{"agent_group": "default", "infra_meters": {"prometheus_simple":
       {"per_agent_group": true, "receivers": {"prometheus_simple": {"collection_interval":
       "1s", "endpoint": "hasura-postgresql-metrics.cloud.svc.cluster.local:9187",
       "tls": {"insecure_skip_verify": true}, "use_service_account": true}}}}}]}, "service_protection_core":
-      {"adaptive_load_scheduler": {"alerter": {"alert_name": "Load Throttling Event"},
-      "gradient": {"max_gradient": 1, "min_gradient": 0.10000000000000001, "slope":
-      -1}, "load_multiplier_linear_increment": 0.0025000000000000001, "load_scheduler":
-      {"scheduler": {"workloads": [{"label_matcher": {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}},
-      "name": "api-service", "parameters": {"priority": 200}}, {"label_matcher": {"match_labels":
+      {"adaptive_load_scheduler": {"load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
+      {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}}, "name":
+      "api-service", "parameters": {"priority": 200}}, {"label_matcher": {"match_labels":
       {"source": "agent-service.cloud.svc.cluster.local"}}, "name": "agent-service",
       "parameters": {"priority": 50}}]}, "selectors": [{"control_point": "ingress",
-      "service": "hasura.cloud.svc.cluster.local"}]}}, "dry_run": false}}}'
+      "service": "hasura.cloud.svc.cluster.local"}]}}}, "setpoint": 3500}}'
   labels:
     fluxninja.com/validate: "true"
   name: workload-prioritization-hasura
@@ -82,40 +76,10 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization-hasura"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="workload-prioritization-hasura"}[5s]))
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL
-          rhs:
-            constant_signal:
-              value: 2
-        operator: mul
-        out_ports:
-          output:
-            signal_name: MAX_EMA
-    - ema:
-        in_ports:
-          input:
-            signal_name: SIGNAL
-          max_envelope:
-            signal_name: MAX_EMA
-        out_ports:
-          output:
-            signal_name: SIGNAL_EMA
-        parameters:
-          correction_factor_on_max_envelope_violation: 0.95
-          ema_window: 1500s
-          warmup_window: 120s
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL_EMA
-          rhs:
-            constant_signal:
-              value: 1.1
-        operator: mul
+          query_string: pg_db_queries_per_second{db="hasura"}
+    - variable:
+        constant_output:
+          value: 3500
         out_ports:
           output:
             signal_name: SETPOINT
@@ -136,14 +100,6 @@ spec:
         selectors:
         - control_point: ingress
           service: hasura.cloud.svc.cluster.local
-      flux_meters:
-        workload-prioritization-hasura:
-          selectors:
-          - control_point: ingress
-            label_matcher:
-              match_labels:
-                operation: mutation
-            service: hasura.cloud.svc.cluster.local
     telemetry_collectors:
     - agent_group: default
       infra_meters:
