@@ -8,7 +8,7 @@ import (
 	"go.uber.org/multierr"
 	"sigs.k8s.io/yaml"
 
-	syncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdnotifier "github.com/fluxninja/aperture/v2/pkg/etcd/notifier"
@@ -122,13 +122,13 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage := &syncv1.PolicyWrapper{}
-			unmarshalErr := yaml.Unmarshal(bytes, policyMessage)
+			policyMessage := &policylangv1.Policy{}
+			unmarshalErr := config.UnmarshalYAML(bytes, policyMessage)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
 			}
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.GetPolicy(), string(key), policyMessage.GetPolicyMetadata())
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr
