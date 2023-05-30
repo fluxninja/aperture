@@ -89,6 +89,7 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 	if err != nil {
 		return nil, nil, err
 	}
+	// TODO: this is a hack to make unmarshal work. We should configure unmarshaller to not fail on unknown fields.
 	delete(yamlRaw, "metadata")
 	yamlSrc, err = yaml.Marshal(yamlRaw)
 	if err != nil {

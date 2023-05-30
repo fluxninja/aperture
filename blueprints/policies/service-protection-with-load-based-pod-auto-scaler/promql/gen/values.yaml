@@ -105,6 +105,9 @@ dashboard:
   # To time of dashboard.
   # Type: string
   time_to: "now"
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters:
   datasource:
     # Datasource name.
     # Type: string

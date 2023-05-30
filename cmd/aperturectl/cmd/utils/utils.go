@@ -115,11 +115,7 @@ func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string, de
 }
 
 // CompilePolicy compiles the policy and returns the circuit.
-func CompilePolicy(path string) (*circuitfactory.Circuit, *languagev1.Policy, error) {
-	yamlFile, err := os.ReadFile(path)
-	if err != nil {
-		return nil, nil, err
-	}
+func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *languagev1.Policy, error) {
 	ctx := context.Background()
 
 	// FIXME This ValidateAndCompile function validates the policy as a whole –
@@ -127,7 +123,7 @@ func CompilePolicy(path string) (*circuitfactory.Circuit, *languagev1.Policy, er
 	// command is called "circuit-compiler" though, so it is bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
-	circuit, policy, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
+	circuit, policy, err := controlplane.ValidateAndCompile(ctx, name, policyBytes)
 	if err != nil {
 		return nil, nil, err
 	}

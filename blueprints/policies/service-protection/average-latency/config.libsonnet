@@ -13,14 +13,6 @@ local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 * @param (policy.service_protection_core.dry_run: bool) Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
 */
 
-/**
-* @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
-* @param (dashboard.time_from: string) From time of dashboard.
-* @param (dashboard.time_to: string) To time of dashboard.
-* @param (dashboard.datasource.name: string) Datasource name.
-* @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
-*/
-
 serviceProtectionDefaults {
   policy+: {
     latency_baseliner: {
@@ -49,11 +41,13 @@ serviceProtectionDefaults {
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
   * @param (dashboard.time_from: string) Time from of dashboard.
   * @param (dashboard.time_to: string) Time to of dashboard.
+  * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
   */
   dashboard: {
     refresh_interval: '15s',
     time_from: 'now-15m',
     time_to: 'now',
+    extra_filters: {},
     /**
     * @param (dashboard.datasource.name: string) Datasource name.
     * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.

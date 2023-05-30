@@ -20,9 +20,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/yaml"
 
+	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	syncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
@@ -205,7 +209,27 @@ func (w *watcher) updateStatus(ctx context.Context, instance *policyv1alpha1.Pol
 
 // reconcilePolicy sends a write event to notifier to get it uploaded on the Etcd.
 func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
-	w.WriteEvent(notifiers.Key(instance.GetName()), instance.Spec.Raw)
+	policySpec := &languagev1.Policy{}
+	unmarshalErr := config.UnmarshalYAML(instance.Spec.Raw, policySpec)
+	if unmarshalErr != nil {
+		log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
+		return unmarshalErr
+	}
+
+	annotations := instance.GetObjectMeta().GetAnnotations()
+	policyMessage := &syncv1.PolicyWrapper{
+		Policy: policySpec,
+		PolicyMetadata: &languagev1.PolicyMetadata{
+			Values:        annotations["fluxninja.com/values"],
+			BlueprintsUri: annotations["fluxninja.com/blueprints-uri"],
+			BlueprintName: annotations["fluxninja.com/blueprint-name"],
+		},
+	}
+	bytes, err := yaml.Marshal(policyMessage)
+	if err != nil {
+		return err
+	}
+	w.WriteEvent(notifiers.Key(instance.GetName()), bytes)
 	w.policyDynamicConfigTrackers.WriteEvent(notifiers.Key(instance.GetName()), instance.DynamicConfig.Raw)
 
 	w.recorder.Eventf(instance, corev1.EventTypeWarning, "UploadSuccessful", "Uploaded policy to trackers.")

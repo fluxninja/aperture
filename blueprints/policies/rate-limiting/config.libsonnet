@@ -35,9 +35,11 @@
   },
   /**
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+  * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
   */
   dashboard: {
     refresh_interval: '10s',
+    extra_filters: {},
     /**
     * @param (dashboard.datasource.name: string) Datasource name.
     * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.

@@ -1,3 +1,4 @@
+local utils = import '../../policy-utils.libsonnet';
 local config = import './config-defaults.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
@@ -21,31 +22,38 @@ local newGraphPanel(title, datasource, query, axisLabel='', unit='') =
     )
   );
 
-local signalAveragePanel(title, datasource, signalName, policyName) =
+local signalAveragePanel(title, datasource, filtersDict) =
+  local filters = utils.dictToPrometheusFilter(filtersDict);
   local query = |||
-    increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="%(signal_name)s"}[$__rate_interval])
+    increase(signal_reading_sum{%(filters)s}[$__rate_interval])
     /
-    increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="%(signal_name)s"}[$__rate_interval])
-  ||| % { policy_name: policyName, signal_name: signalName };
+    increase(signal_reading_count{%(filters)s}[$__rate_interval])
+  ||| % { filters: filters };
   newGraphPanel(title, datasource, query);
 
-local signalFrequencyPanel(title, datasource, signalName, policyName) =
+local signalFrequencyPanel(title, datasource, filtersDict) =
+  local filters = utils.dictToPrometheusFilter(filtersDict);
   local query = |||
-    avg by (valid) (rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="%(signal_name)s"}[$__rate_interval]))
-  ||| % { policy_name: policyName, signal_name: signalName };
+    avg by (valid) (rate(signal_reading_count{%(filters)s}[$__rate_interval]))
+  ||| % { filters: filters };
   newGraphPanel(title, datasource, query);
 
-local dashboardWithPanels(dashboardParams, policyName) =
+local dashboardWithPanels(dashboardParams, policyName, extra_filters) =
   local datasource = dashboardParams.datasource;
   local dsName = datasource.name;
 
-  local actualScaleAverage = signalAveragePanel('Actual Scale Average', dsName, 'ACTUAL_SCALE', policyName);
-  local configuredScaleAverage = signalAveragePanel('Configured Scale Average', dsName, 'CONFIGURED_SCALE', policyName);
-  local desiredScaleAverage = signalAveragePanel('Desired Scale Average', dsName, 'DESIRED_SCALE', policyName);
+  local baseFilters = extra_filters { policy_name: policyName };
+  local actualScaleFilters = baseFilters { signal_name: 'ACTUAL_SCALE' };
+  local configuredScaleFilters = baseFilters { signal_name: 'CONFIGURED_SCALE' };
+  local desiredScaleFilters = baseFilters { signal_name: 'DESIRED_SCALE' };
 
-  local actualScaleFrequency = signalFrequencyPanel('Actual Scale Validity (Frequency)', dsName, 'ACTUAL_SCALE', policyName);
-  local configuredScaleFrequency = signalFrequencyPanel('Configured Scale Validity (Frequency)', dsName, 'CONFIGURED_SCALE', policyName);
-  local desiredScaleFrequency = signalFrequencyPanel('Desired Scale Validity (Frequency)', dsName, 'DESIRED_SCALE', policyName);
+  local actualScaleAverage = signalAveragePanel('Actual Scale Average', dsName, actualScaleFilters);
+  local configuredScaleAverage = signalAveragePanel('Configured Scale Average', dsName, configuredScaleFilters);
+  local desiredScaleAverage = signalAveragePanel('Desired Scale Average', dsName, desiredScaleFilters);
+
+  local actualScaleFrequency = signalFrequencyPanel('Actual Scale Validity (Frequency)', dsName, actualScaleFilters);
+  local configuredScaleFrequency = signalFrequencyPanel('Configured Scale Validity (Frequency)', dsName, configuredScaleFilters);
+  local desiredScaleFrequency = signalFrequencyPanel('Desired Scale Validity (Frequency)', dsName, desiredScaleFilters);
 
   dashboard.new(
     title='Aperture Auto-scale',
@@ -83,7 +91,7 @@ function(cfg) {
   local params = config + cfg,
   local policyName = params.policy.policy_name,
 
-  local dashboardDef = dashboardWithPanels(params.dashboard, policyName),
+  local dashboardDef = dashboardWithPanels(params.dashboard, policyName, params.dashboard.extra_filters),
 
   dashboard: dashboardDef,
 }

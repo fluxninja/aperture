@@ -66,6 +66,7 @@ func (v *Variable) DynamicConfigUpdate(event notifiers.Event, unmarshaller confi
 	// read dynamic config
 	if !unmarshaller.IsSet(key) {
 		v.constantOutput = runtime.ConstantSignalFromProto(v.variableProto.GetConstantOutput())
+		return
 	}
 	constantSignalProto := &policylangv1.ConstantSignal{}
 	if err := unmarshaller.UnmarshalKey(key, constantSignalProto); err != nil {

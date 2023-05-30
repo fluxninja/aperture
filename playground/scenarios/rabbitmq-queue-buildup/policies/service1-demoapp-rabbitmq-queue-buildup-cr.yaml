@@ -2,7 +2,8 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-uri: local
+    fluxninja.com/blueprint-name: policies/service-protection/promql
+    fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"policy_name": "service1-demoapp-rabbitmq-queue-buildup",
       "promql_query": "sum(rabbitmq_message_current{rabbitmq_queue_name=\"service3-demo-app.demoapp.svc.cluster.local\",state=\"ready\"})",
       "resources": {"telemetry_collectors": [{"agent_group": "default", "infra_meters":

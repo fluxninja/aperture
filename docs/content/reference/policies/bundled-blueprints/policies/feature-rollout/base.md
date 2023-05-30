@@ -20,7 +20,7 @@ component that is used within this blueprint.
 :::info
 
 See the tutorial on
-[Feature Rollout with Average Latency Feedback](/applying-policies/feature-rollout/with-average-latency-feedback.md)
+[Feature Rollout with Average Latency Feedback](/use-cases/feature-rollout/with-average-latency-feedback.md)
 to see this blueprint in use.
 
 :::
@@ -103,6 +103,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     type='string'
     reference=''
     value='"now"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
 />
 
 <!-- vale on -->

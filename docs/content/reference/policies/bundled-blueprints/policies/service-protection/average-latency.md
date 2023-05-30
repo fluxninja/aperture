@@ -48,9 +48,9 @@ component that is used within this blueprint.
 :::info
 
 See tutorials on
-[Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
+[Basic Service Protection](/use-cases/service-protection/basic-service-protection.md)
 and
-[Workload Prioritization](/applying-policies/service-protection/workload-prioritization.md)
+[Workload Prioritization](/use-cases/service-protection/workload-prioritization.md)
 to see this blueprint in use.
 
 :::
@@ -273,7 +273,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='dashboard.time_from'
-    description='From time of dashboard.'
+    description='Time from of dashboard.'
     type='string'
     reference=''
     value='"now-15m"'
@@ -287,10 +287,24 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='dashboard.time_to'
-    description='To time of dashboard.'
+    description='Time to of dashboard.'
     type='string'
     reference=''
     value='"now"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
 />
 
 <!-- vale on -->

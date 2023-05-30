@@ -1,4 +1,4 @@
-package config_test
+package otelconfig_test
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("Config", func() {
 	It("Adds extensions properly", func() {
-		otelConfig := otelconfig.NewOTelConfig()
+		otelConfig := otelconfig.New()
 		otelConfig.AddExtension("foo", map[string]interface{}{"bar": "baz"})
 		otelConfig.AddExtension("empty", map[string]interface{}{})
 		marshalledConfig, err := json.Marshal(otelConfig)

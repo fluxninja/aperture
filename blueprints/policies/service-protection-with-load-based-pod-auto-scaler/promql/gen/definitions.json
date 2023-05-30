@@ -180,6 +180,12 @@
           "default": "now",
           "type": "string"
         },
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
         "datasource": {
           "type": "object",
           "additionalProperties": false,

@@ -38,11 +38,13 @@ autoScalingDefaults {
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
   * @param (dashboard.time_from: string) Time from of dashboard.
   * @param (dashboard.time_to: string) Time to of dashboard.
+  * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
   */
   dashboard+: {
     refresh_interval: '15s',
     time_from: 'now-15m',
     time_to: 'now',
+    extra_filters: {},
     /**
     * @param (dashboard.datasource.name: string) Datasource name.
     * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.

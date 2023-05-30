@@ -2,7 +2,8 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-uri: local
+    fluxninja.com/blueprint-name: policies/quota-scheduler
+    fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"policy_name": "quota-scheduler", "quota_scheduler":
       {"bucket_capacity": 500, "fill_amount": 25, "rate_limiter": {"interval": "1s",
       "label_key": "http.request.header.api_key", "lazy_sync": {"enabled": false,
