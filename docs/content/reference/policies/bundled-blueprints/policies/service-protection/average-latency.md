@@ -185,6 +185,88 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+##### policy.auto_scaling {#policy-auto-scaling}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-dry-run"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.dry_run'
+    description='Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.'
+    type='Boolean'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-scaling-parameters"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.scaling_parameters'
+    description='Parameters that define the scaling behavior.'
+    type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
+    reference='../../../spec#auto-scaler-scaling-parameters'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-scaling-backend"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.scaling_backend'
+    description='Scaling backend for the policy.'
+    type='Object (aperture.spec.v1.AutoScalerScalingBackend)'
+    reference='../../../spec#auto-scaler-scaling-backend'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### policy.auto_scaling.periodic_decrease {#policy-auto-scaling-periodic-decrease}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-periodic-decrease-period"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.periodic_decrease.period'
+    description='Period for periodic scale in.'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-periodic-decrease-scale-in-percentage"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.periodic_decrease.scale_in_percentage'
+    description='Percentage of replicas to scale in.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### policy.latency_baseliner {#policy-latency-baseliner}
 
 <!-- vale on -->

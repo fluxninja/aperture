@@ -95,6 +95,46 @@
             }
           }
         },
+        "auto_scaling": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "description": "Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.",
+              "default": null,
+              "type": "boolean"
+            },
+            "scaling_parameters": {
+              "description": "Parameters that define the scaling behavior.",
+              "default": null,
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
+            },
+            "periodic_decrease": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "period": {
+                  "description": "Period for periodic scale in.",
+                  "default": null,
+                  "type": "string"
+                },
+                "scale_in_percentage": {
+                  "description": "Percentage of replicas to scale in.",
+                  "default": null,
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "scaling_backend": {
+              "description": "Scaling backend for the policy.",
+              "default": null,
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackend"
+            }
+          }
+        },
         "latency_baseliner": {
           "type": "object",
           "additionalProperties": false,

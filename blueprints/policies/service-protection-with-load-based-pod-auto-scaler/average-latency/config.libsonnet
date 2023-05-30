@@ -1,5 +1,5 @@
-local baseServiceProtectionDefaults = import '../../auto-scaling/base/config-defaults.libsonnet';
 local averageLatencyServiceProtection = import '../../service-protection/average-latency/config.libsonnet';
+local baseServiceProtectionDefaults = import '../../service-protection/base/config-defaults.libsonnet';
 
 averageLatencyServiceProtection {
   /**

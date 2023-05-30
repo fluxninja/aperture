@@ -128,16 +128,7 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
 
 {
   /**
-  * @param (policy.policy_name: string required) Name of the policy.
-  * @param (policy.load_ramp: aperture.spec.v1.LoadRampParameters required) Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
-  * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
-  * @param (policy.resources: aperture.spec.v1.Resources) List of additional resources.
-  * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
-  * @param (policy.drivers.promql_drivers: []promql_driver) List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.
-  * @param (policy.drivers.average_latency_drivers: []average_latency_driver) List of drivers that compare average latency against forward, backward and reset thresholds.
-  * @param (policy.drivers.percentile_latency_drivers: []percentile_latency_driver) List of drivers that compare percentile latency against forward, backward and reset thresholds.
-  * @param (policy.drivers.ema_latency_drivers: []ema_latency_driver) List of drivers that compare trend latency against forward, backward and reset thresholds.
-  * @param (policy.rollout: bool) Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
+  * @param (policy: rollout_policy required) Parameters for the Feature Rollout policy.
   */
   policy: rollout_policy_base_defaults,
   /**
@@ -173,6 +164,19 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   * @schema (ema_latency_driver.ema: aperture.spec.v1.EMAParameters required) The parameters for the exponential moving average.
   */
   ema_latency_driver: ema_latency_driver_defaults,
+  /**
+  * @schema (rollout_policy.policy_name: string required) Name of the policy.
+  * @schema (rollout_policy.load_ramp: aperture.spec.v1.LoadRampParameters required) Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
+  * @schema (rollout_policy.components: []aperture.spec.v1.Component) List of additional circuit components.
+  * @schema (rollout_policy.resources: aperture.spec.v1.Resources) List of additional resources.
+  * @schema (rollout_policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
+  * @schema (rollout_policy.drivers.promql_drivers: []promql_driver) List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.
+  * @schema (rollout_policy.drivers.average_latency_drivers: []average_latency_driver) List of drivers that compare average latency against forward, backward and reset thresholds.
+  * @schema (rollout_policy.drivers.percentile_latency_drivers: []percentile_latency_driver) List of drivers that compare percentile latency against forward, backward and reset thresholds.
+  * @schema (rollout_policy.drivers.ema_latency_drivers: []ema_latency_driver) List of drivers that compare trend latency against forward, backward and reset thresholds.
+  * @schema (rollout_policy.rollout: bool) Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
+  */
+  rollout_policy: rollout_policy_defaults,
   /**
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
   * @param (dashboard.time_from: string) From time of dashboard.

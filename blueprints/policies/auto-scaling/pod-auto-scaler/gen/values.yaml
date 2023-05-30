@@ -12,7 +12,7 @@ policy:
   # Required: True
   promql_scale_out_controllers:
     - alerter:
-        alert_name: "Scale out controller Alerter"
+        alert_name: "A controller intends to scale out"
       gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__
@@ -22,7 +22,7 @@ policy:
   # Required: True
   promql_scale_in_controllers:
     - alerter:
-        alert_name: "Scale in controller Alerter"
+        alert_name: "A controller intends to scale in"
       gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__

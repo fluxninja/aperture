@@ -314,6 +314,90 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 ---
 
+<!-- vale off -->
+
+#### auto_scaling {#auto-scaling}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="auto-scaling-dry-run"></a>
+
+<ParameterDescription
+    name='dry_run'
+    description='Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="auto-scaling-scaling-parameters"></a>
+
+<ParameterDescription
+    name='scaling_parameters'
+    description='Parameters that define the scaling behavior.'
+    type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
+    reference='../../../spec#auto-scaler-scaling-parameters'
+    value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="auto-scaling-scaling-backend"></a>
+
+<ParameterDescription
+    name='scaling_backend'
+    description='Scaling backend for the policy.'
+    type='Object (aperture.spec.v1.AutoScalerScalingBackend)'
+    reference='../../../spec#auto-scaler-scaling-backend'
+    value='{"kubernetes_replicas": {"kubernetes_object_selector": "__REQUIRED_FIELD__", "max_replicas": "__REQUIRED_FIELD__", "min_replicas": "__REQUIRED_FIELD__"}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### periodic_decrease {#auto-scaling-periodic-decrease}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="auto-scaling-periodic-decrease-period"></a>
+
+<ParameterDescription
+    name='period'
+    description='Period for periodic scale in.'
+    type='string'
+    reference=''
+    value='"60s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="auto-scaling-periodic-decrease-scale-in-percentage"></a>
+
+<ParameterDescription
+    name='scale_in_percentage'
+    description='Percentage of replicas to scale in.'
+    type='Number (double)'
+    reference=''
+    value='10'
+/>
+
+<!-- vale on -->
+
+---
+
 ## Dynamic Configuration
 
 :::note

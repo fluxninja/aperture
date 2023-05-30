@@ -97,14 +97,6 @@ function(cfg, metadata={}) {
 
   /** Auto scale escalation **/
 
-  local autoScalingParams = {
-    policy+: params.policy.auto_scaling {
-      policy_name: params.policy.policy_name,
-    },
-  },
-
-  local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingParams).policyDef,
-
   local scaleInControllers =
     (if
        std.objectHas(params.policy, 'auto_scaling') && std.objectHas(params.policy.auto_scaling, 'periodic_decrease')
@@ -160,24 +152,34 @@ function(cfg, metadata={}) {
         ]
         + params.policy.components,
       ),
-    )
-      {
-      circuit+: {
-        components+: std.map(
-          function(component) if std.objectHas(component, 'auto_scale') then
-            component {
-              auto_scale+: {
-                auto_scaler+: {
-                  scale_out_controllers+: scaleOutControllers,
-                  scale_in_controllers+: scaleInControllers,
-                },
-              },
-            }
-          else component,
-          baseAutoScalingPolicy.circuit.components
-        ),
-      },
-    },
+    ) +
+    (
+      if std.objectHas(params.policy, 'auto_scaling') then
+        local autoScalingParams = {
+          policy+: params.policy.auto_scaling {
+            policy_name: params.policy.policy_name,
+          },
+        };
+
+        local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingParams).policyDef;
+        {
+          circuit+: {
+            components+: std.map(
+              function(component) if std.objectHas(component, 'auto_scale') then
+                component {
+                  auto_scale+: {
+                    auto_scaler+: {
+                      scale_out_controllers+: scaleOutControllers,
+                      scale_in_controllers+: scaleInControllers,
+                    },
+                  },
+                }
+              else component,
+              baseAutoScalingPolicy.circuit.components
+            ),
+          },
+        } else {}
+    ),
   local policyResource = {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',

@@ -176,6 +176,61 @@
           "type": "string"
         }
       }
+    },
+    "auto_scaling": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dry_run": {
+          "description": "Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.",
+          "default": false,
+          "type": "boolean"
+        },
+        "scaling_parameters": {
+          "description": "Parameters that define the scaling behavior.",
+          "default": {
+            "scale_in_alerter": {
+              "alert_name": "Auto-scaler is scaling in"
+            },
+            "scale_in_cooldown": "40s",
+            "scale_out_alerter": {
+              "alert_name": "Auto-scaler is scaling out"
+            },
+            "scale_out_cooldown": "30s"
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
+        },
+        "periodic_decrease": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "period": {
+              "description": "Period for periodic scale in.",
+              "default": "60s",
+              "type": "string"
+            },
+            "scale_in_percentage": {
+              "description": "Percentage of replicas to scale in.",
+              "default": 10,
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "scaling_backend": {
+          "description": "Scaling backend for the policy.",
+          "default": {
+            "kubernetes_replicas": {
+              "kubernetes_object_selector": "__REQUIRED_FIELD__",
+              "max_replicas": "__REQUIRED_FIELD__",
+              "min_replicas": "__REQUIRED_FIELD__"
+            }
+          },
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackend"
+        }
+      }
     }
   }
 }
