@@ -399,6 +399,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 	if !found {
 		tokenBucket := scheduler.NewGlobalTokenBucket(label, qs.limiter)
 		s, err := qs.qsFactory.wsFactory.NewScheduler(
+			qs.clock,
 			qs.registry,
 			qs.proto.Scheduler,
 			qs,

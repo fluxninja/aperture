@@ -333,6 +333,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 
 			// Create a new scheduler
 			ls.Scheduler, err = wsFactory.NewScheduler(
+				ls.clock,
 				ls.registry,
 				ls.proto.Parameters.Scheduler,
 				ls,

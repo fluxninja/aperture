@@ -145,7 +145,10 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
-func runLimiters(ctx context.Context, limiters map[iface.Limiter]struct{}, labels map[string]string) (
+func runLimiters(
+	ctx context.Context,
+	limiters map[iface.Limiter]struct{},
+	labels map[string]string) (
 	map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
