@@ -142,7 +142,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(_ context.Context, label string, n
 
 // Take increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // It also returns the wait time at which the tokens will be available.
-func (gtb *GlobalTokenBucket) Take(_ context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
+func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
 	}
@@ -151,9 +151,17 @@ func (gtb *GlobalTokenBucket) Take(_ context.Context, label string, n float64) (
 		return false, 0, 0, 0
 	}
 
+	deadline := time.Time{}
+
+	d, ok := ctx.Deadline()
+	if ok {
+		deadline = d
+	}
+
 	req := takeNRequest{
-		Want:    n,
-		CanWait: true,
+		Want:     n,
+		CanWait:  true,
+		Deadline: deadline,
 	}
 	// encode request
 	reqBytes, err := utils.MarshalGob(req)
@@ -199,8 +207,9 @@ type tokenBucketState struct {
 }
 
 type takeNRequest struct {
-	Want    float64
-	CanWait bool
+	Deadline time.Time
+	Want     float64
+	CanWait  bool
 }
 
 type takeNResponse struct {
@@ -242,12 +251,15 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 
 	if arg.Want > 0 {
 		if state.Available < 0 {
+			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
 				waitTime := time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
 				availableAt := now.Add(waitTime)
 				result.AvailableAt = availableAt
+				if arg.CanWait && !arg.Deadline.IsZero() && availableAt.After(arg.Deadline) {
+					result.Ok = false
+				}
 			}
-			result.Ok = arg.CanWait
 			// return the tokens to the bucket if the request is not ok
 			if !result.Ok {
 				state.Available += arg.Want
