@@ -221,6 +221,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale off -->
 
+<a id="dashboard-title"></a>
+
+<ParameterDescription
+    name='dashboard.title'
+    description='Name of the main dashboard.'
+    type='string'
+    reference=''
+    value='"Aperture Quota Scheduler"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### dashboard.datasource {#dashboard-datasource}
 
 <!-- vale on -->

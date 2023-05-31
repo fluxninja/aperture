@@ -1,0 +1,3 @@
+blueprint: Adaptive-load-scheduler
+sources:
+  dashboard: dashboards/flow-control/adaptive-load-scheduler/dashboard.libsonnet

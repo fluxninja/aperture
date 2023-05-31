@@ -216,6 +216,11 @@
           "type": "object",
           "additionalProperties": true
         },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Service Protection",
+          "type": "string"
+        },
         "datasource": {
           "type": "object",
           "additionalProperties": false,

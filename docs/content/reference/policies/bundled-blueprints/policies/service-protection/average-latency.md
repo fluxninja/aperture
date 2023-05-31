@@ -420,6 +420,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+<a id="dashboard-title"></a>
+
+<ParameterDescription
+    name='dashboard.title'
+    description='Name of the main dashboard.'
+    type='string'
+    reference=''
+    value='"Aperture Service Protection"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### dashboard.datasource {#dashboard-datasource}
 
 <!-- vale on -->

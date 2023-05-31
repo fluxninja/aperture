@@ -93,6 +93,11 @@
           "type": "object",
           "additionalProperties": true
         },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Rate Limiter",
+          "type": "string"
+        },
         "datasource": {
           "type": "object",
           "additionalProperties": false,

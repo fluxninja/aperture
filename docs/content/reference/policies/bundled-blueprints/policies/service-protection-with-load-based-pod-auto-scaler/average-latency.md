@@ -110,7 +110,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='Configuration for the Grafana dashboard accompanying this policy.'
     type='Object (policies/service-protection/average-latency:param:dashboard)'
     reference='../../../bundled-blueprints/policies/service-protection/average-latency#dashboard'
-    value='{"datasource": {"filter_regex": "", "name": "$datasource"}, "extra_filters": {}, "refresh_interval": "15s", "time_from": "now-15m", "time_to": "now", "variant_name": "Average Latency"}'
+    value='{"datasource": {"filter_regex": "", "name": "$datasource"}, "extra_filters": {}, "refresh_interval": "15s", "time_from": "now-15m", "time_to": "now", "title": "Aperture Service Protection", "variant_name": "Average Latency"}'
 />
 
 <!-- vale on -->
