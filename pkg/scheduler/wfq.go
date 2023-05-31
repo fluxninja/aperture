@@ -275,8 +275,10 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request Request,
 			if dl.Sub(sched.clk.Now()) < waitTime {
 				allowed = false
 				returnCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-				defer cancel()
-				go sched.manager.Return(returnCtx, float64(request.Tokens))
+				go func(cancel context.CancelFunc) {
+					defer cancel()
+					sched.manager.Return(returnCtx, float64(request.Tokens))
+				}(cancel)
 			}
 		}
 
@@ -288,9 +290,11 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request Request,
 			case <-ctx.Done():
 				allowed = false
 				returnCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-				defer cancel()
 				// return the tokens
-				go sched.manager.Return(returnCtx, float64(request.Tokens))
+				go func(cancel context.CancelFunc) {
+					defer cancel()
+					sched.manager.Return(returnCtx, float64(request.Tokens))
+				}(cancel)
 			case <-timer.Chan():
 			}
 		}
