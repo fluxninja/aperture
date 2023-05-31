@@ -60,6 +60,8 @@ spec:
               value: "{{ .Values.simplesrv.rejectRatio }}"
             - name: CPU_LOAD
               value: "{{ .Values.simplesrv.cpuLoadPercentage }}"
+            - name: CONCURRENCY
+              value: "{{ .Values.simplesrv.concurrency }}"
             - name: HOSTNAME
               # TODO: Don't hardcode domain
               value: "{{ include "demo-app.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"

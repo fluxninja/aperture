@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-//import java.util.concurrent.Semaphore;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,7 +51,7 @@ public class RequestController {
     private final AtomicInteger ongoingRequests = new AtomicInteger(0);
 
     // Semaphore for limiting concurrent clients
-    //private Semaphore limitClients = new Semaphore(concurrency);
+    private Semaphore limitClients = new Semaphore(concurrency);
     private ApertureFeatureFilter apertureFilter = new ApertureFeatureFilter();
 
     @RequestMapping(value = "/health", method = RequestMethod.GET)
@@ -162,13 +162,13 @@ public class RequestController {
 
     private String processRequest(Subrequest request) {
         // Limit concurrent clients
-        //if (concurrency > 0 && limitClients != null) {
-        //    try {
-        //        limitClients.acquire();
-        //    } catch (InterruptedException e) {
-        //        throw new RuntimeException(e);
-        //    }
-        //}
+        if (concurrency > 0 && limitClients != null) {
+            try {
+                limitClients.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         try {
             ongoingRequests.incrementAndGet();
@@ -179,7 +179,7 @@ public class RequestController {
                     int numCores = Runtime.getRuntime().availableProcessors();
 
                     // Calculate busy wait and sleep durations based on cpuLoad and ongoing requests
-                    double adjustedLoad = (double) latency.toMillis() / 1000 * (double) ongoingRequests.get();
+                    double adjustedLoad = (double) cpuLoad / 100 * (double) ongoingRequests.get();
                     if (adjustedLoad > 100) {
                         adjustedLoad = 100;
                     }
@@ -216,9 +216,9 @@ public class RequestController {
             }
 
             // Release the semaphore
-            //if (limitClients != null) {
-            //    limitClients.release();
-            //}
+            if (limitClients != null) {
+                limitClients.release();
+            }
             return "Success";
         } finally {
             ongoingRequests.decrementAndGet();
@@ -227,8 +227,10 @@ public class RequestController {
 
     private void busyWait(long duration) {
         long startTime = System.currentTimeMillis();
+        List<Object> objects = new ArrayList<>();
         while (System.currentTimeMillis() - startTime < duration) {
-            // Just busy wait
+            // Try to make garbage collector busy
+            objects.add(new Object());
         }
     }
 
