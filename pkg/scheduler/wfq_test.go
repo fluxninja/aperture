@@ -33,7 +33,7 @@ var (
 	tokenBucketAvailableTokensGauge prometheus.Gauge
 )
 
-func getMetrics() *LoadMultiplierTokenBucketMetrics {
+func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 	prometheusRegistry = prometheus.NewRegistry()
 
 	constLabels := make(prometheus.Labels)
@@ -75,11 +75,8 @@ func getMetrics() *LoadMultiplierTokenBucketMetrics {
 		BucketCapacityGauge:  tokenBucketBucketCapacityGauge,
 		AvailableTokensGauge: tokenBucketAvailableTokensGauge,
 	}
-	metrics := &LoadMultiplierTokenBucketMetrics{
-		LMGauge:            tokenBucketLMGauge,
-		TokenBucketMetrics: tbbMetrics,
-	}
-	return metrics
+
+	return tokenBucketLMGauge, tbbMetrics
 }
 
 type flowTracker struct {
@@ -227,14 +224,15 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		{fairnessLabel: "workload5", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
 	}
 	c := clockwork.NewRealClock()
-	startTime := c.Now()
-	manager := NewBasicTokenBucket(startTime, 0, getMetrics().TokenBucketMetrics)
+	_, metrics := getMetrics()
+
+	manager := NewBasicTokenBucket(c, 0, metrics)
 
 	schedMetrics := &WFQMetrics{
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(manager, c, schedMetrics)
+	sched := NewWFQScheduler(manager, schedMetrics)
 
 	b.Logf("iterations: %d", b.N)
 
@@ -259,15 +257,17 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
-	manager := NewLoadMultiplierTokenBucket(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+
+	lmGauge, metrics := getMetrics()
+	manager := NewLoadMultiplierTokenBucket(c, _testSlotCount, _testSlotDuration, lmGauge, metrics)
 	manager.SetContinuousTracking(true)
-	manager.SetLoadMultiplier(startTime, 1.0)
+	manager.SetLoadMultiplier(1.0)
 
 	schedMetrics := &WFQMetrics{
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(manager, c, schedMetrics)
+	sched := NewWFQScheduler(manager, schedMetrics)
 
 	// bootstrap bucket
 	bootstrapTime := time.Second * 1
@@ -321,12 +321,13 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 
 	startTime := c.Now()
 
-	basicBucket := NewBasicTokenBucket(startTime, fillRate, getMetrics().TokenBucketMetrics)
+	_, tbMetrics := getMetrics()
+	basicBucket := NewBasicTokenBucket(c, fillRate, tbMetrics)
 	metrics := &WFQMetrics{
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(basicBucket, c, metrics)
+	sched := NewWFQScheduler(basicBucket, metrics)
 	var wg sync.WaitGroup
 	var acceptedTokenRatio float64
 
@@ -418,7 +419,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		}
 	}
 	stopTime := c.Now()
-	basicBucket.SetFillRate(stopTime, 0)
+	basicBucket.SetFillRate(0)
 	if basicBucket.GetFillRate() != 0 {
 		t.Logf("Fill rate is not 0 after stop\n")
 		t.Fail()
@@ -581,14 +582,15 @@ func TestLoadMultiplierBucket(t *testing.T) {
 	c := clockwork.NewFakeClock()
 	go updateClock(t, c, flows)
 
-	loadMultiplierBucket := NewLoadMultiplierTokenBucket(c.Now(), _testSlotCount, _testSlotDuration, getMetrics())
+	lmGauge, tbMetrics := getMetrics()
+	loadMultiplierBucket := NewLoadMultiplierTokenBucket(c, _testSlotCount, _testSlotDuration, lmGauge, tbMetrics)
 	loadMultiplierBucket.SetContinuousTracking(true)
-	sched := NewWFQScheduler(loadMultiplierBucket, c, schedMetrics)
+	sched := NewWFQScheduler(loadMultiplierBucket, schedMetrics)
 
 	trainAndDeplete := func() {
 		// Running Train and deplete the bucket
 		depleteRunTime := time.Second * 2
-		loadMultiplierBucket.SetLoadMultiplier(c.Now(), 0.0)
+		loadMultiplierBucket.SetLoadMultiplier(0.0)
 		loadMultiplierBucket.SetPassThrough(false)
 
 		runFlows(sched, &wg, flows, depleteRunTime, c)
@@ -597,7 +599,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 
 	runExperiment := func() {
 		// Running Actual Experiment
-		loadMultiplierBucket.SetLoadMultiplier(c.Now(), lm)
+		loadMultiplierBucket.SetLoadMultiplier(lm)
 		flowRunTime := time.Second * 10
 		runFlows(sched, &wg, flows, flowRunTime, c)
 		wg.Wait()
@@ -633,14 +635,14 @@ func TestPanic(t *testing.T) {
 	defer func() { _ = recover() }()
 
 	c := clockwork.NewRealClock()
-	startTime := c.Now()
-	manager := NewLoadMultiplierTokenBucket(startTime, _testSlotCount, _testSlotDuration, getMetrics())
+	lmGauge, tbMetrics := getMetrics()
+	manager := NewLoadMultiplierTokenBucket(c, _testSlotCount, _testSlotDuration, lmGauge, tbMetrics)
 	manager.SetContinuousTracking(true)
-	manager.SetLoadMultiplier(startTime, 0.5)
+	manager.SetLoadMultiplier(0.5)
 	if manager.LoadMultiplier() != 0.5 {
 		t.Logf("LoadMultiplier is not 0.5\n")
 	}
-	manager.SetLoadMultiplier(startTime, -1.5)
+	manager.SetLoadMultiplier(-1.5)
 
 	// If the panic is not thrown, the test will fail.
 	t.Errorf("Expected panic has not been caught")
