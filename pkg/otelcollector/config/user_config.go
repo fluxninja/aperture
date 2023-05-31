@@ -1,5 +1,5 @@
 // +kubebuilder:validation:Optional
-package config
+package otelconfig
 
 import "github.com/fluxninja/aperture/v2/pkg/config"
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
@@ -41,40 +42,27 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTel Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
-	Factories                otelcol.Factories
-	Lifecycle                fx.Lifecycle
-	Shutdowner               fx.Shutdowner
-	Unmarshaller             config.Unmarshaller
-	StatusRegistry           status.Registry
-	BaseConfig               *otelconfig.OTelConfigProvider `name:"base"`
-	TelemetryCollectorConfig *otelconfig.OTelConfigProvider `name:"telemetry-collector" optional:"true"`
-	Logger                   *log.Logger
-	Readiness                *jobs.MultiJob                   `name:"readiness.service"`
-	ExtensionConfigs         []*otelconfig.OTelConfigProvider `group:"extension-config"`
+	Factories      otelcol.Factories
+	Lifecycle      fx.Lifecycle
+	Shutdowner     fx.Shutdowner
+	Unmarshaller   config.Unmarshaller
+	StatusRegistry status.Registry
+	ConfigProvider *otelconfig.Provider
+	Logger         *log.Logger
+	Readiness      *jobs.MultiJob `name:"readiness.service"`
 }
 
 // setup creates and runs a new instance of OTel Collector with the passed configuration.
 func setup(in ConstructorIn) error {
 	var otelService *otelcol.Collector
+	var wg sync.WaitGroup
+	var cancelRun context.CancelFunc // See OnStop why we need this.
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			baseScheme := in.BaseConfig.Scheme()
-			uris := []string{fmt.Sprintf("%v:%v", baseScheme, baseScheme)}
+			scheme := in.ConfigProvider.Scheme()
+			uris := []string{fmt.Sprintf("%v:%v", scheme, scheme)}
 			providers := map[string]confmap.Provider{
-				baseScheme: in.BaseConfig,
-			}
-			for _, extensionConfig := range in.ExtensionConfigs {
-				if extensionConfig == nil {
-					continue
-				}
-				scheme := extensionConfig.Scheme()
-				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = extensionConfig
-			}
-			if in.TelemetryCollectorConfig != nil {
-				tcScheme := in.TelemetryCollectorConfig.Scheme()
-				uris = append(uris, fmt.Sprintf("%v:%v", tcScheme, tcScheme))
-				providers[tcScheme] = in.TelemetryCollectorConfig
+				scheme: in.ConfigProvider,
 			}
 
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
@@ -113,8 +101,12 @@ func setup(in ConstructorIn) error {
 			}
 
 			log.Info().Msg("Starting OTel Collector")
+			var runCtx context.Context
+			runCtx, cancelRun = context.WithCancel(context.Background())
+			wg.Add(1)
 			panichandler.Go(func() {
-				err := otelService.Run(context.Background())
+				defer wg.Done()
+				err := otelService.Run(runCtx)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to run OTel Collector")
 				}
@@ -122,10 +114,27 @@ func setup(in ConstructorIn) error {
 			})
 			return nil
 		},
-		OnStop: func(context.Context) error {
+		OnStop: func(stopCtx context.Context) error {
 			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTel collector stopping"))
 			log.Info().Msg("Stopping OTel Collector")
+
+			var cancelStop context.CancelFunc
+			stopCtx, cancelStop = context.WithCancel(stopCtx)
+			defer cancelStop()
+			go func() {
+				<-stopCtx.Done()
+				// While collector can be stopped by calling Shutdown(), the
+				// context used for actual shutting down is the context passed
+				// to collector.Run(). To make sure shutdown is actually
+				// bounded by given stopCtx, we need this cancel to enforce
+				// stopCtx's deadline.
+				cancelRun()
+			}()
+
 			otelService.Shutdown()
+			// Shutdown only starts the shutdown process, we need to wait for
+			// actual shutdown to finish.
+			wg.Wait()
 			return nil
 		},
 	})
