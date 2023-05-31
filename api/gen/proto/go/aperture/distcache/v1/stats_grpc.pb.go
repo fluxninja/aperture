@@ -12,6 +12,7 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -27,7 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DistCacheServiceClient interface {
-	GetStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Stats, error)
+	GetStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*structpb.Struct, error)
 }
 
 type distCacheServiceClient struct {
@@ -38,8 +39,8 @@ func NewDistCacheServiceClient(cc grpc.ClientConnInterface) DistCacheServiceClie
 	return &distCacheServiceClient{cc}
 }
 
-func (c *distCacheServiceClient) GetStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Stats, error) {
-	out := new(Stats)
+func (c *distCacheServiceClient) GetStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*structpb.Struct, error) {
+	out := new(structpb.Struct)
 	err := c.cc.Invoke(ctx, DistCacheService_GetStats_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -51,14 +52,14 @@ func (c *distCacheServiceClient) GetStats(ctx context.Context, in *emptypb.Empty
 // All implementations should embed UnimplementedDistCacheServiceServer
 // for forward compatibility
 type DistCacheServiceServer interface {
-	GetStats(context.Context, *emptypb.Empty) (*Stats, error)
+	GetStats(context.Context, *emptypb.Empty) (*structpb.Struct, error)
 }
 
 // UnimplementedDistCacheServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedDistCacheServiceServer struct {
 }
 
-func (UnimplementedDistCacheServiceServer) GetStats(context.Context, *emptypb.Empty) (*Stats, error) {
+func (UnimplementedDistCacheServiceServer) GetStats(context.Context, *emptypb.Empty) (*structpb.Struct, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStats not implemented")
 }
 

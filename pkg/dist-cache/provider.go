@@ -153,13 +153,15 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				}
 				utils.Shutdown(in.Shutdowner)
 			})
+
 			// wait for olric to start by waiting on startChan until ctx is canceled
 			select {
 			case <-ctx.Done():
 				return errors.New("olric failed to start")
 			case <-startChan:
 			}
-			_, err = dc.olric.Stats()
+
+			_, err = dc.client.Stats(ctx, "")
 			if err != nil {
 				return err
 			}
@@ -199,10 +201,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 }
 
 // RegisterDistCacheService registers the handler on grpc.Server.
-func RegisterDistCacheService(handler *DistCache,
-	server *grpc.Server,
-	healthsrv *health.Server,
-) error {
+func RegisterDistCacheService(handler *DistCache, server *grpc.Server, healthsrv *health.Server) error {
 	distcachev1.RegisterDistCacheServiceServer(server, handler)
 
 	healthsrv.SetServingStatus("aperture.distcache.v1.DistCacheService", grpc_health_v1.HealthCheckResponse_SERVING)

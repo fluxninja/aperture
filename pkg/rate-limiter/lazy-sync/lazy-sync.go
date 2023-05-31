@@ -5,10 +5,11 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/protobuf/proto"
+
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
-	"google.golang.org/protobuf/proto"
 )
 
 type counter struct {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/buraksezer/olric"
 	"github.com/buraksezer/olric/config"
+	"github.com/moby/locker"
 
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -17,17 +18,19 @@ import (
 const (
 	// TakeNFunction is the name of the function used to take N tokens from the bucket.
 	TakeNFunction = "TakeN"
+	lookupMargin  = 10 * time.Millisecond
 )
 
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
-	dMap           *olric.DMap
+	mu             sync.RWMutex
+	locker         locker.Locker
+	dMap           olric.DMap
 	dc             *distcache.DistCache
 	name           string
 	bucketCapacity float64
 	fillAmount     float64
 	interval       time.Duration
-	mu             sync.RWMutex
 	continuousFill bool
 	passThrough    bool
 }
@@ -78,6 +81,16 @@ func (gtb *GlobalTokenBucket) GetBucketCapacity() float64 {
 	return gtb.bucketCapacity
 }
 
+func isMarginExceeded(ctx context.Context) bool {
+	deadline, deadlineOK := ctx.Deadline()
+	if deadlineOK {
+		// check if deadline will be passed in the next 10ms
+		deadline = deadline.Add(-lookupMargin)
+		return time.Now().After(deadline)
+	}
+	return false
+}
+
 // SetFillAmount sets the default fill amount for the rate limiter.
 func (gtb *GlobalTokenBucket) SetFillAmount(fillAmount float64) {
 	gtb.mu.Lock()
@@ -103,12 +116,16 @@ func (gtb *GlobalTokenBucket) Close() error {
 
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (gtb *GlobalTokenBucket) TakeIfAvailable(_ context.Context, label string, n float64) (bool, float64, float64) {
+func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0
 	}
 
 	if gtb.GetBucketCapacity() == 0 {
+		return false, 0, 0
+	}
+
+	if isMarginExceeded(ctx) {
 		return false, 0, 0
 	}
 
@@ -123,9 +140,9 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(_ context.Context, label string, n
 		return true, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
 		return true, 0, 0
 	}
 
@@ -158,6 +175,10 @@ func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64)
 		deadline = d
 	}
 
+	if isMarginExceeded(ctx) {
+		return false, 0, 0, 0
+	}
+
 	req := takeNRequest{
 		Want:     n,
 		CanWait:  true,
@@ -170,9 +191,9 @@ func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64)
 		return true, 0, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
 		return true, 0, 0, 0
 	}
 
@@ -223,6 +244,14 @@ type takeNResponse struct {
 func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]byte, []byte, error) {
 	gtb.mu.RLock()
 	defer gtb.mu.RUnlock()
+
+	gtb.locker.Lock(key)
+	defer func() {
+		err := gtb.locker.Unlock(key)
+		if err != nil {
+			log.Error().Err(err).Str("key", key).Msg("error unlocking key")
+		}
+	}()
 
 	// Decode currentState from gob encoded currentStateBytes
 	now := time.Now()

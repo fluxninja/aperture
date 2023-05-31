@@ -903,50 +903,6 @@ definitions:
             id:
                 type: string
         type: object
-    DMap:
-        properties:
-            length:
-                format: int64
-                type: string
-            num_tables:
-                format: int64
-                type: string
-            slab_info:
-                $ref: '#/definitions/SlabInfo'
-        type: object
-    DMaps:
-        properties:
-            delete_hits:
-                format: int64
-                type: string
-            delete_misses:
-                format: int64
-                type: string
-            entries_total:
-                format: int64
-                type: string
-            evicted_total:
-                format: int64
-                type: string
-            get_hits:
-                format: int64
-                type: string
-            get_misses:
-                format: int64
-                type: string
-        type: object
-    DTopics:
-        properties:
-            current_listeners:
-                format: int64
-                type: string
-            listeners_total:
-                format: int64
-                type: string
-            published_total:
-                format: int64
-                type: string
-        type: object
     Decider:
         description: |-
             The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
@@ -2671,17 +2627,6 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: Signal with maximum value as an output signal.
         type: object
-    Member:
-        properties:
-            birthdate:
-                format: int64
-                type: string
-            id:
-                format: uint64
-                type: string
-            name:
-                type: string
-        type: object
     Min:
         description: |-
             Takes an array of input signals and emits the signal with the minimum value
@@ -2777,24 +2722,6 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: Ingress signal.
         type: object
-    Network:
-        properties:
-            commands_total:
-                format: int64
-                type: string
-            connections_total:
-                format: int64
-                type: string
-            current_connections:
-                format: int64
-                type: string
-            read_bytes_total:
-                format: int64
-                type: string
-            written_bytes_total:
-                format: int64
-                type: string
-        type: object
     OkHttpResponse:
         description: HTTP attributes for an OK response.
         properties:
@@ -2859,26 +2786,6 @@ definitions:
                 type: string
             service2:
                 type: string
-        type: object
-    Partition:
-        properties:
-            backups:
-                items:
-                    $ref: '#/definitions/Member'
-                    type: object
-                type: array
-            d_maps:
-                additionalProperties:
-                    $ref: '#/definitions/DMap'
-                type: object
-            length:
-                format: int64
-                type: string
-            previous_owners:
-                items:
-                    $ref: '#/definitions/Member'
-                    type: object
-                type: array
         type: object
     PathTemplateMatcher:
         description: |-
@@ -4016,18 +3923,6 @@ definitions:
         required:
             - duration
         type: object
-    SlabInfo:
-        properties:
-            allocated:
-                format: int64
-                type: string
-            garbage:
-                format: int64
-                type: string
-            inuse:
-                format: int64
-                type: string
-        type: object
     SocketAddress:
         properties:
             address:
@@ -4046,42 +3941,6 @@ definitions:
             - TCP
             - UDP
         type: string
-    Stats:
-        properties:
-            backups:
-                additionalProperties:
-                    $ref: '#/definitions/Partition'
-                type: object
-            cluster_coordinator:
-                $ref: '#/definitions/Member'
-            cluster_members:
-                additionalProperties:
-                    $ref: '#/definitions/Member'
-                type: object
-            cmdline:
-                items:
-                    type: string
-                type: array
-            d_maps:
-                $ref: '#/definitions/DMaps'
-            d_topics:
-                $ref: '#/definitions/DTopics'
-            member:
-                $ref: '#/definitions/Member'
-            network:
-                $ref: '#/definitions/Network'
-            partitions:
-                additionalProperties:
-                    $ref: '#/definitions/Partition'
-                type: object
-            release_version:
-                type: string
-            runtime:
-                type: object
-            uptime_seconds:
-                format: int64
-                type: string
-        type: object
     Status:
         description: Status holds details about a status that can be reported to the registry.
         properties:
@@ -4611,7 +4470,7 @@ paths:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/Stats'
+                        type: object
                 default:
                     description: An unexpected error response.
                     schema:

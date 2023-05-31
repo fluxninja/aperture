@@ -44,6 +44,7 @@ require (
 	github.com/looplab/tarjan v0.1.0
 	github.com/mitchellh/copystructure v1.2.0
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/moby/locker v1.0.1
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.4
@@ -239,6 +240,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8 // indirect
 	github.com/ReneKroon/ttlcache/v2 v2.11.0 // indirect
+	github.com/RoaringBitmap/roaring v1.2.1 // indirect
 	github.com/SAP/go-hdb v1.2.1 // indirect
 	github.com/Shopify/sarama v1.38.1 // indirect
 	github.com/Showmax/go-fqdn v1.0.0 // indirect
@@ -266,6 +268,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.11 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/aymanbagabas/go-osc52 v1.2.1 // indirect
+	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.0 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
@@ -282,6 +285,7 @@ require (
 	github.com/danieljoos/wincred v1.1.2 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.2 // indirect
 	github.com/devigned/tab v0.1.1 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dvsekhvalnov/jose2go v1.5.0 // indirect
 	github.com/eapache/go-resiliency v1.3.0 // indirect
@@ -307,6 +311,7 @@ require (
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/go-openapi/validate v0.22.1 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
+	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
@@ -358,6 +363,7 @@ require (
 	github.com/mongodb-forks/digest v1.0.4 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/mrunalp/fileutils v0.5.0 // indirect
+	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
@@ -430,12 +436,16 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
+	github.com/tidwall/btree v1.1.0 // indirect
+	github.com/tidwall/redcon v1.6.2 // indirect
 	github.com/tilinna/clock v1.1.0 // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/vishvananda/netlink v1.1.1-0.20210330154013-f5de75959ad5 // indirect
 	github.com/vishvananda/netns v0.0.0-20210104183010-2eb08e3e575f // indirect
+	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/vmware/go-vmware-nsxt v0.0.0-20220328155605-f49a14c1ef5f // indirect
 	github.com/vmware/govmomi v0.30.4 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
@@ -483,9 +493,7 @@ require (
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/aws/aws-sdk-go v1.44.255 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/buraksezer/connpool v0.6.0 // indirect
 	github.com/buraksezer/consistent v0.10.0 // indirect
-	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20230112175826-46e39c7b9b43 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -594,7 +602,6 @@ require (
 	github.com/tidwall/wal v1.1.7 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.0 // indirect
-	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vultr/govultr/v2 v2.17.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
@@ -632,7 +639,7 @@ require (
 )
 
 replace (
-	github.com/buraksezer/olric => github.com/fluxninja/olric v0.4.10-fn.patch.17
+	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.11
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.2
 	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.77.0-fn.patch.2
