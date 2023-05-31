@@ -142,7 +142,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 
 	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
 		return true, 0, 0
 	}
 
@@ -193,7 +193,7 @@ func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64)
 
 	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
 		return true, 0, 0, 0
 	}
 
