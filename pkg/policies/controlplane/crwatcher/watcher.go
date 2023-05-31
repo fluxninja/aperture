@@ -3,6 +3,7 @@ package crwatcher
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"sync"
@@ -20,16 +21,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
-	syncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 )
 
 // watcher holds the state of the watcher.
@@ -217,7 +217,7 @@ func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.
 	}
 
 	annotations := instance.GetObjectMeta().GetAnnotations()
-	policyMessage := &syncv1.PolicyWrapper{
+	policyMessage := &iface.PolicyMessage{
 		Policy: policySpec,
 		PolicyMetadata: &languagev1.PolicyMetadata{
 			Values:        annotations["fluxninja.com/values"],
@@ -225,7 +225,7 @@ func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.
 			BlueprintName: annotations["fluxninja.com/blueprint-name"],
 		},
 	}
-	bytes, err := yaml.Marshal(policyMessage)
+	bytes, err := json.Marshal(policyMessage)
 	if err != nil {
 		return err
 	}
