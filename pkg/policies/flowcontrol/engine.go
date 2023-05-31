@@ -131,7 +131,7 @@ func (e *Engine) ProcessRequest(
 
 		defer func() {
 			if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-				revertRemaining(flowLabels, limiterDecisions)
+				revertRemaining(ctx, flowLabels, limiterDecisions)
 			}
 		}()
 
@@ -145,7 +145,10 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
-func runLimiters(ctx context.Context, limiters map[iface.Limiter]struct{}, labels map[string]string) (
+func runLimiters(
+	ctx context.Context,
+	limiters map[iface.Limiter]struct{},
+	labels map[string]string) (
 	map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
@@ -198,6 +201,7 @@ func runLimiters(ctx context.Context, limiters map[iface.Limiter]struct{}, label
 }
 
 func revertRemaining(
+	ctx context.Context,
 	labels map[string]string,
 	limiterDecisions map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 ) {

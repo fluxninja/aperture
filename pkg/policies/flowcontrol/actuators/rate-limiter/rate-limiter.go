@@ -171,11 +171,7 @@ func setupRateLimiterFactory(
 }
 
 // per component fx app.
-func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
-	key notifiers.Key,
-	unmarshaller config.Unmarshaller,
-	reg status.Registry,
-) (fx.Option, error) {
+func (rlFactory *rateLimiterFactory) newRateLimiterOptions(key notifiers.Key, unmarshaller config.Unmarshaller, reg status.Registry) (fx.Option, error) {
 	logger := rlFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)

@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -117,6 +118,7 @@ func init() {
 
 // WFQScheduler : Weighted Fair Queue Scheduler.
 type WFQScheduler struct {
+	clk            clockwork.Clock
 	lastAccessTime time.Time
 	manager        TokenManager
 	// metrics
@@ -132,11 +134,12 @@ type WFQScheduler struct {
 }
 
 // NewWFQScheduler creates a new weighted fair queue scheduler.
-func NewWFQScheduler(tokenManger TokenManager, metrics *WFQMetrics) Scheduler {
+func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQMetrics) Scheduler {
 	sched := new(WFQScheduler)
 	sched.queueOpen = false
 	sched.generation = 0
-	sched.lastAccessTime = time.Now()
+	sched.clk = clk
+	sched.lastAccessTime = sched.clk.Now()
 	sched.vt = 0
 	sched.flows = make(map[string]*flowInfo)
 	sched.manager = tokenManger
@@ -157,7 +160,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) bool {
 
 	sched.lock.Lock()
 	queueOpen := sched.queueOpen
-	sched.lastAccessTime = time.Now()
+	sched.lastAccessTime = sched.clk.Now()
 	sched.lock.Unlock()
 
 	if sched.manager.PreprocessRequest(ctx, request) {
@@ -260,24 +263,39 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request Request) (q
 }
 
 // adjust queue counters. Note: qRequest pointer should not be used after calling this function as it will get recycled via Pool.
-func (sched *WFQScheduler) scheduleRequest(ctx context.Context,
-	request Request,
-	qRequest *queuedRequest,
-) (allowed bool) {
+func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request Request, qRequest *queuedRequest) (allowed bool) {
 	// This request has been selected to be executed next
 	waitTime, allowed := sched.manager.Take(ctx, float64(request.Tokens))
 	// check if we need to wait
 	if allowed && waitTime > 0 {
+		// check whether ctx has deadline
+		// and if deadline is less than waitTime
+		// return tokens immediately
+		if dl, o := ctx.Deadline(); o {
+			if dl.Sub(sched.clk.Now()) < waitTime {
+				allowed = false
+				returnCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+				go func(cancel context.CancelFunc) {
+					defer cancel()
+					sched.manager.Return(returnCtx, float64(request.Tokens))
+				}(cancel)
+			}
+		}
+
 		if allowed {
-			timer := time.NewTimer(waitTime)
+			timer := sched.clk.NewTimer(waitTime)
 			defer timer.Stop()
 
 			select {
 			case <-ctx.Done():
 				allowed = false
+				returnCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 				// return the tokens
-				sched.manager.Return(ctx, float64(request.Tokens))
-			case <-timer.C:
+				go func(cancel context.CancelFunc) {
+					defer cancel()
+					sched.manager.Return(returnCtx, float64(request.Tokens))
+				}(cancel)
+			case <-timer.Chan():
 			}
 		}
 	}

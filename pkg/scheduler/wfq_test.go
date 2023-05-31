@@ -232,7 +232,7 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(manager, schedMetrics)
+	sched := NewWFQScheduler(c, manager, schedMetrics)
 
 	b.Logf("iterations: %d", b.N)
 
@@ -267,7 +267,7 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(manager, schedMetrics)
+	sched := NewWFQScheduler(c, manager, schedMetrics)
 
 	// bootstrap bucket
 	bootstrapTime := time.Second * 1
@@ -327,7 +327,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		FlowsGauge:        wfqFlowsGauge,
 		HeapRequestsGauge: wfqHeapRequestsGauge,
 	}
-	sched := NewWFQScheduler(basicBucket, metrics)
+	sched := NewWFQScheduler(c, basicBucket, metrics)
 	var wg sync.WaitGroup
 	var acceptedTokenRatio float64
 
@@ -585,7 +585,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 	lmGauge, tbMetrics := getMetrics()
 	loadMultiplierBucket := NewLoadMultiplierTokenBucket(c, _testSlotCount, _testSlotDuration, lmGauge, tbMetrics)
 	loadMultiplierBucket.SetContinuousTracking(true)
-	sched := NewWFQScheduler(loadMultiplierBucket, schedMetrics)
+	sched := NewWFQScheduler(c, loadMultiplierBucket, schedMetrics)
 
 	trainAndDeplete := func() {
 		// Running Train and deplete the bucket

@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -289,6 +290,7 @@ type Scheduler struct {
 
 // NewScheduler returns fx options for the load scheduler fx app.
 func (wsFactory *Factory) NewScheduler(
+	clk clockwork.Clock,
 	registry status.Registry,
 	proto *policylangv1.Scheduler,
 	component iface.Component,
@@ -327,7 +329,7 @@ func (wsFactory *Factory) NewScheduler(
 	}
 
 	// setup scheduler
-	ws.scheduler = scheduler.NewWFQScheduler(tokenManger, wfqMetrics)
+	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics)
 
 	return ws, nil
 }
