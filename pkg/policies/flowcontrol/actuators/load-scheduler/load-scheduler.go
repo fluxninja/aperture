@@ -297,7 +297,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 
-			tokenBucketLMGauge, err := lsFactory.tokenBucketLMGaugeVec.GetMetricWith(metricLabels)
+			tbLMGauge, err := lsFactory.tokenBucketLMGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
 				return retErr(fmt.Errorf("%w: Failed to get token bucket LM gauge", err))
 			}
@@ -317,17 +317,14 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				return retErr(fmt.Errorf("%w: Failed to get token bucket available tokens gauge", err))
 			}
 
-			tokenBucketMetrics := &scheduler.LoadMultiplierTokenBucketMetrics{
-				LMGauge: tokenBucketLMGauge,
-				TokenBucketMetrics: &scheduler.TokenBucketMetrics{
-					FillRateGauge:        tokenBucketFillRateGauge,
-					BucketCapacityGauge:  tokenBucketBucketCapacityGauge,
-					AvailableTokensGauge: tokenBucketAvailableTokensGauge,
-				},
+			tbMetrics := &scheduler.TokenBucketMetrics{
+				FillRateGauge:        tokenBucketFillRateGauge,
+				BucketCapacityGauge:  tokenBucketBucketCapacityGauge,
+				AvailableTokensGauge: tokenBucketAvailableTokensGauge,
 			}
 
 			// Initialize the token bucket (non continuous tracking mode)
-			ls.tokenBucket = scheduler.NewLoadMultiplierTokenBucket(ls.clock.Now(), 10, time.Second, tokenBucketMetrics)
+			ls.tokenBucket = scheduler.NewLoadMultiplierTokenBucket(ls.clock, 10, time.Second, tbLMGauge, tbMetrics)
 
 			ls.schedulerMetrics, err = wsFactory.NewSchedulerMetrics(metricLabels)
 			if err != nil {
@@ -340,7 +337,6 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				ls.proto.Parameters.Scheduler,
 				ls,
 				ls.tokenBucket,
-				ls.clock,
 				ls.schedulerMetrics,
 			)
 			if err != nil {
@@ -454,7 +450,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	}
 
 	logger.Autosample().Debug().Bool("passThrough", loadDecision.PassThrough).Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
-	ls.tokenBucket.SetLoadMultiplier(ls.clock.Now(), loadDecision.LoadMultiplier)
+	ls.tokenBucket.SetLoadMultiplier(loadDecision.LoadMultiplier)
 	ls.tokenBucket.SetPassThrough(loadDecision.PassThrough)
 	ls.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
 }

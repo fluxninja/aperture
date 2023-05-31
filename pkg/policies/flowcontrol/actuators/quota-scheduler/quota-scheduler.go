@@ -403,7 +403,6 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 			qs.proto.Scheduler,
 			qs,
 			tokenBucket,
-			qs.clock,
 			qs.schedulerMetrics,
 		)
 		if err != nil {
@@ -424,14 +423,14 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 }
 
 // Revert returns the tokens to the limiter.
-func (qs *quotaScheduler) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (qs *quotaScheduler) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	// return to the underlying rate limiter
 	if qsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_); ok {
 		tokens := qsDecision.QuotaSchedulerInfo.SchedulerInfo.TokensConsumed
 		if tokens > 0 {
 			label, found := qs.getLabelKey(labels)
 			if found {
-				qs.limiter.TakeIfAvailable(label, float64(-tokens))
+				qs.limiter.TakeIfAvailable(ctx, label, float64(-tokens))
 			}
 		}
 	}
