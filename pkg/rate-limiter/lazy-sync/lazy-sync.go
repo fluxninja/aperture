@@ -12,12 +12,11 @@ import (
 )
 
 type counter struct {
-	lock     sync.Mutex
-	nextSync time.Time
-	credit   float64
-	// snapshot
+	nextSync  time.Time
+	credit    float64
 	current   float64
 	available float64
+	lock      sync.Mutex
 	waiting   bool
 }
 
@@ -101,7 +100,7 @@ func (lsl *LazySyncRateLimiter) Name() string {
 	return lsl.name
 }
 
-func (lsl *LazySyncRateLimiter) takeN(label string, n float64, canWait bool) (bool, time.Duration, float64, float64) {
+func (lsl *LazySyncRateLimiter) takeN(ctx context.Context, label string, n float64, canWait bool) (bool, time.Duration, float64, float64) {
 	if lsl.GetPassThrough() {
 		return true, 0, 0, 0
 	}
@@ -112,7 +111,7 @@ func (lsl *LazySyncRateLimiter) takeN(label string, n float64, canWait bool) (bo
 		if canWait {
 			tokens += n
 		}
-		ok, waitTime, remaining, current := lsl.limiter.Take(label, tokens)
+		ok, waitTime, remaining, current := lsl.limiter.Take(ctx, label, tokens)
 		c.credit = 0
 		if waitTime > 0 {
 			c.waiting = true
@@ -184,19 +183,19 @@ func (lsl *LazySyncRateLimiter) takeN(label string, n float64, canWait bool) (bo
 }
 
 // TakeIfAvailable takes n tokens from the limiter if they are available.
-func (lsl *LazySyncRateLimiter) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
-	ok, _, remaining, current := lsl.takeN(label, n, false)
+func (lsl *LazySyncRateLimiter) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, float64, float64) {
+	ok, _, remaining, current := lsl.takeN(ctx, label, n, false)
 	return ok, remaining, current
 }
 
 // Take takes n tokens from the limiter.
-func (lsl *LazySyncRateLimiter) Take(label string, n float64) (bool, time.Duration, float64, float64) {
-	return lsl.takeN(label, n, true)
+func (lsl *LazySyncRateLimiter) Take(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
+	return lsl.takeN(ctx, label, n, true)
 }
 
 // Return returns n tokens to the limiter.
-func (lsl *LazySyncRateLimiter) Return(label string, n float64) (float64, float64) {
-	_, _, remaining, current := lsl.takeN(label, -n, false)
+func (lsl *LazySyncRateLimiter) Return(ctx context.Context, label string, n float64) (float64, float64) {
+	_, _, remaining, current := lsl.takeN(ctx, label, -n, false)
 	return remaining, current
 }
 

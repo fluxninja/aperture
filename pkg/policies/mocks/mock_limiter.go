@@ -109,15 +109,15 @@ func (mr *MockLimiterMockRecorder) GetSelectors() *gomock.Call {
 }
 
 // Revert mocks base method.
-func (m *MockLimiter) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockLimiter) Revert(ctx context.Context, labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Revert", labels, decision)
+	m.ctrl.Call(m, "Revert", ctx, labels, decision)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockLimiterMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
+func (mr *MockLimiterMockRecorder) Revert(ctx, labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockLimiter)(nil).Revert), labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockLimiter)(nil).Revert), ctx, labels, decision)
 }
 
 // MockRateLimiter is a mock of RateLimiter interface.
@@ -214,21 +214,21 @@ func (mr *MockRateLimiterMockRecorder) GetSelectors() *gomock.Call {
 }
 
 // Revert mocks base method.
-func (m *MockRateLimiter) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockRateLimiter) Revert(ctx context.Context, labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Revert", labels, decision)
+	m.ctrl.Call(m, "Revert", ctx, labels, decision)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockRateLimiterMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
+func (mr *MockRateLimiterMockRecorder) Revert(ctx, labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockRateLimiter)(nil).Revert), labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockRateLimiter)(nil).Revert), ctx, labels, decision)
 }
 
 // TakeIfAvailable mocks base method.
-func (m *MockRateLimiter) TakeIfAvailable(labels map[string]string, count float64) (string, bool, float64, float64) {
+func (m *MockRateLimiter) TakeIfAvailable(ctx context.Context, labels map[string]string, count float64) (string, bool, float64, float64) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TakeIfAvailable", labels, count)
+	ret := m.ctrl.Call(m, "TakeIfAvailable", ctx, labels, count)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
 	ret2, _ := ret[2].(float64)
@@ -237,9 +237,9 @@ func (m *MockRateLimiter) TakeIfAvailable(labels map[string]string, count float6
 }
 
 // TakeIfAvailable indicates an expected call of TakeIfAvailable.
-func (mr *MockRateLimiterMockRecorder) TakeIfAvailable(labels, count interface{}) *gomock.Call {
+func (mr *MockRateLimiterMockRecorder) TakeIfAvailable(ctx, labels, count interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeIfAvailable", reflect.TypeOf((*MockRateLimiter)(nil).TakeIfAvailable), labels, count)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TakeIfAvailable", reflect.TypeOf((*MockRateLimiter)(nil).TakeIfAvailable), ctx, labels, count)
 }
 
 // MockScheduler is a mock of Scheduler interface.
@@ -350,13 +350,13 @@ func (mr *MockSchedulerMockRecorder) GetSelectors() *gomock.Call {
 }
 
 // Revert mocks base method.
-func (m *MockScheduler) Revert(labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockScheduler) Revert(ctx context.Context, labels map[string]string, decision *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Revert", labels, decision)
+	m.ctrl.Call(m, "Revert", ctx, labels, decision)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockSchedulerMockRecorder) Revert(labels, decision interface{}) *gomock.Call {
+func (mr *MockSchedulerMockRecorder) Revert(ctx, labels, decision interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockScheduler)(nil).Revert), labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockScheduler)(nil).Revert), ctx, labels, decision)
 }

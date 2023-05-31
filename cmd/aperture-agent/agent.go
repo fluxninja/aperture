@@ -48,13 +48,15 @@ func main() {
 		distcache.Module(),
 		flowcontrol.Module(),
 		autoscale.Module(),
-		otelcollector.Module(),
 		agent.ModuleForAgentOTel(),
 		discovery.Module(),
 		election.Module(),
 		rpc.ClientModule,
 		agentfunctions.Module,
 		Module(),
+		// Start collector after all extensions started, so it won't
+		// immediately reload when extensions add their config.
+		otelcollector.Module(),
 	)
 
 	if err := app.Err(); err != nil {

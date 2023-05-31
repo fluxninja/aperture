@@ -1,9 +1,11 @@
 package scheduler
 
 import (
+	"context"
 	"sync"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -23,6 +25,15 @@ type tokenBucketBase struct {
 	bucketCapacity  float64 // Overall capacity of the bucket, currently the same as fillRate
 	availableTokens float64 // Available Tokens as of latestTime (can be a negative or a fractional number)
 	passThrough     bool
+	clk             clockwork.Clock
+}
+
+func newTokenBucket(clk clockwork.Clock, metrics *TokenBucketMetrics) *tokenBucketBase {
+	return &tokenBucketBase{
+		clk:        clk,
+		metrics:    metrics,
+		latestTime: clk.Now(),
+	}
 }
 
 func (tbb *tokenBucketBase) setFillRateGauge(v float64) {
@@ -43,20 +54,17 @@ func (tbb *tokenBucketBase) setAvailableTokensGauge(v float64) {
 	}
 }
 
-func (tbb *tokenBucketBase) adjustTokens(now time.Time) {
-	if tbb.latestTime.IsZero() {
-		tbb.latestTime = now
-	}
-
+func (tbb *tokenBucketBase) adjustTokens() {
+	now := tbb.clk.Now()
 	toAdd := float64(now.Sub(tbb.latestTime)) * float64(tbb.fillRate) / 1e9
 	tbb.latestTime = now
 	tbb.addTokens(toAdd)
 }
 
 // setFillRate : Adjust tokens fill rate (tokens/sec) at runtime.
-func (tbb *tokenBucketBase) setFillRate(now time.Time, fillRate float64) {
+func (tbb *tokenBucketBase) setFillRate(fillRate float64) {
 	// adjust availableTokens
-	tbb.adjustTokens(now)
+	tbb.adjustTokens()
 	// subsequent requests get scheduled based on the new rate
 	tbb.fillRate = fillRate
 	tbb.setFillRateGauge(tbb.fillRate)
@@ -81,13 +89,13 @@ func (tbb *tokenBucketBase) returnTokens(toReturn float64) {
 	}
 }
 
-func (tbb *tokenBucketBase) take(now time.Time, tokens float64) (time.Duration, bool) {
+func (tbb *tokenBucketBase) take(ctx context.Context, tokens float64) (time.Duration, bool) {
 	// if tokens aren't coming do not provide any more tokens
 	if tbb.fillRate == 0 {
 		return time.Duration(0), false
 	}
 
-	tbb.adjustTokens(now)
+	tbb.adjustTokens()
 	tbb.addTokens(-tokens)
 
 	if tbb.availableTokens >= 0 {
@@ -96,11 +104,19 @@ func (tbb *tokenBucketBase) take(now time.Time, tokens float64) (time.Duration, 
 	// figure out when the tokens will be available
 	waitTime := time.Duration(-tbb.availableTokens * float64(1e9) / float64(tbb.fillRate))
 
+	// get deadline from context
+	deadline, ok := ctx.Deadline()
+	if ok && deadline.Sub(tbb.latestTime) < waitTime {
+		// return tokens
+		tbb.addTokens(tokens)
+		return time.Duration(0), false
+	}
+
 	return waitTime, true
 }
 
-func (tbb *tokenBucketBase) takeIfAvailable(now time.Time, tokens float64) bool {
-	tbb.adjustTokens(now)
+func (tbb *tokenBucketBase) takeIfAvailable(tokens float64) bool {
+	tbb.adjustTokens()
 	if tbb.availableTokens > tokens {
 		tbb.addTokens(-tokens)
 		return true
@@ -125,57 +141,51 @@ var _ TokenManager = &BasicTokenBucket{}
 
 // BasicTokenBucket is a basic token bucket implementation.
 type BasicTokenBucket struct {
-	lock sync.Mutex
 	tbb  *tokenBucketBase
+	lock sync.Mutex
 }
 
 // NewBasicTokenBucket creates a new BasicTokenBucket with adjusted fill rate.
-func NewBasicTokenBucket(now time.Time, fillRate float64, metrics *TokenBucketMetrics) *BasicTokenBucket {
-	btb := &BasicTokenBucket{
-		tbb: &tokenBucketBase{},
-	}
-
-	if metrics != nil {
-		btb.tbb.metrics = metrics
-	}
-
-	btb.tbb.setFillRate(now, fillRate)
+func NewBasicTokenBucket(clk clockwork.Clock, fillRate float64, metrics *TokenBucketMetrics) *BasicTokenBucket {
+	btb := &BasicTokenBucket{}
+	btb.tbb = newTokenBucket(clk, metrics)
+	btb.tbb.setFillRate(fillRate)
 	return btb
 }
 
 // TakeIfAvailable takes tokens from the basic token bucket if available, otherwise return false.
-func (btb *BasicTokenBucket) TakeIfAvailable(now time.Time, tokens float64) bool {
+func (btb *BasicTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) bool {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
-	return btb.tbb.takeIfAvailable(now, tokens)
+	return btb.tbb.takeIfAvailable(tokens)
 }
 
 // Take takes tokens from the basic token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (btb *BasicTokenBucket) Take(now time.Time, tokens float64) (time.Duration, bool) {
+func (btb *BasicTokenBucket) Take(ctx context.Context, tokens float64) (time.Duration, bool) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
-	return btb.tbb.take(now, tokens)
+	return btb.tbb.take(ctx, tokens)
 }
 
 // Return returns tokens to the basic token bucket.
-func (btb *BasicTokenBucket) Return(tokens float64) {
+func (btb *BasicTokenBucket) Return(_ context.Context, tokens float64) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	btb.tbb.returnTokens(tokens)
 }
 
 // PreprocessRequest decides whether to proactively accept a request.
-func (btb *BasicTokenBucket) PreprocessRequest(now time.Time, request Request) bool {
+func (btb *BasicTokenBucket) PreprocessRequest(_ context.Context, request Request) bool {
 	return btb.tbb.getPassThrough()
 }
 
 // SetFillRate adjusts the fill rate of the BasicTokenBucket.
-func (btb *BasicTokenBucket) SetFillRate(now time.Time, fillRate float64) {
+func (btb *BasicTokenBucket) SetFillRate(fillRate float64) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
-	btb.tbb.setFillRate(now, fillRate)
+	btb.tbb.setFillRate(fillRate)
 }
 
 // GetFillRate returns the fill rate of the BasicTokenBucket.

@@ -34,7 +34,7 @@ example, `v0.2.2` to match your Aperture Controller installation version.
 You can then create a Policy resource using Jsonnet definitions:
 
 ```jsonnet
-{@include: ../../applying-policies/alerting/assets/detecting-overload/detecting-overload.jsonnet}
+{@include: ../../use-cases/alerting/assets/detecting-overload/detecting-overload.jsonnet}
 ```
 
 And then, render it with [Jsonnet][jsonnet]:
@@ -47,7 +47,7 @@ After running this command, you should see the following contents in the YAML
 file:
 
 ```yaml
-{@include: ../../applying-policies/alerting/assets/detecting-overload/detecting-overload.mmd}
+{@include: ../../use-cases/alerting/assets/detecting-overload/detecting-overload.mmd}
 ```
 
 The generated policy can be applied to the running instance of
