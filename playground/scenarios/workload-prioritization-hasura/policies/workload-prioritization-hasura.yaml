@@ -2,7 +2,7 @@
 policy:
   policy_name: workload-prioritization-hasura
   promql_query: 'pg_db_queries_per_second{db="hasura"}'
-  setpoint: 3500
+  setpoint: 1500
   evaluation_interval: "1s"
   resources:
     flow_control:
@@ -49,6 +49,14 @@ policy:
             - label_matcher:
                 match_labels:
                   source: "agent-service.cloud.svc.cluster.local"
+                  operation: "mutation"
+              parameters:
+                priority: 100
+              name: "agent-service-mutation"
+            - label_matcher:
+                match_labels:
+                  source: "agent-service.cloud.svc.cluster.local"
+                  operation: "query"
               parameters:
                 priority: 50
-              name: "agent-service"
+              name: "agent-service-query"

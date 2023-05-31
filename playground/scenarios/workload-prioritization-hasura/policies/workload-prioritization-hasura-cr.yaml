@@ -17,9 +17,12 @@ metadata:
       {"adaptive_load_scheduler": {"load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
       {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}}, "name":
       "api-service", "parameters": {"priority": 200}}, {"label_matcher": {"match_labels":
-      {"source": "agent-service.cloud.svc.cluster.local"}}, "name": "agent-service",
-      "parameters": {"priority": 50}}]}, "selectors": [{"control_point": "ingress",
-      "service": "hasura.cloud.svc.cluster.local"}]}}}, "setpoint": 3500}}'
+      {"operation": "mutation", "source": "agent-service.cloud.svc.cluster.local"}},
+      "name": "agent-service-mutation", "parameters": {"priority": 100}}, {"label_matcher":
+      {"match_labels": {"operation": "query", "source": "agent-service.cloud.svc.cluster.local"}},
+      "name": "agent-service-query", "parameters": {"priority": 50}}]}, "selectors":
+      [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}}},
+      "setpoint": 1500}}'
   labels:
     fluxninja.com/validate: "true"
   name: workload-prioritization-hasura
@@ -62,8 +65,16 @@ spec:
                     priority: 200
                 - label_matcher:
                     match_labels:
+                      operation: mutation
                       source: agent-service.cloud.svc.cluster.local
-                  name: agent-service
+                  name: agent-service-mutation
+                  parameters:
+                    priority: 100
+                - label_matcher:
+                    match_labels:
+                      operation: query
+                      source: agent-service.cloud.svc.cluster.local
+                  name: agent-service-query
                   parameters:
                     priority: 50
               selectors:
@@ -79,7 +90,7 @@ spec:
           query_string: pg_db_queries_per_second{db="hasura"}
     - variable:
         constant_output:
-          value: 3500
+          value: 1500
         out_ports:
           output:
             signal_name: SETPOINT

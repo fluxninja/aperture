@@ -4,12 +4,29 @@ import { vu } from "k6/execution";
 import http from "k6/http";
 
 export let vuStagesAPI = [
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
-  { duration: "1m", target: 50 },
-  { duration: "2m", target: 50 },
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
+  { duration: "0s", target: 3 },
+  { duration: "30s", target: 3 },
+  { duration: "30s", target: 6 },
+  { duration: "1m", target: 6 },
+  { duration: "30s", target: 10 },
+  { duration: "3m", target: 10 },
+  { duration: "30s", target: 6 },
+  { duration: "1m", target: 6 },
+  { duration: "30s", target: 3 },
+  { duration: "30s", target: 3 },
+];
+
+export let vuStagesAgent = [
+  { duration: "0s", target: 1 },
+  { duration: "30s", target: 1 },
+  { duration: "30s", target: 3 },
+  { duration: "1m", target: 3 },
+  { duration: "30s", target: 5 },
+  { duration: "3m", target: 5 },
+  { duration: "30s", target: 3 },
+  { duration: "1m", target: 3 },
+  { duration: "30s", target: 1 },
+  { duration: "30s", target: 1 },
 ];
 
 export let options = {
@@ -23,7 +40,7 @@ export let options = {
     },
     agent: {
       executor: "ramping-vus",
-      stages: vuStagesAPI,
+      stages: vuStagesAgent,
       env: { USER_TYPE: "agent" },
     },
   },
