@@ -1,0 +1,4 @@
+blueprint: Auto-Scaling Policy.
+sources:
+  dashboard: policies/auto-scaling/base/dashboard.libsonnet
+  policy: policies/auto-scaling/base/policy.libsonnet

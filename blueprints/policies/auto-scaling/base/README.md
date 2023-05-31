@@ -1,4 +1,3 @@
 # Auto-Scaling Base
 
-This directory contains the base for other auto-scaling blueprints. It cannot be
-used directly.
+[Documentation](https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/auto-scaling/base.md)

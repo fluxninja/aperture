@@ -1,12 +1,12 @@
 ---
-title: Pod Auto-Scaler Policy
+title: Auto-Scaler Policy
 ---
 
 ## Introduction
 
 This blueprint provides a dashboard and policy which auto-scales the targeted
-Kubernetes resources based on the results received by executing the provided
-PromQL queries for scale-in and scale-out.
+resources based on the results received by executing the provided PromQL queries
+for scale-in and scale-out.
 
 :::info
 
