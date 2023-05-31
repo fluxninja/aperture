@@ -403,7 +403,6 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 			qs.proto.Scheduler,
 			qs,
 			tokenBucket,
-			qs.clock,
 			qs.schedulerMetrics,
 		)
 		if err != nil {

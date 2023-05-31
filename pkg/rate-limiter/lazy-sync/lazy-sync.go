@@ -13,12 +13,11 @@ import (
 )
 
 type counter struct {
-	lock     sync.Mutex
-	nextSync time.Time
-	credit   float64
-	// snapshot
+	nextSync  time.Time
+	credit    float64
 	current   float64
 	available float64
+	lock      sync.Mutex
 	waiting   bool
 }
 

@@ -23,13 +23,13 @@ const (
 type GlobalTokenBucket struct {
 	mu             sync.RWMutex
 	dMap           olric.DMap
+	dc             *distcache.DistCache
 	name           string
 	bucketCapacity float64
 	fillAmount     float64
 	interval       time.Duration
 	continuousFill bool
 	passThrough    bool
-	dc             *distcache.DistCache
 }
 
 // NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
@@ -151,9 +151,17 @@ func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64)
 		return false, 0, 0, 0
 	}
 
+	deadline := time.Time{}
+
+	d, ok := ctx.Deadline()
+	if ok {
+		deadline = d
+	}
+
 	req := takeNRequest{
-		Want:    n,
-		CanWait: true,
+		Want:     n,
+		CanWait:  true,
+		Deadline: deadline,
 	}
 	// encode request
 	reqBytes, err := utils.MarshalGob(req)
@@ -199,8 +207,9 @@ type tokenBucketState struct {
 }
 
 type takeNRequest struct {
-	Want    float64
-	CanWait bool
+	Deadline time.Time
+	Want     float64
+	CanWait  bool
 }
 
 type takeNResponse struct {
@@ -242,12 +251,15 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 
 	if arg.Want > 0 {
 		if state.Available < 0 {
+			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
 				waitTime := time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
 				availableAt := now.Add(waitTime)
 				result.AvailableAt = availableAt
+				if arg.CanWait && !arg.Deadline.IsZero() && availableAt.After(arg.Deadline) {
+					result.Ok = false
+				}
 			}
-			result.Ok = arg.CanWait
 			// return the tokens to the bucket if the request is not ok
 			if !result.Ok {
 				state.Available += arg.Want

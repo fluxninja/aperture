@@ -44,16 +44,15 @@ type flow struct {
 }
 
 type flowRunner struct {
-	wg       sync.WaitGroup
 	limiters []ratelimiter.RateLimiter
 	flows    []*flow
+	wg       sync.WaitGroup
 	duration time.Duration
 	limit    float64
 }
 
 // runFlows runs the flows for the given duration.
 func (fr *flowRunner) runFlows(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
 	for _, f := range fr.flows {
 		f.limit = fr.limit
 
@@ -70,7 +69,7 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 				randomLimiterIndex := rand.Intn(len(fr.limiters))
 				limiter := fr.limiters[randomLimiterIndex]
 				atomic.AddInt32(&f.totalRequests, 1)
-				accepted, _, _ := limiter.TakeIfAvailable(ctx, f.requestlabel, 1)
+				accepted, _, _ := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
 				if accepted {
 					atomic.AddInt32(&f.acceptedRequests, 1)
 				}
@@ -85,7 +84,6 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 		}(f)
 	}
 	fr.wg.Wait()
-	cancel()
 }
 
 // createJobGroup creates a job group for the given limiter..

@@ -88,7 +88,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 	if c.controllerAddr == "" && !c.kube {
-		log.Info().Msg("Neither --controller not --kube flags are set. Assuming --kube=true.")
+		log.Info().Msg("Neither --controller nor --kube flag is set. Assuming --kube=true.")
 		c.kube = true
 	}
 
