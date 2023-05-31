@@ -116,15 +116,5 @@ your needs. [See all SDKs](/integrations/flow-control/sdk/sdk.md).
 
 <!-- vale on -->
 
-Once the feature control point is set in code, head over to install Aperture.
-
-```mdx-code-block
-
-<Cards data={[
-  {
-    title: "Install Aperture",
-    description: "Install Controller and Agent in your environment",
-    url: "/get-started/installation/",
-  },
-  ]}/>
-```
+Once the feature control point is set in code, head over to
+[install Aperture](/get-started/installation/installation.md)
