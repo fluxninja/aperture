@@ -43,16 +43,5 @@ out the complete installation guide in
 
 <!-- vale on -->
 
-Once you complete the Service Mesh or API Gateway Integration head over to
-install Aperture.
-
-```mdx-code-block
-
-<Cards data={[
-  {
-    title: "Install Aperture",
-    description: "Install Controller and Agent in your environment",
-    url: "/get-started/installation/",
-  },
-  ]}/>
-```
+Once you complete the Service Mesh or API Gateway integration, head over to
+[install Aperture](/get-started/installation/installation.md).

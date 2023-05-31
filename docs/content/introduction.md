@@ -118,7 +118,7 @@ The analysis and actuation phases use
 in defining responses to different situations, such as deviations from
 service-level objectives.
 
-When defining a policy these are some key components to consider:
+When defining a policy, these are some key components to consider:
 [**Control Point**](./concepts/flow-control/selector.md) → Needed to guide flow
 control based decisions. [**Selector**](./concepts/flow-control/selector.md) →
 Needed to select the flow that the policy should consider.
@@ -131,53 +131,20 @@ policy's operational capability.
 
 ## ✨ Get started
 
-```mdx-code-block
-
-<Cards data={[{
-  title: "Setting up your application",
-  url: "/getting-started/setting-up-application/",
-},
-{
-  title: "Install Aperture",
-  url: "/getting-started/installation/",
-},
-{
-  title: "Your First Policy",
-  url: "/getting-started/policies",
-},
-{
-  title: "Applying Policies",
-  url: "/use-cases/",
-}
-]}/>
-
-```
+- [**Setting up your application**](/get-started/setting-up-application/setting-up-application.md)
+- [**Install Aperture**](/get-started/installation/installation.md)
+- [**Your first policy**](/get-started/policies/policies.md)
+- [**Use cases**](/use-cases/use-cases.md)
 
 For a deeper understanding of how Aperture interacts with applications and its
 various integral components, explore the
 [Architecture](/architecture/architecture.md) section.
 
-```mdx-code-block
-<Cards data={[{
-  title: "Architecture",
-  url: "/architecture",
-}
-]}/>
-```
-
 ## 📖 Learn
 
-The Concept's section provides detailed insights into essential elements of
-Aperture and Aperture policies, offering a comprehensive understanding of their
-key components.
-
-```mdx-code-block
-<Cards data={[{
-  title: "Concepts",
-  url: "/concepts",
-}
-]}/>
-```
+The [Concepts section](/concepts/concepts.md) provides detailed insights into
+essential elements of Aperture and Aperture policies, offering a comprehensive
+understanding of their key components.
 
 ## Additional Support
 
