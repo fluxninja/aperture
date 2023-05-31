@@ -149,6 +149,13 @@ func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.
 		log.Error().Err(err).Msgf("Failed to unmarshal Olric statistics")
 		return nil, err
 	}
-
+	// Removing empty partitions to reduce the response size
+	partitions := make(map[string]*structpb.Value)
+	for key, value := range structpbStats.Fields {
+		if value.GetStructValue().Fields["length"].GetNumberValue() != 0 {
+			partitions[key] = value
+		}
+	}
+	structpbStats.Fields = partitions
 	return structpbStats, nil
 }
