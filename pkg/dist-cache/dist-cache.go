@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -131,6 +132,10 @@ func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
 
 // GetStats returns stats of the current Olric member.
 func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.Struct, error) {
+	// create a new context with a timeout to avoid hanging
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
 	stats, err := dc.client.Stats(ctx, "")
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
@@ -149,13 +154,13 @@ func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.
 		log.Error().Err(err).Msgf("Failed to unmarshal Olric statistics")
 		return nil, err
 	}
-	// Removing empty partitions to reduce the response size
-	partitions := make(map[string]*structpb.Value)
-	for key, value := range structpbStats.Fields {
-		if value.GetStructValue().Fields["length"].GetNumberValue() != 0 {
-			partitions[key] = value
+
+	// remove empty partitions from the stats
+	for k, v := range structpbStats.GetFields()["partitions"].GetStructValue().GetFields() {
+		if v.GetStructValue().GetFields()["length"].GetNumberValue() == 0 {
+			delete(structpbStats.GetFields()["partitions"].GetStructValue().GetFields(), k)
 		}
 	}
-	structpbStats.Fields = partitions
+
 	return structpbStats, nil
 }
