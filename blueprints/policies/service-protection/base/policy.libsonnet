@@ -158,6 +158,9 @@ function(cfg, metadata={}) {
         local autoScalingParams = {
           policy+: params.policy.auto_scaling {
             policy_name: params.policy.policy_name,
+            // Set empty defaults for promql_scale_out_controllers and promql_scale_in_controllers
+            promql_scale_out_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_out_controllers') then params.policy.auto_scaling.promql_scale_out_controllers else [],
+            promql_scale_in_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_in_controllers') then params.policy.auto_scaling.promql_scale_in_controllers else [],
           },
         };
 

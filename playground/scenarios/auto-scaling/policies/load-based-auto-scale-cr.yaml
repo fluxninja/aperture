@@ -4,14 +4,15 @@ metadata:
   annotations:
     fluxninja.com/blueprint-name: policies/service-protection-with-load-based-pod-auto-scaler/average-latency
     fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"auto_scaling": {"dry_run": false, "scaling_backend":
-      {"kubernetes_replicas": {"kubernetes_object_selector": {"agent_group": "default",
-      "api_version": "apps/v1", "kind": "Deployment", "name": "service1-demo-app",
-      "namespace": "demoapp"}, "max_replicas": "10", "min_replicas": "1"}}, "scaling_parameters":
-      {"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown":
-      "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown":
-      "30s"}}, "latency_baseliner": {"flux_meter": {"selectors": [{"control_point":
-      "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
+    fluxninja.com/values: '{"policy": {"auto_scaling": {"dry_run": false, "periodic_decrease":
+      {"period": "60s", "scale_in_percentage": 10}, "scaling_backend": {"kubernetes_replicas":
+      {"kubernetes_object_selector": {"agent_group": "default", "api_version": "apps/v1",
+      "kind": "Deployment", "name": "service1-demo-app", "namespace": "demoapp"},
+      "max_replicas": "10", "min_replicas": "1"}}, "scaling_parameters": {"scale_in_alerter":
+      {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter":
+      {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}},
+      "latency_baseliner": {"flux_meter": {"selectors": [{"control_point": "ingress",
+      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
       "load-based-auto-scale", "service_protection_core": {"adaptive_load_scheduler":
       {"load_scheduler": {"selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
@@ -56,30 +57,12 @@ spec:
           dry_run_config_key: dry_run
           scale_in_controllers:
           - alerter:
-              alert_name: A controller intends to scale in
+              alert_name: Periodic scale in intended
             controller:
-              gradient:
-                in_ports:
-                  setpoint:
-                    constant_signal:
-                      value: 0.5
-                  signal:
-                    signal_name: PROMQL_SCALE_IN_0
-                parameters:
-                  slope: 1
+              periodic:
+                period: 60s
+                scale_in_percentage: 10
           scale_out_controllers:
-          - alerter:
-              alert_name: A controller intends to scale out
-            controller:
-              gradient:
-                in_ports:
-                  setpoint:
-                    constant_signal:
-                      value: 1
-                  signal:
-                    signal_name: PROMQL_SCALE_OUT_0
-                parameters:
-                  slope: 1
           - alerter:
               alert_name: Load based scale out intended
             controller:
@@ -109,20 +92,6 @@ spec:
             scale_out_alerter:
               alert_name: Auto-scaler is scaling out
             scale_out_cooldown: 30s
-    - query:
-        promql:
-          evaluation_interval: 1s
-          out_ports:
-            output:
-              signal_name: PROMQL_SCALE_IN_0
-          query_string: __REQUIRED_FIELD__
-    - query:
-        promql:
-          evaluation_interval: 1s
-          out_ports:
-            output:
-              signal_name: PROMQL_SCALE_OUT_0
-          query_string: __REQUIRED_FIELD__
     - query:
         promql:
           evaluation_interval: 1s

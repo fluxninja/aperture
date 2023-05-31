@@ -51,6 +51,9 @@ policy:
     # Dry run mode ensures that no scaling is invoked by this auto scaler.
     # Type: bool
     dry_run: false
+    periodic_decrease:
+      period: "60s"
+      scale_in_percentage: 10
     # Parameters that define the scaling behavior.
     # Type: aperture.spec.v1.AutoScalerScalingParameters
     # Required: True
