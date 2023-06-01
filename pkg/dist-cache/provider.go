@@ -71,10 +71,19 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	memberlistEnv := "lan"
 	oc := olricconfig.New(memberlistEnv)
-	oc.ReplicaCount = defaultConfig.ReplicaCount
+
 	oc.WriteQuorum = 1
 	oc.ReadQuorum = 1
 	oc.MemberCountQuorum = 1
+	oc.ReadRepair = false
+
+	oc.ReplicaCount = defaultConfig.ReplicaCount
+	if defaultConfig.SyncReplication {
+		oc.ReplicationMode = olricconfig.SyncReplicationMode
+	} else {
+		oc.ReplicationMode = olricconfig.AsyncReplicationMode
+	}
+
 	oc.DMaps.Custom = make(map[string]olricconfig.DMap)
 	oc.Logger = stdlog.New(&OlricLogWriter{Logger: in.Logger}, "", 0)
 

@@ -44,7 +44,6 @@ require (
 	github.com/looplab/tarjan v0.1.0
 	github.com/mitchellh/copystructure v1.2.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/moby/locker v1.0.1
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.4
@@ -639,7 +638,7 @@ require (
 )
 
 replace (
-	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.11
+	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.12
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.2
 	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.77.0-fn.patch.2
