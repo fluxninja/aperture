@@ -41,7 +41,7 @@ function generate_mermaid_images() {
 	fi
 	if [ "$md5sum" != "$md5sum_file" ] || [ "$force" == true ]; then
 		echo "generating svg and png files for $mmd_file"
-		"$scriptroot" "$mmd_file"
+		"$scriptroot"/generate_mermaid.sh "$mmd_file"
 		# update md5sum
 		echo "$md5sum" >"$mmd_file".md5sum
 	fi
