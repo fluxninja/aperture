@@ -77,7 +77,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awscloudwatchreceiver v0.77.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awscontainerinsightreceiver v0.77.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awsecscontainermetricsreceiver v0.77.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awsfirehosereceiver v0.77.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awsfirehosereceiver v0.78.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awsxrayreceiver v0.77.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/azureblobreceiver v0.77.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/azureeventhubreceiver v0.77.0
