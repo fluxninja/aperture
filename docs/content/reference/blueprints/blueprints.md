@@ -1,5 +1,5 @@
 ---
-title: Bundled Blueprints
+title: Blueprints
 description: Documentation of bundled blueprints included in Aperture
 keywords:
   - jsonnet
@@ -7,7 +7,7 @@ keywords:
   - policy
   - blueprints
 sidebar_position: 1
-sidebar_label: Bundled Blueprints
+sidebar_label: Blueprints
 ---
 
 ```mdx-code-block
