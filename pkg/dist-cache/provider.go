@@ -3,9 +3,11 @@ package distcache
 import (
 	"context"
 	"errors"
+	"fmt"
 	stdlog "log"
 	"net"
 	"strconv"
+	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -125,10 +127,13 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		oc.MemberlistConfig.AdvertisePort = advertisePort
 		memberlistAddr = defaultConfig.MemberlistAdvertiseAddr
 	}
+
+	serviceName := fmt.Sprintf("%s-%s", olricMemberlistServiceName, info.GetVersionInfo().Version)
 	oc.ServiceDiscovery = map[string]interface{}{
 		"plugin": &ServiceDiscovery{
-			discovery: in.PeerDiscovery,
-			addr:      memberlistAddr,
+			discovery:   in.PeerDiscovery,
+			addr:        memberlistAddr,
+			serviceName: serviceName,
 		},
 	}
 
@@ -159,23 +164,24 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				startErr := dc.olric.Start()
 				if startErr != nil {
 					log.Error().Err(startErr).Msg("Failed to start distcache")
+					utils.Shutdown(in.Shutdowner)
 				}
-				utils.Shutdown(in.Shutdowner)
 			})
 
-			// wait for olric to start by waiting on startChan until ctx is canceled
+			// wait for olric to start by waiting on startChan or until ctx is canceled
 			select {
 			case <-ctx.Done():
 				return errors.New("olric failed to start")
 			case <-startChan:
 			}
 
-			_, err = dc.client.Stats(ctx, "")
+			// create a new context with a timeout to avoid hanging
+			newCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+			_, err = dc.client.Stats(newCtx, "")
 			if err != nil {
 				return err
 			}
-
-			log.Info().Msg("DistCache started")
 
 			err = in.LivenessMultiJob.RegisterJob(job)
 			if err != nil {
