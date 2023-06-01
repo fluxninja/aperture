@@ -51,7 +51,7 @@ require (
 	github.com/open-policy-agent/opa v0.51.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.77.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.77.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.77.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.78.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.77.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.77.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.77.0
@@ -161,9 +161,9 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.etcd.io/etcd/api/v3 v3.5.7
 	go.etcd.io/etcd/client/v3 v3.5.7
-	go.opentelemetry.io/collector v0.77.0
-	go.opentelemetry.io/collector/component v0.77.0
-	go.opentelemetry.io/collector/confmap v0.77.0
+	go.opentelemetry.io/collector v0.78.2
+	go.opentelemetry.io/collector/component v0.78.2
+	go.opentelemetry.io/collector/confmap v0.78.2
 	go.opentelemetry.io/collector/consumer v0.77.0
 	go.opentelemetry.io/collector/exporter v0.77.0
 	go.opentelemetry.io/collector/exporter/loggingexporter v0.77.0
@@ -171,7 +171,7 @@ require (
 	go.opentelemetry.io/collector/exporter/otlphttpexporter v0.77.0
 	go.opentelemetry.io/collector/extension/ballastextension v0.77.0
 	go.opentelemetry.io/collector/extension/zpagesextension v0.77.0
-	go.opentelemetry.io/collector/pdata v1.0.0-rcv0011
+	go.opentelemetry.io/collector/pdata v1.0.0-rcv0012
 	go.opentelemetry.io/collector/processor/batchprocessor v0.77.0
 	go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.77.0
 	go.opentelemetry.io/collector/receiver v0.77.0
@@ -185,9 +185,9 @@ require (
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
-	golang.org/x/net v0.9.0
+	golang.org/x/net v0.10.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
-	google.golang.org/grpc v1.54.0
+	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v3 v3.0.1
@@ -382,7 +382,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/metrics v0.77.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/proxy v0.77.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/xray v0.77.0 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.77.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.78.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.77.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/docker v0.77.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/filter v0.77.0 // indirect
@@ -456,7 +456,7 @@ require (
 	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64 // indirect
 	go.mongodb.org/atlas v0.25.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.4 // indirect
-	go.opentelemetry.io/collector/featuregate v0.77.0 // indirect
+	go.opentelemetry.io/collector/featuregate v1.0.0-rcv0012 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.15.0 // indirect
 	go.opentelemetry.io/otel/bridge/opencensus v0.38.0 // indirect
 	golang.org/x/tools v0.8.0 // indirect
@@ -495,7 +495,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/buraksezer/consistent v0.10.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/cncf/xds/go v0.0.0-20230112175826-46e39c7b9b43 // indirect
+	github.com/cncf/xds/go v0.0.0-20230310173818-32f1caf87195 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -623,8 +623,8 @@ require (
 	golang.org/x/mod v0.10.0
 	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/term v0.8.0 // indirect
 	golang.org/x/text v0.9.0
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/api v0.120.0 // indirect
