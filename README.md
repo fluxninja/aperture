@@ -27,7 +27,7 @@
 
 # 🥷 FluxNinja Aperture
 
-Aperture is an intelligent load management platform for modern cloud
+Aperture is an observability-driven load management platform for modern cloud
 applications.
 
 ## ⚙️ Features
@@ -37,8 +37,8 @@ applications.
   of services. This queue dynamically adjusts the rate of requests based on live
   service health, thereby mitigating potential service disruptions and ensuring
   optimal performance under all load conditions.
-- **Intelligent quota management:** Maintain compliance with external API quotas
-  with a global token bucket and smart request queuing. This feature regulates
+- **Global quota management:** Maintain compliance with external API quotas with
+  a global token bucket and smart request queuing. This feature regulates
   requests aimed at external services, ensuring that the usage remains within
   prescribed rate limits and avoids penalties or additional costs.
 - **Workload prioritization:** Safeguard crucial user experience pathways and
