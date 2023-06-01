@@ -14,6 +14,8 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+## Policy Overview
+
 External Rate Limiting is a technique to limit the number of outgoing requests
 from services to an external API server. Turning your apps into spend aware and
 keeping them within quota limits to avoid cost overages. However, not all
@@ -26,7 +28,31 @@ ensure quota limits and a
 [Weighted Fair Queuing (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
 based Workload Scheduler to assure prioritized access for critical workloads.
 
-## Policy
+## Policy Key Concepts
+
+At a high-level, this policy consists of:
+
+- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
+  signal managers for flow control and observability components in the Aperture
+  Agents. They lay down the traffic rules determining how these components
+  should select flows for their operations.
+- [Control Point](../../concepts/flow-control/selector.md): Think of Control
+  Points as designated checkpoints in your code or data plane. They're the
+  strategic points where flow control decisions are applied. Developers define
+  these using SDKs or during API Gateways or Service Meshes integration.
+- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md):
+  Implemented on a token bucket algorithm, the rate limiter is an effective tool
+  used to avoid recurring heavy traffic. This parking meter is flexible; it can
+  be configured to work with different labels and limits.
+- [Scheduler](../../concepts/flow-control/components/load-scheduler.md): The
+  Scheduler ensures that requests are served based on their priority and size.
+  It employs a Weighted Fair Queue-based system to serve the requests, using a
+  Load Multiplier to calculate the token refill rate. If the incoming token rate
+  exceeds the desired rate, it queues the requests and helps provide a smooth
+  user experience, prioritizing critical orders over less urgent ones to ensure
+  customer satisfaction.
+
+## Policy Configuration
 
 In this policy,
 [Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)

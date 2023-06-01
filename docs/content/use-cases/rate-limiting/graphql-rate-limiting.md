@@ -13,17 +13,35 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-This tutorial demonstrates how to use the [_Classifier_][rego-rules] to
-implement
-[rate-limiting](/reference/policies/bundled-blueprints/policies/rate-limiting.md)
-for a GraphQL query.
+## Policy Overview
 
-## Policy
+This policy is an example of how to implement
+[rate limiting](../../reference/policies/bundled-blueprints/policies/rate-limiting.md)
+for GraphQL queries using the [_Classifier_][rego-rules].
 
-This tutorial will demonstrate how to implement a policy that uses a
-[_Classifier_][classifier] to extract the `userID` claim from a JWT token in the
-request's Authorization header and then rate limit unique users based on that
-`user_id` [_Flow Label_][flow-label].
+## Policy Key Concepts
+
+At a high level, this policy consists of:
+
+- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md):
+  Implemented on a token bucket algorithm, the rate limiter is an effective tool
+  used to avoid recurring heavy traffic. This parking meter is flexible; it can
+  be configured to work with different labels and limits.
+- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
+  signal managers for flow control and observability components in the Aperture
+  Agents. They lay down the traffic rules determining how these components
+  should select flows for their operations.
+- [Control Point](../../concepts/flow-control/selector.md): Think of Control
+  Points as designated checkpoints in your code or data plane. They're the
+  strategic points where flow control decisions are applied. Developers define
+  these using SDKs or during API Gateways or Service Meshes integration.
+
+## Policy Configuration
+
+The following policy contains [_Classifier_][classifier] that extracts the
+`userID` claim from a JWT token in the request's authorization header and then
+rate limit unique users based on the extracted `user_id` [_Flow
+Label_][flow-label].
 
 :::tip
 

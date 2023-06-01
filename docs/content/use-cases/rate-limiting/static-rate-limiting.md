@@ -12,13 +12,32 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+## Policy Overview
+
 One of the simplest flow control policies is static rate limiting to regulate
 heavy-hitters. It uses the
 [Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
 block specific flow labels that exceed their quota within a certain time frame
 (limit reset interval).
 
-## Policy
+## Policy Key Concepts
+
+At a high level, this policy consists of:
+
+- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md):
+  Implemented on a token bucket algorithm, the rate limiter is an effective tool
+  used to avoid recurring heavy traffic. This parking meter is flexible; it can
+  be configured to work with different labels and limits.
+- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
+  signal managers for flow control and observability components in the Aperture
+  Agents. They lay down the traffic rules determining how these components
+  should select flows for their operations.
+- [Control Point](../../concepts/flow-control/selector.md): Think of Control
+  Points as designated checkpoints in your code or data plane. They're the
+  strategic points where flow control decisions are applied. Developers define
+  these using SDKs or during API Gateways or Service Meshes integration.
+
+## Policy Configuration
 
 This example demonstrates rate limiting of unique users based on the `User-Id`
 header in the HTTP traffic. Envoy proxy provides this header under the label key

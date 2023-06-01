@@ -13,7 +13,7 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Policy
+## Policy Overview
 
 One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be reported using
@@ -29,6 +29,26 @@ latency of only one of these workloads using a Flux Meter. Refer to the
 applying the Flux Meter to a subset of API calls for a service.
 
 :::
+
+## Policy Key Concepts
+
+At a high level, this policy consists of:
+
+- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
+  signal managers for flow control and observability components in the Aperture
+  Agents. They lay down the traffic rules determining how these components
+  should select flows for their operations.
+- [Control Point](../../concepts/flow-control/selector.md): Think of Control
+  Points as designated checkpoints in your code or data plane. They're the
+  strategic points where flow control decisions are applied. Developers define
+  these using SDKs or during API Gateways or Service Meshes integration.
+- [FluxMeter](../../concepts/flow-control/resources/flux-meter.md): Flux Meter
+  converts a flux of flows matching a Flow Selector into a Prometheus histogram.
+  By default, it tracks the workload duration of a flow. However, it's flexible
+  enough to track any metric from OpenTelemetry attributes based on the method
+  of insertion.
+
+## Policy Configuration
 
 In this example, the EMA of latency is computed using metrics reported by the
 Flux Meter and obtained periodically through a

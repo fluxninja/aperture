@@ -25,7 +25,34 @@ enables prioritization of certain flows over others based on their flow labels,
 ensuring that the user experience or revenue is maximized in the face of
 overloads and other failures.
 
-## Policy
+## Policy Key Concepts
+
+At a high level, this policy consists of:
+
+- [Classifier](../../concepts/flow-control/resources/classifier.md): The
+  Classifier creates additional Flow Labels based on request metadata. To set up
+  a Classifier, it must be included as a resource in a policy - specifying the
+  rules based on request metadata.
+- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
+  signal managers for flow control and observability components in the Aperture
+  Agents. They lay down the traffic rules determining how these components
+  should select flows for their operations.
+- [Control Point](../../concepts/flow-control/selector.md): Think of Control
+  Points as designated checkpoints in your code or data plane. They're the
+  strategic points where flow control decisions are applied. Developers define
+  these using SDKs or during API Gateways or Service Meshes integration.
+- [Load Scheduler](../../concepts/flow-control/components/load-scheduler.md):
+  The Load Scheduler prevents chaos by managing incoming request traffic
+  efficiently. It's tasked with limiting the concurrent requests to a service
+  and assigning different priorities and weights to workloads to ensures that
+  high-priority requests get served first during heavy traffic.
+- [FluxMeter](../../concepts/flow-control/resources/flux-meter.md): Flux Meter
+  converts a flux of flows matching a Flow Selector into a Prometheus histogram.
+  By default, it tracks the workload duration of a flow. However, it's flexible
+  enough to track any metric from OpenTelemetry attributes based on the method
+  of insertion.
+
+## Policy Configuration
 
 In this example policy, traffic of different types of users will be prioritized,
 with `subscriber` users receiving higher priority over `guest` users. This means

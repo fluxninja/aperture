@@ -14,6 +14,8 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+## Policy Overview
+
 This policy builds upon the _Service Protection with Load-based Pod Auto-Scaler_
 [blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
 to add an escalation for auto-scaling. The basic service protection policy
@@ -35,11 +37,7 @@ based on CPU utilization. These _Controllers_ adjust the resources allocated to
 the service based on changes in CPU usage, ensuring that the service can handle
 the workload efficiently.
 
-## Policy
-
-This policy extends the _Service Protection_
-[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
-by adding auto-scaling to meet persistent changes in demand.
+## Policy Key Concepts
 
 At a high level, this policy consists of:
 
@@ -55,6 +53,29 @@ At a high level, this policy consists of:
   _Controller_ based on CPU utilization which adjusts the instances of the
   service based on changes in CPU usage, ensuring that the service is not
   over-provisioned.
+
+Some of the key concepts used in this policy are:
+
+- [Load Scheduler](../../../concepts/flow-control/components/load-scheduler.md):
+  The Load Scheduler prevents chaos by managing incoming request traffic
+  efficiently. It's tasked with limiting the concurrent requests to a service
+  and assigning different priorities and weights to workloads to ensures that
+  high-priority requests get served first during heavy traffic.
+- [Selector](../../../concepts/flow-control/selector.md): Selectors are the
+  traffic signal managers for flow control and observability components in the
+  Aperture Agents. They lay down the traffic rules determining how these
+  components should select flows for their operations.
+- [Control Point](../../../concepts/flow-control/selector.md): Think of Control
+  Points as designated checkpoints in your code or data plane. They're the
+  strategic points where flow control decisions are applied. Developers define
+  these using SDKs or during API Gateways or Service Meshes integration.
+- [FluxMeter](../../../concepts/flow-control/resources/flux-meter.md): Flux
+  Meter converts a flux of flows matching a Flow Selector into a Prometheus
+  histogram. By default, it tracks the workload duration of a flow. However,
+  it's flexible enough to track any metric from OpenTelemetry attributes based
+  on the method of insertion.
+
+## Policy Configuration
 
 ```mdx-code-block
 <Tabs>
