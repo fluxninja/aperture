@@ -1427,8 +1427,8 @@ github.com/open-telemetry/opentelemetry-collector-contrib/receiver/dockerstatsre
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/dockerstatsreceiver v0.77.0/go.mod h1:qqjU4kuGAiq3tU/NOuUe0gsq6GL1X+gdUYvHt0v0QKk=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchreceiver v0.77.0 h1:asp0mjiXG2zm1DBI/wZPV9aHPCkqyIw+6C8VqxSuASs=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchreceiver v0.77.0/go.mod h1:Y6qEv1Dei00G2nf8iKti3sMgvcPoAm3PrtLAry9R04E=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/expvarreceiver v0.77.0 h1:e7MAlckPpfDH0xCCCXReRGeqth7iafmIl0wF/wYTAlI=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/expvarreceiver v0.77.0/go.mod h1:7X6WY8g/6jNLb9WEqDtXZFxaI/v2NvVEU/gh5ssZSZA=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/expvarreceiver v0.78.0 h1:Zhvkv68vHacSOl61cSh+50J6RuKLAjveLb2OAsLFRwY=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/expvarreceiver v0.78.0/go.mod h1:vyQ7TLSQqdzueWjpTLa3cRU0VInXrut94Xg0wTx2Y34=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.77.0 h1:QD/YxWhDA+k/7DMwdXJD2OH0r3Aol3JD9p+39SEb9sY=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.77.0/go.mod h1:jfpQHlERye74VxCmfFWxEUWG6j+lHdq3jQi5YkI2Tcc=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/flinkmetricsreceiver v0.77.0 h1:2iMsL1+GDMi+sOFI3sT/LYqbbvCzz9UCv8bkMx/HSn0=
