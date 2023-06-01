@@ -14,7 +14,7 @@ policy:
       label_key: http.request.header.api_key
       interval: 1s
       lazy_sync:
-        enabled: true
+        enabled: false
         num_sync: 4
     scheduler:
       workloads:
