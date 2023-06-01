@@ -1,5 +1,5 @@
 ---
-title: Basic Service Protection
+title: Service Protection
 keywords:
   - policies
   - concurrency

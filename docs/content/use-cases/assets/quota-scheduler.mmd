@@ -1,0 +1,32 @@
+flowchart LR
+classDef TokenBucket fill:#F26D3D,stroke:#000000,stroke-width:2px;
+classDef Signal fill:#ffe4b5,stroke:#000000,stroke-width:1px;
+classDef Service fill:#53A67F,stroke:#000000,stroke-width:2px;
+classDef HP fill:#add8e6,stroke:#000000,stroke-width:1px;
+classDef LP fill:#ffb6c1,stroke:#000000,stroke-width:1px;
+
+BC("Bucket Capacity") --> TB
+RS("Fill Amount") --> TB
+
+TB[\Token Bucket/]
+class TB TokenBucket
+
+TB <-- "Counting" --> Agents
+
+subgraph " "
+Service-A -- "req/s" --> Agents
+class Service-A Service
+  subgraph "Agents"
+    subgraph "Scheduler"
+      HP("High Priority - 200")
+      class HP HP
+      LP("Low Priority - 50")
+      class LP LP
+    end
+    class Scheduler Service
+  end
+  class Agents MainClass
+  HP --> Service-B
+  LP --> Service-B
+  class Service-B Service
+end

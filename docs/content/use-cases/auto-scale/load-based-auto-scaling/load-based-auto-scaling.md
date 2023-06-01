@@ -14,9 +14,7 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Load-based auto-scaling is a technique used to dynamically adjust the number of
-instances or resources allocated to a service based on workload demands. This
-policy builds upon the _Service Protection with Load-based Pod Auto-Scaler_
+This policy builds upon the _Service Protection with Load-based Pod Auto-Scaler_
 [blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
 to add an escalation for auto-scaling. The basic service protection policy
 protects the service from sudden traffic spikes. But it is necessary to scale

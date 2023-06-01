@@ -13,14 +13,6 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Monitoring the health of a service is a critical aspect of ensuring reliable
-operations. In this example, we will demonstrate how to detect an overload state
-of a service and send an alert using Aperture's declarative policy language. The
-policy will create a circuit that models the normal latency behavior of the
-service using an exponential moving average (EMA). This enables the alerting
-policy to automatically learn the normal latency threshold of each service,
-reducing the need for manual tuning of alert policies for individual services.
-
 ## Policy
 
 One of the most reliable metrics to detect overload state is latency of the
