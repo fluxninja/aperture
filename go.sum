@@ -520,8 +520,8 @@ github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1 h1:aZbbKMGqnRUQubdJS5tfoZ
 github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1/go.mod h1:Qrdw/7mOFS2SKCOALKFfEH8gdvXJi8XZjw9g5ilpf4I=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
-github.com/fluxninja/olric v0.5.4-fn.patch.11 h1:ydG2Ey0cbQiUFOY57gah9VDw8gEX9xVmI0Lv6gqwdNs=
-github.com/fluxninja/olric v0.5.4-fn.patch.11/go.mod h1:ndjlnRvJfFrE8eJlQNBJsDJa11tIsb5BXSfPmTi7qjE=
+github.com/fluxninja/olric v0.5.4-fn.patch.12 h1:Hx7kd8ath8N4tCJlId5uIW0H8QEnnOzqjRnupXxYyDs=
+github.com/fluxninja/olric v0.5.4-fn.patch.12/go.mod h1:ndjlnRvJfFrE8eJlQNBJsDJa11tIsb5BXSfPmTi7qjE=
 github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.2 h1:UUGrdDLPV90bWBGh7bB9WXUhMZQkV9CrLmyUkyBIs8k=
 github.com/fluxninja/opentelemetry-collector v0.77.0-fn.patch.2/go.mod h1:DhLxVqYW2XcA+FBhYaj7ZCgMP1IWsYmk/gLrsxE0XXM=
 github.com/fluxninja/opentelemetry-collector/component v0.77.0-fn.patch.2 h1:QT/TZRxIlA4wim+/Zp1zPeckcyfls1D7TWptIP5Y+GY=
@@ -1175,8 +1175,6 @@ github.com/mitchellh/reflectwalk v1.0.0/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx
 github.com/mitchellh/reflectwalk v1.0.2 h1:G2LzWKi524PWgd3mLHV8Y5k7s6XUvT0Gef6zxSIeXaQ=
 github.com/mitchellh/reflectwalk v1.0.2/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
 github.com/mmcloughlin/avo v0.5.0/go.mod h1:ChHFdoV7ql95Wi7vuq2YT1bwCJqiWdZrQ1im3VujLYM=
-github.com/moby/locker v1.0.1 h1:fOXqR41zeveg4fFODix+1Ch4mj/gT0NE1XJbp/epuBg=
-github.com/moby/locker v1.0.1/go.mod h1:S7SDdo5zpBK84bzzVlKr2V0hz+7x9hWbYC/kq7oQppc=
 github.com/moby/patternmatcher v0.5.0 h1:YCZgJOeULcxLw1Q+sVR636pmS7sPEn1Qo2iAN6M7DBo=
 github.com/moby/spdystream v0.2.0 h1:cjW1zVyyoiM0T7b6UoySUFqzXMoqRckQtXwGPiBhOM8=
 github.com/moby/spdystream v0.2.0/go.mod h1:f7i0iNDQJ059oMTcWxx8MA/zKFIuD/lY+0GqbN2Wy8c=
