@@ -7,7 +7,6 @@ import (
 	stdlog "log"
 	"net"
 	"strconv"
-	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -153,6 +152,10 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			defer func() {
+				utils.Shutdown(in.Shutdowner)
+			}()
+
 			// Register metrics with Prometheus.
 			err := dc.metrics.registerMetrics(in.PrometheusRegistry)
 			if err != nil {
@@ -164,7 +167,6 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				startErr := dc.olric.Start()
 				if startErr != nil {
 					log.Error().Err(startErr).Msg("Failed to start distcache")
-					utils.Shutdown(in.Shutdowner)
 				}
 			})
 
@@ -173,14 +175,6 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			case <-ctx.Done():
 				return errors.New("olric failed to start")
 			case <-startChan:
-			}
-
-			// create a new context with a timeout to avoid hanging
-			newCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-			defer cancel()
-			_, err = dc.client.Stats(newCtx, "")
-			if err != nil {
-				return err
 			}
 
 			err = in.LivenessMultiJob.RegisterJob(job)
