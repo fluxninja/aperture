@@ -1107,6 +1107,10 @@ spec:
                       replica_count:
                         description: ReplicaCount is 1 by default.
                         type: integer
+                      sync_replication:
+                        description: SyncReplication enables synchronous replication.
+                          By default the replication is asynchronous.
+                        type: boolean
                     type: object
                   etcd:
                     description: Etcd configuration.
