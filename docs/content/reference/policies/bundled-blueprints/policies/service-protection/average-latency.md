@@ -48,10 +48,9 @@ component that is used within this blueprint.
 :::info
 
 See tutorials on
-[Basic Service Protection](/use-cases/service-protection/basic-service-protection.md)
-and
-[Workload Prioritization](/use-cases/service-protection/workload-prioritization.md)
-to see this blueprint in use.
+[Basic Service Protection](/use-cases/service-protection/protection.md) and
+[Workload Prioritization](/use-cases/service-protection/prioritization.md) to
+see this blueprint in use.
 
 :::
 
