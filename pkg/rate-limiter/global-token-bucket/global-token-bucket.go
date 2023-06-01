@@ -7,7 +7,6 @@ import (
 
 	"github.com/buraksezer/olric"
 	"github.com/buraksezer/olric/config"
-	"github.com/moby/locker"
 
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -23,14 +22,13 @@ const (
 
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
-	mu             sync.RWMutex
-	locker         locker.Locker
 	dMap           olric.DMap
 	dc             *distcache.DistCache
 	name           string
 	bucketCapacity float64
 	fillAmount     float64
 	interval       time.Duration
+	mu             sync.RWMutex
 	continuousFill bool
 	passThrough    bool
 }
@@ -244,14 +242,6 @@ type takeNResponse struct {
 func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]byte, []byte, error) {
 	gtb.mu.RLock()
 	defer gtb.mu.RUnlock()
-
-	gtb.locker.Lock(key)
-	defer func() {
-		err := gtb.locker.Unlock(key)
-		if err != nil {
-			log.Error().Err(err).Str("key", key).Msg("error unlocking key")
-		}
-	}()
 
 	// Decode currentState from gob encoded currentStateBytes
 	now := time.Now()

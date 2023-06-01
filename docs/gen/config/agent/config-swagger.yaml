@@ -394,6 +394,13 @@ definitions:
                 x-go-name: ReplicaCount
                 x-go-tag-default: "1"
                 x-go-tag-json: replica_count
+            sync_replication:
+                default: false
+                description: SyncReplication enables synchronous replication. By default the replication is asynchronous.
+                type: boolean
+                x-go-name: SyncReplication
+                x-go-tag-default: "false"
+                x-go-tag-json: sync_replication
         title: DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/dist-cache/config

@@ -1267,6 +1267,19 @@ to.
 ReplicaCount is 1 by default.
 
 </dd>
+<dt>sync_replication</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+SyncReplication enables synchronous replication. By default the replication is
+asynchronous.
+
+</dd>
 </dl>
 
 ---
