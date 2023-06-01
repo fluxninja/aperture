@@ -152,10 +152,6 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			defer func() {
-				utils.Shutdown(in.Shutdowner)
-			}()
-
 			// Register metrics with Prometheus.
 			err := dc.metrics.registerMetrics(in.PrometheusRegistry)
 			if err != nil {
@@ -164,6 +160,10 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			}
 
 			panichandler.Go(func() {
+				defer func() {
+					utils.Shutdown(in.Shutdowner)
+				}()
+
 				startErr := dc.olric.Start()
 				if startErr != nil {
 					log.Error().Err(startErr).Msg("Failed to start distcache")
