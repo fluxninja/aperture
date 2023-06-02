@@ -15,12 +15,14 @@ public class TrafficFlow {
     private final Span span;
     public boolean ended;
     private boolean ignored;
+    private boolean failOpen;
 
     TrafficFlow(CheckHTTPResponse checkResponse, Span span, boolean ended) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
         this.ignored = false;
+        this.failOpen = true;
     }
 
     static TrafficFlow ignoredFlow() {
@@ -32,7 +34,8 @@ public class TrafficFlow {
     /**
      * Returns 'true' if flow was accepted by Aperture Agent, or if the agent did not respond.
      *
-     * @deprecated This method assumes fail-open behavior. Use {@link #getDecision} instead
+     * @deprecated This method assumes fail-open behavior. Use {@link #shouldRun} or {@link
+     *     #getDecision} instead
      * @return Whether the flow was accepted.
      */
     public boolean accepted() {
@@ -52,6 +55,28 @@ public class TrafficFlow {
             return FlowDecision.Accepted;
         }
         return FlowDecision.Rejected;
+    }
+
+    /**
+     * Returns whether the flow should be allowed to run, based on flow fail-open configuration and
+     * Aperture Agent response.
+     *
+     * @return Whether the flow should be allowed to run
+     */
+    public boolean shouldRun() {
+        return getDecision() == FlowDecision.Accepted
+                || (getDecision() == FlowDecision.Unreachable && this.failOpen);
+    }
+
+    /**
+     * Disables fail-open behavior. If set, the {@link #shouldRun} method will return False if the
+     * Aperture Agent is unreachable.
+     *
+     * @return This TrafficFlow object
+     */
+    public TrafficFlow withNoFailOpen() {
+        this.failOpen = false;
+        return this;
     }
 
     public boolean ignored() {
