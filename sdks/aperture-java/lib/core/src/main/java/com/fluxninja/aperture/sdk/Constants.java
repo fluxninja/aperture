@@ -11,6 +11,8 @@ public final class Constants {
     // Config defaults.
     public static final Duration DEFAULT_RPC_TIMEOUT = Duration.ofMillis(200);
     public static final Duration DEFAULT_GRPC_RECONNECTION_TIME = Duration.ofSeconds(10);
+    public static final String DEFAULT_AGENT_HOST = "localhost";
+    public static final int DEFAULT_AGENT_PORT = 8089;
 
     // Label keys.
     public static final String SOURCE_LABEL = "aperture.source";

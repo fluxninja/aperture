@@ -1,7 +1,6 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.DEFAULT_RPC_TIMEOUT;
-import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
+import static com.fluxninja.aperture.sdk.Constants.*;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
@@ -20,6 +19,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
@@ -31,6 +32,8 @@ public final class ApertureSDKBuilder {
     private String certFile;
     private final List<String> ignoredPaths;
     private boolean ignoredPathsMatchRegex = false;
+
+    private static Logger logger = LoggerFactory.getLogger(ApertureSDKBuilder.class);
 
     ApertureSDKBuilder() {
         ignoredPaths = new ArrayList<>();
@@ -162,12 +165,16 @@ public final class ApertureSDKBuilder {
     public ApertureSDK build() throws ApertureSDKException {
         String host = this.host;
         if (host == null) {
-            throw new ApertureSDKException("host needs to be set");
+            logger.warn(
+                    "Host not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_HOST);
+            host = DEFAULT_AGENT_HOST;
         }
 
         int port = this.port;
         if (port == 0) {
-            throw new ApertureSDKException("port needs to be set");
+            logger.warn(
+                    "Port not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_PORT);
+            port = DEFAULT_AGENT_PORT;
         }
 
         String OtlpSpanExporterProtocol = "http";
