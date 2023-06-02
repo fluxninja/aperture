@@ -5,10 +5,11 @@ metadata:
     fluxninja.com/blueprint-name: policies/service-protection/promql
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"evaluation_interval": "1s", "policy_name":
-      "workload-prioritization-hasura", "promql_query": "pg_db_queries_per_second{db=\"hasura\"}",
-      "resources": {"flow_control": {"classifiers": [{"rego": {"labels": {"operation":
-      {"telemetry": true}, "source": {"telemetry": true}}, "module": "package hasura_example\nsource
-      = input.attributes.source.source_fqdns[0]\noperation = graphql.parse_query(input.parsed_body.query).Operations[_].Operation\n"},
+      "workload-prioritization-postgres", "promql_query": "sum(pg_connections{db=\"hasura\"})
+      / max(pg_setting{name=\"max_connections\"}) * 100", "resources": {"flow_control":
+      {"classifiers": [{"rego": {"labels": {"operation": {"telemetry": true}, "source":
+      {"telemetry": true}}, "module": "package hasura_example\nsource = input.attributes.source.source_fqdns[0]\noperation
+      = graphql.parse_query(input.parsed_body.query).Operations[_].Operation\n"},
       "selectors": [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}]},
       "telemetry_collectors": [{"agent_group": "default", "infra_meters": {"prometheus_simple":
       {"per_agent_group": true, "receivers": {"prometheus_simple": {"collection_interval":
@@ -22,10 +23,10 @@ metadata:
       {"match_labels": {"operation": "query", "source": "agent-service.cloud.svc.cluster.local"}},
       "name": "agent-service-query", "parameters": {"priority": 50}}]}, "selectors":
       [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}}},
-      "setpoint": 1500}}'
+      "setpoint": 70}}'
   labels:
     fluxninja.com/validate: "true"
-  name: workload-prioritization-hasura
+  name: workload-prioritization-postgres
 spec:
   circuit:
     components:
@@ -87,10 +88,11 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: pg_db_queries_per_second{db="hasura"}
+          query_string: sum(pg_connections{db="hasura"}) / max(pg_setting{name="max_connections"})
+            * 100
     - variable:
         constant_output:
-          value: 1500
+          value: 70
         out_ports:
           output:
             signal_name: SETPOINT

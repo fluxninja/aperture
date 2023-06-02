@@ -4,9 +4,9 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "policies/service-protection/promql",
-      "policy_name": "workload-prioritization-hasura",
-      "values_file": "policies/workload-prioritization-hasura.yaml",
+      "blueprint_name": "policies/service-protection-with-load-based-pod-auto-scaler/average-latency",
+      "policy_name": "auto-scaling-hasura",
+      "values_file": "policies/auto-scaling-hasura.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

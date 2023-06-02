@@ -1,9 +1,19 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/promql/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency/gen/definitions.json
 policy:
-  policy_name: workload-prioritization-hasura
-  promql_query: 'pg_db_queries_per_second{db="hasura"}'
-  setpoint: 1500
-  evaluation_interval: "1s"
+  policy_name: auto-scaling-hasura
+  auto_scaling:
+    kubernetes_replicas:
+      max_replicas: "10"
+      min_replicas: "1"
+      kubernetes_object_selector:
+        agent_group: default
+        api_version: apps/v1
+        kind: Deployment
+        name: hasura
+        namespace: cloud
+    scaling_parameters:
+      scale_in_cooldown: "120s"
+      scale_out_cooldown: "30s"
   resources:
     flow_control:
       classifiers:
@@ -20,19 +30,8 @@ policy:
               package hasura_example
               source = input.attributes.source.source_fqdns[0]
               operation = graphql.parse_query(input.parsed_body.query).Operations[_].Operation
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          prometheus_simple:
-            per_agent_group: true
-            receivers:
-              prometheus_simple:
-                collection_interval: 1s
-                use_service_account: true
-                endpoint: "hasura-postgresql-metrics.cloud.svc.cluster.local:9187"
-                tls:
-                  insecure_skip_verify: true
   service_protection_core:
+    dry_run: true
     adaptive_load_scheduler:
       load_scheduler:
         selectors:
@@ -60,3 +59,12 @@ policy:
               parameters:
                 priority: 50
               name: "agent-service-query"
+  latency_baseliner:
+    flux_meter:
+      selectors:
+        - control_point: ingress
+          service: hasura.cloud.svc.cluster.local
+          label_matcher:
+            match_labels:
+              operation: "query"
+              source: "api-service.cloud.svc.cluster.local"

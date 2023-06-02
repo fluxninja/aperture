@@ -4,6 +4,19 @@ import { vu } from "k6/execution";
 import http from "k6/http";
 
 export let vuStagesAPI = [
+  { duration: "0s", target: 5 },
+  { duration: "30s", target: 5 },
+  { duration: "30s", target: 10 },
+  { duration: "1m", target: 10 },
+  { duration: "30s", target: 20 },
+  { duration: "3m", target: 20 },
+  { duration: "30s", target: 10 },
+  { duration: "1m", target: 10 },
+  { duration: "30s", target: 5 },
+  { duration: "30s", target: 5 },
+];
+
+export let vuStagesAgent = [
   { duration: "0s", target: 3 },
   { duration: "30s", target: 3 },
   { duration: "30s", target: 6 },
@@ -14,19 +27,6 @@ export let vuStagesAPI = [
   { duration: "1m", target: 6 },
   { duration: "30s", target: 3 },
   { duration: "30s", target: 3 },
-];
-
-export let vuStagesAgent = [
-  { duration: "0s", target: 1 },
-  { duration: "30s", target: 1 },
-  { duration: "30s", target: 3 },
-  { duration: "1m", target: 3 },
-  { duration: "30s", target: 5 },
-  { duration: "3m", target: 5 },
-  { duration: "30s", target: 3 },
-  { duration: "1m", target: 3 },
-  { duration: "30s", target: 1 },
-  { duration: "30s", target: 1 },
 ];
 
 export let options = {
