@@ -91,9 +91,8 @@ public class App {
         // Flow.
         Flow flow = this.apertureSDK.startFlow(this.featureName, labels);
 
-        FlowDecision flowDecision = flow.getDecision();
         // See whether flow was accepted by Aperture Agent.
-        if (flowDecision != FlowDecision.Rejected) {
+        if (flow.shouldRun()) {
             // Simulate work being done
             try {
                 res.status(202);
