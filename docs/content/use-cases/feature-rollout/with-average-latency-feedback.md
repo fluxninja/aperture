@@ -25,7 +25,7 @@ experience.
 ## Policy
 
 This policy uses the
-[`Feature Rollout with Average Latency Feedback`](/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency.md)
+[`Feature Rollout with Average Latency Feedback`](/reference/blueprints/policies/feature-rollout/average-latency.md)
 blueprint that enables incremental roll out of a new feature. In this example,
 we will create a policy that slowly ramps up the percentage of requests that are
 served with the new feature. We will continuously monitor the application's
@@ -35,7 +35,7 @@ configured limit.
 At a high-level, this policy consists of:
 
 - Latency monitoring: Continuously measure the application's latency using the
-  [`average_latency_driver`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#average-latency-driver).
+  [`average_latency_driver`](/reference/blueprints/policies/feature-rollout/base.md#average-latency-driver).
 - Rollout control: Gradually increase the percentage of requests that are to be
   served the new feature using
   [`steps`](/reference/policies/spec#load-ramp-parameters-step). Monitor the

@@ -70,8 +70,8 @@ to see this blueprint in use.
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration
@@ -161,7 +161,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     name='policy.service_protection_core.overload_confirmations'
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (policies/service-protection/average-latency:schema:overload_confirmation)'
-    reference='../../../bundled-blueprints/policies/service-protection/average-latency#overload-confirmation'
+    reference='../../blueprints/policies/service-protection/average-latency#overload-confirmation'
     value='[{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]'
 />
 

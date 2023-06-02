@@ -289,8 +289,8 @@ rejected.
 :::
 
 [label]: ./flow-label.md
-[flux-meter]: ./resources/flux-meter.md
-[load-scheduler]: ./components/load-scheduler.md
-[classifier]: ./resources/classifier.md
+[flux-meter]: ./flow-control/resources/flux-meter.md
+[load-scheduler]: ./flow-control/components/load-scheduler.md
+[classifier]: ./flow-control/resources/classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md

@@ -30,7 +30,7 @@ processing capacity of the service.
 ## Policy
 
 This policy uses the Service Protection with Average Latency Feedback
-[Blueprint](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md).
+[Blueprint](/reference/blueprints/policies/service-protection/average-latency.md).
 
 ```mdx-code-block
 <Tabs>

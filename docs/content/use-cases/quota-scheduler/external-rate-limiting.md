@@ -20,7 +20,7 @@ keeping them within quota limits to avoid cost overages. However, not all
 workloads are on same priority, based on application, their priority can be
 different. While doing external rate limiting, it is important to ensure
 prioritized access for critical workloads. This policy builds upon the
-[`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
+[`Quota Scheduler`](/reference/blueprints/policies/quota-scheduler.md)
 Blueprint, which comprises components like the token bucket rate limiting to
 ensure quota limits and a
 [Weighted Fair Queuing (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
@@ -29,7 +29,7 @@ based Workload Scheduler to assure prioritized access for critical workloads.
 ## Policy
 
 In this policy,
-[Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
+[Quota Scheduler](/reference/blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
 component is configured with `bucket_capacity`, and rate limiting is configured
 based on label key `api_key` extracted from the request header. While the lazy
 sync of between the agent is set to false.

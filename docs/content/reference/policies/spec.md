@@ -1243,9 +1243,9 @@ extractors are recommended.
 
 <!-- vale on -->
 
-A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to rules that define how
-to extract and propagate flow labels with that key.
+A map of {key, value} pairs mapping from [flow label](/concepts/flow-label.md)
+keys to rules that define how to extract and propagate flow labels with that
+key.
 
 </dd>
 <dt>selectors</dt>
@@ -4147,8 +4147,7 @@ Describes which pods a control or observability component should apply to.
 
 <!-- vale on -->
 
-Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
-selector applies to.
+Which [agent-group](/concepts/selector.md#agent-group) this selector applies to.
 
 </dd>
 <dt>api_version</dt>
@@ -4209,9 +4208,8 @@ Kubernetes namespace that the resource belongs to.
 
 <!-- vale on -->
 
-Allows to define rules whether a map of
-[labels](/concepts/flow-control/flow-label.md) should be considered a match or
-not
+Allows to define rules whether a map of [labels](/concepts/flow-label.md) should
+be considered a match or not
 
 It provides three ways to define requirements:
 
@@ -6197,10 +6195,10 @@ specified by `fill_amount` signal.
 Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/flow-label.md) with given key. For example, to
-give each user a separate limit, assuming you have a _user_ flow label set up,
-set `label_key: "user"`. If no label key is specified, then all requests
-matching the selectors will be rate limited based on the global bucket.
+[label](/concepts/flow-label.md) with given key. For example, to give each user
+a separate limit, assuming you have a _user_ flow label set up, set
+`label_key: "user"`. If no label key is specified, then all requests matching
+the selectors will be rate limited based on the global bucket.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -6328,11 +6326,10 @@ rego:
 
 <!-- vale on -->
 
-A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to queries that define
-how to extract and propagate flow labels with that key. The name of the label
-maps to a variable in the Rego module. It maps to `data.<package>.<label>`
-variable.
+A map of {key, value} pairs mapping from [flow label](/concepts/flow-label.md)
+keys to queries that define how to extract and propagate flow labels with that
+key. The name of the label maps to a variable in the Rego module. It maps to
+`data.<package>.<label>` variable.
 
 </dd>
 <dt>module</dt>
@@ -6374,8 +6371,7 @@ Must include a "package" declaration.
 <!-- vale on -->
 
 Decides if the created flow label should be available as an attribute in OLAP
-telemetry and propagated in
-[baggage](/concepts/flow-control/flow-label.md#baggage)
+telemetry and propagated in [baggage](/concepts/flow-label.md#baggage)
 
 :::note
 
@@ -6404,8 +6400,8 @@ for sensitive labels.
 <!-- vale on -->
 
 _Regulator_ is a component that regulates the load at a
-[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing
-only a specified percentage of flows at random or by sticky sessions.
+[_Control Point_](/concepts/selector.md/#control-point) by allowing only a
+specified percentage of flows at random or by sticky sessions.
 
 :::info
 
@@ -6617,8 +6613,7 @@ High-level declarative extractor.
 <!-- vale on -->
 
 Decides if the created flow label should be available as an attribute in OLAP
-telemetry and propagated in
-[baggage](/concepts/flow-control/flow-label.md#baggage)
+telemetry and propagated in [baggage](/concepts/flow-label.md#baggage)
 
 :::note
 
@@ -7016,7 +7011,7 @@ as response latency and desired priority.
 <!-- vale on -->
 
 Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/flow-label.md).
+[flow labels](/concepts/flow-label.md).
 
 </dd>
 <dt>name</dt>
@@ -7067,9 +7062,9 @@ flows within a workload.
 <!-- vale on -->
 
 Fairness key is a label key that can be used to provide fairness within a
-workload. Any [flow label](/concepts/flow-control/flow-label.md) can be used
-here. For example, if you have a classifier that sets `user` flow label, you
-might want to set `fairness_key = "user"`.
+workload. Any [flow label](/concepts/flow-label.md) can be used here. For
+example, if you have a classifier that sets `user` flow label, you might want to
+set `fairness_key = "user"`.
 
 </dd>
 <dt>priority</dt>
@@ -7124,7 +7119,7 @@ operate on.
 
 :::info
 
-See also [Selector overview](/concepts/flow-control/selector.md).
+See also [Selector overview](/concepts/selector.md).
 
 :::
 
@@ -7157,8 +7152,7 @@ label_matcher:
 
 <!-- vale on -->
 
-[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this selector
-applies to.
+[_Agent Group_](/concepts/selector.md#agent-group) this selector applies to.
 
 :::info
 
@@ -7178,12 +7172,11 @@ configuration and form a peer to peer cluster to constantly share state.
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/selector.md#control-point) identifies
-location within services where policies can act on flows. For an SDK based
-insertion, a _Control Point_ can represent a particular feature or execution
-block within a service. In case of service mesh or middleware insertion, a
-_Control Point_ can identify ingress or egress calls or distinct listeners or
-filter chains.
+[Control Point](/concepts/selector.md#control-point) identifies location within
+services where policies can act on flows. For an SDK based insertion, a _Control
+Point_ can represent a particular feature or execution block within a service.
+In case of service mesh or middleware insertion, a _Control Point_ can identify
+ingress or egress calls or distinct listeners or filter chains.
 
 </dd>
 <dt>label_matcher</dt>
@@ -7195,8 +7188,8 @@ filter chains.
 
 <!-- vale on -->
 
-[Label Matcher](/concepts/flow-control/selector.md#label-matcher) can be used to
-match flows based on flow labels.
+[Label Matcher](/concepts/selector.md#label-matcher) can be used to match flows
+based on flow labels.
 
 </dd>
 <dt>service</dt>
@@ -7208,8 +7201,8 @@ match flows based on flow labels.
 
 <!-- vale on -->
 
-The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/selector.md) to select.
+The Fully Qualified Domain Name of the [service](/concepts/selector.md) to
+select.
 
 In Kubernetes, this is the FQDN of the Service object.
 

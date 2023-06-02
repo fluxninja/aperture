@@ -20,8 +20,8 @@ relevant fields highlighted in the aperturectl generated values file.
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration
@@ -43,7 +43,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     name='policy'
     description='Parameters for the Feature Rollout policy.'
     type='Object (policies/feature-rollout/base:schema:rollout_policy)'
-    reference='../../../bundled-blueprints/policies/feature-rollout/base#rollout-policy'
+    reference='../../blueprints/policies/feature-rollout/base#rollout-policy'
     value='{"components": [], "drivers": {"promql_drivers": [{"criteria": {"backward": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}, "forward": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}, "reset": {"operator": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}}, "query_string": "__REQUIRED_FIELD__"}]}, "evaluation_interval": "1s", "load_ramp": {"regulator": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "rollout": false}'
 />
 
@@ -59,7 +59,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     name='dashboard'
     description='Configuration for the Grafana dashboard accompanying this policy.'
     type='Object (policies/feature-rollout/base:param:dashboard)'
-    reference='../../../bundled-blueprints/policies/feature-rollout/base#dashboard'
+    reference='../../blueprints/policies/feature-rollout/base#dashboard'
     value='{"datasource": {"filter_regex": "", "name": "$datasource"}, "extra_filters": {}, "refresh_interval": "5s", "time_from": "now-15m", "time_to": "now"}'
 />
 

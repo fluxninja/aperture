@@ -91,7 +91,7 @@ you need to install integrations that will communicate with the Aperture Agent.
   to the _Agent_ as telemetry.
 
 [policies]: /concepts/policy/policy.md
-[control-point]: ./selector.md#control-point
+[control-point]: ../selector.md#control-point
 [load-scheduler]: ./components/load-scheduler.md
 [regulator]: ./components/regulator.md
 [rate-limiter]: ./components/rate-limiter.md

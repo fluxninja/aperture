@@ -62,5 +62,5 @@ import DocCardList from '@theme/DocCardList';
 
 [circuit]: /concepts/policy/circuit.md
 [resources]: /concepts/policy/resources.md
-[blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
+[blueprints]: ../../reference/blueprints/blueprints.md
 [control-system]: https://en.wikipedia.org/wiki/Control_system
