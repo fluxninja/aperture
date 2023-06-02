@@ -106,7 +106,7 @@ complete code snippet is available
 :::info
 
 Aperture SDKs are available for multiple languages, you choose the one that fits
-your needs. [See all SDKs](/integrations/flow-control/sdk/sdk.md).
+your needs. [See all SDKs](/integrations/sdk/sdk.md).
 
 :::
 

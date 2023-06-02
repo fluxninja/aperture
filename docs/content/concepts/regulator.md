@@ -52,4 +52,4 @@ control over the flow of requests to a control point, enabling you to achieve
 the desired balance between load and performance.
 
 [flow-regulator]: /reference/policies/spec.md#flow-regulator
-[control-point]: /concepts/flow-control/selector.md/#control-point
+[control-point]: /concepts/selector.md/#control-point

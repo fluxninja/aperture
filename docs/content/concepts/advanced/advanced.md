@@ -1,14 +1,17 @@
 ---
-title: Policy
-sidebar_position: 1
-sidebar_label: Policy Language
+title: Advanced
+sidebar_label: Advanced
+sidebar_position: 8
+keywords:
+  - policy
+  - circuit
+  - resources
 ---
 
-:::info
+This section contains a collection of advanced topics that are useful to better
+understand the dynamics of Aperture, Aperture policies, and their functionality.
 
-See also [Policy reference](/reference/policies/spec.md#policy)
-
-:::
+## Policy
 
 Aperture's policy language enables expression of closed-loop [control
 systems][control-system] in a declarative manner. Aperture includes pre-packaged
@@ -21,6 +24,12 @@ policies programmatically, running in a continuous control loop. In an
 application reliability context, policies codify the capability of the
 application to modify its operational state to achieve the best possible mode of
 operation despite overload and failures.
+
+:::info
+
+See also [Policy reference](/reference/policies/spec.md#policy)
+
+:::
 
 Aperture's control loop policies are programmable "circuits" that are evaluated
 periodically. One of the primary goals of these policies is to calculate the
@@ -50,7 +59,7 @@ objectives and trigger appropriate actions to restore system stability and
 reliability. The circuit is the heart of the policy specification and is
 responsible for the logic of the control system.
 
-## Resources
+## Resource
 
 A list of [Resources][resources] which need to be set up to support the circuit.
 
@@ -60,7 +69,7 @@ import DocCardList from '@theme/DocCardList';
 
 <DocCardList />
 
-[circuit]: /concepts/policy/circuit.md
-[resources]: /concepts/policy/resources.md
+[circuit]: /concepts/advanced/circuit.md
+[resources]: /concepts/resources/resources.md
 [blueprints]: ../../reference/blueprints/blueprints.md
 [control-system]: https://en.wikipedia.org/wiki/Control_system

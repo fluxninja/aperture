@@ -194,20 +194,20 @@ For _Classifier_ created labels, you can disable this behavior by setting
 :::
 
 [selectors]: ./selector.md
-[classifier]: ./flow-control/resources/classifier.md
-[workload]: ./flow-control/components/load-scheduler.md#workload
-[ratelimiter]: ./flow-control/components/rate-limiter.md
-[scheduler]: ./flow-control/components/load-scheduler.md#scheduler
-[flux-meter]: ./flow-control/resources/flux-meter.md
+[classifier]: ./resources/classifier.md
+[workload]: ./load-scheduler.md#workload
+[ratelimiter]: ./rate-limiter.md
+[scheduler]: ./load-scheduler.md#scheduler
+[control-point]: ./control-point.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
 [control-point]: ./selector.md#control-point
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
-[aperture-sdks]: /integrations/flow-control/sdk/sdk.md
-[gateways]: /integrations/flow-control/gateway/gateway.md
-[istio]: /integrations/flow-control/envoy/istio.md
+[aperture-sdks]: /integrations/sdk/sdk.md
+[gateways]: /integrations/gateway/gateway.md
+[istio]: /integrations/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
 [label-matcher]: ./selector.md#label-matcher

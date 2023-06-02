@@ -222,8 +222,7 @@ Kubernetes Objects which will be created by following steps are listed
       kubectl apply -f agent.yaml
       ```
 
-5. Refer to steps on the
-   [Istio Configuration](/integrations/flow-control/envoy/istio.md) if you do
+5. Refer to steps on the [Istio Configuration](/integrations/istio.md) if you do
    not have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.

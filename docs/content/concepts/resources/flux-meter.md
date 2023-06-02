@@ -114,11 +114,11 @@ user compared to guest user).
 
 [reference]: /reference/policies/spec.md#flux-meter
 [flow-selectors]: /concepts/selector.md
-[flow-control-insertion]: ../flow-control.md#insertion
+[control-point]: /concepts/control-point.md
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]:
   https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators
 [promql-reference]: /reference/policies/spec.md#prom-q-l
-[signal]: /concepts/policy/circuit.md#signal
+[signal]: /concepts/advanced/circuit.md#signal
 [google-sre-slo]: https://sre.google/workbook/implementing-slos/

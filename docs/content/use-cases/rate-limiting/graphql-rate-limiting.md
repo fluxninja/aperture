@@ -27,8 +27,8 @@ request's Authorization header and then rate limit unique users based on that
 :::tip
 
 You can write classification rules on
-[HTTP requests](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
-and define scheduler priorities on
+[HTTP requests](/concepts/resources/classifier.md#live-previewing-requests) and
+define scheduler priorities on
 [Flow Labels](/concepts/flow-label.md#live-previewing-flow-labels) by live
 previewing them first using introspection APIs.
 
@@ -92,9 +92,8 @@ tutorial does the following:
 From there on, the Classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
-[`RateLimiter`](/concepts/flow-control/components/rate-limiter.md) component in
-the policy to limit the `createTodo` mutation query to `10 requests/second` for
-each `userID`.
+[`RateLimiter`](/concepts/rate-limiter.md) component in the policy to limit the
+`createTodo` mutation query to `10 requests/second` for each `userID`.
 
 ### Playground
 
@@ -109,6 +108,6 @@ any given time, and rejects the rest of the requests.
 
 </Zoom>
 
-[rego-rules]: /concepts/flow-control/resources/classifier.md#rego
+[rego-rules]: /concepts/resources/classifier.md#rego
 [flow-label]: /concepts/flow-label.md
-[classifier]: /concepts/flow-control/resources/classifier.md
+[classifier]: /concepts/resources/classifier.md

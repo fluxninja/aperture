@@ -1,6 +1,6 @@
 ---
 title: Kubernetes Object Selector
-sidebar_position: 1
+sidebar_position: 2
 keywords:
   - auto-scaling
   - Autoscaling
@@ -23,7 +23,8 @@ Selector identifies a resource in the Kubernetes cluster.
 A _Kubernetes Object Selector_ consists of:
 
 - _Agent Group_: The Agent Group identifies Aperture Agents where the
-  [component](components/components.md) gets applied.
+  [Auto Scaler](../components/auto-scaler.md) or
+  [Pod Scaler](../components/pod-scaler.md) components gets applied.
 - API Version: The Kubernetes API version of the resource.
 - Kind: The Kind of the Kubernetes resource, such as Deployment, ReplicaSet,
   StatefulSet.

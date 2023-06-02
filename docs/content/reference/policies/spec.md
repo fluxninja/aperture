@@ -14,7 +14,7 @@ sidebar_label: Specification
 <!-- vale on -->
 
 Reference for all objects used in
-[the Policy language](/concepts/policy/policy.md).
+[the Policy language](/concepts/advanced/advanced.md).
 
 The top-level object representing a policy is [Policy](#policy).
 
@@ -1128,7 +1128,7 @@ Circuit is graph of inter-connected signal processing components.
 
 :::info
 
-See also [Circuit overview](/concepts/policy/circuit.md).
+See also [Circuit overview](/concepts/advanced/circuit.md).
 
 :::
 
@@ -1193,7 +1193,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+See also [Classifier overview](/concepts/resources/classifier.md).
 
 ::: Example
 
@@ -1274,7 +1274,7 @@ Computational block that forms the circuit
 
 :::info
 
-See also [Components overview](/concepts/policy/circuit.md#components).
+See also [Components overview](/concepts/advanced/circuit.md#components).
 
 :::
 
@@ -2788,7 +2788,7 @@ histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+See also [Flux Meter overview](/concepts/resources/flux-meter.md).
 
 ::: Example:
 
@@ -2831,7 +2831,7 @@ meter is read.
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/integrations/flow-control/envoy/istio.md#envoy-filter)
+[Envoy Filter](/integrations/istio.md#envoy-filter)
 
 :::
 
@@ -4670,8 +4670,7 @@ active service protection
 
 :::info
 
-See also
-[_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+See also [_Load Scheduler_ overview](/concepts/load-scheduler.md).
 
 :::
 
@@ -5754,7 +5753,7 @@ Policy expresses observability-driven control logic.
 
 :::info
 
-See also [Policy overview](/concepts/policy/policy.md).
+See also [Policy overview](/concepts/advanced/advanced.md).
 
 :::
 
@@ -5846,12 +5845,12 @@ single element.
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be
-queries using PromQL. Flux Meter defines histogram type of metrics in
-Prometheus. Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and
-`flux_meter_bucket`. The particular Flux Meter can be identified with the
-`flux_meter_name` label. There are additional labels available on a Flux Meter
-such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+[Flux Meter](/concepts/resources/flux-meter.md) metrics can be queries using
+PromQL. Flux Meter defines histogram type of metrics in Prometheus. Therefore,
+one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+The particular Flux Meter can be identified with the `flux_meter_name` label.
+There are additional labels available on a Flux Meter such as `valid`,
+`flow_status`, `http_status_code` and `decision_type`.
 
 :::
 
@@ -6052,8 +6051,7 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also
-[_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/rate-limiter.md).
 
 :::
 
@@ -6290,7 +6288,7 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 :::info
 
 You can use the
-[live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
+[live-preview](/concepts/resources/classifier.md#live-previewing-requests)
 feature to first preview the input to the classifier before writing the labeling
 logic.
 
@@ -6405,8 +6403,7 @@ specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also
-[\_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+See also [\_Load Regulator overview](/concepts/regulator.md).
 
 :::
 
@@ -6539,7 +6536,7 @@ Resources that need to be setup for the policy to function
 
 :::info
 
-See also [Resources overview](/concepts/policy/resources.md).
+See also [Resources overview](/concepts/resources/resources.md).
 
 :::
 
@@ -6964,9 +6961,9 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-allows for load throttling to be "intelligent" instead of queueing flows in an
-arbitrary order. There are two aspects of this "intelligence":
+Categorizing flows into workloads allows for load throttling to be "intelligent"
+instead of queueing flows in an arbitrary order. There are two aspects of this
+"intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands that
   flows belonging to different classes have different weights (for example,
@@ -6982,7 +6979,7 @@ workloads, the first matching one will be used. If none of workloads match,
 :::info
 
 See also
-[workload definition in the concepts section](/concepts/flow-control/components/load-scheduler.md#workload).
+[workload definition in the concepts section](/concepts/load-scheduler.md#workload).
 
 :::
 
@@ -7113,9 +7110,7 @@ only if tokens for the flow aren't specified in the flow labels.
 <!-- vale on -->
 
 Selects flows based on control point, flow labels, agent group and the service
-that the
-[flow control component](/concepts/flow-control/flow-control.md#components) will
-operate on.
+that the [control points](/concepts/control-point.md) will operate on.
 
 :::info
 

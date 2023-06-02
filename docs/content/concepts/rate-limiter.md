@@ -79,5 +79,5 @@ feature.
 
 [reference]: /reference/policies/spec.md#rate-limiter
 [agent-group]: /concepts/selector.md#agent-group
-[policies]: /concepts/policy/policy.md
+[policies]: /concepts/advanced/advanced.md
 [flow-label]: /concepts/flow-label.md

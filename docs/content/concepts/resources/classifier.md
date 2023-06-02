@@ -220,8 +220,8 @@ See [full example in reference][reference]
 [attr-context]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
-[label]: /concepts/flow-control/flow-label.md
-[baggage]: /concepts/flow-control/flow-label.md#baggage
+[label]: ../flow-label.md
+[baggage]: ../flow-label.md#baggage
 [request-labels]: ../flow-label.md#request-labels
 [reference]: /reference/policies/spec.md#classifier
 [rule]: /reference/policies/spec.md#rule
@@ -229,10 +229,10 @@ See [full example in reference][reference]
 [rego-rule]: /reference/policies/spec.md#rule-rego
 [arc]: /arc/extension.md
 [label-matcher]: ../selector.md#label-matcher
-[policies]: /concepts/policy/policy.md
+[policies]: ../advanced/advanced.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: ../selector.md#control-point
-[install-istio]: /integrations/flow-control/envoy/istio.md
+[install-istio]: /integrations/istio.md
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
