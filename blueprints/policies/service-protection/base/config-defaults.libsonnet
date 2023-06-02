@@ -3,14 +3,8 @@ local selectors_defaults = [{
   control_point: '__REQUIRED_FIELD__',
 }];
 
-local overload_confirmation_defaults = {
-  query_string: '__REQUIRED_FIELD__',
-  threshold: '__REQUIRED_FIELD__',
-  operator: '__REQUIRED_FIELD__',
-};
-
 local service_protection_core_defaults = {
-  overload_confirmations: [overload_confirmation_defaults],
+  overload_confirmations: [],
 
   adaptive_load_scheduler: {
     load_scheduler: {
@@ -56,6 +50,4 @@ local service_protection_core_defaults = {
   },
 
   selectors: selectors_defaults,
-
-  overload_confirmation: overload_confirmation_defaults,
 }
