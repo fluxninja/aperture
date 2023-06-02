@@ -6,7 +6,7 @@ keywords:
   - otel
   - opentelemetry
   - collector
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 Aperture enables feeding custom metrics to the Aperture Controller's Prometheus

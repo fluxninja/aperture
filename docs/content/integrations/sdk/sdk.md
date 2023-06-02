@@ -13,7 +13,7 @@ sidebar_label: SDKs
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion} from '../../apertureVersion.js';
 import DocCardList from '@theme/DocCardList';
 ```
 
@@ -53,8 +53,8 @@ control points with less code changes:
 
 <DocCardList />
 
-[control-point]: /concepts/flow-control/selector.md#control-point
-[istio]: ../envoy/istio.md
+[control-point]: /concepts/selector.md#control-point
+[istio]: ../istio.md
 [golang]: ./go/manual.md
 [java]: ./java/manual.md
 [javascript]: ./javascript/manual.md

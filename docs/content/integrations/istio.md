@@ -1,5 +1,5 @@
 ---
-title: Istio Configuration
+title: Istio
 keywords:
   - install
   - setup
@@ -13,7 +13,7 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../apertureVersion.js';
 ```
 
 ## Envoy Filter {#envoy-filter}
@@ -25,13 +25,13 @@ Aperture Agent requires additional details and needs the following
 [Configuration Patches](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-EnvoyConfigObjectPatch)
 to be added through the Envoy Filter.
 
-**Note**: In all the below patches, it is presumed that the Aperture Agent is
-installed with `DaemonSet` mode and is installed in the `aperture-agent`
-namespace, which makes the target address value
-`aperture-agent.aperture-agent.svc.cluster.local`. If you are running the
-Aperture Agent in Sidecar mode, use `localhost` as the target address.
+**Note**: In all the patches below, it is presumed that the Aperture Agent is
+installed with `DaemonSet` mode and `aperture-agent` namespace, which makes the
+target address value `aperture-agent.aperture-agent.svc.cluster.local`. If you
+are running the Aperture Agent in Sidecar mode, please use `localhost` as the
+target address.
 
-1. The below patch merges the
+1. The patch below merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)
    configuration of type
    [Open Telemetry](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/open_telemetry/v3/logs_service.proto#extensions-access-loggers-open-telemetry-v3-opentelemetryaccesslogconfig)
@@ -111,7 +111,7 @@ Aperture Agent in Sidecar mode, use `localhost` as the target address.
                        string_value: "%RESPONSE_TX_DURATION%"
    ```
 
-2. The below patch also merges the
+2. The patch below also merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)
    configuration of type
    [Open Telemetry](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/open_telemetry/v3/logs_service.proto#extensions-access-loggers-open-telemetry-v3-opentelemetryaccesslogconfig)
@@ -191,7 +191,7 @@ Aperture Agent in Sidecar mode, use `localhost` as the target address.
                        string_value: "%RESPONSE_TX_DURATION%"
    ```
 
-3. The below patch inserts the
+3. The patch below inserts the
    [External Authorization](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter)
    before the `Router` sub-filter of the
    [HTTP Connection Manager](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/http_conn_man#)
@@ -234,7 +234,7 @@ Aperture Agent in Sidecar mode, use `localhost` as the target address.
                value: ingress
    ```
 
-4. The below patch also inserts the
+4. The patch below also inserts the
    [External Authorization](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter)
    before the `Router` sub-filter of the
    [HTTP Connection Manager](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/http_conn_man#)
@@ -282,8 +282,8 @@ More information about the extracted values can be found on
 
 ## Prerequisites
 
-You can do the installation using the `aperturectl` CLI tool or using `Helm`.
-Install the tool of your choice using the following links:
+That installation can be done by using `aperturectl` CLI tool or `Helm`. Install
+the preferred tool from the following option:
 
 1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
 

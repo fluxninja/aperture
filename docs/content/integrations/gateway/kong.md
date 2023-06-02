@@ -11,15 +11,16 @@ sidebar_position: 2
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 ```
 
 Integrating Aperture with Kong using Custom plugins.
 
 ## Introduction
 
-Custom plugins are Lua scripts that can be executed within Kong to extend its
-functionality. The Aperture Custom plugin can be downloaded from the <a
+Aperture can be integrated with Kong using Custom plugins, which are Lua scripts
+that can be executed within Kong to extend its functionality. The Aperture
+Custom plugin can be downloaded from the <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Aperture
 Release Page</a>.
 

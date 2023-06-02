@@ -12,15 +12,14 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 ```
-
-Integrating Aperture with Nginx using Lua modules.
 
 ## Introduction
 
-Lua's modules are scripts that can be executed within Nginx to extend its
-functionality. The Aperture Lua module can be downloaded from the GitHub <a
+Aperture can be integrated with Nginx using Lua modules, which are scripts that
+can be executed within Nginx to extend its functionality. The Aperture Lua
+module can be downloaded from the GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>
 Aperture Release Page</a>.
 
