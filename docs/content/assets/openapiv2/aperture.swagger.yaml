@@ -78,7 +78,6 @@ definitions:
 
                 x-go-tag-validate: required
             load_multiplier_linear_increment:
-                default: 0.0025
                 description: |+
                     Linear increment to load multiplier in each execution tick when the system is
                     not in the overloaded state, up until the `max_load_multiplier` is reached.
@@ -93,7 +92,6 @@ definitions:
 
                 x-go-tag-validate: required
             max_load_multiplier:
-                default: 2
                 description: |+
                     The maximum load multiplier that can be reached during recovery from an overload state.
                     - Helps protect the service from request bursts while the system is still recovering.
@@ -128,8 +126,6 @@ definitions:
 
                 type: string
                 x-go-tag-validate: required
-        required:
-            - from
         title: Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`
         type: object
     Alerter:
@@ -170,27 +166,18 @@ definitions:
                 description: Additional labels to add to alert.
                 type: object
             resolve_timeout:
-                default: 5s
                 description: |+
                     Duration of alert resolver.
 
                 type: string
                 x-go-tag-default: 5s
             severity:
-                default: info
                 description: |+
                     Severity of the alert, one of 'info', 'warn' or 'crit'.
 
-                enum:
-                    - info
-                    - warn
-                    - crit
                 type: string
                 x-go-tag-default: info
                 x-go-tag-validate: oneof=info warn crit
-                x-oneof: info | warn | crit
-        required:
-            - alert_name
         type: object
     And:
         description: |-
@@ -252,17 +239,8 @@ definitions:
                     The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
                     In case of XOR and bit shifts, value of signals is cast to integers before performing the operation.
 
-                enum:
-                    - add
-                    - sub
-                    - mul
-                    - div
-                    - xor
-                    - lshift
-                    - rshift
                 type: string
                 x-go-tag-validate: oneof=add sub mul div xor lshift rshift
-                x-oneof: add | sub | mul | div | xor | lshift | rshift
             out_ports:
                 $ref: '#/definitions/ArithmeticCombinatorOuts'
                 description: Output ports for the Arithmetic Combinator component.
@@ -369,22 +347,18 @@ definitions:
 
                 x-go-tag-validate: required
             max_replicas:
-                default: "9223372036854775807"
                 description: |+
                     The maximum replicas to which the _AutoScaler_ can scale-out.
 
                 format: int64
-                minLength: 1
                 type: string
                 x-go-tag-default: "9223372036854775807"
                 x-go-tag-validate: gt=0
             min_replicas:
-                default: "0"
                 description: |+
                     The minimum replicas to which the _AutoScaler_ can scale-in.
 
                 format: int64
-                minLength: 0
                 type: string
                 x-go-tag-default: "0"
                 x-go-tag-validate: gte=0
@@ -405,7 +379,6 @@ definitions:
     AutoScalerScalingParameters:
         properties:
             cooldown_override_percentage:
-                default: 50
                 description: |+
                     Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
                     For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
@@ -415,7 +388,6 @@ definitions:
                 type: number
                 x-go-tag-default: "50"
             max_scale_in_percentage:
-                default: 1
                 description: |+
                     The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 
@@ -423,7 +395,6 @@ definitions:
                 type: number
                 x-go-tag-default: "1"
             max_scale_out_percentage:
-                default: 10
                 description: |+
                     The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 
@@ -437,7 +408,6 @@ definitions:
 
                 x-go-tag-validate: required
             scale_in_cooldown:
-                default: 120s
                 description: |+
                     The amount of time to wait after a scale-in operation for another scale-in operation.
 
@@ -450,7 +420,6 @@ definitions:
 
                 x-go-tag-validate: required
             scale_out_cooldown:
-                default: 30s
                 description: |+
                     The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 
@@ -662,7 +631,6 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
-                default: 0.5s
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
@@ -720,11 +688,8 @@ definitions:
                 items:
                     $ref: '#/definitions/Selector'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-        required:
-            - selectors
         title: Set of classification rules sharing a common selector
         type: object
     ClassifierInfo:
@@ -886,13 +851,8 @@ definitions:
                 description: |+
                     A special value such as NaN, +Inf, -Inf.
 
-                enum:
-                    - NaN
-                    - +Inf
-                    - -Inf
                 type: string
                 x-go-tag-validate: oneof=NaN +Inf -Inf
-                x-oneof: NaN | +Inf | -Inf
             value:
                 description: A constant value.
                 format: double
@@ -914,7 +874,6 @@ definitions:
             instantaneous.
         properties:
             false_for:
-                default: 0s
                 description: |+
                     Duration of time to wait before changing to false state.
                     If the duration is zero, the change will happen instantaneously.
@@ -928,21 +887,12 @@ definitions:
                 description: |+
                     Comparison operator that computes operation on LHS and RHS input signals.
 
-                enum:
-                    - gt
-                    - lt
-                    - gte
-                    - lte
-                    - eq
-                    - neq
                 type: string
                 x-go-tag-validate: oneof=gt lt gte lte eq neq
-                x-oneof: gt | lt | gte | lte | eq | neq
             out_ports:
                 $ref: '#/definitions/DeciderOuts'
                 description: Output ports for the Decider component.
             true_for:
-                default: 0s
                 title: |-
                     Duration of time to wait before changing to true state.
                     If the duration is zero, the change will happen instantaneously.```
@@ -995,13 +945,11 @@ definitions:
         description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
         properties:
             min_gradient:
-                default: -1.7976931348623157e+308
                 format: double
                 type: number
                 x-go-tag-default: "-1.79769313486231570814527423731704356798070e+308"
                 x-go-tag-validate: lte=1.0
             slope:
-                default: 1
                 format: double
                 type: number
                 x-go-tag-default: "1.0"
@@ -1038,7 +986,6 @@ definitions:
                 $ref: '#/definitions/DifferentiatorOuts'
                 description: Output ports for the Differentiator component.
             window:
-                default: 5s
                 description: |+
                     The window of time over which differentiator operates.
 
@@ -1135,17 +1082,14 @@ definitions:
         description: Parameters for the EMA component.
         properties:
             correction_factor_on_max_envelope_violation:
-                default: 1
                 description: |+
                     Correction factor to apply on the output value if its in violation of the max envelope.
 
                 format: double
-                minimum: 0
                 type: number
                 x-go-tag-default: "1.0"
                 x-go-tag-validate: gte=0,lte=1.0
             correction_factor_on_min_envelope_violation:
-                default: 1
                 description: |+
                     Correction factor to apply on the output value if its in violation of the min envelope.
 
@@ -1160,7 +1104,6 @@ definitions:
                 type: string
                 x-go-tag-validate: required
             valid_during_warmup:
-                default: false
                 description: |+
                     Whether the output is valid during the warm-up stage.
 
@@ -1174,9 +1117,6 @@ definitions:
 
                 type: string
                 x-go-tag-validate: required
-        required:
-            - ema_window
-            - warmup_window
         type: object
     Entities:
         description: Entities contains both mappings of ip address to entity and entity name to entity.
@@ -1201,10 +1141,8 @@ definitions:
                 description: |+
                     IP address of the entity.
 
-                pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
                 type: string
                 x-go-tag-validate: required,ip
-                x-pattern-rules: ip
             name:
                 description: Name of the entity. For example, pod name.
                 type: string
@@ -1220,7 +1158,6 @@ definitions:
 
                 items:
                     type: string
-                minItems: 1
                 type: array
                 x-go-tag-validate: gt=0
             uid:
@@ -1229,9 +1166,6 @@ definitions:
 
                 type: string
                 x-go-tag-validate: required
-        required:
-            - ip_address
-            - uid
         type: object
     EqualsMatchExpression:
         description: Label selector expression of the equal form `label == value`.
@@ -1245,8 +1179,6 @@ definitions:
             value:
                 description: Exact value that the label should be equal to.
                 type: string
-        required:
-            - label
         type: object
     Extractor:
         description: There are multiple variants of extractor, specify exactly one.
@@ -1323,8 +1255,6 @@ definitions:
 
                 type: string
                 x-go-tag-validate: required
-        required:
-            - max_extrapolation_interval
         type: object
     FirstValid:
         properties:
@@ -1444,7 +1374,6 @@ definitions:
             ```
         properties:
             attribute_key:
-                default: workload_duration_ms
                 description: |+
                     Key of the attribute in access log or span from which the metric for this flux meter is read.
 
@@ -1470,13 +1399,10 @@ definitions:
                 items:
                     $ref: '#/definitions/Selector'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
             static_buckets:
                 $ref: '#/definitions/FluxMeterStaticBuckets'
-        required:
-            - selectors
         type: object
     FluxMeterExponentialBuckets:
         description: |-
@@ -1488,9 +1414,7 @@ definitions:
                 description: |+
                     Number of buckets.
 
-                exclusiveMinimum: true
                 format: int32
-                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             factor:
@@ -1517,9 +1441,7 @@ definitions:
                 description: |+
                     Number of buckets.
 
-                exclusiveMinimum: true
                 format: int32
-                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             max:
@@ -1549,9 +1471,7 @@ definitions:
                 description: |+
                     Number of buckets.
 
-                exclusiveMinimum: true
                 format: int32
-                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             start:
@@ -1567,18 +1487,6 @@ definitions:
         description: StaticBuckets holds the static value of the buckets where latency histogram will be stored.
         properties:
             buckets:
-                default:
-                    - 5
-                    - 10
-                    - 25
-                    - 50
-                    - 100
-                    - 250
-                    - 500
-                    - 1000
-                    - 2500
-                    - 5000
-                    - 10000
                 description: |+
                     The buckets in which latency histogram will be stored.
 
@@ -1703,7 +1611,6 @@ definitions:
         description: Gradient Parameters.
         properties:
             max_gradient:
-                default: 1.7976931348623157e+308
                 description: |+
                     Maximum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 
@@ -1711,7 +1618,6 @@ definitions:
                 type: number
                 x-go-tag-default: "1.79769313486231570814527423731704356798070e+308"
             min_gradient:
-                default: -1.7976931348623157e+308
                 description: |+
                     Minimum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 
@@ -1766,8 +1672,6 @@ definitions:
                 format: double
                 type: number
                 x-go-tag-validate: required
-        required:
-            - slope
         type: object
     GroupStatus:
         description: |-
@@ -1787,7 +1691,6 @@ definitions:
             If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
         properties:
             hold_for:
-                default: 5s
                 description: |+
                     Holding the last valid signal value for the `hold_for` duration.
 
@@ -1864,13 +1767,11 @@ definitions:
         description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
         properties:
             max_gradient:
-                default: 1.7976931348623157e+308
                 format: double
                 type: number
                 x-go-tag-default: "1.79769313486231570814527423731704356798070e+308"
                 x-go-tag-validate: gte=1.0
             slope:
-                default: 1
                 format: double
                 type: number
                 x-go-tag-default: "1.0"
@@ -1889,7 +1790,6 @@ definitions:
             :::
         properties:
             per_agent_group:
-                default: false
                 description: |+
                     PerAgentGroup marks the pipeline to be instantiated only once per agent
                     group. This is helpful for receivers that scrape for example, some cluster-wide
@@ -1944,7 +1844,6 @@ definitions:
                 $ref: '#/definitions/IntegratorIns'
                 description: Input ports for the Integrator component.
             initial_value:
-                default: 0
                 description: |+
                     Initial value of the integrator.
 
@@ -2031,8 +1930,6 @@ definitions:
                     Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
                     for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
                 type: string
-        required:
-            - from
         title: Parse JSON, and extract one of the fields
         type: object
     JWTExtractor:
@@ -2061,8 +1958,6 @@ definitions:
                     Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
                     for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
                 type: string
-        required:
-            - from
         title: Parse the attribute as JWT and read the payload
         type: object
     K8sLabelMatcherRequirement:
@@ -2079,14 +1974,8 @@ definitions:
                     Logical operator which represents a key's relationship to a set of values.
                     Valid operators are In, NotIn, Exists and DoesNotExist.
 
-                enum:
-                    - In
-                    - NotIn
-                    - Exists
-                    - DoesNotExists
                 type: string
                 x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
-                x-oneof: In | NotIn | Exists | DoesNotExists
             values:
                 description: |-
                     An array of string values that relates to the key by an operator.
@@ -2095,8 +1984,6 @@ definitions:
                 items:
                     type: string
                 type: array
-        required:
-            - key
         type: object
     KubernetesObjectSelector:
         description: |-
@@ -2104,7 +1991,6 @@ definitions:
             component should apply to.
         properties:
             agent_group:
-                default: default
                 description: |+
                     Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
                     selector applies to.
@@ -2133,11 +2019,6 @@ definitions:
 
                 type: string
                 x-go-tag-validate: required
-        required:
-            - api_version
-            - kind
-            - name
-            - namespace
         type: object
     LabelMatcher:
         description: |-
@@ -2365,11 +2246,8 @@ definitions:
                 items:
                     $ref: '#/definitions/LoadRampParametersStep'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-        required:
-            - steps
         type: object
     LoadRampParametersStep:
         properties:
@@ -2384,12 +2262,8 @@ definitions:
                     The value of the step.
 
                 format: double
-                maximum: 100
-                minimum: 0
                 type: number
                 x-go-tag-validate: gte=0,lte=100
-        required:
-            - duration
         type: object
     LoadRampSeries:
         description: _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
@@ -2436,8 +2310,6 @@ definitions:
                     type: object
                 type: array
                 x-go-tag-validate: required,dive
-        required:
-            - load_ramps
         type: object
     LoadScheduler:
         description: |-
@@ -2508,11 +2380,9 @@ definitions:
                 items:
                     $ref: '#/definitions/Selector'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
             workload_latency_based_tokens:
-                default: true
                 description: |+
                     Automatically estimate the size flows within each workload, based on
                     historical latency. Each workload's `tokens` will be set to average
@@ -2527,8 +2397,6 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
-        required:
-            - selectors
         title: Parameters for _Load Scheduler_ component
         type: object
     MatchExpression:
@@ -2592,9 +2460,6 @@ definitions:
 
                 type: string
                 x-go-tag-validate: required
-        required:
-            - label
-            - regex
         type: object
     Max:
         description: 'Max: output = max([]inputs).'
@@ -2819,7 +2684,6 @@ definitions:
                     /static/*: other
                     ```
 
-                minProperties: 1
                 type: object
                 x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
         title: Matches HTTP Path to given path templates
@@ -2860,13 +2724,8 @@ definitions:
                     The percentage of scale to reduce.
 
                 format: double
-                maximum: 100
-                minimum: 0
                 type: number
                 x-go-tag-validate: required,gte=0,lte=100
-        required:
-            - period
-            - scale_in_percentage
         type: object
     PodScaler:
         description: Component for scaling pods based on a signal.
@@ -3028,7 +2887,6 @@ definitions:
     PromQL:
         properties:
             evaluation_interval:
-                default: 10s
                 description: |+
                     Describes the interval between successive evaluations of the Prometheus query.
 
@@ -3075,7 +2933,6 @@ definitions:
         description: Generates 0 and 1 in turns.
         properties:
             false_for:
-                default: 5s
                 description: |+
                     Emitting 0 for the `false_for` duration.
 
@@ -3085,7 +2942,6 @@ definitions:
                 $ref: '#/definitions/PulseGeneratorOuts'
                 description: Output ports for the PulseGenerator component.
             true_for:
-                default: 5s
                 description: |+
                     Emitting 1 for the `true_for` duration.
 
@@ -3120,11 +2976,8 @@ definitions:
                 items:
                     $ref: '#/definitions/Selector'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-        required:
-            - selectors
         type: object
     RateLimiter:
         description: |-
@@ -3151,11 +3004,8 @@ definitions:
                 items:
                     $ref: '#/definitions/Selector'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-        required:
-            - selectors
         title: Limits the traffic on a control point to specified rate
         type: object
     RateLimiterIns:
@@ -3180,7 +3030,6 @@ definitions:
     RateLimiterParameters:
         properties:
             continuous_fill:
-                default: true
                 description: |+
                     Continuous fill determines whether the token bucket should be filled
                     continuously or only on discrete intervals.
@@ -3210,7 +3059,6 @@ definitions:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behavior of rate limiter
             max_idle_time:
-                default: 7200s
                 description: |+
                     Max idle time before token bucket state for a label is removed.
                     If set to 0, the state is never removed.
@@ -3218,7 +3066,6 @@ definitions:
                 type: string
                 x-go-tag-default: 7200s
             tokens_label_key:
-                default: tokens
                 description: |+
                     Flow label key that will be used to override the number of tokens
                     for this request.
@@ -3228,24 +3075,18 @@ definitions:
 
                 type: string
                 x-go-tag-default: tokens
-        required:
-            - interval
         type: object
     RateLimiterParametersLazySync:
         properties:
             enabled:
-                default: false
                 title: Enables lazy sync
                 type: boolean
                 x-go-tag-default: "false"
             num_sync:
-                default: 4
                 description: |+
                     Number of times to lazy sync within the `interval`.
 
-                exclusiveMinimum: true
                 format: int64
-                minimum: 0
                 type: integer
                 x-go-tag-default: "4"
                 x-go-tag-validate: gt=0
@@ -3288,7 +3129,6 @@ definitions:
                     how to extract and propagate flow labels with that key.
                     The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
 
-                minProperties: 1
                 type: object
                 x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
             module:
@@ -3303,14 +3143,10 @@ definitions:
 
                 type: string
                 x-go-tag-validate: required
-        required:
-            - labels
-            - module
         type: object
     RegoLabelProperties:
         properties:
             telemetry:
-                default: true
                 description: |+
                     :::note
 
@@ -3383,11 +3219,8 @@ definitions:
                 items:
                     $ref: '#/definitions/Selector'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-        required:
-            - selectors
         type: object
     ReportRequest:
         properties:
@@ -3483,7 +3316,6 @@ definitions:
                 $ref: '#/definitions/Extractor'
                 description: High-level declarative extractor.
             telemetry:
-                default: true
                 description: |+
                     :::note
 
@@ -3543,14 +3375,11 @@ definitions:
                 type: string
                 x-go-tag-validate: required
             valid_during_warmup:
-                default: false
                 description: |+
                     Whether the output is valid during the warm-up stage.
 
                 type: boolean
                 x-go-tag-default: "false"
-        required:
-            - sma_window
         type: object
     ScaleInController:
         properties:
@@ -3600,7 +3429,6 @@ definitions:
             :::
         properties:
             decision_deadline_margin:
-                default: 0.01s
                 description: |+
                     Decision deadline margin is the amount of time that the scheduler will
                     subtract from the request deadline to determine the deadline for the
@@ -3621,7 +3449,6 @@ definitions:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters to be used if none of workloads specified in `workloads` match.
             tokens_label_key:
-                default: tokens
                 description: |+
                     * Key for a flow label that can be used to override the default number of tokens for this flow.
                     * The value associated with this key must be a valid uint64 number.
@@ -3690,15 +3517,12 @@ definitions:
                     `fairness_key = "user"`.
                 type: string
             priority:
-                default: 0
                 description: |+
                     $$
                     \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
                     $$
 
                 format: int64
-                maximum: 255
-                minimum: 0
                 title: |-
                     Describes priority level of the flows within the workload.
                     Priority level ranges from 0 to 255.
@@ -3749,7 +3573,6 @@ definitions:
             ```
         properties:
             agent_group:
-                default: default
                 description: |+
                     [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
                     selector applies to.
@@ -3782,7 +3605,6 @@ definitions:
                     [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
                     can be used to match flows based on flow labels.
             service:
-                default: any
                 description: |+
                     The Fully Qualified Domain Name of the
                     [service](/concepts/flow-control/selector.md) to select.
@@ -3803,8 +3625,6 @@ definitions:
 
                 type: string
                 x-go-tag-default: any
-        required:
-            - control_point
         type: object
     ServerToClient:
         properties:
@@ -3903,11 +3723,8 @@ definitions:
                 items:
                     $ref: '#/definitions/SignalGeneratorParametersStep'
                     type: object
-                minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-        required:
-            - steps
         type: object
     SignalGeneratorParametersStep:
         properties:
@@ -3920,8 +3737,6 @@ definitions:
             target_output:
                 $ref: '#/definitions/ConstantSignal'
                 description: The value of the step.
-        required:
-            - duration
         type: object
     SocketAddress:
         properties:
@@ -3994,7 +3809,6 @@ definitions:
     TelemetryCollector:
         properties:
             agent_group:
-                default: default
                 type: string
                 x-go-tag-default: default
             infra_meters:
@@ -4094,47 +3908,8 @@ definitions:
                     * `y0`: Bessel function of the second kind of order 0.
                     * `y1`: Bessel function of the second kind of order 1.
 
-                enum:
-                    - abs
-                    - acos
-                    - acosh
-                    - asin
-                    - asinh
-                    - atan
-                    - atanh
-                    - cbrt
-                    - ceil
-                    - cos
-                    - cosh
-                    - erf
-                    - erfc
-                    - erfcinv
-                    - erfinv
-                    - exp
-                    - exp2
-                    - expm1
-                    - floor
-                    - gamma
-                    - j0
-                    - j1
-                    - lgamma
-                    - log
-                    - log10
-                    - log1p
-                    - log2
-                    - round
-                    - roundtoeven
-                    - sin
-                    - sinh
-                    - sqrt
-                    - tan
-                    - tanh
-                    - trunc
-                    - y0
-                    - y1
                 type: string
                 x-go-tag-validate: oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1
-                x-oneof: abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1
             out_ports:
                 $ref: '#/definitions/UnaryOperatorOuts'
                 description: Output ports for the UnaryOperator component.
