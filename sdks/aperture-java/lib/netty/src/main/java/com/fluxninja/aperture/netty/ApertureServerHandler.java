@@ -54,10 +54,10 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             return;
         }
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+                (flowDecision == FlowDecision.Accepted
+                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
 
         if (flowAccepted) {
             try {
@@ -95,7 +95,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             HttpResponseStatus status;
             Map<String, String> headers;
             if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
-                status = HttpResponseStatus.valueOf(flow.rejectReason());
+                status = HttpResponseStatus.valueOf(flow.getRejectionHttpStatusCode());
                 headers = flow.checkResponse().getDeniedResponse().getHeadersMap();
 
             } else {

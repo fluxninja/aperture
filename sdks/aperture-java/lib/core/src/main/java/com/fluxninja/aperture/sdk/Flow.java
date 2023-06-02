@@ -21,11 +21,11 @@ public final class Flow {
     /**
      * Returns 'true' if flow was accepted by Aperture Agent, or if the Agent did not respond.
      *
-     * @deprecated This method assumes fail-open behavior. Use {@link #result} instead
+     * @deprecated This method assumes fail-open behavior. Use {@link #getDecision} instead
      * @return Whether the flow was accepted.
      */
     public boolean accepted() {
-        return result() == FlowResult.Unreachable || result() == FlowResult.Accepted;
+        return getDecision() == FlowDecision.Unreachable || getDecision() == FlowDecision.Accepted;
     }
 
     /**
@@ -33,15 +33,15 @@ public final class Flow {
      *
      * @return Result of Check query
      */
-    public FlowResult result() {
+    public FlowDecision getDecision() {
         if (this.checkResponse == null) {
-            return FlowResult.Unreachable;
+            return FlowDecision.Unreachable;
         }
         if (this.checkResponse.getDecisionType()
                 == CheckResponse.DecisionType.DECISION_TYPE_ACCEPTED) {
-            return FlowResult.Accepted;
+            return FlowDecision.Accepted;
         }
-        return FlowResult.Rejected;
+        return FlowDecision.Rejected;
     }
 
     public CheckResponse checkResponse() {
@@ -54,8 +54,8 @@ public final class Flow {
      *
      * @return HTTP code of rejection reason
      */
-    public int rejectReason() {
-        if (this.result() == FlowResult.Rejected) {
+    public int getRejectionHttpStatusCode() {
+        if (this.getDecision() == FlowDecision.Rejected) {
             switch (this.checkResponse.getRejectReason()) {
                 case REJECT_REASON_RATE_LIMITED:
                     return HttpStatus.SC_TOO_MANY_REQUESTS;
