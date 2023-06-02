@@ -10,6 +10,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -120,14 +125,14 @@ public class RequestController {
             // If all subrequests were processed successfully, return success message
             response.setStatus(HttpStatus.OK.value());
             response.getWriter().write(payload);
-
-            return "Success";
         } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             String msg = "Error occurred: " + e.getMessage();
             log.error(msg);
             return msg;
         }
+
+        return "Success";
     }
 
     @Bean
@@ -174,7 +179,6 @@ public class RequestController {
             ongoingRequests.incrementAndGet();
             if (!latency.isZero() && !latency.isNegative()) {
                 if (cpuLoad > 0) {
-                    try {
                     // Simulate CPU load by busy waiting
                     int numCores = Runtime.getRuntime().availableProcessors();
 
@@ -187,9 +191,10 @@ public class RequestController {
                     long busyWaitDuration = (long) (totalDuration * adjustedLoad / 100.0);
                     long sleepDuration = (long) (totalDuration * (100.0 - adjustedLoad) / 100.0);
 
-                    CountDownLatch latch = new CountDownLatch(numCores);
+                    ExecutorService executor = Executors.newFixedThreadPool(numCores);
+                    List<Callable<Void>> tasks = new ArrayList<>();
                     for (int i = 0; i < numCores; i++) {
-                        new Thread(() -> {
+                        tasks.add(() -> {
                             long startTime = System.currentTimeMillis();
                             while (System.currentTimeMillis() - startTime < latency.toMillis()) {
                                 busyWait(busyWaitDuration);
@@ -199,11 +204,16 @@ public class RequestController {
                                     log.error("Error while sleeping: " + e.getMessage());
                                 }
                             }
-                            latch.countDown();
-                        }).start();
+                            return null;
+                        });
                     }
-                        latch.await();
-                    } catch (InterruptedException e) {
+
+                    try {
+                        List<Future<Void>> futures = executor.invokeAll(tasks);
+                        for (Future<Void> future : futures) {
+                            future.get();
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
                         log.error("Error while waiting for threads: " + e.getMessage());
                     }
                 } else {
