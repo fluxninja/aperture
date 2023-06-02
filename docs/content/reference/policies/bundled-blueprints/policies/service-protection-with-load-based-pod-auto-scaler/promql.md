@@ -130,7 +130,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (policies/service-protection/promql:schema:overload_confirmation)'
     reference='../../../bundled-blueprints/policies/service-protection/promql#overload-confirmation'
-    value='[{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]'
+    value='[]'
 />
 
 <!-- vale on -->

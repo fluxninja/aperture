@@ -150,7 +150,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
-    value='[{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -362,7 +362,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
     type='string'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='null'
 />
 
 <!-- vale on -->
@@ -376,7 +376,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The threshold for the overload confirmation criteria.'
     type='Number (double)'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='null'
 />
 
 <!-- vale on -->
@@ -390,7 +390,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
     type='string'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='null'
 />
 
 <!-- vale on -->
