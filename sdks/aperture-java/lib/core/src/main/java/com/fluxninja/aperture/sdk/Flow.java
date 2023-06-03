@@ -11,21 +11,24 @@ public final class Flow {
     private final CheckResponse checkResponse;
     private final Span span;
     private boolean ended;
+    private boolean failOpen;
 
     Flow(CheckResponse checkResponse, Span span, boolean ended) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
+        this.failOpen = true;
     }
 
     /**
      * Returns 'true' if flow was accepted by Aperture Agent, or if the Agent did not respond.
      *
-     * @deprecated This method assumes fail-open behavior. Use {@link #result} instead
+     * @deprecated This method assumes fail-open behavior. Use {@link #shouldRun} or {@link
+     *     #getDecision} instead
      * @return Whether the flow was accepted.
      */
     public boolean accepted() {
-        return result() == FlowResult.Unreachable || result() == FlowResult.Accepted;
+        return getDecision() == FlowDecision.Unreachable || getDecision() == FlowDecision.Accepted;
     }
 
     /**
@@ -33,15 +36,38 @@ public final class Flow {
      *
      * @return Result of Check query
      */
-    public FlowResult result() {
+    public FlowDecision getDecision() {
         if (this.checkResponse == null) {
-            return FlowResult.Unreachable;
+            return FlowDecision.Unreachable;
         }
         if (this.checkResponse.getDecisionType()
                 == CheckResponse.DecisionType.DECISION_TYPE_ACCEPTED) {
-            return FlowResult.Accepted;
+            return FlowDecision.Accepted;
         }
-        return FlowResult.Rejected;
+        return FlowDecision.Rejected;
+    }
+
+    /**
+     * Returns whether the flow should be allowed to run, based on flow fail-open configuration and
+     * Aperture Agent response. By default, flow will be allowed to run if Aperture Agent is
+     * unreachable. To change this behavior, use {@link #withNoFailOpen()}.
+     *
+     * @return Whether the flow should be allowed to run
+     */
+    public boolean shouldRun() {
+        return getDecision() == FlowDecision.Accepted
+                || (getDecision() == FlowDecision.Unreachable && this.failOpen);
+    }
+
+    /**
+     * Disables fail-open behavior. If set, the {@link #shouldRun} method will return False if the
+     * Aperture Agent is unreachable.
+     *
+     * @return This Flow object
+     */
+    public Flow withNoFailOpen() {
+        this.failOpen = false;
+        return this;
     }
 
     public CheckResponse checkResponse() {
@@ -54,8 +80,8 @@ public final class Flow {
      *
      * @return HTTP code of rejection reason
      */
-    public int rejectReason() {
-        if (this.result() == FlowResult.Rejected) {
+    public int getRejectionHttpStatusCode() {
+        if (this.getDecision() == FlowDecision.Rejected) {
             switch (this.checkResponse.getRejectReason()) {
                 case REJECT_REASON_RATE_LIMITED:
                     return HttpStatus.SC_TOO_MANY_REQUESTS;

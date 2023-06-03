@@ -15,7 +15,7 @@ class RpcUtils {
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
-        return HttpStatus.valueOf(flow.rejectReason());
+        return HttpStatus.valueOf(flow.getRejectionHttpStatusCode());
     }
 
     protected static Map<String, String> labelsFromRequest(RpcRequest req) {

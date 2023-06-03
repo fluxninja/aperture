@@ -54,10 +54,10 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             return unwrap().serve(ctx, req);
         }
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+                (flowDecision == FlowDecision.Accepted
+                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
 
         if (flowAccepted) {
             HttpResponse res;

@@ -23,7 +23,7 @@ class HttpUtils {
             e.printStackTrace();
         }
         if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
-            int httpStatusCode = flow.rejectReason();
+            int httpStatusCode = flow.getRejectionHttpStatusCode();
             HttpResponseBuilder resBuilder = HttpResponse.builder();
             resBuilder.status(httpStatusCode);
             for (Map.Entry<String, String> entry :
