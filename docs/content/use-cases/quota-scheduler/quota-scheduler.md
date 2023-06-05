@@ -8,7 +8,7 @@ keywords:
   - scheduling
   - external-api
   - prioritization
-sidebar_position: 1
+sidebar_position: 2
 sidebar_label: Quota Scheduling
 ---
 
