@@ -58,7 +58,7 @@ policy:
         threshold: 0.35
         operator: gt
       - query_string: 'avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})'
-        threshold: 10
+        threshold: 30
         operator: gt
     adaptive_load_scheduler:
       load_scheduler:
