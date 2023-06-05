@@ -1,7 +1,6 @@
 package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
@@ -47,9 +46,9 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
 
     @Override
     public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
-        CheckHTTPRequest request =
-                HttpUtils.checkRequestFromRequest(ctx, req, this.controlPointName);
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(req.path(), request);
+        TrafficFlowRequest request =
+                HttpUtils.trafficFlowRequestFromRequest(ctx, req, this.controlPointName);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(request);
 
         if (flow.ignored()) {
             return unwrap().execute(ctx, req);

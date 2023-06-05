@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Aperture SDK provides a set of tools and functionalities for flow control by enabling the
@@ -37,6 +39,8 @@ public final class ApertureSDK {
     private final Duration flowTimeout;
     private final List<String> ignoredPaths;
     private final boolean ignoredPathsMatchRegex;
+
+    private static Logger logger = LoggerFactory.getLogger(ApertureSDK.class);
 
     ApertureSDK(
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
@@ -123,8 +127,19 @@ public final class ApertureSDK {
         return new Flow(res, span, false);
     }
 
-    public TrafficFlow startTrafficFlow(String path, CheckHTTPRequest req) {
+    /**
+     * Starts a new flow, asking the Aperture Agent to accept or reject it based on provided HTTP
+     * request parameters.
+     *
+     * @param req A {@link TrafficFlowRequest} containing configured HTTP request parameters.
+     * @return A TrafficFlow object
+     */
+    public TrafficFlow startTrafficFlow(TrafficFlowRequest req) {
+        CheckHTTPRequest checkHTTPRequest = req.getCheckHTTPRequest();
+        String path = checkHTTPRequest.getRequest().getPath();
+
         if (isIgnored(path)) {
+            logger.debug("Path " + path + " is set to be ignored.");
             return TrafficFlow.ignoredFlow();
         }
 
@@ -138,12 +153,12 @@ public final class ApertureSDK {
         CheckHTTPResponse res = null;
         try {
             if (flowTimeout.isZero()) {
-                res = this.httpFlowControlClient.checkHTTP(req);
+                res = this.httpFlowControlClient.checkHTTP(checkHTTPRequest);
             } else {
                 res =
                         this.httpFlowControlClient
                                 .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
-                                .checkHTTP(req);
+                                .checkHTTP(checkHTTPRequest);
             }
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
