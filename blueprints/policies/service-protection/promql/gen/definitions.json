@@ -95,6 +95,64 @@
             }
           }
         },
+        "auto_scaling": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "description": "Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.",
+              "default": null,
+              "type": "boolean"
+            },
+            "promql_scale_out_controllers": {
+              "description": "List of scale out controllers.",
+              "default": null,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/promql_scale_out_controller"
+              }
+            },
+            "promql_scale_in_controllers": {
+              "description": "List of scale in controllers.",
+              "default": null,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/promql_scale_in_controller"
+              }
+            },
+            "scaling_parameters": {
+              "description": "Parameters that define the scaling behavior.",
+              "default": null,
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
+            },
+            "scaling_backend": {
+              "description": "Scaling backend for the policy.",
+              "default": null,
+              "type": "object",
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackend"
+            },
+            "periodic_decrease": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "period": {
+                  "description": "Period for periodic scale in.",
+                  "default": null,
+                  "type": "string"
+                },
+                "scale_in_percentage": {
+                  "description": "Percentage of replicas to scale in.",
+                  "default": null,
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            }
+          }
+        },
         "setpoint": {
           "description": "Setpoint.",
           "default": "__REQUIRED_FIELD__",
@@ -168,6 +226,64 @@
           "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
           "default": null,
           "type": "string"
+        }
+      }
+    },
+    "promql_scale_out_controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": null,
+          "type": "string"
+        },
+        "threshold": {
+          "description": "Threshold for the controller.",
+          "default": null,
+          "type": "number",
+          "format": "double"
+        },
+        "gradient": {
+          "description": "Gradient parameters for the controller.",
+          "default": null,
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
+        },
+        "alerter": {
+          "description": "Alerter parameters for the controller.",
+          "default": null,
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+        }
+      }
+    },
+    "promql_scale_in_controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": null,
+          "type": "string"
+        },
+        "threshold": {
+          "description": "Threshold for the controller.",
+          "default": null,
+          "type": "number",
+          "format": "double"
+        },
+        "gradient": {
+          "description": "Gradient parameters for the controller.",
+          "default": null,
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
+        },
+        "alerter": {
+          "description": "Alerter parameters for the controller.",
+          "default": null,
+          "type": "object",
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         }
       }
     }

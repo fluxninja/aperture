@@ -6,235 +6,102 @@
   "required": ["policy"],
   "properties": {
     "policy": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "service_protection_core",
-        "latency_baseliner",
-        "auto_scaling"
-      ],
-      "properties": {
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
-        "components": {
-          "description": "List of additional circuit components.",
-          "default": [],
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
-          }
-        },
-        "resources": {
-          "description": "Additional resources.",
-          "default": {
-            "flow_control": {
-              "classifiers": []
+      "description": "Configuration for the Service Protection policy.",
+      "default": {
+        "auto_scaling": {
+          "dry_run": false,
+          "periodic_decrease": {
+            "period": "60s",
+            "scale_in_percentage": 10
+          },
+          "promql_scale_in_controllers": [],
+          "promql_scale_out_controllers": [],
+          "scaling_backend": {
+            "kubernetes_replicas": {
+              "kubernetes_object_selector": "__REQUIRED_FIELD__",
+              "max_replicas": "__REQUIRED_FIELD__",
+              "min_replicas": "__REQUIRED_FIELD__"
             }
           },
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+          "scaling_parameters": {
+            "scale_in_alerter": {
+              "alert_name": "Auto-scaler is scaling in"
+            },
+            "scale_in_cooldown": "40s",
+            "scale_out_alerter": {
+              "alert_name": "Auto-scaler is scaling out"
+            },
+            "scale_out_cooldown": "30s"
+          }
         },
-        "evaluation_interval": {
-          "description": "The interval between successive evaluations of the Circuit.",
-          "default": "1s",
-          "type": "string"
+        "components": [],
+        "evaluation_interval": "1s",
+        "latency_baseliner": {
+          "ema": {
+            "correction_factor_on_max_envelope_violation": 0.95,
+            "ema_window": "1500s",
+            "warmup_window": "60s"
+          },
+          "flux_meter": {
+            "selectors": [
+              {
+                "control_point": "__REQUIRED_FIELD__",
+                "service": "__REQUIRED_FIELD__"
+              }
+            ]
+          },
+          "latency_ema_limit_multiplier": 2,
+          "latency_tolerance_multiplier": 1.1
+        },
+        "policy_name": "__REQUIRED_FIELD__",
+        "resources": {
+          "flow_control": {
+            "classifiers": []
+          }
         },
         "service_protection_core": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["adaptive_load_scheduler"],
-          "properties": {
-            "overload_confirmations": {
-              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
-              "default": [],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "../../../../policies/service-protection/average-latency/gen/definitions.json#/$defs/overload_confirmation"
-              }
+          "adaptive_load_scheduler": {
+            "alerter": {
+              "alert_name": "Load Throttling Event"
             },
-            "adaptive_load_scheduler": {
-              "description": "Parameters for Adaptive Load Scheduler.",
-              "default": {
-                "alerter": {
-                  "alert_name": "Load Throttling Event"
-                },
-                "gradient": {
-                  "max_gradient": 1,
-                  "min_gradient": 0.1,
-                  "slope": -1
-                },
-                "load_multiplier_linear_increment": 0.0025,
-                "load_scheduler": {
-                  "selectors": [
-                    {
-                      "control_point": "__REQUIRED_FIELD__",
-                      "service": "__REQUIRED_FIELD__"
-                    }
-                  ]
-                },
-                "max_load_multiplier": 2
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerParameters"
+            "gradient": {
+              "max_gradient": 1,
+              "min_gradient": 0.1,
+              "slope": -1
             },
-            "dry_run": {
-              "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
-              "default": false,
-              "type": "boolean"
-            }
-          }
-        },
-        "latency_baseliner": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["flux_meter"],
-          "properties": {
-            "flux_meter": {
-              "description": "Flux Meter defines the scope of latency measurements.",
-              "default": {
-                "selectors": [
-                  {
-                    "control_point": "__REQUIRED_FIELD__",
-                    "service": "__REQUIRED_FIELD__"
-                  }
-                ]
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
-            },
-            "ema": {
-              "description": "EMA parameters.",
-              "default": {
-                "correction_factor_on_max_envelope_violation": 0.95,
-                "ema_window": "1500s",
-                "warmup_window": "60s"
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/EMAParameters"
-            },
-            "latency_tolerance_multiplier": {
-              "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.",
-              "default": 1.1,
-              "type": "number",
-              "format": "double"
-            },
-            "latency_ema_limit_multiplier": {
-              "description": "Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.",
-              "default": 2,
-              "type": "number",
-              "format": "double"
-            }
-          }
-        },
-        "auto_scaling": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["kubernetes_replicas", "scaling_parameters"],
-          "properties": {
-            "kubernetes_replicas": {
-              "description": "Kubernetes replicas scaling backend.",
-              "default": {
-                "kubernetes_object_selector": "__REQUIRED_FIELD__",
-                "max_replicas": "__REQUIRED_FIELD__",
-                "min_replicas": "__REQUIRED_FIELD__"
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackendKubernetesReplicas"
-            },
-            "dry_run": {
-              "description": "Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.",
-              "default": false,
-              "type": "boolean"
-            },
-            "scaling_parameters": {
-              "description": "Parameters that define the scaling behavior.",
-              "default": {
-                "scale_in_alerter": {
-                  "alert_name": "Auto-scaler is scaling in"
-                },
-                "scale_in_cooldown": "40s",
-                "scale_out_alerter": {
-                  "alert_name": "Auto-scaler is scaling out"
-                },
-                "scale_out_cooldown": "30s"
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
-            },
-            "disable_periodic_scale_in": {
-              "description": "Disable periodic scale in.",
-              "default": false,
-              "type": "boolean"
-            },
-            "periodic_decrease": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "period": {
-                  "description": "Period for periodic scale in.",
-                  "default": "60s",
-                  "type": "string"
-                },
-                "scale_in_percentage": {
-                  "description": "Percentage of replicas to scale in.",
-                  "default": 10,
-                  "type": "number",
-                  "format": "double"
+            "load_multiplier_linear_increment": 0.0025,
+            "load_scheduler": {
+              "selectors": [
+                {
+                  "control_point": "__REQUIRED_FIELD__",
+                  "service": "__REQUIRED_FIELD__"
                 }
-              }
-            }
-          }
+              ]
+            },
+            "max_load_multiplier": 2
+          },
+          "dry_run": false,
+          "overload_confirmations": []
         }
-      }
+      },
+      "type": "object",
+      "$ref": "../../../../policies/service-protection/average-latency/gen/definitions.json#/properties/policy"
     },
     "dashboard": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "refresh_interval": {
-          "description": "Refresh interval for dashboard panels.",
-          "default": "15s",
-          "type": "string"
-        },
-        "time_from": {
-          "description": "From time of dashboard.",
-          "default": "now-15m",
-          "type": "string"
-        },
-        "time_to": {
-          "description": "To time of dashboard.",
-          "default": "now",
-          "type": "string"
-        },
-        "extra_filters": {
-          "description": "Additional filters to pass to each query to Grafana datasource.",
-          "default": {},
-          "type": "object",
-          "additionalProperties": true
-        },
+      "description": "Configuration for the Grafana dashboard accompanying this policy.",
+      "default": {
         "datasource": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "name": {
-              "description": "Datasource name.",
-              "default": "$datasource",
-              "type": "string"
-            },
-            "filter_regex": {
-              "description": "Datasource filter regex.",
-              "default": "",
-              "type": "string"
-            }
-          }
-        }
-      }
+          "filter_regex": "",
+          "name": "$datasource"
+        },
+        "extra_filters": {},
+        "refresh_interval": "15s",
+        "time_from": "now-15m",
+        "time_to": "now",
+        "variant_name": "Average Latency"
+      },
+      "type": "object",
+      "$ref": "../../../../policies/service-protection/average-latency/gen/definitions.json#/properties/dashboard"
     }
   },
   "$defs": null

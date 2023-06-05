@@ -1,3 +1,4 @@
+local baseAutoScalingDashboardFn = import '../../auto-scaling/base/dashboard.libsonnet';
 local utils = import '../../policy-utils.libsonnet';
 local config = import './config-defaults.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
@@ -109,7 +110,8 @@ local newStatPanel(graphTitle, datasource, graphQuery) =
     },
   };
 
-local dashboardWithPanels(dashboardParams, filters) =
+local dashboardWithPanels(params, filters) =
+  local dashboardParams = params.dashboard;
   local datasource = dashboardParams.datasource;
   local dsName = datasource.name;
 
@@ -161,15 +163,14 @@ local dashboardWithPanels(dashboardParams, filters) =
   local WorkloadLatency =
     newGraphPanel('Workload Latency', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{%(filters)s}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{%(filters)s}[$__rate_interval])))' % { filters: filters }, 'Latency', 'ms');
 
-  dashboard.new(
+  local protectionDashboard = dashboard.new(
     title='Aperture Service Protection',
     editable=true,
     schemaVersion=18,
     refresh=dashboardParams.refresh_interval,
     time_from=dashboardParams.time_from,
     time_to=dashboardParams.time_to
-  )
-  .addTemplate(
+  ).addTemplate(
     {
       current: {
         text: 'default',
@@ -184,26 +185,62 @@ local dashboardWithPanels(dashboardParams, filters) =
       regex: datasource.filter_regex,
       type: 'datasource',
     }
-  )
-  .addPanel(WorkloadDecisionsAccepted, gridPos={ h: 10, w: 24, x: 0, y: 10 })
-  .addPanel(WorkloadDecisionsRejected, gridPos={ h: 10, w: 24, x: 0, y: 20 })
-  .addPanel(WorkloadLatency, gridPos={ h: 10, w: 24, x: 0, y: 30 })
-  .addPanel(IncomingConcurrency, gridPos={ h: 8, w: 12, x: 0, y: 40 })
-  .addPanel(AcceptedConcurrency, gridPos={ h: 8, w: 12, x: 12, y: 40 })
-  .addPanel(WFQSchedulerFlows, gridPos={ h: 3, w: 8, x: 0, y: 50 })
-  .addPanel(TotalBucketLoadSchedFactor, gridPos={ h: 6, w: 4, x: 8, y: 50 })
-  .addPanel(TokenBucketBucketCapacity, gridPos={ h: 6, w: 4, x: 12, y: 50 })
-  .addPanel(TokenBucketBucketFillRate, gridPos={ h: 6, w: 4, x: 16, y: 50 })
-  .addPanel(TokenBucketAvailableTokens, gridPos={ h: 6, w: 4, x: 20, y: 50 })
-  .addPanel(WFQSchedulerHeapRequests, gridPos={ h: 3, w: 8, x: 0, y: 50 });
+  ).addPanel(
+    WorkloadDecisionsAccepted, gridPos={ h: 10, w: 24, x: 0, y: 10 }
+  ).addPanel(
+    WorkloadDecisionsRejected, gridPos={ h: 10, w: 24, x: 0, y: 20 }
+  ).addPanel(
+    WorkloadLatency, gridPos={ h: 10, w: 24, x: 0, y: 30 }
+  ).addPanel(
+    IncomingConcurrency, gridPos={ h: 8, w: 12, x: 0, y: 40 }
+  ).addPanel(
+    AcceptedConcurrency, gridPos={ h: 8, w: 12, x: 12, y: 40 }
+  ).addPanel(
+    WFQSchedulerFlows, gridPos={ h: 3, w: 8, x: 0, y: 50 }
+  ).addPanel(
+    TotalBucketLoadSchedFactor, gridPos={ h: 6, w: 4, x: 8, y: 50 }
+  ).addPanel(
+    TokenBucketBucketCapacity, gridPos={ h: 6, w: 4, x: 12, y: 50 }
+  ).addPanel(
+    TokenBucketBucketFillRate, gridPos={ h: 6, w: 4, x: 16, y: 50 }
+  ).addPanel(
+    TokenBucketAvailableTokens, gridPos={ h: 6, w: 4, x: 20, y: 50 }
+  ).addPanel(
+    WFQSchedulerHeapRequests, gridPos={ h: 3, w: 8, x: 0, y: 50 }
+  );
 
+  local autoScalingParams = {
+    policy+: params.policy.auto_scaling {
+      policy_name: params.policy.policy_name,
+    },
+
+    dashboard: params.dashboard,
+  };
+
+  local baseAutoScalingDashboard = baseAutoScalingDashboardFn(autoScalingParams);
+
+  local maxPanelYAxis = std.reverse(std.sort(protectionDashboard.panels, keyF=function(panel) panel.gridPos.y))[0].gridPos.y;
+  local maxId = std.reverse(std.sort(protectionDashboard.panels, keyF=function(panel) '%s' % panel.id))[0].id;
+
+  local protectionAndEscalationDashboard =
+    protectionDashboard {
+      panels+: [
+        baseAutoScalingDashboard.dashboard.panels[panel_idx] {
+          id: maxId + panel_idx + 1,
+          gridPos: { x: 0, y: (maxPanelYAxis + (panel_idx + 1) * 10), w: 24, h: 10 },
+        }
+        for panel_idx in std.range(0, std.length(baseAutoScalingDashboard.dashboard.panels) - 1)
+      ],
+    };
+
+  (if std.objectHas(params.policy, 'auto_scaling') then protectionAndEscalationDashboard else protectionDashboard);
 
 function(cfg) {
   local params = config + cfg,
   local policyName = params.policy.policy_name,
   local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { policy_name: policyName }),
 
-  local dashboardDef = dashboardWithPanels(params.dashboard, filters),
+  local dashboardDef = dashboardWithPanels(params, filters),
 
   dashboard: dashboardDef,
 }
