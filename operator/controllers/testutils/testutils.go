@@ -1,8 +1,6 @@
 package testutils
 
 import (
-	"fmt"
-
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/yaml"
@@ -15,8 +13,6 @@ func CompareConfigMap(result, expected *corev1.ConfigMap) {
 		err1 := yaml.Unmarshal([]byte(result.Data[key]), &obj1)
 		err2 := yaml.Unmarshal([]byte(expected.Data[key]), &obj2)
 
-		fmt.Printf("result: %v\n", result.Data[key])
-		fmt.Printf("expected: %v\n", expected.Data[key])
 		if err1 == nil && err2 == nil {
 			Expect(obj1).To(Equal(obj2))
 		} else {
