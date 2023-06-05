@@ -26,32 +26,33 @@ experience.
 
 ## Policy Key Concepts
 
-At a high-level, this policy consists of:
+Broadly, this policy revolves around two significant areas: Latency Monitoring
+and Rollout Control.
 
-- Latency monitoring: Continuously measure the application's latency using the
-  [`average_latency_driver`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#average-latency-driver).
-- Rollout control: Gradually increase the percentage of requests that are to be
-  served the new feature using
-  [`steps`](/reference/policies/spec#load-ramp-parameters-step). Monitor the
-  application's latency and roll back the feature if the latency deteriorates
-  beyond the configured limit.
+- Latency Monitoring: By employing the
+  [`average_latency_driver`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#average-latency-driver),
+  the policy persistently measures the application's latency. Within this, a
+  criteria is set to establish the thresholds for both forward progression and
+  rollback of the rollout. Furthermore, selectors play a crucial role in this
+  policy, managing the traffic for flow control and observability components
+  within the Aperture Agents. Selectors lay down the rules for traffic flow,
+  determining how the components should operate. This capability allows
+  developers to define [`control points`] within the code or data plane, which
+  act as strategic locations where flow control decisions are applied.
+  Developers set these control points using SDKs or during API Gateways or
+  Service Meshes integration.
 
-Some of the key concepts used in this policy are:
-
-- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
-  signal managers for flow control and observability components in the Aperture
-  Agents. They lay down the traffic rules determining how these components
-  should select flows for their operations.
-- [Control Point](../../concepts/flow-control/selector.md): Think of Control
-  Points as designated checkpoints in your code or data plane. They're the
-  strategic points where flow control decisions are applied. Developers define
-  these using SDKs or during API Gateways or Service Meshes integration.
-- [Regulator](../../concepts/flow-control/components/regulator.md): Picture the
-  Regulator as a vigilant gatekeeper at a crowded event, letting in only a set
-  number of guests at a time to maintain order. In Aperture's context, it
-  controls the flow traffic to a Control Point, and can allow random or sticky
-  sessions based on your preferences, helping balance load and enabling
-  controlled tests.
+- Rollout Control: The [`load_ramp`] component is instrumental in performing a
+  controlled rollout of the new feature. A
+  [`regulator`](../../concepts/flow-control/components/regulator.md) within this
+  component manages the flow of traffic to control points, facilitating either
+  sticky or random sessions based on preference, thereby balancing the load and
+  enabling controlled tests. The rollout's pace is managed using
+  [`steps`](/reference/policies/spec#load-ramp-parameters-step) that
+  incrementally increase the percentage of requests served by the new feature.
+  This approach allows the policy to continuously monitor the application's
+  latency and rollback the feature if the latency exceeds the configured
+  threshold.
 
 ## Policy Configuration
 

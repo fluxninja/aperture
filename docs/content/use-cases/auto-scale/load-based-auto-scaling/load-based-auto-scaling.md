@@ -16,64 +16,51 @@ import Zoom from 'react-medium-image-zoom';
 
 ## Policy Overview
 
-This policy builds upon the _Service Protection with Load-based Pod Auto-Scaler_
-[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
-to add an escalation for auto-scaling. The basic service protection policy
-protects the service from sudden traffic spikes. But it is necessary to scale
-the service to meet demand in case of a persistent change in load.
+Responding to fluctuating service demand is a common challenge for maintaining
+stable and responsive services. This policy, based on the Service Protection
+with Load-based Pod Auto-Scaler
+[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md),
+presents an evolved strategy to tackle this. It introduces a mechanism to
+dynamically scale the service resources based on observed load, thereby
+optimizing resource allocation and maintaining a balanced system.
 
-To achieve this, the policy makes use of an
+This policy employs two key strategies: it protects the service from sudden
+traffic spikes, and it ensures the service scales proportionally to accommodate
+sustained load changes. The policy uses an
 [_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component to
-adjust the number of instances allocated to the service. Load-based auto-scaling
-is achieved by defining a scale-out _Controller_ that acts on the load
-multiplier signal from the service protection policy. This signal measures the
-fraction of traffic that the
-[_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md) is
-throttling into a queue. The _Auto Scaler_ is configured to scale-out using a
-_Gradient Controller_ based on this signal and a setpoint of 1.0.
-
-In addition to load-based scaling, the policy includes a scale-in _Controller_
-based on CPU utilization. These _Controllers_ adjust the resources allocated to
-the service based on changes in CPU usage, ensuring that the service can handle
-the workload efficiently.
+dynamically adjust the number of service instances in response to changes in
+load and CPU utilization. This load-based auto-scaling is enacted by a scale-out
+Controller that takes input from the
+[_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md) signal,
+effectively throttling traffic into a queue and scaling resources to match the
+demand.
 
 ## Policy Key Concepts
 
-At a high level, this policy consists of:
+This policy integrates a suite of concepts and components to enable a dynamic,
+load-responsive service operation:
 
-- Service protection based on response latency trend of the service.
-- An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
-  Deployment for the service.
-- Load-based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
-  the blueprint. This signal measures the fraction of traffic that the _Load
-  Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
-  scale-out based on a _Gradient Controller_ using this signal and a setpoint of
-  1.0.
-- In addition to the load-based scale-out, the policy also includes a scale-in
-  _Controller_ based on CPU utilization which adjusts the instances of the
-  service based on changes in CPU usage, ensuring that the service is not
-  over-provisioned.
-
-Some of the key concepts used in this policy are:
-
-- [Load Scheduler](../../../concepts/flow-control/components/load-scheduler.md):
-  The Load Scheduler prevents chaos by managing incoming request traffic
-  efficiently. It's tasked with limiting the concurrent requests to a service
-  and assigning different priorities and weights to workloads to ensures that
-  high-priority requests get served first during heavy traffic.
-- [Selector](../../../concepts/flow-control/selector.md): Selectors are the
-  traffic signal managers for flow control and observability components in the
-  Aperture Agents. They lay down the traffic rules determining how these
-  components should select flows for their operations.
-- [Control Point](../../../concepts/flow-control/selector.md): Think of Control
-  Points as designated checkpoints in your code or data plane. They're the
-  strategic points where flow control decisions are applied. Developers define
-  these using SDKs or during API Gateways or Service Meshes integration.
-- [FluxMeter](../../../concepts/flow-control/resources/flux-meter.md): Flux
-  Meter converts a flux of flows matching a Flow Selector into a Prometheus
-  histogram. By default, it tracks the workload duration of a flow. However,
-  it's flexible enough to track any metric from OpenTelemetry attributes based
-  on the method of insertion.
+- Service Protection Core: This component employs an [`adaptive_load_scheduler`]
+  to manage incoming traffic and prevent chaotic load situations. It uses a Load
+  Scheduler to limit concurrent requests, assigning different priorities and
+  weights to workloads to ensure high-priority requests are served first during
+  heavy traffic.
+- [`latency_baseliner`]: This subsystem includes a [`flux_meter`] that measures
+  the scope of latency by converting a flux of flows matching a flow selector
+  into a Prometheus histogram. By default, it tracks the workload duration of a
+  flow, but it can flexibly track any metric from OpenTelemetry attributes
+  depending on the insertion method.
+- Auto Scaling: A crucial part of this policy, this component facilitates
+  automatic scaling of service instances based on the current load. It includes
+  a Kubernetes replica scaling backend that adjusts the number of replicas of
+  the Kubernetes Deployment for the service, ensuring it matches the current
+  demand. The [`dry_run`] parameter can be used to simulate scaling actions
+  without actually performing them, which is useful for testing and
+  verification.
+- Scaling Parameters: These are crucial for controlling the behavior of the
+  [`auto scaling`] component. Parameters such as [`scale_in_cooldown`] and
+  [`scale_out_cooldown`] define the minimum amount of time between consecutive
+  scale-in and scale-out actions, preventing overactive scaling.
 
 ## Policy Configuration
 

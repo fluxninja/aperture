@@ -15,35 +15,38 @@ import Zoom from 'react-medium-image-zoom';
 
 ## Policy Overview
 
-The most effective technique to protect services from cascading failures is to
-limit the concurrency of the service to match the processing capacity of the
-service. However, figuring out the concurrency limit of a service is a hard
-problem in the face of continuously changing service infrastructure. Each new
-version deployed, horizontal scaling, or a change in access patterns can change
-the concurrency limit of a service.
+Mitigating cascading failures is essential to maintain service stability, which
+can be achieved effectively by matching a service's concurrency limit with its
+processing capacity. However, determining the precise concurrency limit can be
+challenging due to the evolving nature of service infrastructure. Factors such
+as deployment of new versions, horizontal scaling, or fluctuating access
+patterns can impact the concurrency limit. This policy is designed to address
+this dynamic problem and offer reliable service protection.
 
 ## Policy Key Concepts
 
-At a high level, this policy consists of:
+This policy encompasses two significant components: [`service_protection_core`]
+and [`latency_baseliner`].
 
-- [Load Scheduler](../../concepts/flow-control/components/load-scheduler.md):
-  The Load Scheduler prevents chaos by managing incoming request traffic
-  efficiently. It's tasked with limiting the concurrent requests to a service
-  and assigning different priorities and weights to workloads to ensures that
-  high-priority requests get served first during heavy traffic.
-- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
+- Service Protection Core: Incorporating an
+  [`adaptive_load_scheduler`](../../concepts/flow-control/components/load-scheduler.md),
+  it manages incoming request traffic to prevent chaos. The load scheduler
+  limits concurrent requests to a service and assigns different priorities and
+  weights to workloads. This ensures that high-priority requests are served
+  first during heavy traffic. Crucial within this setup are
+  [selectors](../../concepts/flow-control/selector.md), which are like traffic
   signal managers for flow control and observability components in the Aperture
-  Agents. They lay down the traffic rules determining how these components
-  should select flows for their operations.
-- [Control Point](../../concepts/flow-control/selector.md): Think of Control
-  Points as designated checkpoints in your code or data plane. They're the
-  strategic points where flow control decisions are applied. Developers define
-  these using SDKs or during API Gateways or Service Meshes integration.
-- [FluxMeter](../../concepts/flow-control/resources/flux-meter.md): Flux Meter
-  converts a flux of flows matching a Flow Selector into a Prometheus histogram.
-  By default, it tracks the workload duration of a flow. However, it's flexible
-  enough to track any metric from OpenTelemetry attributes based on the method
-  of insertion.
+  Agents. Selectors define traffic rules determining how components should
+  select flows for their operations. Also key are
+  [`control_points`](../../concepts/flow-control/selector.md), strategic points
+  in your code or data plane where flow control decisions are applied.
+  Developers define these using SDKs or during API Gateways or Service Meshes
+  integration.
+- Latency Monitoring: It encompasses the [`flux_meter`] that converts a flux of
+  flows matching a flow selector into a Prometheus histogram, essentially
+  measuring the scope of latency. By default, it tracks the workload duration of
+  a flow, but it can flexibly track any metric from OpenTelemetry attributes
+  depending on the insertion method.
 
 ## Policy Configuration
 

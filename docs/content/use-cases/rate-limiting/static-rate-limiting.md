@@ -14,28 +14,36 @@ import Zoom from 'react-medium-image-zoom';
 
 ## Policy Overview
 
-One of the simplest flow control policies is static rate limiting to regulate
-heavy-hitters. It uses the
+Regulating incoming traffic in the face of overwhelming requests is vital to
+maintaining the health and availability of a service. A powerful tool to achieve
+this is the implementation of static rate limiting, aimed at controlling the
+intensity of 'heavy-hitters.' This policy utilizes the
 [Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
-block specific flow labels that exceed their quota within a certain time frame
-(limit reset interval).
+curtail specific flow labels that go beyond their allocated quota within a
+defined time frame (limit reset interval). It is an efficient and
+straightforward mechanism for mitigating traffic congestion and preventing
+potential service degradation or downtime.
 
 ## Policy Key Concepts
 
-At a high level, this policy consists of:
+This policy is centered around two fundamental aspects: the [`rate_limiter`] and
+the [`selectors`].
 
-- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md):
-  Implemented on a token bucket algorithm, the rate limiter is an effective tool
-  used to avoid recurring heavy traffic. This parking meter is flexible; it can
-  be configured to work with different labels and limits.
-- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
-  signal managers for flow control and observability components in the Aperture
-  Agents. They lay down the traffic rules determining how these components
-  should select flows for their operations.
-- [Control Point](../../concepts/flow-control/selector.md): Think of Control
-  Points as designated checkpoints in your code or data plane. They're the
-  strategic points where flow control decisions are applied. Developers define
-  these using SDKs or during API Gateways or Service Meshes integration.
+- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md) is a
+  component modeled on the token bucket algorithm. It serves as an effective
+  bulwark against heavy and frequent traffic spikes, essentially operating like
+  a 'traffic parking meter.' The rate limiter's flexibility lies in its ability
+  to be configured according to various labels and limits, providing an
+  adjustable mechanism to handle diverse traffic patterns and intensities.
+  Selectors and Control Points: The Selectors and Control Points perform similar
+  roles as described in the previous policies.
+
+- [Selectors](../../concepts/flow-control/selector.md) act as traffic signal
+  managers that lay down the rules for flow selection by the rate limiter. On
+  the other hand, [Control Points](../../concepts/flow-control/selector.md)
+  serve as strategic checkpoints where these flow control decisions are applied.
+  These concepts remain central to the process of implementing effective rate
+  limiting for a service.
 
 ## Policy Configuration
 

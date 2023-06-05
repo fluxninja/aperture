@@ -21,12 +21,16 @@ for GraphQL queries using the [_Classifier_][rego-rules].
 
 ## Policy Key Concepts
 
-At a high level, this policy consists of:
+This policy is centered around two fundamental aspects: the [`rate_limiter`] and
+the [`selectors`].
 
-- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md):
-  Implemented on a token bucket algorithm, the rate limiter is an effective tool
-  used to avoid recurring heavy traffic. This parking meter is flexible; it can
-  be configured to work with different labels and limits.
+- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md) is a
+  component modeled on the token bucket algorithm. It serves as an effective
+  bulwark against heavy and frequent traffic spikes, essentially operating like
+  a 'traffic parking meter.' The rate limiter's flexibility lies in its ability
+  to be configured according to various labels and limits, providing an
+  adjustable mechanism to handle diverse traffic patterns and intensities.
+
 - [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
   signal managers for flow control and observability components in the Aperture
   Agents. They lay down the traffic rules determining how these components

@@ -16,41 +16,40 @@ import Zoom from 'react-medium-image-zoom';
 
 ## Policy Overview
 
-External Rate Limiting is a technique to limit the number of outgoing requests
-from services to an external API server. Turning your apps into spend aware and
-keeping them within quota limits to avoid cost overages. However, not all
-workloads are on same priority, based on application, their priority can be
-different. While doing external rate limiting, it is important to ensure
-prioritized access for critical workloads. This policy builds upon the
+The Quota Scheduler Policy is a sophisticated solution designed to manage and
+limit outgoing requests from services to an external API server. This policy
+makes applications cost-aware, ensuring that they operate within assigned quota
+limits to prevent cost overruns. Workload priorities may differ based on the
+application, and maintaining prioritized access for critical workloads during
+external rate limiting is of paramount importance. The policy leverages the
 [`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
-Blueprint, which comprises components like the token bucket rate limiting to
-ensure quota limits and a
+Blueprint, which brings together the token bucket rate limiting and a
 [Weighted Fair Queuing (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
-based Workload Scheduler to assure prioritized access for critical workloads.
+based Workload Scheduler to balance quota limits and priority-based access
+efficiently.
 
 ## Policy Key Concepts
 
-At a high-level, this policy consists of:
+The policy operates around a set of core components each serving a specific
+function in the overall rate limiting process.
 
-- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
-  signal managers for flow control and observability components in the Aperture
-  Agents. They lay down the traffic rules determining how these components
-  should select flows for their operations.
-- [Control Point](../../concepts/flow-control/selector.md): Think of Control
-  Points as designated checkpoints in your code or data plane. They're the
-  strategic points where flow control decisions are applied. Developers define
-  these using SDKs or during API Gateways or Service Meshes integration.
+- [Selector](../../concepts/flow-control/selector.md): The Selector serves as
+  the traffic manager, governing flow control and observability components
+  within the Aperture Agents. By establishing traffic rules, it delineates how
+  components should select flows for their operations.
+
+- [Control Point](../../concepts/flow-control/selector.md): The Control Point
+  acts as a critical checkpoint in your code or data plane, a strategically
+  placed spot where flow control decisions are applied. Developers define these
+  points during the integration of API Gateways or Service Meshes.
 - [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md):
-  Implemented on a token bucket algorithm, the rate limiter is an effective tool
-  used to avoid recurring heavy traffic. This parking meter is flexible; it can
-  be configured to work with different labels and limits.
+  Employing a token bucket algorithm, the Rate Limiter helps prevent heavy
+  traffic recurrence. Its flexibility allows it to adapt to different labels and
+  limits, offering dynamic control over traffic flow.
 - [Scheduler](../../concepts/flow-control/components/load-scheduler.md): The
-  Scheduler ensures that requests are served based on their priority and size.
-  It employs a Weighted Fair Queue-based system to serve the requests, using a
-  Load Multiplier to calculate the token refill rate. If the incoming token rate
-  exceeds the desired rate, it queues the requests and helps provide a smooth
-  user experience, prioritizing critical orders over less urgent ones to ensure
-  customer satisfaction.
+  Scheduler ensures that requests are serviced based on their priority and size.
+  It employs a Weighted Fair Queue-based system, calculating the token refill
+  rate using a Load Multiplier, effectively managing and prioritizing requests.
 
 ## Policy Configuration
 
