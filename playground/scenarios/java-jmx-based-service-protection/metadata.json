@@ -1,0 +1,36 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/java-demo-app",
+  "aperture_policies": [
+    {
+      "blueprint_name": "policies/service-protection/jmx",
+      "policy_name": "jmx-service-protection",
+      "values_file": "policies/jmx-service-protection.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "java-demo-app",
+      "context": "playground/resources/java-demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service2-demo-app",
+      "resource_deps": ["cluster-bootstrap"],
+      "extra_objects": ["service2-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service3-demo-app",
+      "resource_deps": ["cluster-bootstrap"],
+      "extra_objects": ["service3-demo-app:serviceaccount"]
+    }
+  ]
+}

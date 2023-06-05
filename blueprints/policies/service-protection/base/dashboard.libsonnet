@@ -180,7 +180,7 @@ local dashboardWithPanels(dashboardParams, filters) =
       name: 'datasource',
       options: [],
       query: 'prometheus',
-      refres: 1,
+      refresh: 1,
       regex: datasource.filter_regex,
       type: 'datasource',
     }
