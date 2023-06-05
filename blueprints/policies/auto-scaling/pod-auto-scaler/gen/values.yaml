@@ -41,22 +41,10 @@ policy:
   # Type: aperture.spec.v1.AutoScalerScalingBackend
   # Required: True
   scaling_backend:
-    # Kubernetes replicas scaling backend.
-    # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
-    # Required: True
     kubernetes_replicas:
-      # Kubernetes object selector.
-      # Type: aperture.spec.v1.KubernetesObjectSelector
-      # Required: True
       kubernetes_object_selector: __REQUIRED_FIELD__
-      # Minimum number of replicas.
-      # Type: string
-      # Required: True
-      min_replicas: __REQUIRED_FIELD__
-      # Maximum number of replicas.
-      # Type: string
-      # Required: True
       max_replicas: __REQUIRED_FIELD__
+      min_replicas: __REQUIRED_FIELD__
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []

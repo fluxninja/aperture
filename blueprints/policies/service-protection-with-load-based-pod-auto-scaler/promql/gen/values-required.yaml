@@ -2,37 +2,37 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/promql
 
+# Configuration for the Service Protection policy.
+# Type: policies/service-protection/promql:param:policy
+# Required: True
 policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: __REQUIRED_FIELD__
-  # PromQL query.
-  # Type: string
-  # Required: True
-  promql_query: __REQUIRED_FIELD__
-  # Setpoint.
-  # Type: float64
-  # Required: True
-  setpoint: __REQUIRED_FIELD__
-  # List of additional circuit components.
-  # Type: []aperture.spec.v1.Component
+  auto_scaling:
+    dry_run: false
+    periodic_decrease:
+      period: "60s"
+      scale_in_percentage: 10
+    promql_scale_in_controllers: []
+    promql_scale_out_controllers: []
+    scaling_backend:
+      kubernetes_replicas:
+        kubernetes_object_selector: __REQUIRED_FIELD__
+        max_replicas: __REQUIRED_FIELD__
+        min_replicas: __REQUIRED_FIELD__
+    scaling_parameters:
+      scale_in_alerter:
+        alert_name: "Auto-scaler is scaling in"
+      scale_in_cooldown: "40s"
+      scale_out_alerter:
+        alert_name: "Auto-scaler is scaling out"
+      scale_out_cooldown: "30s"
   components: []
-  # Additional resources.
-  # Type: aperture.spec.v1.Resources
+  evaluation_interval: "1s"
+  policy_name: __REQUIRED_FIELD__
+  promql_query: __REQUIRED_FIELD__
   resources:
     flow_control:
       classifiers: []
-  # The interval between successive evaluations of the Circuit.
-  # Type: string
-  evaluation_interval: "1s"
   service_protection_core:
-    # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
-    # Type: []policies/service-protection/promql:schema:overload_confirmation
-    overload_confirmations: []
-    # Parameters for Adaptive Load Scheduler.
-    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
-    # Required: True
     adaptive_load_scheduler:
       alerter:
         alert_name: "Load Throttling Event"
@@ -46,48 +46,6 @@ policy:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
       max_load_multiplier: 2
-    # Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
-    # Type: bool
     dry_run: false
-  auto_scaling:
-    # Kubernetes replicas scaling backend.
-    # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
-    # Required: True
-    kubernetes_replicas:
-      # Kubernetes object selector.
-      # Type: aperture.spec.v1.KubernetesObjectSelector
-      # Required: True
-      kubernetes_object_selector: __REQUIRED_FIELD__
-      # Minimum number of replicas.
-      # Type: string
-      # Required: True
-      min_replicas: __REQUIRED_FIELD__
-      # Maximum number of replicas.
-      # Type: string
-      # Required: True
-      max_replicas: __REQUIRED_FIELD__
-    # Dry run mode ensures that no scaling is invoked by this auto scaler. This config can be updated at runtime without restarting the policy.
-    # Type: bool
-    dry_run: false
-    # Parameters that define the scaling behavior.
-    # Type: aperture.spec.v1.AutoScalerScalingParameters
-    # Required: True
-    scaling_parameters:
-      scale_in_alerter:
-        alert_name: "Auto-scaler is scaling in"
-      scale_in_cooldown: "40s"
-      scale_out_alerter:
-        alert_name: "Auto-scaler is scaling out"
-      scale_out_cooldown: "30s"
-    # Disable periodic scale in.
-    # Type: bool
-    disable_periodic_scale_in: false
-    # Parameters for periodic scale in.
-    # Type: aperture.spec.v1.PeriodicDecreaseParameters
-    periodic_decrease:
-      # Period for periodic scale in.
-      # Type: string
-      period: "60s"
-      # Percentage of replicas to scale in.
-      # Type: float64
-      scale_in_percentage: 10
+    overload_confirmations: []
+  setpoint: __REQUIRED_FIELD__
