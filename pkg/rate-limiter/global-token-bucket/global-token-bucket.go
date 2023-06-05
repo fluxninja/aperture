@@ -1,6 +1,7 @@
 package globaltokenbucket
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -16,19 +17,20 @@ import (
 const (
 	// TakeNFunction is the name of the function used to take N tokens from the bucket.
 	TakeNFunction = "TakeN"
+	lookupMargin  = 10 * time.Millisecond
 )
 
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
-	mu             sync.RWMutex
-	dMap           *olric.DMap
+	dMap           olric.DMap
+	dc             *distcache.DistCache
 	name           string
 	bucketCapacity float64
 	fillAmount     float64
 	interval       time.Duration
+	mu             sync.RWMutex
 	continuousFill bool
 	passThrough    bool
-	dc             *distcache.DistCache
 }
 
 // NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
@@ -77,6 +79,16 @@ func (gtb *GlobalTokenBucket) GetBucketCapacity() float64 {
 	return gtb.bucketCapacity
 }
 
+func isMarginExceeded(ctx context.Context) bool {
+	deadline, deadlineOK := ctx.Deadline()
+	if deadlineOK {
+		// check if deadline will be passed in the next 10ms
+		deadline = deadline.Add(-lookupMargin)
+		return time.Now().After(deadline)
+	}
+	return false
+}
+
 // SetFillAmount sets the default fill amount for the rate limiter.
 func (gtb *GlobalTokenBucket) SetFillAmount(fillAmount float64) {
 	gtb.mu.Lock()
@@ -102,12 +114,16 @@ func (gtb *GlobalTokenBucket) Close() error {
 
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // If an error occurred it returns true, 0 and 0 (fail open).
-func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, float64, float64) {
+func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0
 	}
 
 	if gtb.GetBucketCapacity() == 0 {
+		return false, 0, 0
+	}
+
+	if isMarginExceeded(ctx) {
 		return false, 0, 0
 	}
 
@@ -122,9 +138,9 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, fl
 		return true, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
 		return true, 0, 0
 	}
 
@@ -141,7 +157,7 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(label string, n float64) (bool, fl
 
 // Take increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // It also returns the wait time at which the tokens will be available.
-func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration, float64, float64) {
+func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
 	}
@@ -150,9 +166,21 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 		return false, 0, 0, 0
 	}
 
+	deadline := time.Time{}
+
+	d, ok := ctx.Deadline()
+	if ok {
+		deadline = d
+	}
+
+	if isMarginExceeded(ctx) {
+		return false, 0, 0, 0
+	}
+
 	req := takeNRequest{
-		Want:    n,
-		CanWait: true,
+		Want:     n,
+		CanWait:  true,
+		Deadline: deadline,
 	}
 	// encode request
 	reqBytes, err := utils.MarshalGob(req)
@@ -161,9 +189,9 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 		return true, 0, 0, 0
 	}
 
-	resultBytes, err := gtb.dMap.Function(label, TakeNFunction, reqBytes)
+	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Msg("error taking from token bucket")
+		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
 		return true, 0, 0, 0
 	}
 
@@ -186,8 +214,8 @@ func (gtb *GlobalTokenBucket) Take(label string, n float64) (bool, time.Duration
 }
 
 // Return returns n tokens to the bucket.
-func (gtb *GlobalTokenBucket) Return(label string, n float64) (float64, float64) {
-	_, remaining, current := gtb.TakeIfAvailable(label, -n)
+func (gtb *GlobalTokenBucket) Return(ctx context.Context, label string, n float64) (float64, float64) {
+	_, remaining, current := gtb.TakeIfAvailable(ctx, label, -n)
 	return remaining, current
 }
 
@@ -198,8 +226,9 @@ type tokenBucketState struct {
 }
 
 type takeNRequest struct {
-	Want    float64
-	CanWait bool
+	Deadline time.Time
+	Want     float64
+	CanWait  bool
 }
 
 type takeNResponse struct {
@@ -241,12 +270,15 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 
 	if arg.Want > 0 {
 		if state.Available < 0 {
+			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
 				waitTime := time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
 				availableAt := now.Add(waitTime)
 				result.AvailableAt = availableAt
+				if arg.CanWait && !arg.Deadline.IsZero() && availableAt.After(arg.Deadline) {
+					result.Ok = false
+				}
 			}
-			result.Ok = arg.CanWait
 			// return the tokens to the bucket if the request is not ok
 			if !result.Ok {
 				state.Available += arg.Want

@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"time"
 
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
@@ -33,23 +34,23 @@ func (rltb *GlobalTokenBucket) GetPassThrough() bool {
 }
 
 // PreprocessRequest is a no-op.
-func (rltb *GlobalTokenBucket) PreprocessRequest(now time.Time, request Request) bool {
+func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request Request) bool {
 	return rltb.GetPassThrough()
 }
 
 // TakeIfAvailable takes tokens if available.
-func (rltb *GlobalTokenBucket) TakeIfAvailable(now time.Time, tokens float64) bool {
-	ok, _, _ := rltb.limiter.TakeIfAvailable(rltb.key, tokens)
+func (rltb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, tokens float64) bool {
+	ok, _, _ := rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
 	return ok
 }
 
 // Take takes tokens.
-func (rltb *GlobalTokenBucket) Take(now time.Time, tokens float64) (time.Duration, bool) {
-	ok, waitTime, _, _ := rltb.limiter.Take(rltb.key, tokens)
+func (rltb *GlobalTokenBucket) Take(ctx context.Context, tokens float64) (time.Duration, bool) {
+	ok, waitTime, _, _ := rltb.limiter.Take(ctx, rltb.key, tokens)
 	return waitTime, ok
 }
 
 // Return returns tokens.
-func (rltb *GlobalTokenBucket) Return(tokens float64) {
-	rltb.limiter.Return(rltb.key, tokens)
+func (rltb *GlobalTokenBucket) Return(ctx context.Context, tokens float64) {
+	rltb.limiter.Return(ctx, rltb.key, tokens)
 }

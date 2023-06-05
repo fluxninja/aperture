@@ -106,7 +106,7 @@ public class Config {
                                     Integer.parseInt(
                                             config.getProperty(
                                                     AGENT_PORT_PROPERTY, AGENT_PORT_DEFAULT_VALUE)))
-                            .setDuration(
+                            .setFlowTimeout(
                                     Duration.ofMillis(
                                             Integer.parseInt(
                                                     config.getProperty(

@@ -278,7 +278,6 @@ func (metrics *SchedulerMetrics) Delete() error {
 
 // Scheduler implements load scheduler on the flowcontrol side.
 type Scheduler struct {
-	mutex                 sync.RWMutex
 	component             iface.Component
 	scheduler             scheduler.Scheduler
 	registry              status.Registry
@@ -286,15 +285,16 @@ type Scheduler struct {
 	workloadMultiMatcher  *multiMatcher
 	tokensByWorkloadIndex map[string]uint64
 	metrics               *SchedulerMetrics
+	mutex                 sync.RWMutex
 }
 
 // NewScheduler returns fx options for the load scheduler fx app.
 func (wsFactory *Factory) NewScheduler(
+	clk clockwork.Clock,
 	registry status.Registry,
 	proto *policylangv1.Scheduler,
 	component iface.Component,
 	tokenManger scheduler.TokenManager,
-	clock clockwork.Clock,
 	metrics *SchedulerMetrics,
 ) (*Scheduler, error) {
 	mm := multimatcher.New[int, multiMatchResult]()
@@ -329,7 +329,7 @@ func (wsFactory *Factory) NewScheduler(
 	}
 
 	// setup scheduler
-	ws.scheduler = scheduler.NewWFQScheduler(tokenManger, clock, wfqMetrics)
+	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics)
 
 	return ws, nil
 }
@@ -447,11 +447,11 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 }
 
 // Revert reverts the decision made by the limiter.
-func (ws *Scheduler) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (ws *Scheduler) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
 		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
 		if tokens > 0 {
-			ws.scheduler.Revert(tokens)
+			ws.scheduler.Revert(ctx, tokens)
 		}
 	}
 }

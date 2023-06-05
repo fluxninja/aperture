@@ -8,10 +8,10 @@ metadata:
       {"bucket_capacity": 500, "fill_amount": 25, "rate_limiter": {"interval": "1s",
       "label_key": "http.request.header.api_key", "lazy_sync": {"enabled": false,
       "num_sync": 4}}, "scheduler": {"workloads": [{"label_matcher": {"match_labels":
-      {"http.request.header.user_type": "guest"}}, "parameters": {"priority": 50}},
-      {"label_matcher": {"match_labels": {"http.request.header.user_type": "subscriber"}},
-      "parameters": {"priority": 200}}]}, "selectors": [{"control_point": "ingress",
-      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}'
+      {"http.request.header.user_type": "guest"}}, "name": "guest", "parameters":
+      {"priority": 50}}, {"label_matcher": {"match_labels": {"http.request.header.user_type":
+      "subscriber"}}, "name": "subscriber", "parameters": {"priority": 200}}]}, "selectors":
+      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}'
   labels:
     fluxninja.com/validate: "true"
   name: quota-scheduler
@@ -38,11 +38,13 @@ spec:
             - label_matcher:
                 match_labels:
                   http.request.header.user_type: guest
+              name: guest
               parameters:
                 priority: 50
             - label_matcher:
                 match_labels:
                   http.request.header.user_type: subscriber
+              name: subscriber
               parameters:
                 priority: 200
           selectors:

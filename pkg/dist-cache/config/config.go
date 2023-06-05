@@ -21,4 +21,6 @@ type DistCacheConfig struct {
 	MemberlistAdvertiseAddr string `json:"memberlist_advertise_addr" validate:"omitempty,hostname_port"`
 	// ReplicaCount is 1 by default.
 	ReplicaCount int `json:"replica_count" default:"1"`
+	// SyncReplication enables synchronous replication. By default the replication is asynchronous.
+	SyncReplication bool `json:"sync_replication" default:"false"`
 }

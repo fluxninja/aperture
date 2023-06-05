@@ -1,6 +1,7 @@
 package ratelimiter
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"math/rand"
@@ -43,9 +44,9 @@ type flow struct {
 }
 
 type flowRunner struct {
-	wg       sync.WaitGroup
 	limiters []ratelimiter.RateLimiter
 	flows    []*flow
+	wg       sync.WaitGroup
 	duration time.Duration
 	limit    float64
 }
@@ -68,7 +69,7 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 				randomLimiterIndex := rand.Intn(len(fr.limiters))
 				limiter := fr.limiters[randomLimiterIndex]
 				atomic.AddInt32(&f.totalRequests, 1)
-				accepted, _, _ := limiter.TakeIfAvailable(f.requestlabel, 1)
+				accepted, _, _ := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
 				if accepted {
 					atomic.AddInt32(&f.acceptedRequests, 1)
 				}

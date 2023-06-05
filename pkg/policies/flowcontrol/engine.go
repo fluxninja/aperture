@@ -66,7 +66,6 @@ func (e *Engine) GetAgentInfo() *agentinfo.AgentInfo {
 // (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
-	mutex         sync.RWMutex
 	agentInfo     *agentinfo.AgentInfo
 	fluxMeters    map[iface.FluxMeterID]iface.FluxMeter
 	schedulers    map[iface.LimiterID]iface.Scheduler
@@ -74,6 +73,7 @@ type Engine struct {
 	regulators    map[iface.LimiterID]iface.Limiter
 	labelPreviews map[iface.PreviewID]iface.LabelPreview
 	multiMatchers map[selectors.ControlPointID]*multiMatcher
+	mutex         sync.RWMutex
 }
 
 // ProcessRequest .
@@ -131,7 +131,7 @@ func (e *Engine) ProcessRequest(
 
 		defer func() {
 			if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-				revertRemaining(flowLabels, limiterDecisions)
+				revertRemaining(ctx, flowLabels, limiterDecisions)
 			}
 		}()
 
@@ -145,7 +145,10 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
-func runLimiters(ctx context.Context, limiters map[iface.Limiter]struct{}, labels map[string]string) (
+func runLimiters(
+	ctx context.Context,
+	limiters map[iface.Limiter]struct{},
+	labels map[string]string) (
 	map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
@@ -198,6 +201,7 @@ func runLimiters(ctx context.Context, limiters map[iface.Limiter]struct{}, label
 }
 
 func revertRemaining(
+	ctx context.Context,
 	labels map[string]string,
 	limiterDecisions map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 ) {
@@ -207,7 +211,7 @@ func revertRemaining(
 	}
 	for l, d := range limiterDecisions {
 		if !d.Dropped && d.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
-			go l.Revert(labelsCopy, d)
+			go l.Revert(context.TODO(), labelsCopy, d)
 		}
 	}
 }

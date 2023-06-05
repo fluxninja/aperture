@@ -1,7 +1,6 @@
 package com.fluxninja.aperture.netty;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,21 +42,21 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
-        CheckHTTPRequest checkRequest =
-                NettyUtils.checkRequestFromRequest(ctx, req, controlPointName);
+        TrafficFlowRequest trafficFlowRequest =
+                NettyUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName);
         String path = new QueryStringDecoder(req.uri()).path();
 
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 
         if (flow.ignored()) {
             ctx.fireChannelRead(req);
             return;
         }
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+                (flowDecision == FlowDecision.Accepted
+                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
 
         if (flowAccepted) {
             try {
@@ -95,7 +94,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             HttpResponseStatus status;
             Map<String, String> headers;
             if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
-                status = HttpResponseStatus.valueOf(flow.rejectReason());
+                status = HttpResponseStatus.valueOf(flow.getRejectionHttpStatusCode());
                 headers = flow.checkResponse().getDeniedResponse().getHeadersMap();
 
             } else {

@@ -29,9 +29,9 @@ public class ApertureFeatureFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         // See whether flow was accepted by Aperture Agent.
-        if (flowResult != FlowResult.Rejected) {
+        if (flowDecision != FlowDecision.Rejected) {
             try {
                 chain.doFilter(request, response);
                 flow.end(FlowStatus.OK);
@@ -68,7 +68,7 @@ public class ApertureFeatureFilter implements Filter {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setDuration(Duration.ofMillis(1000))
+                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertificateFile)
                             .build();

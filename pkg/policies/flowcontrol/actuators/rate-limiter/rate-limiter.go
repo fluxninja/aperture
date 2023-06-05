@@ -171,11 +171,7 @@ func setupRateLimiterFactory(
 }
 
 // per component fx app.
-func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
-	key notifiers.Key,
-	unmarshaller config.Unmarshaller,
-	reg status.Registry,
-) (fx.Option, error) {
+func (rlFactory *rateLimiterFactory) newRateLimiterOptions(key notifiers.Key, unmarshaller config.Unmarshaller, reg status.Registry) (fx.Option, error) {
 	logger := rlFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
@@ -330,7 +326,7 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) *fl
 		}
 	}
 
-	label, ok, remaining, current := rl.TakeIfAvailable(labels, tokens)
+	label, ok, remaining, current := rl.TakeIfAvailable(ctx, labels, tokens)
 
 	tokensConsumed := float64(0)
 	if ok {
@@ -359,17 +355,17 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) *fl
 }
 
 // Revert returns the tokens to the limiter.
-func (rl *rateLimiter) Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (rl *rateLimiter) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
 		tokens := rateLimiterDecision.RateLimiterInfo.TokensConsumed
 		if tokens > 0 {
-			rl.TakeIfAvailable(labels, -tokens)
+			rl.TakeIfAvailable(ctx, labels, -tokens)
 		}
 	}
 }
 
 // TakeIfAvailable takes n tokens from the limiter.
-func (rl *rateLimiter) TakeIfAvailable(labels map[string]string, n float64) (label string, ok bool, remaining float64, current float64) {
+func (rl *rateLimiter) TakeIfAvailable(ctx context.Context, labels map[string]string, n float64) (label string, ok bool, remaining float64, current float64) {
 	if rl.limiter.GetPassThrough() {
 		return label, true, 0, 0
 	}
@@ -385,7 +381,7 @@ func (rl *rateLimiter) TakeIfAvailable(labels map[string]string, n float64) (lab
 		label = labelKey + ":" + labelValue
 	}
 
-	ok, remaining, current = rl.limiter.TakeIfAvailable(label, n)
+	ok, remaining, current = rl.limiter.TakeIfAvailable(ctx, label, n)
 	return
 }
 

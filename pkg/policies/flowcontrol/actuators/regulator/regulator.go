@@ -192,15 +192,15 @@ func (frf *regulatorFactory) newRegulatorOptions(
 }
 
 type regulator struct {
-	passthroughLabelValuesMutex sync.RWMutex
 	iface.Component
-	registry               status.Registry
-	factory                *regulatorFactory
-	proto                  *policylangv1.Regulator
-	passthroughLabelValues map[string]bool
-	name                   string
-	labelKey               string
-	acceptPercentage       float64
+	registry                    status.Registry
+	factory                     *regulatorFactory
+	proto                       *policylangv1.Regulator
+	passthroughLabelValues      map[string]bool
+	name                        string
+	labelKey                    string
+	acceptPercentage            float64
+	passthroughLabelValuesMutex sync.RWMutex
 }
 
 // Make sure regulator implements iface.Limiter.
@@ -358,7 +358,7 @@ func (fr *regulator) Decide(ctx context.Context,
 }
 
 // Revert implements the Revert method of the flowcontrolv1.Regulator interface.
-func (fr *regulator) Revert(_ map[string]string, _ *flowcontrolv1.LimiterDecision) {
+func (fr *regulator) Revert(_ context.Context, _ map[string]string, _ *flowcontrolv1.LimiterDecision) {
 	// No-op
 }
 
