@@ -21,6 +21,18 @@ for GraphQL queries using the [_Classifier_][rego-rules].
 
 ## Policy Key Concepts
 
+This policy is centered around the following fundamental components:
+
+- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
+  decide how these components should select flows for processing.
+- [`control point`](../../concepts/flow-control/selector.md) can be considered
+  as a critical checkpoint in code or data plane, a strategically placed spot
+  where flow control decisions are applied. Developers define these points
+  during the integration of API Gateways or Service Meshes.
+- [`rate_limiter`](../../concepts/flow-control/components/rate-limiter.md)
+  prevents heavy traffic recurrence and its flexibility allows it to adapt to
+  different labels, offering dynamic control over traffic flow.
+
 This policy is centered around two fundamental aspects: the [`rate_limiter`] and
 the [`selectors`].
 

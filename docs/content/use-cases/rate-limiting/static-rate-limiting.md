@@ -26,24 +26,18 @@ potential service degradation or downtime.
 
 ## Policy Key Concepts
 
-This policy is centered around two fundamental aspects: the [`rate_limiter`] and
-the [`selectors`].
+This policy is centered around the following fundamental components:
 
-- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md) is a
-  component modeled on the token bucket algorithm. It serves as an effective
-  bulwark against heavy and frequent traffic spikes, essentially operating like
-  a 'traffic parking meter.' The rate limiter's flexibility lies in its ability
-  to be configured according to various labels and limits, providing an
-  adjustable mechanism to handle diverse traffic patterns and intensities.
-  Selectors and Control Points: The Selectors and Control Points perform similar
-  roles as described in the previous policies.
-
-- [Selectors](../../concepts/flow-control/selector.md) act as traffic signal
-  managers that lay down the rules for flow selection by the rate limiter. On
-  the other hand, [Control Points](../../concepts/flow-control/selector.md)
-  serve as strategic checkpoints where these flow control decisions are applied.
-  These concepts remain central to the process of implementing effective rate
-  limiting for a service.
+- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
+  decide how these components should select flows for processing.
+- [`control point`](../../concepts/flow-control/selector.md) can be considered
+  as a critical checkpoint in code or data plane, a strategically placed spot
+  where flow control decisions are applied. Developers define these points
+  during the integration of API Gateways or Service Meshes or by using Aperture
+  SDKs.
+- [`rate_limiter`](../../concepts/flow-control/components/rate-limiter.md)
+  prevents heavy traffic recurrence and its flexibility allows it to adapt to
+  different labels, offering dynamic control over traffic flow.
 
 ## Policy Configuration
 

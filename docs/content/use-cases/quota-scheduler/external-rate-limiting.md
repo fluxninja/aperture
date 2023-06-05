@@ -19,7 +19,7 @@ import Zoom from 'react-medium-image-zoom';
 The Quota Scheduler Policy is a sophisticated solution designed to manage and
 limit outgoing requests from services to an external API server. This policy
 makes applications cost-aware, ensuring that they operate within assigned quota
-limits to prevent cost overruns. Workload priorities may differ based on the
+limits to prevent cost overruns. Workload priorities might differ based on the
 application, and maintaining prioritized access for critical workloads during
 external rate limiting is of paramount importance. The policy leverages the
 [`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
@@ -30,26 +30,24 @@ efficiently.
 
 ## Policy Key Concepts
 
-The policy operates around a set of core components each serving a specific
-function in the overall rate limiting process.
+The policy operates around a set of core components within the
+[`quota_scheduler`], each serving a specific function in the overall rate
+limiting process.
 
-- [Selector](../../concepts/flow-control/selector.md): The Selector serves as
-  the traffic manager, governing flow control and observability components
-  within the Aperture Agents. By establishing traffic rules, it delineates how
-  components should select flows for their operations.
-
-- [Control Point](../../concepts/flow-control/selector.md): The Control Point
-  acts as a critical checkpoint in your code or data plane, a strategically
-  placed spot where flow control decisions are applied. Developers define these
-  points during the integration of API Gateways or Service Meshes.
-- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md):
-  Employing a token bucket algorithm, the Rate Limiter helps prevent heavy
-  traffic recurrence. Its flexibility allows it to adapt to different labels and
-  limits, offering dynamic control over traffic flow.
-- [Scheduler](../../concepts/flow-control/components/load-scheduler.md): The
-  Scheduler ensures that requests are serviced based on their priority and size.
-  It employs a Weighted Fair Queue-based system, calculating the token refill
-  rate using a Load Multiplier, effectively managing and prioritizing requests.
+- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
+  decide how these components should select flows for processing.
+- [`control point`](../../concepts/flow-control/selector.md) can be considered
+  as a critical checkpoint in code or data plane, a strategically placed spot
+  where flow control decisions are applied. Developers define these points
+  during the integration of API Gateways or Service Meshes or by using Aperture
+  SDKs.
+- [`rate_limiter`](../../concepts/flow-control/components/rate-limiter.md)
+  prevents heavy traffic recurrence and its flexibility allows it to adapt to
+  different labels, offering dynamic control over traffic flow.
+- [`scheduler`](../../concepts/flow-control/components/load-scheduler.md)
+  ensures that requests are serviced based on their priority and size. It
+  employs a Weighted Fair Queue-based system, calculating the token refill rate
+  using a Load Multiplier, effectively managing and prioritizing requests.
 
 ## Policy Configuration
 

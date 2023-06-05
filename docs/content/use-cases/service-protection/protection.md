@@ -25,28 +25,28 @@ this dynamic problem and offer reliable service protection.
 
 ## Policy Key Concepts
 
-This policy encompasses two significant components: [`service_protection_core`]
-and [`latency_baseliner`].
+The [`service_protection_core`] incorporates the following components to ensure
+that applications are protected from overload:
 
-- Service Protection Core: Incorporating an
-  [`adaptive_load_scheduler`](../../concepts/flow-control/components/load-scheduler.md),
+- [`adaptive_load_scheduler`](../../concepts/flow-control/components/load-scheduler.md),
   it manages incoming request traffic to prevent chaos. The load scheduler
   limits concurrent requests to a service and assigns different priorities and
   weights to workloads. This ensures that high-priority requests are served
   first during heavy traffic. Crucial within this setup are
-  [selectors](../../concepts/flow-control/selector.md), which are like traffic
+- [`selectors`](../../concepts/flow-control/selector.md), which are like traffic
   signal managers for flow control and observability components in the Aperture
   Agents. Selectors define traffic rules determining how components should
   select flows for their operations. Also key are
-  [`control_points`](../../concepts/flow-control/selector.md), strategic points
+- [`control_points`](../../concepts/flow-control/selector.md), strategic points
   in your code or data plane where flow control decisions are applied.
   Developers define these using SDKs or during API Gateways or Service Meshes
   integration.
-- Latency Monitoring: It encompasses the [`flux_meter`] that converts a flux of
-  flows matching a flow selector into a Prometheus histogram, essentially
-  measuring the scope of latency. By default, it tracks the workload duration of
-  a flow, but it can flexibly track any metric from OpenTelemetry attributes
-  depending on the insertion method.
+
+  For latency monitoring, the [`latency_baseliner`] encompasses the
+  [`flux_meter`] that converts a flux of flows matching a flow selector into a
+  Prometheus histogram, essentially measuring the scope of latency. By default,
+  it tracks the workload duration of a flow, but it can flexibly track any
+  metric from OpenTelemetry attributes depending on the insertion method.
 
 ## Policy Configuration
 

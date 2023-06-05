@@ -17,10 +17,10 @@ import Zoom from 'react-medium-image-zoom';
 ## Policy Overview
 
 Feature flags provide a mechanism for shipping new features to production
-without compromising existing functionality. By utilizing Aperture, features can
-be toggled on or off for specific user segments. The following policy enables
-you to progressively introduce a new feature, all the while assessing its impact
-on your application's latency. If the latency deteriorates beyond the configured
+without compromising existing functionality. With Aperture, features can be
+toggled on or off for specific user segments. The following policy enables you
+to progressively introduce a new feature, all the while assessing its impact on
+the application's latency. If the latency deteriorates beyond the configured
 threshold, the rollout can be halted or reversed to ensure a seamless user
 experience.
 
@@ -29,30 +29,35 @@ experience.
 Broadly, this policy revolves around two significant areas: Latency Monitoring
 and Rollout Control.
 
-- Latency Monitoring: By employing the
-  [`average_latency_driver`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#average-latency-driver),
-  the policy persistently measures the application's latency. Within this, a
-  criteria is set to establish the thresholds for both forward progression and
-  rollback of the rollout. Furthermore, selectors play a crucial role in this
-  policy, managing the traffic for flow control and observability components
-  within the Aperture Agents. Selectors lay down the rules for traffic flow,
-  determining how the components should operate. This capability allows
-  developers to define [`control points`] within the code or data plane, which
-  act as strategic locations where flow control decisions are applied.
-  Developers set these control points using SDKs or during API Gateways or
-  Service Meshes integration.
+The policy monitors the latency with the use of the following components:
 
-- Rollout Control: The [`load_ramp`] component is instrumental in performing a
-  controlled rollout of the new feature. A
-  [`regulator`](../../concepts/flow-control/components/regulator.md) within this
-  component manages the flow of traffic to control points, facilitating either
-  sticky or random sessions based on preference, thereby balancing the load and
-  enabling controlled tests. The rollout's pace is managed using
-  [`steps`](/reference/policies/spec#load-ramp-parameters-step) that
-  incrementally increase the percentage of requests served by the new feature.
-  This approach allows the policy to continuously monitor the application's
-  latency and rollback the feature if the latency exceeds the configured
-  threshold.
+- `average_latency_driver`persistently measures the application's latency.
+- `criteria` determines the thresholds for both forward progression and rollback
+  of the rollout.
+- [`selectors`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#selectors):
+  manage the traffic for flow control and observability components within the
+  Aperture Agents.
+- `control points` act as strategic locations where flow control decisions are
+  applied. Developers set these control points using SDKs or during API Gateways
+  or Service Meshes integration or by using Aperture SDKs.
+
+The policy controls the rollout with the use of the following components:
+
+- [`load_ramp`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#load-ramp):
+  controls the rollout's pace by incrementally increasing the percentage of
+  requests served by the new feature.
+
+- [`regulator`](../../concepts/flow-control/components/regulator.md): manages
+  the flow of traffic to control points, facilitating either sticky or random
+  sessions based on preference, thereby balancing the load and enabling
+  controlled tests.
+
+- [`steps`](/reference/policies/spec#load-ramp-parameters-step): incrementally
+  increase the percentage of requests served by the new feature.
+
+This approach allows the policy to continuously monitor the application's
+latency and rollback the feature if the latency exceeds the configured
+threshold.
 
 ## Policy Configuration
 

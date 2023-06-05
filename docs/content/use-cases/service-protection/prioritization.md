@@ -26,37 +26,28 @@ scenarios.
 
 ## Policy Key Concepts
 
-This policy comprises two significant components: the
-[`service_protection_core`] and the [`latency_baseliner`].
+The [`service_protection_core`] incorporates the following components to ensure
+that applications are protected from overload:
 
-- Service Protection Core: It utilizes the
-  [`adaptive_load_scheduler`](../../concepts/flow-control/components/load-scheduler.md)
-  within its structure to manage incoming request traffic, avoiding potential
-  chaos. The load scheduler limits the number of concurrent requests to a
-  service and assigns different priorities and weights to workloads, ensuring
-  high-priority requests are served first during peak traffic. The scheduler
-  uses [`label_matcher`] to categorize flows based on labels and assign
-  priorities. Critical to this setup are the
-  [selectors](../../concepts/flow-control/selector.md), which are like traffic
+- [`adaptive_load_scheduler`](../../concepts/flow-control/components/load-scheduler.md),
+  it manages incoming request traffic to prevent chaos. The load scheduler
+  limits concurrent requests to a service and assigns different priorities and
+  weights to workloads. This ensures that high-priority requests are served
+  first during heavy traffic. Crucial within this setup are
+- [`selectors`](../../concepts/flow-control/selector.md), which are like traffic
   signal managers for flow control and observability components in the Aperture
-  Agents and [control points](../../concepts/flow-control/selector.md),
-  strategic points in the code or data plane where flow control decisions are
-  applied.
+  Agents. Selectors define traffic rules determining how components should
+  select flows for their operations. Also key are
+- [`control_points`](../../concepts/flow-control/selector.md), strategic points
+  in your code or data plane where flow control decisions are applied.
+  Developers define these using SDKs or during API Gateways or Service Meshes
+  integration.
 
-- Latency Monitoring: The [`latency_baseliner`] uses the
-  [`flux_meter`](../../concepts/flow-control/resources/flux-meter.md) to convert
-  a flux of flows matching a Flow Selector into a Prometheus histogram. It
-  essentially measures the scope of latency, and like the previous policy, it
-  tracks the workload duration of a flow by default but can flexibly track any
-  metric from OpenTelemetry attributes based on the insertion method.
-
-  This policy uses a
-  [`classifier`](../../concepts/flow-control/resources/classifier.md) under the
-  [`resources`] category to create additional Flow Labels based on request
-  metadata, particularly extracting the user type from the request headers. In
-  combination with the selectors that manage traffic rules and control points
-  acting as checkpoints for flow control decisions, it creates an effective
-  system of workload management.
+  For latency monitoring, the [`latency_baseliner`] encompasses the
+  [`flux_meter`] that converts a flux of flows matching a flow selector into a
+  Prometheus histogram, essentially measuring the scope of latency. By default,
+  it tracks the workload duration of a flow, but it can flexibly track any
+  metric from OpenTelemetry attributes depending on the insertion method.
 
 ## Policy Configuration
 
