@@ -7,6 +7,7 @@ import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.api.trace.Span;
 import org.apache.http.HttpStatus;
 
+/** A Flow that can be accepted or rejected by Aperture Agent based on provided labels. */
 public final class Flow {
     private final CheckResponse checkResponse;
     private final Span span;
@@ -70,6 +71,11 @@ public final class Flow {
         return this;
     }
 
+    /**
+     * Returns raw CheckResponse returned by Aperture Agent.
+     *
+     * @return raw CheckResponse returned by Aperture Agent.
+     */
     public CheckResponse checkResponse() {
         return this.checkResponse;
     }
@@ -97,6 +103,11 @@ public final class Flow {
         }
     }
 
+    /**
+     * Ends the flow, notifying the Aperture Agent whether it succeeded.
+     *
+     * @param statusCode Status of the finished flow.
+     */
     public void end(FlowStatus statusCode) throws ApertureSDKException {
         if (this.ended) {
             throw new ApertureSDKException("Flow already ended");

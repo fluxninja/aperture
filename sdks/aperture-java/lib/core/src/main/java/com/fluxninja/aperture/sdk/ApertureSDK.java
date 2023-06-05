@@ -22,6 +22,13 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+/**
+ * The Aperture SDK provides a set of tools and functionalities for flow control by enabling the
+ * initiation of flows.
+ *
+ * <p>To start using the Aperture SDK, create an instance of this class using the {@link
+ * ApertureSDKBuilder} and utilize its methods to initiate and control flows in your application.
+ */
 public final class ApertureSDK {
     private final FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient;
     private final FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub
@@ -49,11 +56,21 @@ public final class ApertureSDK {
     /**
      * Returns a new {@link ApertureSDKBuilder} for configuring an instance of {@linkplain
      * ApertureSDK the Aperture SDK}.
+     *
+     * @return A new ApertureSDKBuilder object.
      */
     public static ApertureSDKBuilder builder() {
         return new ApertureSDKBuilder();
     }
 
+    /**
+     * Starts a new flow, asking the Aperture Agent to accept or reject it based on provided labels.
+     * Additional labels will be extracted from current Baggage context.
+     *
+     * @param controlPoint Name of the control point
+     * @param explicitLabels Labels sent to Aperture Agent
+     * @return A Flow object
+     */
     public Flow startFlow(String controlPoint, Map<String, String> explicitLabels) {
         Map<String, String> labels = new HashMap<>();
 
