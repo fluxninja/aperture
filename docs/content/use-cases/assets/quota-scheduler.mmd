@@ -14,8 +14,8 @@ class TB TokenBucket
 TB <-- "Counting" --> Agents
 
 subgraph " "
-Service-A -- "req/s" --> Agents
-class Service-A Service
+Service -- "req/s" --> Agents
+class Service Service
   subgraph "Agents"
     subgraph "Scheduler"
       HP("High Priority - 200")
@@ -26,7 +26,7 @@ class Service-A Service
     class Scheduler Service
   end
   class Agents MainClass
-  HP --> Service-B
-  LP --> Service-B
-  class Service-B Service
+  HP --> API
+  LP --> API
+  class API Service
 end

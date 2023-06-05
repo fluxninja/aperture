@@ -14,11 +14,17 @@ sidebar_label: Quota Scheduling
 
 ## Overview
 
-Quota Scheduling is a method to maintain the balance of service-to-service
-requests, ensuring that the request frequency stays within the given limit. More
-than just limiting requests, Quota Scheduling allows for request prioritization
-based on the workload, thereby offering a higher degree of control in specific
-use cases.
+Quota scheduling is a sophisticated technique that enables effective management
+of external request quotas. This technique empowers services to enforce rate
+limits for outbound or external API. This helps ensure that services stay within
+allocated rate limits, therefore avoiding penalties, ensuring smooth and
+uninterrupted operation.
+
+Moreover, quota scheduling optimizes the utilization of request quotas by
+prioritizing access based on business-critical workloads. This strategic
+prioritization ensures that the most crucial requests receive their fair share
+of request quotas, aligning API usage with business objectives and preventing
+cost overages.
 
 <Zoom>
 
@@ -28,24 +34,39 @@ use cases.
 
 </Zoom>
 
-The presented graph delineates the Token Bucket's operation, given a specified
-bucket size and fill rate. The Token Bucket performs counting and distributes
-tokens to all Agents. Inside each Agent, a scheduler organizes requests based on
-priority (assigned through label matching) and the availability of tokens.
+The diagram provides an overview of quota scheduling in action, including the
+operation of the token bucket and its role in managing request admission. The
+token bucket, specified by a given bucket size and fill rate, performs counting
+and distributes tokens across agents.
+
+Requests coming into the system are categorized into different workloads, each
+of which is defined by its priority and weight. This classification is crucial
+for the scheduling process within each agent.
+
+Inside every agent, there is a scheduler that priorities request admission based
+on two factors: the priority and weight assigned to the corresponding workload,
+and the availability of tokens from the global token bucket. This mechanism
+ensures that high-priority requests are handled appropriately even under high
+load or when the request rate is close to the rate limit.
 
 :::note
 
-The Token Bucket is distributed across multiple Agents within the same cluster.
+Each token bucket is owned by the partition owner of its key within the
+consistent hashing scheme. The key space of the token buckets is evenly
+distributed among agents within an agent group.
 
 :::
 
-## Real World Scenario
+## Use Case Scenario
 
-For Quota Scheduling, consider a cloud-based storage service managing requests
-from numerous client applications. The service ensures fair usage by
-implementing a quota scheduling policy. This way, it can prioritize critical
-requests and manage resource allocation effectively, thereby preventing any
-single client from monopolizing the service or exhausting the available quota.
+Consider the scenario of a cloud-based storage service handling requests from a
+myriad of client applications. By implementing a quota scheduling policy using
+Aperture, the service can maintain equitable usage. This policy allows it to
+prioritize critical requests and manage resource allocation effectively,
+preventing any single client from monopolizing the service or exhausting the
+available quota. Additionally, with Aperture's quota scheduling, the service
+becomes spend-aware, ensuring it stays within quota limits and avoids cost
+overages.
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';
