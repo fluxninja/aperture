@@ -9,13 +9,12 @@ sidebar_label: Alerting
 
 ## Overview
 
-Monitoring the health of a service is a critical aspect of ensuring reliable
-operations. In this example, we will demonstrate how to detect an overload state
-of a service and send an alert using Aperture's declarative policy language. The
-policy will create a circuit that models the normal latency behavior of the
-service using an exponential moving average (EMA). This enables the alerting
-policy to automatically learn the normal latency threshold of each service,
-reducing the need for manual tuning of alert policies for individual services.
+Aperture's declarative policies can be fine-tuned to identify overload states
+and record them to databases. Beyond just configuring Aperture to send alerts to
+an Alert Manager via database writing, it can also monitor alert signals
+distinct from the standard four gold signals. This affords an extra layer of
+flexibility and coverage, ensuring that potential issues are identified and
+addressed promptly, maintaining the robustness and reliability of the service.
 
 <Zoom>
 

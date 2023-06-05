@@ -118,16 +118,6 @@ The analysis and actuation phases use
 in defining responses to different situations, such as deviations from
 service-level objectives.
 
-When defining a policy, these are some key components to consider:
-
-- [**Control Point**](./concepts/flow-control/selector.md): Needed to guide flow
-  control based decisions.
-- [**Selector**](./concepts/flow-control/selector.md): Needed to select the flow
-  that the policy should consider.
-- [**Classifier**](./concepts/flow-control/resources/classifier.md): Create
-  additional Flow Labels based on request metadata, collectively enriching the
-  policy's operational capability.
-
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
 
