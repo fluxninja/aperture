@@ -54,7 +54,7 @@ function(cfg) {
 
   local dashboardDef =
     dashboard.new(
-      title='Signals changes to blueprint',
+      title='Signals changes for all the files',
       schemaVersion=36,
       editable=true,
       refresh=refresh,

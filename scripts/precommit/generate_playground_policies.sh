@@ -35,6 +35,14 @@ function generate_policies() {
 
 export -f generate_policies
 
-parallel -j8 --no-notice --bar --eta generate_policies ::: "$($FIND playground -type f -name metadata.json)"
+#parallel -j8 --no-notice --bar --eta generate_policies ::: "$($FIND playground -type f -name metadata.json)"
+
+while IFS= read -r -d '' file
+do
+    generate_policies "$file" &
+done < <($FIND playground -type f -name metadata.json -print0)
+
+wait  # Wait for all background jobs to complete
+
 
 popd >/dev/null

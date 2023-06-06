@@ -85,4 +85,11 @@ function generate_jsonnet_files() {
 export -f generate_jsonnet_files
 
 # find all jsonnet files in docs/content directory and generate them
-parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_jsonnet_files ::: "$($FIND "$docsdir"/content -type f -name "*.jsonnet")"
+#parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_jsonnet_files ::: "$($FIND "$docsdir"/content -type f -name "*.jsonnet")"
+
+while IFS= read -r -d '' file
+do
+    generate_jsonnet_files "$file" &
+done < <($FIND "$docsdir"/content -type f -name '*.jsonnet' -print0)
+
+wait  # Wait for all background jobs to complete
