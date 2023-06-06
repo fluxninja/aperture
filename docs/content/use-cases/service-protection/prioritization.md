@@ -24,42 +24,30 @@ enables such prioritization of flows over others based on their labels, ensuring
 user experience or revenue is maximized during overloads or other failure
 scenarios.
 
-## Policy Key Concepts
-
-The `service_protection_core` incorporates the following components to ensure
-that applications are protected from overload:
-
-- [`adaptive_load_scheduler`](../../concepts/flow-control/components/load-scheduler.md),
-  it manages incoming request traffic to prevent service overload by throttling
-  concurrent requests to a service.
-- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how components should select flows for requests processing.
-- [`control point`](../../concepts/flow-control/selector.md) can be considered
-  as a critical checkpoint in code or data plane, a strategically placed spot
-  where flow control decisions are applied. Developers define these points
-  during the integration of API Gateways or Service Meshes or by using Aperture
-  SDKs.
-- [`scheduler`](../../concepts/flow-control/components/load-scheduler.md)
-  ensures that requests are serviced based on their priority and the number of
-  tokens available, which are assigned by the token bucket.
-
 ## Policy Configuration
 
-In this example policy, traffic of different types of users will be prioritized,
-with `subscriber` users receiving higher priority over `guest` users. This means
-that under overload scenarios, subscribed users will receive better quality of
-service than guest users. Two alternative methods will be used to provide the
-`User-Type` value to the scheduler:
+Under this policy, we will implement traffic prioritization depending on the
+type of user requesting access. Users classified as subscribers will be given
+precedence over guest users when connecting to
+**`service1-demo-app.demoapp.svc.cluster.local`**, therefore resulting in high
+priority request being served first during overload situations.
 
-- Subscribers: The header value of `User-Type` will be directly matched to
-  `subscriber`, since all HTTP headers are directly available as flow labels
+There are two distinct methods that are used to convey the **`user_type`**
+information to the scheduler:
+
+- Subscribers: The header value of **`user_type`** will be directly matched to
+  **`subscriber`**, since all HTTP headers are directly available as flow labels
   within the scheduler.
 - Guests: To identify guest users, a classification rule will be used that
   utilizes an
   [extractor](/concepts/flow-control/resources/classifier.md#extractors) to
-  assign the header value to the `user-type` flow label key. The `user_type`
-  label key will then be used in the scheduler to match the request against the
-  `guest` value to identify the workload.
+  assign the header value to the **`user_type`** flow label key. The
+  **`user_type`** label key will then be used in the scheduler to match the
+  request against the **`guest`** value to identify the workload.
+
+To conclude, the prioritization of incoming requested at
+**`service1-demo-app.demoapp.svc.cluster.local`** determined by the latency
+measurements of **`service3-demo-app.demoapp.svc.cluster.local`**.
 
 :::tip
 

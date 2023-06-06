@@ -1,5 +1,5 @@
 ---
-title: Feature Rollout with Average Latency Feedback
+title: Average Latency Feedback based Rollout
 keywords:
   - policies
   - rollout
@@ -14,6 +14,14 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+See
+[Feature Rollout with Average Latency Feedback](/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency.md)
+for more details.
+
+:::
+
 ## Policy Overview
 
 Feature flags provide a mechanism for shipping new features to production
@@ -24,50 +32,23 @@ the application's latency. If the latency deteriorates beyond the configured
 threshold, the rollout can be halted or reversed to ensure a seamless user
 experience.
 
-## Policy Key Concepts
-
-For achieving a controlled rollout it is essential to monitor the service's
-latency to be prepared to rollback the feature if the latency deteriorates
-beyond the configured threshold.
-
-The policy monitors the latency with the use of the following components:
-
-- `average_latency_driver` persistently measures the application's latency.
-- `criteria` determines the thresholds for both forward progression and rollback
-  of the rollout.
-- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how components should select flows for requests processing.
-- [`control point`](../../concepts/flow-control/selector.md) can be considered
-  as a critical checkpoint in code or data plane, a strategically placed spot
-  where flow control decisions are applied. Developers define these points
-  during the integration of API Gateways or Service Meshes or by using Aperture
-  SDKs.
-
-The policy controls the rollout with the use of the following components:
-
-- [`load_ramp`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#load-ramp):
-  controls the rollout's pace by incrementally increasing the percentage of
-  requests served by the new feature.
-- [`regulator`](../../concepts/flow-control/components/regulator.md): manages
-  the flow of traffic to control points, facilitating either sticky or random
-  sessions based on preference, thereby balancing the load and enabling
-  controlled tests.
-- [`steps`](/reference/policies/spec#load-ramp-parameters-step): incrementally
-  increase the percentage of requests served by the new feature.
-
-This approach allows the policy to continuously monitor the application's
-latency and rollback the feature if the latency exceeds the configured
-threshold.
-
 ## Policy Configuration
 
-This policy uses the
-[`Feature Rollout with Average Latency Feedback`](/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency.md)
-blueprint that enables incremental roll out of a new feature. In this example,
-we will create a policy that slowly ramps up the percentage of requests that are
-served with the new feature. We will continuously monitor the application's
-latency and roll back the feature if the latency deteriorates beyond the
-configured limit.
+In this example, the rollout of a new feature is driven by the **`criteria`** of
+75ms latency threshold set for forward and reset actions. Any surge in average
+latency beyond the 75ms mark in the
+**`service1-demo-app.demoapp.svc.cluster.local`** would prompt a halt in the
+rollout process.
+
+The **`load_ramp`** section outlines the configuration details for the rollout
+regulation. Specifically:
+
+- **`service1-demo-app.demoapp.svc.cluster.local`** is selected as the targeted
+  service for the rollout process.
+- The **`duration`** of the rollout ranges from 0 to 300 seconds. Within this
+  window, there is a controlled increase in the target acceptance percentage,
+  beginning at 1.0% and culminating at 100.0%, ensuring a steady rollout of the
+  new feature.
 
 ```mdx-code-block
 <Tabs>

@@ -36,31 +36,17 @@ a scale-out Controller that reads
 effectively throttling traffic into a queue and scaling resources to match the
 demand.
 
-## Policy Key Concepts
-
-This policy integrates a suite of concepts and components to enable a dynamic,
-load-responsive service operation:
-
-- [`service_protection_core`]: This component employs an
-  [`adaptive_load_scheduler`] to manage incoming traffic and prevent chaotic
-  load situations, by throttling concurrent requests to a service.
-- [`latency_baseliner`]: This subsystem includes a [`flux_meter`] that measures
-  the scope of latency by converting a flux of flows matching a flow selector
-  into a Prometheus histogram. By default, it tracks the workload duration of a
-  flow, but it can flexibly track any metric from OpenTelemetry attributes
-  depending on the insertion method.
-- [`auto_scaling`]: A crucial part of this policy, this component facilitates
-  automatic scaling of service instances based on the current load. It includes
-  a Kubernetes replica scaling backend that adjusts the number of replicas of
-  the Kubernetes Deployment for the service, ensuring it matches the current
-  demand. The [`dry_run`] parameter can be used to simulate scaling actions
-  without actually performing them, useful for testing and verification.
-- Scaling Parameters: These are crucial for controlling the behavior of the
-  [`auto scaling`] component. Parameters such as [`scale_in_cooldown`] and
-  [`scale_out_cooldown`] define the minimum amount of time between consecutive
-  scale-in and scale-out actions, preventing overactive scaling.
-
 ## Policy Configuration
+
+This policy, ensures optimized performance at the selected
+**`service1-demo-app.demoapp.svc.cluster.local`**, by applying a service
+protection policy based on the average latency of the service. Based on the
+latency, it performs auto-scaling of Kubernetes replicas for the selected
+service, with a minimum of 1 and a maximum of 10 replicas.
+
+To prevent frequent fluctuation, scale-in and scale-out cooldown periods of 40
+and 30 seconds are defined. The **`dry_run`** parameter is set to false, meaning
+the auto-scaling function is active.
 
 ```mdx-code-block
 <Tabs>

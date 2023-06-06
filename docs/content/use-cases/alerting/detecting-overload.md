@@ -30,23 +30,6 @@ applying the Flux Meter to a subset of API calls for a service.
 
 :::
 
-## Policy Key Concepts
-
-At a high level, this policy consists of:
-
-- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how components should select flows for requests processing.
-- [`control point`](../../concepts/flow-control/selector.md) can be considered
-  as a critical checkpoint in code or data plane, a strategically placed spot
-  where flow control decisions are applied. Developers define these points
-  during the integration of API Gateways or Service Meshes or by using Aperture
-  SDKs.
-- [`flux_meter`](../../concepts/flow-control/resources/flux-meter.md),converts a
-  flux of flows matching a Flow Selector into a Prometheus histogram. By
-  default, it tracks the workload duration of a flow. However, it's flexible
-  enough to track any metric from OpenTelemetry attributes based on the method
-  of insertion.
-
 ## Policy Configuration
 
 In this example, the EMA of latency is computed using metrics reported by the

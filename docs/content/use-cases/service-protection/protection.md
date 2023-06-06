@@ -23,36 +23,14 @@ as deployment of new versions, horizontal scaling, or fluctuating access
 patterns can impact the concurrency limit. This policy is designed to address
 this dynamic problem and offer reliable service protection.
 
-## Policy Key Concepts
-
-The `service_protection_core` incorporates the following components to ensure
-that applications are protected from recurring overloads:
-
-- [`adaptive_load_scheduler`](../../concepts/flow-control/components/load-scheduler.md),
-  it manages incoming request traffic to prevent service overload by throttling
-  concurrent requests to a service.
-- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how components should select flows for requests processing.
-- [`control point`](../../concepts/flow-control/selector.md) can be considered
-  as a critical checkpoint in code or data plane, a strategically placed spot
-  where flow control decisions are applied. Developers define these points
-  during the integration of API Gateways or Service Meshes or by using Aperture
-  SDKs.
-
-  For latency monitoring, the `latency_baseliner` encompasses the `flux_meter`
-  which converts a flux of flows matching a flow selector into a Prometheus
-  histogram, essentially measuring the scope of latency. By default, it tracks
-  the workload duration of a flow, but it can flexibly track any metric from
-  OpenTelemetry attributes depending on the insertion method.
-
 ## Policy Configuration
 
-This policy learns the latency profile of a service using an exponential moving
-average. Deviation of current latency from the historical latency indicates an
-overload. In case of overload, the policy lowers the rate at which requests are
-admitted into the service, making the excess requests wait in a queue. Once the
-latency improves, the rate of requests is slowly increased to find the maximum
-processing capacity of the service.
+In this policy, latency is of **`service1-demo-app.demoapp.svc.cluster.local`**
+is monitored using an exponential moving average. Deviation of current latency
+from the historical latency indicates an overload, which will lead to lower the
+rate at which requests are admitted into the service, making the excess requests
+wait in a queue. Once the latency improves, the rate of requests is slowly
+increased to find the maximum processing capacity of the service.
 
 This policy uses the Service Protection with Average Latency Feedback
 [Blueprint](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md).

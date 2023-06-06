@@ -19,35 +19,19 @@ This policy is an example of how to implement
 [rate limiting](../../reference/policies/bundled-blueprints/policies/rate-limiting.md)
 for GraphQL queries using the [_Classifier_][rego-rules].
 
-## Policy Key Concepts
-
-This policy is centered around the following fundamental components:
-
-- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how components should select flows for processing.
-- [`control point`](../../concepts/flow-control/selector.md) can be considered
-  as a critical checkpoint in code or data plane, a strategically placed spot
-  where flow control decisions are applied. Developers define these points
-  during the integration of API Gateways or Service Meshes or by using Aperture
-  SDKs.
-- [`rate_limiter`](../../concepts/flow-control/components/rate-limiter.md) -
-  prevents heavy traffic recurrence and its flexibility allows it to adapt to
-  different labels, offering dynamic control over traffic flow.
-
-The policy also uses the **Rego** language to write classification rules.
-
 ## Policy Configuration
 
 The following policy contains [_Classifier_][classifier] that extracts the
-`userID` claim from a JWT token in the request's authorization header and then
-rate limit unique users based on the extracted `user_id` [_Flow
-Label_][flow-label].
+**`userID`** claim from a JWT token in the request's authorization header and
+then rate limit unique users based on the extracted **`user_id`** [_Flow
+Label_][flow-label]; **`service1-demo-app.demoapp.svc.cluster.local** is
+selected as the target service for this policy.
 
 :::tip
 
-You can write classification rules on
+Classification rules can be written based on
 [HTTP requests](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
-and define scheduler priorities on
+and scheduler priorities can be defined based on
 [Flow Labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first using introspection APIs.
 

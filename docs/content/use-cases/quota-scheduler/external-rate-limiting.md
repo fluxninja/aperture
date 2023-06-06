@@ -14,6 +14,14 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+See
+[Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
+for more details.
+
+:::
+
 ## Policy Overview
 
 The Quota Scheduler Policy is a sophisticated solution designed to manage and
@@ -28,37 +36,15 @@ Blueprint, which brings together the token bucket rate limiting and a
 based Workload Scheduler to balance quota limits and priority-based access
 efficiently.
 
-## Policy Key Concepts
-
-The policy operates around a set of core components within the
-`quota_scheduler`, each serving a specific function in the overall rate limiting
-process.
-
-- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how components should select flows for requests processing.
-- [`control point`](../../concepts/flow-control/selector.md) can be considered
-  as a critical checkpoint in code or data plane, a strategically placed spot
-  where flow control decisions are applied. Developers define these points
-  during the integration of API Gateways or Service Meshes or by using Aperture
-  SDKs.
-- [`rate_limiter`](../../concepts/flow-control/components/rate-limiter.md)
-  prevents heavy traffic recurrence and its flexibility allows it to adapt to
-  different labels, offering dynamic control over traffic flow.
-- [`scheduler`](../../concepts/flow-control/components/load-scheduler.md)
-  ensures that requests are serviced based on their priority and the number of
-  tokens available, which are assigned by the token bucket.
-
 ## Policy Configuration
 
-In this policy,
-[Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
-component is configured with `bucket_capacity`, and rate limiting is configured
-based on label key `api_key` extracted from the request header. While the lazy
-sync of between the agent is set to false.
-
-WFQ Scheduler is configured two workloads priorities; `guest` and `subscriber`
-with 50 and 200 respectively. Matching labels using `user_type` value from the
-request header.
+In this policy, rate limiting is applied on
+**`service1-demo-app.demoapp.svc.cluster.local`** based on the **`label_key`**
+extracted from the request header. Consequently, user prioritization is achieved
+through weights assigned to the **`user_type`** label value, also extracted from
+the same request header. Finally, WFQ Scheduler is configured two workloads
+priorities: **`guest`** and **`subscriber`** with 50 and 200 respectively.
+Matching labels using **`user_type`** value from the request header.
 
 ```mdx-code-block
 <Tabs>
