@@ -6540,7 +6540,7 @@ Resources that need to be setup for the policy to function
 
 :::info
 
-See also [Resources overview](/concepts/advanced/resources.md).
+See also [Resources overview](/concepts/advanced/policy.md).
 
 :::
 

@@ -3442,7 +3442,7 @@ definitions:
         description: |-
             :::info
 
-            See also [Resources overview](/concepts/advanced/resources.md).
+            See also [Resources overview](/concepts/advanced/policy.md).
 
             :::
         properties:

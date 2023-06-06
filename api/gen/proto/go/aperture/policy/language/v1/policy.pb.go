@@ -551,7 +551,7 @@ func (x *Circuit) GetComponents() []*Component {
 //
 // :::info
 //
-// See also [Resources overview](/concepts/advanced/resources.md).
+// See also [Resources overview](/concepts/advanced/policy.md).
 //
 // :::
 type Resources struct {

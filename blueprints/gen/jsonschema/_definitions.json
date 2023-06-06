@@ -3019,7 +3019,7 @@
       "additionalProperties": false
     },
     "Resources": {
-      "description": ":::info\n\nSee also [Resources overview](/concepts/advanced/resources.md).\n\n:::",
+      "description": ":::info\n\nSee also [Resources overview](/concepts/advanced/policy.md).\n\n:::",
       "properties": {
         "flow_control": {
           "$ref": "#/definitions/FlowControlResources",
