@@ -9,7 +9,7 @@ sidebar_label: Feature Rollout
 
 ## Overview
 
-Feature Rollout is a systematic procedure of gradually introducing a new feature
+Feature rollout is a systematic procedure of gradually introducing a new feature
 to a segment of users. This practice mitigates potential risks associated with a
 full-scale release, allowing the team to gather user feedback and implement
 requisite modifications before launching the feature universally.
