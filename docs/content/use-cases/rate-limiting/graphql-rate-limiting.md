@@ -24,33 +24,17 @@ for GraphQL queries using the [_Classifier_][rego-rules].
 This policy is centered around the following fundamental components:
 
 - [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how these components should select flows for processing.
+  decide how components should select flows for processing.
 - [`control point`](../../concepts/flow-control/selector.md) can be considered
   as a critical checkpoint in code or data plane, a strategically placed spot
   where flow control decisions are applied. Developers define these points
-  during the integration of API Gateways or Service Meshes.
-- [`rate_limiter`](../../concepts/flow-control/components/rate-limiter.md)
+  during the integration of API Gateways or Service Meshes or by using Aperture
+  SDKs.
+- [`rate_limiter`](../../concepts/flow-control/components/rate-limiter.md) -
   prevents heavy traffic recurrence and its flexibility allows it to adapt to
   different labels, offering dynamic control over traffic flow.
 
-This policy is centered around two fundamental aspects: the [`rate_limiter`] and
-the [`selectors`].
-
-- [Rate Limiter](../../concepts/flow-control/components/rate-limiter.md) is a
-  component modeled on the token bucket algorithm. It serves as an effective
-  bulwark against heavy and frequent traffic spikes, essentially operating like
-  a 'traffic parking meter.' The rate limiter's flexibility lies in its ability
-  to be configured according to various labels and limits, providing an
-  adjustable mechanism to handle diverse traffic patterns and intensities.
-
-- [Selector](../../concepts/flow-control/selector.md): Selectors are the traffic
-  signal managers for flow control and observability components in the Aperture
-  Agents. They lay down the traffic rules determining how these components
-  should select flows for their operations.
-- [Control Point](../../concepts/flow-control/selector.md): Think of Control
-  Points as designated checkpoints in your code or data plane. They're the
-  strategic points where flow control decisions are applied. Developers define
-  these using SDKs or during API Gateways or Service Meshes integration.
+The policy also uses the **Rego** language to write classification rules.
 
 ## Policy Configuration
 

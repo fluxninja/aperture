@@ -26,32 +26,32 @@ experience.
 
 ## Policy Key Concepts
 
-Broadly, this policy revolves around two significant areas: Latency Monitoring
-and Rollout Control.
+For achieving a controlled rollout it is essential to monitor the service's
+latency to be prepared to rollback the feature if the latency deteriorates
+beyond the configured threshold.
 
 The policy monitors the latency with the use of the following components:
 
-- `average_latency_driver`persistently measures the application's latency.
+- `average_latency_driver` persistently measures the application's latency.
 - `criteria` determines the thresholds for both forward progression and rollback
   of the rollout.
-- [`selectors`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#selectors):
-  manage the traffic for flow control and observability components within the
-  Aperture Agents.
-- `control points` act as strategic locations where flow control decisions are
-  applied. Developers set these control points using SDKs or during API Gateways
-  or Service Meshes integration or by using Aperture SDKs.
+- [`selectors`](../../concepts/flow-control/selector.md) define the rules that
+  decide how components should select flows for requests processing.
+- [`control point`](../../concepts/flow-control/selector.md) can be considered
+  as a critical checkpoint in code or data plane, a strategically placed spot
+  where flow control decisions are applied. Developers define these points
+  during the integration of API Gateways or Service Meshes or by using Aperture
+  SDKs.
 
 The policy controls the rollout with the use of the following components:
 
 - [`load_ramp`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#load-ramp):
   controls the rollout's pace by incrementally increasing the percentage of
   requests served by the new feature.
-
 - [`regulator`](../../concepts/flow-control/components/regulator.md): manages
   the flow of traffic to control points, facilitating either sticky or random
   sessions based on preference, thereby balancing the load and enabling
   controlled tests.
-
 - [`steps`](/reference/policies/spec#load-ramp-parameters-step): incrementally
   increase the percentage of requests served by the new feature.
 

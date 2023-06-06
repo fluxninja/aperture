@@ -29,7 +29,7 @@ potential service degradation or downtime.
 This policy is centered around the following fundamental components:
 
 - [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how these components should select flows for processing.
+  decide how components should select flows for processing.
 - [`control point`](../../concepts/flow-control/selector.md) can be considered
   as a critical checkpoint in code or data plane, a strategically placed spot
   where flow control decisions are applied. Developers define these points

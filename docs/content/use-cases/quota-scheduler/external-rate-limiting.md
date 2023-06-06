@@ -31,11 +31,11 @@ efficiently.
 ## Policy Key Concepts
 
 The policy operates around a set of core components within the
-[`quota_scheduler`], each serving a specific function in the overall rate
-limiting process.
+`quota_scheduler`, each serving a specific function in the overall rate limiting
+process.
 
 - [`selectors`](../../concepts/flow-control/selector.md) define the rules that
-  decide how these components should select flows for processing.
+  decide how components should select flows for requests processing.
 - [`control point`](../../concepts/flow-control/selector.md) can be considered
   as a critical checkpoint in code or data plane, a strategically placed spot
   where flow control decisions are applied. Developers define these points
@@ -45,9 +45,8 @@ limiting process.
   prevents heavy traffic recurrence and its flexibility allows it to adapt to
   different labels, offering dynamic control over traffic flow.
 - [`scheduler`](../../concepts/flow-control/components/load-scheduler.md)
-  ensures that requests are serviced based on their priority and size. It
-  employs a Weighted Fair Queue-based system, calculating the token refill rate
-  using a Load Multiplier, effectively managing and prioritizing requests.
+  ensures that requests are serviced based on their priority and the number of
+  tokens available, which are assigned by the token bucket.
 
 ## Policy Configuration
 
