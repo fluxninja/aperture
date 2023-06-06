@@ -436,7 +436,7 @@ component's docs on how exactly it handles invalid inputs.
 
 > :::info
 
-See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+See also [Classifier overview](/concepts/flow-control/classifier.md).
 
 ::: Example
 
@@ -1025,7 +1025,7 @@ The histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 
 :::
 Example:
@@ -2224,7 +2224,7 @@ The query must return a single value either as a scalar or as a vector with a si
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+[Flux Meter](/concepts/flow-control/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
 Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
 The particular Flux Meter can be identified with the `flux_meter_name` label.
 There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
@@ -2435,7 +2435,7 @@ The label value must be a valid uint64 number. |  |
 
 :::info
 
-You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+You can use the [live-preview](/concepts/flow-control/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 
 :::
 

@@ -5847,12 +5847,12 @@ single element.
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be
-queries using PromQL. Flux Meter defines histogram type of metrics in
-Prometheus. Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and
-`flux_meter_bucket`. The particular Flux Meter can be identified with the
-`flux_meter_name` label. There are additional labels available on a Flux Meter
-such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+[Flux Meter](/concepts/flow-control/flux-meter.md) metrics can be queries using
+PromQL. Flux Meter defines histogram type of metrics in Prometheus. Therefore,
+one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+The particular Flux Meter can be identified with the `flux_meter_name` label.
+There are additional labels available on a Flux Meter such as `valid`,
+`flow_status`, `http_status_code` and `decision_type`.
 
 :::
 
