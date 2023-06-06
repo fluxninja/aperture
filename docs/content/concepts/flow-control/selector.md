@@ -28,7 +28,7 @@ decide how these components should select flows for their operations.
 
 A _Selector_ consists of:
 
-- [_Control Point_](#) (required)
+- _Control Point_(required)
 - [_Label Matcher_](#label-matcher) (optional)
 - [_Agent Group_](#agent-group) (optional)
 - [_Service_](#service) (optional)
@@ -235,4 +235,3 @@ rejected.
 [load-scheduler]: ./load-scheduler.md
 [classifier]: ./classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
-[aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
