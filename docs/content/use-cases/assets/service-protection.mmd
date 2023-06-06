@@ -13,7 +13,7 @@ subgraph "Controller"
   policy("Service Protection Policy")
 end
 
-Controller -- "Adjust req/s" --> Agent
+Controller -- "Adjust load multiplier" --> Agent
 class Controller Controller
 
 subgraph " "

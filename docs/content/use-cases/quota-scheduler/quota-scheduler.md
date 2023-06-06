@@ -59,14 +59,14 @@ distributed among agents within an agent group.
 
 ## Use Case Scenario
 
-Consider the scenario of a cloud-based storage service handling requests from a
-myriad of client applications. By implementing a quota scheduling policy using
-Aperture, the service can maintain equitable usage. This policy allows it to
-prioritize critical requests and manage resource allocation effectively,
-preventing any single client from monopolizing the service or exhausting the
-available quota. Additionally, with Aperture's quota scheduling, the service
-becomes spend-aware, ensuring it stays within quota limits and avoids cost
-overages.
+Consider the scenario of a cloud-based database service handling requests from
+several client applications with different priorities. By implementing a quota
+scheduling policy using Aperture, service operators can ensure fair and
+prioritized access. This policy enables prioritizing critical requests,
+preventing any single client application from monopolizing the database service
+or exhausting the available quota. Additionally, with Aperture's quota
+scheduling, the system becomes spend-aware, ensuring it stays within quota
+limits and avoids cost overages.
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';
