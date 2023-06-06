@@ -333,7 +333,7 @@ func (x *QuotaScheduler) GetScheduler() *Scheduler {
 //
 // :::info
 //
-// See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+// See also [_Rate Limiter_ overview](/concepts/flow-control/rate-limiter.md).
 //
 // :::
 //
@@ -408,7 +408,7 @@ func (x *RateLimiter) GetSelectors() []*Selector {
 //
 // :::info
 //
-// See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+// See also [_Load Scheduler_ overview](/concepts/flow-control/load-scheduler.md).
 //
 // :::
 //
@@ -534,7 +534,7 @@ type Scheduler struct {
 	// :::info
 	//
 	// See also [workload definition in the concepts
-	// section](/concepts/flow-control/components/load-scheduler.md#workload).
+	// section](/concepts/flow-control/load-scheduler.md#workload).
 	//
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,1,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"

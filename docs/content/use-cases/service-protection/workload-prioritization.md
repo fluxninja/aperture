@@ -20,7 +20,7 @@ critical than personalized recommendations and should be prioritized when
 resources are constrained.
 
 Aperture's
-[weighted fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md#scheduler)
+[weighted fair queuing scheduler](/concepts/flow-control/load-scheduler.md#scheduler)
 enables prioritization of certain flows over others based on their flow labels,
 ensuring that the user experience or revenue is maximized in the face of
 overloads and other failures.

@@ -14,7 +14,7 @@ sidebar_label: Specification
 <!-- vale on -->
 
 Reference for all objects used in
-[the Policy language](/concepts/policy/policy.md).
+[the Policy language](/concepts/advanced/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).
 
@@ -1128,7 +1128,7 @@ Circuit is graph of inter-connected signal processing components.
 
 :::info
 
-See also [Circuit overview](/concepts/policy/circuit.md).
+See also [Circuit overview](/concepts/advanced/circuit.md).
 
 :::
 
@@ -1274,7 +1274,7 @@ Computational block that forms the circuit
 
 :::info
 
-See also [Components overview](/concepts/policy/circuit.md#components).
+See also [Components overview](/concepts/advanced/circuit.md#components).
 
 :::
 
@@ -4672,8 +4672,7 @@ active service protection
 
 :::info
 
-See also
-[_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+See also [_Load Scheduler_ overview](/concepts/flow-control/load-scheduler.md).
 
 :::
 
@@ -5756,7 +5755,7 @@ Policy expresses observability-driven control logic.
 
 :::info
 
-See also [Policy overview](/concepts/policy/policy.md).
+See also [Policy overview](/concepts/advanced/policy.md).
 
 :::
 
@@ -6054,8 +6053,7 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also
-[_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/flow-control/rate-limiter.md).
 
 :::
 
@@ -6543,7 +6541,7 @@ Resources that need to be setup for the policy to function
 
 :::info
 
-See also [Resources overview](/concepts/policy/resources.md).
+See also [Resources overview](/concepts/advanced/resources.md).
 
 :::
 
@@ -6987,7 +6985,7 @@ workloads, the first matching one will be used. If none of workloads match,
 :::info
 
 See also
-[workload definition in the concepts section](/concepts/flow-control/components/load-scheduler.md#workload).
+[workload definition in the concepts section](/concepts/flow-control/load-scheduler.md#workload).
 
 :::
 

@@ -717,7 +717,7 @@ definitions:
 
       :::info
 
-      See also [Circuit overview](/concepts/policy/circuit.md).
+      See also [Circuit overview](/concepts/advanced/circuit.md).
 
       :::
 
@@ -820,7 +820,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Components overview](/concepts/policy/circuit.md#components).
+      See also [Components overview](/concepts/advanced/circuit.md#components).
 
       :::
 
@@ -2287,7 +2287,7 @@ definitions:
     description: |-
       :::info
 
-      See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+      See also [_Load Scheduler_ overview](/concepts/flow-control/load-scheduler.md).
 
       :::
 
@@ -2734,7 +2734,7 @@ definitions:
 
       :::info
 
-      See also [Policy overview](/concepts/policy/policy.md).
+      See also [Policy overview](/concepts/advanced/policy.md).
 
       :::
 
@@ -2866,7 +2866,7 @@ definitions:
     description: |-
       :::info
 
-      See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+      See also [_Rate Limiter_ overview](/concepts/flow-control/rate-limiter.md).
 
       :::
 
@@ -3131,7 +3131,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Resources overview](/concepts/policy/resources.md).
+      See also [Resources overview](/concepts/advanced/resources.md).
 
       :::
     type: object
@@ -3331,7 +3331,7 @@ definitions:
           :::info
 
           See also [workload definition in the concepts
-          section](/concepts/flow-control/components/load-scheduler.md#workload).
+          section](/concepts/flow-control/load-scheduler.md#workload).
 
           :::
 

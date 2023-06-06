@@ -229,7 +229,7 @@ See [full example in reference][reference]
 [rego-rule]: /reference/policies/spec.md#rule-rego
 [arc]: /arc/extension.md
 [label-matcher]: ./selector.md#label-matcher
-[policies]: /concepts/policy/policy.md
+[policies]: /concepts/advanced/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names

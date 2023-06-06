@@ -1,6 +1,6 @@
 ---
 title: Flow Control
-sidebar_position: 2
+sidebar_position: 1
 keywords:
   - flows
   - tracing
@@ -90,11 +90,11 @@ you need to install integrations that will communicate with the Aperture Agent.
   to end a flow, which sends an [OpenTelemetry span][span] representing the flow
   to the _Agent_ as telemetry.
 
-[policies]: /concepts/policy/policy.md
+[policies]: /concepts/advanced/policy.md
 [control-point]: ./selector.md#control-point
-[load-scheduler]: ./components/load-scheduler.md
-[regulator]: ./components/regulator.md
-[rate-limiter]: ./components/rate-limiter.md
+[load-scheduler]: ./load-scheduler.md
+[regulator]: ./regulator.md
+[rate-limiter]: ./rate-limiter.md
 [flux-meter]: ./flux-meter.md
 [classifier]: ./classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span

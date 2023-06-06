@@ -114,7 +114,7 @@ service performance and request attributes, allowing the agent and controller to
 make informed decisions about request handling and workload prioritization.
 
 The analysis and actuation phases use
-[**Declarative policies**](./concepts/policy/policy.md) that facilitates teams
+[**Declarative policies**](./concepts/advanced/policy.md) that facilitates teams
 in defining responses to different situations, such as deviations from
 service-level objectives.
 

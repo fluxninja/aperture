@@ -143,4 +143,4 @@ during overload scenarios.
 :::
 
 [label-matcher]: ./selector.md#label-matcher
-[policies]: /concepts/policy/policy.md
+[policies]: /concepts/advanced/policy.md

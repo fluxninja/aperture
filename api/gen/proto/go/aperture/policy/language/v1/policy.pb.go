@@ -400,7 +400,7 @@ func (x *Policies) GetPolicies() map[string]*Policy {
 //
 // :::info
 //
-// See also [Policy overview](/concepts/policy/policy.md).
+// See also [Policy overview](/concepts/advanced/policy.md).
 //
 // :::
 //
@@ -466,7 +466,7 @@ func (x *Policy) GetResources() *Resources {
 //
 // :::info
 //
-// See also [Circuit overview](/concepts/policy/circuit.md).
+// See also [Circuit overview](/concepts/advanced/circuit.md).
 //
 // :::
 //
@@ -551,7 +551,7 @@ func (x *Circuit) GetComponents() []*Component {
 //
 // :::info
 //
-// See also [Resources overview](/concepts/policy/resources.md).
+// See also [Resources overview](/concepts/advanced/resources.md).
 //
 // :::
 type Resources struct {
@@ -615,7 +615,7 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //
 // :::info
 //
-// See also [Components overview](/concepts/policy/circuit.md#components).
+// See also [Components overview](/concepts/advanced/circuit.md#components).
 //
 // :::
 //

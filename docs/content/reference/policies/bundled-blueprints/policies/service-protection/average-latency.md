@@ -30,7 +30,7 @@ At a high level, this policy works as follows:
   incoming concurrency.
 - Load Scheduler and Actuator: The Accepted Concurrency at the service is
   throttled by a
-  [weighted-fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md).
+  [weighted-fair queuing scheduler](/concepts/flow-control/load-scheduler.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that is
   synchronized with Aperture Agents through etcd. The load multiplier adjusts

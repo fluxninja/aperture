@@ -93,9 +93,9 @@ tutorial does the following:
 From there on, the Classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
-[`RateLimiter`](/concepts/flow-control/components/rate-limiter.md) component in
-the policy to limit the `createTodo` mutation query to `10 requests/second` for
-each `userID`.
+[`RateLimiter`](/concepts/flow-control/rate-limiter.md) component in the policy
+to limit the `createTodo` mutation query to `10 requests/second` for each
+`userID`.
 
 ### Playground
 

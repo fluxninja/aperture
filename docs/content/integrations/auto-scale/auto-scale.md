@@ -18,7 +18,7 @@ APIs to perform auto-scaling of any scalable resource in a Kubernetes cluster.
 
 Aperture performs auto-scaling based on
 [Signals](/concepts/policy/circuit#signal) in an
-[Aperture policy](/concepts/policy/policy.md).
+[Aperture policy](/concepts/advanced/policy.md).
 
 - [Kubernetes](./kubernetes/kubernetes.md): Auto-scaling any scalable resource
   in a Kubernetes cluster can be achieved using Aperture. To achieve this, you
