@@ -1,16 +1,12 @@
+local autoScalingDefaults = import '../../auto-scaling/base/config-defaults.libsonnet';
+
 local selectors_defaults = [{
   service: '__REQUIRED_FIELD__',
   control_point: '__REQUIRED_FIELD__',
 }];
 
-local overload_confirmation_defaults = {
-  query_string: '__REQUIRED_FIELD__',
-  threshold: '__REQUIRED_FIELD__',
-  operator: '__REQUIRED_FIELD__',
-};
-
 local service_protection_core_defaults = {
-  overload_confirmations: [overload_confirmation_defaults],
+  overload_confirmations: [],
 
   adaptive_load_scheduler: {
     load_scheduler: {
@@ -29,6 +25,24 @@ local service_protection_core_defaults = {
   },
 
   dry_run: false,
+};
+
+local auto_scaling_defaults = {
+  dry_run: false,
+  scaling_backend: {},
+  promql_scale_out_controllers: [],
+  promql_scale_in_controllers: [],
+  scaling_parameters: autoScalingDefaults.policy.scaling_parameters,
+  periodic_decrease: {
+    period: '60s',
+    scale_in_percentage: 10,
+  },
+};
+
+local kubernetes_replicas_defaults = {
+  kubernetes_object_selector: '__REQUIRED_FIELD__',
+  min_replicas: '__REQUIRED_FIELD__',
+  max_replicas: '__REQUIRED_FIELD__',
 };
 
 {
@@ -57,5 +71,15 @@ local service_protection_core_defaults = {
 
   selectors: selectors_defaults,
 
-  overload_confirmation: overload_confirmation_defaults,
+  auto_scaling: auto_scaling_defaults {
+    scaling_backend+: {
+      kubernetes_replicas: kubernetes_replicas_defaults,
+    },
+  },
+
+  auto_scaling_pods: auto_scaling_defaults {
+    scaling_backend+: {
+      kubernetes_replicas: kubernetes_replicas_defaults,
+    },
+  },
 }

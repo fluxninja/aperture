@@ -1,9 +1,11 @@
 package scheduler
 
 import (
+	"context"
 	"sync"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -12,41 +14,34 @@ import (
 // Check if TokenBucketLoadMultiplier implements TokenManager interface.
 var _ TokenManager = &LoadMultiplierTokenBucket{}
 
-// LoadMultiplierTokenBucketMetrics holds metrics related to internals of TokenBucketLoadMultiplier.
-type LoadMultiplierTokenBucketMetrics struct {
-	LMGauge            prometheus.Gauge
-	TokenBucketMetrics *TokenBucketMetrics
-}
-
 // LoadMultiplierTokenBucket is a token bucket with load multiplier.
 type LoadMultiplierTokenBucket struct {
-	lock               sync.Mutex
 	lmGauge            prometheus.Gauge // metrics
 	tbb                *tokenBucketBase
 	counter            *WindowedCounter
 	lm                 float64 // load multiplier >=0
+	lock               sync.Mutex
 	continuousTracking bool
 }
 
 // NewLoadMultiplierTokenBucket creates a new TokenBucketLoadMultiplier.
-func NewLoadMultiplierTokenBucket(now time.Time,
+func NewLoadMultiplierTokenBucket(clk clockwork.Clock,
 	slotCount uint8,
 	slotDuration time.Duration,
-	metrics *LoadMultiplierTokenBucketMetrics,
+	lmGauge prometheus.Gauge,
+	tbMetrics *TokenBucketMetrics,
 ) *LoadMultiplierTokenBucket {
+	tbb := newTokenBucket(clk, tbMetrics)
+
 	tbls := &LoadMultiplierTokenBucket{
-		tbb:                &tokenBucketBase{},
-		counter:            NewWindowedCounter(now, slotCount, slotDuration),
+		tbb:                tbb,
+		counter:            NewWindowedCounter(clk, slotCount, slotDuration),
 		lm:                 0,
 		continuousTracking: false,
 	}
 	tbls.tbb.setPassThrough(true)
 
-	if metrics != nil {
-		tbls.lmGauge = metrics.LMGauge
-		tbls.tbb.metrics = metrics.TokenBucketMetrics
-	}
-
+	tbls.lmGauge = lmGauge
 	tbls.setLMGauge(float64(tbls.lm))
 
 	return tbls
@@ -60,7 +55,7 @@ func (tbls *LoadMultiplierTokenBucket) SetContinuousTracking(continuousTracking 
 }
 
 // SetLoadMultiplier sets the load multiplier number --> 0 = no load accepted, 1 = accept up to 100% of current load, 2 = accept up to 200% of current load.
-func (tbls *LoadMultiplierTokenBucket) SetLoadMultiplier(now time.Time, lm float64) {
+func (tbls *LoadMultiplierTokenBucket) SetLoadMultiplier(lm float64) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
@@ -69,7 +64,7 @@ func (tbls *LoadMultiplierTokenBucket) SetLoadMultiplier(now time.Time, lm float
 		tbls.setLMGauge(float64(tbls.lm))
 		if !tbls.counter.IsBootstrapping() {
 			// set fillRate based on latest sched.tokenRate
-			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*tbls.lm)
+			tbls.tbb.setFillRate(tbls.counter.CalculateTokenRate() * tbls.lm)
 			log.Trace().
 				Float64("loadMultiplier", tbls.lm).
 				Float64("calculated fillRate", tbls.tbb.getFillRate()).
@@ -89,20 +84,20 @@ func (tbls *LoadMultiplierTokenBucket) LoadMultiplier() float64 {
 }
 
 // PreprocessRequest preprocesses a request and makes decision whether to pro-actively accept a request.
-func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(now time.Time, request Request) bool {
+func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(_ context.Context, request Request) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
 	wasBootstrapping := tbls.counter.IsBootstrapping()
 
 	// Shift counter slot if needed
-	ready := tbls.counter.AddTokens(now, request.Tokens)
+	ready := tbls.counter.AddTokens(request.Tokens)
 
 	// recalculate token rate
 	if ready {
 		if wasBootstrapping || tbls.continuousTracking {
 			// adjust fillRate based on the new tokenRate
-			tbls.tbb.setFillRate(now, tbls.counter.CalculateTokenRate()*(tbls.lm))
+			tbls.tbb.setFillRate(tbls.counter.CalculateTokenRate() * (tbls.lm))
 			log.Trace().
 				Float64("loadMultiplier", tbls.lm).
 				Float64("calculated fillRate", tbls.tbb.getFillRate()).
@@ -117,7 +112,7 @@ func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(now time.Time, request 
 
 	// Accept this request if we are still learning the tokenRate
 	if tbls.counter.IsBootstrapping() {
-		tbls.tbb.adjustTokens(now)
+		tbls.tbb.adjustTokens()
 		return true
 	}
 
@@ -125,23 +120,23 @@ func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(now time.Time, request 
 }
 
 // TakeIfAvailable takes tokens from the token bucket if available, otherwise return false.
-func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(now time.Time, tokens float64) bool {
+func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
-	return tbls.tbb.takeIfAvailable(now, tokens)
+	return tbls.tbb.takeIfAvailable(tokens)
 }
 
 // Take takes tokens from the token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (tbls *LoadMultiplierTokenBucket) Take(now time.Time, tokens float64) (time.Duration, bool) {
+func (tbls *LoadMultiplierTokenBucket) Take(ctx context.Context, tokens float64) (time.Duration, bool) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
-	return tbls.tbb.take(now, tokens)
+	return tbls.tbb.take(ctx, tokens)
 }
 
 // Return returns tokens to the token bucket.
-func (tbls *LoadMultiplierTokenBucket) Return(tokens float64) {
+func (tbls *LoadMultiplierTokenBucket) Return(_ context.Context, tokens float64) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	tbls.tbb.returnTokens(tokens)

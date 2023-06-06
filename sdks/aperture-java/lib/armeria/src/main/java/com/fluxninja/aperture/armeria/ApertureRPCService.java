@@ -48,10 +48,10 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
         Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels);
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+                (flowDecision == FlowDecision.Accepted
+                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
 
         if (flowAccepted) {
             RpcResponse res;

@@ -13,6 +13,7 @@ RUN ./gradlew clean \
     examples:armeria-example:shadowJar \
     examples:netty-example:shadowJar \
     examples:standalone-example:shadowJar \
+    examples:standalone-traffic-flow-example:shadowJar \
     examples:spring-example:assemble
 # TODO: also add tomcat here
 
@@ -25,6 +26,7 @@ COPY --link --from=builder /javaagent/test-services/netty-test-service/build/lib
 COPY --link --from=builder /examples/armeria-example/build/libs/*-all.jar /armeria-example.jar
 COPY --link --from=builder /examples/netty-example/build/libs/*-all.jar /netty-example.jar
 COPY --link --from=builder /examples/standalone-example/build/libs/*-all.jar /standalone-example.jar
+COPY --link --from=builder /examples/standalone-traffic-flow-example/build/libs/*-all.jar /standalone-traffic-flow-example.jar
 COPY --link --from=builder /examples/spring-example/build/libs/*-SNAPSHOT.jar /spring-example.jar
 
 HEALTHCHECK --interval=5s --timeout=60s --retries=3 --start-period=20s \

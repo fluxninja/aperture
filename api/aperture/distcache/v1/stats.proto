@@ -13,82 +13,10 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 // DistCacheService is used to query DistCache.
 service DistCacheService {
-  rpc GetStats(google.protobuf.Empty) returns (Stats) {
+  rpc GetStats(google.protobuf.Empty) returns (google.protobuf.Struct) {
     option (google.api.http) = {get: "/v1/distcache/stats"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
     };
   }
-}
-
-message DMap {
-  int64 length = 1 [json_name = "Length"];
-  SlabInfo slab_info = 2 [json_name = "SlabInfo"];
-  int64 num_tables = 3 [json_name = "NumTables"];
-}
-
-message DMaps {
-  int64 entries_total = 1 [json_name = "EntriesTotal"];
-  int64 delete_hits = 2 [json_name = "DeleteHits"];
-  int64 delete_misses = 3 [json_name = "DeleteMisses"];
-  int64 get_misses = 4 [json_name = "GetMisses"];
-  int64 get_hits = 5 [json_name = "GetHits"];
-  int64 evicted_total = 6 [json_name = "EvictedTotal"];
-}
-
-message DTopics {
-  int64 published_total = 1 [json_name = "PublishedTotal"];
-  int64 current_listeners = 2 [json_name = "CurrentListeners"];
-  int64 listeners_total = 3 [json_name = "ListenersTotal"];
-}
-
-message Member {
-  string name = 1 [json_name = "Name"];
-  uint64 id = 2 [json_name = "ID"];
-  int64 birthdate = 3 [json_name = "Birthdate"];
-}
-
-message Network {
-  int64 connections_total = 1 [json_name = "ConnectionsTotal"];
-  int64 current_connections = 2 [json_name = "CurrentConnections"];
-  int64 written_bytes_total = 3 [json_name = "WrittenBytesTotal"];
-  int64 read_bytes_total = 4 [json_name = "ReadBytesTotal"];
-  int64 commands_total = 5 [json_name = "CommandsTotal"];
-}
-
-message Partition {
-  repeated Member previous_owners = 1 [json_name = "PreviousOwners"];
-  repeated Member backups = 2 [json_name = "Backups"];
-  int64 length = 3 [json_name = "Length"];
-  map<string, DMap> d_maps = 4 [json_name = "DMaps"];
-}
-
-message Runtime {
-  string go_os = 1 [json_name = "GOOS"];
-  string go_arch = 2 [json_name = "GOARCH"];
-  string version = 3 [json_name = "Version"];
-  int64 num_cpu = 4 [json_name = "NumCPU"];
-  int64 num_goroutine = 5 [json_name = "NumGoroutine"];
-  google.protobuf.Struct mem_stats = 6 [json_name = "MemStats"];
-}
-
-message SlabInfo {
-  int64 allocated = 1 [json_name = "Allocated"];
-  int64 inuse = 2 [json_name = "Inuse"];
-  int64 garbage = 3 [json_name = "Garbage"];
-}
-
-message Stats {
-  repeated string cmdline = 1 [json_name = "Cmdline"];
-  string release_version = 2 [json_name = "ReleaseVersion"];
-  int64 uptime_seconds = 3 [json_name = "UptimeSeconds"];
-  google.protobuf.Struct runtime = 4 [json_name = "Runtime"];
-  Member cluster_coordinator = 5 [json_name = "ClusterCoordinator"];
-  Member member = 6 [json_name = "Member"];
-  map<uint64, Partition> partitions = 7 [json_name = "Partitions"];
-  map<uint64, Partition> backups = 8 [json_name = "Backups"];
-  map<uint64, Member> cluster_members = 9 [json_name = "ClusterMembers"];
-  Network network = 10 [json_name = "Network"];
-  DMaps d_maps = 11 [json_name = "DMaps"];
-  DTopics d_topics = 12 [json_name = "DTopics"];
 }

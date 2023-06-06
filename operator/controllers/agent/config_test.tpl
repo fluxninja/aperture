@@ -26,6 +26,7 @@ dist_cache:
   bind_addr: :3320
   memberlist_bind_addr: :3322
   replica_count: 1
+  sync_replication: false
 etcd:
   endpoints:
   - http://agent-etcd:2379

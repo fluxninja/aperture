@@ -32,10 +32,7 @@ import (
 func ModuleForControllerOTel() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			fx.Annotate(
-				provideController,
-				fx.ResultTags(otelconsts.BaseFxTag),
-			),
+			provideController,
 			fx.Annotate(
 				ControllerOTelComponents,
 				fx.ParamTags(

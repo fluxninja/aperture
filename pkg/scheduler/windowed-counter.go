@@ -2,30 +2,33 @@ package scheduler
 
 import (
 	"time"
+
+	"github.com/jonboulle/clockwork"
 )
 
 // WindowedCounter is a token bucket with a windowed counter.
 type WindowedCounter struct {
 	// stats
-	nextSlotTime time.Time     // Time when we advance the slot
-	counters     []uint64      // Window of counters
-	slotDuration time.Duration // time duration of slot
-	totalSlots   uint8         // total slots in sliding window
-	currentSlot  uint8         // currentSlot being updated for counters
-
+	nextSlotTime  time.Time     // Time when we advance the slot
+	counters      []uint64      // Window of counters
+	slotDuration  time.Duration // time duration of slot
+	totalSlots    uint8         // total slots in sliding window
+	currentSlot   uint8         // currentSlot being updated for counters
+	clk           clockwork.Clock
 	bootstrapping bool
 }
 
 // NewWindowedCounter creates a new WindowedCounter with extra slot for the current window.
-func NewWindowedCounter(now time.Time, totalSlots uint8, slotDuration time.Duration) *WindowedCounter {
+func NewWindowedCounter(clk clockwork.Clock, totalSlots uint8, slotDuration time.Duration) *WindowedCounter {
 	counter := &WindowedCounter{}
 
+	counter.clk = clk
 	// create an extra slot for aggregating current window
 	counter.totalSlots = totalSlots + 1
 	counter.slotDuration = slotDuration
 	counter.counters = make([]uint64, counter.totalSlots)
 	counter.currentSlot = 0
-	counter.nextSlotTime = now.Add(counter.slotDuration)
+	counter.nextSlotTime = counter.clk.Now().Add(counter.slotDuration)
 	counter.bootstrapping = true
 	return counter
 }
@@ -49,9 +52,9 @@ func (counter *WindowedCounter) IsBootstrapping() bool {
 }
 
 // AddTokens to the counter. Return value is true when counter shifted slots and the all the slots in the counter is valid.
-func (counter *WindowedCounter) AddTokens(now time.Time, tokens uint64) bool {
+func (counter *WindowedCounter) AddTokens(tokens uint64) bool {
+	now := counter.clk.Now()
 	shifted := false
-
 	if now.After(counter.nextSlotTime) {
 		// we are going to shift slots
 		shifted = true

@@ -146,14 +146,7 @@ var _ = BeforeSuite(func() {
 	apertureOpts := fx.Options(
 		platform.Config{MergeConfig: apertureConfig}.Module(),
 		prometheusreceiver.Module(),
-		fx.Option(
-			fx.Provide(
-				fx.Annotate(
-					provideOTelConfig,
-					fx.ResultTags(`name:"base"`),
-				),
-			),
-		),
+		fx.Provide(provideOTelConfig),
 		classifier.Module(),
 		service.Module(),
 		fx.Provide(
@@ -244,8 +237,8 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTelConfig() *otelconfig.OTelConfigProvider {
-	cfg := otelconfig.NewOTelConfig()
+func provideOTelConfig() *otelconfig.Provider {
+	cfg := otelconfig.New()
 	if phStarted {
 		cfg.AddReceiver("prometheus", map[string]interface{}{
 			"config": map[string]interface{}{
@@ -275,5 +268,5 @@ func provideOTelConfig() *otelconfig.OTelConfigProvider {
 			Exporters: []string{otelconsts.ExporterLogging},
 		})
 	}
-	return otelconfig.NewOTelConfigProvider("service", cfg)
+	return otelconfig.NewProvider("service", cfg)
 }

@@ -12,7 +12,7 @@ policy:
   # Required: True
   promql_scale_out_controllers:
     - alerter:
-        alert_name: "Scale out controller Alerter"
+        alert_name: "A controller intends to scale out"
       gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__
@@ -22,7 +22,7 @@ policy:
   # Required: True
   promql_scale_in_controllers:
     - alerter:
-        alert_name: "Scale in controller Alerter"
+        alert_name: "A controller intends to scale in"
       gradient:
         slope: 1
       query_string: __REQUIRED_FIELD__
@@ -41,22 +41,10 @@ policy:
   # Type: aperture.spec.v1.AutoScalerScalingBackend
   # Required: True
   scaling_backend:
-    # Kubernetes replicas scaling backend.
-    # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
-    # Required: True
     kubernetes_replicas:
-      # Kubernetes object selector.
-      # Type: aperture.spec.v1.KubernetesObjectSelector
-      # Required: True
       kubernetes_object_selector: __REQUIRED_FIELD__
-      # Minimum number of replicas.
-      # Type: string
-      # Required: True
-      min_replicas: __REQUIRED_FIELD__
-      # Maximum number of replicas.
-      # Type: string
-      # Required: True
       max_replicas: __REQUIRED_FIELD__
+      min_replicas: __REQUIRED_FIELD__
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []

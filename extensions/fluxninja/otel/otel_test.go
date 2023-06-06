@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/mitchellh/copystructure"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.uber.org/fx"
@@ -22,14 +21,9 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/platform"
 )
 
-type inStruct struct {
-	fx.In
-	Actual []*otelconfig.OTelConfigProvider `group:"extension-config"`
-}
-
 var _ = DescribeTable("FN Extension OTel", func(
-	baseConfig *otelconfig.OTelConfig,
-	expected *otelconfig.OTelConfig,
+	baseConfig *otelconfig.Config,
+	expected *otelconfig.Config,
 ) {
 	cfg := map[string]interface{}{
 		"fluxninja": map[string]interface{}{
@@ -42,7 +36,8 @@ var _ = DescribeTable("FN Extension OTel", func(
 	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(marshalledCfg)
 	Expect(err).NotTo(HaveOccurred())
 
-	var in inStruct
+	configProvider := otelconfig.NewProvider("base", baseConfig.MustCopy())
+
 	opts := fx.Options(
 		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.grpc"}.Annotate(),
 		httpclient.ClientConstructor{Name: "heartbeats-http-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.http"}.Annotate(),
@@ -51,98 +46,80 @@ var _ = DescribeTable("FN Extension OTel", func(
 			func() config.Unmarshaller {
 				return unmarshaller
 			},
-			func() *heartbeats.Heartbeats {
-				return &heartbeats.Heartbeats{
-					ControllerInfo: &heartbeatv1.ControllerInfo{
-						Id: "controllero",
-					},
-				}
-			},
-			fx.Annotate(
-				func() *otelconfig.OTelConfigProvider {
-					return otelconfig.NewOTelConfigProvider("fluxninja", baseConfig)
-				},
-				fx.ResultTags(config.NameTag("base")),
-			),
 		),
+		fx.Supply(
+			&heartbeats.Heartbeats{
+				ControllerInfo: &heartbeatv1.ControllerInfo{
+					Id: "controllero",
+				},
+			},
+		),
+		fx.Supply(configProvider),
 		otel.Module(),
-		fx.Populate(&in),
 	)
 	app := platform.New(opts)
-
-	originalBaseConfig, err := copystructure.Copy(baseConfig)
-	Expect(err).NotTo(HaveOccurred())
 
 	err = app.Err()
 	if err != nil {
 		visualize, _ := fx.VisualizeError(err)
 		log.Error().Err(err).Msg("fx.New failed: " + visualize)
 	}
-
 	Expect(err).NotTo(HaveOccurred())
 
 	err = app.Start(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
 
+	Expect(configProvider.MustGetConfig().Receivers).To(Equal(expected.Receivers))
+	Expect(configProvider.MustGetConfig().Processors).To(Equal(expected.Processors))
+	Expect(configProvider.MustGetConfig().Exporters).To(Equal(expected.Exporters))
+	Expect(configProvider.MustGetConfig().Service.Pipelines).To(Equal(expected.Service.Pipelines))
+
 	err = app.Stop(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
 
-	// Ensure we did not modify the original base config
-	Expect(baseConfig).To(BeEquivalentTo(originalBaseConfig))
-
-	Expect(in.Actual).To(HaveLen(1))
-	Expect(in.Actual[0].GetConfig().Receivers).To(Equal(expected.Receivers))
-	Expect(in.Actual[0].GetConfig().Processors).To(Equal(expected.Processors))
-	Expect(in.Actual[0].GetConfig().Exporters).To(Equal(expected.Exporters))
-	Expect(in.Actual[0].GetConfig().Service.Pipelines).To(Equal(expected.Service.Pipelines))
 },
 	Entry(
 		"add FN processors and exporters",
-		otelconfig.NewOTelConfig(),
-		baseExtensionOTelConfig(),
+		otelconfig.New(),
+		configBuilder{cfg: otelconfig.New()}.withExtensionConfig().cfg,
 	),
 	Entry(
 		"add FN exporters to logs pipeline",
-		baseOTelConfigWithPipeline("logs", testPipeline()),
-		baseExtensionOTelConfigWithPipeline("logs", testPipelineWithFN()),
+		baseOTelConfig().withPipeline("logs", testPipeline()).cfg,
+		baseOTelConfig().withPipeline("logs", testPipelineWithFN()).withExtensionConfig().cfg,
 	),
 	Entry(
 		"add FN exporters to alerts pipeline",
-		baseOTelConfigWithPipeline("logs/alerts", testPipeline()),
-		baseExtensionOTelConfigWithPipeline("logs/alerts", testPipelineWithFN()),
+		baseOTelConfig().withPipeline("logs/alerts", testPipeline()).cfg,
+		baseOTelConfig().withPipeline("logs/alerts", testPipelineWithFN()).withExtensionConfig().cfg,
 	),
 	Entry(
 		"add FN exporters to user custom metrics pipeline",
-		baseOTelConfigWithPipeline("metrics/user-defined-rabbitmq", testPipeline()),
-		baseExtensionOTelConfigWithPipeline("metrics/user-defined-rabbitmq", testPipelineWithFN()),
+		baseOTelConfig().withPipeline("metrics/user-defined-rabbitmq", testPipeline()).cfg,
+		baseOTelConfig().withPipeline("metrics/user-defined-rabbitmq", testPipelineWithFN()).withExtensionConfig().cfg,
 	),
 	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
-		baseOTelConfigWithPipeline("metrics/fast", testPipeline()),
-		baseExtensionOTelConfigWithMetrics("metrics/slow"),
+		baseOTelConfig().withPipeline("metrics/fast", testPipeline()).cfg,
+		baseOTelConfig().withPipeline("metrics/fast", testPipeline()).withMetrics("metrics/slow").withExtensionConfig().cfg,
 	),
 	Entry(
 		"add metrics/controller-slow pipeline if metrics/controller-fast pipeline exists",
-		baseOTelConfigWithPipeline("metrics/controller-fast", testPipeline()),
-		baseExtensionOTelConfigWithMetrics("metrics/controller-slow"),
+		baseOTelConfig().withPipeline("metrics/controller-fast", testPipeline()).cfg,
+		baseOTelConfig().withPipeline("metrics/controller-fast", testPipeline()).withMetrics("metrics/controller-slow").withExtensionConfig().cfg,
 	),
 )
 
-func baseOTelConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTelConfig {
-	cfg := baseOTelConfig()
-	cfg.Service.AddPipeline(name, pipeline)
-	return cfg
+// configBuilder is wrapper around otelconfig.Config with builder-style methods.
+type configBuilder struct{ cfg *otelconfig.Config }
+
+func (b configBuilder) withPipeline(name string, pipeline otelconfig.Pipeline) configBuilder {
+	b.cfg.Service.AddPipeline(name, pipeline)
+	return b
 }
 
-func baseExtensionOTelConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTelConfig {
-	cfg := baseExtensionOTelConfig()
-	cfg.Service.AddPipeline(name, pipeline)
-	return cfg
-}
-
-func baseExtensionOTelConfigWithMetrics(pipelineName string) *otelconfig.OTelConfig {
-	cfg := baseExtensionOTelConfig()
-	cfg.AddReceiver("prometheus/fluxninja", map[string]any{
+func (b configBuilder) withMetrics(pipelineName string) configBuilder {
+	b.cfg.AddReceiver("prometheus/fluxninja", map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
 				// Here is different scrape interval than in the base otel config.
@@ -151,7 +128,7 @@ func baseExtensionOTelConfigWithMetrics(pipelineName string) *otelconfig.OTelCon
 			"scrape_configs": []string{"foo", "bar"},
 		},
 	})
-	cfg.AddProcessor("batch/metrics-slow", map[string]any{
+	b.cfg.AddProcessor("batch/metrics-slow", map[string]any{
 		"send_batch_size":     uint32(10000),
 		"send_batch_max_size": uint32(10000),
 		"timeout":             5 * time.Second,
@@ -160,16 +137,16 @@ func baseExtensionOTelConfigWithMetrics(pipelineName string) *otelconfig.OTelCon
 		"batch/metrics-slow",
 		"attributes/fluxninja",
 	}
-	cfg.Service.AddPipeline(pipelineName, otelconfig.Pipeline{
+	b.cfg.Service.AddPipeline(pipelineName, otelconfig.Pipeline{
 		Receivers:  []string{"prometheus/fluxninja"},
 		Processors: processors,
 		Exporters:  []string{"otlp/fluxninja"},
 	})
-	return cfg
+	return b
 }
 
-func baseOTelConfig() *otelconfig.OTelConfig {
-	cfg := otelconfig.NewOTelConfig()
+func baseOTelConfig() configBuilder {
+	cfg := otelconfig.New()
 	cfg.AddReceiver("prometheus", map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
@@ -179,13 +156,12 @@ func baseOTelConfig() *otelconfig.OTelConfig {
 			"scrape_configs": []string{"foo", "bar"},
 		},
 	})
-	return cfg
+	return configBuilder{cfg: cfg}
 }
 
-// baseExtensionOTelConfig as produced by FN Extension
-func baseExtensionOTelConfig() *otelconfig.OTelConfig {
-	cfg := otelconfig.NewOTelConfig()
-	cfg.AddProcessor("attributes/fluxninja", map[string]interface{}{
+// appends basic processors / exporters unconditionally added by fluxninja extension
+func (b configBuilder) withExtensionConfig() configBuilder {
+	b.cfg.AddProcessor("attributes/fluxninja", map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
 				"key":    "controller_id",
@@ -194,7 +170,7 @@ func baseExtensionOTelConfig() *otelconfig.OTelConfig {
 			},
 		},
 	})
-	cfg.AddProcessor("transform/fluxninja", map[string]interface{}{
+	b.cfg.AddProcessor("transform/fluxninja", map[string]interface{}{
 		"log_statements": []map[string]interface{}{
 			{
 				"context": "resource",
@@ -204,7 +180,7 @@ func baseExtensionOTelConfig() *otelconfig.OTelConfig {
 			},
 		},
 	})
-	cfg.AddExporter("otlp/fluxninja", map[string]interface{}{
+	b.cfg.AddExporter("otlp/fluxninja", map[string]interface{}{
 		"endpoint": "http://localhost:1234",
 		"headers": map[string]interface{}{
 			"authorization": "Bearer deadbeef",
@@ -220,7 +196,7 @@ func baseExtensionOTelConfig() *otelconfig.OTelConfig {
 			"insecure_skip_verify": false,
 		},
 	})
-	return cfg
+	return b
 }
 
 func testPipelineWithFN() otelconfig.Pipeline {

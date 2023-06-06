@@ -1,7 +1,6 @@
 package otel
 
 import (
-	"context"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -38,74 +37,64 @@ const (
 // Module provides the OTel configuration for FluxNinja.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(
+		fx.Invoke(
 			fx.Annotate(
-				provideOtelConfig,
-				fx.ParamTags(config.NameTag("base"),
+				injectOtelConfig,
+				fx.ParamTags(
 					config.NameTag("heartbeats-grpc-client-config"),
-					config.NameTag("heartbeats-http-client-config")),
-				fx.ResultTags(config.GroupTag("extension-config")),
+					config.NameTag("heartbeats-http-client-config"),
+				),
 			),
 		),
 	)
 }
 
-func provideOtelConfig(
-	baseConfigProvider *otelconfig.OTelConfigProvider,
+func injectOtelConfig(
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	lifecycle fx.Lifecycle,
 	heartbeats *heartbeats.Heartbeats,
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
-) (*otelconfig.OTelConfigProvider, error) {
+	configProvider *otelconfig.Provider,
+) {
 	if extensionConfig.APIKey == "" {
-		return nil, nil
+		return
 	}
 
-	baseConfig := baseConfigProvider.GetConfig()
+	lifecycle.Append(fx.StartHook(func() {
+		// We must add the config-modifying hook in this start hook, as we need
+		// heartbeats.ControllerInfo, that's populated only in heartbeats start.
+		configProvider.AddMutatingHook(func(config *otelconfig.Config) {
+			addFluxNinjaExporter(config, extensionConfig, grpcClientConfig, httpClientConfig)
 
-	config := otelconfig.NewOTelConfig()
-	addFluxNinjaExporter(config, extensionConfig, grpcClientConfig, httpClientConfig)
-	// This is to prevent overwriting extensions with empty config.
-	config.Extensions = baseConfig.Extensions
-
-	lifecycle.Append(fx.Hook{
-		OnStart: func(context.Context) error {
 			controllerID := heartbeats.ControllerInfo.Id
 
 			addAttributesProcessor(config, controllerID)
 			addResourceAttributesProcessor(config, controllerID)
 
-			if logsPipeline, exists := baseConfig.Service.Pipeline("logs"); exists {
+			if logsPipeline, exists := config.Service.Pipeline("logs"); exists {
 				addFNToPipeline("logs", config, logsPipeline)
 			}
-			if alertsPipeline, exists := baseConfig.Service.Pipeline("logs/alerts"); exists {
+			if alertsPipeline, exists := config.Service.Pipeline("logs/alerts"); exists {
 				addFNToPipeline("logs/alerts", config, alertsPipeline)
 			}
-			if _, exists := baseConfig.Service.Pipeline("metrics/fast"); exists {
-				addMetricsSlowPipeline(baseConfig, config)
+			if _, exists := config.Service.Pipeline("metrics/fast"); exists {
+				addMetricsSlowPipeline(config)
 			}
-			if _, exists := baseConfig.Service.Pipeline("metrics/controller-fast"); exists {
-				addMetricsControllerSlowPipeline(baseConfig, config)
+			if _, exists := config.Service.Pipeline("metrics/controller-fast"); exists {
+				addMetricsControllerSlowPipeline(config)
 			}
-			for pipelineName, customMetricsPipeline := range baseConfig.Service.Pipelines {
+			for pipelineName, customMetricsPipeline := range config.Service.Pipelines {
 				if !strings.HasPrefix(pipelineName, "metrics/user-defined-") {
 					continue
 				}
 				addFNToPipeline(pipelineName, config, customMetricsPipeline)
 			}
-			return nil
-		},
-		OnStop: func(context.Context) error {
-			return nil
-		},
-	})
-
-	fnConfigProvider := otelconfig.NewOTelConfigProvider("fluxninja", config)
-	return fnConfigProvider, nil
+		})
+	}))
 }
 
-func addAttributesProcessor(config *otelconfig.OTelConfig, controllerID string) {
+func addAttributesProcessor(config *otelconfig.Config, controllerID string) {
 	config.AddProcessor(processorAttributes, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
@@ -117,7 +106,7 @@ func addAttributesProcessor(config *otelconfig.OTelConfig, controllerID string) 
 	})
 }
 
-func addResourceAttributesProcessor(config *otelconfig.OTelConfig, controllerID string) {
+func addResourceAttributesProcessor(config *otelconfig.Config, controllerID string) {
 	config.AddProcessor(processorResourceAttributes, map[string]interface{}{
 		"log_statements": []map[string]interface{}{
 			{
@@ -132,9 +121,10 @@ func addResourceAttributesProcessor(config *otelconfig.OTelConfig, controllerID 
 
 func addFNToPipeline(
 	name string,
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	pipeline otelconfig.Pipeline,
 ) {
+	log.Info().Str("pipeline", name).Msg("Adding fluxninja exporter to pipeline")
 	// TODO this duplication of `controller_id` insertion should be cleaned up
 	// when telemetry logs pipeline is update to follow the same rules as alerts
 	// pipeline.
@@ -143,8 +133,9 @@ func addFNToPipeline(
 	config.Service.AddPipeline(name, pipeline)
 }
 
-func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTelConfig) {
-	addFluxNinjaPrometheusReceiver(baseConfig, config)
+func addMetricsSlowPipeline(config *otelconfig.Config) {
+	log.Info().Msg("Adding metrics/slow pipeline")
+	addFluxNinjaPrometheusReceiver(config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
 	config.Service.AddPipeline("metrics/slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
@@ -156,8 +147,9 @@ func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTelConfig) {
 	})
 }
 
-func addMetricsControllerSlowPipeline(baseConfig, config *otelconfig.OTelConfig) {
-	addFluxNinjaPrometheusReceiver(baseConfig, config)
+func addMetricsControllerSlowPipeline(config *otelconfig.Config) {
+	log.Info().Msg("Adding metrics/controller-slow pipeline")
+	addFluxNinjaPrometheusReceiver(config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
 	config.Service.AddPipeline("metrics/controller-slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
@@ -169,8 +161,8 @@ func addMetricsControllerSlowPipeline(baseConfig, config *otelconfig.OTelConfig)
 	})
 }
 
-func addFluxNinjaPrometheusReceiver(baseConfig, config *otelconfig.OTelConfig) {
-	rawReceiverConfig, _ := baseConfig.Receivers[otelconsts.ReceiverPrometheus].(map[string]any)
+func addFluxNinjaPrometheusReceiver(config *otelconfig.Config) {
+	rawReceiverConfig, _ := config.Receivers[otelconsts.ReceiverPrometheus].(map[string]any)
 	duplicatedReceiverConfig, err := duplicateMap(rawReceiverConfig)
 	if err != nil {
 		// It should not happen, unless the original config is messed up.
@@ -203,7 +195,7 @@ func duplicateMap(in map[string]any) (map[string]any, error) {
 	return duplicatedMap, nil
 }
 
-func addFluxNinjaExporter(config *otelconfig.OTelConfig,
+func addFluxNinjaExporter(config *otelconfig.Config,
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,

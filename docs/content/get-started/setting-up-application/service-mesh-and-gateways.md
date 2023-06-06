@@ -1,10 +1,10 @@
 ---
-title: Service Mesh & API Getaways
+title: Service Mesh & API Gateways
 keywords:
   - Service Meshes
-  - API Getaways
+  - API Gateways
 sidebar_position: 3
-sidebar_label: Service Meshes & API Getaways
+sidebar_label: Service Meshes & API Gateways
 ---
 
 ```mdx-code-block
@@ -12,8 +12,8 @@ import { Cards } from '@site/src/components/Cards';
 ```
 
 One of the most common and easy ways to integrate Aperture into your application
-is to use a service mesh or API getaway. Aperture supports Envoy, Istio,
-Linkerd, and Kong.
+is to use a service mesh or API gateway. Aperture supports Envoy, Istio, Nginx
+Gateway, and Kong Gateway.
 
 <!-- vale off -->
 
@@ -28,14 +28,14 @@ Aperture. Check out the complete installation guide in
 
 <!-- vale off -->
 
-## How to integrate Aperture with API Getaways?
+## How to integrate Aperture with API Gateways?
 
 <!-- vale on -->
 
 With the help of Aperture Lua modules and Aperture Plugin for Nginx and Kong
-respectively, it is easy to integrate Aperture with API Getaways. You can check
+respectively, it is easy to integrate Aperture with API Gateway. You can check
 out the complete installation guide in
-[API Getaway Integration](/integrations/flow-control/gateway/gateway.md).
+[API Gateway Integration](/integrations/flow-control/gateway/gateway.md).
 
 <!-- vale off -->
 
@@ -43,16 +43,5 @@ out the complete installation guide in
 
 <!-- vale on -->
 
-Once you complete the Service Mesh or API Gateway Integration head over to
-install Aperture.
-
-```mdx-code-block
-
-<Cards data={[
-  {
-    title: "Install Aperture",
-    description: "Install Controller and Agent in your environment",
-    url: "/get-started/installation/",
-  },
-  ]}/>
-```
+Once you complete the Service Mesh or API Gateway integration, head over to
+[install Aperture](/get-started/installation/installation.md).
