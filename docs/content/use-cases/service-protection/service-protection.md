@@ -37,11 +37,11 @@ uptime.
 
 </Zoom>
 
-The provided diagram illustrates the working of a service protection policy. The
-policy is evaluated at the controller, which analyzes health signals in
-real-time. Based on these metrics, it calculates a load multiplier, which is
-relayed to the agents. The agents then adjust the rate of requests locally based
-on the load multiplier applied to the recent rate of requests.
+The diagram illustrates the working of a service protection policy. The policy
+is evaluated at the controller, which analyzes health signals in real-time.
+Based on these metrics, it calculates a load multiplier, which is relayed to the
+agents. The agents then adjust the rate of requests locally based on the load
+multiplier applied to the recent rate of requests.
 
 :::note
 

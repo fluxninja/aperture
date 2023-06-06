@@ -36,11 +36,11 @@ feature of the service.
 
 ## Use Case Scenario
 
-Consider a scenario where a social media platform is planning to introduce a new
-interface design. Instead of releasing the new design to all users at once, the
-platform could use Aperture to facilitate a controlled rollout. With Aperture's
-Automated Load Ramping feature, the new design could be gradually introduced to
-a select group of users, allowing the platform to gather feedback and make
+Consider a scenario where a video streaming platform is planning to introduce a
+new interface design. Instead of releasing the new design to all users at once,
+the platform could use Aperture to facilitate a controlled rollout. With
+Aperture's feature rollout policy, the new design could be gradually introduced
+to a select group of users, allowing the platform to gather feedback and make
 necessary adjustments. This strategy would enable the platform to continue
 releasing the new design to an increasingly larger user base, until it is
 eventually launched universally. Throughout this process, Aperture would ensure
