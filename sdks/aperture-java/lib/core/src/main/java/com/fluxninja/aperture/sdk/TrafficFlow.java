@@ -20,6 +20,7 @@ public class TrafficFlow {
     public boolean ended;
     private boolean ignored;
     private boolean failOpen;
+    private FlowStatus flowStatus;
 
     TrafficFlow(CheckHTTPResponse checkResponse, Span span, boolean ended) {
         this.checkResponse = checkResponse;
@@ -27,6 +28,7 @@ public class TrafficFlow {
         this.ended = ended;
         this.ignored = false;
         this.failOpen = true;
+        this.flowStatus = FlowStatus.OK;
     }
 
     static TrafficFlow ignoredFlow() {
@@ -121,11 +123,20 @@ public class TrafficFlow {
     }
 
     /**
-     * Ends the flow, notifying the Aperture Agent whether it succeeded.
+     * Set status of the flow to be ended. Primarily used in case of business logic failure after
+     * the flow was accepted by Aperture Agent.
      *
-     * @param statusCode Status of the finished flow.
+     * @param status Status of the flow to be finished.
      */
-    public void end(FlowStatus statusCode) throws ApertureSDKException {
+    public void setStatus(FlowStatus status) {
+        this.flowStatus = status;
+    }
+
+    /**
+     * Ends the flow, notifying the Aperture Agent whether it succeeded. Flow's Status is assumed to
+     * be "OK" and can be set using {@link #setStatus}.
+     */
+    public void end() throws ApertureSDKException {
         if (this.ignored) {
             // span has not been started, and so doesn't need to be ended.
             return;
@@ -162,7 +173,7 @@ public class TrafficFlow {
         }
 
         this.span
-                .setAttribute(FLOW_STATUS_LABEL, statusCode.name())
+                .setAttribute(FLOW_STATUS_LABEL, this.flowStatus.name())
                 .setAttribute(CHECK_RESPONSE_LABEL, serializedFlowcontrolCheckResponse)
                 .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 

@@ -6,7 +6,6 @@ import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.common.HttpStatus;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
@@ -70,18 +69,11 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
                 ctx.updateRequest(newRequest);
 
                 res = unwrap().execute(ctx, newRequest);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
-                return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
-                try {
-                    flow.end(FlowStatus.Error);
-                } catch (ApertureSDKException ae) {
-                    ae.printStackTrace();
-                }
+                flow.setStatus(FlowStatus.Error);
                 throw e;
+            } finally {
+                flow.end();
             }
             return res;
         } else {

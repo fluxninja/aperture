@@ -16,7 +16,8 @@ public class ServletUtils {
     protected static void handleRejectedFlow(TrafficFlow flow, HttpServletResponse response)
             throws IOException {
         try {
-            flow.end(FlowStatus.Unset);
+            flow.setStatus(FlowStatus.Unset);
+            flow.end();
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }

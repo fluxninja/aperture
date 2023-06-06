@@ -115,25 +115,30 @@ public class App {
 
         // See whether flow was accepted by Aperture Agent.
         if (flow.shouldRun()) {
-            // Simulate work being done
             try {
+                // Simulate work being done
                 res.status(202);
                 Thread.sleep(2000);
-                // Need to call end() on the Flow in order to provide telemetry to Aperture
-                // Agent for completing the control loop.
-                // The first argument captures whether the feature captured by the Flow was
-                // successful or resulted in an error.
-                // The second argument is error message for further diagnosis.
-                flow.end(FlowStatus.OK);
-            } catch (InterruptedException | ApertureSDKException e) {
-                e.printStackTrace();
+            } catch (InterruptedException e) {
+                // Flow Status captures whether the feature captured by the Flow was
+                // successful or resulted in an error. When not explicitly set,
+                // the default value is FlowStatus.OK .
+                flow.setStatus(FlowStatus.Error);
+            } finally {
+                try {
+                    flow.end();
+                } catch (ApertureSDKException e) {
+                    // Error: Flow had already been ended.
+                    e.printStackTrace();
+                }
             }
         } else {
             // Flow has been rejected by Aperture Agent.
+            res.status(flow.getRejectionHttpStatusCode());
             try {
-                res.status(flow.getRejectionHttpStatusCode());
-                flow.end(FlowStatus.Error);
+                flow.end();
             } catch (ApertureSDKException e) {
+                // Error: Flow had already been ended.
                 e.printStackTrace();
             }
         }

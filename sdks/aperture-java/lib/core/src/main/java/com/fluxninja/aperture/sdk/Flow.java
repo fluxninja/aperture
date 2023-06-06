@@ -13,12 +13,14 @@ public final class Flow {
     private final Span span;
     private boolean ended;
     private boolean failOpen;
+    private FlowStatus flowStatus;
 
     Flow(CheckResponse checkResponse, Span span, boolean ended) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
         this.failOpen = true;
+        this.flowStatus = FlowStatus.OK;
     }
 
     /**
@@ -104,11 +106,20 @@ public final class Flow {
     }
 
     /**
-     * Ends the flow, notifying the Aperture Agent whether it succeeded.
+     * Set status of the flow to be ended. Primarily used in case of business logic failure after
+     * the flow was accepted by Aperture Agent.
      *
-     * @param statusCode Status of the finished flow.
+     * @param status Status of the flow to be finished.
      */
-    public void end(FlowStatus statusCode) throws ApertureSDKException {
+    public void setStatus(FlowStatus status) {
+        this.flowStatus = status;
+    }
+
+    /**
+     * Ends the flow, notifying the Aperture Agent whether it succeeded. Flow's Status is assumed to
+     * be "OK" and can be set using {@link #setStatus}.
+     */
+    public void end() throws ApertureSDKException {
         if (this.ended) {
             throw new ApertureSDKException("Flow already ended");
         }
@@ -124,7 +135,7 @@ public final class Flow {
         }
 
         this.span
-                .setAttribute(FLOW_STATUS_LABEL, statusCode.name())
+                .setAttribute(FLOW_STATUS_LABEL, this.flowStatus.name())
                 .setAttribute(CHECK_RESPONSE_LABEL, checkResponseJSONBytes)
                 .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 

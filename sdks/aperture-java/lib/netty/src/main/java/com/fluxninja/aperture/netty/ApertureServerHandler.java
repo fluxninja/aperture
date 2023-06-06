@@ -67,27 +67,21 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
                 HttpRequest newRequest = NettyUtils.updateHeaders(req, newHeaders);
 
                 ctx.fireChannelRead(newRequest);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
-                FullHttpResponse response =
-                        new DefaultFullHttpResponse(
-                                HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-                ctx.write(response);
-                ctx.flush();
             } catch (Exception e) {
-                try {
-                    flow.end(FlowStatus.Error);
-                } catch (ApertureSDKException ae) {
-                    e.printStackTrace();
-                    ae.printStackTrace();
-                }
+                flow.setStatus(FlowStatus.Error);
                 throw e;
+            } finally {
+                try {
+                    flow.end();
+                } catch (ApertureSDKException e) {
+                    // ending flow failed
+                    e.printStackTrace();
+                }
             }
         } else {
             try {
-                flow.end(FlowStatus.Unset);
+                flow.setStatus(FlowStatus.Unset);
+                flow.end();
             } catch (ApertureSDKException e) {
                 e.printStackTrace();
             }
