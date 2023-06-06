@@ -23,7 +23,7 @@ protects the service from sudden traffic spikes. But it is necessary to scale
 the service to meet demand in case of a persistent change in load.
 
 To achieve this, the policy makes use of an
-[_Auto Scaler_](/concepts/auto-scale/auto-scaler.md) component to adjust the
+[_Auto Scaler_](/concepts/auto-scale) component to adjust the
 number of instances allocated to the service. Load-based auto-scaling is
 achieved by defining a scale-out _Controller_ that acts on the load multiplier
 signal from the service protection policy. This signal measures the fraction of
