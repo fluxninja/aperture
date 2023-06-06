@@ -60,7 +60,7 @@ entities belonging to the same service.
 
 :::tip
 
-Use the [`aperturectl flow-control control-points`][aperturectl] CLI command to
-list active control points.
+Use the `aperturectl flow-control control-points` CLI command to list active
+control points.
 
 :::

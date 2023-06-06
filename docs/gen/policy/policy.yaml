@@ -615,7 +615,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+      See also [Classifier overview](/concepts/flow-control/classifier.md).
 
       :::
       Example
@@ -1351,7 +1351,7 @@ definitions:
 
       :::info
 
-      See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+      See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 
       :::
       Example:
@@ -3064,7 +3064,7 @@ definitions:
 
       :::info
 
-      You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+      You can use the [live-preview](/concepts/flow-control/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 
       :::
 
@@ -3151,7 +3151,7 @@ definitions:
 
       :::info
 
-      See also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+      See also [_Load Regulator overview](/concepts/flow-control/regulator.md).
 
       :::
     type: object

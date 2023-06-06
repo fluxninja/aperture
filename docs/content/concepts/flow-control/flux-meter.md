@@ -120,5 +120,5 @@ user compared to guest user).
 [envoy-access-log-spec]:
   https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators
 [promql-reference]: /reference/policies/spec.md#prom-q-l
-[signal]: /concepts/policy/circuit.md#signal
+[signal]: /concepts/advanced/circuit.md#signal
 [google-sre-slo]: https://sre.google/workbook/implementing-slos/

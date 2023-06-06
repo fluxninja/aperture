@@ -1193,7 +1193,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+See also [Classifier overview](/concepts/flow-control/classifier.md).
 
 ::: Example
 
@@ -2788,7 +2788,7 @@ histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 
 ::: Example:
 
@@ -6290,7 +6290,7 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 :::info
 
 You can use the
-[live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
+[live-preview](/concepts/flow-control/classifier.md#live-previewing-requests)
 feature to first preview the input to the classifier before writing the labeling
 logic.
 
@@ -6407,8 +6407,7 @@ only a specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also
-[\_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+See also [\_Load Regulator overview](/concepts/flow-control/regulator.md).
 
 :::
 

@@ -1705,8 +1705,7 @@ previous step's `target_accept_percentage` to the next
 
 > :::info
 
-See also
-[_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+See also [_Load Scheduler_ overview](/concepts/flow-control/load-scheduler.md).
 
 :::
 
@@ -2340,7 +2339,7 @@ Aperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/m
 
 > :::info
 
-See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/flow-control/rate-limiter.md).
 
 :::
 
@@ -2506,8 +2505,7 @@ for sensitive labels.
 
 :::info
 
-See also
-[\_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+See also [\_Load Regulator overview](/concepts/flow-control/regulator.md).
 
 :::
 
@@ -2717,7 +2715,7 @@ workloads, the first matching one will be used. If none of workloads match,
 :::info
 
 See also
-[workload definition in the concepts section](/concepts/flow-control/components/load-scheduler.md#workload).
+[workload definition in the concepts section](/concepts/flow-control/load-scheduler.md#workload).
 
 ::: | |
 

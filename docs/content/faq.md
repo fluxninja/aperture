@@ -88,6 +88,6 @@ Kubernetes cluster.
 
 [Rate Limiter]: /concepts/flow-control/rate-limiter.md
 [Load Scheduler]: /concepts/flow-control/load-scheduler.md
-[Classifier]: /concepts/flow-control/resources/classifier.md
+[Classifier]: /concepts/flow-control/classifier.md
 [Flow Label]: /concepts/flow-control/flow-label.md
 [Aperture Controller]: /get-started/installation/controller/controller.md

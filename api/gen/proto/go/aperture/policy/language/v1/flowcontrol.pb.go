@@ -711,7 +711,7 @@ func (x *AdaptiveLoadScheduler) GetDryRunConfigKey() string {
 //
 // :::info
 //
-// See also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+// See also [_Load Regulator overview](/concepts/flow-control/regulator.md).
 //
 // :::
 type Regulator struct {
@@ -944,7 +944,7 @@ func (x *LoadRampSeries) GetParameters() *LoadRampSeries_Parameters {
 //
 // :::info
 //
-// See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+// See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
 //
 // :::
 // Example:
@@ -1100,7 +1100,7 @@ func (*FluxMeter_ExponentialBucketsRange_) isFluxMeter_HistogramBuckets() {}
 //
 // :::info
 //
-// See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+// See also [Classifier overview](/concepts/flow-control/classifier.md).
 //
 // :::
 // Example
@@ -1303,7 +1303,7 @@ func (*Rule_Extractor) isRule_Source() {}
 //
 // :::info
 //
-// You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+// You can use the [live-preview](/concepts/flow-control/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 //
 // :::
 //

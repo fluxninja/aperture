@@ -22,8 +22,8 @@ Selector identifies a resource in the Kubernetes cluster.
 
 A _Kubernetes Object Selector_ consists of:
 
-- _Agent Group_: The Agent Group identifies Aperture Agents where the
-  [component](components/components.md) gets applied.
+- _Agent Group_: The Agent Group identifies Aperture Agents where the component
+  gets applied.
 - API Version: The Kubernetes API version of the resource.
 - Kind: The Kind of the Kubernetes resource, such as Deployment, ReplicaSet,
   StatefulSet.

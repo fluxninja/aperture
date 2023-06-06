@@ -232,7 +232,7 @@ rejected.
 
 [label]: ./flow-label.md
 [flux-meter]: ./flux-meter.md
-[load-scheduler]: ./components/load-scheduler.md
+[load-scheduler]: ./load-scheduler.md
 [classifier]: ./classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md

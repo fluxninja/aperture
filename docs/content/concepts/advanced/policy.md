@@ -50,17 +50,8 @@ objectives and trigger appropriate actions to restore system stability and
 reliability. The circuit is the heart of the policy specification and is
 responsible for the logic of the control system.
 
-## Resources
-
-A list of [Resources][resources] which need to be set up to support the circuit.
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
-
 <DocCardList />
 
-[circuit]: /concepts/policy/circuit.md
-[resources]: /concepts/policy/resources.md
+[circuit]: /concepts/advanced/circuit.md
 [blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
 [control-system]: https://en.wikipedia.org/wiki/Control_system

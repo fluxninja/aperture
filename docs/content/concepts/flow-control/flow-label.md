@@ -195,9 +195,9 @@ For _Classifier_ created labels, you can disable this behavior by setting
 
 [selectors]: ./selector.md
 [classifier]: ./classifier.md
-[workload]: ./components/load-scheduler.md#workload
-[ratelimiter]: ./components/rate-limiter.md
-[scheduler]: ./components/load-scheduler.md#scheduler
+[workload]: ./load-scheduler.md#workload
+[ratelimiter]: ./rate-limiter.md
+[scheduler]: ./load-scheduler.md#scheduler
 [flux-meter]: ./flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
