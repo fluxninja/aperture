@@ -50,18 +50,16 @@ public class ApertureFilter implements Filter {
                 }
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
             } catch (Exception e) {
+                flow.setStatus(FlowStatus.Error);
+                throw e;
+            } finally {
                 try {
-                    flow.end(FlowStatus.Error);
+                    flow.end();
                 } catch (ApertureSDKException ae) {
-                    e.printStackTrace();
+                    // Error: Flow already ended
                     ae.printStackTrace();
                 }
-                throw e;
             }
         } else {
             ServletUtils.handleRejectedFlow(flow, response);

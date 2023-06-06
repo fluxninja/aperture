@@ -3,7 +3,6 @@ package com.fluxninja.aperture.armeria;
 import com.fluxninja.aperture.sdk.*;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.SimpleDecoratingHttpService;
@@ -70,19 +69,11 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
                 ctx.updateRequest(newRequest);
 
                 res = unwrap().serve(ctx, newRequest);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
-                return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
-                try {
-                    flow.end(FlowStatus.Error);
-                } catch (ApertureSDKException ae) {
-                    e.printStackTrace();
-                    ae.printStackTrace();
-                }
+                flow.setStatus(FlowStatus.Error);
                 throw e;
+            } finally {
+                flow.end();
             }
             return res;
         } else {

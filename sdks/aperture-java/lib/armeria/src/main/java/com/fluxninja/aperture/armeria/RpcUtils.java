@@ -11,7 +11,8 @@ import java.util.Map;
 class RpcUtils {
     protected static HttpStatus handleRejectedFlow(Flow flow) {
         try {
-            flow.end(FlowStatus.Unset);
+            flow.setStatus(FlowStatus.Unset);
+            flow.end();
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
