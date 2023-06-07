@@ -1,7 +1,6 @@
 local json = require("cjson")
 local socket = require("socket")
 local http = require("resty.http")
-local ltn12 = require("ltn12")
 
 local apertureAgentEndpoint = os.getenv("APERTURE_AGENT_ENDPOINT")
 if apertureAgentEndpoint == nil or apertureAgentEndpoint == "" then
@@ -28,7 +27,8 @@ local exporter = otlp_exporter_new(otlp_exporter_client_new(apertureAgentEndpoin
 local simple_span_processor = otlp_simple_span_processor_new(exporter)
 local tp = otlp_tracer_provider_new(simple_span_processor, {
   sampler = otlp_always_on_sampler,
-  resource = otlp_resource_new(otlp_attr.string("service.name", "aperture-lua"), otlp_attr.string("service.version", "v0.1.0"))
+  resource = otlp_resource_new(otlp_attr.string("service.name", "aperture-lua"),
+    otlp_attr.string("service.version", "v0.1.0"))
 })
 local otlp_tracer = tp:tracer("aperture-lua")
 
@@ -37,24 +37,20 @@ return function(control_point)
   request.read_body()
   local request_headers = ngx.req.get_headers()
 
-  local server_addr = ngx.var.server_addr
-  local server_port = ngx.var.server_port
-
   local socket_type = ngx.var.server_protocol
   if socket_type ~= "UDP" then
     socket_type = "TCP"
   end
 
-  local response_body = {}
   local request_body = {
     source = {
-      address = ngx.var.remote_addr,
       protocol = socket_type,
+      address = ngx.var.remote_addr,
       port = ngx.var.remote_port
     },
     destination = {
-      address = ngx.var.server_addr,
       protocol = socket_type,
+      address = ngx.var.server_addr,
       port = ngx.var.server_port
     },
     request = {
@@ -76,10 +72,11 @@ return function(control_point)
   request_headers["content-length"] = string.len(request_body_json)
   request_headers["grpc-timeout"] = apertureCheckTimeout
 
-  local context, span = otlp_tracer:start(otlp_trace_context_propagator:extract(otlp_context, ngx.req), "Aperture CheckHTTP", {
-    kind = otlp_span_kind.server,
-    attributes = {otlp_attr.string("aperture.source", "lua")}
-  })
+  local context, span = otlp_tracer:start(otlp_trace_context_propagator:extract(otlp_context, ngx.req),
+    "Aperture CheckHTTP", {
+      kind = otlp_span_kind.server,
+      attributes = { otlp_attr.string("aperture.source", "lua") }
+    })
   ngx.ctx.otlp_span = span
 
   local httpc = http.new()

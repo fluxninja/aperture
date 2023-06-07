@@ -1,7 +1,6 @@
 local access = require "kong.plugins.aperture-plugin.access"
 local log = require "kong.plugins.aperture-plugin.log"
 local headers = require "kong.plugins.aperture-plugin.headers"
-local json = require "cjson"
 
 local ApertureHandler = {
   VERSION  = "0.1.0",
