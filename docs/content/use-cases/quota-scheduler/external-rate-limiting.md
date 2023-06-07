@@ -16,9 +16,9 @@ import Zoom from 'react-medium-image-zoom';
 
 :::note
 
-See
+The following policy is based on the
 [Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
-for more details.
+blueprint.
 
 :::
 
@@ -42,9 +42,9 @@ In this policy, rate limiting is applied on
 **`service1-demo-app.demoapp.svc.cluster.local`** based on the **`label_key`**
 extracted from the request header. Consequently, user prioritization is achieved
 through weights assigned to the **`user_type`** label value, also extracted from
-the same request header. Finally, WFQ Scheduler is configured two workloads
-priorities: **`guest`** and **`subscriber`** with 50 and 200 respectively.
-Matching labels using **`user_type`** value from the request header.
+the same request header. Finally, the WFQ Scheduler is set up to prioritize two
+types of workloads: **`guest`**, with a priority of 50, **`subscriber`** with a
+priority of 100.
 
 ```mdx-code-block
 <Tabs>

@@ -13,6 +13,14 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+The following policy is based on the
+[Service Protection with Average Latency Feedback](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md)
+blueprint.
+
+:::
+
 ## Policy Overview
 
 Mitigating cascading failures is essential to maintain service stability, which
@@ -28,12 +36,9 @@ this dynamic problem and offer reliable service protection.
 In this policy, latency is of **`service1-demo-app.demoapp.svc.cluster.local`**
 is monitored using an exponential moving average. Deviation of current latency
 from the historical latency indicates an overload, which will lead to lower the
-rate at which requests are admitted into the service, making the excess requests
-wait in a queue. Once the latency improves, the rate of requests is slowly
-increased to find the maximum processing capacity of the service.
-
-This policy uses the Service Protection with Average Latency Feedback
-[Blueprint](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md).
+rate at which requests are admitted into the monitored service, making the
+excess requests wait in a queue. Once the latency improves, the rate of requests
+is slowly increased to the maximum processing capacity of the selected service.
 
 ```mdx-code-block
 <Tabs>

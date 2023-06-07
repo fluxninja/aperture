@@ -26,11 +26,12 @@ scenarios.
 
 ## Policy Configuration
 
-Under this policy, we will implement traffic prioritization depending on the
-type of user requesting access. Users classified as subscribers will be given
-precedence over guest users when connecting to
+In this policy, users classified as subscribers will be given precedence over
+guest users when connecting to
 **`service1-demo-app.demoapp.svc.cluster.local`**, therefore resulting in high
-priority request being served first during overload situations.
+priority request being served first during overload situations. The WFQ
+Scheduler is set up to prioritize two types of workloads: **`guest`**, with a
+priority of 50, **`subscriber`** with a priority of 100.
 
 There are two distinct methods that are used to convey the **`user_type`**
 information to the scheduler:
@@ -41,12 +42,12 @@ information to the scheduler:
 - Guests: To identify guest users, a classification rule will be used that
   utilizes an
   [extractor](/concepts/flow-control/resources/classifier.md#extractors) to
-  assign the header value to the **`user_type`** flow label key. The
-  **`user_type`** label key will then be used in the scheduler to match the
-  request against the **`guest`** value to identify the workload.
+  assign the header value to the **`user_type`** flow label key, which will then
+  be used in the scheduler to match the request against the **`guest`** value to
+  identify the workload.
 
 To conclude, the prioritization of incoming requested at
-**`service1-demo-app.demoapp.svc.cluster.local`** determined by the latency
+**`service1-demo-app.demoapp.svc.cluster.local`** is determined by the latency
 measurements of **`service3-demo-app.demoapp.svc.cluster.local`**.
 
 :::tip

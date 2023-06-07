@@ -14,6 +14,14 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+The following policy is based on the
+[Service Protection with Load-based Pod Auto-Scaler](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
+blueprint.
+
+:::
+
 ## Policy Overview
 
 Responding to fluctuating service demand is a common challenge for maintaining

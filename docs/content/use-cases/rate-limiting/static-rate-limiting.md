@@ -19,7 +19,7 @@ maintaining the health and availability of a service. A powerful tool to achieve
 this is the implementation of static rate limiting, aimed at controlling the
 intensity of 'heavy-hitters.' This policy utilizes the
 [Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
-curtail specific flow labels that go beyond their allocated quota within a
+collect specific flow labels that go beyond their allocated quota within a
 defined time frame (limit reset interval). It is an efficient and
 straightforward mechanism for mitigating traffic congestion and preventing
 potential service degradation or downtime.

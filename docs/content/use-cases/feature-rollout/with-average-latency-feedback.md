@@ -1,5 +1,5 @@
 ---
-title: Average Latency Feedback based Rollout
+title: with Average Latency Feedback
 keywords:
   - policies
   - rollout
@@ -16,9 +16,9 @@ import Zoom from 'react-medium-image-zoom';
 
 :::note
 
-See
+The following policy is based on the
 [Feature Rollout with Average Latency Feedback](/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency.md)
-for more details.
+blueprint.
 
 :::
 
@@ -45,10 +45,8 @@ regulation. Specifically:
 
 - **`service1-demo-app.demoapp.svc.cluster.local`** is selected as the targeted
   service for the rollout process.
-- The **`duration`** of the rollout ranges from 0 to 300 seconds. Within this
-  window, there is a controlled increase in the target acceptance percentage,
-  beginning at 1.0% and culminating at 100.0%, ensuring a steady rollout of the
-  new feature.
+- The rollout **`steps`** begin with 1% of the traffic being routed to the new
+  feature and gradually increases to 100%, over a period of 300 seconds.
 
 ```mdx-code-block
 <Tabs>
