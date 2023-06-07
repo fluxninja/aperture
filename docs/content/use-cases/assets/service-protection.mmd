@@ -1,9 +1,9 @@
 flowchart LR
 
-classDef Controller fill:#F26D3D,stroke:#000000,stroke-width:2px;
-classDef Agent fill:#53A67F,stroke:#000000,stroke-width:2px;
-classDef Signal stroke:#000000,stroke-width:1px;
-classDef Service fill:#53A67F,stroke:#000000,stroke-width:1px;
+classDef Controller fill:#F8773D,stroke:#000000,stroke-width:2px;
+classDef Agent fill:#56AE89,stroke:#000000,stroke-width:2px;
+classDef Signal stroke:#EFEEED,stroke-width:1px;
+classDef Service fill:#56AE89,stroke:#000000,stroke-width:1px;
 
 HS("Health Signals") --> Controller
 class HS Signal
@@ -13,7 +13,7 @@ subgraph "Controller"
   policy("Service Protection Policy")
 end
 
-Controller -- "Adjust req/s" --> Agent
+Controller -- "Adjust load multiplier" --> Agent
 class Controller Controller
 
 subgraph " "

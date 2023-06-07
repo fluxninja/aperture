@@ -7,7 +7,6 @@ import (
 	stdlog "log"
 	"net"
 	"strconv"
-	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -161,10 +160,13 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			}
 
 			panichandler.Go(func() {
+				defer func() {
+					utils.Shutdown(in.Shutdowner)
+				}()
+
 				startErr := dc.olric.Start()
 				if startErr != nil {
 					log.Error().Err(startErr).Msg("Failed to start distcache")
-					utils.Shutdown(in.Shutdowner)
 				}
 			})
 
@@ -173,14 +175,6 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			case <-ctx.Done():
 				return errors.New("olric failed to start")
 			case <-startChan:
-			}
-
-			// create a new context with a timeout to avoid hanging
-			newCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-			defer cancel()
-			_, err = dc.client.Stats(newCtx, "")
-			if err != nil {
-				return err
 			}
 
 			err = in.LivenessMultiJob.RegisterJob(job)

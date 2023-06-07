@@ -21,26 +21,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * The Aperture SDK provides a set of tools and functionalities for flow control by enabling the
+ * initiation of flows.
+ *
+ * <p>To start using the Aperture SDK, create an instance of this class using the {@link
+ * ApertureSDKBuilder} and utilize its methods to initiate and control flows in your application.
+ */
 public final class ApertureSDK {
     private final FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient;
     private final FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub
             httpFlowControlClient;
     private final Tracer tracer;
-    private final Duration timeout;
+    private final Duration flowTimeout;
     private final List<String> ignoredPaths;
     private final boolean ignoredPathsMatchRegex;
+
+    private static Logger logger = LoggerFactory.getLogger(ApertureSDK.class);
 
     ApertureSDK(
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
             FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient,
             Tracer tracer,
-            Duration timeout,
+            Duration flowTimeout,
             List<String> ignoredPaths,
             boolean ignoredPathsMatchRegex) {
         this.flowControlClient = flowControlClient;
         this.tracer = tracer;
-        this.timeout = timeout;
+        this.flowTimeout = flowTimeout;
         this.httpFlowControlClient = httpFlowControlClient;
         this.ignoredPaths = ignoredPaths;
         this.ignoredPathsMatchRegex = ignoredPathsMatchRegex;
@@ -49,11 +60,21 @@ public final class ApertureSDK {
     /**
      * Returns a new {@link ApertureSDKBuilder} for configuring an instance of {@linkplain
      * ApertureSDK the Aperture SDK}.
+     *
+     * @return A new ApertureSDKBuilder object.
      */
     public static ApertureSDKBuilder builder() {
         return new ApertureSDKBuilder();
     }
 
+    /**
+     * Starts a new flow, asking the Aperture Agent to accept or reject it based on provided labels.
+     * Additional labels will be extracted from current Baggage context.
+     *
+     * @param controlPoint Name of the control point
+     * @param explicitLabels Labels sent to Aperture Agent
+     * @return A Flow object
+     */
     public Flow startFlow(String controlPoint, Map<String, String> explicitLabels) {
         Map<String, String> labels = new HashMap<>();
 
@@ -90,12 +111,12 @@ public final class ApertureSDK {
 
         CheckResponse res = null;
         try {
-            if (timeout.isZero()) {
+            if (flowTimeout.isZero()) {
                 res = this.flowControlClient.check(req);
             } else {
                 res =
                         this.flowControlClient
-                                .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
                                 .check(req);
             }
         } catch (StatusRuntimeException e) {
@@ -106,8 +127,19 @@ public final class ApertureSDK {
         return new Flow(res, span, false);
     }
 
-    public TrafficFlow startTrafficFlow(String path, CheckHTTPRequest req) {
+    /**
+     * Starts a new flow, asking the Aperture Agent to accept or reject it based on provided HTTP
+     * request parameters.
+     *
+     * @param req A {@link TrafficFlowRequest} containing configured HTTP request parameters.
+     * @return A TrafficFlow object
+     */
+    public TrafficFlow startTrafficFlow(TrafficFlowRequest req) {
+        CheckHTTPRequest checkHTTPRequest = req.getCheckHTTPRequest();
+        String path = checkHTTPRequest.getRequest().getPath();
+
         if (isIgnored(path)) {
+            logger.debug("Path " + path + " is set to be ignored.");
             return TrafficFlow.ignoredFlow();
         }
 
@@ -120,13 +152,13 @@ public final class ApertureSDK {
 
         CheckHTTPResponse res = null;
         try {
-            if (timeout.isZero()) {
-                res = this.httpFlowControlClient.checkHTTP(req);
+            if (flowTimeout.isZero()) {
+                res = this.httpFlowControlClient.checkHTTP(checkHTTPRequest);
             } else {
                 res =
                         this.httpFlowControlClient
-                                .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-                                .checkHTTP(req);
+                                .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .checkHTTP(checkHTTPRequest);
             }
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked

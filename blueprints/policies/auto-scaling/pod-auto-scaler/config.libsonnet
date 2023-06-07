@@ -14,10 +14,6 @@ local autoScalingDefaults = import '../base/config-defaults.libsonnet';
 * @param (policy.promql_scale_in_controllers: []promql_scale_in_controller required) List of scale in controllers.
 * @param (policy.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters required) Parameters that define the scaling behavior.
 * @param (policy.scaling_backend: aperture.spec.v1.AutoScalerScalingBackend required) Scaling backend for the policy.
-* @param (policy.scaling_backend.kubernetes_replicas: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas required) Kubernetes replicas scaling backend.
-* @param (policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector: aperture.spec.v1.KubernetesObjectSelector required) Kubernetes object selector.
-* @param (policy.scaling_backend.kubernetes_replicas.min_replicas: string required) Minimum number of replicas.
-* @param (policy.scaling_backend.kubernetes_replicas.max_replicas: string required) Maximum number of replicas.
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) List of additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.

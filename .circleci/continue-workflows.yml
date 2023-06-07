@@ -500,6 +500,16 @@ jobs:
           use-buildkit: true
           extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
       - aperture_docker_build:
+          step-name: Build traffic flow example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/trafficflow/Dockerfile
+          image: aperture-java-traffic-flow
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
           step-name: Build armeria example image
           docker-context: <<parameters.docker-context>>
           dockerfile: dockerfiles/middlewares/armeria/Dockerfile
@@ -568,6 +578,13 @@ jobs:
           command: >
             go run cmd/sdk-validator/main.go
             -sdk-docker-image=<<parameters.registry>>/aperture-java-feature-flow:<<parameters.tag>>
+            -port=<<parameters.port>> -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
+      - run:
+          name: Run SDK Validator against traffic flow example
+          command: >
+            go run cmd/sdk-validator/main.go
+            -sdk-docker-image=<<parameters.registry>>/aperture-java-traffic-flow:<<parameters.tag>>
             -port=<<parameters.port>> -requests=<<parameters.requests>>
             -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
       - run:

@@ -1,7 +1,6 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -24,23 +23,24 @@ public class ApertureFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        CheckHTTPRequest checkRequest = ServletUtils.checkRequestFromRequest(req, controlPointName);
+        TrafficFlowRequest trafficFlowRequest =
+                ServletUtils.trafficFlowRequestFromRequest(req, controlPointName);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
         String path = request.getServletPath();
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 
         if (flow.ignored()) {
             chain.doFilter(request, response);
             return;
         }
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+                (flowDecision == FlowDecision.Accepted
+                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
 
         if (flowAccepted) {
             try {
@@ -106,7 +106,7 @@ public class ApertureFilter implements Filter {
             builder.setHost(agentHost);
             builder.setPort(Integer.parseInt(agentPort));
             if (timeoutMs != null) {
-                builder.setDuration(Duration.ofMillis(Integer.parseInt(timeoutMs)));
+                builder.setFlowTimeout(Duration.ofMillis(Integer.parseInt(timeoutMs)));
             }
             builder.useInsecureGrpc(insecureGrpc);
             if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {

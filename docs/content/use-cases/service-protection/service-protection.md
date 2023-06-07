@@ -2,17 +2,32 @@
 title: Service Protection
 keywords:
   - tutorial
-sidebar_position: 2
+sidebar_position: 1
 sidebar_label: Service Protection
 ---
 
 ## Overview
 
-Service Protection is an approach tailored to modulate the rate of requests,
-taking into consideration the current health status of the service. By serving
-as an immediate and cost-effective alternative to auto-scaling, this policy acts
-as the first line of defense against overwhelming service loads by limiting the
-number of concurrent requests to a service.
+Service protection is a strategy implemented by Aperture that leverages
+closed-loop feedback of service health telemetry to dynamically adjust the rate
+of requests processed by a service. This adjustment is managed by Aperture
+agents, which provide a virtual request queue at the service's entry point.
+
+The queue adjusts the rate of requests in real-time based on the service's
+health, effectively mitigating potential service disruptions and maintaining
+optimal performance under varying load conditions. This strategic management of
+service load not only maximizes infrastructure utilization and service uptime,
+but also ensures the fair admission of requests into the service based on the
+priority and weight of each request.
+
+Service overloads can result from a wide variety of failure scenarios, such as
+cascading failures where a subset of service instances cause a wider outage, or
+service slowdowns that result in failure at dependent services. Metastable
+failures, where a system remains in a degraded state long after the original
+failure condition has passed, can also lead to service overloads. In such
+complex failure scenarios, Aperture's service protection feature offers a
+reliable safeguard, ensuring that your system maintains optimal performance and
+uptime.
 
 <Zoom>
 
@@ -22,11 +37,11 @@ number of concurrent requests to a service.
 
 </Zoom>
 
-The provided graph illustrates a simplified version of the Service Protection
-Policy. The policy is housed within the controller, which analyzes health
-signals in real-time. Based on these metrics, it calculates an adjusted request
-rate which is relayed to the Agent. The Agent then imposes a rate limit on the
-service as required.
+The diagram illustrates the working of a service protection policy. The policy
+is evaluated at the controller, which analyzes health signals in real-time.
+Based on these metrics, it calculates a load multiplier, which is relayed to the
+agents. The agents then adjust the rate of requests locally based on the load
+multiplier applied to the recent rate of requests.
 
 :::note
 
@@ -36,13 +51,15 @@ observation of an upstream service in relation to a downstream service.
 
 :::
 
-## Real World Scenario
+## Example Scenario
 
-For Service Protection, consider an e-commerce platform during a major sale
-event. To handle the increased traffic, the service protection policy will
-monitor the health of the service and modulate the request rate. This ensures
-smooth operation by preventing service overloads that could lead to crashes,
-therefore providing a consistent user experience.
+Consider the scenario of an e-commerce platform during a major sale event. To
+handle the increased traffic, the service protection policy will monitor the
+health of the service to detect overloads. The request rate will be adjusted in
+case the service begins to deteriorate. This prevents service overloads, which
+reduce good throughput and lead to cascading failures. Service protection policy
+ensures smooth service operation and a consistent user experience for a
+successful sales event.
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';

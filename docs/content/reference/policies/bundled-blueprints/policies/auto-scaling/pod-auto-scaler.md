@@ -63,7 +63,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale out controllers.'
     type='Array of Object (promql_scale_out_controller)'
     reference='#promql-scale-out-controller'
-    value='[{"alerter": {"alert_name": "Scale out controller Alerter"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 1}]'
+    value='[{"alerter": {"alert_name": "A controller intends to scale out"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 1}]'
 />
 
 <!-- vale on -->
@@ -77,7 +77,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale in controllers.'
     type='Array of Object (promql_scale_in_controller)'
     reference='#promql-scale-in-controller'
-    value='[{"alerter": {"alert_name": "Scale in controller Alerter"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 0.5}]'
+    value='[{"alerter": {"alert_name": "A controller intends to scale in"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 0.5}]'
 />
 
 <!-- vale on -->
