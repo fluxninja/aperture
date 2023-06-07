@@ -36,7 +36,7 @@ export let options = {
 export default function () {
   let userType = __ENV.USER_TYPE;
   let userId = vu.idInTest;
-  const url = "http://kong-server.demoapp.svc.cluster.local:8000/service1";
+  const url = "http://kong-server.demoapp.svc.cluster.local:8000/service1/request";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
@@ -48,7 +48,7 @@ export default function () {
     request: [
       [
         {
-          destination: "kong-server.demoapp.svc.cluster.local:8000/service1",
+          destination: "kong-server.demoapp.svc.cluster.local:8000/service1/request",
         },
         {
           destination: "kong-server.demoapp.svc.cluster.local:8000/service2",

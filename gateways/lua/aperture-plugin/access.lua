@@ -32,29 +32,13 @@ local tp = otlp_tracer_provider_new(simple_span_processor, {
 })
 local otlp_tracer = tp:tracer("aperture-lua")
 
-return function(destination_hostname, destination_port, control_point)
+return function(control_point)
   local request = ngx.req
   request.read_body()
   local request_headers = ngx.req.get_headers()
 
-  local server_addr = ""
-  local server_port = ""
-
-  if destination_hostname ~= nil and destination_hostname ~= "" then
-    server_addr = socket.dns.toip(destination_hostname)
-  end
-
-  if server_addr == "" then
-    server_addr = ngx.var.server_addr
-  end
-
-  if destination_port ~= nil and destination_port ~= "" then
-    server_port = destination_port
-  end
-
-  if server_port == "" then
-    server_port = ngx.var.server_port
-  end
+  local server_addr = ngx.var.server_addr
+  local server_port = ngx.var.server_port
 
   local socket_type = ngx.var.server_protocol
   if socket_type ~= "UDP" then
@@ -69,9 +53,9 @@ return function(destination_hostname, destination_port, control_point)
       port = ngx.var.remote_port
     },
     destination = {
-      address = server_addr,
+      address = ngx.var.server_addr,
       protocol = socket_type,
-      port = server_port
+      port = ngx.var.server_port
     },
     request = {
       method = request.get_method(),
