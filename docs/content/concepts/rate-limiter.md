@@ -1,6 +1,6 @@
 ---
 title: Rate Limiter
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 :::info
@@ -78,6 +78,6 @@ Please refer to the [reference][reference] for more details on how to use this
 feature.
 
 [reference]: /reference/policies/spec.md#rate-limiter
-[agent-group]: /concepts/flow-control/selector.md#agent-group
+[agent-group]: /concepts/selector.md#agent-group
 [policies]: /concepts/advanced/policy.md
-[flow-label]: /concepts/flow-control/flow-label.md
+[flow-label]: /concepts/flow-label.md

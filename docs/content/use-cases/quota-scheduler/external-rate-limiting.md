@@ -23,8 +23,8 @@ prioritized access for critical workloads. This policy builds upon the
 [`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
 Blueprint, which comprises components like the token bucket rate limiting to
 ensure quota limits and a
-[Weighted Fair Queuing (WFQ)](/concepts/flow-control/load-scheduler.md#scheduler)
-based Workload Scheduler to assure prioritized access for critical workloads.
+[Weighted Fair Queuing (WFQ)](/concepts/load-scheduler.md#scheduler) based
+Workload Scheduler to assure prioritized access for critical workloads.
 
 ## Policy
 

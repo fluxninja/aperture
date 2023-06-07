@@ -202,7 +202,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
-[control-point]: ./selector.md#control-point
+[control-point]: ./control-point.md
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-sdks]: /integrations/flow-control/sdk/sdk.md

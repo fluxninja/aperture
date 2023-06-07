@@ -27,9 +27,9 @@ To achieve this, the policy makes use of an
 instances allocated to the service. Load-based auto-scaling is achieved by
 defining a scale-out _Controller_ that acts on the load multiplier signal from
 the service protection policy. This signal measures the fraction of traffic that
-the [_Load Scheduler_](/concepts/flow-control/load-scheduler.md) is throttling
-into a queue. The _Auto Scaler_ is configured to scale-out using a _Gradient
-Controller_ based on this signal and a setpoint of 1.0.
+the [_Load Scheduler_](/concepts/load-scheduler.md) is throttling into a queue.
+The _Auto Scaler_ is configured to scale-out using a _Gradient Controller_ based
+on this signal and a setpoint of 1.0.
 
 In addition to load-based scaling, the policy includes a scale-in _Controller_
 based on CPU utilization. These _Controllers_ adjust the resources allocated to

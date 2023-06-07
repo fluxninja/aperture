@@ -436,7 +436,7 @@ component's docs on how exactly it handles invalid inputs.
 
 > :::info
 
-See also [Classifier overview](/concepts/flow-control/classifier.md).
+See also [Classifier overview](/concepts/classifier.md).
 
 ::: Example
 
@@ -468,11 +468,10 @@ It can be used to define flow classification rules by writing custom queries
 that extract values from request metadata. For simple cases, such as directly
 reading a value from header or a field from JSON body, declarative extractors
 are recommended. | | | rules | map of [Rule](#rule)| `map[string]Rule` | | | A
-map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to rules that define how
-to extract and propagate flow labels with that key. | | | selectors |
-[][Selector](#selector)| `[]*Selector` | ✓ | | Selectors for flows that will be
-classified by this _Classifier_. | |
+map of {key, value} pairs mapping from [flow label](/concepts/flow-label.md)
+keys to rules that define how to extract and propagate flow labels with that
+key. | | | selectors | [][Selector](#selector)| `[]*Selector` | ✓ | | Selectors
+for flows that will be classified by this _Classifier_. | |
 
 ### <span id="classifier-info-error"></span> ClassifierInfoError
 
@@ -1025,7 +1024,7 @@ The histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
+See also [Flux Meter overview](/concepts/flux-meter.md).
 
 :::
 Example:
@@ -1511,14 +1510,14 @@ operator is Exists or DoesNotExist, the values array must be empty. | |
 
 **Properties**
 
-| Name                 | Type   | Go type  | Required | Default     | Description                                                              | Example |
-| -------------------- | ------ | -------- | :------: | ----------- | ------------------------------------------------------------------------ | ------- |
-| agent_group          | string | `string` |          | `"default"` | Which [agent-group](/concepts/flow-control/selector.md#agent-group) this |
+| Name                 | Type   | Go type  | Required | Default     | Description                                                 | Example |
+| -------------------- | ------ | -------- | :------: | ----------- | ----------------------------------------------------------- | ------- |
+| agent_group          | string | `string` |          | `"default"` | Which [agent-group](/concepts/selector.md#agent-group) this |
 | selector applies to. |        |
-| api_version          | string | `string` |    ✓     |             |                                                                          |         |
-| kind                 | string | `string` |    ✓     |             | Kubernetes resource type.                                                |         |
-| name                 | string | `string` |    ✓     |             | Kubernetes resource name.                                                |         |
-| namespace            | string | `string` |    ✓     |             | Kubernetes namespace that the resource belongs to.                       |         |
+| api_version          | string | `string` |    ✓     |             |                                                             |         |
+| kind                 | string | `string` |    ✓     |             | Kubernetes resource type.                                   |         |
+| name                 | string | `string` |    ✓     |             | Kubernetes resource name.                                   |         |
+| namespace            | string | `string` |    ✓     |             | Kubernetes namespace that the resource belongs to.          |         |
 
 ### <span id="label-matcher"></span> LabelMatcher
 
@@ -1705,7 +1704,7 @@ previous step's `target_accept_percentage` to the next
 
 > :::info
 
-See also [_Load Scheduler_ overview](/concepts/flow-control/load-scheduler.md).
+See also [_Load Scheduler_ overview](/concepts/load-scheduler.md).
 
 :::
 
@@ -2224,7 +2223,7 @@ The query must return a single value either as a scalar or as a vector with a si
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flow-control/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+[Flux Meter](/concepts/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
 Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
 The particular Flux Meter can be identified with the `flux_meter_name` label.
 There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
@@ -2339,7 +2338,7 @@ Aperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/m
 
 > :::info
 
-See also [_Rate Limiter_ overview](/concepts/flow-control/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/rate-limiter.md).
 
 :::
 
@@ -2395,7 +2394,7 @@ will fill tokens specified by `fill_amount` signal. |  |
 | label_key | string| `string` |  | | Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/flow-label.md) with given key.
+[label](/concepts/flow-label.md) with given key.
 For example, to give each user a separate limit, assuming you
 have a _user_ flow
 label set up, set `label_key: "user"`.
@@ -2435,7 +2434,7 @@ The label value must be a valid uint64 number. |  |
 
 :::info
 
-You can use the [live-preview](/concepts/flow-control/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+You can use the [live-preview](/concepts/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 
 :::
 
@@ -2464,11 +2463,10 @@ rego:
 | ------ | ---------------------------------------------------- | -------------------------------- | :------: | ------- | ---------------------------------------- | ------- |
 | labels | map of [RegoLabelProperties](#rego-label-properties) | `map[string]RegoLabelProperties` |    ✓     |         | A map of {key, value} pairs mapping from |
 
-[flow label](/concepts/flow-control/flow-label.md) keys to queries that define
-how to extract and propagate flow labels with that key. The name of the label
-maps to a variable in the Rego module. It maps to `data.<package>.<label>`
-variable. | | | module | string| `string` | ✓ | | Source code of the Rego
-module.
+[flow label](/concepts/flow-label.md) keys to queries that define how to extract
+and propagate flow labels with that key. The name of the label maps to a
+variable in the Rego module. It maps to `data.<package>.<label>` variable. | | |
+module | string| `string` | ✓ | | Source code of the Rego module.
 
 :::note
 
@@ -2500,12 +2498,12 @@ for sensitive labels.
 ### <span id="regulator"></span> Regulator
 
 > _Regulator_ is a component that regulates the load at a
-> [_Control Point_](/concepts/flow-control/selector.md/#control-point) by
-> allowing only a specified percentage of flows at random or by sticky sessions.
+> [_Control Point_](/concepts/control-point.md) by allowing only a specified
+> percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [\_Load Regulator overview](/concepts/flow-control/regulator.md).
+See also [\_Load Regulator overview](/concepts/regulator.md).
 
 :::
 
@@ -2697,9 +2695,9 @@ number of tokens for this flow.
   [][SchedulerWorkload](#scheduler-workload)| `[]*SchedulerWorkload` | | | List
   of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-allows for load throttling to be "intelligent" instead of queueing flows in an
-arbitrary order. There are two aspects of this "intelligence":
+Categorizing [flows](/concepts/flow-control.md#flow) into workloads allows for
+load throttling to be "intelligent" instead of queueing flows in an arbitrary
+order. There are two aspects of this "intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands that
   flows belonging to different classes have different weights (for example,
@@ -2715,7 +2713,7 @@ workloads, the first matching one will be used. If none of workloads match,
 :::info
 
 See also
-[workload definition in the concepts section](/concepts/flow-control/load-scheduler.md#workload).
+[workload definition in the concepts section](/concepts/load-scheduler.md#workload).
 
 ::: | |
 
@@ -2726,11 +2724,11 @@ See also
 
 **Properties**
 
-| Name                                                 | Type                                                          | Go type                       | Required | Default | Description                                                  | Example |
-| ---------------------------------------------------- | ------------------------------------------------------------- | ----------------------------- | :------: | ------- | ------------------------------------------------------------ | ------- |
-| label_matcher                                        | [LabelMatcher](#label-matcher)                                | `LabelMatcher`                |          |         | Label Matcher to select a Workload based on                  |
-| [flow labels](/concepts/flow-control/flow-label.md). |                                                               |
-| parameters                                           | [SchedulerWorkloadParameters](#scheduler-workload-parameters) | `SchedulerWorkloadParameters` |          |         | Parameters associated with flows matching the label matcher. |         |
+| Name                       | Type                                                          | Go type                       | Required | Default | Description                                                  | Example |
+| -------------------------- | ------------------------------------------------------------- | ----------------------------- | :------: | ------- | ------------------------------------------------------------ | ------- |
+| label_matcher              | [LabelMatcher](#label-matcher)                                | `LabelMatcher`                |          |         | Label Matcher to select a Workload based on                  |
+| [flow labels](/concepts/). |                                                               |
+| parameters                 | [SchedulerWorkloadParameters](#scheduler-workload-parameters) | `SchedulerWorkloadParameters` |          |         | Parameters associated with flows matching the label matcher. |         |
 
 ### <span id="scheduler-workload-parameters"></span> SchedulerWorkloadParameters
 
@@ -2743,10 +2741,10 @@ See also
 | ------------ | ------ | -------- | :------: | ------- | ----------------------------------------------------------------------------------- | ------- |
 | fairness_key | string | `string` |          |         | Fairness key is a label key that can be used to provide fairness within a workload. |
 
-Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For
-example, if you have a classifier that sets `user` flow label, you might want to
-set `fairness_key = "user"`. | | | priority | int64 (formatted integer)| `int64`
-| | | $$ \text{virtual_finish_time} = \text{virtual_time} + \left(\text{tokens}
+Any [flow label](/concepts/flow-label.md) can be used here. For example, if you
+have a classifier that sets `user` flow label, you might want to set
+`fairness_key = "user"`. | | | priority | int64 (formatted integer)| `int64` | |
+| $$ \text{virtual_finish_time} = \text{virtual_time} + \left(\text{tokens}
 \cdot \left(\text{256} - \text{priority}\right)\right)
 
 $$
@@ -2764,12 +2762,12 @@ in the flow labels. |  |
 
 
 > Selects flows based on control point, flow labels, agent group and the service
-that the [flow control component](/concepts/flow-control/flow-control.md#components)
+that the [flow control component](/concepts/flow-control.md#components)
 will operate on.
 
 :::info
 
-See also [Selector overview](/concepts/flow-control/selector.md).
+See also [Selector overview](/concepts/
 
 :::
 
@@ -2800,7 +2798,7 @@ label_matcher:
 
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
-| agent_group | string| `string` |  | `"default"`| [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
+| agent_group | string| `string` |  | `"default"`| [_Agent Group_](/concepts/gent-group) this
 selector applies to.
 
 :::info
@@ -2810,17 +2808,17 @@ The agents within an agent group receive exact same policy configuration and
 form a peer to peer cluster to constantly share state.
 
 ::: |  |
-| control_point | string| `string` | ✓ | | [Control Point](/concepts/flow-control/selector.md#control-point)
+| control_point | string| `string` | ✓ | | [Control Point](/concepts/control-point.md)
 identifies location within services where policies can act on flows.
 For an SDK based insertion,
 a _Control Point_ can represent a particular feature or execution
 block within a service. In case of service mesh or middleware insertion, a
 _Control Point_ can identify ingress or egress calls or distinct listeners
 or filter chains. |  |
-| label_matcher | [LabelMatcher](#label-matcher)| `LabelMatcher` |  | | [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
+| label_matcher | [LabelMatcher](#label-matcher)| `LabelMatcher` |  | | [Label Matcher](/concepts/selector.md#label-matcher)
 can be used to match flows based on flow labels. |  |
 | service | string| `string` |  | `"any"`| The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/selector.md) to select.
+[service](/concepts/selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 

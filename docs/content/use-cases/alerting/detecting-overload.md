@@ -25,7 +25,7 @@ reducing the need for manual tuning of alert policies for individual services.
 
 One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be reported using
-a [_Flux Meter_](/concepts/flow-control/flux-meter.md).
+a [_Flux Meter_](/concepts/flux-meter.md).
 
 :::tip
 
@@ -33,8 +33,8 @@ To prevent the mixing of latency measurements across different workloads, it's
 recommended to apply the Flux Meter to a single type of workload. For instance,
 if a service has both Select and Insert API calls, it is advised to measure the
 latency of only one of these workloads using a Flux Meter. Refer to the
-[_Selector_](/concepts/flow-control/selector.md) documentation for guidance on
-applying the Flux Meter to a subset of API calls for a service.
+[_Selector_](/concepts/selector.md) documentation for guidance on applying the
+Flux Meter to a subset of API calls for a service.
 
 :::
 

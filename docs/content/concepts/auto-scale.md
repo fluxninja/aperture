@@ -1,6 +1,6 @@
 ---
 title: Auto Scale
-sidebar_position: 2
+sidebar_position: 9
 keywords:
   - auto-scaling
   - Autoscaling
@@ -54,7 +54,7 @@ auto-scaling decisions.
 <Zoom>
 
 ```mermaid
-{@include: ./assets/insertion.mmd}
+{@include: ./assets/gen/auto-scale/insertion.mmd}
 ```
 
 </Zoom>

@@ -20,10 +20,10 @@ critical than personalized recommendations and should be prioritized when
 resources are constrained.
 
 Aperture's
-[weighted fair queuing scheduler](/concepts/flow-control/load-scheduler.md#scheduler)
-enables prioritization of certain flows over others based on their flow labels,
-ensuring that the user experience or revenue is maximized in the face of
-overloads and other failures.
+[weighted fair queuing scheduler](/concepts/load-scheduler.md#scheduler) enables
+prioritization of certain flows over others based on their flow labels, ensuring
+that the user experience or revenue is maximized in the face of overloads and
+other failures.
 
 ## Policy
 
@@ -37,18 +37,18 @@ service than guest users. Two alternative methods will be used to provide the
   `subscriber`, since all HTTP headers are directly available as flow labels
   within the scheduler.
 - Guests: To identify guest users, a classification rule will be used that
-  utilizes an [extractor](/concepts/flow-control/classifier.md#extractors) to
-  assign the header value to the `user-type` flow label key. The `user_type`
-  label key will then be used in the scheduler to match the request against the
-  `guest` value to identify the workload.
+  utilizes an [extractor](/concepts/classifier.md#extractors) to assign the
+  header value to the `user-type` flow label key. The `user_type` label key will
+  then be used in the scheduler to match the request against the `guest` value
+  to identify the workload.
 
 :::tip
 
 Classification rules can be written for
-[HTTP requests](/concepts/flow-control/classifier.md#live-previewing-requests),
-and scheduler priorities can be defined for
-[Flow Labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them first using introspection APIs.
+[HTTP requests](/concepts/classifier.md#live-previewing-requests), and scheduler
+priorities can be defined for
+[Flow Labels](/concepts/flow-label.md#live-previewing-flow-labels) by live
+previewing them first using introspection APIs.
 
 :::
 

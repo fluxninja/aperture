@@ -53,7 +53,7 @@ control points with less code changes:
 
 <DocCardList />
 
-[control-point]: /concepts/flow-control/selector.md#control-point
+[control-point]: /concepts/control-point.md
 [istio]: ../envoy/istio.md
 [golang]: ./go/manual.md
 [java]: ./java/manual.md

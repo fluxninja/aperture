@@ -82,7 +82,7 @@ features over background workloads.
 
 Aperture Agents can be installed on a variety of infrastructure such as
 Kubernetes, VMs, or bare-metal. They integrate with Service Meshes or can be
-used with SDKs to provide [flow control](/concepts/flow-control/flow-control.md)
+used with SDKs to provide [flow control](/concepts/flow-control.md)
 capabilities. Additionally, agents work with auto-scaling APIs for platforms
 such as Kubernetes, to help scale infrastructure when needed.
 

@@ -13,17 +13,16 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 One of the simplest flow control policies is static rate limiting to regulate
-heavy-hitters. It uses the
-[Rate-Limiting Actuator](/concepts/flow-control/rate-limiter.md) to block
-specific flow labels that exceed their quota within a certain time frame (limit
-reset interval).
+heavy-hitters. It uses the [Rate-Limiting Actuator](/concepts/rate-limiter.md)
+to block specific flow labels that exceed their quota within a certain time
+frame (limit reset interval).
 
 ## Policy
 
 This example demonstrates rate limiting of unique users based on the `User-Id`
 header in the HTTP traffic. Envoy proxy provides this header under the label key
-`http.request.header.user_id` (see
-[Flow Labels](/concepts/flow-control/flow-label.md) for more information).
+`http.request.header.user_id` (see [Flow Labels](/concepts/flow-label.md) for
+more information).
 
 This configuration limits each user to a burst of `40 requests` and `2 requests`
 every `1s` period using the rate limiter. Additionally, the rate limiter applies

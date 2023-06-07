@@ -1,6 +1,6 @@
 ---
 title: Classifier
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 :::info
@@ -220,8 +220,8 @@ See [full example in reference][reference]
 [attr-context]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
-[label]: /concepts/flow-control/flow-label.md
-[baggage]: /concepts/flow-control/flow-label.md#baggage
+[label]: /concepts/flow-label.md
+[baggage]: /concepts/flow-label.md#baggage
 [request-labels]: ./flow-label.md#request-labels
 [reference]: /reference/policies/spec.md#classifier
 [rule]: /reference/policies/spec.md#rule
@@ -233,6 +233,6 @@ See [full example in reference][reference]
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ./selector.md#control-point
+[control-point]: ./control-point.md
 [install-istio]: /integrations/flow-control/envoy/istio.md
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
