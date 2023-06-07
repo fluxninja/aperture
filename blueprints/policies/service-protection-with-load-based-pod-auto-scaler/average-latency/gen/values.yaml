@@ -65,7 +65,7 @@ dashboard:
   datasource:
     filter_regex: ""
     name: "$datasource"
-  extra_filters:
+  extra_filters: {}
   refresh_interval: "15s"
   time_from: "now-15m"
   time_to: "now"
