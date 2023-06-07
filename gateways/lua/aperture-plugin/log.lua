@@ -27,7 +27,8 @@ return function(config)
       span:set_attributes(otlp_attr.int("REQUEST_TX_DURATION", upstream_connect_time * 1000))
     end
     if upstream_response_time ~= nil and upstream_header_time ~= nil then
-      span:set_attributes(otlp_attr.int("RESPONSE_TX_DURATION", math.floor((upstream_response_time - upstream_header_time) * 1000)))
+      span:set_attributes(otlp_attr.int("RESPONSE_TX_DURATION",
+        math.floor((upstream_response_time - upstream_header_time) * 1000)))
     end
     span:set_attributes(otlp_attr.int("aperture.flow_end_timestamp", math.floor(socket.gettime() * 1000)))
     span:set_attributes(otlp_attr.string("aperture.check_response", ngx.ctx.aperture_check_reponse))
