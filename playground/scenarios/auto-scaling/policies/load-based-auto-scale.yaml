@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=file:/home/hardik/Work/fluxninja/aperture/blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency/gen/definitions.json
 # Generated values file for policies/service-protection-with-load-based-pod-auto-scaler/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency
@@ -26,30 +26,34 @@ policy:
         - control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
   auto_scaling:
-    # Kubernetes replicas scaling backend.
-    # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
-    # Required: True
-    kubernetes_replicas:
-      # Kubernetes object selector.
-      # Type: aperture.spec.v1.KubernetesObjectSelector
+    scaling_backend:
+      # Kubernetes replicas scaling backend.
+      # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
       # Required: True
-      kubernetes_object_selector:
-        agent_group: default
-        api_version: apps/v1
-        kind: Deployment
-        name: service1-demo-app
-        namespace: demoapp
-      # Minimum number of replicas.
-      # Type: string
-      # Required: True
-      min_replicas: "1"
-      # Maximum number of replicas.
-      # Type: string
-      # Required: True
-      max_replicas: "10"
+      kubernetes_replicas:
+        # Kubernetes object selector.
+        # Type: aperture.spec.v1.KubernetesObjectSelector
+        # Required: True
+        kubernetes_object_selector:
+          agent_group: default
+          api_version: apps/v1
+          kind: Deployment
+          name: service1-demo-app
+          namespace: demoapp
+        # Minimum number of replicas.
+        # Type: string
+        # Required: True
+        min_replicas: "1"
+        # Maximum number of replicas.
+        # Type: string
+        # Required: True
+        max_replicas: "10"
     # Dry run mode ensures that no scaling is invoked by this auto scaler.
     # Type: bool
     dry_run: false
+    periodic_decrease:
+      period: "60s"
+      scale_in_percentage: 10
     # Parameters that define the scaling behavior.
     # Type: aperture.spec.v1.AutoScalerScalingParameters
     # Required: True

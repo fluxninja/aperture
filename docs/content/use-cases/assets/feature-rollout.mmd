@@ -1,0 +1,37 @@
+flowchart LR
+
+classDef Controller fill:#F8773D,stroke:#000000,stroke-width:2px;
+classDef Agent fill:#56AE89,stroke:#000000,stroke-width:2px;
+classDef Signal fill:#EFEEED,stroke:#000000,stroke-width:1px;
+classDef Service fill:#56AE89,stroke:#000000,stroke-width:2px;
+classDef On fill:#add8e6,stroke:#000000,stroke-width:1px;
+classDef Off fill:#ffb6c1,stroke:#000000,stroke-width:1px;
+
+Forward("Forward Crieria") --> Controller
+
+Reset("Reset Criteria") --> Controller
+
+subgraph "Controller"
+  policy("Feature Rollout Policy")
+end
+
+Controller -- "Load Ramp 30%" --> Agent
+class Controller Controller
+
+subgraph " "
+Client -- "Incoming requests" --> Agent
+class Agent Agent
+class Client Service
+  subgraph "Agent"
+		Reg("Regulator 🎛️")
+  end
+  subgraph "Service"
+    On("Feature On")
+    class On On
+    Off("Feature Off")
+    class Off Off
+  end
+	class Service Service
+  Agent -- "30%" --> On
+  Agent -- "70%" --> Off
+end

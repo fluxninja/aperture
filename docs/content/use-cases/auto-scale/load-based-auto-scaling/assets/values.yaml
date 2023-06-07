@@ -26,33 +26,41 @@ policy:
         - control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
   auto_scaling:
-    # Kubernetes replicas scaling backend.
-    # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
-    # Required: True
-    kubernetes_replicas:
-      # Kubernetes object selector.
-      # Type: aperture.spec.v1.KubernetesObjectSelector
+    scaling_backend:
+      # Kubernetes replicas scaling backend.
+      # Type: aperture.spec.v1.AutoScalerScalingBackendKubernetesReplicas
       # Required: True
-      kubernetes_object_selector:
-        agent_group: default
-        api_version: apps/v1
-        kind: Deployment
-        name: service1-demo-app
-        namespace: demoapp
-      # Minimum number of replicas.
-      # Type: string
-      # Required: True
-      min_replicas: "1"
-      # Maximum number of replicas.
-      # Type: string
-      # Required: True
-      max_replicas: "10"
+      kubernetes_replicas:
+        # Kubernetes object selector.
+        # Type: aperture.spec.v1.KubernetesObjectSelector
+        # Required: True
+        kubernetes_object_selector:
+          agent_group: default
+          api_version: apps/v1
+          kind: Deployment
+          name: service1-demo-app
+          namespace: demoapp
+        # Minimum number of replicas.
+        # Type: string
+        # Required: True
+        min_replicas: "1"
+        # Maximum number of replicas.
+        # Type: string
+        # Required: True
+        max_replicas: "10"
     # Dry run mode ensures that no scaling is invoked by this auto scaler.
     # Type: bool
     dry_run: false
+    periodic_decrease:
+      period: "60s"
+      scale_in_percentage: 10
     # Parameters that define the scaling behavior.
     # Type: aperture.spec.v1.AutoScalerScalingParameters
     # Required: True
     scaling_parameters:
+      scale_in_alerter:
+        alert_name: "Auto-scaler is scaling in"
       scale_in_cooldown: "40s"
+      scale_out_alerter:
+        alert_name: "Auto-scaler is scaling out"
       scale_out_cooldown: "30s"

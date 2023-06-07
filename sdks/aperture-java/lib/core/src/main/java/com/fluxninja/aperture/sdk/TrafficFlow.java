@@ -10,6 +10,10 @@ import com.google.rpc.Code;
 import io.opentelemetry.api.trace.Span;
 import org.apache.http.HttpStatus;
 
+/**
+ * A Flow that can be accepted or rejected by Aperture Agent based on provided HTTP request
+ * parameters.
+ */
 public class TrafficFlow {
     private final CheckHTTPResponse checkResponse;
     private final Span span;
@@ -61,7 +65,7 @@ public class TrafficFlow {
      * Returns whether the flow should be allowed to run, based on flow fail-open configuration and
      * Aperture Agent response.
      *
-     * @return Whether the flow should be allowed to run
+     * @return Whether the flow should be allowed to run.
      */
     public boolean shouldRun() {
         return getDecision() == FlowDecision.Accepted
@@ -79,10 +83,20 @@ public class TrafficFlow {
         return this;
     }
 
+    /**
+     * Returns 'true' if the flow should be ignored based on provided path ignore configuration.
+     *
+     * @return Whether the flow should be ignored.
+     */
     public boolean ignored() {
         return this.ignored;
     }
 
+    /**
+     * Returns raw CheckHTTPResponse returned by Aperture Agent.
+     *
+     * @return raw CheckHTTPResponse returned by Aperture Agent.
+     */
     public CheckHTTPResponse checkResponse() {
         return this.checkResponse;
     }
@@ -106,6 +120,11 @@ public class TrafficFlow {
         }
     }
 
+    /**
+     * Ends the flow, notifying the Aperture Agent whether it succeeded.
+     *
+     * @param statusCode Status of the finished flow.
+     */
     public void end(FlowStatus statusCode) throws ApertureSDKException {
         if (this.ignored) {
             // span has not been started, and so doesn't need to be ended.

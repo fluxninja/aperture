@@ -1,7 +1,6 @@
 package com.fluxninja.aperture.netty;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,11 +42,11 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
-        CheckHTTPRequest checkRequest =
-                NettyUtils.checkRequestFromRequest(ctx, req, controlPointName);
+        TrafficFlowRequest trafficFlowRequest =
+                NettyUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName);
         String path = new QueryStringDecoder(req.uri()).path();
 
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 
         if (flow.ignored()) {
             ctx.fireChannelRead(req);

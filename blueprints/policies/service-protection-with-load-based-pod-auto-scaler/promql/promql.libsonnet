@@ -1,6 +1,6 @@
 {
   config: import 'config.libsonnet',
-  policy: import 'policy.libsonnet',
-  dashboard: import 'dashboard.libsonnet',
+  policy: import '../../service-protection/promql/policy.libsonnet',
+  dashboard: import '../../service-protection/promql/dashboard.libsonnet',
   bundle: import 'bundle.libsonnet',
 }

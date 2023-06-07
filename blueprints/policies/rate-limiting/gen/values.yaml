@@ -46,7 +46,7 @@ dashboard:
   refresh_interval: "10s"
   # Additional filters to pass to each query to Grafana datasource.
   # Type: map[string]string
-  extra_filters:
+  extra_filters: {}
   datasource:
     # Datasource name.
     # Type: string

@@ -4,7 +4,7 @@ loguru==0.7.0
 MarkupSafe==2.1.2
 prance==0.22.11.4.0
 requests==2.29.0
-typer==0.7.0
+typer==0.9.0
 openapi2jsonschema==0.9.1
 ordered-set==4.1.0
 python-slugify==8.0.1

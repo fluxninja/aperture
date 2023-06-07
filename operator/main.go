@@ -98,6 +98,12 @@ func main() {
 		leaderElectionID = "a4362587-controller.fluxninja.com"
 	}
 
+	server := webhook.NewServer(webhook.Options{
+		CertDir:  os.Getenv("APERTURE_OPERATOR_CERT_DIR"),
+		CertName: os.Getenv("APERTURE_OPERATOR_CERT_NAME"),
+		KeyName:  os.Getenv("APERTURE_OPERATOR_KEY_NAME"),
+	})
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -105,6 +111,7 @@ func main() {
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       leaderElectionID,
+		WebhookServer:          server,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -135,18 +142,11 @@ func main() {
 	// Checking if the minimum Kubernetes version is satisfied
 	controllers.MinimumKubernetesVersionBool = controllers.CurrentKubernetesVersion.AtLeast(apimachineryversion.MustParseSemantic(controllers.MinimumKubernetesVersion))
 
-	var server *webhook.Server
-
 	if agentManager || controllerManager {
 		if err = controllers.CheckAndGenerateCertForOperator(ctrl.GetConfigOrDie()); err != nil {
 			setupLog.Error(err, "unable to manage webhook certificates")
 			os.Exit(1)
 		}
-
-		server = mgr.GetWebhookServer()
-		server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
-		server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
-		server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
 
 		if err = (&mutatingwebhook.MutatingWebhookReconciler{
 			Client:            mgr.GetClient(),
@@ -214,8 +214,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	ctx := ctrl.SetupSignalHandler()
+	setupLog.Info("starting webhook server")
+	go func() {
+		if err := server.Start(ctx); err != nil {
+			setupLog.Error(err, "unable to run webhook server")
+			os.Exit(1)
+		}
+	}()
+
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}

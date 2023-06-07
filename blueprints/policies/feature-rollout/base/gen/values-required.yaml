@@ -7,7 +7,7 @@
 # Required: True
 policy:
   components: []
-  drivers:
+  drivers: {}
   evaluation_interval: "1s"
   load_ramp:
     regulator:

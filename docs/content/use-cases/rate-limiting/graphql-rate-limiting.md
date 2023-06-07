@@ -13,23 +13,25 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-This tutorial demonstrates how to use the [_Classifier_][rego-rules] to
-implement
-[rate-limiting](/reference/policies/bundled-blueprints/policies/rate-limiting.md)
-for a GraphQL query.
+## Policy Overview
 
-## Policy
+This policy is an example of how to implement
+[rate limiting](../../reference/policies/bundled-blueprints/policies/rate-limiting.md)
+for GraphQL queries using the [_Classifier_][rego-rules].
 
-This tutorial will demonstrate how to implement a policy that uses a
-[_Classifier_][classifier] to extract the `userID` claim from a JWT token in the
-request's Authorization header and then rate limit unique users based on that
-`user_id` [_Flow Label_][flow-label].
+## Policy Configuration
+
+The following policy contains [_Classifier_][classifier] that extracts the
+**`userID`** claim from a JWT token in the request's authorization header and
+then rate limit unique users based on the extracted **`user_id`** [_Flow
+Label_][flow-label]; **`service1-demo-app.demoapp.svc.cluster.local** is
+selected as the target service for this policy.
 
 :::tip
 
-You can write classification rules on
+Classification rules can be written based on
 [HTTP requests](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
-and define scheduler priorities on
+and scheduler priorities can be defined based on
 [Flow Labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first using introspection APIs.
 

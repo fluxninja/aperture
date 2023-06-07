@@ -1,0 +1,3 @@
+simplesrv:
+  concurrency: 0
+  cpuLoadPercentage: 50

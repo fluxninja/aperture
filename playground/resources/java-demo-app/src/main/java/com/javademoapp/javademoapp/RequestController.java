@@ -6,8 +6,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,8 +50,10 @@ public class RequestController {
     private int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "10"));
     private Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "50")));
     private double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0.05"));
+    private int cpuLoad = Integer.parseInt(System.getenv().getOrDefault("CPU_LOAD", "0"));
     private Logger log = LoggerFactory.getLogger(RequestController.class);
     private String hostname = System.getenv().getOrDefault("HOSTNAME", DEFAULT_HOST);
+    private final AtomicInteger ongoingRequests = new AtomicInteger(0);
 
     // Semaphore for limiting concurrent clients
     private Semaphore limitClients = new Semaphore(concurrency);
@@ -116,13 +125,13 @@ public class RequestController {
             // If all subrequests were processed successfully, return success message
             response.setStatus(HttpStatus.OK.value());
             response.getWriter().write(payload);
-
         } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             String msg = "Error occurred: " + e.getMessage();
             log.error(msg);
             return msg;
         }
+
         return "Success";
     }
 
@@ -165,20 +174,74 @@ public class RequestController {
                 throw new RuntimeException(e);
             }
         }
-        if (!latency.isZero() && !latency.isNegative()) {
-            try {
-                // Fake Overload
-                Thread.sleep(latency.toMillis());
-            } catch (InterruptedException e) {
-                log.error("Error while sleeping: " + e.getMessage());
-            }
-        }
 
-        // Release the semaphore
-        if (limitClients != null) {
-            limitClients.release();
+        try {
+            ongoingRequests.incrementAndGet();
+            if (!latency.isZero() && !latency.isNegative()) {
+                if (cpuLoad > 0) {
+                    // Simulate CPU load by busy waiting
+                    int numCores = Runtime.getRuntime().availableProcessors();
+
+                    // Calculate busy wait and sleep durations based on cpuLoad and ongoing requests
+                    double adjustedLoad = (double) cpuLoad / 100 * (double) ongoingRequests.get();
+                    if (adjustedLoad > 100) {
+                        adjustedLoad = 100;
+                    }
+                    double totalDuration = latency.toMillis();
+                    long busyWaitDuration = (long) (totalDuration * adjustedLoad / 100.0);
+                    long sleepDuration = (long) (totalDuration * (100.0 - adjustedLoad) / 100.0);
+
+                    ExecutorService executor = Executors.newFixedThreadPool(numCores);
+                    List<Callable<Void>> tasks = new ArrayList<>();
+                    for (int i = 0; i < numCores; i++) {
+                        tasks.add(() -> {
+                            long startTime = System.currentTimeMillis();
+                            while (System.currentTimeMillis() - startTime < latency.toMillis()) {
+                                busyWait(busyWaitDuration);
+                                try {
+                                    Thread.sleep(sleepDuration);
+                                } catch (InterruptedException e) {
+                                    log.error("Error while sleeping: " + e.getMessage());
+                                }
+                            }
+                            return null;
+                        });
+                    }
+
+                    try {
+                        List<Future<Void>> futures = executor.invokeAll(tasks);
+                        for (Future<Void> future : futures) {
+                            future.get();
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        log.error("Error while waiting for threads: " + e.getMessage());
+                    }
+                } else {
+                    try {
+                        Thread.sleep(latency.toMillis());
+                    } catch (InterruptedException e) {
+                        log.error("Error while sleeping: " + e.getMessage());
+                    }
+                }
+            }
+
+            // Release the semaphore
+            if (limitClients != null) {
+                limitClients.release();
+            }
+            return "Success";
+        } finally {
+            ongoingRequests.decrementAndGet();
         }
-        return "Success";
+    }
+
+    private void busyWait(long duration) {
+        long startTime = System.currentTimeMillis();
+        List<Object> objects = new ArrayList<>();
+        while (System.currentTimeMillis() - startTime < duration) {
+            // Try to make garbage collector busy
+            objects.add(new Object());
+        }
     }
 
     private String forwardRequest(Request request, String destination, HttpHeaders httpHeaders) {
