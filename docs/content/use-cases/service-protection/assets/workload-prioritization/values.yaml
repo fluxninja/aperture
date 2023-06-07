@@ -10,18 +10,6 @@ policy:
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []
-  # Additional resources.
-  # Type: aperture.spec.v1.Resources
-  resources:
-    flow_control:
-      classifiers:
-        - selectors:
-            - service: service1-demo-app.demoapp.svc.cluster.local
-              control_point: ingress
-          rules:
-            user_type:
-              extractor:
-                from: request.http.headers.user-type
   # The interval between successive evaluations of the Circuit.
   # Type: string
   evaluation_interval: "1s"
@@ -40,7 +28,7 @@ policy:
           workloads:
             - label_matcher:
                 match_labels:
-                  user_type: "guest"
+                  http.request.header.user_type: guest
               parameters:
                 priority: 50
             - label_matcher:
@@ -54,5 +42,5 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-        - service: service1-demo-app.demoapp.svc.cluster.local
+        - service: service3-demo-app.demoapp.svc.cluster.local
           control_point: ingress

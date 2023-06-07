@@ -1,0 +1,22 @@
+flowchart LR
+
+classDef Controller fill:#F8773D,stroke:#000000,stroke-width:2px;
+classDef Service fill:#56AE89,stroke:#000000,stroke-width:1px;
+classDef Agent fill:#56AE89,stroke:#000000,stroke-width:2px;
+
+Agent -- "Write" --> Prometheus
+
+Prometheus <-- "Read" --> Controller
+
+subgraph "Controller"
+ Signal("Signal Processing")
+end
+
+Controller -- "Alerting" --> AlertManager
+
+class Controller Controller
+class Agent Agent
+class Prometheus Service
+class AlertManager Service
+
+

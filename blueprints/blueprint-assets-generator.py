@@ -543,9 +543,13 @@ YAML_TPL = """
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/{{ blueprint_name }}
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
+{%- if not value.items() %}
+{{- '{}' }}
+{%- else %}
 {%- for key, val in value.items() %}
 {{ '  ' * (level) }}{{ key }}: {{ render_value(val, level+1) }}
 {%- endfor %}
+{%- endif %}
 {%- elif value is iterable and value is not string %}
 {%- if value | length == 0 %}
 {{- '[]' }}

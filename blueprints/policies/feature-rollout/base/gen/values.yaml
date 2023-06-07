@@ -7,7 +7,7 @@
 # Required: True
 policy:
   components: []
-  drivers:
+  drivers: {}
   evaluation_interval: "1s"
   load_ramp:
     regulator:
@@ -36,7 +36,7 @@ dashboard:
   time_to: "now"
   # Additional filters to pass to each query to Grafana datasource.
   # Type: map[string]string
-  extra_filters:
+  extra_filters: {}
   datasource:
     # Datasource name.
     # Type: string

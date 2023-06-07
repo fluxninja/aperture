@@ -19,7 +19,6 @@ paths:
       operationId: PolicyService_PostDynamicConfig
       parameters:
       - type: string
-        x-go-tag-validate: required
         name: policy_name
         in: path
         required: true
@@ -33,7 +32,6 @@ paths:
           properties:
             dynamic_config:
               type: object
-              x-go-tag-validate: required
       responses:
         "200":
           description: A successful response.
@@ -150,7 +148,6 @@ paths:
       operationId: PolicyService_UpsertPolicy
       parameters:
       - type: string
-        x-go-tag-validate: required
         name: policy_name
         in: path
         required: true
@@ -162,7 +159,6 @@ paths:
           type: object
           properties:
             policy:
-              x-go-tag-validate: required
               $ref: '#/definitions/Policy'
             policy_metadata:
               $ref: '#/definitions/PolicyMetadata'
@@ -185,7 +181,6 @@ paths:
       operationId: PolicyService_UpsertPolicy2
       parameters:
       - type: string
-        x-go-tag-validate: required
         name: policy_name
         in: path
         required: true
@@ -197,7 +192,6 @@ paths:
           type: object
           properties:
             policy:
-              x-go-tag-validate: required
               $ref: '#/definitions/Policy'
             policy_metadata:
               $ref: '#/definitions/PolicyMetadata'
@@ -2747,6 +2741,15 @@ definitions:
       resources:
         description: Resources (such as Flux Meters, Classifiers) to setup.
         $ref: '#/definitions/Resources'
+  PolicyMetadata:
+    type: object
+    properties:
+      blueprint_name:
+        type: string
+      blueprints_uri:
+        type: string
+      values:
+        type: string
   ProcessInfo:
     type: object
     properties:

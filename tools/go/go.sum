@@ -84,10 +84,10 @@ github.com/favadi/protoc-go-inject-tag v1.4.0/go.mod h1:AZ+PK+QDKUOLlBRG0rYiKkUX
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
-github.com/fluxninja/analysis v0.21.2-fn.patch.3 h1:A1829BqfgROVin6LqHELT234hRrwqKkkvdZgh6EZsDg=
-github.com/fluxninja/analysis v0.21.2-fn.patch.3/go.mod h1:4zQ35W4neeZTqh3ol0rv/O8JBbka9QyAgQRPp9y3pfo=
-github.com/fluxninja/go-swagger v0.29.0-fn.patch.13 h1:5SC6FCIXqfljWyG0fdkhUbTuoSqTbwS7v3tj+dTgYBs=
-github.com/fluxninja/go-swagger v0.29.0-fn.patch.13/go.mod h1:h3zeMrYCz5TLTdB7ECf4pTvYEbvWKC1dkPqgNt1r4r0=
+github.com/fluxninja/analysis v0.21.2-fn.patch.5 h1:uYbUvcvvOfdIk1z+kieQC3YgPQCw1P3vie5/MqAyjR4=
+github.com/fluxninja/analysis v0.21.2-fn.patch.5/go.mod h1:4zQ35W4neeZTqh3ol0rv/O8JBbka9QyAgQRPp9y3pfo=
+github.com/fluxninja/go-swagger v0.29.0-fn.patch.15 h1:pLob7Z221xIGKcfRMgcNWGHxNQr2IdQS+e1ugH4jDQE=
+github.com/fluxninja/go-swagger v0.29.0-fn.patch.15/go.mod h1:rb+fRTlO8HTZeiF96bTGSHcnm02BI5F3FD+6+VYh0ok=
 github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmVXmkdnm1bU=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=

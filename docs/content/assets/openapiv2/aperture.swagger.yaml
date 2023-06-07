@@ -4485,7 +4485,6 @@ paths:
                   name: policy_name
                   required: true
                   type: string
-                  x-go-tag-validate: required
                 - in: body
                   name: body
                   required: true
@@ -4494,7 +4493,6 @@ paths:
                     properties:
                         dynamic_config:
                             type: object
-                            x-go-tag-validate: required
                     type: object
             responses:
                 "200":
@@ -4832,7 +4830,6 @@ paths:
                   name: policy_name
                   required: true
                   type: string
-                  x-go-tag-validate: required
                 - in: body
                   name: body
                   required: true
@@ -4841,7 +4838,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                            x-go-tag-validate: required
                         policy_metadata:
                             $ref: '#/definitions/PolicyMetadata'
                         update_mask:
@@ -4868,7 +4864,6 @@ paths:
                   name: policy_name
                   required: true
                   type: string
-                  x-go-tag-validate: required
                 - in: body
                   name: body
                   required: true
@@ -4877,7 +4872,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                            x-go-tag-validate: required
                         policy_metadata:
                             $ref: '#/definitions/PolicyMetadata'
                         update_mask:

@@ -80,8 +80,8 @@ message GetPolicyResponse {
 
 // PostPolicyRequest is a request to create or update Policy.
 message UpsertPolicyRequest {
-  string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
-  Policy policy = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
+  string policy_name = 1 [(validate.rules).string.min_len = 1];
+  Policy policy = 2 [(validate.rules).message.required = true];
   // The paths to update.
   google.protobuf.FieldMask update_mask = 3;
   PolicyMetadata policy_metadata = 4;
@@ -89,8 +89,8 @@ message UpsertPolicyRequest {
 
 // PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
 message PostDynamicConfigRequest {
-  string policy_name = 1 [(validate.rules).string.min_len = 1]; // @gotags: validate:"required"
-  google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true]; // @gotags: validate:"required"
+  string policy_name = 1 [(validate.rules).string.min_len = 1];
+  google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true];
 }
 
 // DeletePolicyRequest is a request to delete a policy with given name.

@@ -129,8 +129,8 @@ type UpsertPolicyRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	PolicyName string  `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty" validate:"required"` // @gotags: validate:"required"
-	Policy     *Policy `protobuf:"bytes,2,opt,name=policy,proto3" json:"policy,omitempty" validate:"required"`                           // @gotags: validate:"required"
+	PolicyName string  `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	Policy     *Policy `protobuf:"bytes,2,opt,name=policy,proto3" json:"policy,omitempty"`
 	// The paths to update.
 	UpdateMask     *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	PolicyMetadata *PolicyMetadata        `protobuf:"bytes,4,opt,name=policy_metadata,json=policyMetadata,proto3" json:"policy_metadata,omitempty"`
@@ -202,8 +202,8 @@ type PostDynamicConfigRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	PolicyName    string           `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty" validate:"required"`          // @gotags: validate:"required"
-	DynamicConfig *structpb.Struct `protobuf:"bytes,2,opt,name=dynamic_config,json=dynamicConfig,proto3" json:"dynamic_config,omitempty" validate:"required"` // @gotags: validate:"required"
+	PolicyName    string           `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	DynamicConfig *structpb.Struct `protobuf:"bytes,2,opt,name=dynamic_config,json=dynamicConfig,proto3" json:"dynamic_config,omitempty"`
 }
 
 func (x *PostDynamicConfigRequest) Reset() {
