@@ -1,7 +1,7 @@
 package com.fluxninja.aperture.netty;
 
-import com.fluxninja.aperture.sdk.Utils;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
+import com.fluxninja.aperture.sdk.TrafficFlowRequestBuilder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
@@ -26,7 +26,7 @@ public class NettyUtils {
         return req;
     }
 
-    protected static CheckHTTPRequest checkRequestFromRequest(
+    protected static TrafficFlowRequest trafficFlowRequestFromRequest(
             ChannelHandlerContext ctx, HttpRequest req, String controlPointName) {
         Map<String, String> baggageLabels = new HashMap<>();
 
@@ -43,12 +43,12 @@ public class NettyUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        CheckHTTPRequest.Builder builder = addHttpAttributes(baggageLabels, ctx, req);
+        TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, ctx, req);
         builder.setControlPoint(controlPointName);
         return builder.build();
     }
 
-    private static CheckHTTPRequest.Builder addHttpAttributes(
+    private static TrafficFlowRequestBuilder addHttpAttributes(
             Map<String, String> headers, ChannelHandlerContext ctx, HttpRequest req) {
 
         HttpHeaders originalHeaders = req.headers();
@@ -87,24 +87,21 @@ public class NettyUtils {
             destinationPort = localAddress.getPort();
         }
 
-        CheckHTTPRequest.Builder builder = CheckHTTPRequest.newBuilder();
+        TrafficFlowRequestBuilder builder = TrafficFlowRequest.newBuilder();
 
-        builder.setRequest(
-                CheckHTTPRequest.HttpRequest.newBuilder()
-                        .setMethod(req.method().toString())
-                        .setPath(new QueryStringDecoder(req.uri()).path())
-                        .setHost(req.headers().get("host"))
-                        .setScheme(scheme)
-                        .setSize(size)
-                        .setProtocol(req.protocolVersion().text())
-                        .putAllHeaders(headers));
+        builder.setHttpMethod(req.method().toString())
+                .setHttpPath(new QueryStringDecoder(req.uri()).path())
+                .setHttpHost(req.headers().get("host"))
+                .setHttpScheme(scheme)
+                .setHttpSize(size)
+                .setHttpProtocol(req.protocolVersion().text())
+                .setHttpHeaders(headers);
 
         if (sourceIp != null && sourcePort != 0) {
-            builder.setSource(Utils.createSocketAddress(sourceIp, sourcePort, "TCP"));
+            builder.setSource(sourceIp, sourcePort, "TCP");
         }
         if (destinationIp != null && destinationPort != 0) {
-            builder.setDestination(
-                    Utils.createSocketAddress(destinationIp, destinationPort, "TCP"));
+            builder.setDestination(destinationIp, destinationPort, "TCP");
         }
         return builder;
     }

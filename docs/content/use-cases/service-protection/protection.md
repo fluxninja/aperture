@@ -1,5 +1,5 @@
 ---
-title: Basic Service Protection
+title: Service Protection
 keywords:
   - policies
   - concurrency
@@ -13,24 +13,32 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-The most effective technique to protect services from cascading failures is to
-limit the concurrency of the service to match the processing capacity of the
-service. However, figuring out the concurrency limit of a service is a hard
-problem in the face of continuously changing service infrastructure. Each new
-version deployed, horizontal scaling, or a change in access patterns can change
-the concurrency limit of a service.
+:::note
 
-This policy learns the latency profile of a service using an exponential moving
-average. Deviation of current latency from the historical latency indicates an
-overload. In case of overload, the policy lowers the rate at which requests are
-admitted into the service, making the excess requests wait in a queue. Once the
-latency improves, the rate of requests is slowly increased to find the maximum
-processing capacity of the service.
+The following policy is based on the
+[Service Protection with Average Latency Feedback](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md)
+blueprint.
 
-## Policy
+:::
 
-This policy uses the Service Protection with Average Latency Feedback
-[Blueprint](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md).
+## Policy Overview
+
+Mitigating cascading failures is essential to maintain service stability, which
+can be achieved effectively by matching a service's concurrency limit with its
+processing capacity. However, determining the precise concurrency limit can be
+challenging due to the evolving nature of service infrastructure. Factors such
+as deployment of new versions, horizontal scaling, or fluctuating access
+patterns can impact the concurrency limit. This policy is designed to address
+this dynamic problem and offer reliable service protection.
+
+## Policy Configuration
+
+In this policy, latency is of **`service1-demo-app.demoapp.svc.cluster.local`**
+is monitored using an exponential moving average. Deviation of current latency
+from the historical latency indicates an overload, which will lead to lower the
+rate at which requests are admitted into the monitored service, making the
+excess requests wait in a queue. Once the latency improves, the rate of requests
+is slowly increased to the maximum processing capacity of the selected service.
 
 ```mdx-code-block
 <Tabs>

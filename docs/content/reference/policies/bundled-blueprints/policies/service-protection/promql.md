@@ -129,7 +129,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
-    value='[{"operator": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "threshold": "__REQUIRED_FIELD__"}]'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -158,6 +158,116 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Boolean'
     reference=''
     value='false'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.auto_scaling {#policy-auto-scaling}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-dry-run"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.dry_run'
+    description='Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.'
+    type='Boolean'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-promql-scale-out-controllers"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.promql_scale_out_controllers'
+    description='List of scale out controllers.'
+    type='Array of Object (promql_scale_out_controller)'
+    reference='#promql-scale-out-controller'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-promql-scale-in-controllers"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.promql_scale_in_controllers'
+    description='List of scale in controllers.'
+    type='Array of Object (promql_scale_in_controller)'
+    reference='#promql-scale-in-controller'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-scaling-parameters"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.scaling_parameters'
+    description='Parameters that define the scaling behavior.'
+    type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
+    reference='../../../spec#auto-scaler-scaling-parameters'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-scaling-backend"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.scaling_backend'
+    description='Scaling backend for the policy.'
+    type='Object (aperture.spec.v1.AutoScalerScalingBackend)'
+    reference='../../../spec#auto-scaler-scaling-backend'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### policy.auto_scaling.periodic_decrease {#policy-auto-scaling-periodic-decrease}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-periodic-decrease-period"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.periodic_decrease.period'
+    description='Period for periodic scale in.'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-auto-scaling-periodic-decrease-scale-in-percentage"></a>
+
+<ParameterDescription
+    name='policy.auto_scaling.periodic_decrease.scale_in_percentage'
+    description='Percentage of replicas to scale in.'
+    type='Number (double)'
+    reference=''
+    value='null'
 />
 
 <!-- vale on -->
@@ -279,7 +389,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
     type='string'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='null'
 />
 
 <!-- vale on -->
@@ -293,7 +403,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The threshold for the overload confirmation criteria.'
     type='Number (double)'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='null'
 />
 
 <!-- vale on -->
@@ -307,7 +417,135 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
     type='string'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='null'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### promql_scale_out_controller {#promql-scale-out-controller}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-out-controller-query-string"></a>
+
+<ParameterDescription
+    name='query_string'
+    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-out-controller-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the controller.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-out-controller-gradient"></a>
+
+<ParameterDescription
+    name='gradient'
+    description='Gradient parameters for the controller.'
+    type='Object (aperture.spec.v1.IncreasingGradientParameters)'
+    reference='../../../spec#increasing-gradient-parameters'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-out-controller-alerter"></a>
+
+<ParameterDescription
+    name='alerter'
+    description='Alerter parameters for the controller.'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../../spec#alerter-parameters'
+    value='null'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### promql_scale_in_controller {#promql-scale-in-controller}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-in-controller-query-string"></a>
+
+<ParameterDescription
+    name='query_string'
+    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-in-controller-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the controller.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-in-controller-gradient"></a>
+
+<ParameterDescription
+    name='gradient'
+    description='Gradient parameters for the controller.'
+    type='Object (aperture.spec.v1.DecreasingGradientParameters)'
+    reference='../../../spec#decreasing-gradient-parameters'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-scale-in-controller-alerter"></a>
+
+<ParameterDescription
+    name='alerter'
+    description='Alerter parameters for the controller.'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../../spec#alerter-parameters'
+    value='null'
 />
 
 <!-- vale on -->

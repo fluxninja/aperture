@@ -74,7 +74,7 @@ local dashboardWithPanels(dashboardParams, policyName, extra_filters) =
       name: 'datasource',
       options: [],
       query: 'prometheus',
-      refres: 1,
+      refresh: 1,
       regex: datasource.filter_regex,
       type: 'datasource',
     }

@@ -12,23 +12,29 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-One of the simplest flow control policies is static rate limiting to regulate
-heavy-hitters. It uses the
+## Policy Overview
+
+Regulating incoming traffic in the face of overwhelming requests is vital to
+maintaining the health and availability of a service. A powerful tool to achieve
+this is the implementation of static rate limiting, aimed at controlling the
+intensity of 'heavy-hitters.' This policy utilizes the
 [Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
-block specific flow labels that exceed their quota within a certain time frame
-(limit reset interval).
+collect specific flow labels that go beyond their allocated quota within a
+defined time frame (limit reset interval). It is an efficient and
+straightforward mechanism for mitigating traffic congestion and preventing
+potential service degradation or downtime.
 
-## Policy
+## Policy Configuration
 
-This example demonstrates rate limiting of unique users based on the `User-Id`
-header in the HTTP traffic. Envoy proxy provides this header under the label key
-`http.request.header.user_id` (see
+This example demonstrates rate limiting of unique users based on the
+**`user_id`** header in the HTTP traffic. Envoy proxy provides this header under
+the label key **`http.request.header.user_id`** (see
 [Flow Labels](/concepts/flow-control/flow-label.md) for more information).
 
-This configuration limits each user to a burst of `40 requests` and `2 requests`
-every `1s` period using the rate limiter. Additionally, the rate limiter applies
-these limits to `ingress` traffic on the Kubernetes service
-`service1-demo-app.demoapp.svc.cluster.local`.
+This configuration limits each user to a burst of **`40 requests`** and
+**`2 requests`** every **`1s`** period using the rate limiter. Additionally, the
+rate limiter applies these limits to **`ingress`** traffic on the Kubernetes
+service **`service1-demo-app.demoapp.svc.cluster.local`**.
 
 ```mdx-code-block
 <Tabs>

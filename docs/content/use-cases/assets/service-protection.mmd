@@ -1,0 +1,31 @@
+flowchart LR
+
+classDef Controller fill:#F8773D,stroke:#000000,stroke-width:2px;
+classDef Agent fill:#56AE89,stroke:#000000,stroke-width:2px;
+classDef Signal stroke:#EFEEED,stroke-width:1px;
+classDef Service fill:#56AE89,stroke:#000000,stroke-width:1px;
+
+HS("Health Signals") --> Controller
+class HS Signal
+CS("Confirmation Signals") --> Controller
+class CS Signal
+subgraph "Controller"
+  policy("Service Protection Policy")
+end
+
+Controller -- "Adjust load multiplier" --> Agent
+class Controller Controller
+
+subgraph " "
+Client -- "Incoming requests" --> Agent
+class Client Service
+	subgraph "Agent"
+	    subgraph "Req Queue"
+				packets("[] [] []")
+	      class packets Service
+			end
+  end
+Agent -- "req/s" --> Service
+class Agent Agent
+class Service Service
+end
