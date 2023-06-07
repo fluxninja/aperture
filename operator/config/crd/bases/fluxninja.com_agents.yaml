@@ -952,7 +952,7 @@ spec:
                         description: "All agents within an agent group receive the
                           same data-plane configuration (for example, Flux Meters,
                           Rate Limiters and so on). \n [Read more about agent groups
-                          here](/concepts/flow-control/selector.md#agent-group)."
+                          here](/concepts/selector.md#agent-group)."
                         type: string
                     type: object
                   alertmanagers:

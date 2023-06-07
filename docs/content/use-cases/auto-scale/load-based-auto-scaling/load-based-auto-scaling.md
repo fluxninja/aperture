@@ -35,11 +35,10 @@ system.
 
 This policy employs two key strategies: it protects the service from sudden
 traffic spikes, and it ensures the service scales proportionally to accommodate
-sustained load changes. An
-[_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component is
-used to dynamically adjust the number of service instances in response to
-changes in load and CPU utilization. This load-based auto-scaling is enacted by
-a scale-out Controller that reads
+sustained load changes. An [_Auto Scaler_](/concepts/auto-scale.md#auto-scaler)
+component is used to dynamically adjust the number of service instances in
+response to changes in load and CPU utilization. This load-based auto-scaling is
+enacted by a scale-out Controller that reads
 [_Load Scheduler_](/concepts/load-scheduler.md) signals, effectively throttling
 traffic into a queue and scaling resources to match the demand.
 

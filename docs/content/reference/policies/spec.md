@@ -6960,9 +6960,9 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control.md#flow) into workloads allows for
-load throttling to be "intelligent" instead of queueing flows in an arbitrary
-order. There are two aspects of this "intelligence":
+Categorizing flows into workloads allows for load throttling to be "intelligent"
+instead of queueing flows in an arbitrary order. There are two aspects of this
+"intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands that
   flows belonging to different classes have different weights (for example,
@@ -7109,8 +7109,7 @@ only if tokens for the flow aren't specified in the flow labels.
 <!-- vale on -->
 
 Selects flows based on control point, flow labels, agent group and the service
-that the [flow control component](/concepts/flow-control.md#components) will
-operate on.
+that the flow control component will operate on.
 
 :::info
 

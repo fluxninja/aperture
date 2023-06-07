@@ -20,7 +20,7 @@ change in load.
 At a high level, this policy works as follows:
 
 - Latency EMA-based overload detection: A Flux Meter is used to gather latency
-  metrics from a [service control point](/concepts/flow-control/selector.md).
+  metrics from a [service control point](/concepts/selector.md).
   The latency signal gets fed into an Exponential Moving Average (EMA) component
   to establish a long-term trend that can be compared to the current latency to
   detect overloads.
@@ -36,7 +36,7 @@ At a high level, this policy works as follows:
   incoming concurrency.
 - Load Scheduler and Actuator: The Accepted Concurrency at the service is
   throttled by a
-  [weighted-fair queuing scheduler](/concepts/flow-control/load-scheduler.md).
+  [weighted-fair queuing scheduler](/concepts/load-scheduler.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that is
   synchronized with Aperture Agents through etcd. The load multiplier adjusts

@@ -50,9 +50,8 @@ designates ingress and egress Control Points as identified by
 Feature Control Points are facilitated by the
 [Aperture SDKs](/integrations/flow-control/sdk/sdk.md), which are available for
 a variety of popular programming languages. These SDKs allow any function call
-or code snippet within the service code to be wrapped as a
-_Feature_Control_Point_. In Aperture's context, every execution of the feature
-is seen as a flow.
+or code snippet within the service code to be wrapped as a _Feature Control
+Point_. In Aperture's context, every execution of the feature is seen as a flow.
 
 The SDK offers an API to initiate a flow, which corresponds to a
 [`flowcontrol.v1.Check`][flowcontrol-proto] call into the Agent. The response

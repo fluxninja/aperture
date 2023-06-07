@@ -518,7 +518,7 @@ type Scheduler struct {
 
 	// List of workloads to be used in scheduler.
 	//
-	// Categorizing [flows](/concepts/flow-control.md#flow) into workloads
+	// Categorizing flows into workloads
 	// allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
 	// There are two aspects of this "intelligence":
 	//   - Scheduler can more precisely calculate concurrency if it understands
@@ -1817,7 +1817,7 @@ func (x *PathTemplateMatcher) GetTemplateValues() map[string]string {
 }
 
 // Selects flows based on control point, flow labels, agent group and the service
-// that the [flow control component](/concepts/flow-control.md#components)
+// that the flow control component
 // will operate on.
 //
 // :::info

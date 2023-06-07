@@ -36,9 +36,8 @@ agents.
 The default metric tracked by _Flux Meter_ is the flow's workload duration in
 milliseconds. The _Flux Meter_ might be configured to track any arbitrary metric
 from OpenTelemetry attributes on log or span telemetry streams based on the
-[insertion method][flow-control-insertion]. For instance, any of the metrics
-defined in the Envoy [access log specification][envoy-access-log-spec] might be
-used by _Flux Meter_.
+insertion method. For instance, any of the metrics defined in the Envoy [access
+log specification][envoy-access-log-spec] might be used by _Flux Meter_.
 
 ## Buckets
 
@@ -114,7 +113,6 @@ user compared to guest user).
 
 [reference]: /reference/policies/spec.md#flux-meter
 [flow-selectors]: /concepts/selector.md
-[flow-control-insertion]: ./flow-control.md#insertion
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]:
