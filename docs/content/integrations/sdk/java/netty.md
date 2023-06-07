@@ -83,4 +83,4 @@ the [example app][netty-example] available in the repository.
 
 [netty-example]:
   https://github.com/fluxninja/aperture-java/blob/releases/aperture-java/v2.1.0/examples/netty-example/src/main/java/com/fluxninja/example/ServerInitializer.java
-[javaagent]: /integrations/flow-control/sdk/java/auto-instrumentation.md
+[javaagent]: /integrations/sdk/java/auto-instrumentation.md

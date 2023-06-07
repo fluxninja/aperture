@@ -2831,7 +2831,7 @@ meter is read.
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/integrations/flow-control/envoy/istio.md#envoy-filter)
+[Envoy Filter](/integrations/envoy/istio.md#envoy-filter)
 
 :::
 

@@ -73,15 +73,14 @@ you need to install integrations that will communicate with the Aperture Agent.
   Integration instructions for [Istio/Envoy][istio] are provided, and the
   Control Point can be named to identify a particular filter chain in Envoy. If
   insertion is done through Istio, the
-  [default filter configuration](/integrations/flow-control/envoy/istio.md#envoy-filter)
+  [default filter configuration](/integrations/envoy/istio.md#envoy-filter)
   assigns _ingress_ and _egress_ Control Points as identified by
   [Istio][istio-patch-context].
 
-- _Feature_ _Control Points_:
-  [Aperture SDKs](/integrations/flow-control/sdk/sdk.md) are available for
-  popular programming languages. Aperture SDK wraps any function call or code
-  snippet inside the service code as a _Feature_ _Control Point_. Every
-  invocation of the feature is a flow from the perspective of Aperture.
+- _Feature_ _Control Points_: [Aperture SDKs](/integrations/sdk/sdk.md) are
+  available for popular programming languages. Aperture SDK wraps any function
+  call or code snippet inside the service code as a _Feature_ _Control Point_.
+  Every invocation of the feature is a flow from the perspective of Aperture.
 
   The SDK provides an API to begin a flow, which translates to a
   [`flowcontrol.v1.Check`][flowcontrol-proto] call into Agent. The response of
@@ -98,7 +97,7 @@ you need to install integrations that will communicate with the Aperture Agent.
 [flux-meter]: ./resources/flux-meter.md
 [classifier]: ./resources/classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[istio]: /integrations/flow-control/envoy/istio.md
+[istio]: /integrations/envoy/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [flowcontrol-proto]:

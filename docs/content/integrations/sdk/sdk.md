@@ -13,7 +13,7 @@ sidebar_label: SDKs
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion} from '../../apertureVersion.js';
 import DocCardList from '@theme/DocCardList';
 ```
 
