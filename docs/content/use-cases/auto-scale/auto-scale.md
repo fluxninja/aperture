@@ -35,7 +35,7 @@ scale in or out signal, dispatches an auto-scaling signal to the agent, which
 interfaces with the infrastructure APIs, such as Kubernetes, to perform the
 scaling.
 
-## Use Case Scenario
+## Example Scenario
 
 Imagine a task management application whose usage varies significantly between
 working days and holidays, and even fluctuates during different hours of a

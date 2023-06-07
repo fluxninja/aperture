@@ -43,7 +43,7 @@ available in the bucket, the request is accepted. The token bucket is
 continually replenished at a predefined fill rate, up to the maximum number of
 tokens specified by the bucket capacity.
 
-## Use Case Scenario
+## Example Scenario
 
 Consider a social media platform that implements rate limits to prevent abuse of
 its APIs. Each user of the platform gets identified by a unique key and assigned

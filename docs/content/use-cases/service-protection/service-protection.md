@@ -51,7 +51,7 @@ observation of an upstream service in relation to a downstream service.
 
 :::
 
-## Use Case Scenario
+## Example Scenario
 
 Consider the scenario of an e-commerce platform during a major sale event. To
 handle the increased traffic, the service protection policy will monitor the

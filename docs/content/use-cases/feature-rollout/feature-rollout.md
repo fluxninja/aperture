@@ -34,7 +34,7 @@ criteria, the Controller sends the defined load ramp percentage to the Agent.
 Subsequently, the Agent redirects traffic based on this percentage to the new
 feature of the service.
 
-## Use Case Scenario
+## Example Scenario
 
 Consider a scenario where a video streaming platform is planning to introduce a
 new interface design. Instead of releasing the new design to all users at once,

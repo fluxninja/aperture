@@ -57,7 +57,7 @@ distributed among agents within an agent group.
 
 :::
 
-## Use Case Scenario
+## Example Scenario
 
 Consider the scenario of a cloud-based database service handling requests from
 several client applications with different priorities. By implementing a quota

@@ -36,7 +36,7 @@ which are relayed to the Alert Manager.
 
 </Zoom>
 
-## Use Case Scenario
+## Example Scenario
 
 Examples of complex alerting scenarios include:
 
