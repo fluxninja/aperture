@@ -25,7 +25,7 @@ application.
    To make it easier to integrate Aperture in your application, we have created
    middleware for popular frameworks like Spring Boot, Netty, Armeria
    [see available middleware](../integrations/sdk/java/java.md). With the help
-   of middleware there isn't much code changes required in your application.
+   of middleware, there isn't much code changes required in your application.
    Some middleware doesn't require any code change at all.
 
 3. [**Service Meshes (Istio, Envoy) & API Gateways**](./setting-up-application/service-mesh-and-gateways.md)
