@@ -58,7 +58,7 @@ function(cfg) {
         name: 'datasource',
         options: [],
         query: 'prometheus',
-        refres: 1,
+        refresh: 1,
         regex: ds.filter_regex,
         type: 'datasource',
       }

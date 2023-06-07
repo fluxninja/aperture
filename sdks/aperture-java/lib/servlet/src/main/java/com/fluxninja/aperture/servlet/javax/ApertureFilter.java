@@ -1,7 +1,6 @@
 package com.fluxninja.aperture.servlet.javax;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
@@ -24,13 +23,14 @@ public class ApertureFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        CheckHTTPRequest checkRequest = ServletUtils.checkRequestFromRequest(req, controlPointName);
+        TrafficFlowRequest trafficFlowRequest =
+                ServletUtils.trafficFlowRequestFromRequest(req, controlPointName);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
         String path = request.getServletPath();
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 
         if (flow.ignored()) {
             chain.doFilter(request, response);

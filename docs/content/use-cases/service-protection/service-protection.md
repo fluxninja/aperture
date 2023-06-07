@@ -2,7 +2,7 @@
 title: Service Protection
 keywords:
   - tutorial
-sidebar_position: 2
+sidebar_position: 1
 sidebar_label: Service Protection
 ---
 

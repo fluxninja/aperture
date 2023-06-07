@@ -39,11 +39,23 @@ public final class ApertureSDKBuilder {
         ignoredPaths = new ArrayList<>();
     }
 
+    /**
+     * Set hostname of Aperture Agent to connect to.
+     *
+     * @param host hostname of Aperture Agent to connect to.
+     * @return the builder object.
+     */
     public ApertureSDKBuilder setHost(String host) {
         this.host = host;
         return this;
     }
 
+    /**
+     * Set port number of Aperture Agent to connect to.
+     *
+     * @param port port number of Aperture Agent to connect to.
+     * @return the builder object.
+     */
     public ApertureSDKBuilder setPort(int port) {
         this.port = port;
         return this;
@@ -72,6 +84,12 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
+    /**
+     * Sets custom root CA certificate to be used by SSL connection.
+     *
+     * @param filename path to file containing custom root CA certificate.
+     * @return the builder object.
+     */
     public ApertureSDKBuilder setRootCertificateFile(String filename) {
         this.certFile = filename;
         return this;
@@ -162,6 +180,11 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
+    /**
+     * Build an ApertureSDK object using the configured parameters.
+     *
+     * @return The constructed ApertureSDK object.
+     */
     public ApertureSDK build() throws ApertureSDKException {
         String host = this.host;
         if (host == null) {

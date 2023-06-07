@@ -26,7 +26,7 @@
           "default": [
             {
               "alerter": {
-                "alert_name": "Scale out controller Alerter"
+                "alert_name": "A controller intends to scale out"
               },
               "gradient": {
                 "slope": 1
@@ -46,7 +46,7 @@
           "default": [
             {
               "alerter": {
-                "alert_name": "Scale in controller Alerter"
+                "alert_name": "A controller intends to scale in"
               },
               "gradient": {
                 "slope": 1

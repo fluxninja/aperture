@@ -1,4 +1,5 @@
 local spec = import '../../../spec.libsonnet';
+local baseAutoScalingPolicyFn = import '../../auto-scaling/base/policy.libsonnet';
 local config = import './config-defaults.libsonnet';
 
 function(cfg, metadata={}) {
@@ -94,6 +95,49 @@ function(cfg, metadata={}) {
     ),
   ),
 
+  /** Auto scale escalation **/
+
+  local scaleInControllers =
+    (if
+       std.objectHas(params.policy, 'auto_scaling') && std.objectHas(params.policy.auto_scaling, 'periodic_decrease')
+     then
+       [
+         spec.v1.ScaleInController.new()
+         + spec.v1.ScaleInController.withAlerter(
+           spec.v1.AlerterParameters.new()
+           + spec.v1.AlerterParameters.withAlertName('Periodic scale in intended')
+         )
+         + spec.v1.ScaleInController.withController(
+           spec.v1.ScaleInControllerController.new()
+           + spec.v1.ScaleInControllerController.withPeriodic(params.policy.auto_scaling.periodic_decrease)
+         ),
+       ]
+     else []),
+
+  local scaleOutControllers =
+    (if std.objectHas(params.policy, 'auto_scaling') then [
+       spec.v1.ScaleOutController.new()
+       + spec.v1.ScaleOutController.withAlerter(
+         spec.v1.AlerterParameters.new()
+         + spec.v1.AlerterParameters.withAlertName('Load based scale out intended')
+       )
+       + spec.v1.ScaleOutController.withController(
+         spec.v1.ScaleOutControllerController.new()
+         + spec.v1.ScaleOutControllerController.withGradient(
+           spec.v1.IncreasingGradient.new()
+           + spec.v1.IncreasingGradient.withInPorts(
+             spec.v1.IncreasingGradientIns.new()
+             + spec.v1.IncreasingGradientIns.withSignal(spec.v1.Port.withSignalName('DESIRED_LOAD_MULTIPLIER'))
+             + spec.v1.IncreasingGradientIns.withSetpoint(spec.v1.Port.withConstantSignal(1.0))
+           )
+           + spec.v1.IncreasingGradient.withParameters(
+             spec.v1.IncreasingGradientParameters.new()
+             + spec.v1.IncreasingGradientParameters.withSlope(-1.0)
+           )
+         )
+       ),
+     ] else []),
+
   local policyDef =
     spec.v1.Policy.new()
     + spec.v1.Policy.withResources(params.policy.resources)
@@ -108,6 +152,36 @@ function(cfg, metadata={}) {
         ]
         + params.policy.components,
       ),
+    ) +
+    (
+      if std.objectHas(params.policy, 'auto_scaling') then
+        local autoScalingParams = {
+          policy+: params.policy.auto_scaling {
+            policy_name: params.policy.policy_name,
+            // Set empty defaults for promql_scale_out_controllers and promql_scale_in_controllers
+            promql_scale_out_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_out_controllers') then params.policy.auto_scaling.promql_scale_out_controllers else [],
+            promql_scale_in_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_in_controllers') then params.policy.auto_scaling.promql_scale_in_controllers else [],
+          },
+        };
+
+        local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingParams).policyDef;
+        {
+          circuit+: {
+            components+: std.map(
+              function(component) if std.objectHas(component, 'auto_scale') then
+                component {
+                  auto_scale+: {
+                    auto_scaler+: {
+                      scale_out_controllers+: scaleOutControllers,
+                      scale_in_controllers+: scaleInControllers,
+                    },
+                  },
+                }
+              else component,
+              baseAutoScalingPolicy.circuit.components
+            ),
+          },
+        } else {}
     ),
   local policyResource = {
     kind: 'Policy',

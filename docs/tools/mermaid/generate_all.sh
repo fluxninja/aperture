@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 gitroot=$(git rev-parse --show-toplevel)
 export gitroot
 
