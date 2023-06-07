@@ -54,7 +54,7 @@ function(cfg) {
 
   local dashboardDef =
     dashboard.new(
-      title='Signals changes running all the pre-commit',
+      title='Signals changes running all the pre-commit yes run all',
       schemaVersion=36,
       editable=true,
       refresh=refresh,

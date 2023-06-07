@@ -42,7 +42,7 @@ function generate_readme() {
 
 export -f generate_readme
 
-parallel -j8 --no-notice --bar --eta generate_readme ::: "$($FIND "$blueprints_root" -type f -name config.libsonnet)"
+#parallel -j8 --no-notice --bar --eta generate_readme ::: "$($FIND "$blueprints_root" -type f -name config.libsonnet)"
 
 # run prettier on generated readme docs
 #parallel -j8 --no-notice --bar --eta prettier --write ::: "$($FIND "$git_root"/docs/content/reference/policies/bundled-blueprints -type f -name '*.md')"
