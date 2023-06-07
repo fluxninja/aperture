@@ -376,9 +376,8 @@ jobs:
             if [ "$CIRCLE_BRANCH" = "main" ]; then
               pre-commit run --all-files
             else
-              pre-commit run --all-files
-              # base_ref="$(git merge-base main $CIRCLE_SHA1)"
-              # pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
+              base_ref="$(git merge-base main $CIRCLE_SHA1)"
+              pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
             fi
             if asdf where golang &> /dev/null; then
               asdf reshim golang

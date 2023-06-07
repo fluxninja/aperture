@@ -54,7 +54,7 @@ function(cfg) {
 
   local dashboardDef =
     dashboard.new(
-      title='Signals only main commands',
+      title='Signals',
       schemaVersion=36,
       editable=true,
       refresh=refresh,
