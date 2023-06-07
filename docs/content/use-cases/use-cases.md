@@ -1,6 +1,6 @@
 ---
 title: Use Cases
-sidebar_position: 4
+sidebar_position: 3
 description:
   Explore our step-by-step tutorials on Aperture's use case based policies.
   Learn how to configure policies to improve the reliability and stability of

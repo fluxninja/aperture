@@ -1,9 +1,9 @@
 ---
-title: Auto Scale
+title: Auto Scaling
 keywords:
   - tutorial
 sidebar_position: 4
-sidebar_label: Auto Scale
+sidebar_label: Auto Scaling
 ---
 
 ## Overview
