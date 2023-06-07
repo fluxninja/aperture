@@ -3,7 +3,7 @@ title: Gateways
 keywords:
   - flow control
   - gateways
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 Aperture also support Gateways integration for Flow Control.
