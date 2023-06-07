@@ -36,7 +36,7 @@ policy:
       label_key: ""
     # Scheduler configuration.
     # Type: aperture.spec.v1.Scheduler
-    scheduler:
+    scheduler: {}
 
 dashboard:
   # Refresh interval for dashboard panels.
@@ -50,7 +50,7 @@ dashboard:
   time_to: "now"
   # Additional filters to pass to each query to Grafana datasource.
   # Type: map[string]string
-  extra_filters:
+  extra_filters: {}
   datasource:
     # Datasource name.
     # Type: string

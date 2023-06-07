@@ -36,4 +36,4 @@ policy:
       label_key: ""
     # Scheduler configuration.
     # Type: aperture.spec.v1.Scheduler
-    scheduler:
+    scheduler: {}
