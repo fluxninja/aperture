@@ -19,7 +19,7 @@ to prioritize key user experiences and business-critical features over less
 crucial tasks or background workloads. For instance, in an e-commerce platform,
 the checkout process must take precedence over functionalities like personalized
 recommendations, especially during resource shortage or high traffic. Aperture's
-[Weighted Fair Queuing Scheduler (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
+[Weighted Fair Queuing Scheduler (WFQ)](/concepts/load-scheduler.md#scheduler)
 enables such prioritization of flows over others based on their labels, ensuring
 user experience or revenue is maximized during overloads or other failure
 scenarios.
@@ -40,11 +40,10 @@ information to the scheduler:
   **`subscriber`**, since all HTTP headers are directly available as flow labels
   within the scheduler.
 - Guests: To identify guest users, a classification rule will be used that
-  utilizes an
-  [extractor](/concepts/flow-control/resources/classifier.md#extractors) to
-  assign the header value to the **`user_type`** flow label key, which will then
-  be used in the scheduler to match the request against the **`guest`** value to
-  identify the workload.
+  utilizes an [extractor](/concepts/classifier.md#extractors) to assign the
+  header value to the **`user_type`** flow label key, which will then be used in
+  the scheduler to match the request against the **`guest`** value to identify
+  the workload.
 
 To conclude, the prioritization of incoming requested at
 **`service1-demo-app.demoapp.svc.cluster.local`** is determined by the latency

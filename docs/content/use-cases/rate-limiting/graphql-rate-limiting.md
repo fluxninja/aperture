@@ -30,10 +30,10 @@ selected as the target service for this policy.
 :::tip
 
 Classification rules can be written based on
-[HTTP requests](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
-and scheduler priorities can be defined based on
-[Flow Labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them first using introspection APIs.
+[HTTP requests](/concepts/classifier.md#live-previewing-requests) and scheduler
+priorities can be defined based on
+[Flow Labels](/concepts/flow-label.md#live-previewing-flow-labels) by live
+previewing them first using introspection APIs.
 
 :::
 
