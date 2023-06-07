@@ -2,7 +2,7 @@
 policy:
   policy_name: workload-prioritization-postgres
   promql_query: 'sum(pg_connections{db="hasura"}) / max(pg_setting{name="max_connections"}) * 100'
-  setpoint: 70
+  setpoint: 80
   evaluation_interval: "1s"
   resources:
     flow_control:
@@ -44,7 +44,7 @@ policy:
                 match_labels:
                   source: "api-service.cloud.svc.cluster.local"
               parameters:
-                priority: 200
+                priority: 250
               name: "api-service"
             - label_matcher:
                 match_labels:

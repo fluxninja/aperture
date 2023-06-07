@@ -2,18 +2,23 @@
 policy:
   policy_name: auto-scaling-hasura
   auto_scaling:
-    kubernetes_replicas:
-      max_replicas: "10"
-      min_replicas: "1"
-      kubernetes_object_selector:
-        agent_group: default
-        api_version: apps/v1
-        kind: Deployment
-        name: hasura
-        namespace: cloud
+    scaling_backend:
+      kubernetes_replicas:
+        max_replicas: "10"
+        min_replicas: "1"
+        kubernetes_object_selector:
+          agent_group: default
+          api_version: apps/v1
+          kind: Deployment
+          name: hasura
+          namespace: cloud
     scaling_parameters:
       scale_in_cooldown: "120s"
       scale_out_cooldown: "30s"
+      scale_out_alerter:
+        alert_name: Auto-scaler is scaling out
+      scale_in_alerter:
+        alert_name: Auto-scaler is scaling in
   resources:
     flow_control:
       classifiers:
@@ -43,7 +48,7 @@ policy:
                 match_labels:
                   source: "api-service.cloud.svc.cluster.local"
               parameters:
-                priority: 200
+                priority: 250
               name: "api-service"
             - label_matcher:
                 match_labels:

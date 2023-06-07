@@ -5,28 +5,28 @@ import http from "k6/http";
 
 export let vuStagesAPI = [
   { duration: "0s", target: 5 },
-  { duration: "30s", target: 5 },
+  { duration: "1m", target: 5 },
   { duration: "30s", target: 10 },
+  { duration: "2m", target: 10 },
+  { duration: "1m", target: 20 },
+  { duration: "6m", target: 20 },
   { duration: "1m", target: 10 },
-  { duration: "30s", target: 20 },
-  { duration: "3m", target: 20 },
-  { duration: "30s", target: 10 },
-  { duration: "1m", target: 10 },
+  { duration: "2m", target: 10 },
   { duration: "30s", target: 5 },
-  { duration: "30s", target: 5 },
+  { duration: "1m", target: 5 },
 ];
 
 export let vuStagesAgent = [
-  { duration: "0s", target: 3 },
-  { duration: "30s", target: 3 },
-  { duration: "30s", target: 6 },
-  { duration: "1m", target: 6 },
-  { duration: "30s", target: 10 },
-  { duration: "3m", target: 10 },
-  { duration: "30s", target: 6 },
-  { duration: "1m", target: 6 },
-  { duration: "30s", target: 3 },
-  { duration: "30s", target: 3 },
+  { duration: "0s", target: 2 },
+  { duration: "1m", target: 2 },
+  { duration: "30s", target: 4 },
+  { duration: "2m", target: 4 },
+  { duration: "1m", target: 8 },
+  { duration: "6m", target: 8 },
+  { duration: "1m", target: 4 },
+  { duration: "2m", target: 4 },
+  { duration: "30s", target: 2 },
+  { duration: "1m", target: 2 },
 ];
 
 export let options = {
@@ -101,10 +101,6 @@ export function agent_service_request() {
   const ret = check(res, {
     "http status was 200": res.status === 200,
   });
-  if (!ret) {
-    // sleep for 10ms to 25ms
-    sleep(randomIntBetween(0.01, 0.025));
-  }
 };
 
 export function api_service_request() {
@@ -150,10 +146,6 @@ export function api_service_request() {
   const ret = check(res, {
     "http status was 200": res.status === 200,
   });
-  if (!ret) {
-    // sleep for 10ms to 25ms
-    sleep(randomIntBetween(0.01, 0.025));
-  }
 };
 
 export function setup() {

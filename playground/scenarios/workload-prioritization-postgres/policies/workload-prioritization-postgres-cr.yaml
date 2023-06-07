@@ -17,13 +17,13 @@ metadata:
       "tls": {"insecure_skip_verify": true}, "use_service_account": true}}}}}]}, "service_protection_core":
       {"adaptive_load_scheduler": {"load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
       {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}}, "name":
-      "api-service", "parameters": {"priority": 200}}, {"label_matcher": {"match_labels":
+      "api-service", "parameters": {"priority": 250}}, {"label_matcher": {"match_labels":
       {"operation": "mutation", "source": "agent-service.cloud.svc.cluster.local"}},
       "name": "agent-service-mutation", "parameters": {"priority": 100}}, {"label_matcher":
       {"match_labels": {"operation": "query", "source": "agent-service.cloud.svc.cluster.local"}},
       "name": "agent-service-query", "parameters": {"priority": 50}}]}, "selectors":
       [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}}},
-      "setpoint": 70}}'
+      "setpoint": 80}}'
   labels:
     fluxninja.com/validate: "true"
   name: workload-prioritization-postgres
@@ -63,7 +63,7 @@ spec:
                       source: api-service.cloud.svc.cluster.local
                   name: api-service
                   parameters:
-                    priority: 200
+                    priority: 250
                 - label_matcher:
                     match_labels:
                       operation: mutation
@@ -92,7 +92,7 @@ spec:
             * 100
     - variable:
         constant_output:
-          value: 70
+          value: 80
         out_ports:
           output:
             signal_name: SETPOINT
