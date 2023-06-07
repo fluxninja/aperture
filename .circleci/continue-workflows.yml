@@ -374,10 +374,10 @@ jobs:
             export LOGURU_LEVEL=TRACE
             export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes -o IdentityAgent=none"
             if [ "$CIRCLE_BRANCH" = "main" ]; then
+              pre-commit run --all-files
+            else
               base_ref="$(git merge-base main $CIRCLE_SHA1)"
               pre-commit run --from-ref "${base_ref}" --to-ref "$CIRCLE_SHA1"
-            else
-              pre-commit run --all-files
             fi
             if asdf where golang &> /dev/null; then
               asdf reshim golang
