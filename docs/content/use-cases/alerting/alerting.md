@@ -29,9 +29,9 @@ channels, ensuring prompt response to any potential issues.
 {@include: ../assets/alerting.mmd}
 ```
 
-The diagram depicts Agents collecting metrics into Prometheus (the metrics can
+The diagram depicts agents collecting metrics into Prometheus (the metrics can
 be collected by any other mechanism). These metrics are queried by the
-Controller, processed in the circuit-based policies to compute Alert events
+controller, processed in the circuit-based policies to compute Alert events
 which are relayed to the Alert Manager.
 
 </Zoom>
