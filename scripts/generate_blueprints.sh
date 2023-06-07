@@ -42,11 +42,6 @@ function generate_readme() {
 
 export -f generate_readme
 
-#parallel -j8 --no-notice --bar --eta generate_readme ::: "$($FIND "$blueprints_root" -type f -name config.libsonnet)"
-
-# run prettier on generated readme docs
-#parallel -j8 --no-notice --bar --eta prettier --write ::: "$($FIND "$git_root"/docs/content/reference/policies/bundled-blueprints -type f -name '*.md')"
-
 
 while IFS= read -r -d '' file
 do
@@ -55,6 +50,8 @@ done < <($FIND "$blueprints_root" -type f -name 'config.libsonnet' -print0)
 
 wait  # Wait for all background jobs to complete
 
+
+# run prettier on generated readme docs
 while IFS= read -r -d '' file
 do
     prettier --write "$file"

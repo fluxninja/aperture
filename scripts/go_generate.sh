@@ -21,9 +21,6 @@ fi
 # list all directories that contain .go files except for vendor directories
 dirs=$("${GREP}" --include="*.go" --exclude-dir="vendor" -r "go:generate" -l | xargs "${DIRNAME}" | sort -u)
 
-# use parallel to execute "cd {} && go generate" in for each directory in $dirs
-#parallel -j8 --no-notice --bar --eta "cd {} && go generate" ::: "$dirs"
-
 echo "$dirs" | while IFS= read -r dir; do
     (cd "$dir" && go generate) &
 done

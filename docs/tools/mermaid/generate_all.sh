@@ -51,8 +51,6 @@ function generate_mermaid_images() {
 
 export -f generate_mermaid_images
 
-#parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_mermaid_images ::: "$($FIND "$docsdir"/content -type f -name "*.mmd")"
-
 while IFS= read -r -d '' file
 do
     generate_mermaid_images "$file" &
