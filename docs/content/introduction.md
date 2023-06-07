@@ -60,7 +60,7 @@ applicable to a wide range of cloud-native applications. These capabilities
 ensure the reliability and stability of applications, and include:
 
 - 🛡️
-  [**Adaptive Service Protection**](./use-cases/service-protection/basic-service-protection.md):
+  [**Adaptive Service Protection**](./use-cases/service-protection/protection.md):
   Enhance resource utilization and safeguard against abrupt service overloads
   with an intelligent queue at the entry point of services. This queue
   dynamically adjusts the rate of requests based on live service health, thereby
@@ -73,7 +73,7 @@ ensure the reliability and stability of applications, and include:
   services, ensuring that the usage remains within prescribed rate limits and
   avoids penalties or additional costs.
 - 🎯
-  [**Workload Prioritization**](./use-cases/service-protection/workload-prioritization.md):
+  [**Workload Prioritization**](./use-cases/service-protection/prioritization.md):
   Safeguard crucial user experience pathways and ensure prioritized access to
   external APIs even during high-load conditions by strategically prioritizing
   workloads. This is achieved through the use of declarative policies that label
@@ -117,14 +117,6 @@ The analysis and actuation phases use
 [**Declarative policies**](./concepts/policy/policy.md) that facilitates teams
 in defining responses to different situations, such as deviations from
 service-level objectives.
-
-When defining a policy, these are some key components to consider:
-[**Control Point**](./concepts/flow-control/selector.md) → Needed to guide flow
-control based decisions. [**Selector**](./concepts/flow-control/selector.md) →
-Needed to select the flow that the policy should consider.
-[**Classifier**](./concepts/flow-control/resources/classifier.md). → Create
-additional Flow Labels based on request metadata, collectively enriching the
-policy's operational capability.
 
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)

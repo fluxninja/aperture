@@ -14,29 +14,37 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-External Rate Limiting is a technique to limit the number of outgoing requests
-from services to an external API server. Turning your apps into spend aware and
-keeping them within quota limits to avoid cost overages. However, not all
-workloads are on same priority, based on application, their priority can be
-different. While doing external rate limiting, it is important to ensure
-prioritized access for critical workloads. This policy builds upon the
-[`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
-Blueprint, which comprises components like the token bucket rate limiting to
-ensure quota limits and a
-[Weighted Fair Queuing (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
-based Workload Scheduler to assure prioritized access for critical workloads.
+:::note
 
-## Policy
-
-In this policy,
+The following policy is based on the
 [Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
-component is configured with `bucket_capacity`, and rate limiting is configured
-based on label key `api_key` extracted from the request header. While the lazy
-sync of between the agent is set to false.
+blueprint.
 
-WFQ Scheduler is configured two workloads priorities; `guest` and `subscriber`
-with 50 and 200 respectively. Matching labels using `user_type` value from the
-request header.
+:::
+
+## Policy Overview
+
+The Quota Scheduler Policy is a sophisticated solution designed to manage and
+limit outgoing requests from services to an external API server. This policy
+makes applications cost-aware, ensuring that they operate within assigned quota
+limits to prevent cost overruns. Workload priorities might differ based on the
+application, and maintaining prioritized access for critical workloads during
+external rate limiting is of paramount importance. The policy leverages the
+[`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
+Blueprint, which brings together the token bucket rate limiting and a
+[Weighted Fair Queuing (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
+based Workload Scheduler to balance quota limits and priority-based access
+efficiently.
+
+## Policy Configuration
+
+In this policy, rate limiting is applied on
+**`service1-demo-app.demoapp.svc.cluster.local`** based on the **`label_key`**
+extracted from the request header. Consequently, user prioritization is achieved
+through weights assigned to the **`user_type`** label value, also extracted from
+the same request header. Finally, the WFQ Scheduler is set up to prioritize two
+types of workloads: **`guest`**, with a priority of 50, **`subscriber`** with a
+priority of 100.
 
 ```mdx-code-block
 <Tabs>

@@ -14,49 +14,47 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Load-based auto-scaling is a technique used to dynamically adjust the number of
-instances or resources allocated to a service based on workload demands. This
-policy builds upon the _Service Protection with Load-based Pod Auto-Scaler_
-[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
-to add an escalation for auto-scaling. The basic service protection policy
-protects the service from sudden traffic spikes. But it is necessary to scale
-the service to meet demand in case of a persistent change in load.
+:::note
 
-To achieve this, the policy makes use of an
-[_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component to
-adjust the number of instances allocated to the service. Load-based auto-scaling
-is achieved by defining a scale-out _Controller_ that acts on the load
-multiplier signal from the service protection policy. This signal measures the
-fraction of traffic that the
-[_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md) is
-throttling into a queue. The _Auto Scaler_ is configured to scale-out using a
-_Gradient Controller_ based on this signal and a setpoint of 1.0.
+The following policy is based on the
+[Service Protection with Load-based Pod Auto-Scaler](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
+blueprint.
 
-In addition to load-based scaling, the policy includes a scale-in _Controller_
-based on CPU utilization. These _Controllers_ adjust the resources allocated to
-the service based on changes in CPU usage, ensuring that the service can handle
-the workload efficiently.
+:::
 
-## Policy
+## Policy Overview
 
-This policy extends the _Service Protection_
-[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
-by adding auto-scaling to meet persistent changes in demand.
+Responding to fluctuating service demand is a common challenge for maintaining
+stable and responsive services. This policy, based on the Service Protection
+with Load-based Pod Auto-Scaler
+[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md),
+presents an evolved strategy to tackle the surges of service demands. It
+introduces a mechanism to dynamically scale the service resources based on
+observed load, thereby optimizing resource allocation and maintaining a balanced
+system.
 
-At a high level, this policy consists of:
+This policy employs two key strategies: it protects the service from sudden
+traffic spikes, and it ensures the service scales proportionally to accommodate
+sustained load changes. An
+[_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component is
+used to dynamically adjust the number of service instances in response to
+changes in load and CPU utilization. This load-based auto-scaling is enacted by
+a scale-out Controller that reads
+[_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md) signals,
+effectively throttling traffic into a queue and scaling resources to match the
+demand.
 
-- Service protection based on response latency trend of the service.
-- An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
-  Deployment for the service.
-- Load-based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
-  the blueprint. This signal measures the fraction of traffic that the _Load
-  Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
-  scale-out based on a _Gradient Controller_ using this signal and a setpoint of
-  1.0.
-- In addition to the load-based scale-out, the policy also includes a scale-in
-  _Controller_ based on CPU utilization which adjusts the instances of the
-  service based on changes in CPU usage, ensuring that the service is not
-  over-provisioned.
+## Policy Configuration
+
+This policy, ensures optimized performance at the selected
+**`service1-demo-app.demoapp.svc.cluster.local`**, by applying a service
+protection policy based on the average latency of the service. Based on the
+latency, it performs auto-scaling of Kubernetes replicas for the selected
+service, with a minimum of 1 and a maximum of 10 replicas.
+
+To prevent frequent fluctuation, scale-in and scale-out cooldown periods of 40
+and 30 seconds are defined. The **`dry_run`** parameter is set to false, meaning
+the auto-scaling function is active.
 
 ```mdx-code-block
 <Tabs>

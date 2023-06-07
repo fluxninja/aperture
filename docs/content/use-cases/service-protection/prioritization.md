@@ -12,36 +12,43 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-When services are resource constrained, it is often crucial to preserve key
-user-experience. Business critical features need to be prioritized while
-throttling background workloads and less critical features. For instance, for an
-e-commerce application, the ability to check out a shopping cart is more
-critical than personalized recommendations and should be prioritized when
-resources are constrained.
+## Policy Overview
 
-Aperture's
-[weighted fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md#scheduler)
-enables prioritization of certain flows over others based on their flow labels,
-ensuring that the user experience or revenue is maximized in the face of
-overloads and other failures.
+When dealing with services in resource-limited scenarios, it becomes paramount
+to prioritize key user experiences and business-critical features over less
+crucial tasks or background workloads. For instance, in an e-commerce platform,
+the checkout process must take precedence over functionalities like personalized
+recommendations, especially during resource shortage or high traffic. Aperture's
+[Weighted Fair Queuing Scheduler (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
+enables such prioritization of flows over others based on their labels, ensuring
+user experience or revenue is maximized during overloads or other failure
+scenarios.
 
-## Policy
+## Policy Configuration
 
-In this example policy, traffic of different types of users will be prioritized,
-with `subscriber` users receiving higher priority over `guest` users. This means
-that under overload scenarios, subscribed users will receive better quality of
-service than guest users. Two alternative methods will be used to provide the
-`User-Type` value to the scheduler:
+In this policy, users classified as subscribers will be given precedence over
+guest users when connecting to
+**`service1-demo-app.demoapp.svc.cluster.local`**, therefore resulting in high
+priority request being served first during overload situations. The WFQ
+Scheduler is set up to prioritize two types of workloads: **`guest`**, with a
+priority of 50, **`subscriber`** with a priority of 100.
 
-- Subscribers: The header value of `User-Type` will be directly matched to
-  `subscriber`, since all HTTP headers are directly available as flow labels
+There are two distinct methods that are used to convey the **`user_type`**
+information to the scheduler:
+
+- Subscribers: The header value of **`user_type`** will be directly matched to
+  **`subscriber`**, since all HTTP headers are directly available as flow labels
   within the scheduler.
 - Guests: To identify guest users, a classification rule will be used that
   utilizes an
   [extractor](/concepts/flow-control/resources/classifier.md#extractors) to
-  assign the header value to the `user-type` flow label key. The `user_type`
-  label key will then be used in the scheduler to match the request against the
-  `guest` value to identify the workload.
+  assign the header value to the **`user_type`** flow label key, which will then
+  be used in the scheduler to match the request against the **`guest`** value to
+  identify the workload.
+
+To conclude, the prioritization of incoming requested at
+**`service1-demo-app.demoapp.svc.cluster.local`** is determined by the latency
+measurements of **`service3-demo-app.demoapp.svc.cluster.local`**.
 
 :::tip
 

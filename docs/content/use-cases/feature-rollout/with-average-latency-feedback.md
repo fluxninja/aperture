@@ -1,5 +1,5 @@
 ---
-title: Feature Rollout with Average Latency Feedback
+title: with Average Latency Feedback
 keywords:
   - policies
   - rollout
@@ -14,33 +14,39 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+The following policy is based on the
+[Feature Rollout with Average Latency Feedback](/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency.md)
+blueprint.
+
+:::
+
+## Policy Overview
+
 Feature flags provide a mechanism for shipping new features to production
-without compromising existing functionality. By utilizing Aperture, features can
-be toggled on or off for specific user segments. The following policy enables
-you to progressively introduce a new feature, all the while assessing its impact
-on your application's latency. If the latency deteriorates beyond the configured
+without compromising existing functionality. With Aperture, features can be
+toggled on or off for specific user segments. The following policy enables you
+to progressively introduce a new feature, all the while assessing its impact on
+the application's latency. If the latency deteriorates beyond the configured
 threshold, the rollout can be halted or reversed to ensure a seamless user
 experience.
 
-## Policy
+## Policy Configuration
 
-This policy uses the
-[`Feature Rollout with Average Latency Feedback`](/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency.md)
-blueprint that enables incremental roll out of a new feature. In this example,
-we will create a policy that slowly ramps up the percentage of requests that are
-served with the new feature. We will continuously monitor the application's
-latency and roll back the feature if the latency deteriorates beyond the
-configured limit.
+In this example, the rollout of a new feature is driven by the **`criteria`** of
+75ms latency threshold set for forward and reset actions. Any surge in average
+latency beyond the 75ms mark in the
+**`service1-demo-app.demoapp.svc.cluster.local`** would prompt a halt in the
+rollout process.
 
-At a high-level, this policy consists of:
+The **`load_ramp`** section outlines the configuration details for the rollout
+regulation. Specifically:
 
-- Latency monitoring: Continuously measure the application's latency using the
-  [`average_latency_driver`](/reference/policies/bundled-blueprints/policies/feature-rollout/base.md#average-latency-driver).
-- Rollout control: Gradually increase the percentage of requests that are to be
-  served the new feature using
-  [`steps`](/reference/policies/spec#load-ramp-parameters-step). Monitor the
-  application's latency and roll back the feature if the latency deteriorates
-  beyond the configured limit.
+- **`service1-demo-app.demoapp.svc.cluster.local`** is selected as the targeted
+  service for the rollout process.
+- The rollout **`steps`** begin with 1% of the traffic being routed to the new
+  feature and gradually increases to 100%, over a period of 300 seconds.
 
 ```mdx-code-block
 <Tabs>
