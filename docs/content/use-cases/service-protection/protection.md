@@ -34,7 +34,8 @@ adjusts the request rate accordingly to restore latency to its acceptable range.
 This policy monitors the latency of requests processed by the
 **`service1-demo-app.demoapp.svc.cluster.local`** service. It calculates the
 deviations in current latency from a baseline historical latency, which serves
-as an indicator of service overload.
+as an indicator of service overload. A deviation of **`1.1`** from the baseline
+is considered as a signal for service overload.
 
 To mitigate service overload, the requests to
 **`service1-demo-app.demoapp.svc.cluster.local`** service are passed through a
