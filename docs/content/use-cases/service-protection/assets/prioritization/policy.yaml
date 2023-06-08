@@ -6,7 +6,7 @@ metadata:
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"components": [ ], "evaluation_interval": "1s",
       "latency_baseliner": {"flux_meter": {"selectors": [{"control_point": "ingress",
-      "service": "service3-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
+      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
       "workload-prioritization", "service_protection_core": {"adaptive_load_scheduler":
       {"load_scheduler": {"scheduler": {"workloads": [{"label_matcher": {"match_labels":
       {"http.request.header.user_type": "guest"}}, "parameters": {"priority": 50}},
@@ -112,4 +112,4 @@ spec:
         workload-prioritization:
           selectors:
           - control_point: ingress
-            service: service3-demo-app.demoapp.svc.cluster.local
+            service: service1-demo-app.demoapp.svc.cluster.local

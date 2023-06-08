@@ -1,5 +1,5 @@
 ---
-title: Service Protection
+title: Protection
 keywords:
   - policies
   - concurrency
@@ -21,24 +21,30 @@ blueprint.
 
 :::
 
-## Policy Overview
+## Overview
 
-Mitigating cascading failures is essential to maintain service stability, which
-can be achieved effectively by matching a service's concurrency limit with its
-processing capacity. However, determining the precise concurrency limit can be
-challenging due to the evolving nature of service infrastructure. Factors such
-as deployment of new versions, horizontal scaling, or fluctuating access
-patterns can impact the concurrency limit. This policy is designed to address
-this dynamic problem and offer reliable service protection.
+The response times of a service can start to deteriorate when the service's
+concurrency limit is surpassed. Consequently, a degradation in response latency
+can serve as a reliable signal for identifying service overload. This policy is
+designed to detect overload situations based on latency deterioration and
+adjusts the request rate accordingly to restore latency to its acceptable range.
 
 ## Policy Configuration
 
-In this policy, latency is of **`service1-demo-app.demoapp.svc.cluster.local`**
-is monitored using an exponential moving average. Deviation of current latency
-from the historical latency indicates an overload, which will lead to lower the
-rate at which requests are admitted into the monitored service, making the
-excess requests wait in a queue. Once the latency improves, the rate of requests
-is slowly increased to the maximum processing capacity of the selected service.
+This policy monitors the latency of requests processed by the
+**`service1-demo-app.demoapp.svc.cluster.local`** service. It calculates the
+deviations in current latency from a baseline historical latency, which serves
+as an indicator of service overload.
+
+To mitigate service overload, the requests to
+**`service1-demo-app.demoapp.svc.cluster.local`** service are passed through a
+load scheduler. The load scheduler reduces the request rate in overload
+scenarios, temporarily placing excess requests in a queue.
+
+As service latency improves, indicating a return to normal operational state,
+the request rate is incrementally increased until it matches the incoming
+request rate. This responsive mechanism helps ensure that service performance is
+optimized while mitigating the risk of service disruptions due to overload.
 
 ```mdx-code-block
 <Tabs>
@@ -46,7 +52,7 @@ is slowly increased to the maximum processing capacity of the selected service.
 ```
 
 ```yaml
-{@include: ./assets/basic-service-protection/values.yaml}
+{@include: ./assets/protection/values.yaml}
 ```
 
 ```mdx-code-block
@@ -58,7 +64,7 @@ is slowly increased to the maximum processing capacity of the selected service.
 <p>
 
 ```yaml
-{@include: ./assets/basic-service-protection/policy.yaml}
+{@include: ./assets/protection/policy.yaml}
 ```
 
 </p>
@@ -66,8 +72,7 @@ is slowly increased to the maximum processing capacity of the selected service.
 
 :::info
 
-[Circuit Diagram](./assets/basic-service-protection/graph.mmd.svg) for this
-policy.
+[Circuit Diagram](./assets/protection/graph.mmd.svg) for this policy.
 
 :::
 
@@ -83,7 +88,7 @@ tolerance limit (`1.1`) of historical latency.
 
 <Zoom>
 
-![Basic Service Protection](./assets/basic-service-protection/dashboard.png)
+![Basic Service Protection](./assets/protection/dashboard.png)
 
 </Zoom>
 
