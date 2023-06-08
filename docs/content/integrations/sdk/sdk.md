@@ -8,12 +8,12 @@ keywords:
   - control
   - points
   - sdk
-sidebar_position: 3
+sidebar_position: 2
 sidebar_label: SDKs
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion} from '../../apertureVersion.js';
 import DocCardList from '@theme/DocCardList';
 ```
 

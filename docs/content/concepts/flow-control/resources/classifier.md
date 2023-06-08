@@ -234,5 +234,5 @@ See [full example in reference][reference]
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: ../selector.md#control-point
-[install-istio]: /integrations/flow-control/envoy/istio.md
+[install-istio]: /integrations/envoy/istio.md
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
