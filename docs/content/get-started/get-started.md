@@ -18,26 +18,25 @@ application.
 
    Using Aperture SDKs, it is easier to manually set feature control points in
    your application. There are SDKs available for multiple languages. You can
-   find the list of SDKs [here](../integrations/flow-control/sdk/sdk.md).
+   find the list of SDKs [here](../integrations/sdk/sdk.md).
 
 2. [**Middleware Insertions**](./setting-up-application/middleware-insertions.md)
 
    To make it easier to integrate Aperture in your application, we have created
    middleware for popular frameworks like Spring Boot, Netty, Armeria
-   [see available middleware](../integrations/flow-control/sdk/java/java.md).
-   With the help of middleware there isn't much code changes required in your
-   application. Some middleware doesn't require any code change at all.
+   [see available middleware](../integrations/sdk/java/java.md). With the help
+   of middleware, there isn't much code changes required in your application.
+   Some middleware doesn't require any code change at all.
 
 3. [**Service Meshes (Istio, Envoy) & API Gateways**](./setting-up-application/service-mesh-and-gateways.md)
 
    Aperture can be integrated with service meshes like Istio and Envoy. You can
-   find the list of service meshes
-   [here](../integrations/flow-control/envoy/envoy.md). With help of service
-   meshes, you can control the flow of traffic in your application without any
-   code change. It is recommended to use service meshes for Aperture integration
-   as it is easier to get started with and doesn't require any code change. You
-   can also integrate Aperture with API gateways, checkout the supported
-   [API Gateways](../integrations/flow-control/gateway/gateway.md).
+   find the list of service meshes [here](../integrations/envoy/envoy.md). With
+   help of service meshes, you can control the flow of traffic in your
+   application without any code change. It is recommended to use service meshes
+   for Aperture integration as it is easier to get started with and doesn't
+   require any code change. You can also integrate Aperture with API gateways,
+   checkout the supported [API Gateways](../integrations/gateway/gateway.md).
 
 ## [Installing Aperture](./installation/installation.md)
 

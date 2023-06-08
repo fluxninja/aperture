@@ -1271,7 +1271,7 @@
       "properties": {
         "attribute_key": {
           "default": "workload_duration_ms",
-          "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/integrations/flow-control/envoy/istio.md#envoy-filter)\n\n:::\n\n",
+          "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/integrations/envoy/istio.md#envoy-filter)\n\n:::\n\n",
           "type": "string",
           "x-go-tag-default": "workload_duration_ms",
           "x-order": 0

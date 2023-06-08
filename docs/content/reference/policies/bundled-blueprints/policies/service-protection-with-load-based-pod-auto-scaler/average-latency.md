@@ -35,12 +35,12 @@ At a high level, this policy works as follows:
   on a service in each execution cycle of the circuit based on the observed
   incoming concurrency.
 - Load Scheduler and Actuator: The Accepted Concurrency at the service is
-  throttled by a [weighted-fair queuing scheduler](/concepts/scheduler.md).
-  The output of the adjustments to accepted concurrency made by gradient
-  controller and optimizer logic are translated to a load multiplier that is
-  synchronized with Aperture Agents through etcd. The load multiplier adjusts
-  (increases or decreases) the token bucket fill rates based on the incoming
-  concurrency observed at each agent.
+  throttled by a [weighted-fair queuing scheduler](/concepts/scheduler.md). The
+  output of the adjustments to accepted concurrency made by gradient controller
+  and optimizer logic are translated to a load multiplier that is synchronized
+  with Aperture Agents through etcd. The load multiplier adjusts (increases or
+  decreases) the token bucket fill rates based on the incoming concurrency
+  observed at each agent.
 - An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
   Deployment for the service.
 - Load-based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from

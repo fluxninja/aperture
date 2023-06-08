@@ -21,10 +21,10 @@ Gateway, and Kong Gateway.
 
 <!-- vale on -->
 
-Aperture, supports integration to EnvoyProxy and Istio. With the help
-`aperturectl` which is a CLI tool provided by Aperture you can easily integrate
+Aperture, supports integration with EnvoyProxy and Istio. With the help
+`aperturectl` which is a CLI tool provided by Aperture, you can easily integrate
 Aperture. Check out the complete installation guide in
-[Service Mesh Integration](/integrations/flow-control/envoy/envoy.md).
+[Service Mesh Integration](/integrations/envoy/envoy.md).
 
 <!-- vale off -->
 
@@ -35,7 +35,7 @@ Aperture. Check out the complete installation guide in
 With the help of Aperture Lua modules and Aperture Plugin for Nginx and Kong
 respectively, it is easy to integrate Aperture with API Gateway. You can check
 out the complete installation guide in
-[API Gateway Integration](/integrations/flow-control/gateway/gateway.md).
+[API Gateway Integration](/integrations/gateway/gateway.md).
 
 <!-- vale off -->
 
