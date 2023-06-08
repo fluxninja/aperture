@@ -1451,7 +1451,7 @@ definitions:
                     :::info
 
                     For list of available attributes in Envoy access logs, refer
-                    [Envoy Filter](/integrations/envoy/istio.md#envoy-filter)
+                    [Envoy Filter](/integrations/istio/istio.md#envoy-filter)
 
                     :::
 

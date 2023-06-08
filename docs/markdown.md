@@ -1048,7 +1048,7 @@ attribute_key: response_duration_ms
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/integrations/envoy/istio.md#envoy-filter)
+[Envoy Filter](/integrations/istio/istio.md#envoy-filter)
 
 ::: | | | exponential*buckets |
 [FluxMeterExponentialBuckets](#flux-meter-exponential-buckets)|
