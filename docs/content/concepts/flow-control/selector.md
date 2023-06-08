@@ -239,6 +239,36 @@ graph TB
 _Agent Group_ name together with _Service_ name determine the
 [service](#service) to select flows from.
 
+### Gateways Integration {#gateways-integration}
+
+Aperture can be integrated with [Gateways][gateway] to control traffic before
+that is routed to the upstream service. Gateways can be configured to send flow
+control requests to Aperture for every incoming request.
+
+As the requests to Aperture are sent from the Gateway, the service selector has
+to be configured to match the Gateway's service. For example, if the Gateway
+controller is running with service name `nginx-server` in namespace `nginx`, for
+upstream service having location/route as `/service1`, the selector should be
+configured as follows:
+
+```yaml
+service: nginx-server.nginx.svc.cluster.local
+agent_group: default
+control_point: service1
+label_matcher:
+  match_labels:
+    http.target: "/service1"
+```
+
+Also, if the control point is configured uniquely for each location/route, the
+`control_point` field alone can be used to match the upstream service and the
+rest of the fields can be omitted:
+
+```yaml
+agent_group: default
+control_point: service1
+```
+
 ## Filtering out liveness/health probes, and metrics endpoints
 
 Liveness and health probes are essential for checking the health of the
@@ -294,3 +324,4 @@ rejected.
 [classifier]: ./resources/classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
+[gateway]: /integrations/gateway/gateway.md
