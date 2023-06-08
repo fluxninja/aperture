@@ -5,30 +5,25 @@
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
-          "type": "boolean",
-          "x-order": 0
+          "type": "boolean"
         },
         "dry_run_config_key": {
           "description": "Configuration key for setting dry run mode through dynamic configuration.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         },
         "in_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerIns",
           "description": "Collection of input ports for the _Adaptive Load Scheduler_ component.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         },
         "out_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerOuts",
-          "description": "Collection of output ports for the _Adaptive Load Scheduler_ component.",
-          "x-order": 3
+          "description": "Collection of output ports for the _Adaptive Load Scheduler_ component."
         },
         "parameters": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerParameters",
           "description": "Parameters for the _Adaptive Load Scheduler_ component.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 4
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -39,20 +34,17 @@
       "properties": {
         "overload_confirmation": {
           "$ref": "#/definitions/InPort",
-          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service.",
-          "x-order": 0
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service."
         },
         "setpoint": {
           "$ref": "#/definitions/InPort",
           "description": "The setpoint input to the controller.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "signal": {
           "$ref": "#/definitions/InPort",
           "description": "The input signal to the controller.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -63,18 +55,15 @@
       "properties": {
         "desired_load_multiplier": {
           "$ref": "#/definitions/OutPort",
-          "description": "Desired Load multiplier is the ratio of desired token rate to the incoming token rate.",
-          "x-order": 0
+          "description": "Desired Load multiplier is the ratio of desired token rate to the incoming token rate."
         },
         "is_overload": {
           "$ref": "#/definitions/OutPort",
-          "description": "A Boolean signal that indicates whether the service is in overload state.",
-          "x-order": 1
+          "description": "A Boolean signal that indicates whether the service is in overload state."
         },
         "observed_load_multiplier": {
           "$ref": "#/definitions/OutPort",
-          "description": "Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.",
-          "x-order": 2
+          "description": "Observed Load multiplier is the ratio of accepted token rate to the incoming token rate."
         }
       },
       "type": "object",
@@ -86,36 +75,31 @@
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration parameters for the embedded Alerter.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "gradient": {
           "$ref": "#/definitions/GradientControllerParameters",
           "description": "Parameters for the _Gradient Controller_.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "load_multiplier_linear_increment": {
           "default": 0.0025,
           "description": "Linear increment to load multiplier in each execution tick when the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "0.0025",
-          "x-order": 2
+          "x-go-tag-default": "0.0025"
         },
         "load_scheduler": {
           "$ref": "#/definitions/LoadSchedulerParameters",
           "description": "Parameters for the _Load Scheduler_.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 3
+          "x-go-tag-validate": "required"
         },
         "max_load_multiplier": {
           "default": 2,
           "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "2.0",
-          "x-order": 4
+          "x-go-tag-default": "2.0"
         }
       },
       "type": "object",
@@ -127,8 +111,7 @@
         "from": {
           "description": "Attribute path pointing to some string - for example, `source.address`.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         }
       },
       "required": ["from"],
@@ -141,14 +124,12 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/AlerterIns",
-          "description": "Input ports for the Alerter component.",
-          "x-order": 0
+          "description": "Input ports for the Alerter component."
         },
         "parameters": {
           "$ref": "#/definitions/AlerterParameters",
           "title": "Alerter configuration",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -159,8 +140,7 @@
       "properties": {
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.",
-          "x-order": 0
+          "description": "Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert."
         }
       },
       "type": "object",
@@ -174,29 +154,25 @@
           "items": {
             "type": "string"
           },
-          "type": "array",
-          "x-order": 0
+          "type": "array"
         },
         "alert_name": {
           "description": "Name of the alert.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "labels": {
           "additionalProperties": {
             "type": "string"
           },
           "description": "Additional labels to add to alert.",
-          "type": "object",
-          "x-order": 2
+          "type": "object"
         },
         "resolve_timeout": {
           "default": "5s",
           "description": "Duration of alert resolver.\n\n",
           "type": "string",
-          "x-go-tag-default": "5s",
-          "x-order": 3
+          "x-go-tag-default": "5s"
         },
         "severity": {
           "default": "info",
@@ -205,8 +181,7 @@
           "type": "string",
           "x-go-tag-default": "info",
           "x-go-tag-validate": "oneof=info warn crit",
-          "x-oneof": "info | warn | crit",
-          "x-order": 4
+          "x-oneof": "info | warn | crit"
         }
       },
       "required": ["alert_name"],
@@ -218,13 +193,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/AndIns",
-          "description": "Input ports for the And component.",
-          "x-order": 0
+          "description": "Input ports for the And component."
         },
         "out_ports": {
           "$ref": "#/definitions/AndOuts",
-          "description": "Output ports for the And component.",
-          "x-order": 1
+          "description": "Output ports for the And component."
         }
       },
       "type": "object",
@@ -240,8 +213,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         }
       },
       "type": "object",
@@ -252,8 +224,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Result of logical AND of all the input signals.\n\nWill always be 0 (false), 1 (true) or invalid (unknown).",
-          "x-order": 0
+          "description": "Result of logical AND of all the input signals.\n\nWill always be 0 (false), 1 (true) or invalid (unknown)."
         }
       },
       "type": "object",
@@ -263,21 +234,18 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/ArithmeticCombinatorIns",
-          "description": "Input ports for the Arithmetic Combinator component.",
-          "x-order": 0
+          "description": "Input ports for the Arithmetic Combinator component."
         },
         "operator": {
           "description": "Operator of the arithmetic operation.\n\nThe arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.\nIn case of XOR and bit shifts, value of signals is cast to integers before performing the operation.\n\n",
           "enum": ["add", "sub", "mul", "div", "xor", "lshift", "rshift"],
           "type": "string",
           "x-go-tag-validate": "oneof=add sub mul div xor lshift rshift",
-          "x-oneof": "add | sub | mul | div | xor | lshift | rshift",
-          "x-order": 1
+          "x-oneof": "add | sub | mul | div | xor | lshift | rshift"
         },
         "out_ports": {
           "$ref": "#/definitions/ArithmeticCombinatorOuts",
-          "description": "Output ports for the Arithmetic Combinator component.",
-          "x-order": 2
+          "description": "Output ports for the Arithmetic Combinator component."
         }
       },
       "title": "Type of Combinator that computes the arithmetic operation on the operand signals",
@@ -289,13 +257,11 @@
       "properties": {
         "lhs": {
           "$ref": "#/definitions/InPort",
-          "description": "Left hand side of the arithmetic operation.",
-          "x-order": 0
+          "description": "Left hand side of the arithmetic operation."
         },
         "rhs": {
           "$ref": "#/definitions/InPort",
-          "description": "Right hand side of the arithmetic operation.",
-          "x-order": 1
+          "description": "Right hand side of the arithmetic operation."
         }
       },
       "type": "object",
@@ -306,8 +272,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Result of arithmetic operation.",
-          "x-order": 0
+          "description": "Result of arithmetic operation."
         }
       },
       "type": "object",
@@ -318,13 +283,11 @@
       "properties": {
         "auto_scaler": {
           "$ref": "#/definitions/AutoScaler",
-          "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource.",
-          "x-order": 0
+          "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource."
         },
         "pod_scaler": {
           "$ref": "#/definitions/PodScaler",
-          "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.",
-          "x-order": 1
+          "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources."
         }
       },
       "type": "object",
@@ -335,13 +298,11 @@
       "properties": {
         "dry_run": {
           "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.\nThis is useful for observing the behavior of auto scaler without disrupting any real deployment.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
-          "type": "boolean",
-          "x-order": 0
+          "type": "boolean"
         },
         "dry_run_config_key": {
           "description": "Configuration key for overriding dry run setting through dynamic configuration.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         },
         "scale_in_controllers": {
           "description": "List of _Controllers_ for scaling in.\n\n",
@@ -350,8 +311,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 2
+          "x-go-tag-validate": "dive"
         },
         "scale_out_controllers": {
           "description": "List of _Controllers_ for scaling out.\n\n",
@@ -360,19 +320,16 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 3
+          "x-go-tag-validate": "dive"
         },
         "scaling_backend": {
           "$ref": "#/definitions/AutoScalerScalingBackend",
-          "x-go-tag-validate": "required",
-          "x-order": 4
+          "x-go-tag-validate": "required"
         },
         "scaling_parameters": {
           "$ref": "#/definitions/AutoScalerScalingParameters",
           "description": "Parameters that define the scaling behavior.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 5
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -381,8 +338,7 @@
     "AutoScalerScalingBackend": {
       "properties": {
         "kubernetes_replicas": {
-          "$ref": "#/definitions/AutoScalerScalingBackendKubernetesReplicas",
-          "x-order": 0
+          "$ref": "#/definitions/AutoScalerScalingBackendKubernetesReplicas"
         }
       },
       "type": "object",
@@ -394,8 +350,7 @@
         "kubernetes_object_selector": {
           "$ref": "#/definitions/KubernetesObjectSelector",
           "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "max_replicas": {
           "default": "9223372036854775807",
@@ -404,8 +359,7 @@
           "minLength": 1,
           "type": "string",
           "x-go-tag-default": "9223372036854775807",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 1
+          "x-go-tag-validate": "gt=0"
         },
         "min_replicas": {
           "default": "0",
@@ -414,13 +368,11 @@
           "minLength": 0,
           "type": "string",
           "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0",
-          "x-order": 2
+          "x-go-tag-validate": "gte=0"
         },
         "out_ports": {
           "$ref": "#/definitions/AutoScalerScalingBackendKubernetesReplicasOuts",
-          "description": "Output ports for _Kubernetes Replicas_.",
-          "x-order": 3
+          "description": "Output ports for _Kubernetes Replicas_."
         }
       },
       "type": "object",
@@ -429,16 +381,13 @@
     "AutoScalerScalingBackendKubernetesReplicasOuts": {
       "properties": {
         "actual_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
+          "$ref": "#/definitions/OutPort"
         },
         "configured_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 1
+          "$ref": "#/definitions/OutPort"
         },
         "desired_replicas": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 2
+          "$ref": "#/definitions/OutPort"
         }
       },
       "title": "Outputs",
@@ -452,50 +401,43 @@
           "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "50",
-          "x-order": 0
+          "x-go-tag-default": "50"
         },
         "max_scale_in_percentage": {
           "default": 1,
           "description": "The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "1",
-          "x-order": 1
+          "x-go-tag-default": "1"
         },
         "max_scale_out_percentage": {
           "default": 10,
           "description": "The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "10",
-          "x-order": 2
+          "x-go-tag-default": "10"
         },
         "scale_in_alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-in Alerter.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 3
+          "x-go-tag-validate": "required"
         },
         "scale_in_cooldown": {
           "default": "120s",
           "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
           "type": "string",
-          "x-go-tag-default": "120s",
-          "x-order": 4
+          "x-go-tag-default": "120s"
         },
         "scale_out_alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale-out Alerter.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 5
+          "x-go-tag-validate": "required"
         },
         "scale_out_cooldown": {
           "default": "30s",
           "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
           "type": "string",
-          "x-go-tag-default": "30s",
-          "x-order": 6
+          "x-go-tag-default": "30s"
         }
       },
       "type": "object",
@@ -506,18 +448,15 @@
       "properties": {
         "config_key": {
           "description": "Configuration key for overriding value setting through dynamic configuration.",
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         },
         "constant_output": {
           "description": "The constant Boolean signal emitted by this component. The value of the constant Boolean signal can be overridden at runtime through dynamic configuration.",
-          "type": "boolean",
-          "x-order": 1
+          "type": "boolean"
         },
         "out_ports": {
           "$ref": "#/definitions/BoolVariableOuts",
-          "description": "Output ports for the BoolVariable component.",
-          "x-order": 2
+          "description": "Output ports for the BoolVariable component."
         }
       },
       "type": "object",
@@ -528,8 +467,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "The value is emitted to the output port.",
-          "x-order": 0
+          "description": "The value is emitted to the output port."
         }
       },
       "type": "object",
@@ -545,15 +483,13 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         },
         "evaluation_interval": {
           "default": "0.5s",
           "description": "Evaluation interval (tick) is the time between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\n\n",
           "type": "string",
-          "x-go-tag-default": "0.5s",
-          "x-order": 1
+          "x-go-tag-default": "0.5s"
         }
       },
       "type": "object",
@@ -565,8 +501,7 @@
         "rego": {
           "$ref": "#/definitions/Rego",
           "description": "Rego is a policy language used to express complex policies in a concise and declarative way.\nIt can be used to define flow classification rules by writing custom queries that extract values from request metadata.\nFor simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.",
-          "title": "Rego based classification",
-          "x-order": 0
+          "title": "Rego based classification"
         },
         "rules": {
           "additionalProperties": {
@@ -574,8 +509,7 @@
           },
           "description": "A map of {key, value} pairs mapping from\n[flow label](/concepts/flow-control/flow-label.md) keys to rules that define\nhow to extract and propagate flow labels with that key.\n\n",
           "type": "object",
-          "x-go-tag-validate": "dive,keys,required,endkeys,required",
-          "x-order": 1
+          "x-go-tag-validate": "dive,keys,required,endkeys,required"
         },
         "selectors": {
           "description": "Selectors for flows that will be classified by this _Classifier_.\n\n",
@@ -585,8 +519,7 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 2
+          "x-go-tag-validate": "required,gt=0,dive"
         }
       },
       "required": ["selectors"],
@@ -599,143 +532,115 @@
       "properties": {
         "alerter": {
           "$ref": "#/definitions/Alerter",
-          "description": "Alerter reacts to a signal and generates alert to send to alert manager.",
-          "x-order": 0
+          "description": "Alerter reacts to a signal and generates alert to send to alert manager."
         },
         "and": {
           "$ref": "#/definitions/And",
-          "description": "Logical AND.",
-          "x-order": 1
+          "description": "Logical AND."
         },
         "arithmetic_combinator": {
           "$ref": "#/definitions/ArithmeticCombinator",
-          "description": "Applies the given operator on input operands (signals) and emits the result.",
-          "x-order": 2
+          "description": "Applies the given operator on input operands (signals) and emits the result."
         },
         "auto_scale": {
           "$ref": "#/definitions/AutoScale",
-          "description": "AutoScale components are used to scale the service.",
-          "x-order": 3
+          "description": "AutoScale components are used to scale the service."
         },
         "bool_variable": {
           "$ref": "#/definitions/BoolVariable",
-          "description": "BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.",
-          "x-order": 4
+          "description": "BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration."
         },
         "decider": {
           "$ref": "#/definitions/Decider",
-          "description": "Decider emits the binary result of comparison operator on two operands.",
-          "x-order": 5
+          "description": "Decider emits the binary result of comparison operator on two operands."
         },
         "differentiator": {
           "$ref": "#/definitions/Differentiator",
-          "description": "Differentiator calculates rate of change per tick.",
-          "x-order": 6
+          "description": "Differentiator calculates rate of change per tick."
         },
         "ema": {
           "$ref": "#/definitions/EMA",
-          "description": "Exponential Moving Average filter.",
-          "x-order": 7
+          "description": "Exponential Moving Average filter."
         },
         "extrapolator": {
           "$ref": "#/definitions/Extrapolator",
-          "description": "Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.",
-          "x-order": 8
+          "description": "Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval."
         },
         "first_valid": {
           "$ref": "#/definitions/FirstValid",
-          "description": "Picks the first valid input signal and emits it.",
-          "x-order": 9
+          "description": "Picks the first valid input signal and emits it."
         },
         "flow_control": {
           "$ref": "#/definitions/FlowControl",
-          "description": "FlowControl components are used to regulate requests flow.",
-          "x-order": 10
+          "description": "FlowControl components are used to regulate requests flow."
         },
         "gradient_controller": {
           "$ref": "#/definitions/GradientController",
-          "description": "Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.\nThis controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.",
-          "x-order": 11
+          "description": "Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.\nThis controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response."
         },
         "holder": {
           "$ref": "#/definitions/Holder",
-          "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold.",
-          "x-order": 12
+          "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold."
         },
         "integrator": {
           "$ref": "#/definitions/Integrator",
-          "description": "Accumulates sum of signal every tick.",
-          "x-order": 13
+          "description": "Accumulates sum of signal every tick."
         },
         "inverter": {
           "$ref": "#/definitions/Inverter",
-          "description": "Logical NOT.",
-          "x-order": 14
+          "description": "Logical NOT."
         },
         "max": {
           "$ref": "#/definitions/Max",
-          "description": "Emits the maximum of the input signals.",
-          "x-order": 15
+          "description": "Emits the maximum of the input signals."
         },
         "min": {
           "$ref": "#/definitions/Min",
-          "description": "Emits the minimum of the input signals.",
-          "x-order": 16
+          "description": "Emits the minimum of the input signals."
         },
         "nested_circuit": {
           "$ref": "#/definitions/NestedCircuit",
-          "description": "Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.",
-          "x-order": 17
+          "description": "Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports."
         },
         "nested_signal_egress": {
           "$ref": "#/definitions/NestedSignalEgress",
-          "description": "Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.",
-          "x-order": 18
+          "description": "Nested signal egress is a special type of component that allows to extract a signal from a nested circuit."
         },
         "nested_signal_ingress": {
           "$ref": "#/definitions/NestedSignalIngress",
-          "description": "Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.",
-          "x-order": 19
+          "description": "Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit."
         },
         "or": {
           "$ref": "#/definitions/Or",
-          "description": "Logical OR.",
-          "x-order": 20
+          "description": "Logical OR."
         },
         "pulse_generator": {
           "$ref": "#/definitions/PulseGenerator",
-          "description": "Generates 0 and 1 in turns.",
-          "x-order": 21
+          "description": "Generates 0 and 1 in turns."
         },
         "query": {
           "$ref": "#/definitions/Query",
-          "description": "Query components that are query databases such as Prometheus.",
-          "x-order": 22
+          "description": "Query components that are query databases such as Prometheus."
         },
         "signal_generator": {
           "$ref": "#/definitions/SignalGenerator",
-          "description": "Generates the specified signal.",
-          "x-order": 23
+          "description": "Generates the specified signal."
         },
         "sma": {
           "$ref": "#/definitions/SMA",
-          "description": "Simple Moving Average filter.",
-          "x-order": 24
+          "description": "Simple Moving Average filter."
         },
         "switcher": {
           "$ref": "#/definitions/Switcher",
-          "description": "Switcher acts as a switch that emits one of the two signals based on third signal.",
-          "x-order": 25
+          "description": "Switcher acts as a switch that emits one of the two signals based on third signal."
         },
         "unary_operator": {
           "$ref": "#/definitions/UnaryOperator",
-          "description": "Takes an input signal and emits the square root of the input signal.",
-          "x-order": 26
+          "description": "Takes an input signal and emits the square root of the input signal."
         },
         "variable": {
           "$ref": "#/definitions/Variable",
-          "description": "Emits a variable signal which can be changed at runtime via dynamic configuration.",
-          "x-order": 27
+          "description": "Emits a variable signal which can be changed at runtime via dynamic configuration."
         }
       },
       "title": "Computational block that forms the circuit",
@@ -750,14 +655,12 @@
           "enum": ["NaN", "+Inf", "-Inf"],
           "type": "string",
           "x-go-tag-validate": "oneof=NaN +Inf -Inf",
-          "x-oneof": "NaN | +Inf | -Inf",
-          "x-order": 0
+          "x-oneof": "NaN | +Inf | -Inf"
         },
         "value": {
           "description": "A constant value.",
           "format": "double",
-          "type": "number",
-          "x-order": 1
+          "type": "number"
         }
       },
       "type": "object",
@@ -770,33 +673,28 @@
           "default": "0s",
           "description": "Duration of time to wait before changing to false state.\nIf the duration is zero, the change will happen instantaneously.\n\n",
           "type": "string",
-          "x-go-tag-default": "0s",
-          "x-order": 0
+          "x-go-tag-default": "0s"
         },
         "in_ports": {
           "$ref": "#/definitions/DeciderIns",
-          "description": "Input ports for the Decider component.",
-          "x-order": 1
+          "description": "Input ports for the Decider component."
         },
         "operator": {
           "description": "Comparison operator that computes operation on LHS and RHS input signals.\n\n",
           "enum": ["gt", "lt", "gte", "lte", "eq", "neq"],
           "type": "string",
           "x-go-tag-validate": "oneof=gt lt gte lte eq neq",
-          "x-oneof": "gt | lt | gte | lte | eq | neq",
-          "x-order": 2
+          "x-oneof": "gt | lt | gte | lte | eq | neq"
         },
         "out_ports": {
           "$ref": "#/definitions/DeciderOuts",
-          "description": "Output ports for the Decider component.",
-          "x-order": 3
+          "description": "Output ports for the Decider component."
         },
         "true_for": {
           "default": "0s",
           "title": "Duration of time to wait before changing to true state.\nIf the duration is zero, the change will happen instantaneously.```",
           "type": "string",
-          "x-go-tag-default": "0s",
-          "x-order": 4
+          "x-go-tag-default": "0s"
         }
       },
       "title": "Type of Combinator that computes the comparison operation on LHS and RHS signals",
@@ -808,13 +706,11 @@
       "properties": {
         "lhs": {
           "$ref": "#/definitions/InPort",
-          "description": "Left hand side input signal for the comparison operation.",
-          "x-order": 0
+          "description": "Left hand side input signal for the comparison operation."
         },
         "rhs": {
           "$ref": "#/definitions/InPort",
-          "description": "Right hand side input signal for the comparison operation.",
-          "x-order": 1
+          "description": "Right hand side input signal for the comparison operation."
         }
       },
       "type": "object",
@@ -825,8 +721,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Selected signal (1.0 or 0.0).",
-          "x-order": 0
+          "description": "Selected signal (1.0 or 0.0)."
         }
       },
       "type": "object",
@@ -837,13 +732,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/DecreasingGradientIns",
-          "description": "Input ports for the Gradient.",
-          "x-order": 0
+          "description": "Input ports for the Gradient."
         },
         "parameters": {
           "$ref": "#/definitions/DecreasingGradientParameters",
-          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = -Inf (must be less than 1)\n* `max_gradient` = 1 (cannot be changed)",
-          "x-order": 1
+          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = -Inf (must be less than 1)\n* `max_gradient` = 1 (cannot be changed)"
         }
       },
       "type": "object",
@@ -854,13 +747,11 @@
       "properties": {
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint to use for scale-in.",
-          "x-order": 0
+          "description": "The setpoint to use for scale-in."
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The signal to use for scale-in.",
-          "x-order": 1
+          "description": "The signal to use for scale-in."
         }
       },
       "type": "object",
@@ -874,15 +765,13 @@
           "format": "double",
           "type": "number",
           "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308",
-          "x-go-tag-validate": "lte=1.0",
-          "x-order": 0
+          "x-go-tag-validate": "lte=1.0"
         },
         "slope": {
           "default": 1,
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "1.0",
-          "x-order": 1
+          "x-go-tag-default": "1.0"
         }
       },
       "type": "object",
@@ -893,20 +782,17 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/DifferentiatorIns",
-          "description": "Input ports for the Differentiator component.",
-          "x-order": 0
+          "description": "Input ports for the Differentiator component."
         },
         "out_ports": {
           "$ref": "#/definitions/DifferentiatorOuts",
-          "description": "Output ports for the Differentiator component.",
-          "x-order": 1
+          "description": "Output ports for the Differentiator component."
         },
         "window": {
           "default": "5s",
           "description": "The window of time over which differentiator operates.\n\n",
           "type": "string",
-          "x-go-tag-default": "5s",
-          "x-order": 2
+          "x-go-tag-default": "5s"
         }
       },
       "type": "object",
@@ -916,8 +802,7 @@
       "description": "Inputs for the Differentiator component.",
       "properties": {
         "input": {
-          "$ref": "#/definitions/InPort",
-          "x-order": 0
+          "$ref": "#/definitions/InPort"
         }
       },
       "type": "object",
@@ -927,8 +812,7 @@
       "description": "Outputs for the Differentiator component.",
       "properties": {
         "output": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
+          "$ref": "#/definitions/OutPort"
         }
       },
       "type": "object",
@@ -939,19 +823,16 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/EMAIns",
-          "description": "Input ports for the EMA component.",
-          "x-order": 0
+          "description": "Input ports for the EMA component."
         },
         "out_ports": {
           "$ref": "#/definitions/EMAOuts",
-          "description": "Output ports for the EMA component.",
-          "x-order": 1
+          "description": "Output ports for the EMA component."
         },
         "parameters": {
           "$ref": "#/definitions/EMAParameters",
           "description": "Parameters for the EMA component.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         }
       },
       "title": "Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings",
@@ -963,18 +844,15 @@
       "properties": {
         "input": {
           "$ref": "#/definitions/InPort",
-          "description": "Input signal to be used for the EMA computation.",
-          "x-order": 0
+          "description": "Input signal to be used for the EMA computation."
         },
         "max_envelope": {
           "$ref": "#/definitions/InPort",
-          "description": "Upper bound of the moving average.\n\nWhen the signal exceeds `max_envelope` it is multiplied by\n`correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::",
-          "x-order": 1
+          "description": "Upper bound of the moving average.\n\nWhen the signal exceeds `max_envelope` it is multiplied by\n`correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::"
         },
         "min_envelope": {
           "$ref": "#/definitions/InPort",
-          "description": "Lower bound of the moving average.\n\nBehavior is similar to `max_envelope`.",
-          "x-order": 2
+          "description": "Lower bound of the moving average.\n\nBehavior is similar to `max_envelope`."
         }
       },
       "type": "object",
@@ -985,8 +863,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Exponential moving average of the series of reading as an output signal.",
-          "x-order": 0
+          "description": "Exponential moving average of the series of reading as an output signal."
         }
       },
       "type": "object",
@@ -1002,8 +879,7 @@
           "minimum": 0,
           "type": "number",
           "x-go-tag-default": "1.0",
-          "x-go-tag-validate": "gte=0,lte=1.0",
-          "x-order": 0
+          "x-go-tag-validate": "gte=0,lte=1.0"
         },
         "correction_factor_on_min_envelope_violation": {
           "default": 1,
@@ -1011,27 +887,23 @@
           "format": "double",
           "type": "number",
           "x-go-tag-default": "1.0",
-          "x-go-tag-validate": "gte=1.0",
-          "x-order": 1
+          "x-go-tag-validate": "gte=1.0"
         },
         "ema_window": {
           "description": "Duration of EMA sampling window.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         },
         "valid_during_warmup": {
           "default": false,
           "description": "Whether the output is valid during the warm-up stage.\n\n",
           "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 3
+          "x-go-tag-default": "false"
         },
         "warmup_window": {
           "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm up window.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 4
+          "x-go-tag-validate": "required"
         }
       },
       "required": ["ema_window", "warmup_window"],
@@ -1044,13 +916,11 @@
         "label": {
           "description": "Name of the label to equal match the value.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "value": {
           "description": "Exact value that the label should be equal to.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         }
       },
       "required": ["label"],
@@ -1062,29 +932,24 @@
       "properties": {
         "address": {
           "$ref": "#/definitions/AddressExtractor",
-          "description": "Display an address as a single string - `<ip>:<port>`.",
-          "x-order": 0
+          "description": "Display an address as a single string - `<ip>:<port>`."
         },
         "from": {
           "description": "Attribute path is a dot-separated path to attribute.\n\nShould be either:\n* one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or\n* a special `request.http.bearer` pseudo-attribute.\nFor example, `request.http.method` or `request.http.header.user-agent`\n\nNote: The same attribute path syntax is shared by other extractor variants,\nwherever attribute path is needed in their \"from\" syntax.\n\nExample:\n```yaml\nfrom: request.http.headers.user-agent\n```",
           "title": "Use an attribute with no conversion",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         },
         "json": {
           "$ref": "#/definitions/JSONExtractor",
-          "description": "Parse JSON, and extract one of the fields.",
-          "x-order": 2
+          "description": "Parse JSON, and extract one of the fields."
         },
         "jwt": {
           "$ref": "#/definitions/JWTExtractor",
-          "description": "Parse the attribute as JWT and read the payload.",
-          "x-order": 3
+          "description": "Parse the attribute as JWT and read the payload."
         },
         "path_templates": {
           "$ref": "#/definitions/PathTemplateMatcher",
-          "description": "Match HTTP Path to given path templates.",
-          "x-order": 4
+          "description": "Match HTTP Path to given path templates."
         }
       },
       "title": "Defines a high-level way to specify how to extract a flow label value given HTTP request metadata, without a need to write Rego code",
@@ -1096,19 +961,16 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/ExtrapolatorIns",
-          "description": "Input ports for the Extrapolator component.",
-          "x-order": 0
+          "description": "Input ports for the Extrapolator component."
         },
         "out_ports": {
           "$ref": "#/definitions/ExtrapolatorOuts",
-          "description": "Output ports for the Extrapolator component.",
-          "x-order": 1
+          "description": "Output ports for the Extrapolator component."
         },
         "parameters": {
           "$ref": "#/definitions/ExtrapolatorParameters",
           "description": "Parameters for the Extrapolator component.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         }
       },
       "title": "Extrapolates the input signal by repeating the last valid value during the period in which it is invalid",
@@ -1120,8 +982,7 @@
       "properties": {
         "input": {
           "$ref": "#/definitions/InPort",
-          "description": "Input signal for the Extrapolator component.",
-          "x-order": 0
+          "description": "Input signal for the Extrapolator component."
         }
       },
       "type": "object",
@@ -1132,8 +993,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Extrapolated signal.",
-          "x-order": 0
+          "description": "Extrapolated signal."
         }
       },
       "type": "object",
@@ -1145,8 +1005,7 @@
         "max_extrapolation_interval": {
           "description": "Maximum time interval to repeat the last valid value of input signal.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         }
       },
       "required": ["max_extrapolation_interval"],
@@ -1157,13 +1016,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/FirstValidIns",
-          "description": "Input ports for the FirstValid component.",
-          "x-order": 0
+          "description": "Input ports for the FirstValid component."
         },
         "out_ports": {
           "$ref": "#/definitions/FirstValidOuts",
-          "description": "Output ports for the FirstValid component.",
-          "x-order": 1
+          "description": "Output ports for the FirstValid component."
         }
       },
       "title": "Picks the first valid input signal from the array of input signals and emits it as an output signal",
@@ -1180,8 +1037,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         }
       },
       "type": "object",
@@ -1192,8 +1048,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "First valid input signal as an output signal.",
-          "x-order": 0
+          "description": "First valid input signal as an output signal."
         }
       },
       "type": "object",
@@ -1204,37 +1059,30 @@
       "properties": {
         "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
-          "description": "_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.",
-          "x-order": 0
+          "description": "_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint."
         },
         "load_ramp": {
           "$ref": "#/definitions/LoadRamp",
-          "description": "_Load Ramp_ smoothly regulates the flow of requests over specified steps.",
-          "x-order": 1
+          "description": "_Load Ramp_ smoothly regulates the flow of requests over specified steps."
         },
         "load_ramp_series": {
           "$ref": "#/definitions/LoadRampSeries",
-          "description": "_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.",
-          "x-order": 2
+          "description": "_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_."
         },
         "load_scheduler": {
           "$ref": "#/definitions/LoadScheduler",
-          "description": "_Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.",
-          "x-order": 3
+          "description": "_Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing."
         },
         "quota_scheduler": {
-          "$ref": "#/definitions/QuotaScheduler",
-          "x-order": 4
+          "$ref": "#/definitions/QuotaScheduler"
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
-          "description": "_Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.",
-          "x-order": 5
+          "description": "_Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm."
         },
         "regulator": {
           "$ref": "#/definitions/Regulator",
-          "description": "Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
-          "x-order": 6
+          "description": "Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions."
         }
       },
       "type": "object",
@@ -1249,8 +1097,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         },
         "flux_meters": {
           "additionalProperties": {
@@ -1258,8 +1105,7 @@
           },
           "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit through the PromQL component.\n\n",
           "type": "object",
-          "x-go-tag-validate": "dive",
-          "x-order": 1
+          "x-go-tag-validate": "dive"
         }
       },
       "title": "FlowControl Resources",
@@ -1273,20 +1119,16 @@
           "default": "workload_duration_ms",
           "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/integrations/istio/istio.md#envoy-filter)\n\n:::\n\n",
           "type": "string",
-          "x-go-tag-default": "workload_duration_ms",
-          "x-order": 0
+          "x-go-tag-default": "workload_duration_ms"
         },
         "exponential_buckets": {
-          "$ref": "#/definitions/FluxMeterExponentialBuckets",
-          "x-order": 1
+          "$ref": "#/definitions/FluxMeterExponentialBuckets"
         },
         "exponential_buckets_range": {
-          "$ref": "#/definitions/FluxMeterExponentialBucketsRange",
-          "x-order": 2
+          "$ref": "#/definitions/FluxMeterExponentialBucketsRange"
         },
         "linear_buckets": {
-          "$ref": "#/definitions/FluxMeterLinearBuckets",
-          "x-order": 3
+          "$ref": "#/definitions/FluxMeterLinearBuckets"
         },
         "selectors": {
           "description": "Selectors for flows that will be metered by this _Flux Meter_.\n\n",
@@ -1296,12 +1138,10 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 4
+          "x-go-tag-validate": "required,gt=0,dive"
         },
         "static_buckets": {
-          "$ref": "#/definitions/FluxMeterStaticBuckets",
-          "x-order": 5
+          "$ref": "#/definitions/FluxMeterStaticBuckets"
         }
       },
       "required": ["selectors"],
@@ -1316,22 +1156,19 @@
           "exclusiveMinimum": 0,
           "format": "int32",
           "type": "integer",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 0
+          "x-go-tag-validate": "gt=0"
         },
         "factor": {
           "description": "Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-validate": "gt=1.0",
-          "x-order": 1
+          "x-go-tag-validate": "gt=1.0"
         },
         "start": {
           "description": "Upper bound of the lowest bucket.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-validate": "gt=0.0",
-          "x-order": 2
+          "x-go-tag-validate": "gt=0.0"
         }
       },
       "type": "object",
@@ -1345,21 +1182,18 @@
           "exclusiveMinimum": 0,
           "format": "int32",
           "type": "integer",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 0
+          "x-go-tag-validate": "gt=0"
         },
         "max": {
           "description": "Highest bucket.",
           "format": "double",
-          "type": "number",
-          "x-order": 1
+          "type": "number"
         },
         "min": {
           "description": "Lowest bucket.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-validate": "gt=0.0",
-          "x-order": 2
+          "x-go-tag-validate": "gt=0.0"
         }
       },
       "type": "object",
@@ -1373,20 +1207,17 @@
           "exclusiveMinimum": 0,
           "format": "int32",
           "type": "integer",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 0
+          "x-go-tag-validate": "gt=0"
         },
         "start": {
           "description": "Upper bound of the lowest bucket.",
           "format": "double",
-          "type": "number",
-          "x-order": 1
+          "type": "number"
         },
         "width": {
           "description": "Width of each bucket.",
           "format": "double",
-          "type": "number",
-          "x-order": 2
+          "type": "number"
         }
       },
       "type": "object",
@@ -1403,8 +1234,7 @@
             "type": "number"
           },
           "type": "array",
-          "x-go-tag-default": "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]",
-          "x-order": 0
+          "x-go-tag-default": "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
         }
       },
       "type": "object",
@@ -1415,29 +1245,24 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/GradientControllerIns",
-          "description": "Input ports of the Gradient Controller.",
-          "x-order": 0
+          "description": "Input ports of the Gradient Controller."
         },
         "manual_mode": {
           "description": "In manual mode, the controller does not adjust the control variable. It emits the same output as the control variable input. This setting can be adjusted at runtime through dynamic configuration without restarting the policy.",
-          "type": "boolean",
-          "x-order": 1
+          "type": "boolean"
         },
         "manual_mode_config_key": {
           "description": "Configuration key for overriding `manual_mode` setting through dynamic configuration.",
-          "type": "string",
-          "x-order": 2
+          "type": "string"
         },
         "out_ports": {
           "$ref": "#/definitions/GradientControllerOuts",
-          "description": "Output ports of the Gradient Controller.",
-          "x-order": 3
+          "description": "Output ports of the Gradient Controller."
         },
         "parameters": {
           "$ref": "#/definitions/GradientControllerParameters",
           "description": "Gradient Parameters.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 4
+          "x-go-tag-validate": "required"
         }
       },
       "title": "Gradient controller is a type of controller which tries to adjust the\ncontrol variable proportionally to the relative difference between setpoint\nand actual value of the signal",
@@ -1449,28 +1274,23 @@
       "properties": {
         "control_variable": {
           "$ref": "#/definitions/InPort",
-          "description": "Actual current value of the control variable.\n\nThis signal is multiplied by the gradient to produce the output.",
-          "x-order": 0
+          "description": "Actual current value of the control variable.\n\nThis signal is multiplied by the gradient to produce the output."
         },
         "max": {
           "$ref": "#/definitions/InPort",
-          "description": "Maximum value to limit the output signal.",
-          "x-order": 1
+          "description": "Maximum value to limit the output signal."
         },
         "min": {
           "$ref": "#/definitions/InPort",
-          "description": "Minimum value to limit the output signal.",
-          "x-order": 2
+          "description": "Minimum value to limit the output signal."
         },
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "Setpoint to be used for the gradient computation.",
-          "x-order": 3
+          "description": "Setpoint to be used for the gradient computation."
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "Signal to be used for the gradient computation.",
-          "x-order": 4
+          "description": "Signal to be used for the gradient computation."
         }
       },
       "type": "object",
@@ -1481,8 +1301,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Computed desired value of the control variable.",
-          "x-order": 0
+          "description": "Computed desired value of the control variable."
         }
       },
       "type": "object",
@@ -1496,23 +1315,20 @@
           "description": "Maximum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308",
-          "x-order": 0
+          "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308"
         },
         "min_gradient": {
           "default": -1.7976931348623157e308,
           "description": "Minimum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308",
-          "x-order": 1
+          "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308"
         },
         "slope": {
           "description": "Slope controls the aggressiveness and direction of the Gradient Controller.\n\nSlope is used as exponent on the signal to setpoint ratio in computation\nof the gradient (see the [main description](#gradient-controller) for\nexact equation). This parameter decides how aggressive the controller\nresponds to the deviation of signal from the setpoint.\nfor example:\n* $\\text{slope} = 1$: when signal is too high, increase control variable,\n* $\\text{slope} = -1$: when signal is too high, decrease control variable,\n* $\\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.\n\nThe sign of slope depends on correlation between the signal and control variable:\n* Use $\\text{slope} < 0$ if there is a _positive_ correlation between the signal and\nthe control variable (for example, Per-pod CPU usage and total concurrency).\n* Use $\\text{slope} > 0$ if there is a _negative_ correlation between the signal and\nthe control variable (for example, Per-pod CPU usage and number of pods).\n\n:::note\n\nYou need to set _negative_ slope for a _positive_ correlation, as you're\ndescribing the _action_ which controller should make when the signal\nincreases.\n\n:::\n\nThe magnitude of slope describes how aggressively should the controller\nreact to a deviation of signal.\nWith $|\\text{slope}| = 1$, the controller will aim to bring the signal to\nthe setpoint in one tick (assuming linear correlation with signal and setpoint).\nSmaller magnitudes of slope will make the controller adjust the control\nvariable gradually.\n\nSetting $|\\text{slope}| < 1$ (for example, $\\pm0.8$) is recommended.\nIf you experience overshooting, consider lowering the magnitude even more.\nValues of $|\\text{slope}| > 1$ aren't recommended.\n\n:::note\n\nRemember that the gradient and output signal can be (optionally) clamped,\nso the _slope_ might not fully describe aggressiveness of the controller.\n\n:::\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         }
       },
       "required": ["slope"],
@@ -1526,18 +1342,15 @@
           "default": "5s",
           "description": "Holding the last valid signal value for the `hold_for` duration.\n\n",
           "type": "string",
-          "x-go-tag-default": "5s",
-          "x-order": 0
+          "x-go-tag-default": "5s"
         },
         "in_ports": {
           "$ref": "#/definitions/HolderIns",
-          "description": "Input ports for the Holder component.",
-          "x-order": 1
+          "description": "Input ports for the Holder component."
         },
         "out_ports": {
           "$ref": "#/definitions/HolderOuts",
-          "description": "Output ports for the Holder component.",
-          "x-order": 2
+          "description": "Output ports for the Holder component."
         }
       },
       "type": "object",
@@ -1548,13 +1361,11 @@
       "properties": {
         "input": {
           "$ref": "#/definitions/InPort",
-          "description": "The input signal.",
-          "x-order": 0
+          "description": "The input signal."
         },
         "reset": {
           "$ref": "#/definitions/InPort",
-          "description": "Resets the holder output to the current input signal when reset signal is valid and non-zero.",
-          "x-order": 1
+          "description": "Resets the holder output to the current input signal when reset signal is valid and non-zero."
         }
       },
       "type": "object",
@@ -1565,8 +1376,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "The output signal.",
-          "x-order": 0
+          "description": "The output signal."
         }
       },
       "type": "object",
@@ -1576,13 +1386,11 @@
       "properties": {
         "constant_signal": {
           "$ref": "#/definitions/ConstantSignal",
-          "description": "Constant value to be used for this InPort instead of a signal.",
-          "x-order": 0
+          "description": "Constant value to be used for this InPort instead of a signal."
         },
         "signal_name": {
           "description": "Name of the incoming Signal on the InPort.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         }
       },
       "title": "Components receive input from other components through InPorts",
@@ -1594,13 +1402,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/IncreasingGradientIns",
-          "description": "Input ports for the Gradient.",
-          "x-order": 0
+          "description": "Input ports for the Gradient."
         },
         "parameters": {
           "$ref": "#/definitions/IncreasingGradientParameters",
-          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = 1 (cannot be changed)\n* `max_gradient` = +Inf (must be greater than 1)",
-          "x-order": 1
+          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = 1 (cannot be changed)\n* `max_gradient` = +Inf (must be greater than 1)"
         }
       },
       "type": "object",
@@ -1611,13 +1417,11 @@
       "properties": {
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint to use for scale-out.",
-          "x-order": 0
+          "description": "The setpoint to use for scale-out."
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The signal to use for scale-out.",
-          "x-order": 1
+          "description": "The signal to use for scale-out."
         }
       },
       "type": "object",
@@ -1631,15 +1435,13 @@
           "format": "double",
           "type": "number",
           "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308",
-          "x-go-tag-validate": "gte=1.0",
-          "x-order": 0
+          "x-go-tag-validate": "gte=1.0"
         },
         "slope": {
           "default": 1,
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "1.0",
-          "x-order": 1
+          "x-go-tag-default": "1.0"
         }
       },
       "type": "object",
@@ -1652,30 +1454,26 @@
           "default": false,
           "description": "PerAgentGroup marks the pipeline to be instantiated only once per agent\ngroup. This is helpful for receivers that scrape for example, some cluster-wide\nmetrics. When not set, pipeline will be instantiated on every Agent.\n\n",
           "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 0
+          "x-go-tag-default": "false"
         },
         "pipeline": {
           "$ref": "#/definitions/InfraMeterMetricsPipeline",
           "description": "Pipeline is an OTel metrics pipeline definition, which **only** uses receivers\nand processors defined above. Exporter would be added automatically.\n\nIf there are no processors defined or only one processor is defined, the\npipeline definition can be omitted. In such cases, the pipeline will\nautomatically use all given receivers and the defined processor (if\nany).  However, if there are more than one processor, the pipeline must\nbe defined explicitly.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "processors": {
           "additionalProperties": {
             "type": "object"
           },
           "description": "Processors define processors to be used in custom metrics pipelines. This should\nbe in [OTel format](https://opentelemetry.io/docs/collector/configuration/#processors).",
-          "type": "object",
-          "x-order": 2
+          "type": "object"
         },
         "receivers": {
           "additionalProperties": {
             "type": "object"
           },
           "description": "Receivers define receivers to be used in custom metrics pipelines. This should\nbe in [OTel format](https://opentelemetry.io/docs/collector/configuration/#receivers).",
-          "type": "object",
-          "x-order": 3
+          "type": "object"
         }
       },
       "type": "object",
@@ -1688,15 +1486,13 @@
           "items": {
             "type": "string"
           },
-          "type": "array",
-          "x-order": 0
+          "type": "array"
         },
         "receivers": {
           "items": {
             "type": "string"
           },
-          "type": "array",
-          "x-order": 1
+          "type": "array"
         }
       },
       "type": "object",
@@ -1707,21 +1503,18 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/IntegratorIns",
-          "description": "Input ports for the Integrator component.",
-          "x-order": 0
+          "description": "Input ports for the Integrator component."
         },
         "initial_value": {
           "default": 0,
           "description": "Initial value of the integrator.\n\n",
           "format": "double",
           "type": "number",
-          "x-go-tag-default": "0",
-          "x-order": 1
+          "x-go-tag-default": "0"
         },
         "out_ports": {
           "$ref": "#/definitions/IntegratorOuts",
-          "description": "Output ports for the Integrator component.",
-          "x-order": 2
+          "description": "Output ports for the Integrator component."
         }
       },
       "type": "object",
@@ -1732,23 +1525,19 @@
       "properties": {
         "input": {
           "$ref": "#/definitions/InPort",
-          "description": "The input signal.",
-          "x-order": 0
+          "description": "The input signal."
         },
         "max": {
           "$ref": "#/definitions/InPort",
-          "description": "The maximum output.",
-          "x-order": 1
+          "description": "The maximum output."
         },
         "min": {
           "$ref": "#/definitions/InPort",
-          "description": "The minimum output.",
-          "x-order": 2
+          "description": "The minimum output."
         },
         "reset": {
           "$ref": "#/definitions/InPort",
-          "description": "Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.",
-          "x-order": 3
+          "description": "Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints."
         }
       },
       "type": "object",
@@ -1758,8 +1547,7 @@
       "description": "Outputs for the Integrator component.",
       "properties": {
         "output": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
+          "$ref": "#/definitions/OutPort"
         }
       },
       "type": "object",
@@ -1770,13 +1558,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/InverterIns",
-          "description": "Input ports for the Inverter component.",
-          "x-order": 0
+          "description": "Input ports for the Inverter component."
         },
         "out_ports": {
           "$ref": "#/definitions/InverterOuts",
-          "description": "Output ports for the Inverter component.",
-          "x-order": 1
+          "description": "Output ports for the Inverter component."
         }
       },
       "type": "object",
@@ -1788,8 +1574,7 @@
         "input": {
           "$ref": "#/definitions/InPort",
           "description": "Signal to be negated.\n\n",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         }
       },
       "type": "object",
@@ -1800,8 +1585,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Logical negation of the input signal.\n\nWill always be 0 (false), 1 (true) or invalid (unknown).",
-          "x-order": 0
+          "description": "Logical negation of the input signal.\n\nWill always be 0 (false), 1 (true) or invalid (unknown)."
         }
       },
       "type": "object",
@@ -1813,13 +1597,11 @@
         "from": {
           "description": "Attribute path pointing to some strings - for example, `request.http.body`.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "pointer": {
           "description": "JSON pointer represents a parsed JSON pointer which allows to select a specified field from the payload.\n\nNote: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,\nfor example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         }
       },
       "required": ["from"],
@@ -1833,13 +1615,11 @@
         "from": {
           "description": "JWT (JSON Web Token) can be extracted from any input attribute, but most likely you'd want to use `request.http.bearer`.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "json_pointer": {
           "description": "JSON pointer allowing to select a specified field from the payload.\n\nNote: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,\nfor example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         }
       },
       "required": ["from"],
@@ -1853,24 +1633,21 @@
         "key": {
           "description": "Label key that the selector applies to.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "operator": {
           "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n",
           "enum": ["In", "NotIn", "Exists", "DoesNotExists"],
           "type": "string",
           "x-go-tag-validate": "oneof=In NotIn Exists DoesNotExists",
-          "x-oneof": "In | NotIn | Exists | DoesNotExists",
-          "x-order": 1
+          "x-oneof": "In | NotIn | Exists | DoesNotExists"
         },
         "values": {
           "description": "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty.",
           "items": {
             "type": "string"
           },
-          "type": "array",
-          "x-order": 2
+          "type": "array"
         }
       },
       "required": ["key"],
@@ -1884,32 +1661,27 @@
           "default": "default",
           "description": "Which [agent-group](/concepts/flow-control/selector.md#agent-group) this\nselector applies to.\n\n",
           "type": "string",
-          "x-go-tag-default": "default",
-          "x-order": 0
+          "x-go-tag-default": "default"
         },
         "api_version": {
           "title": "API version of Kubernetes resource",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "kind": {
           "description": "Kubernetes resource type.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         },
         "name": {
           "description": "Kubernetes resource name.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 3
+          "x-go-tag-validate": "required"
         },
         "namespace": {
           "description": "Kubernetes namespace that the resource belongs to.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 4
+          "x-go-tag-validate": "required"
         }
       },
       "required": ["api_version", "kind", "name", "namespace"],
@@ -1921,8 +1693,7 @@
       "properties": {
         "expression": {
           "$ref": "#/definitions/MatchExpression",
-          "description": "An arbitrary expression to be evaluated on the labels.",
-          "x-order": 0
+          "description": "An arbitrary expression to be evaluated on the labels."
         },
         "match_expressions": {
           "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.",
@@ -1930,16 +1701,14 @@
             "$ref": "#/definitions/K8sLabelMatcherRequirement",
             "type": "object"
           },
-          "type": "array",
-          "x-order": 1
+          "type": "array"
         },
         "match_labels": {
           "additionalProperties": {
             "type": "string"
           },
           "description": "A map of {key,value} pairs representing labels to be matched.\nA single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.\n\nNote: The requirements are combined using the logical AND operator.",
-          "type": "object",
-          "x-order": 2
+          "type": "object"
         }
       },
       "title": "Allows to define rules whether a map of\n[labels](/concepts/flow-control/flow-label.md)\nshould be considered a match or not",
@@ -1950,30 +1719,25 @@
       "description": "The _Load Ramp_ produces a smooth and continuous traffic load\nthat changes progressively over time, based on the specified steps.\n\nEach step is defined by two parameters:\n- The `target_accept_percentage`.\n- The `duration` for the signal to change from the\n  previous step's `target_accept_percentage` to the current step's\n  `target_accept_percentage`.\n\nThe percentage of requests accepted starts at the `target_accept_percentage`\ndefined in the first step and gradually ramps up or down linearly from\nthe previous step's `target_accept_percentage` to the next\n`target_accept_percentage`, over the `duration` specified for each step.",
       "properties": {
         "in_ports": {
-          "$ref": "#/definitions/LoadRampIns",
-          "x-order": 0
+          "$ref": "#/definitions/LoadRampIns"
         },
         "out_ports": {
-          "$ref": "#/definitions/LoadRampOuts",
-          "x-order": 1
+          "$ref": "#/definitions/LoadRampOuts"
         },
         "parameters": {
           "$ref": "#/definitions/LoadRampParameters",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         },
         "pass_through_label_values": {
           "description": "Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.",
           "items": {
             "type": "string"
           },
-          "type": "array",
-          "x-order": 3
+          "type": "array"
         },
         "pass_through_label_values_config_key": {
           "description": "Configuration key for setting pass through label values through dynamic configuration.",
-          "type": "string",
-          "x-order": 4
+          "type": "string"
         }
       },
       "type": "object",
@@ -1984,18 +1748,15 @@
       "properties": {
         "backward": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the _Load Ramp_ towards the previous step.",
-          "x-order": 0
+          "description": "Whether to progress the _Load Ramp_ towards the previous step."
         },
         "forward": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the _Load Ramp_ towards the next step.",
-          "x-order": 1
+          "description": "Whether to progress the _Load Ramp_ towards the next step."
         },
         "reset": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to reset the _Load Ramp_ to the first step.",
-          "x-order": 2
+          "description": "Whether to reset the _Load Ramp_ to the first step."
         }
       },
       "type": "object",
@@ -2006,18 +1767,15 @@
       "properties": {
         "accept_percentage": {
           "$ref": "#/definitions/OutPort",
-          "description": "The percentage of flows being accepted by the _Load Ramp_.",
-          "x-order": 0
+          "description": "The percentage of flows being accepted by the _Load Ramp_."
         },
         "at_end": {
           "$ref": "#/definitions/OutPort",
-          "description": "A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation.",
-          "x-order": 1
+          "description": "A Boolean signal indicating whether the _Load Ramp_ is at the end of signal generation."
         },
         "at_start": {
           "$ref": "#/definitions/OutPort",
-          "description": "A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation.",
-          "x-order": 2
+          "description": "A Boolean signal indicating whether the _Load Ramp_ is at the start of signal generation."
         }
       },
       "type": "object",
@@ -2028,8 +1786,7 @@
       "properties": {
         "regulator": {
           "$ref": "#/definitions/RegulatorParameters",
-          "description": "Parameters for the _Regulator_.",
-          "x-order": 0
+          "description": "Parameters for the _Regulator_."
         },
         "steps": {
           "items": {
@@ -2038,8 +1795,7 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 1
+          "x-go-tag-validate": "required,gt=0,dive"
         }
       },
       "required": ["steps"],
@@ -2051,8 +1807,7 @@
         "duration": {
           "description": "Duration for which the step is active.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "target_accept_percentage": {
           "description": "The value of the step.\n\n",
@@ -2060,8 +1815,7 @@
           "maximum": 100,
           "minimum": 0,
           "type": "number",
-          "x-go-tag-validate": "gte=0,lte=100",
-          "x-order": 1
+          "x-go-tag-validate": "gte=0,lte=100"
         }
       },
       "required": ["duration"],
@@ -2072,13 +1826,11 @@
       "description": "_LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.",
       "properties": {
         "in_ports": {
-          "$ref": "#/definitions/LoadRampSeriesIns",
-          "x-order": 0
+          "$ref": "#/definitions/LoadRampSeriesIns"
         },
         "parameters": {
           "$ref": "#/definitions/LoadRampSeriesParameters",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -2089,18 +1841,15 @@
       "properties": {
         "backward": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the load ramp series towards the previous step.",
-          "x-order": 0
+          "description": "Whether to progress the load ramp series towards the previous step."
         },
         "forward": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the load ramp series towards the next step.",
-          "x-order": 1
+          "description": "Whether to progress the load ramp series towards the next step."
         },
         "reset": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to reset the load ramp series to the first step.",
-          "x-order": 2
+          "description": "Whether to reset the load ramp series to the first step."
         }
       },
       "type": "object",
@@ -2111,12 +1860,10 @@
         "load_ramp": {
           "$ref": "#/definitions/LoadRampParameters",
           "description": "The load ramp.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "out_ports": {
-          "$ref": "#/definitions/LoadRampOuts",
-          "x-order": 1
+          "$ref": "#/definitions/LoadRampOuts"
         }
       },
       "type": "object",
@@ -2132,8 +1879,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "required,dive",
-          "x-order": 0
+          "x-go-tag-validate": "required,dive"
         }
       },
       "required": ["load_ramps"],
@@ -2145,29 +1891,24 @@
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
-          "type": "boolean",
-          "x-order": 0
+          "type": "boolean"
         },
         "dry_run_config_key": {
           "description": "Configuration key for setting dry run mode through dynamic configuration.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         },
         "in_ports": {
           "$ref": "#/definitions/LoadSchedulerIns",
           "description": "Input ports for the LoadScheduler component.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         },
         "out_ports": {
           "$ref": "#/definitions/LoadSchedulerOuts",
-          "description": "Output ports for the LoadScheduler component.",
-          "x-order": 3
+          "description": "Output ports for the LoadScheduler component."
         },
         "parameters": {
           "$ref": "#/definitions/LoadSchedulerParameters",
-          "x-go-tag-validate": "required",
-          "x-order": 4
+          "x-go-tag-validate": "required"
         }
       },
       "title": "_Load Scheduler_ creates a queue for flows in front of a service to provide active service protection",
@@ -2179,8 +1920,7 @@
       "properties": {
         "load_multiplier": {
           "$ref": "#/definitions/InPort",
-          "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted.",
-          "x-order": 0
+          "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted."
         }
       },
       "type": "object",
@@ -2191,8 +1931,7 @@
       "properties": {
         "observed_load_multiplier": {
           "$ref": "#/definitions/OutPort",
-          "description": "Observed load multiplier is the proportion of incoming token rate that is being accepted.",
-          "x-order": 0
+          "description": "Observed load multiplier is the proportion of incoming token rate that is being accepted."
         }
       },
       "type": "object",
@@ -2202,8 +1941,7 @@
       "properties": {
         "scheduler": {
           "$ref": "#/definitions/Scheduler",
-          "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler",
-          "x-order": 0
+          "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler"
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -2213,15 +1951,13 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 1
+          "x-go-tag-validate": "required,gt=0,dive"
         },
         "workload_latency_based_tokens": {
           "default": true,
           "description": "Automatically estimate the size flows within each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during the last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrency limiting use-case, where the\nconcurrency is calculated as ``(avg. latency \\* in-flight flows)`.\n\nThe value of tokens estimated takes a lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the flow labels.\n\n",
           "type": "boolean",
-          "x-go-tag-default": "true",
-          "x-order": 2
+          "x-go-tag-default": "true"
         }
       },
       "required": ["selectors"],
@@ -2234,33 +1970,27 @@
       "properties": {
         "all": {
           "$ref": "#/definitions/MatchExpressionList",
-          "description": "The expression is true when all sub expressions are true.",
-          "x-order": 0
+          "description": "The expression is true when all sub expressions are true."
         },
         "any": {
           "$ref": "#/definitions/MatchExpressionList",
-          "description": "The expression is true when any sub expression is true.",
-          "x-order": 1
+          "description": "The expression is true when any sub expression is true."
         },
         "label_equals": {
           "$ref": "#/definitions/EqualsMatchExpression",
-          "description": "The expression is true when label value equals given value.",
-          "x-order": 2
+          "description": "The expression is true when label value equals given value."
         },
         "label_exists": {
           "description": "The expression is true when label with given name exists.",
-          "type": "string",
-          "x-order": 3
+          "type": "string"
         },
         "label_matches": {
           "$ref": "#/definitions/MatchesMatchExpression",
-          "description": "The expression is true when label matches given regular expression.",
-          "x-order": 4
+          "description": "The expression is true when label matches given regular expression."
         },
         "not": {
           "$ref": "#/definitions/MatchExpression",
-          "description": "The expression negates the result of sub expression.",
-          "x-order": 5
+          "description": "The expression negates the result of sub expression."
         }
       },
       "title": "Defines a `[map<string, string> \u2192\u00a0bool]` expression to be evaluated on labels",
@@ -2276,8 +2006,7 @@
             "$ref": "#/definitions/MatchExpression",
             "type": "object"
           },
-          "type": "array",
-          "x-order": 0
+          "type": "array"
         }
       },
       "title": "List of MatchExpressions that is used for all or any matching",
@@ -2290,14 +2019,12 @@
         "label": {
           "description": "Name of the label to match the regular expression.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "regex": {
           "description": "Regular expression that should match the label value.\nIt uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         }
       },
       "required": ["label", "regex"],
@@ -2309,13 +2036,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/MaxIns",
-          "description": "Input ports for the Max component.",
-          "x-order": 0
+          "description": "Input ports for the Max component."
         },
         "out_ports": {
           "$ref": "#/definitions/MaxOuts",
-          "description": "Output ports for the Max component.",
-          "x-order": 1
+          "description": "Output ports for the Max component."
         }
       },
       "title": "Takes a list of input signals and emits the signal with the maximum value",
@@ -2332,8 +2057,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         }
       },
       "type": "object",
@@ -2344,8 +2068,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Signal with maximum value as an output signal.",
-          "x-order": 0
+          "description": "Signal with maximum value as an output signal."
         }
       },
       "type": "object",
@@ -2356,13 +2079,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/MinIns",
-          "description": "Input ports for the Min component.",
-          "x-order": 0
+          "description": "Input ports for the Min component."
         },
         "out_ports": {
           "$ref": "#/definitions/MinOuts",
-          "description": "Output ports for the Min component.",
-          "x-order": 1
+          "description": "Output ports for the Min component."
         }
       },
       "type": "object",
@@ -2378,8 +2099,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         }
       },
       "type": "object",
@@ -2390,8 +2110,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Signal with minimum value as an output signal.",
-          "x-order": 0
+          "description": "Signal with minimum value as an output signal."
         }
       },
       "type": "object",
@@ -2407,34 +2126,29 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         },
         "in_ports_map": {
           "additionalProperties": {
             "$ref": "#/definitions/InPort"
           },
           "description": "Maps input port names to input ports.",
-          "type": "object",
-          "x-order": 1
+          "type": "object"
         },
         "name": {
           "description": "Name of the nested circuit component. This name is displayed by graph visualization tools.",
-          "type": "string",
-          "x-order": 2
+          "type": "string"
         },
         "out_ports_map": {
           "additionalProperties": {
             "$ref": "#/definitions/OutPort"
           },
           "description": "Maps output port names to output ports.",
-          "type": "object",
-          "x-order": 3
+          "type": "object"
         },
         "short_description": {
           "description": "Short description of the nested circuit component. This description is displayed by graph visualization tools.",
-          "type": "string",
-          "x-order": 4
+          "type": "string"
         }
       },
       "type": "object",
@@ -2445,13 +2159,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/NestedSignalEgressIns",
-          "description": "Input ports for the NestedSignalEgress component.",
-          "x-order": 0
+          "description": "Input ports for the NestedSignalEgress component."
         },
         "port_name": {
           "description": "Name of the port.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         }
       },
       "type": "object",
@@ -2462,8 +2174,7 @@
       "properties": {
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "Egress signal.",
-          "x-order": 0
+          "description": "Egress signal."
         }
       },
       "type": "object",
@@ -2474,13 +2185,11 @@
       "properties": {
         "out_ports": {
           "$ref": "#/definitions/NestedSignalIngressOuts",
-          "description": "Output ports for the NestedSignalIngress component.",
-          "x-order": 0
+          "description": "Output ports for the NestedSignalIngress component."
         },
         "port_name": {
           "description": "Name of the port.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         }
       },
       "type": "object",
@@ -2491,8 +2200,7 @@
       "properties": {
         "signal": {
           "$ref": "#/definitions/OutPort",
-          "description": "Ingress signal.",
-          "x-order": 0
+          "description": "Ingress signal."
         }
       },
       "type": "object",
@@ -2503,13 +2211,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/OrIns",
-          "description": "Input ports for the Or component.",
-          "x-order": 0
+          "description": "Input ports for the Or component."
         },
         "out_ports": {
           "$ref": "#/definitions/OrOuts",
-          "description": "Output ports for the Or component.",
-          "x-order": 1
+          "description": "Output ports for the Or component."
         }
       },
       "type": "object",
@@ -2525,8 +2231,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 0
+          "x-go-tag-validate": "dive"
         }
       },
       "type": "object",
@@ -2537,8 +2242,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Result of logical OR of all the input signals.\n\nWill always be 0 (false), 1 (true) or invalid (unknown).",
-          "x-order": 0
+          "description": "Result of logical OR of all the input signals.\n\nWill always be 0 (false), 1 (true) or invalid (unknown)."
         }
       },
       "type": "object",
@@ -2548,8 +2252,7 @@
       "properties": {
         "signal_name": {
           "description": "Name of the outgoing Signal on the OutPort.",
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         }
       },
       "title": "Components produce output for other components through OutPorts",
@@ -2566,8 +2269,7 @@
           "description": "Template value keys are OpenAPI-inspired path templates.\n\n* Static path segment `/foo` matches a path segment exactly\n* `/{param}` matches arbitrary path segment.\n  (The parameter name is ignored and can be omitted (`{}`))\n* The parameter must cover whole segment.\n* Additionally, path template can end with `/*` wildcard to match\n  arbitrary number of trailing segments (0 or more).\n* Multiple consecutive `/` are ignored, as well as trailing `/`.\n* Parametrized path segments must come after static segments.\n* `*`, if present, must come last.\n* Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).\n\nSee also <https://swagger.io/specification/#path-templating-matching>\n\nExample:\n```yaml\n/register: register\n\"/user/{userId}\": user\n/static/*: other\n```\n\n",
           "minProperties": 1,
           "type": "object",
-          "x-go-tag-validate": "gt=0,dive,keys,required,endkeys,required",
-          "x-order": 0
+          "x-go-tag-validate": "gt=0,dive,keys,required,endkeys,required"
         }
       },
       "title": "Matches HTTP Path to given path templates",
@@ -2580,8 +2282,7 @@
         "period": {
           "description": "The period of the timer.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "scale_in_percentage": {
           "description": "The percentage of scale to reduce.\n\n",
@@ -2589,8 +2290,7 @@
           "maximum": 100,
           "minimum": 0,
           "type": "number",
-          "x-go-tag-validate": "required,gte=0,lte=100",
-          "x-order": 1
+          "x-go-tag-validate": "required,gte=0,lte=100"
         }
       },
       "required": ["period", "scale_in_percentage"],
@@ -2602,29 +2302,24 @@
       "properties": {
         "dry_run": {
           "description": "Dry run mode ensures that no scaling is invoked by this pod scaler.\nThis is useful for observing the behavior of pod scaler without disrupting any real deployment.\nThis parameter sets the default value of dry run setting which can be overridden at runtime using dynamic configuration.",
-          "type": "boolean",
-          "x-order": 0
+          "type": "boolean"
         },
         "dry_run_config_key": {
           "description": "Configuration key for overriding dry run setting through dynamic configuration.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         },
         "in_ports": {
           "$ref": "#/definitions/PodScalerIns",
-          "description": "Input ports for the PodScaler component.",
-          "x-order": 2
+          "description": "Input ports for the PodScaler component."
         },
         "kubernetes_object_selector": {
           "$ref": "#/definitions/KubernetesObjectSelector",
           "description": "The Kubernetes object to which this pod scaler applies.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 3
+          "x-go-tag-validate": "required"
         },
         "out_ports": {
           "$ref": "#/definitions/PodScalerOuts",
-          "description": "Output ports for the PodScaler component.",
-          "x-order": 4
+          "description": "Output ports for the PodScaler component."
         }
       },
       "type": "object",
@@ -2635,8 +2330,7 @@
       "properties": {
         "replicas": {
           "$ref": "#/definitions/InPort",
-          "title": "The number of replicas to configure for the Kubernetes resource",
-          "x-order": 0
+          "title": "The number of replicas to configure for the Kubernetes resource"
         }
       },
       "type": "object",
@@ -2647,13 +2341,11 @@
       "properties": {
         "actual_replicas": {
           "$ref": "#/definitions/OutPort",
-          "description": "The number of replicas that are currently running.",
-          "x-order": 0
+          "description": "The number of replicas that are currently running."
         },
         "configured_replicas": {
           "$ref": "#/definitions/OutPort",
-          "description": "The number of replicas that are desired.",
-          "x-order": 1
+          "description": "The number of replicas that are desired."
         }
       },
       "type": "object",
@@ -2664,13 +2356,11 @@
       "properties": {
         "circuit": {
           "$ref": "#/definitions/Circuit",
-          "description": "Defines the control-loop logic of the policy.",
-          "x-order": 0
+          "description": "Defines the control-loop logic of the policy."
         },
         "resources": {
           "$ref": "#/definitions/Resources",
-          "description": "Resources (such as Flux Meters, Classifiers) to setup.",
-          "x-order": 1
+          "description": "Resources (such as Flux Meters, Classifiers) to setup."
         }
       },
       "type": "object",
@@ -2682,18 +2372,15 @@
           "default": "10s",
           "description": "Describes the interval between successive evaluations of the Prometheus query.\n\n",
           "type": "string",
-          "x-go-tag-default": "10s",
-          "x-order": 0
+          "x-go-tag-default": "10s"
         },
         "out_ports": {
           "$ref": "#/definitions/PromQLOuts",
-          "description": "Output ports for the PromQL component.",
-          "x-order": 1
+          "description": "Output ports for the PromQL component."
         },
         "query_string": {
           "description": "Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.\n\n:::note\n\nThe query must return a single value either as a scalar or as a vector with a single element.\n\n:::\n\n:::info Usage with Flux Meter\n\n[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.\nTherefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.\nThe particular Flux Meter can be identified with the `flux_meter_name` label.\nThere are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.\n\n:::\n\n:::info Usage with OpenTelemetry Metrics\n\nAperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/metrics.md) for more details.\n\n:::",
-          "type": "string",
-          "x-order": 2
+          "type": "string"
         }
       },
       "title": "Component that runs a Prometheus query periodically and returns the result as an output signal",
@@ -2705,8 +2392,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "The result of the Prometheus query as an output signal.",
-          "x-order": 0
+          "description": "The result of the Prometheus query as an output signal."
         }
       },
       "type": "object",
@@ -2719,20 +2405,17 @@
           "default": "5s",
           "description": "Emitting 0 for the `false_for` duration.\n\n",
           "type": "string",
-          "x-go-tag-default": "5s",
-          "x-order": 0
+          "x-go-tag-default": "5s"
         },
         "out_ports": {
           "$ref": "#/definitions/PulseGeneratorOuts",
-          "description": "Output ports for the PulseGenerator component.",
-          "x-order": 1
+          "description": "Output ports for the PulseGenerator component."
         },
         "true_for": {
           "default": "5s",
           "description": "Emitting 1 for the `true_for` duration.\n\n",
           "type": "string",
-          "x-go-tag-default": "5s",
-          "x-order": 2
+          "x-go-tag-default": "5s"
         }
       },
       "type": "object",
@@ -2742,8 +2425,7 @@
       "description": "Outputs for the PulseGenerator component.",
       "properties": {
         "output": {
-          "$ref": "#/definitions/OutPort",
-          "x-order": 0
+          "$ref": "#/definitions/OutPort"
         }
       },
       "type": "object",
@@ -2754,8 +2436,7 @@
       "properties": {
         "promql": {
           "$ref": "#/definitions/PromQL",
-          "description": "Periodically runs a Prometheus query in the background and emits the result.",
-          "x-order": 0
+          "description": "Periodically runs a Prometheus query in the background and emits the result."
         }
       },
       "type": "object",
@@ -2766,17 +2447,14 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiterParameters",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "scheduler": {
-          "$ref": "#/definitions/Scheduler",
-          "x-order": 2
+          "$ref": "#/definitions/Scheduler"
         },
         "selectors": {
           "items": {
@@ -2785,8 +2463,7 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 3
+          "x-go-tag-validate": "required,gt=0,dive"
         }
       },
       "required": ["selectors"],
@@ -2799,14 +2476,12 @@
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
           "title": "Input ports for the RateLimiter component",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "parameters": {
           "$ref": "#/definitions/RateLimiterParameters",
           "title": "Parameters for the RateLimiter component",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -2816,8 +2491,7 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 2
+          "x-go-tag-validate": "required,gt=0,dive"
         }
       },
       "required": ["selectors"],
@@ -2830,19 +2504,16 @@
         "bucket_capacity": {
           "$ref": "#/definitions/InPort",
           "description": "Capacity of the bucket.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "fill_amount": {
           "$ref": "#/definitions/InPort",
           "description": "Number of tokens to fill within an `interval`.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "pass_through": {
           "$ref": "#/definitions/InPort",
-          "title": "PassThrough port determines whether all requests",
-          "x-order": 2
+          "title": "PassThrough port determines whether all requests"
         }
       },
       "title": "Inputs for the RateLimiter component",
@@ -2855,38 +2526,32 @@
           "default": true,
           "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",
           "type": "boolean",
-          "x-go-tag-default": "true",
-          "x-order": 0
+          "x-go-tag-default": "true"
         },
         "interval": {
           "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "label_key": {
           "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-control/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf no label key is specified, then all requests matching the\nselectors will be rate limited based on the global bucket.",
-          "type": "string",
-          "x-order": 2
+          "type": "string"
         },
         "lazy_sync": {
           "$ref": "#/definitions/RateLimiterParametersLazySync",
-          "title": "Configuration of lazy-syncing behavior of rate limiter",
-          "x-order": 3
+          "title": "Configuration of lazy-syncing behavior of rate limiter"
         },
         "max_idle_time": {
           "default": "7200s",
           "description": "Max idle time before token bucket state for a label is removed.\nIf set to 0, the state is never removed.\n\n",
           "type": "string",
-          "x-go-tag-default": "7200s",
-          "x-order": 4
+          "x-go-tag-default": "7200s"
         },
         "tokens_label_key": {
           "default": "tokens",
           "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
           "type": "string",
-          "x-go-tag-default": "tokens",
-          "x-order": 5
+          "x-go-tag-default": "tokens"
         }
       },
       "required": ["interval"],
@@ -2899,8 +2564,7 @@
           "default": false,
           "title": "Enables lazy sync",
           "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 0
+          "x-go-tag-default": "false"
         },
         "num_sync": {
           "default": 4,
@@ -2909,8 +2573,7 @@
           "format": "int64",
           "type": "integer",
           "x-go-tag-default": "4",
-          "x-go-tag-validate": "gt=0",
-          "x-order": 1
+          "x-go-tag-validate": "gt=0"
         }
       },
       "type": "object",
@@ -2926,14 +2589,12 @@
           "description": "A map of {key, value} pairs mapping from\n[flow label](/concepts/flow-control/flow-label.md) keys to queries that define\nhow to extract and propagate flow labels with that key.\nThe name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.\n\n",
           "minProperties": 1,
           "type": "object",
-          "x-go-tag-validate": "required,gt=0,dive,keys,required,endkeys,required",
-          "x-order": 0
+          "x-go-tag-validate": "required,gt=0,dive,keys,required,endkeys,required"
         },
         "module": {
           "description": "Source code of the Rego module.\n\n:::note\n\nMust include a \"package\" declaration.\n\n:::\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         }
       },
       "required": ["labels", "module"],
@@ -2947,8 +2608,7 @@
           "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled\nlabels are sent to FluxNinja ARC for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
           "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/flow-control/flow-label.md#baggage)",
           "type": "boolean",
-          "x-go-tag-default": "true",
-          "x-order": 0
+          "x-go-tag-default": "true"
         }
       },
       "type": "object",
@@ -2959,26 +2619,22 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/RegulatorIns",
-          "description": "Input ports for the _Regulator_.",
-          "x-order": 0
+          "description": "Input ports for the _Regulator_."
         },
         "parameters": {
           "$ref": "#/definitions/RegulatorParameters",
-          "description": "Parameters for the _Regulator_.",
-          "x-order": 1
+          "description": "Parameters for the _Regulator_."
         },
         "pass_through_label_values": {
           "description": "Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.",
           "items": {
             "type": "string"
           },
-          "type": "array",
-          "x-order": 2
+          "type": "array"
         },
         "pass_through_label_values_config_key": {
           "description": "Configuration key for setting pass through label values through dynamic configuration.",
-          "type": "string",
-          "x-order": 3
+          "type": "string"
         }
       },
       "type": "object",
@@ -2988,8 +2644,7 @@
       "properties": {
         "accept_percentage": {
           "$ref": "#/definitions/InPort",
-          "description": "The percentage of requests to accept.",
-          "x-order": 0
+          "description": "The percentage of requests to accept."
         }
       },
       "type": "object",
@@ -2999,8 +2654,7 @@
       "properties": {
         "label_key": {
           "description": "The flow label key for identifying sessions.\n- When label key is specified, _Regulator_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Regulator_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         },
         "selectors": {
           "description": "Selectors for the component.\n\n",
@@ -3010,8 +2664,7 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 1
+          "x-go-tag-validate": "required,gt=0,dive"
         }
       },
       "required": ["selectors"],
@@ -3023,8 +2676,7 @@
       "properties": {
         "flow_control": {
           "$ref": "#/definitions/FlowControlResources",
-          "description": "FlowControlResources are resources that are provided by flow control integration.",
-          "x-order": 0
+          "description": "FlowControlResources are resources that are provided by flow control integration."
         },
         "telemetry_collectors": {
           "description": "TelemetryCollector configures OpenTelemetry collector integration.",
@@ -3032,8 +2684,7 @@
             "$ref": "#/definitions/TelemetryCollector",
             "type": "object"
           },
-          "type": "array",
-          "x-order": 1
+          "type": "array"
         }
       },
       "title": "Resources that need to be setup for the policy to function",
@@ -3045,16 +2696,14 @@
       "properties": {
         "extractor": {
           "$ref": "#/definitions/Extractor",
-          "description": "High-level declarative extractor.",
-          "x-order": 0
+          "description": "High-level declarative extractor."
         },
         "telemetry": {
           "default": true,
           "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled\nlabels are sent to FluxNinja ARC for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
           "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/flow-control/flow-label.md#baggage)",
           "type": "boolean",
-          "x-go-tag-default": "true",
-          "x-order": 1
+          "x-go-tag-default": "true"
         }
       },
       "title": "Rule describes a single classification Rule",
@@ -3066,19 +2715,16 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/SMAIns",
-          "description": "Input ports for the SMA component.",
-          "x-order": 0
+          "description": "Input ports for the SMA component."
         },
         "out_ports": {
           "$ref": "#/definitions/SMAOuts",
-          "description": "Output ports for the SMA component.",
-          "x-order": 1
+          "description": "Output ports for the SMA component."
         },
         "parameters": {
           "$ref": "#/definitions/SMAParameters",
           "description": "Parameters for the SMA component.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -3088,8 +2734,7 @@
       "properties": {
         "input": {
           "$ref": "#/definitions/InPort",
-          "description": "Signal to be used for the moving average computation.",
-          "x-order": 0
+          "description": "Signal to be used for the moving average computation."
         }
       },
       "type": "object",
@@ -3099,8 +2744,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Computed moving average.",
-          "x-order": 0
+          "description": "Computed moving average."
         }
       },
       "type": "object",
@@ -3111,15 +2755,13 @@
         "sma_window": {
           "description": "Window of time over which the moving average is computed.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "valid_during_warmup": {
           "default": false,
           "description": "Whether the output is valid during the warm-up stage.\n\n",
           "type": "boolean",
-          "x-go-tag-default": "false",
-          "x-order": 1
+          "x-go-tag-default": "false"
         }
       },
       "required": ["sma_window"],
@@ -3131,14 +2773,12 @@
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for embedded Alerter.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "controller": {
           "$ref": "#/definitions/ScaleInControllerController",
           "title": "Controller",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -3147,12 +2787,10 @@
     "ScaleInControllerController": {
       "properties": {
         "gradient": {
-          "$ref": "#/definitions/DecreasingGradient",
-          "x-order": 0
+          "$ref": "#/definitions/DecreasingGradient"
         },
         "periodic": {
-          "$ref": "#/definitions/PeriodicDecrease",
-          "x-order": 1
+          "$ref": "#/definitions/PeriodicDecrease"
         }
       },
       "type": "object",
@@ -3163,14 +2801,12 @@
         "alerter": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for embedded Alerter.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "controller": {
           "$ref": "#/definitions/ScaleOutControllerController",
           "title": "Controller",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -3179,8 +2815,7 @@
     "ScaleOutControllerController": {
       "properties": {
         "gradient": {
-          "$ref": "#/definitions/IncreasingGradient",
-          "x-order": 0
+          "$ref": "#/definitions/IncreasingGradient"
         }
       },
       "type": "object",
@@ -3193,20 +2828,17 @@
           "default": "0.01s",
           "description": "Decision deadline margin is the amount of time that the scheduler will\nsubtract from the request deadline to determine the deadline for the\ndecision. This is to ensure that the scheduler has enough time to\nmake a decision before the request deadline happens, accounting for\nprocessing delays.\nThe request deadline is based on the\n[gRPC deadline](https://grpc.io/blog/deadlines) or the\n[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).\n\nFail-open logic is use for flow control APIs, so if the gRPC deadline\nreaches, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\n",
           "type": "string",
-          "x-go-tag-default": "0.01s",
-          "x-order": 0
+          "x-go-tag-default": "0.01s"
         },
         "default_workload_parameters": {
           "$ref": "#/definitions/SchedulerWorkloadParameters",
-          "description": "Parameters to be used if none of workloads specified in `workloads` match.",
-          "x-order": 1
+          "description": "Parameters to be used if none of workloads specified in `workloads` match."
         },
         "tokens_label_key": {
           "default": "tokens",
           "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid uint64 number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.\n\n",
           "type": "string",
-          "x-go-tag-default": "tokens",
-          "x-order": 2
+          "x-go-tag-default": "tokens"
         },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load throttling to be \"intelligent\" instead of queueing flows in an arbitrary order.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/load-scheduler.md#workload).\n\n:::\n\n",
@@ -3215,8 +2847,7 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
-          "x-order": 3
+          "x-go-tag-validate": "dive"
         }
       },
       "title": "Weighted Fair Queuing-based workload scheduler",
@@ -3229,18 +2860,15 @@
         "label_matcher": {
           "$ref": "#/definitions/LabelMatcher",
           "description": "Label Matcher to select a Workload based on\n[flow labels](/concepts/flow-control/flow-label.md).\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "name": {
           "description": "Name of the workload.",
-          "type": "string",
-          "x-order": 1
+          "type": "string"
         },
         "parameters": {
           "$ref": "#/definitions/SchedulerWorkloadParameters",
-          "description": "Parameters associated with flows matching the label matcher.",
-          "x-order": 2
+          "description": "Parameters associated with flows matching the label matcher."
         }
       },
       "type": "object",
@@ -3251,8 +2879,7 @@
       "properties": {
         "fairness_key": {
           "description": "Fairness key is a label key that can be used to provide fairness within a workload.\nAny [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if\nyou have a classifier that sets `user` flow label, you might want to set\n`fairness_key = \"user\"`.",
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         },
         "priority": {
           "default": 0,
@@ -3263,14 +2890,12 @@
           "title": "Describes priority level of the flows within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:",
           "type": "integer",
           "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0,lte=255",
-          "x-order": 1
+          "x-go-tag-validate": "gte=0,lte=255"
         },
         "tokens": {
           "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.",
           "format": "uint64",
-          "type": "string",
-          "x-order": 2
+          "type": "string"
         }
       },
       "type": "object",
@@ -3283,26 +2908,22 @@
           "default": "default",
           "description": "[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller.\nThe agents within an agent group receive exact same policy configuration and\nform a peer to peer cluster to constantly share state.\n\n:::\n\n",
           "type": "string",
-          "x-go-tag-default": "default",
-          "x-order": 0
+          "x-go-tag-default": "default"
         },
         "control_point": {
           "description": "[Control Point](/concepts/flow-control/selector.md#control-point)\nidentifies location within services where policies can act on flows.\nFor an SDK based insertion,\na _Control Point_ can represent a particular feature or execution\nblock within a service. In case of service mesh or middleware insertion, a\n_Control Point_ can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "label_matcher": {
           "$ref": "#/definitions/LabelMatcher",
-          "description": "[Label Matcher](/concepts/flow-control/selector.md#label-matcher)\ncan be used to match flows based on flow labels.",
-          "x-order": 2
+          "description": "[Label Matcher](/concepts/flow-control/selector.md#label-matcher)\ncan be used to match flows based on flow labels."
         },
         "service": {
           "default": "any",
           "description": "The Fully Qualified Domain Name of the\n[service](/concepts/flow-control/selector.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n:::info\n\n`any` matches all services.\n\n:::\n\n:::info\n\nAn entity (for example, Kubernetes pod) might belong to multiple services.\n\n:::\n\n",
           "type": "string",
-          "x-go-tag-default": "any",
-          "x-order": 3
+          "x-go-tag-default": "any"
         }
       },
       "required": ["control_point"],
@@ -3313,18 +2934,15 @@
       "description": "The _Signal Generator_ component generates a smooth and continuous signal\nby following a sequence of specified steps. Each step has two parameters:\n- `target_output`: The desired output value at the end of the step.\n- `duration`: The time it takes for the signal to change linearly from the\n  previous step's `target_output` to the current step's `target_output`.\n\nThe output signal starts at the `target_output` of the first step and\nchanges linearly between steps based on their `duration`. The _Signal\nGenerator_ can be controlled to move forwards, backwards, or reset to the\nbeginning based on input signals.",
       "properties": {
         "in_ports": {
-          "$ref": "#/definitions/SignalGeneratorIns",
-          "x-order": 0
+          "$ref": "#/definitions/SignalGeneratorIns"
         },
         "out_ports": {
-          "$ref": "#/definitions/SignalGeneratorOuts",
-          "x-order": 1
+          "$ref": "#/definitions/SignalGeneratorOuts"
         },
         "parameters": {
           "$ref": "#/definitions/SignalGeneratorParameters",
           "description": "Parameters for the _Signal Generator_ component.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -3335,18 +2953,15 @@
       "properties": {
         "backward": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the _Signal Generator_ towards the previous step.",
-          "x-order": 0
+          "description": "Whether to progress the _Signal Generator_ towards the previous step."
         },
         "forward": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to progress the _Signal Generator_ towards the next step.",
-          "x-order": 1
+          "description": "Whether to progress the _Signal Generator_ towards the next step."
         },
         "reset": {
           "$ref": "#/definitions/InPort",
-          "description": "Whether to reset the _Signal Generator_ to the first step.",
-          "x-order": 2
+          "description": "Whether to reset the _Signal Generator_ to the first step."
         }
       },
       "type": "object",
@@ -3357,18 +2972,15 @@
       "properties": {
         "at_end": {
           "$ref": "#/definitions/OutPort",
-          "description": "A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.",
-          "x-order": 0
+          "description": "A Boolean signal indicating whether the _Signal Generator_ is at the end of signal generation."
         },
         "at_start": {
           "$ref": "#/definitions/OutPort",
-          "description": "A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.",
-          "x-order": 1
+          "description": "A Boolean signal indicating whether the _Signal Generator_ is at the start of signal generation."
         },
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "The generated signal.",
-          "x-order": 2
+          "description": "The generated signal."
         }
       },
       "type": "object",
@@ -3384,8 +2996,7 @@
           },
           "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,gt=0,dive",
-          "x-order": 0
+          "x-go-tag-validate": "required,gt=0,dive"
         }
       },
       "required": ["steps"],
@@ -3397,13 +3008,11 @@
         "duration": {
           "description": "Duration for which the step is active.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
-          "x-order": 0
+          "x-go-tag-validate": "required"
         },
         "target_output": {
           "$ref": "#/definitions/ConstantSignal",
-          "description": "The value of the step.",
-          "x-order": 1
+          "description": "The value of the step."
         }
       },
       "required": ["duration"],
@@ -3415,13 +3024,11 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/SwitcherIns",
-          "description": "Input ports for the Switcher component.",
-          "x-order": 0
+          "description": "Input ports for the Switcher component."
         },
         "out_ports": {
           "$ref": "#/definitions/SwitcherOuts",
-          "description": "Output ports for the Switcher component.",
-          "x-order": 1
+          "description": "Output ports for the Switcher component."
         }
       },
       "title": "Type of Combinator that switches between `on_signal` and `off_signal` signals based on switch input",
@@ -3433,18 +3040,15 @@
       "properties": {
         "off_signal": {
           "$ref": "#/definitions/InPort",
-          "description": "Output signal when switch is invalid or 0.0.",
-          "x-order": 0
+          "description": "Output signal when switch is invalid or 0.0."
         },
         "on_signal": {
           "$ref": "#/definitions/InPort",
-          "description": "Output signal when switch is valid and not 0.0.",
-          "x-order": 1
+          "description": "Output signal when switch is valid and not 0.0."
         },
         "switch": {
           "$ref": "#/definitions/InPort",
-          "description": "Decides whether to return `on_signal` or `off_signal`.",
-          "x-order": 2
+          "description": "Decides whether to return `on_signal` or `off_signal`."
         }
       },
       "type": "object",
@@ -3455,8 +3059,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Selected signal (`on_signal` or `off_signal`).",
-          "x-order": 0
+          "description": "Selected signal (`on_signal` or `off_signal`)."
         }
       },
       "type": "object",
@@ -3467,16 +3070,14 @@
         "agent_group": {
           "default": "default",
           "type": "string",
-          "x-go-tag-default": "default",
-          "x-order": 0
+          "x-go-tag-default": "default"
         },
         "infra_meters": {
           "additionalProperties": {
             "$ref": "#/definitions/InfraMeter"
           },
           "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\n telemetry_collectors:\n   - agent_group: default\n     infra_meters:\n\t      rabbitmq:\n\t        processors:\n\t          batch:\n\t            send_batch_size: 10\n\t            timeout: 10s\n\t        receivers:\n\t          rabbitmq:\n\t            collection_interval: 10s\n\t            endpoint: http://<rabbitmq-svc-fqdn>:15672\n\t            password: secretpassword\n\t            username: admin\n\t        per_agent_group: true\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying it to the\nproduction cluster.\nIncorrect configuration will get rejected at the agents and might cause\nshutdown of the agent(s).\n\n:::",
-          "type": "object",
-          "x-order": 1
+          "type": "object"
         }
       },
       "title": "TelemetryCollector defines the telemetry configuration to be synced with the agents.\nIt consists of two parts:\n- Agent Group: Agent group to sync telemetry configuration with\n- Infra Meters: OTel compatible metrics pipelines",
@@ -3488,8 +3089,7 @@
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/UnaryOperatorIns",
-          "description": "Input ports for the UnaryOperator component.",
-          "x-order": 0
+          "description": "Input ports for the UnaryOperator component."
         },
         "operator": {
           "description": "Unary Operator to apply.\n\nThe unary operator can be one of the following:\n* `abs`: Absolute value with the sign removed.\n* `acos`: `arccosine`, in radians.\n* `acosh`: Inverse hyperbolic cosine.\n* `asin`: `arcsine`, in radians.\n* `asinh`: Inverse hyperbolic sine.\n* `atan`: `arctangent`, in radians.\n* `atanh`: Inverse hyperbolic tangent.\n* `cbrt`: Cube root.\n* `ceil`: Least integer value greater than or equal to input signal.\n* `cos`: `cosine`, in radians.\n* `cosh`: Hyperbolic cosine.\n* `erf`: Error function.\n* `erfc`: Complementary error function.\n* `erfcinv`: Inverse complementary error function.\n* `erfinv`: Inverse error function.\n* `exp`: The base-e exponential of input signal.\n* `exp2`: The base-2 exponential of input signal.\n* `expm1`: The base-e exponential of input signal minus 1.\n* `floor`: Greatest integer value less than or equal to input signal.\n* `gamma`: Gamma function.\n* `j0`: Bessel function of the first kind of order 0.\n* `j1`: Bessel function of the first kind of order 1.\n* `lgamma`: Natural logarithm of the absolute value of the gamma function.\n* `log`: Natural logarithm of input signal.\n* `log10`: Base-10 logarithm of input signal.\n* `log1p`: Natural logarithm of input signal plus 1.\n* `log2`: Base-2 logarithm of input signal.\n* `round`: Round to nearest integer.\n* `roundtoeven`: Round to nearest integer, with ties going to the nearest even integer.\n* `sin`: `sine`, in radians.\n* `sinh`: Hyperbolic sine.\n* `sqrt`: Square root.\n* `tan`: `tangent`, in radians.\n* `tanh`: Hyperbolic tangent.\n* `trunc`: Truncate to integer.\n* `y0`: Bessel function of the second kind of order 0.\n* `y1`: Bessel function of the second kind of order 1.\n\n",
@@ -3534,13 +3134,11 @@
           ],
           "type": "string",
           "x-go-tag-validate": "oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1",
-          "x-oneof": "abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1",
-          "x-order": 1
+          "x-oneof": "abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1"
         },
         "out_ports": {
           "$ref": "#/definitions/UnaryOperatorOuts",
-          "description": "Output ports for the UnaryOperator component.",
-          "x-order": 2
+          "description": "Output ports for the UnaryOperator component."
         }
       },
       "title": "Takes an input signal and emits the output after applying the specified unary operator",
@@ -3552,8 +3150,7 @@
       "properties": {
         "input": {
           "$ref": "#/definitions/InPort",
-          "description": "Input signal.",
-          "x-order": 0
+          "description": "Input signal."
         }
       },
       "type": "object",
@@ -3564,8 +3161,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "Output signal.",
-          "x-order": 0
+          "description": "Output signal."
         }
       },
       "type": "object",
@@ -3576,19 +3172,16 @@
       "properties": {
         "config_key": {
           "description": "Configuration key for overriding value setting through dynamic configuration.",
-          "type": "string",
-          "x-order": 0
+          "type": "string"
         },
         "constant_output": {
           "$ref": "#/definitions/ConstantSignal",
           "description": "The constant signal emitted by this component. The value of the constant signal can be overridden at runtime through dynamic configuration.\n\n",
-          "x-go-tag-validate": "required",
-          "x-order": 1
+          "x-go-tag-validate": "required"
         },
         "out_ports": {
           "$ref": "#/definitions/VariableOuts",
-          "description": "Output ports for the Variable component.",
-          "x-order": 2
+          "description": "Output ports for the Variable component."
         }
       },
       "type": "object",
@@ -3599,8 +3192,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
-          "description": "The value is emitted to the output port.",
-          "x-order": 0
+          "description": "The value is emitted to the output port."
         }
       },
       "type": "object",

@@ -77,7 +77,9 @@ buf-generate:
 			yq eval -i "del(.tags)" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			yq eval -i ".host = \"$$process\"" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			yq eval -i '.schemes = ["https"]' $(DOCS_OPENAPI)/$$process.swagger.yaml; \
-			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --format=yaml --output=$(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --output=$(DOCS_OPENAPI)/$$process.swagger.json; \
+			go run $(DOCS_ROOT)/tools/jsonnet/json2yaml.go $(DOCS_OPENAPI)/$$process.swagger.json $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			rm $(DOCS_OPENAPI)/$$process.swagger.json; \
 		done; \
 	}
 	@git add $(DOCS_OPENAPI)
