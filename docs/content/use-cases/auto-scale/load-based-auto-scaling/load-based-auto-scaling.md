@@ -39,7 +39,7 @@ sustained load changes. An [_Auto Scaler_](/concepts/auto-scale.md#auto-scaler)
 component is used to dynamically adjust the number of service instances in
 response to changes in load and CPU utilization. This load-based auto-scaling is
 enacted by a scale-out Controller that reads
-[_Load Scheduler_](/concepts/load-scheduler.md) signals, effectively throttling
+[_Load Scheduler_](/concepts/scheduler.md) signals, effectively throttling
 traffic into a queue and scaling resources to match the demand.
 
 ## Policy Configuration

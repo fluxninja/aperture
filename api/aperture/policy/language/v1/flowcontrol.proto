@@ -136,7 +136,7 @@ message RateLimiter {
 //
 // :::info
 //
-// See also [_Load Scheduler_ overview](/concepts/load-scheduler.md).
+// See also [_Load Scheduler_ overview](/concepts/scheduler.md).
 //
 // :::
 //
@@ -269,7 +269,7 @@ message Scheduler {
   // :::info
   //
   // See also [workload definition in the concepts
-  // section](/concepts/load-scheduler.md#workload).
+  // section](/concepts/scheduler.md#workload).
   //
   // :::
   repeated Workload workloads = 1; // @gotags: validate:"dive"

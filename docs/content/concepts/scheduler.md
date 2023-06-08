@@ -1,5 +1,5 @@
 ---
-title: Load Scheduler
+title: Scheduler
 keywords:
   - scheduler
   - tokens

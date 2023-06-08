@@ -87,7 +87,7 @@ No, as for now, we only support deploying [Aperture Controller][] on a
 Kubernetes cluster.
 
 [Rate Limiter]: /concepts/rate-limiter.md
-[Load Scheduler]: /concepts/load-scheduler.md
+[Load Scheduler]: /concepts/scheduler.md
 [Classifier]: /concepts/classifier.md
 [Flow Label]: /concepts/flow-label.md
 [Aperture Controller]: /get-started/installation/controller/controller.md

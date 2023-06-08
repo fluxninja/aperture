@@ -408,7 +408,7 @@ func (x *RateLimiter) GetSelectors() []*Selector {
 //
 // :::info
 //
-// See also [_Load Scheduler_ overview](/concepts/load-scheduler.md).
+// See also [_Load Scheduler_ overview](/concepts/scheduler.md).
 //
 // :::
 //
@@ -534,7 +534,7 @@ type Scheduler struct {
 	// :::info
 	//
 	// See also [workload definition in the concepts
-	// section](/concepts/load-scheduler.md#workload).
+	// section](/concepts/scheduler.md#workload).
 	//
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,1,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"

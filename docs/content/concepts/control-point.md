@@ -110,3 +110,7 @@ Use the [`aperturectl flow-control control-points`][aperturectl] CLI command to
 list active control points.
 
 :::
+
+[flowcontrol-proto]:
+  https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.check.v1
+[aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
