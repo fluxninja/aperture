@@ -57,6 +57,10 @@ policy:
       classifiers:
         - selectors:
             - control_point: service1-demo-app
+              service: kong-server.demoapp.svc.cluster.local
+              label_matcher:
+                match_labels:
+                  http.target: "/service1/request"
           rules:
             user_type:
               extractor:
@@ -70,6 +74,10 @@ policy:
         # Required: True
         selectors:
           - control_point: service1-demo-app
+            service: kong-server.demoapp.svc.cluster.local
+            label_matcher:
+              match_labels:
+                http.target: "/service1/request"
         # Scheduler parameters.
         # Type: aperture.spec.v1.SchedulerParameters
         scheduler:
@@ -79,11 +87,13 @@ policy:
               label_matcher:
                 match_labels:
                   user_type: guest
+              name: guest
             - parameters:
                 priority: 200
               label_matcher:
                 match_labels:
                   http.request.header.user_type: subscriber
+              name: subscriber
       # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
       # Type: float64
       load_multiplier_linear_increment: 0.0025
@@ -95,3 +105,7 @@ policy:
     flux_meter:
       selectors:
         - control_point: service3-demo-app
+          service: kong-server.demoapp.svc.cluster.local
+          label_matcher:
+            match_labels:
+              http.target: "/service3"

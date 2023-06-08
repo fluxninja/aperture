@@ -86,6 +86,14 @@ existing services.
 No, as for now, we only support deploying [Aperture Controller][] on a
 Kubernetes cluster.
 
+### Can the Aperture Agent run in a non-containerized environment?
+
+Yes, the Aperture Agent can be deployed in a non-containerized environment. The
+Aperture Agent is a binary that can be run on the
+[Supported Linux platforms](/get-started/installation/agent/supported-platforms.md).
+The installation steps are available
+[here](/get-started/installation/agent/bare_metal.md).
+
 [Rate Limiter]: /concepts/flow-control/components/rate-limiter.md
 [Load Scheduler]: /concepts/flow-control/components/load-scheduler.md
 [Classifier]: /concepts/flow-control/resources/classifier.md

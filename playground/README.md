@@ -44,9 +44,9 @@ Now, press Space to open the Tilt UI in your default browser.
 The above command starts an Aperture Controller and an Aperture Agent on each
 worker node in the local Kubernetes cluster. Additionally, it starts a
 Java-based demo application with
-[Aperture Java SDK](/integrations/flow-control/sdk/java/java.md) configured to
-integrate with Aperture. There is an instance of Grafana running on the cluster
-as well for viewing metrics from experiments.
+[Aperture Java SDK](/integrations/sdk/java/java.md) configured to integrate with
+Aperture. There is an instance of Grafana running on the cluster as well for
+viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
 [Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)

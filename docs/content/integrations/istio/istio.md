@@ -1,5 +1,5 @@
 ---
-title: Istio Configuration
+title: Istio
 keywords:
   - install
   - setup
@@ -13,7 +13,7 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 ```
 
 ## Envoy Filter {#envoy-filter}
