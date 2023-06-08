@@ -88,7 +88,7 @@ Kubernetes cluster.
 
 ### Can the Aperture Agent run in a non-containerized environment?
 
-Yes, the Aperture Agent can be deployed on a non-containerized environment. The
+Yes, the Aperture Agent can be deployed in a non-containerized environment. The
 Aperture Agent is a binary that can be run on the [Supported Linux platforms][].
 The installation steps are available
 [here](/get-started/installation/agent/bare_metal.md).
