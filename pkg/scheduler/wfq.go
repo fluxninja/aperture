@@ -153,9 +153,17 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
-func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) bool {
+func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) (accepted bool) {
+	retDecision := func(accepted bool) bool {
+		if accepted {
+			sched.metrics.AcceptedTokensCounter.Add(float64(request.Tokens) / 1000)
+		}
+		sched.metrics.IncomingTokensCounter.Add(float64(request.Tokens) / 1000)
+		return accepted
+	}
+
 	if request.Tokens == 0 {
-		return true
+		return retDecision(true)
 	}
 
 	sched.lock.Lock()
@@ -164,7 +172,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) bool {
 	sched.lock.Unlock()
 
 	if sched.manager.PreprocessRequest(ctx, request) {
-		return true
+		return retDecision(true)
 	}
 
 	// try to schedule right now
@@ -172,7 +180,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) bool {
 		ok := sched.manager.TakeIfAvailable(ctx, float64(request.Tokens))
 		if ok {
 			// we got the tokens, no need to queue
-			return true
+			return retDecision(true)
 		}
 	}
 
@@ -182,10 +190,10 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) bool {
 	// scheduler is in overload situation and we have to wait for ready signal and tokens
 	select {
 	case <-qRequest.ready:
-		return sched.scheduleRequest(ctx, request, qRequest)
+		return retDecision(sched.scheduleRequest(ctx, request, qRequest))
 	case <-ctx.Done():
 		sched.cancelRequest(qRequest)
-		return false
+		return retDecision(false)
 	}
 }
 
@@ -455,6 +463,8 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
 type WFQMetrics struct {
-	FlowsGauge        prometheus.Gauge
-	HeapRequestsGauge prometheus.Gauge
+	FlowsGauge            prometheus.Gauge
+	HeapRequestsGauge     prometheus.Gauge
+	IncomingTokensCounter prometheus.Counter
+	AcceptedTokensCounter prometheus.Counter
 }
