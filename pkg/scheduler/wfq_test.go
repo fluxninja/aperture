@@ -27,6 +27,8 @@ var (
 	prometheusRegistry              *prometheus.Registry
 	wfqFlowsGauge                   prometheus.Gauge
 	wfqHeapRequestsGauge            prometheus.Gauge
+	wfqAcceptedTokensCounter        prometheus.Counter
+	wfqIncomingTokensCounter        prometheus.Counter
 	tokenBucketLMGauge              prometheus.Gauge
 	tokenBucketFillRateGauge        prometheus.Gauge
 	tokenBucketBucketCapacityGauge  prometheus.Gauge
@@ -50,6 +52,18 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqHeapRequestsGauge)
+	wfqIncomingTokensCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name:        metrics.IncomingTokensMetricName,
+		Help:        "A counter measuring work incoming into Scheduler",
+		ConstLabels: constLabels,
+	})
+	_ = prometheusRegistry.Register(wfqIncomingTokensCounter)
+	wfqAcceptedTokensCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name:        metrics.AcceptedTokensMetricName,
+		Help:        "A counter measuring work admitted by Scheduler",
+		ConstLabels: constLabels,
+	})
+	_ = prometheusRegistry.Register(wfqIncomingTokensCounter)
 	tokenBucketLMGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: metrics.TokenBucketLMMetricName,
 		Help: "A gauge that tracks the load multiplier",
@@ -229,8 +243,10 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 	manager := NewBasicTokenBucket(c, 0, metrics)
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -264,8 +280,10 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	manager.SetLoadMultiplier(1.0)
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -324,8 +342,10 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	_, tbMetrics := getMetrics()
 	basicBucket := NewBasicTokenBucket(c, fillRate, tbMetrics)
 	metrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, basicBucket, metrics)
 	var wg sync.WaitGroup
@@ -575,8 +595,10 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		},
 	}
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 
 	c := clockwork.NewFakeClock()
