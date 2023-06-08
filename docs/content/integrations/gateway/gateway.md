@@ -6,7 +6,7 @@ keywords:
 sidebar_position: 3
 ---
 
-Aperture also support Gateways integration for Flow Control.
+Aperture also supports Gateways integration for Flow Control.
 
 :::info Selector
 

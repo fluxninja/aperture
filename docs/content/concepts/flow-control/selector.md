@@ -242,8 +242,8 @@ _Agent Group_ name together with _Service_ name determine the
 ### Gateways Integration {#gateways-integration}
 
 Aperture can be integrated with [Gateways][gateway] to control traffic before
-they are routed to the service. Gateways can be configured to send flow control
-requests to Aperture for every incoming request.
+that is routed to the upstream service. Gateways can be configured to send flow
+control requests to Aperture for every incoming request.
 
 As the requests to Aperture are sent from the Gateway, the service selector has
 to be configured to match the Gateway's service. For example, if the Gateway
@@ -261,8 +261,8 @@ label_matcher:
 ```
 
 Also, if the control point is configured uniquely for each location/route, the
-`control_point` field alone can be used to match the upstream service and rest
-of the fields can be omitted:
+`control_point` field alone can be used to match the upstream service and the
+rest of the fields can be omitted:
 
 ```yaml
 agent_group: default

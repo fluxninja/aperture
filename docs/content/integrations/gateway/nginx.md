@@ -195,7 +195,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    ```
 
 7. Aperture needs `control_point` variable for referring the service in Aperture
-   Policy, which need to be set from Nginx `location` block:
+   Policy, which needs to be set from Nginx `location` block:
 
    ```bash
    http {
@@ -258,12 +258,12 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
          proxy_pass http://service1-demo-app.demoapp.svc.cluster.local:80/request;
        }
 
-       location /service1 {
+       location /service2 {
          set $control_point "service2-demo-app";
          proxy_pass http://service2-demo-app.demoapp.svc.cluster.local:80/request;
        }
 
-       location /service1 {
+       location /service3 {
          set $control_point "service3-demo-app";
          proxy_pass http://service3-demo-app.demoapp.svc.cluster.local:80/request;
        }
