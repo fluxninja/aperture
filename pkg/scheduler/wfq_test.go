@@ -63,7 +63,7 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		Help:        "A counter measuring work admitted by Scheduler",
 		ConstLabels: constLabels,
 	})
-	_ = prometheusRegistry.Register(wfqIncomingTokensCounter)
+	_ = prometheusRegistry.Register(wfqAcceptedTokensCounter)
 	tokenBucketLMGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: metrics.TokenBucketLMMetricName,
 		Help: "A gauge that tracks the load multiplier",
