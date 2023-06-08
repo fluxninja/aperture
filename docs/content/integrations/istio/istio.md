@@ -1,5 +1,5 @@
 ---
-title: Istio Configuration
+title: Istio
 keywords:
   - install
   - setup
