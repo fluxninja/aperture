@@ -31,6 +31,22 @@ agents.
 
 :::
 
+[!Flux Meter](./assets/img/flux-meter-light.svg#gh-light-mode-only)
+[!Flux Meter](./assets/img/flux-meter-dark.svg#gh-dark-mode-only)
+
+The diagram details the journey of a request, as it traverses through the Flow
+Selector forwards the request to the Flux Meter, which matches the request with
+a Flow Selector.
+
+Post matching, the request is returned to the originating service for additional
+processing. Subsequently, the service dispatches the request to the
+OpenTelemetry pipeline. This pipeline's function is to report the data to
+Prometheus for monitoring and alerting purposes.
+
+This sophisticated workflow enables your cloud-native product to monitor and
+observe traffic patterns effectively, promoting reliability and effective
+anomaly detection.
+
 ## Metric
 
 The default metric tracked by _Flux Meter_ is the flow's workload duration in

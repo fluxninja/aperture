@@ -77,6 +77,25 @@ the same number of tokens.
 
 :::
 
+![Token Bucket](./assets/img/token-bucket-light.svg#gh-light-mode-only)
+![Token Bucket](./assets/img/token-bucket-dark.svg#gh-dark-mode-only)
+
+The diagram at hand illustrates the use of the token bucket algorithm for
+workload prioritization by the scheduler. It demonstrates how the Aperture
+Controller periodically adjusts the token bucket's load multiplier and refill
+rate by broadcasting signals to the Aperture Agent.
+
+In the scope of the Aperture Agent, the scheduler efficiently handles incoming
+requests, categorizing them according to their urgency. This classification
+scale ranges from 0 to 255, where 0 indicates the lowest and 255 the highest
+priority.
+
+To manage a prioritized request, the scheduler obtains tokens from the token
+bucket, which either returns tokens, if available, or returns an await signal.
+Then, tokens are used to schedule and route requests to the appropriate service.
+Any requests exceeding the available token limit are strategically discarded to
+maintain optimal system performance.
+
 ### Tokens {#tokens}
 
 Tokens represent the unit of cost for accepting a certain flow. Typically,
