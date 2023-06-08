@@ -73,7 +73,7 @@ you need to install integrations that will communicate with the Aperture Agent.
   Integration instructions for [Istio/Envoy][istio] are provided, and the
   Control Point can be named to identify a particular filter chain in Envoy. If
   insertion is done through Istio, the
-  [default filter configuration](/integrations/envoy/istio.md#envoy-filter)
+  [default filter configuration](/integrations/istio/istio.md#envoy-filter)
   assigns _ingress_ and _egress_ Control Points as identified by
   [Istio][istio-patch-context].
 
@@ -97,7 +97,7 @@ you need to install integrations that will communicate with the Aperture Agent.
 [flux-meter]: ./resources/flux-meter.md
 [classifier]: ./resources/classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[istio]: /integrations/envoy/istio.md
+[istio]: /integrations/istio/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [flowcontrol-proto]:

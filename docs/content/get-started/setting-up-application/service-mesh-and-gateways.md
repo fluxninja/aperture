@@ -24,7 +24,7 @@ Gateway, and Kong Gateway.
 Aperture, supports integration with EnvoyProxy and Istio. With the help
 `aperturectl` which is a CLI tool provided by Aperture, you can easily integrate
 Aperture. Check out the complete installation guide in
-[Service Mesh Integration](/integrations/envoy/envoy.md).
+[Service Mesh Integration](/integrations/istio/istio.md).
 
 <!-- vale off -->
 
