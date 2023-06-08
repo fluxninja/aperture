@@ -9,7 +9,7 @@ metadata:
       "kind": "Deployment", "name": "hasura", "namespace": "cloud"}, "max_replicas":
       "10", "min_replicas": "1"}}, "scaling_parameters": {"scale_in_alerter": {"alert_name":
       "Auto-scaler is scaling in"}, "scale_in_cooldown": "120s", "scale_out_alerter":
-      {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}},
+      {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "10s"}},
       "latency_baseliner": {"flux_meter": {"selectors": [{"control_point": "ingress",
       "label_matcher": {"match_labels": {"operation": "query", "source": "api-service.cloud.svc.cluster.local"}},
       "service": "hasura.cloud.svc.cluster.local"}]}}, "policy_name": "auto-scaling-hasura",
@@ -118,7 +118,7 @@ spec:
             scale_in_cooldown: 120s
             scale_out_alerter:
               alert_name: Auto-scaler is scaling out
-            scale_out_cooldown: 30s
+            scale_out_cooldown: 10s
     - query:
         promql:
           evaluation_interval: 1s

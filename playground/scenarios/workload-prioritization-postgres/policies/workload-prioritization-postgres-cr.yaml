@@ -5,39 +5,73 @@ metadata:
     fluxninja.com/blueprint-name: policies/service-protection/promql
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"evaluation_interval": "1s", "policy_name":
-      "workload-prioritization-postgres", "promql_query": "sum(pg_connections{db=\"hasura\"})
-      / max(pg_setting{name=\"max_connections\"}) * 100", "resources": {"flow_control":
-      {"classifiers": [{"rego": {"labels": {"operation": {"telemetry": true}, "source":
-      {"telemetry": true}}, "module": "package hasura_example\nsource = input.attributes.source.source_fqdns[0]\noperation
+      "workload-prioritization-postgres", "promql_query": "(sum(postgresql_backends)
+      / sum(postgresql_connection_max)) * 100", "resources": {"flow_control": {"classifiers":
+      [{"rego": {"labels": {"operation": {"telemetry": true}, "source": {"telemetry":
+      true}}, "module": "package hasura_example\nsource = input.attributes.source.source_fqdns[0]\noperation
       = graphql.parse_query(input.parsed_body.query).Operations[_].Operation\n"},
       "selectors": [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}]},
-      "telemetry_collectors": [{"agent_group": "default", "infra_meters": {"prometheus_simple":
-      {"per_agent_group": true, "receivers": {"prometheus_simple": {"collection_interval":
-      "1s", "endpoint": "hasura-postgresql-metrics.cloud.svc.cluster.local:9187",
-      "tls": {"insecure_skip_verify": true}, "use_service_account": true}}}}}]}, "service_protection_core":
+      "telemetry_collectors": [{"agent_group": "default", "infra_meters": {"postgresql":
+      {"per_agent_group": true, "receivers": {"postgresql": {"collection_interval":
+      "1s", "endpoint": "hasura-postgresql.cloud.svc.cluster.local:5432", "password":
+      "DevPassword", "tls": {"insecure": true}, "username": "postgres"}}}}}]}, "service_protection_core":
       {"adaptive_load_scheduler": {"load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
       {"match_labels": {"source": "api-service.cloud.svc.cluster.local"}}, "name":
-      "api-service", "parameters": {"priority": 250}}, {"label_matcher": {"match_labels":
+      "api-service", "parameters": {"priority": 255}}, {"label_matcher": {"match_labels":
       {"operation": "mutation", "source": "agent-service.cloud.svc.cluster.local"}},
       "name": "agent-service-mutation", "parameters": {"priority": 100}}, {"label_matcher":
       {"match_labels": {"operation": "query", "source": "agent-service.cloud.svc.cluster.local"}},
       "name": "agent-service-query", "parameters": {"priority": 50}}]}, "selectors":
-      [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}}},
-      "setpoint": 80}}'
+      [{"control_point": "ingress", "service": "hasura.cloud.svc.cluster.local"}]}},
+      "overload_confirmations": [{"operator": "gte", "query_string": "max(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name=\"hasura-postgresql\"})",
+      "threshold": 2.1000000000000001}]}, "setpoint": 70}}'
   labels:
     fluxninja.com/validate: "true"
   name: workload-prioritization-postgres
 spec:
   circuit:
     components:
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: PROMQL_0
+          query_string: max(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name="hasura-postgresql"})
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: PROMQL_0
+          rhs:
+            constant_signal:
+              value: 2.1
+        operator: gte
+        out_ports:
+          output:
+            signal_name: CONFIRMATION_SIGNAL_0
+    - first_valid:
+        in_ports:
+          inputs:
+          - signal_name: CONFIRMATION_SIGNAL_0
+          - constant_signal:
+              value: 0
+        out_ports:
+          output:
+            signal_name: OVERLOAD_CONFIRMATION_0
+    - and:
+        in_ports:
+          inputs:
+          - signal_name: OVERLOAD_CONFIRMATION_0
+        out_ports:
+          output:
+            signal_name: OVERLOAD_CONFIRMATION
     - flow_control:
         adaptive_load_scheduler:
           dry_run: false
           dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
-              constant_signal:
-                value: 1
+              signal_name: OVERLOAD_CONFIRMATION
             setpoint:
               signal_name: SETPOINT
             signal:
@@ -63,7 +97,7 @@ spec:
                       source: api-service.cloud.svc.cluster.local
                   name: api-service
                   parameters:
-                    priority: 250
+                    priority: 255
                 - label_matcher:
                     match_labels:
                       operation: mutation
@@ -88,11 +122,11 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(pg_connections{db="hasura"}) / max(pg_setting{name="max_connections"})
+          query_string: (sum(postgresql_backends) / sum(postgresql_connection_max))
             * 100
     - variable:
         constant_output:
-          value: 80
+          value: 70
         out_ports:
           output:
             signal_name: SETPOINT
@@ -116,12 +150,13 @@ spec:
     telemetry_collectors:
     - agent_group: default
       infra_meters:
-        prometheus_simple:
+        postgresql:
           per_agent_group: true
           receivers:
-            prometheus_simple:
+            postgresql:
               collection_interval: 1s
-              endpoint: hasura-postgresql-metrics.cloud.svc.cluster.local:9187
+              endpoint: hasura-postgresql.cloud.svc.cluster.local:5432
+              password: DevPassword
               tls:
-                insecure_skip_verify: true
-              use_service_account: true
+                insecure: true
+              username: postgres

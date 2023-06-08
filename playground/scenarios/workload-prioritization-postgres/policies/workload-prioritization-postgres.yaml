@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=../../../../blueprints/policies/service-protection/promql/gen/definitions.json
 policy:
   policy_name: workload-prioritization-postgres
-  promql_query: 'sum(pg_connections{db="hasura"}) / max(pg_setting{name="max_connections"}) * 100'
-  setpoint: 80
+  promql_query: '(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100'
+  setpoint: 70
   evaluation_interval: "1s"
   resources:
     flow_control:
@@ -23,16 +23,21 @@ policy:
     telemetry_collectors:
       - agent_group: default
         infra_meters:
-          prometheus_simple:
+          postgresql:
             per_agent_group: true
             receivers:
-              prometheus_simple:
+              postgresql:
+                endpoint: hasura-postgresql.cloud.svc.cluster.local:5432
+                username: postgres
+                password: DevPassword
                 collection_interval: 1s
-                use_service_account: true
-                endpoint: "hasura-postgresql-metrics.cloud.svc.cluster.local:9187"
                 tls:
-                  insecure_skip_verify: true
+                  insecure: true
   service_protection_core:
+    overload_confirmations:
+      - query_string: 'max(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name="hasura-postgresql"})'
+        threshold: 2.1
+        operator: gte
     adaptive_load_scheduler:
       load_scheduler:
         selectors:
@@ -44,7 +49,7 @@ policy:
                 match_labels:
                   source: "api-service.cloud.svc.cluster.local"
               parameters:
-                priority: 250
+                priority: 255
               name: "api-service"
             - label_matcher:
                 match_labels:

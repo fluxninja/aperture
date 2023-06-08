@@ -14,7 +14,7 @@ policy:
           namespace: cloud
     scaling_parameters:
       scale_in_cooldown: "120s"
-      scale_out_cooldown: "30s"
+      scale_out_cooldown: "10s"
       scale_out_alerter:
         alert_name: Auto-scaler is scaling out
       scale_in_alerter:
