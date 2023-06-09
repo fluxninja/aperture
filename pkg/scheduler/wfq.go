@@ -151,20 +151,20 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	return sched
 }
 
+func (sched *WFQScheduler) updateMetricsAndReturnDecision(accepted bool, request *Request) bool {
+	if accepted {
+		sched.metrics.AcceptedTokensCounter.Add(float64(request.Tokens) / 1000)
+	}
+	sched.metrics.IncomingTokensCounter.Add(float64(request.Tokens) / 1000)
+	sched.metrics.IncomingWeightedTokensCounter.Add(request.WeightedTokens / 1000)
+	return accepted
+}
+
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
 func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (accepted bool) {
-	retDecision := func(accepted bool) bool {
-		if accepted {
-			sched.metrics.AcceptedTokensCounter.Add(float64(request.Tokens) / 1000)
-		}
-		sched.metrics.IncomingTokensCounter.Add(float64(request.Tokens) / 1000)
-		sched.metrics.IncomingWeightedTokensCounter.Add(request.WeightedTokens / 1000)
-		return accepted
-	}
-
 	if request.Tokens == 0 {
-		return retDecision(true)
+		return sched.updateMetricsAndReturnDecision(true, request)
 	}
 
 	sched.lock.Lock()
@@ -173,7 +173,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	sched.lock.Unlock()
 
 	if sched.manager.PreprocessRequest(ctx, request) {
-		return retDecision(true)
+		return sched.updateMetricsAndReturnDecision(true, request)
 	}
 
 	// try to schedule right now
@@ -181,7 +181,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 		ok := sched.manager.TakeIfAvailable(ctx, float64(request.Tokens))
 		if ok {
 			// we got the tokens, no need to queue
-			return retDecision(true)
+			return sched.updateMetricsAndReturnDecision(true, request)
 		}
 	}
 
@@ -191,10 +191,10 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	// scheduler is in overload situation and we have to wait for ready signal and tokens
 	select {
 	case <-qRequest.ready:
-		return retDecision(sched.scheduleRequest(ctx, request, qRequest))
+		return sched.updateMetricsAndReturnDecision(sched.scheduleRequest(ctx, request, qRequest), request)
 	case <-ctx.Done():
 		sched.cancelRequest(qRequest)
-		return retDecision(false)
+		return sched.updateMetricsAndReturnDecision(false, request)
 	}
 }
 
