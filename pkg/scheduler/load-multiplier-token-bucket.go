@@ -8,6 +8,7 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
 
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -20,12 +21,14 @@ type LoadMultiplierTokenBucket struct {
 	tbb                *tokenBucketBase
 	counter            *WindowedCounter
 	lm                 float64 // load multiplier >=0
+	wtr                float64 // weighted token rate
 	lock               sync.Mutex
 	continuousTracking bool
 }
 
 // NewLoadMultiplierTokenBucket creates a new TokenBucketLoadMultiplier.
-func NewLoadMultiplierTokenBucket(clk clockwork.Clock,
+func NewLoadMultiplierTokenBucket(
+	clk clockwork.Clock,
 	slotCount uint8,
 	slotDuration time.Duration,
 	lmGauge prometheus.Gauge,
@@ -54,17 +57,20 @@ func (tbls *LoadMultiplierTokenBucket) SetContinuousTracking(continuousTracking 
 	tbls.continuousTracking = continuousTracking
 }
 
-// SetLoadMultiplier sets the load multiplier number --> 0 = no load accepted, 1 = accept up to 100% of current load, 2 = accept up to 200% of current load.
-func (tbls *LoadMultiplierTokenBucket) SetLoadMultiplier(lm float64) {
+// SetLoadDecisionValues sets:
+// the load multiplier number --> 0 = no load accepted, 1 = accept up to 100% of current load, 2 = accept up to 200% of current load
+// the weighted token rate.
+func (tbls *LoadMultiplierTokenBucket) SetLoadDecisionValues(loadDecision *policysyncv1.LoadDecision) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
+	lm := loadDecision.GetLoadMultiplier()
 	if lm >= 0 {
 		tbls.lm = lm
 		tbls.setLMGauge(float64(tbls.lm))
 		if !tbls.counter.IsBootstrapping() {
 			// set fillRate based on latest sched.tokenRate
-			tbls.tbb.setFillRate(tbls.counter.CalculateTokenRate() * tbls.lm)
+			tbls.setFillRate()
 			log.Trace().
 				Float64("loadMultiplier", tbls.lm).
 				Float64("calculated fillRate", tbls.tbb.getFillRate()).
@@ -74,6 +80,17 @@ func (tbls *LoadMultiplierTokenBucket) SetLoadMultiplier(lm float64) {
 	} else {
 		log.Panic().Msgf("Load multiplier must be greater than 0, got %f", lm)
 	}
+
+	wtr := loadDecision.GetWeightedTokenRate()
+	if wtr >= 0 {
+		tbls.wtr = wtr
+	}
+}
+
+// setFillRate - unsage, must be called with lock held.
+func (tbls *LoadMultiplierTokenBucket) setFillRate() {
+	lmCorrected := (tbls.counter.CalculateWeightedTokenRate() * tbls.lm) / tbls.wtr
+	tbls.tbb.setFillRate(lmCorrected)
 }
 
 // LoadMultiplier returns the current load multiplier.
@@ -84,20 +101,20 @@ func (tbls *LoadMultiplierTokenBucket) LoadMultiplier() float64 {
 }
 
 // PreprocessRequest preprocesses a request and makes decision whether to pro-actively accept a request.
-func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(_ context.Context, request Request) bool {
+func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(_ context.Context, request *Request) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
 	wasBootstrapping := tbls.counter.IsBootstrapping()
 
 	// Shift counter slot if needed
-	ready := tbls.counter.AddTokens(request.Tokens)
+	ready := tbls.counter.AddTokens(request)
 
 	// recalculate token rate
 	if ready {
 		if wasBootstrapping || tbls.continuousTracking {
 			// adjust fillRate based on the new tokenRate
-			tbls.tbb.setFillRate(tbls.counter.CalculateTokenRate() * (tbls.lm))
+			tbls.setFillRate()
 			log.Trace().
 				Float64("loadMultiplier", tbls.lm).
 				Float64("calculated fillRate", tbls.tbb.getFillRate()).

@@ -459,7 +459,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	}
 
 	logger.Autosample().Debug().Bool("passThrough", loadDecision.PassThrough).Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
-	ls.tokenBucket.SetLoadMultiplier(loadDecision.LoadMultiplier)
+	ls.tokenBucket.SetLoadDecisionValues(loadDecision)
 	ls.tokenBucket.SetPassThrough(loadDecision.PassThrough)
 	ls.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
 }

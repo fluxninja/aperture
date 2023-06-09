@@ -177,7 +177,7 @@ func (btb *BasicTokenBucket) Return(_ context.Context, tokens float64) {
 }
 
 // PreprocessRequest decides whether to proactively accept a request.
-func (btb *BasicTokenBucket) PreprocessRequest(_ context.Context, request Request) bool {
+func (btb *BasicTokenBucket) PreprocessRequest(_ context.Context, request *Request) bool {
 	return btb.tbb.getPassThrough()
 }
 

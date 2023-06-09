@@ -6,11 +6,16 @@ import (
 	"github.com/jonboulle/clockwork"
 )
 
+type tokenCounts struct {
+	tokens         uint64
+	weightedTokens float64
+}
+
 // WindowedCounter is a token bucket with a windowed counter.
 type WindowedCounter struct {
 	// stats
 	nextSlotTime  time.Time     // Time when we advance the slot
-	counters      []uint64      // Window of counters
+	counters      []tokenCounts // Window of counters
 	slotDuration  time.Duration // time duration of slot
 	totalSlots    uint8         // total slots in sliding window
 	currentSlot   uint8         // currentSlot being updated for counters
@@ -26,7 +31,7 @@ func NewWindowedCounter(clk clockwork.Clock, totalSlots uint8, slotDuration time
 	// create an extra slot for aggregating current window
 	counter.totalSlots = totalSlots + 1
 	counter.slotDuration = slotDuration
-	counter.counters = make([]uint64, counter.totalSlots)
+	counter.counters = make([]tokenCounts, counter.totalSlots)
 	counter.currentSlot = 0
 	counter.nextSlotTime = counter.clk.Now().Add(counter.slotDuration)
 	counter.bootstrapping = true
@@ -39,7 +44,20 @@ func (counter *WindowedCounter) CalculateTokenRate() float64 {
 	// calculate total (ignoring the currentSlot)
 	for i := uint8(0); i < counter.totalSlots; i++ {
 		if i != counter.currentSlot {
-			total += counter.counters[i]
+			total += counter.counters[i].tokens
+		}
+	}
+	// recalculate tokenRate
+	return float64(total) * 1e9 / float64(int64(counter.totalSlots-1)*int64(counter.slotDuration))
+}
+
+// CalculateWeightedTokenRate returns the calculated weighted token rate in the current window.
+func (counter *WindowedCounter) CalculateWeightedTokenRate() float64 {
+	var total float64
+	// calculate total (ignoring the currentSlot)
+	for i := uint8(0); i < counter.totalSlots; i++ {
+		if i != counter.currentSlot {
+			total += counter.counters[i].weightedTokens
 		}
 	}
 	// recalculate tokenRate
@@ -52,7 +70,7 @@ func (counter *WindowedCounter) IsBootstrapping() bool {
 }
 
 // AddTokens to the counter. Return value is true when counter shifted slots and the all the slots in the counter is valid.
-func (counter *WindowedCounter) AddTokens(tokens uint64) bool {
+func (counter *WindowedCounter) AddTokens(request *Request) bool {
 	now := counter.clk.Now()
 	shifted := false
 	if now.After(counter.nextSlotTime) {
@@ -84,7 +102,8 @@ func (counter *WindowedCounter) AddTokens(tokens uint64) bool {
 				}
 			}
 			// reset slot counter
-			counter.counters[counter.currentSlot] = 0
+			counter.counters[counter.currentSlot].tokens = 0
+			counter.counters[counter.currentSlot].weightedTokens = 0
 		}
 
 		// If entire window was invalidated, it is better to go back to the bootstrap mode
@@ -98,7 +117,8 @@ func (counter *WindowedCounter) AddTokens(tokens uint64) bool {
 	}
 
 	// Increment counter
-	counter.counters[counter.currentSlot] += tokens
+	counter.counters[counter.currentSlot].tokens += request.Tokens
+	counter.counters[counter.currentSlot].weightedTokens += request.WeightedTokens
 
 	if shifted && !counter.bootstrapping {
 		return true

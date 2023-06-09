@@ -153,12 +153,13 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
-func (sched *WFQScheduler) Schedule(ctx context.Context, request Request) (accepted bool) {
+func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (accepted bool) {
 	retDecision := func(accepted bool) bool {
 		if accepted {
 			sched.metrics.AcceptedTokensCounter.Add(float64(request.Tokens) / 1000)
 		}
 		sched.metrics.IncomingTokensCounter.Add(float64(request.Tokens) / 1000)
+		sched.metrics.IncomingWeightedTokensCounter.Add(request.WeightedTokens / 1000)
 		return accepted
 	}
 
@@ -208,7 +209,7 @@ func (sched *WFQScheduler) flowID(fairnessLabel string, priority uint8, generati
 // If admitted == false, might return a valid heapRequest
 // If admitted == false and qRequest == nil, request was neither admitted nor
 // queued (rejected right away).
-func (sched *WFQScheduler) queueRequest(ctx context.Context, request Request) (qRequest *queuedRequest) {
+func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (qRequest *queuedRequest) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
@@ -271,7 +272,7 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request Request) (q
 }
 
 // adjust queue counters. Note: qRequest pointer should not be used after calling this function as it will get recycled via Pool.
-func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request Request, qRequest *queuedRequest) (allowed bool) {
+func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request, qRequest *queuedRequest) (allowed bool) {
 	// This request has been selected to be executed next
 	waitTime, allowed := sched.manager.Take(ctx, float64(request.Tokens))
 	// check if we need to wait
@@ -463,8 +464,9 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
 type WFQMetrics struct {
-	FlowsGauge            prometheus.Gauge
-	HeapRequestsGauge     prometheus.Gauge
-	IncomingTokensCounter prometheus.Counter
-	AcceptedTokensCounter prometheus.Counter
+	FlowsGauge                    prometheus.Gauge
+	HeapRequestsGauge             prometheus.Gauge
+	IncomingTokensCounter         prometheus.Counter
+	IncomingWeightedTokensCounter prometheus.Counter
+	AcceptedTokensCounter         prometheus.Counter
 }

@@ -57,6 +57,8 @@ const (
 
 	// IncomingTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all incoming requests.
 	IncomingTokensMetricName = "incoming_tokens_total"
+	// IncomingWeightedTokensMetricName - metric used for counting weighted tokens.
+	IncomingWeightedTokensMetricName = "incoming_weighted_tokens_total"
 	// AcceptedTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all accepted requests.
 	AcceptedTokensMetricName = "accepted_tokens_total"
 
