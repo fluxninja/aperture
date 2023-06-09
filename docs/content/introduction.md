@@ -39,25 +39,21 @@ import { Cards } from '@site/src/components/Cards';
 
 <!-- vale on -->
 
-The [FluxNinja Aperture](https://github.com/fluxninja/aperture) project, an open
-source Intelligent Load Management platform that seamlessly integrates into any
-tech stack. This innovative platform is built to empower developers, platform
-engineers, and reliability engineers, providing them with an advanced control
-mechanism dovetailed with an observability layer. Aperture streamlines the task
-of handling diverse traffic load intensities, spanning from low throughput
-instances to conditions necessitating web-scale capacities.
+Aperture is an [open source](https://github.com/fluxninja/aperture) load
+management platform designed for classifying, scheduling, and rate-limiting API
+traffic in cloud applications. Built upon a foundation of observability and a
+global control plane, it offers a comprehensive suite of load management
+capabilities. These capabilities enhance the reliability and performance of
+cloud applications while also optimizing resource utilization.
 
-Aperture's cutting-edge features enable teams to effortlessly implement
-intelligent load management strategies, ensuring optimal performance and maximal
-infrastructure utilization optimal end-user experience, even during service
-failures. This versatility and resilience apply across all types of systems,
-including monolithic architectures and distributed microservices environments.
+Aperture can seamlessly integrate with existing control points such as gateways,
+service meshes, and application middlewares. Moreover, it offers SDKs for
+developers who need to establish control points around specific features or code
+sections inside applications.
 
 ## ⚙️ Load management capabilities
 
-Aperture offers a suite of intelligent load management capabilities that are
-applicable to a wide range of cloud-native applications. These capabilities
-ensure the reliability and stability of applications, and include:
+Aperture provides a variety of advanced load management features:
 
 - 🛡️
   [**Adaptive Service Protection**](./use-cases/service-protection/protection.md):
@@ -81,7 +77,7 @@ ensure the reliability and stability of applications, and include:
   [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
   for scheduling, Aperture ensures a fair distribution of resources that aligns
   with the business value and urgency of requests.
-- 🔀 [**Load based Auto Scaling**](./use-cases/auto-scale/auto-scale.md):
+- 🔀 [**Load-based Auto Scaling**](./use-cases/auto-scale/auto-scale.md):
   Eliminate the need for costly over-provisioning and enhance efficiency with
   Aperture's load-based auto-scaling. Aperture's policies are expressed as
   circuit graphs that continuously track deviations from service-level
@@ -114,8 +110,8 @@ service performance and request attributes, allowing the agent and controller to
 make informed decisions about request handling and workload prioritization.
 
 The analysis and actuation phases use
-[**Declarative policies**](./concepts/policy/policy.md) that facilitates teams
-in defining responses to different situations, such as deviations from
+[**Declarative policies**](./concepts/policy/policy.md) that facilitate teams in
+defining responses to different situations, such as deviations from
 service-level objectives.
 
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
@@ -128,14 +124,14 @@ service-level objectives.
 - [**Your first policy**](/get-started/policies/policies.md)
 - [**Use cases**](/use-cases/use-cases.md)
 
-For a deeper understanding of how Aperture interacts with applications and its
-various integral components, explore the
+For an in-depth understanding of how Aperture interacts with applications and
+its various integral components, explore the
 [Architecture](/architecture/architecture.md) section.
 
 ## 📖 Learn
 
 The [Concepts section](/concepts/concepts.md) provides detailed insights into
-essential elements of Aperture and Aperture policies, offering a comprehensive
+essential elements of Aperture's system and policies, offering a comprehensive
 understanding of their key components.
 
 ## Additional Support
