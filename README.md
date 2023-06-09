@@ -30,14 +30,14 @@
 Aperture is an observability-driven load management platform designed for
 classifying, scheduling, and rate-limiting API traffic in cloud applications.
 Built upon a foundation of observability and a global control plane, it offers a
-comprehensive suite of load management capabilities. These capabilities enhance
-the reliability and performance of cloud applications while also optimizing
-resource utilization.
+comprehensive suite of load management capabilities that enhance the reliability
+and performance of cloud applications while also optimizing resource
+utilization.
 
-Aperture can seamlessly integrate with existing control points such as gateways,
+Aperture seamlessly integrates with existing control points such as gateways,
 service meshes, and application middlewares. Moreover, it offers SDKs for
-developers who need to establish control points around specific features or code
-sections inside applications.
+developers to establish control points around specific features or code sections
+inside applications
 
 ## ⚙️ Features
 
@@ -109,8 +109,8 @@ To install the Aperture system, please follow the
 
 ### 📖 Use Cases
 
-Learn about various use cases of Apertures in the
-[Applying Policies](https://docs.fluxninja.com/applying-policies) section.
+Learn about various use cases of Aperture in the
+[Use Cases](https://docs.fluxninja.com/use-cases) section.
 
 ## 🎥 Videos
 
