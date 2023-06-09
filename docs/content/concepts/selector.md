@@ -277,7 +277,7 @@ graph TB
 _Agent Group_ name together with _Service_ name determine the
 [service](#service) to select flows from.
 
-## Resources {#resources}
+## Extra References {#resources}
 
 ### Gateways Integration {#gateways-integration}
 
