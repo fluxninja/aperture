@@ -27,10 +27,21 @@
 
 # 🥷 FluxNinja Aperture
 
-Aperture is an observability-driven load management platform for modern cloud
-applications.
+Aperture is an observability-driven load management platform designed for
+classifying, scheduling, and rate-limiting API traffic in cloud applications.
+Built upon a foundation of observability and a global control plane, it offers a
+comprehensive suite of load management capabilities that enhance the reliability
+and performance of cloud applications while also optimizing resource
+utilization.
+
+Aperture seamlessly integrates with existing control points such as gateways,
+service meshes, and application middlewares. Moreover, it offers SDKs for
+developers to establish control points around specific features or code sections
+inside applications
 
 ## ⚙️ Features
+
+Aperture provides a variety of advanced load management features:
 
 - **Adaptive service protection:** Enhance resource utilization and safeguard
   against abrupt service overloads with an intelligent queue at the entry point
@@ -98,8 +109,8 @@ To install the Aperture system, please follow the
 
 ### 📖 Use Cases
 
-Learn about various use cases of Apertures in the
-[Applying Policies](https://docs.fluxninja.com/applying-policies) section.
+Learn about various use cases of Aperture in the
+[Use Cases](https://docs.fluxninja.com/use-cases) section.
 
 ## 🎥 Videos
 

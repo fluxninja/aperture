@@ -36,5 +36,8 @@ function generate_otel_docs() {
 
 export -f generate_otel_docs
 
-# generate OpenTelemetry metrics documentation for all the receivers defined in metadata.yaml
-parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_otel_docs ::: "$(yq eval 'keys' "$SCRIPT_DIR"/metadata.yaml)"
+
+# Read output of yq command line by line
+yq eval 'keys' "$SCRIPT_DIR"/metadata.yaml | while IFS= read -r key; do
+    generate_otel_docs "$key"
+done
