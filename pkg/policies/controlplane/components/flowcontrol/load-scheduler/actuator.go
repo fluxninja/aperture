@@ -32,7 +32,6 @@ type Actuator struct {
 	decisionWriter           *etcdwriter.Writer
 	actuatorProto            *policyprivatev1.LoadActuator
 	tokensQuery              *promql.TaggedQuery
-	weightedTokensQuery      *promql.TaggedQuery
 	loadSchedulerComponentID string
 	etcdPaths                []string
 }
@@ -194,7 +193,16 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 		}
 	}
 
-	return nil, la.publishDecision(tickInfo, lm, pt, tokensByWorkload)
+	var wtr float64
+	wtrValue := inPortReadings.ReadSingleReadingPort("incoming_weighted_token_rate")
+	if wtrValue.Valid() {
+		wtr = wtrValue.Value()
+		if wtr <= 0 {
+			wtr = 0
+		}
+	}
+
+	return nil, la.publishDecision(tickInfo, lm, wtr, pt, tokensByWorkload)
 }
 
 // DynamicConfigUpdate implements runtime.Component.DynamicConfigUpdate.
@@ -202,17 +210,18 @@ func (la *Actuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller conf
 }
 
 func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
-	return la.publishDecision(tickInfo, 1.0, true, nil)
+	return la.publishDecision(tickInfo, 1.0, 1.0, true, nil)
 }
 
-func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool, tokensByWorkload map[string]uint64) error {
+func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, incomingWeightedTokenRate float64, passThrough bool, tokensByWorkload map[string]uint64) error {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Save load multiplier in decision message
 	decision := &policysyncv1.LoadDecision{
-		LoadMultiplier:        loadMultiplier,
-		PassThrough:           passThrough,
-		TickInfo:              tickInfo.Serialize(),
-		TokensByWorkloadIndex: tokensByWorkload,
+		LoadMultiplier:            loadMultiplier,
+		IncomingWeightedTokenRate: incomingWeightedTokenRate,
+		PassThrough:               passThrough,
+		TickInfo:                  tickInfo.Serialize(),
+		TokensByWorkloadIndex:     tokensByWorkload,
 	}
 	// Publish decision
 	logger.Autosample().Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")

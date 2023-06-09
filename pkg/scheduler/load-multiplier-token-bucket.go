@@ -81,7 +81,7 @@ func (tbls *LoadMultiplierTokenBucket) SetLoadDecisionValues(loadDecision *polic
 		log.Panic().Msgf("Load multiplier must be greater than 0, got %f", lm)
 	}
 
-	wtr := loadDecision.GetWeightedTokenRate()
+	wtr := loadDecision.GetIncomingWeightedTokenRate()
 	if wtr >= 0 {
 		tbls.wtr = wtr
 	}

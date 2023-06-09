@@ -408,7 +408,7 @@ func (m *LoadDecision) validate(all bool) error {
 
 	// no validation rules for LoadMultiplier
 
-	// no validation rules for WeightedTokenRate
+	// no validation rules for IncomingWeightedTokenRate
 
 	// no validation rules for PassThrough
 

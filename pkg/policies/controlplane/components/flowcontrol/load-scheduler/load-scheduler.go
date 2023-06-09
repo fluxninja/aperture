@@ -82,7 +82,11 @@ func ParseLoadScheduler(
 						SignalName: "LOAD_MULTIPLIER",
 					},
 				},
-				IncomingWeightedTokenRate: &policylangv1.InPort{},
+				IncomingWeightedTokenRate: &policylangv1.InPort{
+					Value: &policylangv1.InPort_SignalName{
+						SignalName: "INCOMING_WEIGHTED_TOKEN_RATE",
+					},
+				},
 			},
 			LoadSchedulerComponentId:   componentID.String(),
 			WorkloadLatencyBasedTokens: loadScheduler.Parameters.GetWorkloadLatencyBasedTokens(),
@@ -180,6 +184,23 @@ func ParseLoadScheduler(
 									},
 								},
 								QueryString:        incomingTokenRate,
+								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Query{
+					Query: &policylangv1.Query{
+						Component: &policylangv1.Query_Promql{
+							Promql: &policylangv1.PromQL{
+								OutPorts: &policylangv1.PromQL_Outs{
+									Output: &policylangv1.OutPort{
+										SignalName: "INCOMING_WEIGHTED_TOKEN_RATE",
+									},
+								},
+								QueryString:        incomingWeightedTokenRate,
 								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
 							},
 						},
