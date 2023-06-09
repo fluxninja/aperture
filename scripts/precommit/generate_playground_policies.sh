@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+curr_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+func_dir="../"
+# shellcheck source=/dev/null
+source "$curr_dir/$func_dir/limit_jobs.sh"
 
 FIND="find"
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -37,7 +41,7 @@ export -f generate_policies
 
 while IFS= read -r -d '' file
 do
-    generate_policies "$file" &
+    limit_jobs 8 generate_policies "$file"
 done < <($FIND playground -type f -name metadata.json -print0)
 
 wait  # Wait for all background jobs to complete

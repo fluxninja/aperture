@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Get the directory of the main script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+source "$SCRIPT_DIR/limit_jobs.sh"
 echo Generating libsonnet library
 git_root=$(git rev-parse --show-toplevel)
 export git_root
@@ -45,7 +49,7 @@ export -f generate_readme
 
 while IFS= read -r -d '' file
 do
-    generate_readme "$file" &
+   limit_jobs 8 generate_readme "$file"
 done < <($FIND "$blueprints_root" -type f -name 'config.libsonnet' -print0)
 
 wait  # Wait for all background jobs to complete

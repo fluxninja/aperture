@@ -16,11 +16,6 @@ pushd "$gitroot" >/dev/null || exit 1
 
 dirs=$($FIND . -name go.mod -not -path "*/vendor/*" -exec dirname {} \; | sort -u)
 
-echo "$dirs" | while IFS= read -r dir; do
-    (cd "$dir" && go mod tidy -compat=1.20) &
-done
-
-wait  # Wait for all background jobs to complete
-
+parallel -j8 --no-notice --bar --eta "cd {} && go mod tidy -compat=1.20" ::: "$dirs"
 
 popd >/dev/null || exit 1

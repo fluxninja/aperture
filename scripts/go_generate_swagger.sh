@@ -23,8 +23,7 @@ dirs=$("${GREP}" --include="*.go" --exclude-dir="vendor" -r "go:generate swagger
 
 
 echo "$dirs" | while IFS= read -r dir; do
-    (cd "$dir" && go generate -v -x) &
+    (cd "$dir" && go generate -v -x)
 done
 
-wait  # Wait for all background jobs to complete
 popd >/dev/null || exit 1
