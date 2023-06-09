@@ -39,7 +39,7 @@ import { Cards } from '@site/src/components/Cards';
 
 <!-- vale on -->
 
-Aperture is an [open source](https://github.com/fluxninja/aperture) load
+[Aperture](https://github.com/fluxninja/aperture) is an open source load
 management platform designed for classifying, scheduling, and rate-limiting API
 traffic in cloud applications. Built upon a foundation of observability and a
 global control plane, it offers a comprehensive suite of load management
