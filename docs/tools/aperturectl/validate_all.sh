@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 git_root=$(git rev-parse --show-toplevel)
+# Get the directory of the main script
+curr_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+func_dir="../../../scripts/"
+
+# shellcheck source=/dev/null
+source "$curr_dir/$func_dir/limit_jobs.sh"
 
 FIND="find"
 if [ "$(uname)" == "Darwin" ]; then
@@ -15,5 +21,9 @@ aperturectl="$("$git_root"/scripts/build_aperturectl.sh)"
 # find all directories with a validate.sh script and save them to dirs
 dirs=$($FIND "$git_root" -name validate.sh -exec dirname {} \;)
 
-# use parallel command to cd into each directory and run validate.sh
-parallel -j8 --no-notice --bar --eta --halt-on-error now,fail,1 "cd {} && ./validate.sh" ::: "$dirs"
+# Use the limit_jobs function
+for dir in $dirs; do
+  limit_jobs 8 bash -c "cd $dir && ./validate.sh"
+done
+
+wait  # Wait for all background jobs to complete

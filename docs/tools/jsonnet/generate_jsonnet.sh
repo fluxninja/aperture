@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Get the directory of the main script
+curr_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+func_dir="../../../scripts/"
+# shellcheck source=/dev/null
+source "$curr_dir/$func_dir/limit_jobs.sh"
+
 gitroot=$(git rev-parse --show-toplevel)
 export gitroot
 
@@ -84,5 +90,10 @@ function generate_jsonnet_files() {
 
 export -f generate_jsonnet_files
 
-# find all jsonnet files in docs/content directory and generate them
-parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_jsonnet_files ::: "$($FIND "$docsdir"/content -type f -name "*.jsonnet")"
+# find all jsonnet files and run generate_jsonnet_files in parallel
+while IFS= read -r -d '' file
+do
+    limit_jobs 8 generate_jsonnet_files "$file"
+done < <($FIND "$docsdir"/content -type f -name '*.jsonnet' -print0)
+
+wait  # Wait for all background jobs to complete
