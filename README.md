@@ -109,7 +109,7 @@ To install the Aperture system, please follow the
 
 ### 📖 Use Cases
 
-Learn about various use cases of Apertures in the
+Learn about various use cases of Aperture in the
 [Use Cases](https://docs.fluxninja.com/use-cases) section.
 
 ## 🎥 Videos
