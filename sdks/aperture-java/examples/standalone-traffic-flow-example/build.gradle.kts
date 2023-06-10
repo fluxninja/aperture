@@ -31,4 +31,6 @@ dependencies {
     implementation("com.sparkjava:spark-core:2.9.4")
     implementation("io.grpc:grpc-api:1.44.0")
     implementation(project(":lib:core"))
+
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.0")
 }
