@@ -21,4 +21,6 @@ dependencies {
     implementation("com.linecorp.armeria:armeria:1.15.0")
     implementation(project(":lib:core"))
     implementation(project(":lib:armeria"))
+
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.0")
 }
