@@ -865,6 +865,21 @@ java.lang.String defaultValue) {
     return limiterDecisions_.get(index);
   }
 
+  public static final int DRY_RUN_FIELD_NUMBER = 13;
+  private boolean dryRun_ = false;
+  /**
+   * <pre>
+   * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+   * </pre>
+   *
+   * <code>bool dry_run = 13 [json_name = "dryRun"];</code>
+   * @return The dryRun.
+   */
+  @java.lang.Override
+  public boolean getDryRun() {
+    return dryRun_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -914,6 +929,9 @@ java.lang.String defaultValue) {
     }
     for (int i = 0; i < limiterDecisions_.size(); i++) {
       output.writeMessage(12, limiterDecisions_.get(i));
+    }
+    if (dryRun_ != false) {
+      output.writeBool(13, dryRun_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -981,6 +999,10 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(12, limiterDecisions_.get(i));
     }
+    if (dryRun_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(13, dryRun_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -1022,6 +1044,8 @@ java.lang.String defaultValue) {
         .equals(other.getFluxMeterInfosList())) return false;
     if (!getLimiterDecisionsList()
         .equals(other.getLimiterDecisionsList())) return false;
+    if (getDryRun()
+        != other.getDryRun()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -1071,6 +1095,9 @@ java.lang.String defaultValue) {
       hash = (37 * hash) + LIMITER_DECISIONS_FIELD_NUMBER;
       hash = (53 * hash) + getLimiterDecisionsList().hashCode();
     }
+    hash = (37 * hash) + DRY_RUN_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getDryRun());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -1267,6 +1294,7 @@ java.lang.String defaultValue) {
         limiterDecisionsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000400);
+      dryRun_ = false;
       return this;
     }
 
@@ -1361,6 +1389,9 @@ java.lang.String defaultValue) {
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
         result.rejectReason_ = rejectReason_;
+      }
+      if (((from_bitField0_ & 0x00000800) != 0)) {
+        result.dryRun_ = dryRun_;
       }
     }
 
@@ -1526,6 +1557,9 @@ java.lang.String defaultValue) {
           }
         }
       }
+      if (other.getDryRun() != false) {
+        setDryRun(other.getDryRun());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -1641,6 +1675,11 @@ java.lang.String defaultValue) {
               }
               break;
             } // case 98
+            case 104: {
+              dryRun_ = input.readBool();
+              bitField0_ |= 0x00000800;
+              break;
+            } // case 104
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -3589,6 +3628,50 @@ java.lang.String defaultValue) {
         limiterDecisions_ = null;
       }
       return limiterDecisionsBuilder_;
+    }
+
+    private boolean dryRun_ ;
+    /**
+     * <pre>
+     * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+     * </pre>
+     *
+     * <code>bool dry_run = 13 [json_name = "dryRun"];</code>
+     * @return The dryRun.
+     */
+    @java.lang.Override
+    public boolean getDryRun() {
+      return dryRun_;
+    }
+    /**
+     * <pre>
+     * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+     * </pre>
+     *
+     * <code>bool dry_run = 13 [json_name = "dryRun"];</code>
+     * @param value The dryRun to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDryRun(boolean value) {
+
+      dryRun_ = value;
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+     * </pre>
+     *
+     * <code>bool dry_run = 13 [json_name = "dryRun"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDryRun() {
+      bitField0_ = (bitField0_ & ~0x00000800);
+      dryRun_ = false;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

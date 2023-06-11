@@ -101,7 +101,7 @@ public final class CheckhttpProto {
       "ersEntryR\007headers\022B\n\020dynamic_metadata\030\002 " +
       "\001(\0132\027.google.protobuf.StructR\017dynamicMet" +
       "adata\032:\n\014HeadersEntry\022\020\n\003key\030\001 \001(\tR\003key\022" +
-      "\024\n\005value\030\002 \001(\tR\005value:\0028\001\"\314\002\n\021CheckHTTPR" +
+      "\024\n\005value\030\002 \001(\tR\005value:\0028\001\"\345\002\n\021CheckHTTPR" +
       "esponse\022*\n\006status\030\001 \001(\0132\022.google.rpc.Sta" +
       "tusR\006status\022`\n\017denied_response\030\002 \001(\01325.a" +
       "perture.flowcontrol.checkhttp.v1.DeniedH" +
@@ -109,27 +109,27 @@ public final class CheckhttpProto {
       "onse\030\003 \001(\01321.aperture.flowcontrol.checkh" +
       "ttp.v1.OkHttpResponseH\000R\nokResponse\022B\n\020d" +
       "ynamic_metadata\030\004 \001(\0132\027.google.protobuf." +
-      "StructR\017dynamicMetadataB\017\n\rhttp_response" +
-      "\"\320\001\n\rSocketAddress\022_\n\010protocol\030\001 \001(\01629.a" +
-      "perture.flowcontrol.checkhttp.v1.SocketA" +
-      "ddress.ProtocolB\010\372B\005\202\001\002\020\001R\010protocol\022!\n\007a" +
-      "ddress\030\002 \001(\tB\007\372B\004r\002\020\001R\007address\022\035\n\004port\030\003" +
-      " \001(\rB\t\372B\006*\004\030\377\377\003R\004port\"\034\n\010Protocol\022\007\n\003TCP" +
-      "\020\000\022\007\n\003UDP\020\0012\312\001\n\026FlowControlServiceHTTP\022\257" +
-      "\001\n\tCheckHTTP\0223.aperture.flowcontrol.chec" +
-      "khttp.v1.CheckHTTPRequest\0324.aperture.flo" +
-      "wcontrol.checkhttp.v1.CheckHTTPResponse\"" +
-      "7\222A\020\n\016aperture-agent\202\323\344\223\002\036\"\031/v1/flowcont" +
-      "rol/checkhttp:\001*B\323\002\n9com.fluxninja.gener" +
-      "ated.aperture.flowcontrol.checkhttp.v1B\016" +
-      "CheckhttpProtoP\001Z_github.com/fluxninja/a" +
-      "perture/v2/api/gen/proto/go/aperture/flo" +
-      "wcontrol/checkhttp/v1;checkhttpv1\242\002\003AFC\252" +
-      "\002!Aperture.Flowcontrol.Checkhttp.V1\312\002!Ap" +
-      "erture\\Flowcontrol\\Checkhttp\\V1\342\002-Apertu" +
-      "re\\Flowcontrol\\Checkhttp\\V1\\GPBMetadata\352" +
-      "\002$Aperture::Flowcontrol::Checkhttp::V1b\006" +
-      "proto3"
+      "StructR\017dynamicMetadata\022\027\n\007dry_run\030\005 \001(\010" +
+      "R\006dryRunB\017\n\rhttp_response\"\320\001\n\rSocketAddr" +
+      "ess\022_\n\010protocol\030\001 \001(\01629.aperture.flowcon" +
+      "trol.checkhttp.v1.SocketAddress.Protocol" +
+      "B\010\372B\005\202\001\002\020\001R\010protocol\022!\n\007address\030\002 \001(\tB\007\372" +
+      "B\004r\002\020\001R\007address\022\035\n\004port\030\003 \001(\rB\t\372B\006*\004\030\377\377\003" +
+      "R\004port\"\034\n\010Protocol\022\007\n\003TCP\020\000\022\007\n\003UDP\020\0012\312\001\n" +
+      "\026FlowControlServiceHTTP\022\257\001\n\tCheckHTTP\0223." +
+      "aperture.flowcontrol.checkhttp.v1.CheckH" +
+      "TTPRequest\0324.aperture.flowcontrol.checkh" +
+      "ttp.v1.CheckHTTPResponse\"7\222A\020\n\016aperture-" +
+      "agent\202\323\344\223\002\036\"\031/v1/flowcontrol/checkhttp:\001" +
+      "*B\323\002\n9com.fluxninja.generated.aperture.f" +
+      "lowcontrol.checkhttp.v1B\016CheckhttpProtoP" +
+      "\001Z_github.com/fluxninja/aperture/v2/api/" +
+      "gen/proto/go/aperture/flowcontrol/checkh" +
+      "ttp/v1;checkhttpv1\242\002\003AFC\252\002!Aperture.Flow" +
+      "control.Checkhttp.V1\312\002!Aperture\\Flowcont" +
+      "rol\\Checkhttp\\V1\342\002-Aperture\\Flowcontrol\\" +
+      "Checkhttp\\V1\\GPBMetadata\352\002$Aperture::Flo" +
+      "wcontrol::Checkhttp::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -187,7 +187,7 @@ public final class CheckhttpProto {
     internal_static_aperture_flowcontrol_checkhttp_v1_CheckHTTPResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_checkhttp_v1_CheckHTTPResponse_descriptor,
-        new java.lang.String[] { "Status", "DeniedResponse", "OkResponse", "DynamicMetadata", "HttpResponse", });
+        new java.lang.String[] { "Status", "DeniedResponse", "OkResponse", "DynamicMetadata", "DryRun", "HttpResponse", });
     internal_static_aperture_flowcontrol_checkhttp_v1_SocketAddress_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_aperture_flowcontrol_checkhttp_v1_SocketAddress_fieldAccessorTable = new

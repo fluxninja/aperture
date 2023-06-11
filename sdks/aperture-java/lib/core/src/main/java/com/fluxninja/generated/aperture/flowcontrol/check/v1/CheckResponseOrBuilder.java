@@ -386,4 +386,14 @@ java.lang.String defaultValue);
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecisionOrBuilder getLimiterDecisionsOrBuilder(
       int index);
+
+  /**
+   * <pre>
+   * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+   * </pre>
+   *
+   * <code>bool dry_run = 13 [json_name = "dryRun"];</code>
+   * @return The dryRun.
+   */
+  boolean getDryRun();
 }

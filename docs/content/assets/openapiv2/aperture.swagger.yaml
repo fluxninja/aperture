@@ -540,6 +540,9 @@ definitions:
             denied_response:
                 $ref: '#/definitions/DeniedHttpResponse'
                 description: Supplies http attributes for a denied response.
+            dry_run:
+                description: When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+                type: boolean
             dynamic_metadata:
                 description: |-
                     Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
@@ -567,6 +570,9 @@ definitions:
             decision_type:
                 $ref: '#/definitions/CheckResponseDecisionType'
                 description: decision_type contains what the decision was.
+            dry_run:
+                description: When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+                type: boolean
             end:
                 format: date-time
                 title: end timestamp

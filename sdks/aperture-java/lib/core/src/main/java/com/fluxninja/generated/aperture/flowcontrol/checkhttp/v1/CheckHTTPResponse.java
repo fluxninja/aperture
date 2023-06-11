@@ -245,6 +245,21 @@ private static final long serialVersionUID = 0L;
     return dynamicMetadata_ == null ? com.google.protobuf.Struct.getDefaultInstance() : dynamicMetadata_;
   }
 
+  public static final int DRY_RUN_FIELD_NUMBER = 5;
+  private boolean dryRun_ = false;
+  /**
+   * <pre>
+   * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+   * </pre>
+   *
+   * <code>bool dry_run = 5 [json_name = "dryRun"];</code>
+   * @return The dryRun.
+   */
+  @java.lang.Override
+  public boolean getDryRun() {
+    return dryRun_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -271,6 +286,9 @@ private static final long serialVersionUID = 0L;
     if (dynamicMetadata_ != null) {
       output.writeMessage(4, getDynamicMetadata());
     }
+    if (dryRun_ != false) {
+      output.writeBool(5, dryRun_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -295,6 +313,10 @@ private static final long serialVersionUID = 0L;
     if (dynamicMetadata_ != null) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(4, getDynamicMetadata());
+    }
+    if (dryRun_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(5, dryRun_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -321,6 +343,8 @@ private static final long serialVersionUID = 0L;
       if (!getDynamicMetadata()
           .equals(other.getDynamicMetadata())) return false;
     }
+    if (getDryRun()
+        != other.getDryRun()) return false;
     if (!getHttpResponseCase().equals(other.getHttpResponseCase())) return false;
     switch (httpResponseCase_) {
       case 2:
@@ -353,6 +377,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + DYNAMIC_METADATA_FIELD_NUMBER;
       hash = (53 * hash) + getDynamicMetadata().hashCode();
     }
+    hash = (37 * hash) + DRY_RUN_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getDryRun());
     switch (httpResponseCase_) {
       case 2:
         hash = (37 * hash) + DENIED_RESPONSE_FIELD_NUMBER;
@@ -512,6 +539,7 @@ private static final long serialVersionUID = 0L;
         dynamicMetadataBuilder_.dispose();
         dynamicMetadataBuilder_ = null;
       }
+      dryRun_ = false;
       httpResponseCase_ = 0;
       httpResponse_ = null;
       return this;
@@ -557,6 +585,9 @@ private static final long serialVersionUID = 0L;
         result.dynamicMetadata_ = dynamicMetadataBuilder_ == null
             ? dynamicMetadata_
             : dynamicMetadataBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
+        result.dryRun_ = dryRun_;
       }
     }
 
@@ -622,6 +653,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasDynamicMetadata()) {
         mergeDynamicMetadata(other.getDynamicMetadata());
+      }
+      if (other.getDryRun() != false) {
+        setDryRun(other.getDryRun());
       }
       switch (other.getHttpResponseCase()) {
         case DENIED_RESPONSE: {
@@ -690,6 +724,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000008;
               break;
             } // case 34
+            case 40: {
+              dryRun_ = input.readBool();
+              bitField0_ |= 0x00000010;
+              break;
+            } // case 40
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1395,6 +1434,50 @@ private static final long serialVersionUID = 0L;
         dynamicMetadata_ = null;
       }
       return dynamicMetadataBuilder_;
+    }
+
+    private boolean dryRun_ ;
+    /**
+     * <pre>
+     * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+     * </pre>
+     *
+     * <code>bool dry_run = 5 [json_name = "dryRun"];</code>
+     * @return The dryRun.
+     */
+    @java.lang.Override
+    public boolean getDryRun() {
+      return dryRun_;
+    }
+    /**
+     * <pre>
+     * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+     * </pre>
+     *
+     * <code>bool dry_run = 5 [json_name = "dryRun"];</code>
+     * @param value The dryRun to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDryRun(boolean value) {
+
+      dryRun_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+     * </pre>
+     *
+     * <code>bool dry_run = 5 [json_name = "dryRun"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDryRun() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      dryRun_ = false;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

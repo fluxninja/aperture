@@ -118,5 +118,15 @@ public interface CheckHTTPResponseOrBuilder extends
    */
   com.google.protobuf.StructOrBuilder getDynamicMetadataOrBuilder();
 
+  /**
+   * <pre>
+   * When true, dry_run informs the receiver to allow all traffic regardless of Agent's decision.
+   * </pre>
+   *
+   * <code>bool dry_run = 5 [json_name = "dryRun"];</code>
+   * @return The dryRun.
+   */
+  boolean getDryRun();
+
   com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.HttpResponseCase getHttpResponseCase();
 }

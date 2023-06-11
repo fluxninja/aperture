@@ -543,6 +543,8 @@ func (m *CheckHTTPResponse) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DryRun
+
 	switch v := m.HttpResponse.(type) {
 	case *CheckHTTPResponse_DeniedResponse:
 		if v == nil {

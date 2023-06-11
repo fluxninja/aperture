@@ -328,6 +328,8 @@ func (m *CheckResponse) validate(all bool) error {
 
 	}
 
+	// no validation rules for DryRun
+
 	if len(errors) > 0 {
 		return CheckResponseMultiError(errors)
 	}
