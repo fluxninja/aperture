@@ -41,6 +41,9 @@ public final class Flow {
         if (this.checkResponse == null) {
             return FlowDecision.Unreachable;
         }
+        if (this.checkResponse.getDryRun()) {
+            return FlowDecision.Accepted;
+        }
         if (this.checkResponse.getDecisionType()
                 == CheckResponse.DecisionType.DECISION_TYPE_ACCEPTED) {
             return FlowDecision.Accepted;

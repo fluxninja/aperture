@@ -55,6 +55,9 @@ public class TrafficFlow {
         if (this.checkResponse == null) {
             return FlowDecision.Unreachable;
         }
+        if (this.checkResponse.getDryRun()) {
+            return FlowDecision.Accepted;
+        }
         if (this.checkResponse.getStatus().getCode() == Code.OK_VALUE) {
             return FlowDecision.Accepted;
         }
