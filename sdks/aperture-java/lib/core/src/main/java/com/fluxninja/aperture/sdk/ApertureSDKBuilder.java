@@ -33,7 +33,7 @@ public final class ApertureSDKBuilder {
     private final List<String> ignoredPaths;
     private boolean ignoredPathsMatchRegex = false;
 
-    private static Logger logger = LoggerFactory.getLogger(ApertureSDKBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApertureSDKBuilder.class);
 
     ApertureSDKBuilder() {
         ignoredPaths = new ArrayList<>();

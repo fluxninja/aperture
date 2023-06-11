@@ -71,20 +71,11 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                try {
-                    flow.end();
-                } catch (ApertureSDKException e) {
-                    // ending flow failed
-                    e.printStackTrace();
-                }
+                flow.end();
             }
         } else {
-            try {
-                flow.setStatus(FlowStatus.Unset);
-                flow.end();
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
-            }
+            flow.setStatus(FlowStatus.Unset);
+            flow.end();
             HttpResponseStatus status;
             Map<String, String> headers;
             if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {

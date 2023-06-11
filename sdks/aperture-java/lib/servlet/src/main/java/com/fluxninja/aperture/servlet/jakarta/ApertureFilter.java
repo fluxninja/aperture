@@ -54,12 +54,7 @@ public class ApertureFilter implements Filter {
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                try {
-                    flow.end();
-                } catch (ApertureSDKException ae) {
-                    // Error: Flow already ended
-                    ae.printStackTrace();
-                }
+                flow.end();
             }
         } else {
             ServletUtils.handleRejectedFlow(flow, response);
