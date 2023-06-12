@@ -45,3 +45,4 @@ dashboard:
   refresh_interval: "5s"
   time_from: "now-15m"
   time_to: "now"
+  title: "Aperture Feature Rollout"
