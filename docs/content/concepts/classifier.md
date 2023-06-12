@@ -3,23 +3,38 @@ title: Classifier
 sidebar_position: 4
 ---
 
-:::info See Also
+The _Classifier_ is a component that allows you to create additional [_Flow
+Labels_][label] based on request metadata without requiring any changes to your
+service, If the existing flow labels aren't sufficient.
 
-[_Classifier_ reference][reference]
-
-:::
-
-The _Classifier_ can be used to create additional [_Flow Labels_][label] based
-on request metadata without requiring any changes to your service, if the
-existing flow labels aren't sufficient.
+## Defining a Classifier
 
 To define a Classifier, it needs to be added as a resource in a
 [policy][policies]. It specifies a set of rules to create new flow labels based
 on request metadata. Envoy's [External Authorization][ext-authz] definition is
 used by Aperture to describe the request metadata, specifically the
-[`AttributeContext`][attr-context]. An example of how the request attributes
-might look can be seen in the [INPUT section at this Rego
-playground][rego-playground].
+[`AttributeContext`][attr-context].
+
+An example of how the request attributes might look can be seen in the [INPUT
+section at this Rego playground][rego-playground].
+
+Example of a Classifier that creates a flow label `user-type` based on the value
+of the `user-type` HTTP header:
+
+```yaml
+policy:
+  policy_name: POLICY_NAME
+  resources:
+    flow_control:
+      classifiers: # resource name
+        - selectors: # Selector Defining Classifier's Scope
+            - service: service1-demo-app.demoapp.svc.cluster.local
+              control_point: ingress
+          rules: # classification rules
+            user_type: # flow label key
+              extractor: # Declarative Extractor
+                from: request.http.headers.user-type # HTTP header
+```
 
 :::note
 
@@ -281,6 +296,12 @@ rego:
         user := object.user
     }
 ```
+
+:::info
+
+For more details and examples, refer to the [Classifier reference][reference].
+
+:::
 
 [ext-authz-extension]:
   https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#config-http-filters-ext-authz
