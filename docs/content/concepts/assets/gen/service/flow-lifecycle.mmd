@@ -1,4 +1,4 @@
-flowchart RL
+flowchart LR
 classDef Green fill:#56AE89,stroke:#000000,stroke-width:2px;
 classDef Orange fill:#F8773D,stroke:#000000,stroke-width:2px;
 
@@ -6,15 +6,15 @@ subgraph "Service"
 end
 class Service Green
 
-Service --"request"--> Selectors
+Service <-- "request\n decision" --> Selectors
+Selectors <-- "request\n decision" --> Components
 
 subgraph "Selectors"
 	Text("Match components")
 	class Text Orange
 end
 class Selectors Green
-Selectors --"request"--> Components
-Selectors --"decision"--> Service
+
 
 subgraph Components
     Classifiers --> FluxMeters --> Regulators--"accept"--> Rate-Limiters --"accept"--> Schedulers
@@ -25,7 +25,3 @@ class Rate-Limiters Orange
 class Schedulers Orange
 end
 class Components Green
-
-Components --"decision"--> Selectors
-
-
