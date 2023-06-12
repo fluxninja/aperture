@@ -296,7 +296,7 @@ func (wsFactory *Factory) NewScheduler(
 	proto *policylangv1.Scheduler,
 	component iface.Component,
 	tokenManger scheduler.TokenManager,
-	metrics *SchedulerMetrics,
+	schedulerMetrics *SchedulerMetrics,
 ) (*Scheduler, error) {
 	priorities := []uint64{proto.DefaultWorkloadParameters.Priority}
 	// Loop through the workloads to find all priorities.
@@ -332,17 +332,18 @@ func (wsFactory *Factory) NewScheduler(
 			invPriority: l / proto.DefaultWorkloadParameters.Priority,
 			proto: &policylangv1.Scheduler_Workload{
 				Parameters: proto.DefaultWorkloadParameters,
+				Name:       metrics.DefaultWorkloadIndex,
 			},
 		},
 		registry:             registry,
 		workloadMultiMatcher: mm,
 		component:            component,
-		metrics:              metrics,
+		metrics:              schedulerMetrics,
 	}
 
 	var wfqMetrics *scheduler.WFQMetrics
-	if metrics != nil {
-		wfqMetrics = metrics.wfqMetrics
+	if schedulerMetrics != nil {
+		wfqMetrics = schedulerMetrics.wfqMetrics
 	}
 
 	// setup scheduler
@@ -354,12 +355,12 @@ func (wsFactory *Factory) NewScheduler(
 // Decide processes a single flow by load scheduler in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority uint64
 	var matchedWorkloadIndex string
 	// match labels against ws.workloadMultiMatcher
-	mmr := ws.workloadMultiMatcher.Match(multimatcher.Labels(labels))
+	mmr := s.workloadMultiMatcher.Match(multimatcher.Labels(labels))
 	// if at least one match, return workload with lowest index
 	if len(mmr.matchedWorkloads) > 0 {
 		// select the smallest workloadIndex
@@ -379,9 +380,9 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 		}
 	} else {
 		// no match, return default workload
-		matchedWorkloadParametersProto = ws.defaultWorkload.proto.Parameters
-		invPriority = ws.defaultWorkload.invPriority
-		matchedWorkloadIndex = metrics.DefaultWorkloadIndex
+		invPriority = s.defaultWorkload.invPriority
+		matchedWorkloadParametersProto = s.defaultWorkload.proto.Parameters
+		matchedWorkloadIndex = s.defaultWorkload.proto.Name
 	}
 
 	fairnessLabel := "workload:" + matchedWorkloadIndex
@@ -391,7 +392,7 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 	// 1. Estimated Tokens
 	// 2. Workload tokens
 	// 3. Label tokens
-	if tokensEstimated, ok := ws.GetEstimatedTokens(matchedWorkloadIndex); ok {
+	if tokensEstimated, ok := s.GetEstimatedTokens(matchedWorkloadIndex); ok {
 		tokens = tokensEstimated
 	}
 
@@ -399,8 +400,8 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 		tokens = matchedWorkloadParametersProto.Tokens
 	}
 
-	if ws.proto.TokensLabelKey != "" {
-		if val, ok := labels[ws.proto.TokensLabelKey]; ok {
+	if s.proto.TokensLabelKey != "" {
+		if val, ok := labels[s.proto.TokensLabelKey]; ok {
 			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
 				tokens = parsedTokens
 			}
@@ -417,7 +418,7 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 		// the client, we set an "internal" deadline to a bit before client's
 		// deadline, subtracting the configured margin.
 		clientTimeout := time.Until(clientDeadline)
-		timeout := clientTimeout - ws.proto.DecisionDeadlineMargin.AsDuration()
+		timeout := clientTimeout - s.proto.DecisionDeadlineMargin.AsDuration()
 		if timeout < 0 {
 			// we will still schedule the request and it will get
 			// dropped if it doesn't get the tokens immediately.
@@ -430,7 +431,7 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 
 	req := scheduler.NewRequest(fairnessLabel, tokens, invPriority)
 
-	accepted := ws.scheduler.Schedule(reqCtx, req)
+	accepted := s.scheduler.Schedule(reqCtx, req)
 
 	tokensConsumed := uint64(0)
 	if accepted {
@@ -438,9 +439,9 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		PolicyName:  ws.component.GetPolicyName(),
-		PolicyHash:  ws.component.GetPolicyHash(),
-		ComponentId: ws.component.GetComponentId(),
+		PolicyName:  s.component.GetPolicyName(),
+		PolicyHash:  s.component.GetPolicyHash(),
+		ComponentId: s.component.GetComponentId(),
 		Dropped:     !accepted,
 		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
@@ -452,43 +453,43 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 }
 
 // Revert reverts the decision made by the limiter.
-func (ws *Scheduler) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (s *Scheduler) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
 	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
 		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
 		if tokens > 0 {
-			ws.scheduler.Revert(ctx, tokens)
+			s.scheduler.Revert(ctx, tokens)
 		}
 	}
 }
 
 // GetLatencyObserver returns histogram for specific workload.
-func (ws *Scheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
-	return ws.metrics.wsFactory.GetLatencyObserver(labels)
+func (s *Scheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+	return s.metrics.wsFactory.GetLatencyObserver(labels)
 }
 
 // GetRequestCounter returns request counter for specific workload.
-func (ws *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
-	return ws.metrics.wsFactory.GetRequestCounter(labels)
+func (s *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	return s.metrics.wsFactory.GetRequestCounter(labels)
 }
 
 // GetEstimatedTokens returns estimated tokens for specific workload.
-func (ws *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
-	ws.mutex.RLock()
-	defer ws.mutex.RUnlock()
-	val, ok := ws.tokensByWorkloadIndex[workloadIndex]
+func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	val, ok := s.tokensByWorkloadIndex[workloadIndex]
 	return val, ok
 }
 
 // SetEstimatedTokens sets estimated tokens for specific workload.
-func (ws *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]uint64) {
-	ws.mutex.Lock()
-	defer ws.mutex.Unlock()
-	ws.tokensByWorkloadIndex = tokensByWorkloadIndex
+func (s *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]uint64) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	s.tokensByWorkloadIndex = tokensByWorkloadIndex
 }
 
 // Info returns information about the scheduler.
-func (ws *Scheduler) Info() (time.Time, int) {
-	return ws.scheduler.Info()
+func (s *Scheduler) Info() (time.Time, int) {
+	return s.scheduler.Info()
 }
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
