@@ -179,9 +179,9 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
 
-			// Update flow regulator metrics.
-			if fr := decision.GetRegulatorInfo(); fr != nil {
-				p.updateMetricsForRegulator(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+			// Update flow sampler metrics.
+			if fr := decision.GetSamplerInfo(); fr != nil {
+				p.updateMetricsForSampler(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
 		}
 	}
@@ -257,20 +257,20 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForRegulator(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
-	regulator := p.cfg.engine.GetRegulator(limiterID)
-	if regulator == nil {
-		log.Sample(noRegulatorSampler).Warn().
+func (p *metricsProcessor) updateMetricsForSampler(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
+	sampler := p.cfg.engine.GetSampler(limiterID)
+	if sampler == nil {
+		log.Sample(noSamplerSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
-			Msg("Regulator not found")
+			Msg("Sampler not found")
 		return
 	}
 	// Add decision type label to the request counter metric
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
-	labels[metrics.RegulatorDroppedLabel] = strconv.FormatBool(dropped)
-	requestCounter := regulator.GetRequestCounter(labels)
+	labels[metrics.SamplerDroppedLabel] = strconv.FormatBool(dropped)
+	requestCounter := sampler.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
 	}
@@ -340,7 +340,7 @@ func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv
 var (
 	noLoadSchedulerSampler = log.NewRatelimitingSampler()
 	noRateLimiterSampler   = log.NewRatelimitingSampler()
-	noRegulatorSampler     = log.NewRatelimitingSampler()
+	noSamplerSampler       = log.NewRatelimitingSampler()
 	noClassifierSampler    = log.NewRatelimitingSampler()
 	noFluxMeterSampler     = log.NewRatelimitingSampler()
 )

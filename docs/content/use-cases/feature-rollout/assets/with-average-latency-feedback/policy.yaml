@@ -4,10 +4,11 @@ metadata:
   annotations:
     fluxninja.com/blueprint-name: policies/feature-rollout/average-latency
     fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"components": [ ], "drivers": {"average_latency_drivers":
+    fluxninja.com/values:
+      '{"policy": {"components": [ ], "drivers": {"average_latency_drivers":
       [{"criteria": {"forward": {"threshold": 75}, "reset": {"threshold": 75}}, "selectors":
       [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}]},
-      "evaluation_interval": "1s", "load_ramp": {"regulator": {"label_key": "", "selectors":
+      "evaluation_interval": "1s", "load_ramp": {"sampler": {"label_key": "", "selectors":
       [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]},
       "steps": [{"duration": "0s", "target_accept_percentage": 1}, {"duration": "300s",
       "target_accept_percentage": 100}]}, "policy_name": "feature-rollout", "resources":
@@ -18,140 +19,141 @@ metadata:
 spec:
   circuit:
     components:
-    - query:
-        promql:
-          evaluation_interval: 1s
+      - query:
+          promql:
+            evaluation_interval: 1s
+            out_ports:
+              output:
+                signal_name: AVERAGE_LATENCY_0
+            query_string:
+              sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+              flux_meter_name="feature-rollout/average_latency/0"}[5s]))
+      - decider:
+          in_ports:
+            lhs:
+              signal_name: AVERAGE_LATENCY_0
+            rhs:
+              constant_signal:
+                value: 75
+          operator: lt
           out_ports:
             output:
-              signal_name: AVERAGE_LATENCY_0
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="feature-rollout/average_latency/0"}[5s]))
-    - decider:
-        in_ports:
-          lhs:
-            signal_name: AVERAGE_LATENCY_0
-          rhs:
-            constant_signal:
-              value: 75
-        operator: lt
-        out_ports:
-          output:
-            signal_name: FORWARD_0
-    - decider:
-        in_ports:
-          lhs:
-            signal_name: AVERAGE_LATENCY_0
-          rhs:
-            constant_signal:
-              value: 75
-        operator: gt
-        out_ports:
-          output:
-            signal_name: RESET_0
-    - bool_variable:
-        config_key: rollout
-        constant_output: false
-        out_ports:
-          output:
-            signal_name: USER_ROLLOUT_CONTROL
-    - bool_variable:
-        config_key: reset
-        constant_output: false
-        out_ports:
-          output:
-            signal_name: USER_RESET_CONTROL
-    - or:
-        in_ports:
-          inputs: []
-        out_ports:
-          output:
-            signal_name: BACKWARD_INTENT
-    - or:
-        in_ports:
-          inputs:
-          - signal_name: RESET_0
-          - signal_name: USER_RESET_CONTROL
-        out_ports:
-          output:
-            signal_name: RESET
-    - or:
-        in_ports:
-          inputs:
-          - signal_name: FORWARD_0
-        out_ports:
-          output:
-            signal_name: FORWARD_INTENT
-    - inverter:
-        in_ports:
-          input:
-            signal_name: BACKWARD_INTENT
-        out_ports:
-          output:
-            signal_name: INVERTED_BACKWARD_INTENT
-    - first_valid:
-        in_ports:
-          inputs:
-          - signal_name: INVERTED_BACKWARD_INTENT
-          - constant_signal:
-              value: 1
-        out_ports:
-          output:
-            signal_name: NOT_BACKWARD
-    - inverter:
-        in_ports:
-          input:
-            signal_name: RESET
-        out_ports:
-          output:
-            signal_name: INVERTED_RESET
-    - first_valid:
-        in_ports:
-          inputs:
-          - signal_name: INVERTED_RESET
-          - constant_signal:
-              value: 1
-        out_ports:
-          output:
-            signal_name: NOT_RESET
-    - and:
-        in_ports:
-          inputs:
-          - signal_name: NOT_BACKWARD
-          - signal_name: NOT_RESET
-          - signal_name: USER_ROLLOUT_CONTROL
-          - signal_name: FORWARD_INTENT
-        out_ports:
-          output:
-            signal_name: FORWARD
-    - and:
-        in_ports:
-          inputs:
-          - signal_name: BACKWARD_INTENT
-          - signal_name: NOT_RESET
-        out_ports:
-          output:
-            signal_name: BACKWARD
-    - flow_control:
-        load_ramp:
+              signal_name: FORWARD_0
+      - decider:
           in_ports:
-            backward:
-              signal_name: BACKWARD
-            forward:
-              signal_name: FORWARD
-            reset:
+            lhs:
+              signal_name: AVERAGE_LATENCY_0
+            rhs:
+              constant_signal:
+                value: 75
+          operator: gt
+          out_ports:
+            output:
+              signal_name: RESET_0
+      - bool_variable:
+          config_key: rollout
+          constant_output: false
+          out_ports:
+            output:
+              signal_name: USER_ROLLOUT_CONTROL
+      - bool_variable:
+          config_key: reset
+          constant_output: false
+          out_ports:
+            output:
+              signal_name: USER_RESET_CONTROL
+      - or:
+          in_ports:
+            inputs: []
+          out_ports:
+            output:
+              signal_name: BACKWARD_INTENT
+      - or:
+          in_ports:
+            inputs:
+              - signal_name: RESET_0
+              - signal_name: USER_RESET_CONTROL
+          out_ports:
+            output:
               signal_name: RESET
-          parameters:
-            regulator:
-              label_key: ""
-              selectors:
-              - control_point: ingress
-                service: service1-demo-app.demoapp.svc.cluster.local
-            steps:
-            - duration: 0s
-              target_accept_percentage: 1
-            - duration: 300s
-              target_accept_percentage: 100
-          pass_through_label_values_config_key: pass_through_label_values
+      - or:
+          in_ports:
+            inputs:
+              - signal_name: FORWARD_0
+          out_ports:
+            output:
+              signal_name: FORWARD_INTENT
+      - inverter:
+          in_ports:
+            input:
+              signal_name: BACKWARD_INTENT
+          out_ports:
+            output:
+              signal_name: INVERTED_BACKWARD_INTENT
+      - first_valid:
+          in_ports:
+            inputs:
+              - signal_name: INVERTED_BACKWARD_INTENT
+              - constant_signal:
+                  value: 1
+          out_ports:
+            output:
+              signal_name: NOT_BACKWARD
+      - inverter:
+          in_ports:
+            input:
+              signal_name: RESET
+          out_ports:
+            output:
+              signal_name: INVERTED_RESET
+      - first_valid:
+          in_ports:
+            inputs:
+              - signal_name: INVERTED_RESET
+              - constant_signal:
+                  value: 1
+          out_ports:
+            output:
+              signal_name: NOT_RESET
+      - and:
+          in_ports:
+            inputs:
+              - signal_name: NOT_BACKWARD
+              - signal_name: NOT_RESET
+              - signal_name: USER_ROLLOUT_CONTROL
+              - signal_name: FORWARD_INTENT
+          out_ports:
+            output:
+              signal_name: FORWARD
+      - and:
+          in_ports:
+            inputs:
+              - signal_name: BACKWARD_INTENT
+              - signal_name: NOT_RESET
+          out_ports:
+            output:
+              signal_name: BACKWARD
+      - flow_control:
+          load_ramp:
+            in_ports:
+              backward:
+                signal_name: BACKWARD
+              forward:
+                signal_name: FORWARD
+              reset:
+                signal_name: RESET
+            parameters:
+              sampler:
+                label_key: ""
+                selectors:
+                  - control_point: ingress
+                    service: service1-demo-app.demoapp.svc.cluster.local
+              steps:
+                - duration: 0s
+                  target_accept_percentage: 1
+                - duration: 300s
+                  target_accept_percentage: 100
+            pass_through_label_values_config_key: pass_through_label_values
     evaluation_interval: 1s
   resources:
     flow_control:
@@ -159,5 +161,5 @@ spec:
       flux_meters:
         feature-rollout/average_latency/0:
           selectors:
-          - control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+            - control_point: ingress
+              service: service1-demo-app.demoapp.svc.cluster.local

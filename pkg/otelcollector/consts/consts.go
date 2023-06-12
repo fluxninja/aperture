@@ -61,10 +61,10 @@ const (
 	ApertureLoadSchedulersLabel = "aperture.load_schedulers"
 	// ApertureDroppingLoadSchedulersLabel describes load schedulers dropping the traffic.
 	ApertureDroppingLoadSchedulersLabel = "aperture.dropping_load_schedulers"
-	// ApertureLoadRegulatorsLabel describes load regulators matched to the traffic.
-	ApertureLoadRegulatorsLabel = "aperture.load_regulators"
-	// ApertureDroppingLoadRegulatorsLabel describes load regulators dropping the traffic.
-	ApertureDroppingLoadRegulatorsLabel = "aperture.dropping_load_regulators"
+	// ApertureSamplersLabel describes samplers matched to the traffic.
+	ApertureSamplersLabel = "aperture.samplers"
+	// ApertureDroppingSamplersLabel describes samplers dropping the traffic.
+	ApertureDroppingSamplersLabel = "aperture.dropping_samplers"
 	// ApertureWorkloadsLabel describes workloads matched to the traffic.
 	ApertureWorkloadsLabel = "aperture.workloads"
 	// ApertureDroppingWorkloadsLabel describes workloads dropping the traffic.
