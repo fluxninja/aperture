@@ -33,8 +33,12 @@ Flow Labels serve various purposes within Aperture:
 
 ## Flow Label Sources
 
-Flows are annotated with _Flow Labels_ based on four sources: request labels,
-baggage, flow classifiers, and explicit labels from the Aperture SDK call.
+Flows are annotated with _Flow Labels_ based on four sources:
+
+- Request labels
+- Baggage
+- Classifiers
+- Aperture SDKs.
 
 ### Request labels
 
@@ -133,7 +137,7 @@ directly on a `aperture-agent` local to the service instances (pods):
 curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
 ```
 
-## Telemetry
+## Telemetry and Flow Labels
 
 Telemetry data is extracted out of flows for further processing. This data is
 collected from the following sources:

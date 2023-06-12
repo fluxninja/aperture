@@ -12,24 +12,18 @@ See also [_Flux Meter_ reference][reference]
 
 :::
 
-## Purpose
+The Flux Meter component provides a way to translates a flux of flows, matching
+a [Selector][flow-selectors], into a Prometheus [histogram][histogram-metric].
+It also gathers metrics for the traffic that matches its selector. The histogram
+created by Flux Meter measures the workload latency by default.
 
-The _Flux Meter_ provides a way to translate a flux of flows matching a [Flow
-Selector][flow-selectors] to a Prometheus [histogram][histogram-metric].
+## Naming Convention
 
-## Naming
-
-_Flux Meter_ is referred to by its name. It's strongly recommended to assign
-globally unique names to _Flux Meters_. A good practice is to prefix the Flux
-Meter name with the policy name.
-
-:::caution warning
-
-_Flux Meters_ with repeated names within the same
-[_Agent Group_](/concepts/selector.md#agent-group) will fail to load at the
-agents.
-
-:::
+Each Flux Meter is identified by its unique name. It's strongly recommended
+assigning globally unique names to Flux Meters. A good practice is to prefix the
+Flux Meter name with the policy name. _Note that Flux Meters with repeated names
+within the same [Agent Group](/concepts/selector.md#agent-group) will fail to
+load at the agents._
 
 ![Flux Meter](./assets/img/flux-meter-light.svg#gh-light-mode-only)
 ![Flux Meter](./assets/img/flux-meter-dark.svg#gh-dark-mode-only)
