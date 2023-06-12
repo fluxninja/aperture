@@ -46,9 +46,9 @@ var (
 	PodScalerDecisionsPath = path.Join(DecisionsPrefix, "pod_scaler")
 	// PodScalerStatusPath is decision path in etcd for pod scaler status.
 	PodScalerStatusPath = path.Join(StatusPrefix, "pod_scaler")
-	// SamplerConfigPath is config path in etcd for load sampler.
+	// SamplerConfigPath is config path in etcd for sampler.
 	SamplerConfigPath = path.Join(ConfigPrefix, "sampler")
-	// SamplerDecisionsPath is decision path in etcd for load sampler decisions.
+	// SamplerDecisionsPath is decision path in etcd for sampler decisions.
 	SamplerDecisionsPath = path.Join(DecisionsPrefix, "sampler")
 )
 

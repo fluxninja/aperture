@@ -29,7 +29,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-const samplerStatusRoot = "load_samplers"
+const samplerStatusRoot = "samplers"
 
 var (
 	fxNameTag       = config.NameTag(samplerStatusRoot)
@@ -42,7 +42,7 @@ var (
 	}
 )
 
-// Module returns the fx options for load sampler.
+// Module returns the fx options for sampler.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
@@ -106,7 +106,7 @@ func setupSamplerFactory(
 	counterVector := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: metrics.SamplerCounterTotalMetricName,
-			Help: "Total number of decisions made by load samplers.",
+			Help: "Total number of decisions made by samplers.",
 		},
 		metricLabelKeys,
 	)
@@ -169,7 +169,7 @@ func (frf *samplerFactory) newSamplerOptions(
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.Sampler == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		logger.Warn().Err(err).Msg("Failed to unmarshal load sampler config")
+		logger.Warn().Err(err).Msg("Failed to unmarshal sampler config")
 		return fx.Options(), err
 	}
 
@@ -244,7 +244,7 @@ func (fr *sampler) setup(lifecycle fx.Lifecycle) error {
 			// add to data engine
 			err = fr.factory.engineAPI.RegisterSampler(fr)
 			if err != nil {
-				logger.Error().Err(err).Msg("Failed to register load sampler")
+				logger.Error().Err(err).Msg("Failed to register sampler")
 				return err
 			}
 
@@ -254,7 +254,7 @@ func (fr *sampler) setup(lifecycle fx.Lifecycle) error {
 			var merr, err error
 			deleted := counterVec.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
-				logger.Warn().Msg("Could not delete load sampler counter from its metric vector. No traffic to generate metrics?")
+				logger.Warn().Msg("Could not delete sampler counter from its metric vector. No traffic to generate metrics?")
 			}
 			// remove from data engine
 			err = fr.factory.engineAPI.UnregisterSampler(fr)
@@ -286,7 +286,7 @@ func (fr *sampler) setPassthroughLabelValues(labelList []string) {
 	fr.passthroughLabelValues = labelSet
 }
 
-// GetSelectors returns the selectors for the load sampler.
+// GetSelectors returns the selectors for the sampler.
 func (fr *sampler) GetSelectors() []*policylangv1.Selector {
 	return fr.proto.Parameters.GetSelectors()
 }

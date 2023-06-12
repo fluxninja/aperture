@@ -711,7 +711,7 @@ func (x *AdaptiveLoadScheduler) GetDryRunConfigKey() string {
 //
 // :::info
 //
-// See also [_Load Sampler_ overview](/concepts/flow-control/components/sampler.md).
+// See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
 //
 // :::
 type Sampler struct {

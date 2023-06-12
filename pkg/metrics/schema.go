@@ -26,7 +26,7 @@ const (
 	RateLimiterCounterTotalMetricName = "rate_limiter_counter_total"
 	// ClassifierCounterTotalMetricName - name of the counter describing times classifier was triggered.
 	ClassifierCounterTotalMetricName = "classifier_counter_total"
-	// SamplerCounterTotalMetricName - name of the counter describing times load sampler was triggered.
+	// SamplerCounterTotalMetricName - name of the counter describing times sampler was triggered.
 	SamplerCounterTotalMetricName = "sampler_counter_total"
 
 	// DistCache metrics scraped from Olric DMaps statistics.

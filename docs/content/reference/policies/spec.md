@@ -6647,8 +6647,7 @@ only a specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also
-[_Load Sampler_ overview](/concepts/flow-control/components/sampler.md).
+See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
 
 :::
 
