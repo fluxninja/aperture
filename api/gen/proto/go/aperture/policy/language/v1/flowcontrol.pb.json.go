@@ -296,7 +296,7 @@ func (msg *AdaptiveLoadScheduler_Outs) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Regulator) MarshalJSON() ([]byte, error) {
+func (msg *Sampler) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -305,14 +305,14 @@ func (msg *Regulator) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Regulator) UnmarshalJSON(b []byte) error {
+func (msg *Sampler) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Regulator_Parameters) MarshalJSON() ([]byte, error) {
+func (msg *Sampler_Parameters) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -321,14 +321,14 @@ func (msg *Regulator_Parameters) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Regulator_Parameters) UnmarshalJSON(b []byte) error {
+func (msg *Sampler_Parameters) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Regulator_Ins) MarshalJSON() ([]byte, error) {
+func (msg *Sampler_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -337,7 +337,7 @@ func (msg *Regulator_Ins) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Regulator_Ins) UnmarshalJSON(b []byte) error {
+func (msg *Sampler_Ins) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

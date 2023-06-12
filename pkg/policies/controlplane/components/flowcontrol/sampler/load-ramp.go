@@ -1,4 +1,4 @@
-package regulator
+package sampler
 
 import (
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -66,7 +66,7 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "LoadRamp",
-		ShortDescription: iface.GetSelectorsShortDescription(loadRamp.Parameters.Regulator.GetSelectors()),
+		ShortDescription: iface.GetSelectorsShortDescription(loadRamp.Parameters.Sampler.GetSelectors()),
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
@@ -110,10 +110,10 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 			{
 				Component: &policylangv1.Component_FlowControl{
 					FlowControl: &policylangv1.FlowControl{
-						Component: &policylangv1.FlowControl_Regulator{
-							Regulator: &policylangv1.Regulator{
-								Parameters: loadRamp.Parameters.Regulator,
-								InPorts: &policylangv1.Regulator_Ins{
+						Component: &policylangv1.FlowControl_Sampler{
+							Sampler: &policylangv1.Sampler{
+								Parameters: loadRamp.Parameters.Sampler,
+								InPorts: &policylangv1.Sampler_Ins{
 									AcceptPercentage: &policylangv1.InPort{
 										Value: &policylangv1.InPort_SignalName{
 											SignalName: "ACCEPT_PERCENTAGE",

@@ -88,7 +88,7 @@ message LimiterDecision {
     uint64 tokens_consumed = 2;
   }
 
-  message RegulatorInfo {
+  message SamplerInfo {
     string label = 1;
   }
 
@@ -110,7 +110,7 @@ message LimiterDecision {
   oneof details {
     RateLimiterInfo rate_limiter_info = 6;
     SchedulerInfo load_scheduler_info = 7;
-    RegulatorInfo regulator_info = 8;
+    SamplerInfo sampler_info = 8;
     QuotaSchedulerInfo quota_scheduler_info = 9;
   }
 }

@@ -1,8 +1,8 @@
-local regulatorins = import './regulatorins.libsonnet';
+local samplerins = import './samplerins.libsonnet';
 {
   new():: {
   },
-  inPorts:: regulatorins,
+  inPorts:: samplerins,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

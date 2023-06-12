@@ -16,7 +16,7 @@ import (
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/regulator"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/sampler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
@@ -109,8 +109,8 @@ func NewComponentAndOptions(
 			ctor = mkCtor(flowControlConfig.QuotaScheduler, quotascheduler.NewQuotaSchedulerAndOptions)
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, ratelimiter.NewRateLimiterAndOptions)
-		case *policylangv1.FlowControl_Regulator:
-			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
+		case *policylangv1.FlowControl_Sampler:
+			ctor = mkCtor(flowControlConfig.Sampler, sampler.NewSamplerAndOptions)
 		case *policylangv1.FlowControl_Private:
 			switch flowControlConfig.Private.TypeUrl {
 			case "type.googleapis.com/aperture.policy.private.v1.LoadActuator":

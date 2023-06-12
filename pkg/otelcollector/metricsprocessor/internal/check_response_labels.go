@@ -100,7 +100,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
 			}
 		}
-		if decision.GetRegulatorInfo() != nil {
+		if decision.GetSamplerInfo() != nil {
 			rawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
 				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),

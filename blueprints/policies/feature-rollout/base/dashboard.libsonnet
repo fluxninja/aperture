@@ -25,7 +25,7 @@ function(cfg) {
     )
     .addTarget(
       prometheus.target(
-        expr='rate(regulator_counter_total{%(filters)s}[$__rate_interval])' % {
+        expr='rate(sampler_counter_total{%(filters)s}[$__rate_interval])' % {
           filters: throughput_filters,
         },
         intervalFactor=1,
