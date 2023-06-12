@@ -223,10 +223,10 @@ See [full example in reference][reference]
 [label]: /concepts/flow-control/flow-label.md
 [baggage]: /concepts/flow-control/flow-label.md#baggage
 [request-labels]: ../flow-label.md#request-labels
-[reference]: /reference/policies/spec.md#classifier
-[rule]: /reference/policies/spec.md#rule
-[extractor]: /reference/policies/spec.md#extractor
-[rego-rule]: /reference/policies/spec.md#rule-rego
+[reference]: /reference/configuration/spec.md#classifier
+[rule]: /reference/configuration/spec.md#rule
+[extractor]: /reference/configuration/spec.md#extractor
+[rego-rule]: /reference/configuration/spec.md#rule-rego
 [arc]: /arc/extension.md
 [label-matcher]: ../selector.md#label-matcher
 [policies]: /concepts/policy/policy.md

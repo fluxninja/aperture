@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Service Protection with Load-based Pod Auto-Scaler](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
+[Service Protection with Load-based Pod Auto-Scaler](/reference/blueprints/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
 blueprint.
 
 :::
@@ -27,7 +27,7 @@ blueprint.
 Responding to fluctuating service demand is a common challenge for maintaining
 stable and responsive services. This policy, based on the Service Protection
 with Load-based Pod Auto-Scaler
-[blueprint](/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md),
+[blueprint](/reference/blueprints/service-protection-with-load-based-pod-auto-scaler/average-latency.md),
 presents an evolved strategy to tackle the surges of service demands. It
 introduces a mechanism to dynamically scale the service resources based on
 observed load, thereby optimizing resource allocation and maintaining a balanced
