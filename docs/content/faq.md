@@ -35,8 +35,9 @@ are still benefits of using Aperture:
   – [mesh of Agents is providing distributed counters](/concepts/rate-limiter.md#distributed-counters).
 - Rate-limiting decisions can be made locally on the agent if lazy sync is
   enabled.
-- In addition to Rate Limiter, Aperture also offers Load Scheduler, which Envoy
-  doesn't have an equivalent of.
+- In addition to Rate Limiter, Aperture also offers
+  [Load Scheduler](/concepts/scheduler.md), which Envoy doesn't have an
+  equivalent of.
 
 ### Does Aperture reject requests immediately?
 
@@ -83,8 +84,8 @@ existing services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
 
-No, as for now, we only support deploying [Aperture Controller][] on a
-Kubernetes cluster.
+No, as for now, we only support deploying [Aperture
+Controller][Aperture Controller] on a Kubernetes cluster.
 
 ### Can the Aperture Agent run in a non-containerized environment?
 

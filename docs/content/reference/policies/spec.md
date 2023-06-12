@@ -5845,7 +5845,7 @@ single element.
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flux-meter.md) metrics can be queries using PromQL. Flux
+[Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux
 Meter defines histogram type of metrics in Prometheus. Therefore, one can refer
 to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`. The particular
 Flux Meter can be identified with the `flux_meter_name` label. There are
