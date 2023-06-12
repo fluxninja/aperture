@@ -62,12 +62,12 @@ policy:
                 match_labels:
                   is_demo_app_requests_total: "true"
               parameters:
-                priority: 50
+                priority: "50"
             - label_matcher:
                 match_labels:
                   is_demo_app_request_duration_micro_seconds: "true"
               parameters:
-                priority: 200
+                priority: "200"
   latency_baseliner:
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter

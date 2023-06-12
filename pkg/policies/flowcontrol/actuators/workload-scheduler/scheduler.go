@@ -24,6 +24,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // Module provides the fx options for the workload scheduler.
@@ -281,6 +282,7 @@ type Scheduler struct {
 	scheduler             scheduler.Scheduler
 	registry              status.Registry
 	proto                 *policylangv1.Scheduler
+	defaultWorkload       *workload
 	workloadMultiMatcher  *multiMatcher
 	tokensByWorkloadIndex map[string]uint64
 	metrics               *SchedulerMetrics
@@ -296,17 +298,27 @@ func (wsFactory *Factory) NewScheduler(
 	tokenManger scheduler.TokenManager,
 	metrics *SchedulerMetrics,
 ) (*Scheduler, error) {
+	priorities := []uint64{proto.DefaultWorkloadParameters.Priority}
+	// Loop through the workloads to find all priorities.
+	for _, workloadProto := range proto.Workloads {
+		priorities = append(priorities, workloadProto.Parameters.Priority)
+	}
+	// find least common multiple of all priorities
+	l := utils.LCMOfNums(priorities)
+
 	mm := multimatcher.New[int, multiMatchResult]()
-	// Loop through the workloads
 	for workloadIndex, workloadProto := range proto.Workloads {
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
 		if err != nil {
 			return nil, err
 		}
-
+		invPriority := l / workloadProto.Parameters.Priority
 		wm := &workloadMatcher{
 			workloadIndex: workloadIndex,
-			workloadProto: workloadProto,
+			workload: &workload{
+				proto:       workloadProto,
+				invPriority: invPriority,
+			},
 		}
 		err = mm.AddEntry(workloadIndex, labelMatcher, wm.matchCallback)
 		if err != nil {
@@ -315,7 +327,13 @@ func (wsFactory *Factory) NewScheduler(
 	}
 
 	ws := &Scheduler{
-		proto:                proto,
+		proto: proto,
+		defaultWorkload: &workload{
+			invPriority: l / proto.DefaultWorkloadParameters.Priority,
+			proto: &policylangv1.Scheduler_Workload{
+				Parameters: proto.DefaultWorkloadParameters,
+			},
+		},
 		registry:             registry,
 		workloadMultiMatcher: mm,
 		component:            component,
@@ -338,6 +356,7 @@ func (wsFactory *Factory) NewScheduler(
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
 func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
+	var invPriority uint64
 	var matchedWorkloadIndex string
 	// match labels against ws.workloadMultiMatcher
 	mmr := ws.workloadMultiMatcher.Match(multimatcher.Labels(labels))
@@ -351,23 +370,21 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 			}
 		}
 		matchedWorkload := mmr.matchedWorkloads[smallestWorkloadIndex]
-		matchedWorkloadParametersProto = matchedWorkload.GetParameters()
-		if matchedWorkload.GetName() != "" {
-			matchedWorkloadIndex = matchedWorkload.GetName()
+		invPriority = matchedWorkload.invPriority
+		matchedWorkloadParametersProto = matchedWorkload.proto.GetParameters()
+		if matchedWorkload.proto.GetName() != "" {
+			matchedWorkloadIndex = matchedWorkload.proto.GetName()
 		} else {
 			matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
 		}
 	} else {
 		// no match, return default workload
-		matchedWorkloadParametersProto = ws.proto.DefaultWorkloadParameters
+		matchedWorkloadParametersProto = ws.defaultWorkload.proto.Parameters
+		invPriority = ws.defaultWorkload.invPriority
 		matchedWorkloadIndex = metrics.DefaultWorkloadIndex
 	}
 
 	fairnessLabel := "workload:" + matchedWorkloadIndex
-
-	if val, ok := labels[matchedWorkloadParametersProto.FairnessKey]; ok {
-		fairnessLabel = fairnessLabel + "," + val
-	}
 
 	tokens := uint64(1)
 	// Precedence order (lowest to highest):
@@ -411,7 +428,7 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 		reqCtx = timeoutCtx
 	}
 
-	req := scheduler.NewRequest(fairnessLabel, tokens, uint8(matchedWorkloadParametersProto.Priority))
+	req := scheduler.NewRequest(fairnessLabel, tokens, invPriority)
 
 	accepted := ws.scheduler.Schedule(reqCtx, req)
 
@@ -476,23 +493,29 @@ func (ws *Scheduler) Info() (time.Time, int) {
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_Workload
+	matchedWorkloads map[int]*workload
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
 type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 
+type workload struct {
+	proto       *policylangv1.Scheduler_Workload
+	invPriority uint64
+}
+
 type workloadMatcher struct {
-	workloadProto *policylangv1.Scheduler_Workload
+	workload      *workload
 	workloadIndex int
 }
 
 func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
 	// mmr.matchedWorkloads is nil on first match.
 	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload)
+		mmr.matchedWorkloads = make(map[int]*workload)
 	}
-	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto
+
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workload
 	return mmr
 }
 

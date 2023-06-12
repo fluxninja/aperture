@@ -22,9 +22,10 @@ metadata:
       "awesomeFeature", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}]}},
       "service_protection_core": {"adaptive_load_scheduler": {"load_multiplier_linear_increment":
       0.0025000000000000001, "load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
-      {"match_labels": {"user_type": "guest"}}, "parameters": {"priority": 50}}, {"label_matcher":
-      {"match_labels": {"user_type": "subscriber"}}, "parameters": {"priority": 200}}]},
-      "selectors": [{"control_point": "awesomeFeature", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
+      {"match_labels": {"user_type": "guest"}}, "parameters": {"priority": "50"}},
+      {"label_matcher": {"match_labels": {"user_type": "subscriber"}}, "parameters":
+      {"priority": "200"}}]}, "selectors": [{"control_point": "awesomeFeature", "service":
+      "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: service-protection
@@ -63,12 +64,12 @@ spec:
                     match_labels:
                       user_type: guest
                   parameters:
-                    priority: 50
+                    priority: "50"
                 - label_matcher:
                     match_labels:
                       user_type: subscriber
                   parameters:
-                    priority: 200
+                    priority: "200"
               selectors:
               - control_point: awesomeFeature
                 service: service1-demo-app.demoapp.svc.cluster.local
