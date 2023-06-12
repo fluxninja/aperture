@@ -202,11 +202,9 @@ func (wsFactory *Factory) GetRequestCounter(labels map[string]string) prometheus
 
 // SchedulerMetrics is a struct that holds all metrics for Scheduler.
 type SchedulerMetrics struct {
-	incomingTokensCounter prometheus.Counter
-	acceptedTokensCounter prometheus.Counter
-	wfqMetrics            *scheduler.WFQMetrics
-	metricLabels          prometheus.Labels
-	wsFactory             *Factory
+	wfqMetrics   *scheduler.WFQMetrics
+	metricLabels prometheus.Labels
+	wsFactory    *Factory
 }
 
 // NewSchedulerMetrics creates a new SchedulerMetrics instance.
@@ -221,26 +219,27 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		return nil, fmt.Errorf("%w: failed to get wfq requests gauge", err)
 	}
 
-	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqRequestsGauge,
-	}
-
 	incomingTokensCounter, err := wsFactory.incomingTokensCounterVec.GetMetricWith(metricLabels)
 	if err != nil {
 		return nil, err
 	}
+
 	acceptedTokensCounter, err := wsFactory.acceptedTokensCounterVec.GetMetricWith(metricLabels)
 	if err != nil {
 		return nil, err
 	}
 
+	wfqMetrics := &scheduler.WFQMetrics{
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqRequestsGauge,
+		IncomingTokensCounter: incomingTokensCounter,
+		AcceptedTokensCounter: acceptedTokensCounter,
+	}
+
 	return &SchedulerMetrics{
-		incomingTokensCounter: incomingTokensCounter,
-		acceptedTokensCounter: acceptedTokensCounter,
-		wfqMetrics:            wfqMetrics,
-		metricLabels:          metricLabels,
-		wsFactory:             wsFactory,
+		wfqMetrics:   wfqMetrics,
+		metricLabels: metricLabels,
+		wsFactory:    wsFactory,
 	}, nil
 }
 
@@ -412,24 +411,13 @@ func (ws *Scheduler) Decide(ctx context.Context, labels map[string]string) *flow
 		reqCtx = timeoutCtx
 	}
 
-	req := scheduler.Request{
-		FairnessLabel: fairnessLabel,
-		Priority:      uint8(matchedWorkloadParametersProto.Priority),
-		Tokens:        tokens,
-	}
+	req := scheduler.NewRequest(fairnessLabel, tokens, uint8(matchedWorkloadParametersProto.Priority))
 
 	accepted := ws.scheduler.Schedule(reqCtx, req)
 
 	tokensConsumed := uint64(0)
 	if accepted {
 		tokensConsumed = req.Tokens
-	}
-
-	// update load scheduler metrics and decisionType
-	ws.metrics.incomingTokensCounter.Add(float64(req.Tokens) / 1000)
-
-	if accepted {
-		ws.metrics.acceptedTokensCounter.Add(float64(req.Tokens) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{
