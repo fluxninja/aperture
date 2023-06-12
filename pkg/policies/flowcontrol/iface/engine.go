@@ -37,9 +37,9 @@ type Engine interface {
 	UnregisterRateLimiter(l RateLimiter) error
 	GetRateLimiter(limiterID LimiterID) RateLimiter
 
-	RegisterRegulator(l Limiter) error
-	UnregisterRegulator(l Limiter) error
-	GetRegulator(limiterID LimiterID) Limiter
+	RegisterSampler(l Limiter) error
+	UnregisterSampler(l Limiter) error
+	GetSampler(limiterID LimiterID) Limiter
 
 	RegisterLabelPreview(l LabelPreview) error
 	UnregisterLabelPreview(l LabelPreview) error

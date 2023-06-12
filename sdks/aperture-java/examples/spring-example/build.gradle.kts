@@ -27,4 +27,6 @@ dependencies {
 
 	implementation(project(":lib:core"))
 	implementation(project(":lib:servlet"))
+
+	runtimeOnly("org.slf4j:slf4j-simple:1.7.0")
 }

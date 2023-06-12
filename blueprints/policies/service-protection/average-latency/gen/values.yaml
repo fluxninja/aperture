@@ -98,6 +98,9 @@ dashboard:
   # Additional filters to pass to each query to Grafana datasource.
   # Type: map[string]string
   extra_filters: {}
+  # Name of the main dashboard.
+  # Type: string
+  title: "Aperture Service Protection"
   datasource:
     # Datasource name.
     # Type: string

@@ -34,8 +34,8 @@ message FlowControl {
     // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
     AdaptiveLoadScheduler adaptive_load_scheduler = 8;
 
-    // Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
-    Regulator regulator = 9;
+    // Sampler is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
+    Sampler sampler = 9;
 
     // _Load Ramp_ smoothly regulates the flow of requests over specified steps.
     LoadRamp load_ramp = 10;
@@ -359,22 +359,22 @@ message AdaptiveLoadScheduler {
   string dry_run_config_key = 7;
 }
 
-// _Regulator_ is a component that regulates the load at a
+// _Sampler_ is a component that regulates the load at a
 // [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
 // flows at random or by sticky sessions.
 //
 // :::info
 //
-// See also [_Load Regulator overview](/concepts/flow-control/components/regulator.md).
+// See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
 //
 // :::
-message Regulator {
+message Sampler {
   message Parameters {
     // The flow label key for identifying sessions.
-    // - When label key is specified, _Regulator_ acts as a sticky filter.
+    // - When label key is specified, _Sampler_ acts as a sticky filter.
     //   The series of flows with the same value of label key get the same
     //   decision provided that the `accept_percentage` is same or higher.
-    // - When label key is not specified, _Regulator_ acts as a stateless filter.
+    // - When label key is not specified, _Sampler_ acts as a stateless filter.
     //   Percentage of flows are selected randomly for rejection.
     string label_key = 2;
 
@@ -387,13 +387,13 @@ message Regulator {
     InPort accept_percentage = 1;
   }
 
-  // Input ports for the _Regulator_.
+  // Input ports for the _Sampler_.
   Ins in_ports = 1;
 
-  // Parameters for the _Regulator_.
+  // Parameters for the _Sampler_.
   Parameters parameters = 2;
 
-  // Specify certain label values to be always accepted by this _Regulator_ regardless of accept percentage.
+  // Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.
   repeated string pass_through_label_values = 5;
 
   // Configuration key for setting pass through label values through dynamic configuration.
@@ -423,8 +423,8 @@ message LoadRamp {
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
 
-    // Parameters for the _Regulator_.
-    Regulator.Parameters regulator = 1;
+    // Parameters for the _Sampler_.
+    Sampler.Parameters sampler = 1;
 
     repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
   }
@@ -453,7 +453,7 @@ message LoadRamp {
 
   Parameters parameters = 3; // @gotags: validate:"required"
 
-  // Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage.
+  // Specify certain label values to be always accepted by the _Sampler_ regardless of accept percentage.
   repeated string pass_through_label_values = 4;
 
   // Configuration key for setting pass through label values through dynamic configuration.

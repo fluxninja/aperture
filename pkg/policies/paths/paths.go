@@ -46,10 +46,10 @@ var (
 	PodScalerDecisionsPath = path.Join(DecisionsPrefix, "pod_scaler")
 	// PodScalerStatusPath is decision path in etcd for pod scaler status.
 	PodScalerStatusPath = path.Join(StatusPrefix, "pod_scaler")
-	// RegulatorConfigPath is config path in etcd for load regulator.
-	RegulatorConfigPath = path.Join(ConfigPrefix, "regulator")
-	// RegulatorDecisionsPath is decision path in etcd for load regulator decisions.
-	RegulatorDecisionsPath = path.Join(DecisionsPrefix, "regulator")
+	// SamplerConfigPath is config path in etcd for sampler.
+	SamplerConfigPath = path.Join(ConfigPrefix, "sampler")
+	// SamplerDecisionsPath is decision path in etcd for sampler decisions.
+	SamplerDecisionsPath = path.Join(DecisionsPrefix, "sampler")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.

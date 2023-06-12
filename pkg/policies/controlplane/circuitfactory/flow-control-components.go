@@ -7,7 +7,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/regulator"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/sampler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
@@ -75,7 +75,7 @@ func newFlowControlNestedAndOptions(
 
 		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
 	} else if isLoadRamp {
-		nestedCircuit, err := regulator.ParseLoadRamp(loadRampProto)
+		nestedCircuit, err := sampler.ParseLoadRamp(loadRampProto)
 		if err != nil {
 			return retErr(err)
 		}

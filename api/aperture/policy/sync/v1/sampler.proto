@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/flowcontrol.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message SamplerWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  //  Sampler
+  policy.language.v1.Sampler sampler = 2;
+}
+
+message SamplerDecisionWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  //  Sampler Decision
+  SamplerDecision sampler_decision = 2;
+}
+
+message SamplerDecision {
+  double accept_percentage = 1;
+  // PassThroughLabelValues dynamic config.
+  repeated string pass_through_label_values = 2;
+}

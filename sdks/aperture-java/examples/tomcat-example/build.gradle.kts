@@ -23,6 +23,8 @@ dependencies {
     implementation(project(":lib:servlet"))
 
     providedCompile("javax.servlet:javax.servlet-api:3.1.0")
+
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.0")
 }
 
 tomcat {

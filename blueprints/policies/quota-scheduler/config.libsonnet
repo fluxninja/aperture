@@ -38,12 +38,14 @@
   * @param (dashboard.time_from: string) Time from of dashboard.
   * @param (dashboard.time_to: string) Time to of dashboard.
   * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
+  * @param (dashboard.title: string) Name of the main dashboard.
   */
   dashboard: {
     refresh_interval: '10s',
     time_from: 'now-15m',
     time_to: 'now',
     extra_filters: {},
+    title: 'Aperture Quota Scheduler',
     /**
     * @param (dashboard.datasource.name: string) Datasource name.
     * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.

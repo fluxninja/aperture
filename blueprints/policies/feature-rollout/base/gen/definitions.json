@@ -12,7 +12,7 @@
         "drivers": {},
         "evaluation_interval": "1s",
         "load_ramp": {
-          "regulator": {
+          "sampler": {
             "label_key": "",
             "selectors": [
               {
@@ -63,6 +63,11 @@
           "default": {},
           "type": "object",
           "additionalProperties": true
+        },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Feature Rollout",
+          "type": "string"
         },
         "datasource": {
           "type": "object",
@@ -372,7 +377,7 @@
         "load_ramp": {
           "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
           "default": {
-            "regulator": {
+            "sampler": {
               "label_key": "",
               "selectors": [
                 {

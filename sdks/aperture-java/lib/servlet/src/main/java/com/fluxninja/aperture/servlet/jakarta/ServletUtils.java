@@ -15,11 +15,8 @@ import java.util.*;
 public class ServletUtils {
     protected static void handleRejectedFlow(TrafficFlow flow, HttpServletResponse response)
             throws IOException {
-        try {
-            flow.end(FlowStatus.Unset);
-        } catch (ApertureSDKException e) {
-            e.printStackTrace();
-        }
+        flow.setStatus(FlowStatus.Unset);
+        flow.end();
 
         int code = 403;
         if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
