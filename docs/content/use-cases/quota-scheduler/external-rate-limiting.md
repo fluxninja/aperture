@@ -1,5 +1,5 @@
 ---
-title: External Rate Limiting
+title: Client-side Rate Limiting
 keywords:
   - policies
   - quota
