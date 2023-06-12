@@ -12,9 +12,9 @@ See also [_Flux Meter_ reference][reference]
 
 :::
 
-The Flux Meter component provides a way to translates a flux of flows, matching
-a [Selector][flow-selectors], into a Prometheus [histogram][histogram-metric].
-It also gathers metrics for the traffic that matches its selector. The histogram
+The Flux Meter component provides a way to translate a flux of flows, matching a
+[Selector][flow-selectors], into a Prometheus [histogram][histogram-metric]. It
+also gathers metrics for the traffic that matches its selector. The histogram
 created by Flux Meter measures the workload latency by default.
 
 ## Naming Convention
