@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 
 :::info
 
-See also [_Selector_ reference](/reference/policies/spec.md#selector)
+See also [_Selector_ reference](/reference/configuration/spec.md#selector)
 
 :::
 
@@ -322,6 +322,6 @@ rejected.
 [flux-meter]: ./resources/flux-meter.md
 [load-scheduler]: ./components/load-scheduler.md
 [classifier]: ./resources/classifier.md
-[label-matcher]: /reference/policies/spec.md#label-matcher
+[label-matcher]: /reference/configuration/spec.md#label-matcher
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
 [gateway]: /integrations/gateway/gateway.md
