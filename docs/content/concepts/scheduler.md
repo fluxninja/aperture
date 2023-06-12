@@ -19,11 +19,11 @@ and
 
 :::
 
-The _Load Scheduler_ is a powerful tool designed to protect your services from
-overloads and prevent cascading failures. Its **primary goal is to limit** the
-number of concurrent requests to a service, ensuring that the service can handle
-the incoming workload. By defining workloads with different priorities and
-weights, the _Load Scheduler_ can prioritize certain requests over others,
+The _Load Scheduler_ is a powerful component designed to protect your services
+from overloads and prevent cascading failures. Its **primary goal is to limit**
+the number of concurrent requests to a service, ensuring that the service can
+handle the incoming workload. By defining workloads with different priorities
+and weights, the _Load Scheduler_ can prioritize certain requests over others,
 enabling graceful degradation of service during times of high traffic.
 
 As with other components of the Aperture platform, the _Load Scheduler_ is

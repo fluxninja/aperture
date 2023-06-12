@@ -9,13 +9,13 @@ See also [_Rate Limiter_ reference][reference]
 
 :::
 
-The _Rate Limiter_ is a powerful component that can be used to prevent recurring
-overloads by proactively regulating heavy-hitters. It achieves this by accepting
-or rejecting incoming flows based on per-label limits, which are configured
-using the [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket).
-The _Rate Limiter_ is a component of Aperture's [policy][policies] system, and
-it can be configured to work with different labels and limits depending on the
-needs of your application.
+The _Rate Limiter_ component can be used to prevent recurring overloads by
+proactively regulating heavy-hitters. It achieves this by accepting or rejecting
+incoming flows based on per-label limits, which are configured using the
+[token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket). The _Rate
+Limiter_ is a component of Aperture's [policy][policies] system, and it can be
+configured to work with different labels and limits depending on the needs of
+your application.
 
 ## Distributed Counters {#distributed-counters}
 
