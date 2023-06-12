@@ -229,11 +229,11 @@ func Time(duration string) {
 // ------------------------- Benchmark Testing -------------------------
 func BenchmarkBasicTokenBucket(b *testing.B) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload1", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload2", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload3", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload4", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload5", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload1", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload2", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload3", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload4", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload5", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
 	}
 	c := clockwork.NewRealClock()
 	_, metrics := getMetrics()
@@ -263,11 +263,11 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 
 func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload1", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload2", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload3", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload4", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload5", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload1", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload2", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload3", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload4", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload5", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
@@ -449,9 +449,9 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 
 func TestHighRpsFlows(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 5, priority: 0, requestRate: 100},
-		{fairnessLabel: "workload1", tokens: 5, priority: 0, requestRate: 100},
-		{fairnessLabel: "workload2", tokens: 5, priority: 0, requestRate: 100},
+		{fairnessLabel: "workload0", tokens: 5, priority: 1, requestRate: 100},
+		{fairnessLabel: "workload1", tokens: 5, priority: 1, requestRate: 100},
+		{fairnessLabel: "workload2", tokens: 5, priority: 1, requestRate: 100},
 		{fairnessLabel: "workload3", tokens: 5, priority: 50, requestRate: 100},
 	}
 	for _, flow := range flows {
@@ -514,7 +514,7 @@ func TestSingleLowRequest(t *testing.T) {
 
 func TestSingleLowRequestLowTimeout(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 1, priority: 0, requestRate: 1, timeout: time.Millisecond},
+		{fairnessLabel: "workload0", tokens: 1, priority: 1, requestRate: 1, timeout: time.Millisecond},
 		{fairnessLabel: "workload1", tokens: 8, priority: 75, requestRate: 100, timeout: 50 * time.Millisecond},
 		{fairnessLabel: "workload2", tokens: 8, priority: 100, requestRate: 100, timeout: 50 * time.Millisecond},
 		{fairnessLabel: "workload3", tokens: 8, priority: 125, requestRate: 100, timeout: 50 * time.Millisecond},
@@ -527,7 +527,7 @@ func TestSingleLowRequestLowTimeout(t *testing.T) {
 
 func TestIncreasingPriority(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 5, priority: 0, requestRate: 50},
+		{fairnessLabel: "workload0", tokens: 5, priority: 1, requestRate: 50},
 		{fairnessLabel: "workload1", tokens: 5, priority: 50, requestRate: 50},
 		{fairnessLabel: "workload2", tokens: 5, priority: 100, requestRate: 50},
 		{fairnessLabel: "workload3", tokens: 5, priority: 150, requestRate: 50},
@@ -540,7 +540,7 @@ func TestIncreasingPriority(t *testing.T) {
 
 func Test0FillRate(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 0, priority: 0, requestRate: 50},
+		{fairnessLabel: "workload0", tokens: 0, priority: 1, requestRate: 50},
 		{fairnessLabel: "workload1", tokens: 5, priority: 50, requestRate: 50},
 		{fairnessLabel: "workload2", tokens: 5, priority: 100, requestRate: 50},
 		{fairnessLabel: "workload3", tokens: 5, priority: 200, requestRate: 50},
@@ -576,7 +576,7 @@ func TestFairnessWithinPriority(t *testing.T) {
 
 func TestTimeouts(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 5, priority: 0, requestRate: 50, timeout: time.Millisecond * 5},
+		{fairnessLabel: "workload0", tokens: 5, priority: 1, requestRate: 50, timeout: time.Millisecond * 5},
 	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
