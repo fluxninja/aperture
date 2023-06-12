@@ -64,6 +64,11 @@
           "type": "object",
           "additionalProperties": true
         },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Feature Rollout",
+          "type": "string"
+        },
         "datasource": {
           "type": "object",
           "additionalProperties": false,

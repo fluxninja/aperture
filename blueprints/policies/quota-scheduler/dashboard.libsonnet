@@ -1,7 +1,5 @@
-local aperture = import '../../grafana/aperture.libsonnet';
-local lib = import '../../grafana/grafana.libsonnet';
+local quotaSchedulerDashboard = import '../../../blueprints/dashboards/flow-control/quota-scheduler/dashboard.libsonnet';
 local utils = import '../policy-utils.libsonnet';
-local baseDashboardFn = import '../service-protection/base/dashboard.libsonnet';
 local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
@@ -12,7 +10,7 @@ local graphPanel = grafana.graphPanel;
 function(cfg) {
   local params = config + cfg,
 
-  local baseDashboard = baseDashboardFn(params),
+  local baseDashboard = quotaSchedulerDashboard(params),
 
   local policyName = params.policy.policy_name,
   local ds = params.dashboard.datasource,

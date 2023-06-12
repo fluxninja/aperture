@@ -1,0 +1,3 @@
+blueprint: Quota-scheduler
+sources:
+  dashboard: dashboards/flow-control/quota-scheduler/dashboard.libsonnet
