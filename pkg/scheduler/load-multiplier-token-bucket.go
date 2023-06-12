@@ -21,7 +21,6 @@ type LoadMultiplierTokenBucket struct {
 	tbb                *tokenBucketBase
 	counter            *WindowedCounter
 	lm                 float64 // load multiplier >=0
-	wtr                float64 // weighted token rate
 	lock               sync.Mutex
 	continuousTracking bool
 }
@@ -57,9 +56,7 @@ func (tbls *LoadMultiplierTokenBucket) SetContinuousTracking(continuousTracking 
 	tbls.continuousTracking = continuousTracking
 }
 
-// SetLoadDecisionValues sets:
-// the load multiplier number --> 0 = no load accepted, 1 = accept up to 100% of current load, 2 = accept up to 200% of current load
-// the weighted token rate.
+// SetLoadDecisionValues sets the load multiplier number --> 0 = no load accepted, 1 = accept up to 100% of current load, 2 = accept up to 200% of current load.
 func (tbls *LoadMultiplierTokenBucket) SetLoadDecisionValues(loadDecision *policysyncv1.LoadDecision) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
@@ -80,16 +77,11 @@ func (tbls *LoadMultiplierTokenBucket) SetLoadDecisionValues(loadDecision *polic
 	} else {
 		log.Panic().Msgf("Load multiplier must be greater than 0, got %f", lm)
 	}
-
-	wtr := loadDecision.GetIncomingWeightedTokenRate()
-	if wtr >= 0 {
-		tbls.wtr = wtr
-	}
 }
 
 // setFillRate - unsage, must be called with lock held.
 func (tbls *LoadMultiplierTokenBucket) setFillRate() {
-	lmCorrected := (tbls.counter.CalculateWeightedTokenRate() * tbls.lm) / tbls.wtr
+	lmCorrected := tbls.counter.CalculateTokenRate() * tbls.lm
 	tbls.tbb.setFillRate(lmCorrected)
 }
 

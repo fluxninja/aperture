@@ -42,9 +42,8 @@ type Factory struct {
 	wfqFlowsGaugeVec    *prometheus.GaugeVec
 	wfqRequestsGaugeVec *prometheus.GaugeVec
 
-	incomingTokensCounterVec         *prometheus.CounterVec
-	incomingWeightedTokensCounterVec *prometheus.CounterVec
-	acceptedTokensCounterVec         *prometheus.CounterVec
+	incomingTokensCounterVec *prometheus.CounterVec
+	acceptedTokensCounterVec *prometheus.CounterVec
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
@@ -80,13 +79,6 @@ func newFactory(
 		prometheus.CounterOpts{
 			Name: metrics.IncomingTokensMetricName,
 			Help: "A counter measuring work incoming into Scheduler",
-		},
-		MetricLabelKeys,
-	)
-	wsFactory.incomingWeightedTokensCounterVec = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: metrics.IncomingWeightedTokensMetricName,
-			Help: "A counter measuring the weighted token rate",
 		},
 		MetricLabelKeys,
 	)
@@ -136,10 +128,6 @@ func newFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(wsFactory.incomingWeightedTokensCounterVec)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
 			err = prometheusRegistry.Register(wsFactory.acceptedTokensCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
@@ -168,10 +156,6 @@ func newFactory(
 			}
 			if !prometheusRegistry.Unregister(wsFactory.incomingTokensCounterVec) {
 				err := fmt.Errorf("failed to unregister incoming_tokens_total metric")
-				merr = multierr.Append(merr, err)
-			}
-			if !prometheusRegistry.Unregister(wsFactory.incomingWeightedTokensCounterVec) {
-				err := fmt.Errorf("failed to unregister weighted_tokens_total metric")
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(wsFactory.acceptedTokensCounterVec) {
@@ -240,22 +224,16 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		return nil, err
 	}
 
-	incomingWeightedTokensCounter, err := wsFactory.incomingWeightedTokensCounterVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, err
-	}
-
 	acceptedTokensCounter, err := wsFactory.acceptedTokensCounterVec.GetMetricWith(metricLabels)
 	if err != nil {
 		return nil, err
 	}
 
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:                    wfqFlowsGauge,
-		HeapRequestsGauge:             wfqRequestsGauge,
-		IncomingTokensCounter:         incomingTokensCounter,
-		IncomingWeightedTokensCounter: incomingWeightedTokensCounter,
-		AcceptedTokensCounter:         acceptedTokensCounter,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqRequestsGauge,
+		IncomingTokensCounter: incomingTokensCounter,
+		AcceptedTokensCounter: acceptedTokensCounter,
 	}
 
 	return &SchedulerMetrics{
@@ -281,10 +259,6 @@ func (metrics *SchedulerMetrics) Delete() error {
 	deleted = metrics.wsFactory.incomingTokensCounterVec.Delete(metrics.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
-	}
-	deleted = metrics.wsFactory.incomingWeightedTokensCounterVec.Delete(metrics.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete weighted_tokens_total counter from its metric vector"))
 	}
 	deleted = metrics.wsFactory.acceptedTokensCounterVec.Delete(metrics.metricLabels)
 	if !deleted {

@@ -23,7 +23,6 @@ message LoadDecisionWrapper {
 message LoadDecision {
   TickInfo tick_info = 1;
   double load_multiplier = 2;
-  double incoming_weighted_token_rate = 3;
-  bool pass_through = 4;
-  map<string, uint64> tokens_by_workload_index = 5;
+  bool pass_through = 3;
+  map<string, uint64> tokens_by_workload_index = 4;
 }

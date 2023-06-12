@@ -25,16 +25,15 @@ const (
 )
 
 var (
-	prometheusRegistry               *prometheus.Registry
-	wfqFlowsGauge                    prometheus.Gauge
-	wfqHeapRequestsGauge             prometheus.Gauge
-	wfqAcceptedTokensCounter         prometheus.Counter
-	wfqIncomingTokensCounter         prometheus.Counter
-	wfqIncomingWeightedTokensCounter prometheus.Counter
-	tokenBucketLMGauge               prometheus.Gauge
-	tokenBucketFillRateGauge         prometheus.Gauge
-	tokenBucketBucketCapacityGauge   prometheus.Gauge
-	tokenBucketAvailableTokensGauge  prometheus.Gauge
+	prometheusRegistry              *prometheus.Registry
+	wfqFlowsGauge                   prometheus.Gauge
+	wfqHeapRequestsGauge            prometheus.Gauge
+	wfqAcceptedTokensCounter        prometheus.Counter
+	wfqIncomingTokensCounter        prometheus.Counter
+	tokenBucketLMGauge              prometheus.Gauge
+	tokenBucketFillRateGauge        prometheus.Gauge
+	tokenBucketBucketCapacityGauge  prometheus.Gauge
+	tokenBucketAvailableTokensGauge prometheus.Gauge
 )
 
 func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
@@ -60,12 +59,6 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqIncomingTokensCounter)
-	wfqIncomingWeightedTokensCounter = prometheus.NewCounter(prometheus.CounterOpts{
-		Name:        metrics.IncomingWeightedTokensMetricName,
-		Help:        "A counter measuring work incoming into Scheduler",
-		ConstLabels: constLabels,
-	})
-	_ = prometheusRegistry.Register(wfqIncomingWeightedTokensCounter)
 	wfqAcceptedTokensCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name:        metrics.AcceptedTokensMetricName,
 		Help:        "A counter measuring work admitted by Scheduler",
@@ -247,11 +240,10 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 	manager := NewBasicTokenBucket(c, 0, metrics)
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:                    wfqFlowsGauge,
-		HeapRequestsGauge:             wfqHeapRequestsGauge,
-		IncomingTokensCounter:         wfqIncomingTokensCounter,
-		IncomingWeightedTokensCounter: wfqIncomingWeightedTokensCounter,
-		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -287,11 +279,10 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	})
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:                    wfqFlowsGauge,
-		HeapRequestsGauge:             wfqHeapRequestsGauge,
-		IncomingTokensCounter:         wfqIncomingTokensCounter,
-		IncomingWeightedTokensCounter: wfqIncomingWeightedTokensCounter,
-		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -350,11 +341,10 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	_, tbMetrics := getMetrics()
 	basicBucket := NewBasicTokenBucket(c, fillRate, tbMetrics)
 	metrics := &WFQMetrics{
-		FlowsGauge:                    wfqFlowsGauge,
-		HeapRequestsGauge:             wfqHeapRequestsGauge,
-		IncomingTokensCounter:         wfqIncomingTokensCounter,
-		IncomingWeightedTokensCounter: wfqIncomingWeightedTokensCounter,
-		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, basicBucket, metrics)
 	var wg sync.WaitGroup
@@ -604,11 +594,10 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		},
 	}
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:                    wfqFlowsGauge,
-		HeapRequestsGauge:             wfqHeapRequestsGauge,
-		IncomingTokensCounter:         wfqIncomingTokensCounter,
-		IncomingWeightedTokensCounter: wfqIncomingWeightedTokensCounter,
-		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 
 	c := clockwork.NewFakeClock()

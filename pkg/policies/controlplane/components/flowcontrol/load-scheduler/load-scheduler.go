@@ -16,7 +16,6 @@ import (
 
 const (
 	inputLoadMultiplierPortName          = "load_multiplier"
-	inputWeightedTokenRatePortName       = "weighted_token_rate"
 	outputObservedLoadMultiplierPortName = "observed_load_multiplier"
 )
 
@@ -68,23 +67,12 @@ func ParseLoadScheduler(
 		policyParams,
 	)
 
-	incomingWeightedTokenRate := fmt.Sprintf(
-		"avg(rate(%s{%s}[10s]))",
-		metrics.IncomingWeightedTokensMetricName,
-		policyParams,
-	)
-
 	loadActuatorAnyProto, err := anypb.New(
 		&policyprivatev1.LoadActuator{
 			InPorts: &policyprivatev1.LoadActuator_Ins{
 				LoadMultiplier: &policylangv1.InPort{
 					Value: &policylangv1.InPort_SignalName{
 						SignalName: "LOAD_MULTIPLIER",
-					},
-				},
-				IncomingWeightedTokenRate: &policylangv1.InPort{
-					Value: &policylangv1.InPort_SignalName{
-						SignalName: "INCOMING_WEIGHTED_TOKEN_RATE",
 					},
 				},
 			},
@@ -184,23 +172,6 @@ func ParseLoadScheduler(
 									},
 								},
 								QueryString:        incomingTokenRate,
-								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Query{
-					Query: &policylangv1.Query{
-						Component: &policylangv1.Query_Promql{
-							Promql: &policylangv1.PromQL{
-								OutPorts: &policylangv1.PromQL_Outs{
-									Output: &policylangv1.OutPort{
-										SignalName: "INCOMING_WEIGHTED_TOKEN_RATE",
-									},
-								},
-								QueryString:        incomingWeightedTokenRate,
 								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
 							},
 						},

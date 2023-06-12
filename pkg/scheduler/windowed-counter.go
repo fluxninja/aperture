@@ -7,8 +7,7 @@ import (
 )
 
 type tokenCounts struct {
-	tokens         uint64
-	weightedTokens float64
+	tokens uint64
 }
 
 // WindowedCounter is a token bucket with a windowed counter.
@@ -45,19 +44,6 @@ func (counter *WindowedCounter) CalculateTokenRate() float64 {
 	for i := uint8(0); i < counter.totalSlots; i++ {
 		if i != counter.currentSlot {
 			total += counter.counters[i].tokens
-		}
-	}
-	// recalculate tokenRate
-	return float64(total) * 1e9 / float64(int64(counter.totalSlots-1)*int64(counter.slotDuration))
-}
-
-// CalculateWeightedTokenRate returns the calculated weighted token rate in the current window.
-func (counter *WindowedCounter) CalculateWeightedTokenRate() float64 {
-	var total float64
-	// calculate total (ignoring the currentSlot)
-	for i := uint8(0); i < counter.totalSlots; i++ {
-		if i != counter.currentSlot {
-			total += counter.counters[i].weightedTokens
 		}
 	}
 	// recalculate tokenRate
@@ -103,7 +89,6 @@ func (counter *WindowedCounter) AddTokens(request *Request) bool {
 			}
 			// reset slot counter
 			counter.counters[counter.currentSlot].tokens = 0
-			counter.counters[counter.currentSlot].weightedTokens = 0
 		}
 
 		// If entire window was invalidated, it is better to go back to the bootstrap mode
@@ -118,7 +103,6 @@ func (counter *WindowedCounter) AddTokens(request *Request) bool {
 
 	// Increment counter
 	counter.counters[counter.currentSlot].tokens += request.Tokens
-	counter.counters[counter.currentSlot].weightedTokens += request.WeightedTokens
 
 	if shifted && !counter.bootstrapping {
 		return true

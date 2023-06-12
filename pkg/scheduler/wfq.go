@@ -156,7 +156,6 @@ func (sched *WFQScheduler) updateMetricsAndReturnDecision(accepted bool, request
 		sched.metrics.AcceptedTokensCounter.Add(float64(request.Tokens) / 1000)
 	}
 	sched.metrics.IncomingTokensCounter.Add(float64(request.Tokens) / 1000)
-	sched.metrics.IncomingWeightedTokensCounter.Add(request.WeightedTokens / 1000)
 	return accepted
 }
 
@@ -464,9 +463,8 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
 type WFQMetrics struct {
-	FlowsGauge                    prometheus.Gauge
-	HeapRequestsGauge             prometheus.Gauge
-	IncomingTokensCounter         prometheus.Counter
-	IncomingWeightedTokensCounter prometheus.Counter
-	AcceptedTokensCounter         prometheus.Counter
+	FlowsGauge            prometheus.Gauge
+	HeapRequestsGauge     prometheus.Gauge
+	IncomingTokensCounter prometheus.Counter
+	AcceptedTokensCounter prometheus.Counter
 }

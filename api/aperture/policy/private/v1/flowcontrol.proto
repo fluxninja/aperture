@@ -10,7 +10,6 @@ message LoadActuator {
     // Load multiplier is proportion of incoming
     // token rate that needs to be accepted.
     aperture.policy.language.v1.InPort load_multiplier = 1;
-    aperture.policy.language.v1.InPort incoming_weighted_token_rate = 2;
   }
 
   Ins in_ports = 1;
