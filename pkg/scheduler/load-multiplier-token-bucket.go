@@ -81,8 +81,8 @@ func (tbls *LoadMultiplierTokenBucket) SetLoadDecisionValues(loadDecision *polic
 
 // setFillRate - unsage, must be called with lock held.
 func (tbls *LoadMultiplierTokenBucket) setFillRate() {
-	lmCorrected := tbls.counter.CalculateTokenRate() * tbls.lm
-	tbls.tbb.setFillRate(lmCorrected)
+	fillRate := tbls.counter.CalculateTokenRate() * tbls.lm
+	tbls.tbb.setFillRate(fillRate)
 }
 
 // LoadMultiplier returns the current load multiplier.

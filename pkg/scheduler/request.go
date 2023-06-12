@@ -1,7 +1,5 @@
 package scheduler
 
-import "math"
-
 // Request is metadata for request in a flow that is to be allowed or dropped based on controlled delay and queue limits.
 type Request struct {
 	FairnessLabel string // for enforcing fairness
@@ -11,10 +9,9 @@ type Request struct {
 
 // NewRequest calculates the inverse priority and returns a new Request.
 func NewRequest(fairnessLabel string, tokens uint64, priority uint8) *Request {
-	invPriority := (math.MaxUint8 - priority) + 1
 	return &Request{
 		FairnessLabel: fairnessLabel,
 		Tokens:        tokens,
-		Priority:      invPriority,
+		Priority:      priority,
 	}
 }
