@@ -304,7 +304,7 @@ func (wsFactory *Factory) NewScheduler(
 		priorities = append(priorities, workloadProto.Parameters.Priority)
 	}
 	// find least common multiple of all priorities
-	l := utils.LCMOfNums(priorities)
+	lcm := utils.LCMOfNums(priorities)
 
 	mm := multimatcher.New[int, multiMatchResult]()
 	for workloadIndex, workloadProto := range proto.Workloads {
@@ -312,7 +312,7 @@ func (wsFactory *Factory) NewScheduler(
 		if err != nil {
 			return nil, err
 		}
-		invPriority := l / workloadProto.Parameters.Priority
+		invPriority := lcm / workloadProto.Parameters.Priority
 		wm := &workloadMatcher{
 			workloadIndex: workloadIndex,
 			workload: &workload{
@@ -329,7 +329,7 @@ func (wsFactory *Factory) NewScheduler(
 	ws := &Scheduler{
 		proto: proto,
 		defaultWorkload: &workload{
-			invPriority: l / proto.DefaultWorkloadParameters.Priority,
+			invPriority: lcm / proto.DefaultWorkloadParameters.Priority,
 			proto: &policylangv1.Scheduler_Workload{
 				Parameters: proto.DefaultWorkloadParameters,
 				Name:       metrics.DefaultWorkloadIndex,

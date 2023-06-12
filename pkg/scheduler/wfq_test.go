@@ -16,6 +16,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (
@@ -355,21 +356,21 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	flowRunTime := time.Second * 10
 
 	sumPriority := float64(0)
-	minInvPrio := uint8(math.MaxUint8)
-	minPrio := uint8(math.MaxUint8)
+	priorities := []uint64{}
 	for _, flow := range flows {
-		if minInvPrio > (math.MaxUint8 - flow.priority) {
-			minInvPrio = math.MaxUint8 - flow.priority
-		}
-		if minPrio > flow.priority {
-			minPrio = flow.priority
-		}
+		// if minInvPrio > (math.MaxUint8 - flow.priority) {
+		// 	minInvPrio = math.MaxUint8 - flow.priority
+		// }
+		// if minPrio > flow.priority {
+		// 	minPrio = flow.priority
+		// }
+		priorities = append(priorities, uint64(flow.priority))
 	}
-	t.Logf("minPrio: %d, minInvPrio: %d\n", minPrio, minInvPrio)
-	adjustedPrio := make([]uint16, len(flows))
+	lcm := utils.LCMOfNums(priorities)
+	adjustedPriority := make([]uint16, len(flows))
 	for i, flow := range flows {
-		adjustedPrio[i] = uint16(flow.priority-minPrio+minInvPrio) + 1
-		sumPriority += float64(adjustedPrio[i])
+		adjustedPriority[i] = uint16(lcm / uint64(flow.priority))
+		sumPriority += float64(adjustedPriority[i])
 	}
 
 	// Estimate the tokens -- It's a rough approach but seems to work so far for variety of loads and priorities
@@ -377,11 +378,11 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	estimatedTokens := make([]uint64, len(flows))
 
 	for i := range flows {
-		estimatedTokens[i] = uint64(fillRate*float64(adjustedPrio[i])/sumPriority) * uint64(flowRunTime.Seconds())
+		estimatedTokens[i] = uint64(fillRate*float64(adjustedPriority[i])/sumPriority) * uint64(flowRunTime.Seconds())
 		totalEstimatedtokens += estimatedTokens[i]
 	}
 	t.Logf("Flows: %v", flows)
-	t.Logf("Adjusted Prios: %v\n", adjustedPrio)
+	t.Logf("Adjusted Prios: %v\n", adjustedPriority)
 	t.Logf("Estimated minimum tokens per flow before run are: %v\n", estimatedTokens)
 	t.Logf("Total estimated allocated tokens: %d\n", totalEstimatedtokens)
 
