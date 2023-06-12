@@ -31,8 +31,8 @@ agents.
 
 :::
 
-[!Flux Meter](./assets/img/flux-meter-light.svg#gh-light-mode-only)
-[!Flux Meter](./assets/img/flux-meter-dark.svg#gh-dark-mode-only)
+![Flux Meter](./assets/img/flux-meter-light.svg#gh-light-mode-only)
+![Flux Meter](./assets/img/flux-meter-dark.svg#gh-dark-mode-only)
 
 The diagram details the journey of a request, as it traverses through the Flow
 Selector forwards the request to the Flux Meter, which matches the request with

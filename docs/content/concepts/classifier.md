@@ -3,9 +3,9 @@ title: Classifier
 sidebar_position: 4
 ---
 
-:::info
+:::info See Also
 
-See also [_Classifier_ reference][reference]
+[_Classifier_ reference][reference]
 
 :::
 
@@ -52,7 +52,7 @@ Labels_ aren't isolated in any way and are shared across policies.
 
 :::
 
-## Selectors {#selectors}
+## Defining Classifier's Scope {#selectors}
 
 Each _Classifier_ needs to specify which control point it will be run at. For
 instance, the following selector is for the "ingress" control point at a
@@ -67,10 +67,13 @@ selectors:
 You can be more precise by adding a [_Label Matcher_][label-matcher] and, for
 example, gate the Classifier to particular paths.
 
-## Live Previewing Requests {#live-previewing-requests}
+## Live Previewing Requests Attributes {#live-previewing-requests}
 
-You can discover the request attributes flowing through services and control
-points using [`aperturectl`][aperturectl].
+Live previewing of request attributes is a feature that allows real-time
+examination of attributes flowing through services and control points. This can
+be done using the [`aperturectl`][aperturectl] tool, aiding in setting up or
+debugging your Classifier. It provides insights into the data your Classifier
+will handle, enabling the creation of more effective classification rules.
 
 For example:
 
@@ -145,20 +148,32 @@ Alternatively, you can use the
 [Introspection API](/reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
 directly on a `aperture-agent` local to the service instances (pods):
 
+Example:
+
 ```sh
 curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
 ```
 
-## Rules ([reference][rule]) {#rules}
+## Classification Rules {#rules}
+
+:::note See Also
+
+Rules ([reference][rule])
+
+:::
 
 In addition to the selectors, a Classifier needs to specify classification
-rules. Each classification rule consists of:
+rules. Each classification rule consists of two main components:
 
-- _Flow Label_ key,
-- A rule how to extract the flow label value based on request metadata.
+- **Flow Label Key**: This is the identifier for the flow label. It is used to
+  reference the flow label in other parts of the system.
+- **Extraction Rule**: A rule how to extract the flow label value based on
+  request metadata.
 
-There are two ways to specify a classification rule: using declarative
-extractors and [Rego][rego] modules. [See examples in reference][rule].
+There are two ways to specify a classification rule:
+
+- **Declarative extractors**
+- **Rego modules**
 
 :::caution Request body availability
 
@@ -170,19 +185,49 @@ APIs.
 
 :::
 
-### Extractors ([reference][extractor]) {#extractors}
+### Declarative Extractors {#extractors}
 
-Extractors are declarative recipes how to extract flow label value from
-metadata. Provided extractors include:
+Extractors provide a high-level way to specify how to extract a flow label value
+given HTTP request metadata, eliminating the need to write Rego code. Provided
+extractors include:
 
-- Extracting values from headers
-- Parsing a field from JSON encoded request payload
-- Parsing JWT tokens
+- [Extracting values from headers][extractor]
 
-Aperture aims to expand the set of extractors to cover the most-common use
-cases.
+  ```yaml
+  classifiers:
+    - selectors:
+        - service: service1-demo-app.demoapp.svc.cluster.local
+          control_point: ingress # control point
+      rules: # classification rules
+        user_type: # flow label key
+          extractor: # extractor
+            from: request.http.headers.user-type # HTTP header
+  ```
 
-:::caution
+- [Parsing a field from JSON encoded request payload][json-extractor]
+
+  ```yaml
+  from: request.http.body
+  pointer: /user/name
+  ```
+
+- [Parsing JWT tokens][jwt-extractor]
+
+  ```yaml
+  from: request.http.bearer
+  json_pointer: /user/email
+  ```
+
+:::info See Also
+
+[Extractor reference][extractor]
+
+:::
+
+> Aperture aims to expand the set of extractors to cover the most-common use
+> cases.
+
+:::caution Naming Conventions for Flow Label Keys
 
 Keys of flow labels created by extractors must be valid [Rego][rego] identifiers
 (alphanumeric characters and underscore are allowed; also, label name cannot be
@@ -190,7 +235,7 @@ a [Rego keyword][rego-kw], like `if` or `default`).
 
 :::
 
-:::note
+:::note Benefits of Explicit Flow Label Extraction from Headers
 
 Extracting the value from the header might not seem useful, as the value is
 already available as _Flow Label_ ([as
@@ -202,16 +247,40 @@ telemetry for this flow label.
 
 <!-- vale off -->
 
-### Rego ([reference][rego-rule]) {#rego}
+### Advanced Classification with Rego Language {#rego}
 
 <!-- vale on -->
 
-For more advanced cases, you can define the extractor in [the Rego
-language][rego].
+:::note See Also
 
-## Example
+Rego [reference][rego-rule]
 
-See [full example in reference][reference]
+:::
+
+For more complex scenarios, [the Rego language][rego] can be used to define the
+extractor. Rego allows you to define a set of labels that are extracted after
+evaluating a Rego module.
+
+Example of Rego module which also disables telemetry visibility of label:
+
+```rego
+
+rego:
+  labels:
+    user:
+      telemetry: false
+  module: |
+    package user_from_cookie
+    cookies := split(input.attributes.request.http.headers.cookie, "; ")
+    user := user {
+        cookie := cookies[_]
+        startswith(cookie, "session=")
+        session := substring(cookie, count("session="), -1)
+        parts := split(session, ".")
+        object := json.unmarshal(base64url.decode(parts[0]))
+        user := object.user
+    }
+```
 
 [ext-authz-extension]:
   https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#config-http-filters-ext-authz
@@ -236,3 +305,5 @@ See [full example in reference][reference]
 [control-point]: ./control-point.md
 [install-istio]: /integrations/envoy/istio.md
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
+[json-extractor]: /reference/policies/spec.md#json-extractor
+[jwt-extractor]: /reference/policies/spec.md#j-w-t-extractor
