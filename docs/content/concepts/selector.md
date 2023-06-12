@@ -131,11 +131,11 @@ should be under the same Agent Group.
 
 In DaemonSet mode, the Kubernetes cluster name typically becomes the Agent Group
 name, which applies to all agents deployed on each node. This ensures all Agents
-spanning entire cluster comes under same Agent Group.
+spanning the entire cluster comes under the same Agent Group.
 
 <!-- vale off -->
 
-### Where does Agent Groups help?
+### Where does Agent Group help?
 
 <!-- vale on -->
 

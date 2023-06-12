@@ -64,10 +64,11 @@ See also [Resources reference](/reference/policies/spec.md#resources)
 
 :::
 
-Resources section in Policy describes resources needed to set up a Circuit. It's
-possible but not recommended to share Resources across Policies since Resources
-are always defined in the global scope. Resources may be referenced inside the
-Circuit, the exact reference mechanism depends on the type of Resource.
+Resources section in the Policy describes resources needed to set up a Circuit.
+It's possible but not recommended to share Resources across Policies since
+Resources are always defined in the global scope. Resources may be referenced
+inside the Circuit, the exact reference mechanism depends on the type of
+Resource.
 
 Examples:
 
