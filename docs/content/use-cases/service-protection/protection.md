@@ -30,7 +30,7 @@ overload. This policy is designed to detect overload situations based on latency
 deterioration. During overload, the request rate is throttled so that latency
 gets restored back to an acceptable range.
 
-## Policy Configuration
+## Configuration
 
 This policy monitors the latency of requests processed by the
 **`service1-demo-app.demoapp.svc.cluster.local`** service. It calculates the
@@ -78,11 +78,12 @@ optimized while mitigating the risk of service disruptions due to overload.
 
 :::
 
-### Playground
+### Policy is Action
 
-When the above policy is loaded in Aperture's
-[Playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md),
-it demonstrates that when latency spikes due to high traffic at
+To see the policy in action, the traffic is generated such that it starts within
+the service's capacity and then goes beyond the capacity after some time. Such a
+traffic pattern is repeated periodically. The below dashboard demonstrates that
+when latency spikes due to high traffic at
 `service1-demo-app.demoapp.svc.cluster.local`, the controller throttles the rate
 of requests admitted into the service. This approach helps protect the service
 from becoming unresponsive and maintains the current latency within the

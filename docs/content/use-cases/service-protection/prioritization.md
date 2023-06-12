@@ -24,7 +24,7 @@ enables such prioritization of flows over others based on their labels, ensuring
 user experience or revenue is maximized during overloads or other failure
 scenarios.
 
-## Policy Configuration
+## Configuration
 
 This policy defines service protection on
 **`service1-demo-app.demoapp.svc.cluster.local`** using a load scheduler and
@@ -66,16 +66,14 @@ priority of 200.
 
 :::
 
-### Playground
+### Policy in Action
 
-The traffic generator in the
-[playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md)
-is configured to generate similar traffic pattern (number of concurrent users)
-for 2 types of users - subscribers and guests.
+The traffic generator in this scenario is configured to generate similar traffic
+pattern (number of concurrent users) for 2 types of users - subscribers and
+guests.
 
-Loading the policy highlighted above in the playground will reveal that, during
-overload periods, requests from `subscriber` users have a higher acceptance rate
-than those from `guest` users.
+The below dashboard shows that, during overload periods, requests from
+`subscriber` users have a higher acceptance rate than those from `guest` users.
 
 <Zoom>
 
