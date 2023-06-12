@@ -1,5 +1,5 @@
 ---
-title: Istio Configuration
+title: Istio
 keywords:
   - install
   - setup
@@ -15,6 +15,14 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 ```
+
+## Supported Versions
+
+Aperture supports the following version of Istio:
+
+| Platform | Extent of Support |
+| -------- | ----------------- |
+| Istio    | 1.14 and above    |
 
 ## Envoy Filter {#envoy-filter}
 

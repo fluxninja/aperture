@@ -31,7 +31,7 @@ application.
 3. [**Service Meshes (Istio, Envoy) & API Gateways**](./setting-up-application/service-mesh-and-gateways.md)
 
    Aperture can be integrated with service meshes like Istio and Envoy. You can
-   find the list of service meshes [here](../integrations/envoy/envoy.md). With
+   find the list of service meshes [here](../integrations/istio/istio.md). With
    help of service meshes, you can control the flow of traffic in your
    application without any code change. It is recommended to use service meshes
    for Aperture integration as it is easier to get started with and doesn't

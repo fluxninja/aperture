@@ -25,9 +25,9 @@ for dir in $dirs; do
 	cp "$dir"/config-swagger.yaml "$dir"/gen.yaml
 	yq eval-all --inplace "select(fileIndex==0).definitions *= select(fileIndex==1).definitions | select(fileIndex==0)" "$dir"/gen.yaml merged-extension-swagger.yaml
 	yq eval-all --inplace "select(fileIndex==0).paths *= select(fileIndex==1).paths | select(fileIndex==0)" "$dir"/gen.yaml merged-extension-swagger.yaml
-	swagger flatten \
-		--with-flatten=remove-unused "$dir"/gen.yaml \
-		--format=yaml --output "$dir"/gen.yaml
+	swagger flatten --with-flatten=remove-unused "$dir"/gen.yaml --output "$dir"/gen.json
+	go run "$docs_root"/tools/jsonnet/json2yaml.go "$dir"/gen.json "$dir"/gen.yaml
+	rm "$dir"/gen.json
 	swagger generate markdown \
 		--spec "$dir"/gen.yaml \
 		--target "$dir" \
@@ -57,11 +57,14 @@ cp "$docs_root"/content/assets/openapiv2/aperture.swagger.yaml "$policy_dir"/
 yq -i eval 'del(.paths)' "$policy_dir"/aperture.swagger.yaml
 yq -i eval 'del(.tags)' "$policy_dir"/aperture.swagger.yaml
 # 'mixin' is mostly used for --keep-spec-order
-swagger mixin "$policy_dir"/config-swagger.yaml "$policy_dir"/aperture.swagger.yaml --keep-spec-order --format=yaml -o "$policy_dir"/policy.yaml
+swagger mixin "$policy_dir"/config-swagger.yaml "$policy_dir"/aperture.swagger.yaml -o "$policy_dir"/policy.json
+go run "$docs_root"/tools/jsonnet/json2yaml.go "$policy_dir"/policy.json "$policy_dir"/policy.yaml
+rm "$policy_dir"/policy.json
 # Fixup .info, which is altered by 'mixin'
-yq -i eval-all 'select(fileIndex == 0).info = select(fileIndex == 1).info' \
-	"$policy_dir"/policy.yaml "$policy_dir"/config-swagger.yaml
-swagger flatten --with-flatten=remove-unused "$policy_dir"/policy.yaml --format=yaml --output "$policy_dir"/policy.yaml
+yq -i eval-all 'select(fileIndex == 0).info = select(fileIndex == 1).info' "$policy_dir"/policy.yaml "$policy_dir"/config-swagger.yaml
+swagger flatten --with-flatten=remove-unused "$policy_dir"/policy.yaml --output "$policy_dir"/policy.json
+go run "$docs_root"/tools/jsonnet/json2yaml.go "$policy_dir"/policy.json "$policy_dir"/policy.yaml
+rm "$policy_dir"/policy.json
 swagger generate markdown \
 	--spec "$policy_dir"/policy.yaml \
 	--target "$policy_dir" \

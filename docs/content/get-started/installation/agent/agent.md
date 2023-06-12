@@ -66,7 +66,7 @@ and can result in unpredictable behavior.
 2. [**Bare Metal or VM**](bare_metal.md)
 
    The Aperture Agent can be installed as a system service on any Linux system
-   that is [supported](supported-platforms.md).
+   that is [supported](../supported-platforms.md).
 
 3. [**Docker**](docker.md)
 

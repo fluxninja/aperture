@@ -75,7 +75,8 @@
         "extra_filters": {},
         "refresh_interval": "5s",
         "time_from": "now-15m",
-        "time_to": "now"
+        "time_to": "now",
+        "title": "Aperture Feature Rollout"
       },
       "type": "object",
       "$ref": "../../../../policies/feature-rollout/base/gen/definitions.json#/properties/dashboard"

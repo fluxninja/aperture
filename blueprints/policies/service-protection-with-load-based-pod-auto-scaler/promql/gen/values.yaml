@@ -60,4 +60,5 @@ dashboard:
   refresh_interval: "15s"
   time_from: "now-15m"
   time_to: "now"
+  title: "Aperture Service Protection"
   variant_name: "PromQL Output"

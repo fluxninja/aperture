@@ -1,6 +1,6 @@
 ---
 title: Auto Scale
-sidebar_position: 9
+sidebar_position: 10
 keywords:
   - auto-scaling
   - Autoscaling

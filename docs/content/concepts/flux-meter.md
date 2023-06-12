@@ -1,6 +1,6 @@
 ---
 title: Flux Meter
-sidebar_position: 5
+sidebar_position: 6
 keywords:
   - fluxmeter
   - histograms
@@ -36,7 +36,7 @@ agents.
 
 The diagram details the journey of a request, as it traverses through the Flow
 Selector forwards the request to the Flux Meter, which matches the request with
-a Flow Selector.
+a Selector.
 
 Post matching, the request is returned to the originating service for additional
 processing. Subsequently, the service dispatches the request to the

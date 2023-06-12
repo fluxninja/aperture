@@ -1,6 +1,6 @@
 ---
 title: Regulator
-sidebar_position: 8
+sidebar_position: 9
 ---
 
 :::info
@@ -38,11 +38,11 @@ values to be accepted by the flow filter, regardless of the accept percentage.
 This allows you to make exceptions for specific sessions or users, granting them
 unhindered access to a control point.
 
-## Flow Selector {#flow-selectors}
+## Selector {#selectors}
 
-The Flow Selector is responsible for determining the service and flows at which
-the _Regulator_ is applied. By configuring the Flow Selector, you can control
-which parts of your service are affected by the _Regulator_.
+The Selector is responsible for determining the service and flows at which the
+_Regulator_ is applied. By configuring the Selector, you can control which parts
+of your service are affected by the _Regulator_.
 
 ## Accept Percentage Signal {#accept-percentage-signal}
 

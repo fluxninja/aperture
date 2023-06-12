@@ -1,7 +1,7 @@
 ---
 title: Control Point
 sidebar_label: Control Point
-sidebar_position: 2
+sidebar_position: 1
 keywords:
   - flows
   - services
@@ -42,7 +42,7 @@ using this method. These integrations use Envoy's External Authorization API,
 and there are ready integrations available for many popular web frameworks.
 
 For example, instructions for integration with
-[Istio/Envoy](/integrations/envoy/istio.md) are provided. In such a setup, the
+[Istio/Envoy](/integrations/istio/istio.md) are provided. In such a setup, the
 Control Point can be labeled to identify a specific filter chain in Envoy. If
 insertion is achieved via Istio, the default filter configuration designates
 ingress and egress Control Points as identified by

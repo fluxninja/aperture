@@ -1,7 +1,6 @@
 ---
 title: 📦 SDKs
 description: Setup Control Points using SDK libraries
-slug: setup-control-points-using-sdks-libraries
 keywords:
   - setup
   - flow

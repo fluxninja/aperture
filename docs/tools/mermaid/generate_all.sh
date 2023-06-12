@@ -2,6 +2,12 @@
 
 set -x
 
+# Get the directory of the main script
+curr_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+func_dir="../../../scripts/"
+# shellcheck source=/dev/null
+source "$curr_dir/$func_dir/limit_jobs.sh"
+
 gitroot=$(git rev-parse --show-toplevel)
 export gitroot
 
@@ -51,4 +57,9 @@ function generate_mermaid_images() {
 
 export -f generate_mermaid_images
 
-parallel -j8 --halt-on-error now,fail,1 --no-notice --bar --eta generate_mermaid_images ::: "$($FIND "$docsdir"/content -type f -name "*.mmd")"
+while IFS= read -r -d '' file
+do
+    limit_jobs 8 generate_mermaid_images "$file"
+done < <($FIND "$docsdir"/content -type f -name '*.mmd' -print0)
+
+wait  # Wait for all background jobs to complete

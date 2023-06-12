@@ -1,6 +1,6 @@
 ---
 title: Classifier
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 The _Classifier_ is a component that allows you to create additional [_Flow
@@ -324,7 +324,7 @@ For more details and examples, refer to the [Classifier reference][reference].
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: ./control-point.md
-[install-istio]: /integrations/envoy/istio.md
+[install-istio]: /integrations/istio/istio.md
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
 [json-extractor]: /reference/policies/spec.md#json-extractor
 [jwt-extractor]: /reference/policies/spec.md#j-w-t-extractor
