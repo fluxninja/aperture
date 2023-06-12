@@ -6,6 +6,8 @@ import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.api.trace.Span;
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A Flow that can be accepted or rejected by Aperture Agent based on provided labels. */
 public final class Flow {
@@ -13,12 +15,16 @@ public final class Flow {
     private final Span span;
     private boolean ended;
     private boolean failOpen;
+    private FlowStatus flowStatus;
+
+    private static final Logger logger = LoggerFactory.getLogger(Flow.class);
 
     Flow(CheckResponse checkResponse, Span span, boolean ended) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
         this.failOpen = true;
+        this.flowStatus = FlowStatus.OK;
     }
 
     /**
@@ -104,13 +110,26 @@ public final class Flow {
     }
 
     /**
-     * Ends the flow, notifying the Aperture Agent whether it succeeded.
+     * Set status of the flow to be ended. Primarily used in case of business logic failure after
+     * the flow was accepted by Aperture Agent.
      *
-     * @param statusCode Status of the finished flow.
+     * @param status Status of the flow to be finished.
      */
-    public void end(FlowStatus statusCode) throws ApertureSDKException {
+    public void setStatus(FlowStatus status) {
         if (this.ended) {
-            throw new ApertureSDKException("Flow already ended");
+            logger.warn("Trying to change status of an already ended flow");
+        }
+        this.flowStatus = status;
+    }
+
+    /**
+     * Ends the flow, notifying the Aperture Agent whether it succeeded. Flow's Status is assumed to
+     * be "OK" and can be set using {@link #setStatus}.
+     */
+    public void end() {
+        if (this.ended) {
+            logger.warn("Trying to end an already ended flow with status " + this.flowStatus);
+            return;
         }
         this.ended = true;
 
@@ -120,11 +139,13 @@ public final class Flow {
                 checkResponseJSONBytes = JsonFormat.printer().print(this.checkResponse);
             }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-            throw new ApertureSDKException(e);
+            logger.warn("Could not attach check response when ending flow", e);
         }
 
+        logger.debug("Ending flow with status " + this.flowStatus);
+
         this.span
-                .setAttribute(FLOW_STATUS_LABEL, statusCode.name())
+                .setAttribute(FLOW_STATUS_LABEL, this.flowStatus.name())
                 .setAttribute(CHECK_RESPONSE_LABEL, checkResponseJSONBytes)
                 .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 

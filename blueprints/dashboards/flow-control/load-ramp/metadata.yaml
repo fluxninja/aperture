@@ -1,0 +1,3 @@
+blueprint: Load-ramp
+sources:
+  dashboard: dashboards/flow-control/load-ramp/dashboard.libsonnet

@@ -51,6 +51,9 @@ dashboard:
   # Additional filters to pass to each query to Grafana datasource.
   # Type: map[string]string
   extra_filters: {}
+  # Name of the main dashboard.
+  # Type: string
+  title: "Aperture Quota Scheduler"
   datasource:
     # Datasource name.
     # Type: string

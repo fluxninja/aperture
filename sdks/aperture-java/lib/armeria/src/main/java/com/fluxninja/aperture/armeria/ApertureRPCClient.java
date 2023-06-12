@@ -57,18 +57,11 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
             RpcResponse res;
             try {
                 res = unwrap().execute(ctx, req);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
-                return RpcResponse.ofFailure(e);
             } catch (Exception e) {
-                try {
-                    flow.end(FlowStatus.Error);
-                } catch (ApertureSDKException ae) {
-                    ae.printStackTrace();
-                }
+                flow.setStatus(FlowStatus.Error);
                 throw e;
+            } finally {
+                flow.end();
             }
             return res;
         } else {
