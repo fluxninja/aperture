@@ -51,10 +51,6 @@ func provideAgent(
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
 
 	customConfig := map[string]*policylangv1.InfraMeter{}
-	if !agentCfg.DisableKubeletScraper {
-		customConfig[otelconsts.ReceiverKubeletStats] = inframeter.InfraMeterForKubeletStats()
-	}
-
 	if err := inframeter.AddInfraMeters(otelCfg, customConfig); err != nil {
 		return nil, fmt.Errorf("adding builtin custom metrics pipelines: %w", err)
 	}
