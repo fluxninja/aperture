@@ -6,7 +6,6 @@ keywords:
   - latency
   - feature-flags
 sidebar_position: 1
-# sidebar_label: With Average Latency Feedback
 ---
 
 ```mdx-code-block

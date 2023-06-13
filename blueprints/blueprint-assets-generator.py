@@ -90,7 +90,9 @@ class Blueprint:
                 raise typer.Exit(1)
             # parameter is of the form <blueprint>:<annotation_type>:<param>
             blueprint, annotation_type, param = param.split(":")
-            docs_link = f"{policies_relative_path}/bundled-blueprints/{blueprint}#{slugify(param)}"
+            docs_link = (
+                f"{policies_relative_path}/blueprints/{blueprint}#{slugify(param)}"
+            )
             parts = param.split(".")
             json_schema_link = (
                 f"{blueprints_root_relative_path}/{blueprint}/gen/definitions.json#"
