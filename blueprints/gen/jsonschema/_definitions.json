@@ -2879,9 +2879,10 @@
       "properties": {
         "priority": {
           "default": "1",
-          "description": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\n\n",
+          "description": "$$\ninverted\\_priority = {\\frac {\\operatorname{lcm} \\left(priorities\\right)} {priority}}\n$$\n\n$$\nvirtual\\_finish\\_time = virtual\\_time + \\left(tokens \\cdot inverted\\_priority\\right)\n$$\n\n",
           "format": "uint64",
           "minLength": 1,
+          "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\nThe following formula is used to determine the position of a flow in the queue based on virtual finish time:",
           "type": "string",
           "x-go-tag-default": "1",
           "x-go-tag-validate": "gt=0"

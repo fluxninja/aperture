@@ -7067,7 +7067,16 @@ workload.
 
 Describes priority level of the flows within the workload. Priority level is
 unbounded and can be any positive integer. Higher numbers means higher priority
-level.
+level. The following formula is used to determine the position of a flow in the
+queue based on virtual finish time:
+
+$$
+inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+$$
+
+$$
+virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
+$$
 
 </dd>
 <dt>tokens</dt>
