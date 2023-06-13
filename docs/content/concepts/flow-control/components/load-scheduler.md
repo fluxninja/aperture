@@ -4,7 +4,6 @@ keywords:
   - scheduler
   - tokens
   - priority
-  - fairness
   - queuing
   - actuators
 sidebar_position: 6

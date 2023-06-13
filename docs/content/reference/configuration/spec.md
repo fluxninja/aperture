@@ -7052,41 +7052,30 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale on -->
 
-Parameters such as priority, tokens and fairness key that are applicable to
-flows within a workload.
+Parameters such as priority and tokens that are applicable to flows within a
+workload.
 
 <dl>
-<dt>fairness_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Fairness key is a label key that can be used to provide fairness within a
-workload. Any [flow label](/concepts/flow-control/flow-label.md) can be used
-here. For example, if you have a classifier that sets `user` flow label, you
-might want to set `fairness_key = "user"`.
-
-</dd>
 <dt>priority</dt>
 <dd>
 
 <!-- vale off -->
 
-(int64, minimum: `0`, maximum: `255`, default: `0`)
+(string, default: `"1"`)
 
 <!-- vale on -->
 
-Describes priority level of the flows within the workload. Priority level ranges
-from 0 to 255. Higher numbers means higher priority level. Priority levels have
-non-linear effect on the workload scheduling. The following formula is used to
-determine the position of a flow in the queue based on virtual finish time:
+Describes priority level of the flows within the workload. Priority level is
+unbounded and can be any positive integer. Higher numbers means higher priority
+level. The following formula is used to determine the position of a flow in the
+queue based on virtual finish time:
 
 $$
-\text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+$$
+
+$$
+virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
 $$
 
 </dd>

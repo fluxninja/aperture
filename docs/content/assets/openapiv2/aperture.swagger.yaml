@@ -3678,35 +3678,29 @@ definitions:
                 description: Parameters associated with flows matching the label matcher.
         type: object
     SchedulerWorkloadParameters:
-        description: |-
-            Parameters such as priority, tokens and fairness key that
-            are applicable to flows within a workload.
+        description: Parameters such as priority and tokens that are applicable to flows within a workload.
         properties:
-            fairness_key:
-                description: |-
-                    Fairness key is a label key that can be used to provide fairness within a workload.
-                    Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
-                    you have a classifier that sets `user` flow label, you might want to set
-                    `fairness_key = "user"`.
-                type: string
             priority:
-                default: 0
+                default: "1"
                 description: |+
                     $$
-                    \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+                    inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
                     $$
 
-                format: int64
-                maximum: 255
-                minimum: 0
+                    $$
+                    virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
+                    $$
+
+                format: uint64
+                minLength: 1
                 title: |-
                     Describes priority level of the flows within the workload.
-                    Priority level ranges from 0 to 255.
+                    Priority level is unbounded and can be any positive integer.
                     Higher numbers means higher priority level.
-                    Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
-                type: integer
-                x-go-tag-default: "0"
-                x-go-tag-validate: gte=0,lte=255
+                    The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+                type: string
+                x-go-tag-default: "1"
+                x-go-tag-validate: gt=0
             tokens:
                 description: |-
                     Tokens determines the cost of admitting a single flow in the workload,
