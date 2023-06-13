@@ -2,6 +2,17 @@
 FROM golang:1.20.4-bullseye AS builder
 
 WORKDIR /src
+
+COPY go.mod go.sum ./
+# Cache go mod download as separate layer, but only in case of empty mount
+# cache (like in CI).
+RUN --mount=type=cache,target=/go/pkg/ \
+  if [ ! -d "/go/pkg/mod" ]; then \
+    export GOMODCACHE=/go/ci-pkg/mod && \
+    go mod download && \
+    cp -ar /go/ci-pkg/mod /go/pkg/mod; \
+  fi
+
 COPY --link . .
 
 # App build
