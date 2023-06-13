@@ -14,6 +14,15 @@ ENV APERTURECTL_BUILD_GIT_BRANCH=${APERTURECTL_BUILD_GIT_BRANCH}
 ARG APERTURECTL_BUILD_FLAGS
 ENV APERTURECTL_BUILD_FLAGS=${APERTURECTL_BUILD_FLAGS}
 
+# Cache go mod download as separate layer, but only in case of empty mount
+# cache (like in CI).
+RUN --mount=type=cache,target=/go/pkg/ \
+  if [ ! -d "/go/pkg/mod" ]; then \
+    export GOMODCACHE=/go/ci-pkg/mod && \
+    go mod download && \
+    cp -ar /go/ci-pkg/mod /go/pkg/mod; \
+  fi
+
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.20.4,sharing=private \
   --mount=type=cache,target=/root/.aperturectl,id=agent-1.20.4,sharing=private \
