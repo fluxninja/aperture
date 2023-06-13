@@ -10,14 +10,15 @@ which are key-value pairs. For instance, if a flow is tagged with
 `user_tier:gold`, `user_tier` is the label key and `gold` is the label value.
 `user_tier` is a Flow Label.
 
+_Example:_
+
+<Zoom>
+
 ```mermaid
-
-graph TD;
-    A[Users] -->|user_tier:gold| B[API Call];
-    B -->|http_method:GET| C[Feature];
-    C -->|db_query:SELECT| D[Database Query];
-
+{@include: ./assets/gen/flow-label/labels.mmd}
 ```
+
+</Zoom>
 
 ## Usage of Flow Labels
 
