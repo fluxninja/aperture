@@ -4879,8 +4879,6 @@ func (m *Scheduler_Workload_Parameters) validate(all bool) error {
 
 	// no validation rules for Tokens
 
-	// no validation rules for FairnessKey
-
 	if len(errors) > 0 {
 		return Scheduler_Workload_ParametersMultiError(errors)
 	}

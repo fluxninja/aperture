@@ -11,10 +11,10 @@ metadata:
       {"all": {"of": [{"label_matches": {"label": "aperture.source_fqdns", "regex":
       "service1-demo-app.demoapp.svc.cluster.local"}}, {"label_matches": {"label":
       "aperture.destination_fqdns", "regex": "service3-demo-app.demoapp.svc.cluster.local"}}]}}},
-      "parameters": {"priority": 200}}, {"label_matcher": {"expression": {"all": {"of":
-      [{"label_matches": {"label": "aperture.source_fqdns", "regex": "service2-demo-app.demoapp.svc.cluster.local"}},
+      "parameters": {"priority": "200"}}, {"label_matcher": {"expression": {"all":
+      {"of": [{"label_matches": {"label": "aperture.source_fqdns", "regex": "service2-demo-app.demoapp.svc.cluster.local"}},
       {"label_matches": {"label": "aperture.destination_fqdns", "regex": "service3-demo-app.demoapp.svc.cluster.local"}}]}}},
-      "parameters": {"priority": 50}}]}, "selectors": [{"control_point": "egress",
+      "parameters": {"priority": "50"}}]}, "selectors": [{"control_point": "egress",
       "service": "service1-demo-app.demoapp.svc.cluster.local"}, {"control_point":
       "egress", "service": "service2-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
@@ -62,7 +62,7 @@ spec:
                             label: aperture.destination_fqdns
                             regex: service3-demo-app.demoapp.svc.cluster.local
                   parameters:
-                    priority: 200
+                    priority: "200"
                 - label_matcher:
                     expression:
                       all:
@@ -74,7 +74,7 @@ spec:
                             label: aperture.destination_fqdns
                             regex: service3-demo-app.demoapp.svc.cluster.local
                   parameters:
-                    priority: 50
+                    priority: "50"
               selectors:
               - control_point: egress
                 service: service1-demo-app.demoapp.svc.cluster.local
