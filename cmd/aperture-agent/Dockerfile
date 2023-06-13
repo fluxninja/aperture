@@ -2,6 +2,10 @@
 FROM golang:1.20.4-bullseye AS builder
 
 WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY --link . .
 
 # App build
@@ -19,7 +23,6 @@ RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.aperturectl,id=agent-1.20.4,sharing=private \
   /bin/bash -c \
   'set -eu; \
-  go mod download; \
   ./scripts/build_aperturectl.sh ./cmd/aperturectl; \
   ./scripts/generate_full_build_config.sh ./extensions > build.yaml; \
   ./cmd/aperturectl/aperturectl build agent -c build.yaml -o / --uri .; \
