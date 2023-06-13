@@ -1,1 +1,1 @@
-[Documentation](https://docs.fluxninja.com/reference/policies/bundled-blueprints/dashboards/flow-control/load-ramp)
+[Documentation](https://docs.fluxninja.com/reference/blueprints/dashboards/flow-control/load-ramp)

@@ -1,1 +1,1 @@
-[Documentation](https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/jmx.md)
+[Documentation](https://docs.fluxninja.com/reference/blueprints/policies/service-protection/jmx.md)

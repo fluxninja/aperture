@@ -1,1 +1,1 @@
-[Documentation](https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/quota-scheduler)
+[Documentation](https://docs.fluxninja.com/reference/blueprints/policies/quota-scheduler)

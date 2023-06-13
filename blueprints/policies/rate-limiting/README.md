@@ -1,1 +1,1 @@
-[Documentation](https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/rate-limiting)
+[Documentation](https://docs.fluxninja.com/reference/blueprints/policies/rate-limiting)
