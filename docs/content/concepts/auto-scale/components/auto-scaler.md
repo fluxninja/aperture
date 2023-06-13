@@ -8,7 +8,7 @@ sidebar_position: 1
 
 :::info
 
-See also [_Auto Scaler_ reference](/reference/configuration/spec.md#auto-scaler)
+See also [_Auto Scaler_ reference](/reference/policies/spec.md#auto-scaler)
 
 :::
 

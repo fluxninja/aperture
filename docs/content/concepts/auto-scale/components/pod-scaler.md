@@ -9,7 +9,7 @@ sidebar_position: 1
 
 :::info
 
-See also [_Pod Scaler_ reference](/reference/configuration/spec.md#pod-scaler)
+See also [_Pod Scaler_ reference](/reference/policies/spec.md#pod-scaler)
 
 :::
 

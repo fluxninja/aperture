@@ -77,5 +77,5 @@ import DocCardList from '@theme/DocCardList';
 
 <DocCardList />
 
-[config]: /reference/configuration/spec.md#resources
+[config]: /reference/policies/spec.md#resources
 [rabbitmq]: /integrations/metrics/rabbitmq.md

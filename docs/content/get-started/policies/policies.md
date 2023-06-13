@@ -191,6 +191,6 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 
 [controller-metrics]: /reference/observability/prometheus-metrics/controller.md
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
-[blueprints]: /reference/blueprints/blueprints.md
+[blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
 [policies]: /concepts/policy/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/
