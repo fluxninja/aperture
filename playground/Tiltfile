@@ -965,7 +965,6 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
         if resource == "agent":
             images[0]["build_args"]["APERTURECTL_BUILD_VERSION"] = agent_version
         if race_arg:
-            images = resource_info.get("images",{})
             if resource == "controller":
                 images[0]["build_args"]["APERTURECTL_BUILD_FLAGS"] = "['-race']"
             if resource == "agent":
