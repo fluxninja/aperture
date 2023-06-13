@@ -2879,9 +2879,9 @@
       "properties": {
         "priority": {
           "default": "1",
+          "description": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\n\n",
           "format": "uint64",
           "minLength": 1,
-          "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\nTODO: explain the formula for priority level",
           "type": "string",
           "x-go-tag-default": "1",
           "x-go-tag-validate": "gt=0"

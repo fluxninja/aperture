@@ -2989,13 +2989,13 @@ definitions:
         properties:
             priority:
                 default: "1"
-                format: uint64
-                minLength: 1
-                title: |-
+                description: |+
                     Describes priority level of the flows within the workload.
                     Priority level is unbounded and can be any positive integer.
                     Higher numbers means higher priority level.
-                    TODO: explain the formula for priority level
+
+                format: uint64
+                minLength: 1
                 type: string
                 x-go-tag-default: "1"
                 x-go-tag-validate: gt=0

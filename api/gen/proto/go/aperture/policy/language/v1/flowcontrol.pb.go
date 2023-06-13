@@ -2437,7 +2437,6 @@ type Scheduler_Workload_Parameters struct {
 	// Describes priority level of the flows within the workload.
 	// Priority level is unbounded and can be any positive integer.
 	// Higher numbers means higher priority level.
-	// TODO: explain the formula for priority level
 	Priority uint64 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gt=0" default:"1"` // @gotags: validate:"gt=0" default:"1"
 	// Tokens determines the cost of admitting a single flow in the workload,
 	// which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or

@@ -216,7 +216,6 @@ message Scheduler {
       // Describes priority level of the flows within the workload.
       // Priority level is unbounded and can be any positive integer.
       // Higher numbers means higher priority level.
-      // TODO: explain the formula for priority level
       uint64 priority = 1; // @gotags: validate:"gt=0" default:"1"
 
       // Tokens determines the cost of admitting a single flow in the workload,

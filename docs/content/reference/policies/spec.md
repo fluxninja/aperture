@@ -7067,7 +7067,7 @@ workload.
 
 Describes priority level of the flows within the workload. Priority level is
 unbounded and can be any positive integer. Higher numbers means higher priority
-level. TODO: explain the formula for priority level
+level.
 
 </dd>
 <dt>tokens</dt>
