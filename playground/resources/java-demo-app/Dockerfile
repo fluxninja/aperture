@@ -7,8 +7,9 @@ COPY --link . .
 RUN gradle clean build
 
 
-FROM openjdk:18-jdk-alpine
+FROM openjdk:22-jdk-slim-bullseye
 
+RUN apt-get update && apt-get install -y wget
 COPY --link --from=builder /app/build/libs/JavaDemoApp-0.0.1-SNAPSHOT.war demo.war
 COPY --link ./config.yaml config.yaml
 RUN wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.18.0/jmx_prometheus_javaagent-0.18.0.jar
