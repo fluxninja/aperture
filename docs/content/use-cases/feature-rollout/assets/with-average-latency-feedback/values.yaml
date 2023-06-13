@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../../../../../blueprints/policies/feature-rollout/average-latency/gen/definitions.json
 # Generated values file for policies/feature-rollout/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/feature-rollout/average-latency
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency
 
 # Parameters for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy

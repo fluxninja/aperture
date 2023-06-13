@@ -16,7 +16,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Service Protection with Average Latency Feedback](/reference/blueprints/service-protection/average-latency.md)
+[Service Protection with Average Latency Feedback](/reference/policies/bundled-blueprints/policies/service-protection/average-latency.md)
 blueprint.
 
 :::

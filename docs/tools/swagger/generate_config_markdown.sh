@@ -79,5 +79,5 @@ rm "$policy_dir"/aperture.swagger.yaml
 # append gen/policy/metadata on top of gen/policy/policy.md
 cat "$policy_dir"/metadata "$policy_dir"/policy.md >"$policy_dir"/policy.md.tmp
 mv "$policy_dir"/policy.md.tmp "$policy_dir"/policy.md
-mv "$policy_dir"/policy.md "$docs_root"/content/reference/configuration/spec.md
-prettier --write "$docs_root"/content/reference/configuration/spec.md
+mv "$policy_dir"/policy.md "$docs_root"/content/reference/policies/spec.md
+prettier --write "$docs_root"/content/reference/policies/spec.md
