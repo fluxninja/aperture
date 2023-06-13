@@ -1531,8 +1531,9 @@ spec:
                             type: string
                         type: object
                       disable_kubelet_scraper:
-                        description: DisableKubeletScraper disables the default metrics
-                          collection for kubelet.
+                        description: 'DisableKubeletScraper disables the default metrics
+                          collection for kubelet. Deprecated: kubelet scraper is removed
+                          entirely, so this flag makes no difference.'
                         type: boolean
                       disable_kubernetes_scraper:
                         description: DisableKubernetesScraper disables the default
