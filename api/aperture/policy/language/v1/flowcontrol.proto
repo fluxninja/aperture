@@ -211,19 +211,22 @@ message LoadScheduler {
 message Scheduler {
   // Workload defines a class of flows that preferably have similar properties such as response latency and desired priority.
   message Workload {
-    // Parameters such as priority, tokens and fairness key that
-    // are applicable to flows within a workload.
+    // Parameters such as priority and tokens that are applicable to flows within a workload.
     message Parameters {
       // Describes priority level of the flows within the workload.
-      // Priority level ranges from 0 to 255.
+      // Priority level is unbounded and can be any positive integer.
       // Higher numbers means higher priority level.
-      // Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:
+      // The following formula is used to determine the position of a flow in the queue based on virtual finish time:
       //
       // $$
-      // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+      // inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
       // $$
       //
-      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255" default:"0"
+      // $$
+      // virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
+      // $$
+      //
+      uint64 priority = 1; // @gotags: validate:"gt=0" default:"1"
 
       // Tokens determines the cost of admitting a single flow in the workload,
       // which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
@@ -232,12 +235,6 @@ message Scheduler {
       // This override is applicable only if tokens for the flow aren't specified
       // in the flow labels.
       uint64 tokens = 2;
-
-      // Fairness key is a label key that can be used to provide fairness within a workload.
-      // Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
-      // you have a classifier that sets `user` flow label, you might want to set
-      // `fairness_key = "user"`.
-      string fairness_key = 3;
     }
 
     // Parameters associated with flows matching the label matcher.

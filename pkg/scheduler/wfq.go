@@ -5,7 +5,6 @@ import (
 	"container/list"
 	"context"
 	"fmt"
-	"math"
 	"sync"
 	"time"
 
@@ -198,7 +197,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 }
 
 // Construct FlowID by appending RequestLabel and Priority.
-func (sched *WFQScheduler) flowID(fairnessLabel string, priority uint8, generation uint64) string {
+func (sched *WFQScheduler) flowID(fairnessLabel string, priority uint64, generation uint64) string {
 	return fmt.Sprintf("%s_%d_%d", fairnessLabel, priority, generation)
 }
 
@@ -226,13 +225,11 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 
 	qRequest = getHeapRequest()
 
-	flowID := sched.flowID(request.FairnessLabel, request.Priority, sched.generation)
+	flowID := sched.flowID(request.FairnessLabel, request.InvPriority, sched.generation)
 
 	qRequest.flowID = flowID
 
-	// invPriority range [1, 256]
-	invPriority := uint64(math.MaxUint8-request.Priority) + 1
-	cost := request.Tokens * invPriority
+	cost := request.Tokens * request.InvPriority
 
 	// Get FlowInfo
 	fInfo, ok := sched.flows[flowID]

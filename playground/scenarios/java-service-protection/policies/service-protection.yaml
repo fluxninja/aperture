@@ -78,12 +78,12 @@ policy:
         scheduler:
           workloads:
             - parameters:
-                priority: 50
+                priority: "50"
               label_matcher:
                 match_labels:
                   user_type: guest
             - parameters:
-                priority: 200
+                priority: "200"
               label_matcher:
                 match_labels:
                   user_type: subscriber

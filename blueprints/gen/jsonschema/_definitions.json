@@ -2875,22 +2875,17 @@
       "additionalProperties": false
     },
     "SchedulerWorkloadParameters": {
-      "description": "Parameters such as priority, tokens and fairness key that\nare applicable to flows within a workload.",
+      "description": "Parameters such as priority and tokens that are applicable to flows within a workload.",
       "properties": {
-        "fairness_key": {
-          "description": "Fairness key is a label key that can be used to provide fairness within a workload.\nAny [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if\nyou have a classifier that sets `user` flow label, you might want to set\n`fairness_key = \"user\"`.",
-          "type": "string"
-        },
         "priority": {
-          "default": 0,
-          "description": "$$\n\\text{virtual\\_finish\\_time} = \\text{virtual\\_time} + \\left(\\text{tokens} \\cdot \\left(\\text{256} - \\text{priority}\\right)\\right)\n$$\n\n",
-          "format": "int64",
-          "maximum": 255,
-          "minimum": 0,
-          "title": "Describes priority level of the flows within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a flow in the queue based on virtual finish time:",
-          "type": "integer",
-          "x-go-tag-default": "0",
-          "x-go-tag-validate": "gte=0,lte=255"
+          "default": "1",
+          "description": "$$\ninverted\\_priority = {\\frac {\\operatorname{lcm} \\left(priorities\\right)} {priority}}\n$$\n\n$$\nvirtual\\_finish\\_time = virtual\\_time + \\left(tokens \\cdot inverted\\_priority\\right)\n$$\n\n",
+          "format": "uint64",
+          "minLength": 1,
+          "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\nThe following formula is used to determine the position of a flow in the queue based on virtual finish time:",
+          "type": "string",
+          "x-go-tag-default": "1",
+          "x-go-tag-validate": "gt=0"
         },
         "tokens": {
           "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.",
