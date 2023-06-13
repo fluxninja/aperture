@@ -1,6 +1,6 @@
 ---
 title: Aperture Agent Configuration Reference
-sidebar_position: 11
+sidebar_position: 2
 sidebar_label: Agent
 ---
 

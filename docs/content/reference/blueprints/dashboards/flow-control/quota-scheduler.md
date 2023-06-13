@@ -1,5 +1,5 @@
 ---
-title: Auto scale
+title: Quota scheduler
 ---
 
 <!-- Configuration Marker -->
@@ -14,7 +14,7 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/auto-scale`}>dashboards/auto-scale</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/flow-control/quota-scheduler`}>dashboards/flow-control/quota-scheduler</a>
 
 <!-- vale on -->
 
@@ -113,7 +113,21 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
     description='Name of the main dashboard.'
     type='string'
     reference=''
-    value='"Aperture Auto-scale"'
+    value='"Aperture Quota Scheduler"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-variant-name"></a>
+
+<ParameterDescription
+    name='dashboard.variant_name'
+    description='Name of the dashboard variant.'
+    type='string'
+    reference=''
+    value='""'
 />
 
 <!-- vale on -->

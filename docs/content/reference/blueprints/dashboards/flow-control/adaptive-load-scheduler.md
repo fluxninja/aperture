@@ -1,12 +1,6 @@
 ---
-title: Signals
+title: Adaptive load scheduler
 ---
-
-## Introduction
-
-This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
-dashboard that visualizes Signals flowing through the
-[Circuit](/concepts/policy/circuit.md).
 
 <!-- Configuration Marker -->
 
@@ -20,7 +14,7 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/flow-control/adaptive-load-scheduler`}>dashboards/flow-control/adaptive-load-scheduler</a>
 
 <!-- vale on -->
 
@@ -92,6 +86,48 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
     type='string'
     reference=''
     value='"now"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-title"></a>
+
+<ParameterDescription
+    name='dashboard.title'
+    description='Name of the main dashboard.'
+    type='string'
+    reference=''
+    value='"Aperture Adaptive Load Scheduler"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-variant-name"></a>
+
+<ParameterDescription
+    name='dashboard.variant_name'
+    description='Name of the dashboard variant.'
+    type='string'
+    reference=''
+    value='""'
 />
 
 <!-- vale on -->

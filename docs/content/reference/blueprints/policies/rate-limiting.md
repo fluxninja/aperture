@@ -11,13 +11,13 @@ sidebar_label: Rate Limiting Policy
 This blueprint provides a
 [token bucket](https://en.wikipedia.org/wiki/Token_bucket) based rate-limiting
 policy and a dashboard. This policy uses the
-[`RateLimiter`](/reference/policies/spec.md#rate-limiter) component.
+[`RateLimiter`](/reference/configuration/spec.md#rate-limiter) component.
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../apertureVersion.js'
+import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration

@@ -835,7 +835,7 @@ def main(
     # make a prefix of ../ for each part
     policies_relative_path = "/".join([".."] * len(relative_blueprint_path_parts))
     docs_root_relative_path = "/".join(
-        [".."] * (len(relative_blueprint_path_parts) + 2)
+        [".."] * (len(relative_blueprint_path_parts) + 1)
     )
 
     blueprints_root_relative_path = "/".join(
@@ -890,9 +890,7 @@ def main(
         dynamic_config_parameters,
     )
 
-    blueprints_docs_root_path = (
-        repository_root / "docs/content/reference/policies/bundled-blueprints"
-    )
+    blueprints_docs_root_path = repository_root / "docs/content/reference/blueprints"
     # check whether the blueprint_docs_root_path exists
     if blueprints_docs_root_path.exists():
         readme_path = (

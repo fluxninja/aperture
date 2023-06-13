@@ -1,11 +1,12 @@
 ---
-title: with Average Latency Feedback
+title: With Average Latency Feedback
 keywords:
   - policies
   - rollout
   - latency
   - feature-flags
 sidebar_position: 1
+# sidebar_label: With Average Latency Feedback
 ---
 
 ```mdx-code-block
