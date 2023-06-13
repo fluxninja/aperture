@@ -91,8 +91,9 @@ function generate_jsonnet_files() {
 export -f generate_jsonnet_files
 
 # find all jsonnet files and run generate_jsonnet_files in parallel
-while IFS= read -r -d '' file; do
-	limit_jobs 8 generate_jsonnet_files "$file"
+while IFS= read -r -d '' file
+do
+    limit_jobs 8 generate_jsonnet_files "$file"
 done < <($FIND "$docsdir"/content -type f -name '*.jsonnet' -print0)
 
-wait # Wait for all background jobs to complete
+wait  # Wait for all background jobs to complete

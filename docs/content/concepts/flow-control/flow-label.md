@@ -189,8 +189,7 @@ up and sent to the analytics database in the FluxNinja ARC. This allows:
 :::note
 
 For _Classifier_ created labels, you can disable this behavior by setting
-`hidden: true` in the
-[classification rule](/reference/configuration/spec.md#rule).
+`hidden: true` in the [classification rule](/reference/policies/spec.md#rule).
 
 :::
 
