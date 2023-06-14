@@ -2712,7 +2712,7 @@
       "additionalProperties": false
     },
     "Sampler": {
-      "description": "_Sampler_ is a component that regulates the load at a\n[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).\n\n:::",
+      "description": "_Sampler_ is a component that regulates the load at a\n[_Control Point_](/concepts/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Sampler_ overview](/concepts/sampler.md).\n\n:::",
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/SamplerIns",

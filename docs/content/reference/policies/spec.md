@@ -6634,12 +6634,12 @@ Whether the output is valid during the warm-up stage.
 <!-- vale on -->
 
 _Sampler_ is a component that regulates the load at a
-[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing
-only a specified percentage of flows at random or by sticky sessions.
+[_Control Point_](/concepts/selector.md/#control-point) by allowing only a
+specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
+See also [_Sampler_ overview](/concepts/sampler.md).
 
 :::
 
