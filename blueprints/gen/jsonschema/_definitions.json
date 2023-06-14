@@ -2712,7 +2712,7 @@
       "additionalProperties": false
     },
     "Sampler": {
-      "description": "_Sampler_ is a component that regulates the load at a\n[_Control Point_](/concepts/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Sampler_ overview](/concepts/sampler.md).\n\n:::",
+      "description": "_Sampler_ is a component that regulates the load at a\n[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).\n\n:::",
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/SamplerIns",
@@ -2877,10 +2877,6 @@
     "SchedulerWorkloadParameters": {
       "description": "Parameters such as priority and tokens that are applicable to flows within a workload.",
       "properties": {
-        "fairness_key": {
-          "description": "Fairness key is a label key that can be used to provide fairness within a workload.\nAny [flow label](/concepts/flow-label.md) can be used here. For example, if\nyou have a classifier that sets `user` flow label, you might want to set\n`fairness_key = \"user\"`.",
-          "type": "string"
-        },
         "priority": {
           "default": "1",
           "description": "$$\ninverted\\_priority = {\\frac {\\operatorname{lcm} \\left(priorities\\right)} {priority}}\n$$\n\n$$\nvirtual\\_finish\\_time = virtual\\_time + \\left(tokens \\cdot inverted\\_priority\\right)\n$$\n\n",

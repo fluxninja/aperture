@@ -235,12 +235,6 @@ message Scheduler {
       // This override is applicable only if tokens for the flow aren't specified
       // in the flow labels.
       uint64 tokens = 2;
-
-      // Fairness key is a label key that can be used to provide fairness within a workload.
-      // Any [flow label](/concepts/flow-label.md) can be used here. For example, if
-      // you have a classifier that sets `user` flow label, you might want to set
-      // `fairness_key = "user"`.
-      string fairness_key = 3;
     }
 
     // Parameters associated with flows matching the label matcher.
@@ -363,12 +357,12 @@ message AdaptiveLoadScheduler {
 }
 
 // _Sampler_ is a component that regulates the load at a
-// [_Control Point_](/concepts/selector.md/#control-point) by allowing only a specified percentage of
+// [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
 // flows at random or by sticky sessions.
 //
 // :::info
 //
-// See also [_Sampler_ overview](/concepts/sampler.md).
+// See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
 //
 // :::
 message Sampler {

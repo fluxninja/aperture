@@ -6634,12 +6634,12 @@ Whether the output is valid during the warm-up stage.
 <!-- vale on -->
 
 _Sampler_ is a component that regulates the load at a
-[_Control Point_](/concepts/selector.md/#control-point) by allowing only a
-specified percentage of flows at random or by sticky sessions.
+[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing
+only a specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [_Sampler_ overview](/concepts/sampler.md).
+See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
 
 :::
 
@@ -7048,21 +7048,6 @@ Parameters such as priority and tokens that are applicable to flows within a
 workload.
 
 <dl>
-<dt>fairness_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Fairness key is a label key that can be used to provide fairness within a
-workload. Any [flow label](/concepts/flow-label.md) can be used here. For
-example, if you have a classifier that sets `user` flow label, you might want to
-set `fairness_key = "user"`.
-
-</dd>
 <dt>priority</dt>
 <dd>
 

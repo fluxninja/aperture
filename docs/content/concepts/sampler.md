@@ -1,6 +1,6 @@
 ---
-sidebar_position: 9
 title: Sampler
+sidebar_position: 6
 ---
 
 :::info
@@ -51,5 +51,5 @@ it decides the percentage of flows to accept. This gives you fine-grained
 control over the flow of requests to a control point, enabling you to achieve
 the desired balance between load and performance.
 
-[control-point]: /concepts/control-point.md
 [flow-sampler]: /reference/policies/spec.md#flow-sampler
+[control-point]: /concepts/flow-control/selector.md/#control-point
