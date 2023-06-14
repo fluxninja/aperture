@@ -82,7 +82,6 @@ func sanitizeBaggageHeaderValue(value string) string {
 // * computes flow labels and returns them via DynamicMetadata.
 // * makes the allow/deny decision - sends flow labels to flow control's Check function.
 func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.CheckResponse, error) {
-	log.Info().Msg("authz.Check")
 	// record the start time of the request
 	start := time.Now()
 

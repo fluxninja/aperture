@@ -9,7 +9,6 @@ import (
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
 )
 
@@ -109,13 +108,11 @@ func (lsl *LazySyncRateLimiter) takeN(ctx context.Context, label string, n float
 
 	now := time.Now()
 	syncRemote := func(c *counter, n float64) (bool, time.Duration, float64, float64) {
-		log.Info().Msg("syncRemote")
 		tokens := c.credit
 		if canWait {
 			tokens += n
 		}
 		ok, waitTime, remaining, current := lsl.limiter.Take(ctx, label, tokens)
-		log.Info().Dur("waitTime", waitTime).Bool("ok", ok).Msg("remote response")
 		c.credit = 0
 		if waitTime > 0 {
 			c.waiting = true
@@ -157,8 +154,6 @@ func (lsl *LazySyncRateLimiter) takeN(ctx context.Context, label string, n float
 		}
 
 		waitTime := time.Duration(0)
-
-		log.Info().Bool("waiting", c.waiting).Send()
 
 		if c.waiting && !canWait {
 			return ret(false, 0)
