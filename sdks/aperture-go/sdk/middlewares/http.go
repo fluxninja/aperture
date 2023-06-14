@@ -45,20 +45,20 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 
 		flow, err := m.client.StartHTTPFlow(r.Context(), req)
 		if err != nil {
-			m.client.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
+			m.client.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.ShouldRun()", flow.ShouldRun())
 		}
 
 		defer func() {
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
-			// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
-			// The second argument is error message for further diagnosis.
-			err := flow.End(aperture.OK)
+			// SetStatus() method of Flow object can be used to capture whether the Flow was successful or resulted in an error.
+			// If not set, status defaults to OK.
+			err := flow.End()
 			if err != nil {
 				m.client.GetLogger().Info("Aperture flow control end got error.", "error", err)
 			}
 		}()
 
-		if flow.Accepted() {
+		if flow.ShouldRun() {
 			// Simulate work being done
 			next.ServeHTTP(w, r)
 		} else {

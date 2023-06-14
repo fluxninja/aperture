@@ -5,9 +5,11 @@ import (
 	"context"
 	"encoding/base64"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
+	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	typev3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	"google.golang.org/genproto/googleapis/rpc/code"
@@ -15,6 +17,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -214,33 +217,34 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		resp.Status = &status.Status{
 			Code: int32(code.Code_UNAVAILABLE),
 		}
+		var statusCode typev3.StatusCode
 		switch checkResponse.RejectReason {
 		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
-			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
-				DeniedResponse: &authv3.DeniedHttpResponse{
-					Status: &typev3.HttpStatus{
-						Code: typev3.StatusCode_TooManyRequests,
-					},
-				},
-			}
+			statusCode = typev3.StatusCode_TooManyRequests
 		case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
-			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
-				DeniedResponse: &authv3.DeniedHttpResponse{
-					Status: &typev3.HttpStatus{
-						Code: typev3.StatusCode_ServiceUnavailable,
-					},
-				},
-			}
+			statusCode = typev3.StatusCode_ServiceUnavailable
 		case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
-			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
-				DeniedResponse: &authv3.DeniedHttpResponse{
-					Status: &typev3.HttpStatus{
-						Code: typev3.StatusCode_Forbidden,
-					},
-				},
-			}
+			statusCode = typev3.StatusCode_Forbidden
 		default:
 			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
+		}
+		deniedHTTPResponse := &authv3.DeniedHttpResponse{
+			Status: &typev3.HttpStatus{
+				Code: statusCode,
+			},
+		}
+		if checkResponse.WaitTime != nil {
+			deniedHTTPResponse.Headers = append(
+				deniedHTTPResponse.Headers,
+				waitTimeToRetryAfter(checkResponse.WaitTime),
+			)
+			// Clear to avoid redundancy, as we're translating it into header.
+			// Logs processor doesn't read it and Envoy doesn't peek into
+			// CheckResponse.
+			checkResponse.WaitTime = nil
+		}
+		resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
+			DeniedResponse: deniedHTTPResponse,
 		}
 	default:
 		return nil, grpc.Bug().Stringer("type", checkResponse.DecisionType).
@@ -248,6 +252,21 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	}
 
 	return resp, nil
+}
+
+func waitTimeToRetryAfter(waitTime *durationpb.Duration) *corev3.HeaderValueOption {
+	seconds := waitTime.Seconds
+	// Retry-after header doesn't have full second resolution, we need to round
+	// up to avoid clients retrying too early.
+	if waitTime.Nanos != 0 {
+		seconds += 1
+	}
+	return &corev3.HeaderValueOption{
+		Header: &corev3.HeaderValue{
+			Key:   "retry-after",
+			Value: strconv.FormatInt(seconds, 10),
+		},
+	}
 }
 
 func authzRequestToCheckHTTPRequest(

@@ -49,17 +49,17 @@ The created instance can then be used to start a flow:
     // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
     flow, err := a.apertureClient.StartFlow(ctx, "featureName", labels)
     if err != nil {
-        log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.Accepted(): %t", flow.Accepted())
+        log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.ShouldRun(): %t", flow.ShouldRun())
     }
 
     // See whether flow was accepted by Aperture Agent.
-    if flow.Accepted() {
+    if flow.ShouldRun() {
         // do actual work
-        _ = flow.End(aperture.OK)
     } else {
         // handle flow rejection by Aperture Agent
-        _ = flow.End(aperture.Error)
+        flow.SetStatus(aperture.Error)
     }
+    _ = flow.End()
 ```
 
 For more context on using Aperture Go SDK to set feature control points, refer

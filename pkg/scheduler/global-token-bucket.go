@@ -40,7 +40,7 @@ func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request *Req
 
 // TakeIfAvailable takes tokens if available.
 func (rltb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, tokens float64) bool {
-	ok, _, _ := rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
+	ok, _, _, _ := rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
 	return ok
 }
 

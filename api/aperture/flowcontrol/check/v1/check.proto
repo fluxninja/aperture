@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package aperture.flowcontrol.check.v1;
 
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 // FlowControlService is used to perform Flow Control operations.
@@ -54,6 +55,9 @@ message CheckResponse {
   repeated FluxMeterInfo flux_meter_infos = 11;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 12;
+  // Recommended minimal amount of time to wait when retrying the request, if
+  // decision_type is REJECTED. Optional.
+  google.protobuf.Duration wait_time = 13;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

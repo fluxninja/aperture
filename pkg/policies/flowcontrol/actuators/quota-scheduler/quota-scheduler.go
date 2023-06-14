@@ -358,7 +358,7 @@ func (qs *quotaScheduler) getLabelKey(labels map[string]string) (string, bool) {
 }
 
 // Decide runs the limiter.
-func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 	dropped := false
 	label := ""
@@ -366,17 +366,19 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 		WorkloadIndex: metrics.DefaultWorkloadIndex,
 	}
 
-	returnDecision := func() *flowcontrolv1.LimiterDecision {
-		return &flowcontrolv1.LimiterDecision{
-			PolicyName:  qs.GetPolicyName(),
-			PolicyHash:  qs.GetPolicyHash(),
-			ComponentId: qs.GetComponentId(),
-			Dropped:     dropped,
-			Reason:      reason,
-			Details: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_{
-				QuotaSchedulerInfo: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo{
-					Label:         label,
-					SchedulerInfo: schedulerInfo,
+	returnDecision := func() iface.LimiterDecision {
+		return iface.LimiterDecision{
+			LimiterDecision: &flowcontrolv1.LimiterDecision{
+				PolicyName:  qs.GetPolicyName(),
+				PolicyHash:  qs.GetPolicyHash(),
+				ComponentId: qs.GetComponentId(),
+				Dropped:     dropped,
+				Reason:      reason,
+				Details: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_{
+					QuotaSchedulerInfo: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo{
+						Label:         label,
+						SchedulerInfo: schedulerInfo,
+					},
 				},
 			},
 		}

@@ -19,7 +19,7 @@ from aperture_sdk.const import (
     source_label,
     workload_start_timestamp_label,
 )
-from aperture_sdk.flow import Flow, FlowResult
+from aperture_sdk.flow import Flow
 from aperture_sdk.utils import TWrappedReturn, run_fn
 from opentelemetry import baggage, trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -128,9 +128,7 @@ class ApertureClient:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
                 with self.start_flow(control_point, explicit_labels) as flow:
-                    if flow.result == FlowResult.Accepted or (
-                        fail_open and flow.result == FlowResult.Unreachable
-                    ):
+                    if flow.should_run():
                         return await run_fn(fn, *args, **kwargs)
                     else:
                         if on_reject:
