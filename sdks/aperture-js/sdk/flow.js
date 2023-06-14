@@ -25,8 +25,8 @@ export class Flow {
   }
 
   ShouldRun() {
-    decision = this.Decision();
-    return decision == FlowDecision.Accepted || (this.failOpen && decision == FlowDecision.Unreachable)
+    var decision = this.Decision();
+    return decision === FlowDecision.Accepted || (this.failOpen && decision === FlowDecision.Unreachable)
   }
 
   DisableFailOpen() {
