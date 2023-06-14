@@ -1,6 +1,6 @@
 # Generated values file for dashboards/flow-control/load-ramp blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/dashboards/flow-control/load-ramp
+# https://docs.fluxninja.com/reference/blueprints/ dashboards/flow-control/load-ramp
 
 policy:
   # Name of the policy.

@@ -1,16 +1,64 @@
 ---
-title: Service Protection Based on PromQL Query
-keywords:
-  - blueprints
-sidebar_position: 3
-sidebar_label: Service Protection Based on PromQL Query
+title: Service Protection with Average Latency Feedback
 ---
+
+## Introduction
+
+This policy detects traffic overloads and cascading failure build-up by
+comparing the real-time latency with its exponential moving average. A gradient
+controller calculates a proportional response to limit accepted concurrency. The
+concurrency is reduced by a multiplicative factor when the service is
+overloaded, and increased by an additive factor while the service is no longer
+overloaded.
+
+At a high level, this policy works as follows:
+
+- Latency EMA-based overload detection: A Flux Meter is used to gather latency
+  metrics from a [service control point](/concepts/flow-control/selector.md).
+  The latency signal gets fed into an Exponential Moving Average (EMA) component
+  to establish a long-term trend that can be compared to the current latency to
+  detect overloads.
+- Gradient Controller: Set point latency and current latency signals are fed to
+  the gradient controller that calculates the proportional response to adjust
+  the accepted concurrency (Control Variable).
+- Integral Optimizer: When the service is detected to be in the normal state, an
+  integral optimizer is used to additively increase the concurrency of the
+  service in each execution cycle of the circuit. This design allows warming-up
+  a service from an initial inactive state. This also protects applications from
+  sudden spikes in traffic, as it sets an upper bound to the concurrency allowed
+  on a service in each execution cycle of the circuit based on the observed
+  incoming concurrency.
+- Load Scheduler and Actuator: The Accepted Concurrency at the service is
+  throttled by a
+  [weighted-fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md).
+  The output of the adjustments to accepted concurrency made by gradient
+  controller and optimizer logic are translated to a load multiplier that is
+  synchronized with Aperture Agents through etcd. The load multiplier adjusts
+  (increases or decreases) the token bucket fill rates based on the incoming
+  concurrency observed at each agent.
+
+:::info
+
+Please see reference for the
+[`AdaptiveLoadScheduler`](/reference/configuration/spec.md#adaptive-load-scheduler)
+component that is used within this blueprint.
+
+:::
+
+:::info
+
+See tutorials on
+[Basic Service Protection](/use-cases/service-protection/protection.md) and
+[Workload Prioritization](/use-cases/service-protection/prioritization.md) to
+see this blueprint in use.
+
+:::
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration
@@ -18,7 +66,7 @@ import {ParameterDescription} from '../../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/service-protection/promql`}>policies/service-protection/promql</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/service-protection/average-latency`}>policies/service-protection/average-latency</a>
 
 <!-- vale on -->
 
@@ -37,20 +85,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 <ParameterDescription
     name='policy.policy_name'
     description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-promql-query"></a>
-
-<ParameterDescription
-    name='policy.promql_query'
-    description='PromQL query.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -96,20 +130,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='string'
     reference=''
     value='"1s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-setpoint"></a>
-
-<ParameterDescription
-    name='policy.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -268,6 +288,68 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Number (double)'
     reference=''
     value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.latency_baseliner {#policy-latency-baseliner}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-latency-baseliner-flux-meter"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.flux_meter'
+    description='Flux Meter defines the scope of latency measurements.'
+    type='Object (aperture.spec.v1.FluxMeter)'
+    reference='../../../spec#flux-meter'
+    value='{"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-latency-baseliner-ema"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.ema'
+    description='EMA parameters.'
+    type='Object (aperture.spec.v1.EMAParameters)'
+    reference='../../../spec#e-m-a-parameters'
+    value='{"correction_factor_on_max_envelope_violation": 0.95, "ema_window": "1500s", "warmup_window": "60s"}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-latency-baseliner-latency-tolerance-multiplier"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.latency_tolerance_multiplier'
+    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.'
+    type='Number (double)'
+    reference=''
+    value='1.1'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-latency-baseliner-latency-ema-limit-multiplier"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.latency_ema_limit_multiplier'
+    description='Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.'
+    type='Number (double)'
+    reference=''
+    value='2'
 />
 
 <!-- vale on -->

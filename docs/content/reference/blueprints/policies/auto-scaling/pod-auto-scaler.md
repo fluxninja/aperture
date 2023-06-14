@@ -11,16 +11,16 @@ PromQL queries for scale-in and scale-out.
 :::info
 
 Please see reference for the
-[`AutoScale`](/reference/policies/spec.md#auto-scale) component that is used
-within this blueprint.
+[`AutoScale`](/reference/configuration/spec.md#auto-scale) component that is
+used within this blueprint.
 
 :::
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration

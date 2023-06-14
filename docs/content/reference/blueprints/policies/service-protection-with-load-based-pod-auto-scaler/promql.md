@@ -10,8 +10,8 @@ sidebar_label:
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration
@@ -33,7 +33,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     name='policy'
     description='Configuration for the Service Protection policy.'
     type='Object (policies/service-protection/promql:param:policy)'
-    reference='../../../bundled-blueprints/policies/service-protection/promql#policy'
+    reference='../../../blueprints/policies/service-protection/promql#policy'
     value='{"auto_scaling": {"dry_run": false, "periodic_decrease": {"period": "60s", "scale_in_percentage": 10}, "promql_scale_in_controllers": [], "promql_scale_out_controllers": [], "scaling_backend": {"kubernetes_replicas": {"kubernetes_object_selector": "__REQUIRED_FIELD__", "max_replicas": "__REQUIRED_FIELD__", "min_replicas": "__REQUIRED_FIELD__"}}, "scaling_parameters": {"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}}, "components": [], "evaluation_interval": "1s", "policy_name": "__REQUIRED_FIELD__", "promql_query": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "service_protection_core": {"adaptive_load_scheduler": {"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.0025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}, "dry_run": false, "overload_confirmations": []}, "setpoint": "__REQUIRED_FIELD__"}'
 />
 
@@ -49,7 +49,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     name='dashboard'
     description='Configuration for the Grafana dashboard accompanying this policy.'
     type='Object (policies/service-protection/promql:param:dashboard)'
-    reference='../../../bundled-blueprints/policies/service-protection/promql#dashboard'
+    reference='../../../blueprints/policies/service-protection/promql#dashboard'
     value='{"datasource": {"filter_regex": "", "name": "$datasource"}, "extra_filters": {}, "refresh_interval": "15s", "time_from": "now-15m", "time_to": "now", "title": "Aperture Service Protection", "variant_name": "PromQL Output"}'
 />
 

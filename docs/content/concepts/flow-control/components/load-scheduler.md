@@ -12,9 +12,9 @@ sidebar_position: 6
 :::info
 
 See also
-[_Adaptive Load Scheduler_ reference](/reference/policies/spec.md#adaptive-load-scheduler)
+[_Adaptive Load Scheduler_ reference](/reference/configuration/spec.md#adaptive-load-scheduler)
 and
-[_Load Scheduler_ reference](/reference/policies/spec.md#adaptive-load-scheduler).
+[_Load Scheduler_ reference](/reference/configuration/spec.md#adaptive-load-scheduler).
 
 :::
 
@@ -87,7 +87,8 @@ response times, arrival rate, and the number of requests in the system
 (concurrency). Aperture can automatically estimate the tokens for each workload
 based on historical latency measurements. See the
 `workload_latency_based_tokens`
-[configuration](/reference/policies/spec.md#load-scheduler) for more details.
+[configuration](/reference/configuration/spec.md#load-scheduler) for more
+details.
 
 Alternatively, tokens can also be represented as the number of requests instead
 of response times. For example, when scheduling access to external APIs that
@@ -100,7 +101,7 @@ Tokens are determined in the following order of precedence:
 - Specified in the flow labels.
 - Specified in the `Workload.tokens` setting.
 - Estimated tokens (see
-  [`workload_latency_based_tokens`](/reference/policies/spec.md#load-scheduler)
+  [`workload_latency_based_tokens`](/reference/configuration/spec.md#load-scheduler)
   setting).
 
 ### Token rate {#token-rate}

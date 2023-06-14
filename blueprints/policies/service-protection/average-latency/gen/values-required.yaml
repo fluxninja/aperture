@@ -1,6 +1,6 @@
 # Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
+# https://docs.fluxninja.com/reference/blueprints/ policies/service-protection/average-latency
 
 policy:
   # Name of the policy.

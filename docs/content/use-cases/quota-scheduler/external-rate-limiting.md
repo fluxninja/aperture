@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Quota Scheduler](/reference/policies/bundled-blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
+[Quota Scheduler](/reference/blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
 blueprint.
 
 :::
@@ -30,7 +30,7 @@ makes applications cost-aware, ensuring that they operate within assigned quota
 limits to prevent cost overruns. Workload priorities might differ based on the
 application, and maintaining prioritized access for critical workloads during
 external rate limiting is of paramount importance. The policy leverages the
-[`Quota Scheduler`](/reference/policies/bundled-blueprints/policies/quota-scheduler.md)
+[`Quota Scheduler`](/reference/blueprints/policies/quota-scheduler.md)
 Blueprint, which brings together the token bucket rate limiting and a
 [Weighted Fair Queuing (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
 based Workload Scheduler to balance quota limits and priority-based access

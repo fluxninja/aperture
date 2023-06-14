@@ -1,12 +1,12 @@
 ---
-title: Quota scheduler
+title: Auto scale
 ---
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../apertureVersion.js'
+import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
@@ -14,7 +14,7 @@ import {ParameterDescription} from '../../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/flow-control/quota-scheduler`}>dashboards/flow-control/quota-scheduler</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/auto-scale`}>dashboards/auto-scale</a>
 
 <!-- vale on -->
 
@@ -113,21 +113,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
     description='Name of the main dashboard.'
     type='string'
     reference=''
-    value='"Aperture Quota Scheduler"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="dashboard-variant-name"></a>
-
-<ParameterDescription
-    name='dashboard.variant_name'
-    description='Name of the dashboard variant.'
-    type='string'
-    reference=''
-    value='""'
+    value='"Aperture Auto-scale"'
 />
 
 <!-- vale on -->

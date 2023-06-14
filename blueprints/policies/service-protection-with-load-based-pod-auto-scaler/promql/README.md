@@ -1,1 +1,1 @@
-[Documentation](https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection-with-load-based-pod-auto-scaler/promql)
+[Documentation](https://docs.fluxninja.com/reference/blueprints/policies/service-protection-with-load-based-pod-auto-scaler/promql)
