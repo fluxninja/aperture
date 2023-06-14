@@ -1146,7 +1146,7 @@ workflows:
           docker-context: .
           dockerfile: cmd/aperture-agent/Dockerfile
           use-docker-layer-caching: true
-          resource-class: large
+          resource-class: medium
       - update-environment:
           filters:
             branches:
@@ -1167,7 +1167,7 @@ workflows:
           docker-context: .
           dockerfile: cmd/aperture-controller/Dockerfile
           use-docker-layer-caching: true
-          resource-class: large
+          resource-class: medium
       - update-environment:
           filters:
             branches:
