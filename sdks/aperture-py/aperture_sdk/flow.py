@@ -13,7 +13,7 @@ from google.protobuf import json_format
 from opentelemetry import trace
 
 
-class FlowResult(enum.Enum):
+class FlowDecision(enum.Enum):
     Accepted = enum.auto()
     Rejected = enum.auto()
     Unreachable = enum.auto()
@@ -33,28 +33,41 @@ class Flow(AbstractContextManager):
     ):
         self._span = span
         self._check_response = check_response
+        self._status_code = FlowStatus.OK
         self._ended = False
+        self._fail_open = True
+
+    def should_run(self) -> bool:
+        return self.decision == FlowDecision.Accepted or (
+            self._fail_open and self.decision == FlowDecision.Unreachable
+        )
+
+    def disable_fail_open(self) -> None:
+        self._fail_open = False
 
     @property
-    def result(self) -> FlowResult:
+    def decision(self) -> FlowDecision:
         if self.check_response is None:
-            return FlowResult.Unreachable
+            return FlowDecision.Unreachable
         if (
             self.check_response.decision_type
             == check_pb2.CheckResponse.DECISION_TYPE_ACCEPTED
         ):
-            return FlowResult.Accepted
-        return FlowResult.Rejected
+            return FlowDecision.Accepted
+        return FlowDecision.Rejected
 
     @property
     def success(self) -> bool:
-        return self.result != FlowResult.Unreachable
+        return self.decision != FlowDecision.Unreachable
 
     @property
     def check_response(self) -> Optional[check_pb2.CheckResponse]:
         return self._check_response
 
-    def end(self, status_code: FlowStatus) -> None:
+    def set_status(self, status_code: FlowStatus) -> None:
+        self._status_code = status_code
+
+    def end(self) -> None:
         if self._ended:
             raise ValueError("flow already ended")
         self._ended = True
@@ -66,7 +79,7 @@ class Flow(AbstractContextManager):
         )
         self._span.set_attributes(
             {
-                flow_status_label: status_code.name,
+                flow_status_label: self._status_code.name,
                 check_response_label: check_response_json,
                 flow_end_timestamp_label: time.monotonic_ns(),
             }
@@ -80,6 +93,5 @@ class Flow(AbstractContextManager):
         if self._ended:
             return
         if exc_type is not None:
-            self.end(FlowStatus.Error)
-        else:
-            self.end(FlowStatus.OK)
+            self.set_status(FlowStatus.Error)
+        self.end()

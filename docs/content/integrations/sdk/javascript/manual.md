@@ -33,13 +33,13 @@ var labelsMap = new Map().set("key", "value");
 apertureClient
   .StartFlow("feature-name", labelsMap)
   .then((flow) => {
-    if (flow.Result() != FlowResult.Rejected) {
+    if (flow.ShouldRun()) {
       // Do actual work
-      flow.End(FlowStatus.Ok);
     } else {
       // handle flow rejection by Aperture Agent
-      flow.End(FlowStatus.Error);
+      flow.SetStatus(FlowStatus.Error);
     }
+    flow.End();
   })
   .catch((e) => {
     console.log(e);

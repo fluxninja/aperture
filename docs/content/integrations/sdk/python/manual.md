@@ -43,12 +43,12 @@ The created instance can then be used to start a flow:
         logger.info("Flow check failed - will fail-open")
 
     # See whether flow was accepted by Aperture Agent.
-    if flow.result != FlowResult.Rejected:
+    if flow.should_run():
         # do actual work
-        flow.end(FlowStatus.OK)
     else:
         # handle flow rejection by Aperture Agent
-        flow.end(FlowStatus.Error)
+        flow.set_status(FlowStatus.Error)
+    flow.end()
 ```
 
 You can also use the flow as a context manager:
@@ -58,7 +58,7 @@ You can also use the flow as a context manager:
     control_point="AwesomeFeature",
     explicit_labels=labels,
   ) as flow:
-    if flow.result != FlowResult.Rejected:
+    if flow.should_run():
       # do actual work
       # if you do not call flow.end() explicitly, it will be called automatically
       # when the context manager exits - with the status of the flow
