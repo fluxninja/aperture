@@ -116,6 +116,7 @@ func (gtb *GlobalTokenBucket) Close() error {
 // If an error occurred it returns true, 0, 0 and 0 (fail open).
 // It also may return the wait time at which the tokens will be available.
 func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
+	log.Info().Msg("GlobalTokenBucket.TakeIfAvailable")
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
 	}

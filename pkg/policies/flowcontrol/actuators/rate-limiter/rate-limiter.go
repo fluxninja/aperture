@@ -390,6 +390,7 @@ func (rl *rateLimiter) TakeIfAvailable(
 	}
 
 	ok, waitTime, remaining, current = rl.limiter.TakeIfAvailable(ctx, label, n)
+	log.Info().Dur("waitTime", waitTime).Bool("ok", ok).Msg("rl.TakeIfAvailable")
 	return
 }
 
