@@ -355,7 +355,7 @@ func (wsFactory *Factory) NewScheduler(
 // Decide processes a single flow by load scheduler in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority uint64
 	var matchedWorkloadIndex string
@@ -438,15 +438,17 @@ func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) *flowc
 		tokensConsumed = req.Tokens
 	}
 
-	return &flowcontrolv1.LimiterDecision{
-		PolicyName:  s.component.GetPolicyName(),
-		PolicyHash:  s.component.GetPolicyHash(),
-		ComponentId: s.component.GetComponentId(),
-		Dropped:     !accepted,
-		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
-			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
-				WorkloadIndex:  matchedWorkloadIndex,
-				TokensConsumed: tokensConsumed,
+	return iface.LimiterDecision{
+		LimiterDecision: &flowcontrolv1.LimiterDecision{
+			PolicyName:  s.component.GetPolicyName(),
+			PolicyHash:  s.component.GetPolicyHash(),
+			ComponentId: s.component.GetComponentId(),
+			Dropped:     !accepted,
+			Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+				LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
+					WorkloadIndex:  matchedWorkloadIndex,
+					TokensConsumed: tokensConsumed,
+				},
 			},
 		},
 	}

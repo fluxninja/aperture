@@ -386,4 +386,34 @@ java.lang.String defaultValue);
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecisionOrBuilder getLimiterDecisionsOrBuilder(
       int index);
+
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   * @return Whether the waitTime field is set.
+   */
+  boolean hasWaitTime();
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   * @return The waitTime.
+   */
+  com.google.protobuf.Duration getWaitTime();
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   */
+  com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder();
 }
