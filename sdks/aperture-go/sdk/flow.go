@@ -58,10 +58,7 @@ func (f *flow) Decision() FlowDecision {
 // By default, fail-open behavior is enabled. Use DisableFailOpen to disable it.
 func (f *flow) ShouldRun() bool {
 	var decision = f.Decision()
-	if decision == Accepted || (f.failOpen && decision == Unreachable) {
-		return true
-	}
-	return false
+	return decision == Accepted || (f.failOpen && decision == Unreachable)
 }
 
 func (f *flow) DisableFailOpen() {

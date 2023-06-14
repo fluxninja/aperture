@@ -16,7 +16,7 @@ import {
 } from "./consts.js";
 import {
   Flow,
-  FlowResult
+  FlowDecision
 } from "./flow.js";
 import { fcs } from "./utils.js";
 
