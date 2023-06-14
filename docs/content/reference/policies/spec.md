@@ -2715,16 +2715,16 @@ _Rate Limiter_ provides service protection by applying rate limits using the
 token bucket algorithm.
 
 </dd>
-<dt>regulator</dt>
+<dt>sampler</dt>
 <dd>
 
 <!-- vale off -->
 
-([Regulator](#regulator))
+([Sampler](#sampler))
 
 <!-- vale on -->
 
-Regulator is a component that regulates the flow of requests to the service by
+Sampler is a component that regulates the flow of requests to the service by
 allowing only the specified percentage of requests or sticky sessions.
 
 </dd>
@@ -4327,7 +4327,7 @@ previous step's `target_accept_percentage` to the next
 
 <!-- vale on -->
 
-Specify certain label values to be always accepted by the _Regulator_ regardless
+Specify certain label values to be always accepted by the _Sampler_ regardless
 of accept percentage.
 
 </dd>
@@ -4457,16 +4457,16 @@ generation.
 Parameters for the _Load Ramp_ component.
 
 <dl>
-<dt>regulator</dt>
+<dt>sampler</dt>
 <dd>
 
 <!-- vale off -->
 
-([RegulatorParameters](#regulator-parameters))
+([SamplerParameters](#sampler-parameters))
 
 <!-- vale on -->
 
-Parameters for the _Regulator_.
+Parameters for the _Sampler_.
 
 </dd>
 <dt>steps</dt>
@@ -6392,141 +6392,6 @@ for sensitive labels.
 
 <!-- vale off -->
 
-### Regulator {#regulator}
-
-<!-- vale on -->
-
-_Regulator_ is a component that regulates the load at a
-[_Control Point_](/concepts/control-point.md) by allowing only a specified
-percentage of flows at random or by sticky sessions.
-
-:::info
-
-See also [\_Load Regulator overview](/concepts/regulator.md).
-
-:::
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([RegulatorIns](#regulator-ins))
-
-<!-- vale on -->
-
-Input ports for the _Regulator_.
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([RegulatorParameters](#regulator-parameters))
-
-<!-- vale on -->
-
-Parameters for the _Regulator_.
-
-</dd>
-<dt>pass_through_label_values</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-Specify certain label values to be always accepted by this _Regulator_
-regardless of accept percentage.
-
-</dd>
-<dt>pass_through_label_values_config_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Configuration key for setting pass through label values through dynamic
-configuration.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RegulatorIns {#regulator-ins}
-
-<!-- vale on -->
-
-<dl>
-<dt>accept_percentage</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-The percentage of requests to accept.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RegulatorParameters {#regulator-parameters}
-
-<!-- vale on -->
-
-<dl>
-<dt>label_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-The flow label key for identifying sessions.
-
-- When label key is specified, _Regulator_ acts as a sticky filter. The series
-  of flows with the same value of label key get the same decision provided that
-  the `accept_percentage` is same or higher.
-- When label key is not specified, _Regulator_ acts as a stateless filter.
-  Percentage of flows are selected randomly for rejection.
-
-</dd>
-<dt>selectors</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]Selector](#selector), **required**)
-
-<!-- vale on -->
-
-Selectors for the component.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### Resources {#resources}
 
 <!-- vale on -->
@@ -6756,6 +6621,141 @@ Window of time over which the moving average is computed.
 <!-- vale on -->
 
 Whether the output is valid during the warm-up stage.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### Sampler {#sampler}
+
+<!-- vale on -->
+
+_Sampler_ is a component that regulates the load at a
+[_Control Point_](/concepts/selector.md/#control-point) by allowing only a
+specified percentage of flows at random or by sticky sessions.
+
+:::info
+
+See also [_Sampler_ overview](/concepts/sampler.md).
+
+:::
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([SamplerIns](#sampler-ins))
+
+<!-- vale on -->
+
+Input ports for the _Sampler_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([SamplerParameters](#sampler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Sampler_.
+
+</dd>
+<dt>pass_through_label_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+Specify certain label values to be always accepted by this _Sampler_ regardless
+of accept percentage.
+
+</dd>
+<dt>pass_through_label_values_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting pass through label values through dynamic
+configuration.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SamplerIns {#sampler-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The percentage of requests to accept.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### SamplerParameters {#sampler-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The flow label key for identifying sessions.
+
+- When label key is specified, _Sampler_ acts as a sticky filter. The series of
+  flows with the same value of label key get the same decision provided that the
+  `accept_percentage` is same or higher.
+- When label key is not specified, _Sampler_ acts as a stateless filter.
+  Percentage of flows are selected randomly for rejection.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+Selectors for the component.
 
 </dd>
 </dl>
@@ -7044,8 +7044,8 @@ Parameters associated with flows matching the label matcher.
 
 <!-- vale on -->
 
-Parameters such as priority, tokens and fairness key that are applicable to
-flows within a workload.
+Parameters such as priority and tokens that are applicable to flows within a
+workload.
 
 <dl>
 <dt>fairness_key</dt>
@@ -7068,17 +7068,21 @@ set `fairness_key = "user"`.
 
 <!-- vale off -->
 
-(int64, minimum: `0`, maximum: `255`, default: `0`)
+(string, default: `"1"`)
 
 <!-- vale on -->
 
-Describes priority level of the flows within the workload. Priority level ranges
-from 0 to 255. Higher numbers means higher priority level. Priority levels have
-non-linear effect on the workload scheduling. The following formula is used to
-determine the position of a flow in the queue based on virtual finish time:
+Describes priority level of the flows within the workload. Priority level is
+unbounded and can be any positive integer. Higher numbers means higher priority
+level. The following formula is used to determine the position of a flow in the
+queue based on virtual finish time:
 
 $$
-\text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+$$
+
+$$
+virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
 $$
 
 </dd>

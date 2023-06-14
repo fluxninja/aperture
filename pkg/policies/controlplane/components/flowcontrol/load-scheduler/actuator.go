@@ -6,6 +6,7 @@ import (
 	"math"
 	"path"
 
+	prometheusmodel "github.com/prometheus/common/model"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -23,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
-	prometheusmodel "github.com/prometheus/common/model"
 )
 
 // Actuator struct.
@@ -150,7 +150,6 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 	}
 
 	tokensByWorkload := make(map[string]uint64)
-
 	if la.tokensQuery != nil {
 		taggedResult, err := la.tokensQuery.ExecuteTaggedQuery(tickInfo)
 		if err != nil {
@@ -184,7 +183,6 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 
 	var lm float64
 	var pt bool
-
 	lmValue := inPortReadings.ReadSingleReadingPort("load_multiplier")
 	if !lmValue.Valid() {
 		pt = true

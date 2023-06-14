@@ -404,7 +404,7 @@ func (m *FlowControl) validate(all bool) error {
 			}
 		}
 
-	case *FlowControl_Regulator:
+	case *FlowControl_Sampler:
 		if v == nil {
 			err := FlowControlValidationError{
 				field:  "Component",
@@ -417,11 +417,11 @@ func (m *FlowControl) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetRegulator()).(type) {
+			switch v := interface{}(m.GetSampler()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "Regulator",
+						field:  "Sampler",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -429,16 +429,16 @@ func (m *FlowControl) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, FlowControlValidationError{
-						field:  "Regulator",
+						field:  "Sampler",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetRegulator()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetSampler()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FlowControlValidationError{
-					field:  "Regulator",
+					field:  "Sampler",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1638,22 +1638,21 @@ var _ interface {
 	ErrorName() string
 } = AdaptiveLoadSchedulerValidationError{}
 
-// Validate checks the field values on Regulator with the rules defined in the
+// Validate checks the field values on Sampler with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *Regulator) Validate() error {
+func (m *Sampler) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Regulator with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in RegulatorMultiError, or nil
-// if none found.
-func (m *Regulator) ValidateAll() error {
+// ValidateAll checks the field values on Sampler with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SamplerMultiError, or nil if none found.
+func (m *Sampler) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Regulator) validate(all bool) error {
+func (m *Sampler) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1664,7 +1663,7 @@ func (m *Regulator) validate(all bool) error {
 		switch v := interface{}(m.GetInPorts()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegulatorValidationError{
+				errors = append(errors, SamplerValidationError{
 					field:  "InPorts",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1672,7 +1671,7 @@ func (m *Regulator) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, RegulatorValidationError{
+				errors = append(errors, SamplerValidationError{
 					field:  "InPorts",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1681,7 +1680,7 @@ func (m *Regulator) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return RegulatorValidationError{
+			return SamplerValidationError{
 				field:  "InPorts",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -1693,7 +1692,7 @@ func (m *Regulator) validate(all bool) error {
 		switch v := interface{}(m.GetParameters()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegulatorValidationError{
+				errors = append(errors, SamplerValidationError{
 					field:  "Parameters",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1701,7 +1700,7 @@ func (m *Regulator) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, RegulatorValidationError{
+				errors = append(errors, SamplerValidationError{
 					field:  "Parameters",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1710,7 +1709,7 @@ func (m *Regulator) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return RegulatorValidationError{
+			return SamplerValidationError{
 				field:  "Parameters",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -1721,18 +1720,18 @@ func (m *Regulator) validate(all bool) error {
 	// no validation rules for PassThroughLabelValuesConfigKey
 
 	if len(errors) > 0 {
-		return RegulatorMultiError(errors)
+		return SamplerMultiError(errors)
 	}
 
 	return nil
 }
 
-// RegulatorMultiError is an error wrapping multiple validation errors returned
-// by Regulator.ValidateAll() if the designated constraints aren't met.
-type RegulatorMultiError []error
+// SamplerMultiError is an error wrapping multiple validation errors returned
+// by Sampler.ValidateAll() if the designated constraints aren't met.
+type SamplerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m RegulatorMultiError) Error() string {
+func (m SamplerMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1741,11 +1740,11 @@ func (m RegulatorMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m RegulatorMultiError) AllErrors() []error { return m }
+func (m SamplerMultiError) AllErrors() []error { return m }
 
-// RegulatorValidationError is the validation error returned by
-// Regulator.Validate if the designated constraints aren't met.
-type RegulatorValidationError struct {
+// SamplerValidationError is the validation error returned by Sampler.Validate
+// if the designated constraints aren't met.
+type SamplerValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1753,22 +1752,22 @@ type RegulatorValidationError struct {
 }
 
 // Field function returns field value.
-func (e RegulatorValidationError) Field() string { return e.field }
+func (e SamplerValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e RegulatorValidationError) Reason() string { return e.reason }
+func (e SamplerValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e RegulatorValidationError) Cause() error { return e.cause }
+func (e SamplerValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e RegulatorValidationError) Key() bool { return e.key }
+func (e SamplerValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e RegulatorValidationError) ErrorName() string { return "RegulatorValidationError" }
+func (e SamplerValidationError) ErrorName() string { return "SamplerValidationError" }
 
 // Error satisfies the builtin error interface
-func (e RegulatorValidationError) Error() string {
+func (e SamplerValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1780,14 +1779,14 @@ func (e RegulatorValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRegulator.%s: %s%s",
+		"invalid %sSampler.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = RegulatorValidationError{}
+var _ error = SamplerValidationError{}
 
 var _ interface {
 	Field() string
@@ -1795,7 +1794,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = RegulatorValidationError{}
+} = SamplerValidationError{}
 
 // Validate checks the field values on LoadRamp with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -5537,22 +5536,22 @@ var _ interface {
 	ErrorName() string
 } = AdaptiveLoadScheduler_OutsValidationError{}
 
-// Validate checks the field values on Regulator_Parameters with the rules
+// Validate checks the field values on Sampler_Parameters with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *Regulator_Parameters) Validate() error {
+func (m *Sampler_Parameters) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Regulator_Parameters with the rules
+// ValidateAll checks the field values on Sampler_Parameters with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// Regulator_ParametersMultiError, or nil if none found.
-func (m *Regulator_Parameters) ValidateAll() error {
+// Sampler_ParametersMultiError, or nil if none found.
+func (m *Sampler_Parameters) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Regulator_Parameters) validate(all bool) error {
+func (m *Sampler_Parameters) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -5568,7 +5567,7 @@ func (m *Regulator_Parameters) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, Regulator_ParametersValidationError{
+					errors = append(errors, Sampler_ParametersValidationError{
 						field:  fmt.Sprintf("Selectors[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -5576,7 +5575,7 @@ func (m *Regulator_Parameters) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, Regulator_ParametersValidationError{
+					errors = append(errors, Sampler_ParametersValidationError{
 						field:  fmt.Sprintf("Selectors[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -5585,7 +5584,7 @@ func (m *Regulator_Parameters) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return Regulator_ParametersValidationError{
+				return Sampler_ParametersValidationError{
 					field:  fmt.Sprintf("Selectors[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5596,19 +5595,19 @@ func (m *Regulator_Parameters) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return Regulator_ParametersMultiError(errors)
+		return Sampler_ParametersMultiError(errors)
 	}
 
 	return nil
 }
 
-// Regulator_ParametersMultiError is an error wrapping multiple validation
-// errors returned by Regulator_Parameters.ValidateAll() if the designated
-// constraints aren't met.
-type Regulator_ParametersMultiError []error
+// Sampler_ParametersMultiError is an error wrapping multiple validation errors
+// returned by Sampler_Parameters.ValidateAll() if the designated constraints
+// aren't met.
+type Sampler_ParametersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m Regulator_ParametersMultiError) Error() string {
+func (m Sampler_ParametersMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -5617,11 +5616,11 @@ func (m Regulator_ParametersMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m Regulator_ParametersMultiError) AllErrors() []error { return m }
+func (m Sampler_ParametersMultiError) AllErrors() []error { return m }
 
-// Regulator_ParametersValidationError is the validation error returned by
-// Regulator_Parameters.Validate if the designated constraints aren't met.
-type Regulator_ParametersValidationError struct {
+// Sampler_ParametersValidationError is the validation error returned by
+// Sampler_Parameters.Validate if the designated constraints aren't met.
+type Sampler_ParametersValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -5629,24 +5628,24 @@ type Regulator_ParametersValidationError struct {
 }
 
 // Field function returns field value.
-func (e Regulator_ParametersValidationError) Field() string { return e.field }
+func (e Sampler_ParametersValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e Regulator_ParametersValidationError) Reason() string { return e.reason }
+func (e Sampler_ParametersValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e Regulator_ParametersValidationError) Cause() error { return e.cause }
+func (e Sampler_ParametersValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e Regulator_ParametersValidationError) Key() bool { return e.key }
+func (e Sampler_ParametersValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e Regulator_ParametersValidationError) ErrorName() string {
-	return "Regulator_ParametersValidationError"
+func (e Sampler_ParametersValidationError) ErrorName() string {
+	return "Sampler_ParametersValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e Regulator_ParametersValidationError) Error() string {
+func (e Sampler_ParametersValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -5658,14 +5657,14 @@ func (e Regulator_ParametersValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRegulator_Parameters.%s: %s%s",
+		"invalid %sSampler_Parameters.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = Regulator_ParametersValidationError{}
+var _ error = Sampler_ParametersValidationError{}
 
 var _ interface {
 	Field() string
@@ -5673,24 +5672,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = Regulator_ParametersValidationError{}
+} = Sampler_ParametersValidationError{}
 
-// Validate checks the field values on Regulator_Ins with the rules defined in
+// Validate checks the field values on Sampler_Ins with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *Regulator_Ins) Validate() error {
+func (m *Sampler_Ins) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Regulator_Ins with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in Regulator_InsMultiError, or
+// ValidateAll checks the field values on Sampler_Ins with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in Sampler_InsMultiError, or
 // nil if none found.
-func (m *Regulator_Ins) ValidateAll() error {
+func (m *Sampler_Ins) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Regulator_Ins) validate(all bool) error {
+func (m *Sampler_Ins) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -5701,7 +5700,7 @@ func (m *Regulator_Ins) validate(all bool) error {
 		switch v := interface{}(m.GetAcceptPercentage()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Regulator_InsValidationError{
+				errors = append(errors, Sampler_InsValidationError{
 					field:  "AcceptPercentage",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5709,7 +5708,7 @@ func (m *Regulator_Ins) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, Regulator_InsValidationError{
+				errors = append(errors, Sampler_InsValidationError{
 					field:  "AcceptPercentage",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5718,7 +5717,7 @@ func (m *Regulator_Ins) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetAcceptPercentage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return Regulator_InsValidationError{
+			return Sampler_InsValidationError{
 				field:  "AcceptPercentage",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -5727,19 +5726,18 @@ func (m *Regulator_Ins) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return Regulator_InsMultiError(errors)
+		return Sampler_InsMultiError(errors)
 	}
 
 	return nil
 }
 
-// Regulator_InsMultiError is an error wrapping multiple validation errors
-// returned by Regulator_Ins.ValidateAll() if the designated constraints
-// aren't met.
-type Regulator_InsMultiError []error
+// Sampler_InsMultiError is an error wrapping multiple validation errors
+// returned by Sampler_Ins.ValidateAll() if the designated constraints aren't met.
+type Sampler_InsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m Regulator_InsMultiError) Error() string {
+func (m Sampler_InsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -5748,11 +5746,11 @@ func (m Regulator_InsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m Regulator_InsMultiError) AllErrors() []error { return m }
+func (m Sampler_InsMultiError) AllErrors() []error { return m }
 
-// Regulator_InsValidationError is the validation error returned by
-// Regulator_Ins.Validate if the designated constraints aren't met.
-type Regulator_InsValidationError struct {
+// Sampler_InsValidationError is the validation error returned by
+// Sampler_Ins.Validate if the designated constraints aren't met.
+type Sampler_InsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -5760,22 +5758,22 @@ type Regulator_InsValidationError struct {
 }
 
 // Field function returns field value.
-func (e Regulator_InsValidationError) Field() string { return e.field }
+func (e Sampler_InsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e Regulator_InsValidationError) Reason() string { return e.reason }
+func (e Sampler_InsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e Regulator_InsValidationError) Cause() error { return e.cause }
+func (e Sampler_InsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e Regulator_InsValidationError) Key() bool { return e.key }
+func (e Sampler_InsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e Regulator_InsValidationError) ErrorName() string { return "Regulator_InsValidationError" }
+func (e Sampler_InsValidationError) ErrorName() string { return "Sampler_InsValidationError" }
 
 // Error satisfies the builtin error interface
-func (e Regulator_InsValidationError) Error() string {
+func (e Sampler_InsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -5787,14 +5785,14 @@ func (e Regulator_InsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRegulator_Ins.%s: %s%s",
+		"invalid %sSampler_Ins.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = Regulator_InsValidationError{}
+var _ error = Sampler_InsValidationError{}
 
 var _ interface {
 	Field() string
@@ -5802,7 +5800,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = Regulator_InsValidationError{}
+} = Sampler_InsValidationError{}
 
 // Validate checks the field values on LoadRamp_Parameters with the rules
 // defined in the proto definition for this message. If any rules are
@@ -5827,11 +5825,11 @@ func (m *LoadRamp_Parameters) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetRegulator()).(type) {
+		switch v := interface{}(m.GetSampler()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, LoadRamp_ParametersValidationError{
-					field:  "Regulator",
+					field:  "Sampler",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -5839,16 +5837,16 @@ func (m *LoadRamp_Parameters) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, LoadRamp_ParametersValidationError{
-					field:  "Regulator",
+					field:  "Sampler",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetRegulator()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetSampler()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return LoadRamp_ParametersValidationError{
-				field:  "Regulator",
+				field:  "Sampler",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

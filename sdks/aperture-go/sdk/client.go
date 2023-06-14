@@ -129,7 +129,7 @@ func LabelsFromCtx(ctx context.Context) map[string]string {
 // StartFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
-// The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
+// The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
 func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string) (Flow, error) {
 	// if c.timeout is not 0, then create a new context with timeout
 	if c.timeout != 0 {
@@ -152,9 +152,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 
 	span := c.getSpan(ctx)
 
-	f := &flow{
-		span: span,
-	}
+	f := newFlow(span)
 
 	res, err := c.flowControlClient.Check(ctx, req)
 	if err != nil {
@@ -173,16 +171,14 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 // StartHTTPFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolhttp.CheckHTTP call.
 // Return value is a HTTPFlow.
 // The call returns immediately in case connection with Aperture Agent is not established.
-// The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.Accepted() on returned HTTPFlow returns as true.
+// The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.ShouldRun() on returned HTTPFlow returns as true.
 func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *flowcontrolhttp.CheckHTTPRequest) (HTTPFlow, error) {
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
 	span := c.getSpan(ctx)
 
-	f := &httpflow{
-		span: span,
-	}
+	f := newHTTPFlow(span)
 
 	res, err := c.flowControlHTTPClient.CheckHTTP(ctx, request)
 	if err != nil {
@@ -212,19 +208,12 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 
 			flow, err := c.StartFlow(r.Context(), controlPoint, newLabels)
 			if err != nil {
-				c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
+				c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.ShouldRun()", flow.ShouldRun())
 			}
 
-			if flow.Accepted() {
+			if flow.ShouldRun() {
 				// Simulate work being done
 				next.ServeHTTP(w, r)
-				// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
-				// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
-				// The second argument is error message for further diagnosis.
-				err := flow.End(OK)
-				if err != nil {
-					c.log.Info("Aperture flow control end got error.", "error", err)
-				}
 			} else {
 				// TODO use HTTP Check and pull proper status
 				w.WriteHeader(http.StatusServiceUnavailable)
@@ -232,10 +221,13 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 				if err != nil {
 					c.log.Info("Aperture flow control end got error.", "error", err)
 				}
-				err = flow.End(OK)
-				if err != nil {
-					c.log.Info("Aperture flow control end got error.", "error", err)
-				}
+			}
+			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
+			// SetStatus() method of Flow object can be used to capture whether the Flow was successful or resulted in an error.
+			// If not set, status defaults to OK.
+			err = flow.End()
+			if err != nil {
+				c.log.Info("Aperture flow control end got error.", "error", err)
 			}
 		})
 	}
@@ -257,22 +249,22 @@ func (c *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[st
 
 		flow, err := c.StartFlow(ctx, controlPoint, labels)
 		if err != nil {
-			c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
+			c.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.ShouldRun()", flow.ShouldRun())
 		}
 
-		if flow.Accepted() {
+		if flow.ShouldRun() {
 			// Simulate work being done
 			resp, err := handler(ctx, req)
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
-			// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
-			// The second argument is error message for further diagnosis.
-			flowErr := flow.End(OK)
+			// SetStatus() method of Flow object can be used to capture whether the Flow was successful or resulted in an error.
+			// If not set, status defaults to OK.
+			flowErr := flow.End()
 			if flowErr != nil {
 				c.log.Info("Aperture flow control end got error.", "error", err)
 			}
 			return resp, err
 		} else {
-			err := flow.End(OK)
+			err := flow.End()
 			if err != nil {
 				c.log.Info("Aperture flow control end got error.", "error", err)
 			}

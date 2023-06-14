@@ -5,21 +5,21 @@ package aperture.policy.sync.v1;
 import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
 
-message RegulatorWrapper {
+message SamplerWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
-  //  Regulator
-  policy.language.v1.Regulator regulator = 2;
+  //  Sampler
+  policy.language.v1.Sampler sampler = 2;
 }
 
-message RegulatorDecisionWrapper {
+message SamplerDecisionWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
-  //  Regulator Decision
-  RegulatorDecision regulator_decision = 2;
+  //  Sampler Decision
+  SamplerDecision sampler_decision = 2;
 }
 
-message RegulatorDecision {
+message SamplerDecision {
   double accept_percentage = 1;
   // PassThroughLabelValues dynamic config.
   repeated string pass_through_label_values = 2;

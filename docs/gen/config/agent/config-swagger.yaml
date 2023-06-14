@@ -71,7 +71,9 @@ definitions:
                 x-go-tag-json: batch_prerollup
             disable_kubelet_scraper:
                 default: false
-                description: DisableKubeletScraper disables the default metrics collection for kubelet.
+                description: |-
+                    DisableKubeletScraper disables the default metrics collection for kubelet.
+                    Deprecated: kubelet scraper is removed entirely, so this flag makes no difference.
                 type: boolean
                 x-go-name: DisableKubeletScraper
                 x-go-tag-default: "false"

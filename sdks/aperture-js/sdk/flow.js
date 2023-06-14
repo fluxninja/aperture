@@ -9,7 +9,7 @@ export const FlowStatus = Object.freeze({
   Error: "Error",
 });
 
-export const FlowResult = Object.freeze({
+export const FlowDecision = Object.freeze({
   Accepted: "Accepted",
   Rejected: "Rejected",
   Unreachable: "Unreachable",
@@ -18,27 +18,42 @@ export const FlowResult = Object.freeze({
 export class Flow {
   constructor(span, checkResponse = null) {
     this.span = span;
-    this.ended = false;
     this.checkResponse = checkResponse;
+    this.statusCode = FlowStatus.Ok;
+    this.ended = false;
+    this.failOpen = true;
   }
 
-  Result() {
+  ShouldRun() {
+    var decision = this.Decision();
+    return decision === FlowDecision.Accepted || (this.failOpen && decision === FlowDecision.Unreachable)
+  }
+
+  DisableFailOpen() {
+    this.failOpen = false;
+  }
+
+  Decision() {
     if (this.checkResponse === undefined) {
-      return FlowResult.Unreachable;
+      return FlowDecision.Unreachable;
     }
     if (this.checkResponse.decisionType === "DECISION_TYPE_ACCEPTED") {
-      return FlowResult.Accepted;
+      return FlowDecision.Accepted;
     }
-    return FlowResult.Rejected;
+    return FlowDecision.Rejected;
   }
 
-  End(flowStatus) {
+  SetStatus(statusCode) {
+    this.statusCode = statusCode;
+  }
+
+  End() {
     if (this.ended) {
       return new Error("flow already ended");
     }
     this.ended = true;
 
-    this.span.setAttribute(FLOW_STATUS_LABEL, flowStatus);
+    this.span.setAttribute(FLOW_STATUS_LABEL, this.statusCode);
     this.span.setAttribute(
       CHECK_RESPONSE_LABEL,
       JSON.stringify(this.checkResponse),

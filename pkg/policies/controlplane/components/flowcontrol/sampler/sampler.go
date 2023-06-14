@@ -1,4 +1,4 @@
-package regulator
+package sampler
 
 import (
 	"context"
@@ -21,10 +21,10 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
-type regulatorSync struct {
+type samplerSync struct {
 	policyReadAPI          iface.Policy
-	RegulatorProto         *policylangv1.Regulator
-	decision               *policysyncv1.RegulatorDecision
+	SamplerProto           *policylangv1.Sampler
+	decision               *policysyncv1.SamplerDecision
 	decisionWriter         *etcdwriter.Writer
 	componentID            string
 	configEtcdPaths        []string
@@ -33,26 +33,26 @@ type regulatorSync struct {
 }
 
 // Name implements runtime.Component.
-func (*regulatorSync) Name() string { return "Regulator" }
+func (*samplerSync) Name() string { return "Sampler" }
 
 // Type implements runtime.Component.
-func (*regulatorSync) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+func (*samplerSync) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
 
 // ShortDescription implements runtime.Component.
-func (regulatorSync *regulatorSync) ShortDescription() string {
-	return iface.GetSelectorsShortDescription(regulatorSync.RegulatorProto.Parameters.GetSelectors())
+func (samplerSync *samplerSync) ShortDescription() string {
+	return iface.GetSelectorsShortDescription(samplerSync.SamplerProto.Parameters.GetSelectors())
 }
 
 // IsActuator implements runtime.Component.
-func (*regulatorSync) IsActuator() bool { return true }
+func (*samplerSync) IsActuator() bool { return true }
 
-// NewRegulatorAndOptions creates fx options for Regulator and also returns agent group name associated with it.
-func NewRegulatorAndOptions(
-	regulatorProto *policylangv1.Regulator,
+// NewSamplerAndOptions creates fx options for Sampler and also returns agent group name associated with it.
+func NewSamplerAndOptions(
+	samplerProto *policylangv1.Sampler,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	s := regulatorProto.Parameters.GetSelectors()
+	s := samplerProto.Parameters.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)
 
@@ -60,58 +60,58 @@ func NewRegulatorAndOptions(
 
 	for _, agentGroup := range agentGroups {
 		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
-		configEtcdPath := path.Join(paths.RegulatorConfigPath, etcdKey)
+		configEtcdPath := path.Join(paths.SamplerConfigPath, etcdKey)
 		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
-		decisionEtcdPath := path.Join(paths.RegulatorDecisionsPath, etcdKey)
+		decisionEtcdPath := path.Join(paths.SamplerDecisionsPath, etcdKey)
 		decisionEtcdPaths = append(decisionEtcdPaths, decisionEtcdPath)
 	}
 
-	regulatorSync := &regulatorSync{
-		RegulatorProto:    regulatorProto,
-		decision:          &policysyncv1.RegulatorDecision{},
+	samplerSync := &samplerSync{
+		SamplerProto:      samplerProto,
+		decision:          &policysyncv1.SamplerDecision{},
 		policyReadAPI:     policyReadAPI,
 		configEtcdPaths:   configEtcdPaths,
 		decisionEtcdPaths: decisionEtcdPaths,
 		componentID:       componentID.String(),
 	}
-	return regulatorSync, fx.Options(
+	return samplerSync, fx.Options(
 		fx.Invoke(
-			regulatorSync.setupSync,
+			samplerSync.setupSync,
 		),
 	), nil
 }
 
-func (regulatorSync *regulatorSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
-	logger := regulatorSync.policyReadAPI.GetStatusRegistry().GetLogger()
+func (samplerSync *samplerSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	logger := samplerSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.RegulatorWrapper{
-				Regulator: regulatorSync.RegulatorProto,
+			wrapper := &policysyncv1.SamplerWrapper{
+				Sampler: samplerSync.SamplerProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:  regulatorSync.policyReadAPI.GetPolicyName(),
-					PolicyHash:  regulatorSync.policyReadAPI.GetPolicyHash(),
-					ComponentId: regulatorSync.componentID,
+					PolicyName:  samplerSync.policyReadAPI.GetPolicyName(),
+					PolicyHash:  samplerSync.policyReadAPI.GetPolicyHash(),
+					ComponentId: samplerSync.componentID,
 				},
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
-				logger.Error().Err(err).Msg("failed to marshal  regulator config")
+				logger.Error().Err(err).Msg("failed to marshal  sampler config")
 				return err
 			}
 			var merr error
-			for _, configEtcdPath := range regulatorSync.configEtcdPaths {
+			for _, configEtcdPath := range samplerSync.configEtcdPaths {
 				_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
 					configEtcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
 				if err != nil {
-					logger.Error().Err(err).Msg("failed to put regulator config")
+					logger.Error().Err(err).Msg("failed to put sampler config")
 					merr = multierr.Append(merr, err)
 				}
 			}
-			regulatorSync.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
+			samplerSync.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
 			return merr
 		},
 		OnStop: func(ctx context.Context) error {
-			regulatorSync.decisionWriter.Close()
+			samplerSync.decisionWriter.Close()
 			deleteEtcdPath := func(paths []string) error {
 				var merr error
 				for _, path := range paths {
@@ -124,8 +124,8 @@ func (regulatorSync *regulatorSync) setupSync(etcdClient *etcdclient.Client, lif
 				return merr
 			}
 
-			merr := deleteEtcdPath(regulatorSync.configEtcdPaths)
-			merr = multierr.Append(merr, deleteEtcdPath(regulatorSync.decisionEtcdPaths))
+			merr := deleteEtcdPath(samplerSync.configEtcdPaths)
+			merr = multierr.Append(merr, deleteEtcdPath(samplerSync.decisionEtcdPaths))
 			return merr
 		},
 	})
@@ -133,7 +133,7 @@ func (regulatorSync *regulatorSync) setupSync(etcdClient *etcdclient.Client, lif
 }
 
 // Execute implements runtime.Component.Execute.
-func (regulatorSync *regulatorSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (samplerSync *samplerSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	acceptPercentage, ok := inPortReadings["accept_percentage"]
 	if !ok {
 		return nil, nil
@@ -150,53 +150,53 @@ func (regulatorSync *regulatorSync) Execute(inPortReadings runtime.PortToReading
 	} else {
 		acceptPercentageValue = acceptPercentageReading.Value()
 	}
-	return nil, regulatorSync.publishAcceptPercentage(acceptPercentageValue)
+	return nil, samplerSync.publishAcceptPercentage(acceptPercentageValue)
 }
 
-func (regulatorSync *regulatorSync) publishAcceptPercentage(acceptPercentageValue float64) error {
-	logger := regulatorSync.policyReadAPI.GetStatusRegistry().GetLogger()
+func (samplerSync *samplerSync) publishAcceptPercentage(acceptPercentageValue float64) error {
+	logger := samplerSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Publish decision
-	logger.Debug().Float64("flux", acceptPercentageValue).Msg("publishing flux regulator decision")
-	wrapper := &policysyncv1.RegulatorDecisionWrapper{
-		RegulatorDecision: &policysyncv1.RegulatorDecision{
+	logger.Debug().Float64("flux", acceptPercentageValue).Msg("publishing flux sampler decision")
+	wrapper := &policysyncv1.SamplerDecisionWrapper{
+		SamplerDecision: &policysyncv1.SamplerDecision{
 			AcceptPercentage:       acceptPercentageValue,
-			PassThroughLabelValues: regulatorSync.passThroughLabelValues,
+			PassThroughLabelValues: samplerSync.passThroughLabelValues,
 		},
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:  regulatorSync.policyReadAPI.GetPolicyName(),
-			PolicyHash:  regulatorSync.policyReadAPI.GetPolicyHash(),
-			ComponentId: regulatorSync.componentID,
+			PolicyName:  samplerSync.policyReadAPI.GetPolicyName(),
+			PolicyHash:  samplerSync.policyReadAPI.GetPolicyHash(),
+			ComponentId: samplerSync.componentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)
 	if err != nil {
-		logger.Error().Err(err).Msg("failed to marshal flux regulator decision")
+		logger.Error().Err(err).Msg("failed to marshal flux sampler decision")
 		return err
 	}
-	if regulatorSync.decisionWriter == nil {
+	if samplerSync.decisionWriter == nil {
 		logger.Panic().Msg("decision writer is nil")
 	}
-	for _, decisionEtcdPath := range regulatorSync.decisionEtcdPaths {
-		regulatorSync.decisionWriter.Write(decisionEtcdPath, dat)
+	for _, decisionEtcdPath := range samplerSync.decisionEtcdPaths {
+		samplerSync.decisionWriter.Write(decisionEtcdPath, dat)
 	}
 
 	return nil
 }
 
 // DynamicConfigUpdate handles overrides.
-func (regulatorSync *regulatorSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := regulatorSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	key := regulatorSync.RegulatorProto.GetPassThroughLabelValuesConfigKey()
+func (samplerSync *samplerSync) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := samplerSync.policyReadAPI.GetStatusRegistry().GetLogger()
+	key := samplerSync.SamplerProto.GetPassThroughLabelValuesConfigKey()
 	passThroughLabelValues := []string{}
 	if !unmarshaller.IsSet(key) {
-		regulatorSync.passThroughLabelValues = regulatorSync.RegulatorProto.GetPassThroughLabelValues()
+		samplerSync.passThroughLabelValues = samplerSync.SamplerProto.GetPassThroughLabelValues()
 		return
 	}
 	err := unmarshaller.UnmarshalKey(key, passThroughLabelValues)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to unmarshal dynamic config")
-		regulatorSync.passThroughLabelValues = regulatorSync.RegulatorProto.GetPassThroughLabelValues()
+		samplerSync.passThroughLabelValues = samplerSync.SamplerProto.GetPassThroughLabelValues()
 		return
 	}
-	regulatorSync.passThroughLabelValues = passThroughLabelValues
+	samplerSync.passThroughLabelValues = passThroughLabelValues
 }

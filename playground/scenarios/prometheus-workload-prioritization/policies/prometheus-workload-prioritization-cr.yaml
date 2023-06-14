@@ -17,9 +17,9 @@ metadata:
       {"match_labels": {"http.path": "/api/v1/write"}}, "service": "controller-prometheus-server.aperture-controller.svc.cluster.local"}]}]}},
       "service_protection_core": {"adaptive_load_scheduler": {"load_scheduler": {"scheduler":
       {"workloads": [{"label_matcher": {"match_labels": {"is_demo_app_requests_total":
-      "true"}}, "parameters": {"priority": 50}}, {"label_matcher": {"match_labels":
+      "true"}}, "parameters": {"priority": "50"}}, {"label_matcher": {"match_labels":
       {"is_demo_app_request_duration_micro_seconds": "true"}}, "parameters": {"priority":
-      200}}]}, "selectors": [{"control_point": "ingress", "label_matcher": {"match_labels":
+      "200"}}]}, "selectors": [{"control_point": "ingress", "label_matcher": {"match_labels":
       {"http.path": "/api/v1/write", "is_demo_app": "true"}}, "service": "controller-prometheus-server.aperture-controller.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
@@ -59,12 +59,12 @@ spec:
                     match_labels:
                       is_demo_app_requests_total: "true"
                   parameters:
-                    priority: 50
+                    priority: "50"
                 - label_matcher:
                     match_labels:
                       is_demo_app_request_duration_micro_seconds: "true"
                   parameters:
-                    priority: 200
+                    priority: "200"
               selectors:
               - control_point: ingress
                 label_matcher:

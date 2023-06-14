@@ -81,15 +81,17 @@ policy:
         scheduler:
           workloads:
             - parameters:
-                priority: 50
+                priority: "50"
               label_matcher:
                 match_labels:
                   user_type: guest
+              name: guest
             - parameters:
-                priority: 200
+                priority: "200"
               label_matcher:
                 match_labels:
                   http.request.header.user_type: subscriber
+              name: subscriber
       # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
       # Type: float64
       load_multiplier_linear_increment: 0.0025

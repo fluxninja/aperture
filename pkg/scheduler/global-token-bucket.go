@@ -34,7 +34,7 @@ func (rltb *GlobalTokenBucket) GetPassThrough() bool {
 }
 
 // PreprocessRequest is a no-op.
-func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request Request) bool {
+func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request *Request) bool {
 	return rltb.GetPassThrough()
 }
 

@@ -2,7 +2,7 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/percentile-latency
 
-# Specify certain label values to be always accepted by the _Regulator_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.
+# Specify certain label values to be always accepted by the _Sampler_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.
 # Type: []string
 pass_through_label_values:
   - __REQUIRED_FIELD__

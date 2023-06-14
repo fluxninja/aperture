@@ -1,4 +1,4 @@
-package regulator
+package sampler
 
 import (
 	"context"
@@ -29,20 +29,20 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-const regulatorStatusRoot = "load_regulators"
+const samplerStatusRoot = "samplers"
 
 var (
-	fxNameTag       = config.NameTag(regulatorStatusRoot)
+	fxNameTag       = config.NameTag(samplerStatusRoot)
 	metricLabelKeys = []string{
 		metrics.PolicyNameLabel,
 		metrics.PolicyHashLabel,
 		metrics.ComponentIDLabel,
 		metrics.DecisionTypeLabel,
-		metrics.RegulatorDroppedLabel,
+		metrics.SamplerDroppedLabel,
 	}
 )
 
-// Module returns the fx options for load regulator.
+// Module returns the fx options for sampler.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
@@ -53,7 +53,7 @@ func Module() fx.Option {
 		),
 		fx.Invoke(
 			fx.Annotate(
-				setupRegulatorFactory,
+				setupSamplerFactory,
 				fx.ParamTags(fxNameTag),
 			),
 		),
@@ -66,7 +66,7 @@ func provideWatchers(
 ) (notifiers.Watcher, error) {
 	agentGroupName := ai.GetAgentGroup()
 
-	etcdPath := path.Join(paths.RegulatorConfigPath,
+	etcdPath := path.Join(paths.SamplerConfigPath,
 		paths.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
@@ -76,7 +76,7 @@ func provideWatchers(
 	return watcher, nil
 }
 
-type regulatorFactory struct {
+type samplerFactory struct {
 	engineAPI        iface.Engine
 	registry         status.Registry
 	distCache        *distcache.DistCache
@@ -85,7 +85,7 @@ type regulatorFactory struct {
 	agentGroupName   string
 }
 
-func setupRegulatorFactory(
+func setupSamplerFactory(
 	watcher notifiers.Watcher,
 	lifecycle fx.Lifecycle,
 	e iface.Engine,
@@ -96,22 +96,22 @@ func setupRegulatorFactory(
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
-	etcdPath := path.Join(paths.RegulatorDecisionsPath)
+	etcdPath := path.Join(paths.SamplerDecisionsPath)
 	decisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
 	}
 
-	reg := statusRegistry.Child("component", regulatorStatusRoot)
+	reg := statusRegistry.Child("component", samplerStatusRoot)
 	counterVector := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.RegulatorCounterTotalMetricName,
-			Help: "Total number of decisions made by load regulators.",
+			Name: metrics.SamplerCounterTotalMetricName,
+			Help: "Total number of decisions made by samplers.",
 		},
 		metricLabelKeys,
 	)
 
-	factory := &regulatorFactory{
+	factory := &samplerFactory{
 		engineAPI:        e,
 		registry:         statusRegistry,
 		distCache:        distCache,
@@ -122,7 +122,7 @@ func setupRegulatorFactory(
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
 		config.NewProtobufUnmarshaller,
-		[]notifiers.FxOptionsFunc{factory.newRegulatorOptions})
+		[]notifiers.FxOptionsFunc{factory.newSamplerOptions})
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func setupRegulatorFactory(
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(factory.counterVector) {
-				err2 := fmt.Errorf("failed to unregister regulator_counter_total metric")
+				err2 := fmt.Errorf("failed to unregister sampler_counter_total metric")
 				merr = multierr.Append(merr, err2)
 			}
 			reg.Detach()
@@ -159,25 +159,25 @@ func setupRegulatorFactory(
 	return nil
 }
 
-func (frf *regulatorFactory) newRegulatorOptions(
+func (frf *samplerFactory) newSamplerOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
 	logger := frf.registry.GetLogger()
-	wrapperMessage := &policysyncv1.RegulatorWrapper{}
+	wrapperMessage := &policysyncv1.SamplerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	if err != nil || wrapperMessage.Regulator == nil {
+	if err != nil || wrapperMessage.Sampler == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		logger.Warn().Err(err).Msg("Failed to unmarshal load regulator config")
+		logger.Warn().Err(err).Msg("Failed to unmarshal sampler config")
 		return fx.Options(), err
 	}
 
-	regulatorProto := wrapperMessage.Regulator
-	fr := &regulator{
+	samplerProto := wrapperMessage.Sampler
+	fr := &sampler{
 		Component:              wrapperMessage.GetCommonAttributes(),
-		proto:                  regulatorProto,
-		labelKey:               regulatorProto.GetParameters().GetLabelKey(),
+		proto:                  samplerProto,
+		labelKey:               samplerProto.GetParameters().GetLabelKey(),
 		factory:                frf,
 		registry:               reg,
 		passthroughLabelValues: make(map[string]bool),
@@ -191,11 +191,11 @@ func (frf *regulatorFactory) newRegulatorOptions(
 	), nil
 }
 
-type regulator struct {
+type sampler struct {
 	iface.Component
 	registry                    status.Registry
-	factory                     *regulatorFactory
-	proto                       *policylangv1.Regulator
+	factory                     *samplerFactory
+	proto                       *policylangv1.Sampler
 	passthroughLabelValues      map[string]bool
 	name                        string
 	labelKey                    string
@@ -203,10 +203,10 @@ type regulator struct {
 	passthroughLabelValuesMutex sync.RWMutex
 }
 
-// Make sure regulator implements iface.Limiter.
-var _ iface.Limiter = (*regulator)(nil)
+// Make sure sampler implements iface.Limiter.
+var _ iface.Limiter = (*sampler)(nil)
 
-func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
+func (fr *sampler) setup(lifecycle fx.Lifecycle) error {
 	logger := fr.registry.GetLogger()
 	etcdKey := paths.AgentComponentKey(fr.factory.agentGroupName,
 		fr.GetPolicyName(),
@@ -242,9 +242,9 @@ func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// add to data engine
-			err = fr.factory.engineAPI.RegisterRegulator(fr)
+			err = fr.factory.engineAPI.RegisterSampler(fr)
 			if err != nil {
-				logger.Error().Err(err).Msg("Failed to register load regulator")
+				logger.Error().Err(err).Msg("Failed to register sampler")
 				return err
 			}
 
@@ -254,10 +254,10 @@ func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 			var merr, err error
 			deleted := counterVec.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
-				logger.Warn().Msg("Could not delete load regulator counter from its metric vector. No traffic to generate metrics?")
+				logger.Warn().Msg("Could not delete sampler counter from its metric vector. No traffic to generate metrics?")
 			}
 			// remove from data engine
-			err = fr.factory.engineAPI.UnregisterRegulator(fr)
+			err = fr.factory.engineAPI.UnregisterSampler(fr)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
 				merr = multierr.Append(merr, err)
@@ -276,7 +276,7 @@ func (fr *regulator) setup(lifecycle fx.Lifecycle) error {
 	return nil
 }
 
-func (fr *regulator) setPassthroughLabelValues(labelList []string) {
+func (fr *sampler) setPassthroughLabelValues(labelList []string) {
 	labelSet := make(map[string]bool)
 	for _, labelValue := range labelList {
 		labelSet[labelValue] = true
@@ -286,13 +286,13 @@ func (fr *regulator) setPassthroughLabelValues(labelList []string) {
 	fr.passthroughLabelValues = labelSet
 }
 
-// GetSelectors returns the selectors for the load regulator.
-func (fr *regulator) GetSelectors() []*policylangv1.Selector {
+// GetSelectors returns the selectors for the sampler.
+func (fr *sampler) GetSelectors() []*policylangv1.Selector {
 	return fr.proto.Parameters.GetSelectors()
 }
 
 // Decide runs the limiter.
-func (fr *regulator) Decide(ctx context.Context,
+func (fr *sampler) Decide(ctx context.Context,
 	labels map[string]string,
 ) *flowcontrolv1.LimiterDecision {
 	var (
@@ -311,8 +311,8 @@ func (fr *regulator) Decide(ctx context.Context,
 		ComponentId: fr.GetComponentId(),
 		Dropped:     false,
 		Reason:      flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED,
-		Details: &flowcontrolv1.LimiterDecision_RegulatorInfo_{
-			RegulatorInfo: &flowcontrolv1.LimiterDecision_RegulatorInfo{
+		Details: &flowcontrolv1.LimiterDecision_SamplerInfo_{
+			SamplerInfo: &flowcontrolv1.LimiterDecision_SamplerInfo{
 				Label: labelKey + ":" + labelValue,
 			},
 		},
@@ -357,12 +357,12 @@ func (fr *regulator) Decide(ctx context.Context,
 	return limiterDecision
 }
 
-// Revert implements the Revert method of the flowcontrolv1.Regulator interface.
-func (fr *regulator) Revert(_ context.Context, _ map[string]string, _ *flowcontrolv1.LimiterDecision) {
+// Revert implements the Revert method of the flowcontrolv1.Sampler interface.
+func (fr *sampler) Revert(_ context.Context, _ map[string]string, _ *flowcontrolv1.LimiterDecision) {
 	// No-op
 }
 
-func (fr *regulator) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (fr *sampler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := fr.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
@@ -370,9 +370,9 @@ func (fr *regulator) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 		return
 	}
 
-	var wrapperMessage policysyncv1.RegulatorDecisionWrapper
+	var wrapperMessage policysyncv1.SamplerDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.RegulatorDecision == nil {
+	if err != nil || wrapperMessage.SamplerDecision == nil {
 		return
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
@@ -383,13 +383,13 @@ func (fr *regulator) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 	if commonAttributes.PolicyHash != fr.GetPolicyHash() {
 		return
 	}
-	regulatorDecision := wrapperMessage.RegulatorDecision
-	fr.setPassthroughLabelValues(regulatorDecision.PassThroughLabelValues)
-	fr.acceptPercentage = regulatorDecision.AcceptPercentage
+	samplerDecision := wrapperMessage.SamplerDecision
+	fr.setPassthroughLabelValues(samplerDecision.PassThroughLabelValues)
+	fr.acceptPercentage = samplerDecision.AcceptPercentage
 }
 
 // GetLimiterID returns the limiter ID.
-func (fr *regulator) GetLimiterID() iface.LimiterID {
+func (fr *sampler) GetLimiterID() iface.LimiterID {
 	return iface.LimiterID{
 		PolicyName:  fr.GetPolicyName(),
 		PolicyHash:  fr.GetPolicyHash(),
@@ -397,8 +397,8 @@ func (fr *regulator) GetLimiterID() iface.LimiterID {
 	}
 }
 
-// GetRequestCounter returns counter for tracking number of times regulator was triggered.
-func (fr *regulator) GetRequestCounter(labels map[string]string) prometheus.Counter {
+// GetRequestCounter returns counter for tracking number of times sampler was triggered.
+func (fr *sampler) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	counter, err := fr.factory.counterVector.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to get counter")
