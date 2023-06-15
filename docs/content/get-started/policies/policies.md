@@ -162,7 +162,7 @@ The policy YAML generated (Kubernetes Custom Resource) using the above example
 can also be applied using `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/policies/rate-limiting-cr.yaml -n aperture-controller
+kubectl apply -f policy-gen/configuration/rate-limiting-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
@@ -191,6 +191,6 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 
 [controller-metrics]: /reference/observability/prometheus-metrics/controller.md
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
-[blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
+[blueprints]: /reference/blueprints/blueprints.md
 [policies]: /concepts/advanced/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/

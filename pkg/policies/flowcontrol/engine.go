@@ -6,9 +6,11 @@ import (
 	"sort"
 	"strconv"
 	"sync"
+	"time"
 
 	"go.uber.org/multierr"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -124,7 +126,7 @@ func (e *Engine) ProcessRequest(
 	}
 
 	for _, limiterType := range limiterTypes {
-		limiterDecisions, decisionType := runLimiters(ctx, limiterType.limiters, flowLabels)
+		limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
 		for _, limiterDecision := range limiterDecisions {
 			response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
 		}
@@ -138,6 +140,9 @@ func (e *Engine) ProcessRequest(
 		if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
 			response.DecisionType = decisionType
 			response.RejectReason = limiterType.rejectReason
+			if waitTime != 0 {
+				response.WaitTime = durationpb.New(waitTime)
+			}
 			return
 		}
 	}
@@ -145,12 +150,18 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
+// Runs limiters in parallel.
+//
+// The returned duration, if non-zero, represents recommended minimal amount of
+// time before retrying rejected request.
 func runLimiters(
 	ctx context.Context,
 	limiters map[iface.Limiter]struct{},
-	labels map[string]string) (
+	labels map[string]string,
+) (
 	map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
+	time.Duration,
 ) {
 	var wg sync.WaitGroup
 	var once sync.Once
@@ -169,7 +180,8 @@ func runLimiters(
 		cancel()
 	}
 
-	lock := &sync.Mutex{}
+	var lock sync.Mutex
+	var waitTime time.Duration
 
 	execLimiter := func(limiter iface.Limiter) func() {
 		return func() {
@@ -180,7 +192,10 @@ func runLimiters(
 			}
 			lock.Lock()
 			defer lock.Unlock()
-			decisions[limiter] = decision
+			decisions[limiter] = decision.LimiterDecision
+			if decision.WaitTime > waitTime {
+				waitTime = decision.WaitTime
+			}
 		}
 	}
 
@@ -197,7 +212,7 @@ func runLimiters(
 	}
 	wg.Wait()
 
-	return decisions, decisionType
+	return decisions, decisionType, waitTime
 }
 
 func revertRemaining(

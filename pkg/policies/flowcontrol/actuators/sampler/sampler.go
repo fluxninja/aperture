@@ -294,7 +294,7 @@ func (fr *sampler) GetSelectors() []*policylangv1.Selector {
 // Decide runs the limiter.
 func (fr *sampler) Decide(ctx context.Context,
 	labels map[string]string,
-) *flowcontrolv1.LimiterDecision {
+) iface.LimiterDecision {
 	var (
 		labelValue  string
 		hasLabelKey bool
@@ -324,7 +324,7 @@ func (fr *sampler) Decide(ctx context.Context,
 	fr.passthroughLabelValuesMutex.RUnlock()
 	if ok {
 		limiterDecision.Dropped = false
-		return limiterDecision
+		return iface.LimiterDecision{LimiterDecision: limiterDecision}
 	}
 
 	// If label_key is a non-empty string and is found within labels
@@ -354,7 +354,7 @@ func (fr *sampler) Decide(ctx context.Context,
 		}
 	}
 
-	return limiterDecision
+	return iface.LimiterDecision{LimiterDecision: limiterDecision}
 }
 
 // Revert implements the Revert method of the flowcontrolv1.Sampler interface.

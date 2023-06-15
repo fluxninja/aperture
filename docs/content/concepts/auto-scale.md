@@ -65,7 +65,7 @@ Components involved in the auto-scaling process:
 
 :::info
 
-See also [_Auto Scaler_ reference](/reference/policies/spec.md#auto-scaler)
+See also [_Auto Scaler_ reference](/reference/configuration/spec.md#auto-scaler)
 
 :::
 
@@ -133,7 +133,7 @@ $$
 
 :::info
 
-See also [_Pod Scaler_ reference](/reference/policies/spec.md#pod-scaler)
+See also [_Pod Scaler_ reference](/reference/configuration/spec.md#pod-scaler)
 
 :::
 
@@ -153,14 +153,14 @@ care of instantiating the _Pod Scaler_ component.
 :::info
 
 See also
-[_Kubernetes Object Selector_ reference](/reference/policies/spec.md#kubernetes-object-selector)
+[_Kubernetes Object Selector_ reference](/reference/configuration/spec.md#kubernetes-object-selector)
 
 :::
 
 _Kubernetes Object Selectors_ are used by auto-scaling components in a policy,
-such as [Pod Scaler](/reference/policies/spec.md#pod-scaler) or
-[_Auto Scaler_](/reference/policies/spec.md#pod-scaler). A Kubernetes Object
-Selector identifies a resource in the Kubernetes cluster.
+such as [Pod Scaler](/reference/configuration/spec.md#pod-scaler) or
+[_Auto Scaler_](/reference/configuration/spec.md#pod-scaler). A Kubernetes
+Object Selector identifies a resource in the Kubernetes cluster.
 
 A _Kubernetes Object Selector_ consists of:
 

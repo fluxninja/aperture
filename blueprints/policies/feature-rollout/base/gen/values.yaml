@@ -1,6 +1,6 @@
 # Generated values file for policies/feature-rollout/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/base
+# https://docs.fluxninja.com/reference/blueprints/ policies/feature-rollout/base
 
 # Parameters for the Feature Rollout policy.
 # Type: rollout_policy

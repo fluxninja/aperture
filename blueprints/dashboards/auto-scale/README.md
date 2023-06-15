@@ -1,1 +1,1 @@
-[Documentation](https://docs.fluxninja.com/reference/policies/bundled-blueprints/dashboards/auto-scale)
+[Documentation](https://docs.fluxninja.com/reference/blueprints/dashboards/auto-scale)

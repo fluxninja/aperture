@@ -6,7 +6,7 @@ sidebar_label: Policy Language
 
 :::info
 
-See also [Policy reference](/reference/policies/spec.md#policy)
+See also [Policy reference](/reference/configuration/spec.md#policy)
 
 :::
 
@@ -60,7 +60,7 @@ responsible for the logic of the control system.
 
 :::info
 
-See also [Resources reference](/reference/policies/spec.md#resources)
+See also [Resources reference](/reference/configuration/spec.md#resources)
 
 :::
 
@@ -79,8 +79,8 @@ Examples:
 
 [flux-meter]: /concepts/flux-meter.md
 [flow-classifier]: /concepts/classifier.md
-[promql-reference]: /reference/policies/spec.md#prom-q-l
-[selector-reference]: /reference/policies/spec.md#selector
+[promql-reference]: /reference/configuration/spec.md#prom-q-l
+[selector-reference]: /reference/configuration/spec.md#selector
 [circuit]: /concepts/advanced/circuit.md
-[blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
+[blueprints]: /reference/blueprints/blueprints.md
 [control-system]: https://en.wikipedia.org/wiki/Control_system

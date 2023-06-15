@@ -1,18 +1,12 @@
 ---
-title: Signals
+title: Auto scale
 ---
-
-## Introduction
-
-This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
-dashboard that visualizes Signals flowing through the
-[Circuit](/concepts/advanced/circuit.md).
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../apertureVersion.js'
+import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
@@ -20,7 +14,7 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/auto-scale`}>dashboards/auto-scale</a>
 
 <!-- vale on -->
 
@@ -92,6 +86,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
     type='string'
     reference=''
     value='"now"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-title"></a>
+
+<ParameterDescription
+    name='dashboard.title'
+    description='Name of the main dashboard.'
+    type='string'
+    reference=''
+    value='"Aperture Auto-scale"'
 />
 
 <!-- vale on -->

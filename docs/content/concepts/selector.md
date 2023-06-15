@@ -24,7 +24,7 @@ that determine how these components should select flows for their operations.
 
 :::note See also
 
-[_Selector_ configuration specification.](/reference/policies/spec.md#selector)
+[_Selector_ configuration specification.](/reference/configuration/spec.md#selector)
 
 :::
 
@@ -365,5 +365,5 @@ rejected.
 [flux-meter]: ./flux-meter.md
 [load-scheduler]: ./scheduler.md
 [classifier]: ./classifier.md
-[label-matcher]: /reference/policies/spec.md#label-matcher
+[label-matcher]: /reference/configuration/spec.md#label-matcher
 [gateway]: /integrations/gateway/gateway.md

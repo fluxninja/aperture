@@ -313,10 +313,10 @@ For more details and examples, refer to the [Classifier reference][reference].
 [label]: /concepts/flow-label.md
 [baggage]: /concepts/flow-label.md#baggage
 [request-labels]: ./flow-label.md#request-labels
-[reference]: /reference/policies/spec.md#classifier
-[rule]: /reference/policies/spec.md#rule
-[extractor]: /reference/policies/spec.md#extractor
-[rego-rule]: /reference/policies/spec.md#rule-rego
+[reference]: /reference/configuration/spec.md#classifier
+[rule]: /reference/configuration/spec.md#rule
+[extractor]: /reference/configuration/spec.md#extractor
+[rego-rule]: /reference/configuration/spec.md#rule-rego
 [arc]: /arc/extension.md
 [label-matcher]: ./selector.md#label-matcher
 [policies]: /concepts/advanced/policy.md
@@ -326,5 +326,5 @@ For more details and examples, refer to the [Classifier reference][reference].
 [control-point]: ./control-point.md
 [install-istio]: /integrations/istio/istio.md
 [aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
-[json-extractor]: /reference/policies/spec.md#json-extractor
-[jwt-extractor]: /reference/policies/spec.md#j-w-t-extractor
+[json-extractor]: /reference/configuration/spec.md#json-extractor
+[jwt-extractor]: /reference/configuration/spec.md#j-w-t-extractor

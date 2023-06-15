@@ -605,6 +605,11 @@ definitions:
                     type: string
                 description: telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
                 type: object
+            wait_time:
+                description: |-
+                    Recommended minimal amount of time to wait when retrying the request, if
+                    decision_type is REJECTED. Optional.
+                type: string
         type: object
     CheckResponseDecisionType:
         default: DECISION_TYPE_ACCEPTED

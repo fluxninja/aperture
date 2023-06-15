@@ -7,6 +7,7 @@ package mocks
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	checkv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -39,10 +40,10 @@ func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockLimiter) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", ctx, labels)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	ret0, _ := ret[0].(iface.LimiterDecision)
 	return ret0
 }
 
@@ -144,10 +145,10 @@ func (m *MockRateLimiter) EXPECT() *MockRateLimiterMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockRateLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockRateLimiter) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", ctx, labels)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	ret0, _ := ret[0].(iface.LimiterDecision)
 	return ret0
 }
 
@@ -226,14 +227,15 @@ func (mr *MockRateLimiterMockRecorder) Revert(ctx, labels, decision interface{})
 }
 
 // TakeIfAvailable mocks base method.
-func (m *MockRateLimiter) TakeIfAvailable(ctx context.Context, labels map[string]string, count float64) (string, bool, float64, float64) {
+func (m *MockRateLimiter) TakeIfAvailable(ctx context.Context, labels map[string]string, count float64) (string, bool, time.Duration, float64, float64) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TakeIfAvailable", ctx, labels, count)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
-	ret2, _ := ret[2].(float64)
+	ret2, _ := ret[2].(time.Duration)
 	ret3, _ := ret[3].(float64)
-	return ret0, ret1, ret2, ret3
+	ret4, _ := ret[4].(float64)
+	return ret0, ret1, ret2, ret3, ret4
 }
 
 // TakeIfAvailable indicates an expected call of TakeIfAvailable.
@@ -266,10 +268,10 @@ func (m *MockScheduler) EXPECT() *MockSchedulerMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockScheduler) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockScheduler) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", ctx, labels)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	ret0, _ := ret[0].(iface.LimiterDecision)
 	return ret0
 }
 

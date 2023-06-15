@@ -184,9 +184,8 @@ func (lsl *LazySyncRateLimiter) takeN(ctx context.Context, label string, n float
 }
 
 // TakeIfAvailable takes n tokens from the limiter if they are available.
-func (lsl *LazySyncRateLimiter) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, float64, float64) {
-	ok, _, remaining, current := lsl.takeN(ctx, label, n, false)
-	return ok, remaining, current
+func (lsl *LazySyncRateLimiter) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
+	return lsl.takeN(ctx, label, n, false)
 }
 
 // Take takes n tokens from the limiter.

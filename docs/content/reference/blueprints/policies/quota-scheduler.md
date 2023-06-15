@@ -11,13 +11,13 @@ sidebar_label: Quota Scheduler Policy
 This blueprint provides a
 [token bucket](https://en.wikipedia.org/wiki/Token_bucket) based quota scheduler
 policy and a dashboard. This policy uses the
-[`QuotaScheduler`](/reference/policies/spec.md#quota-scheduler) component.
+[`QuotaScheduler`](/reference/configuration/spec.md#quota-scheduler) component.
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../apertureVersion.js'
+import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration

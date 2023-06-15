@@ -328,6 +328,35 @@ func (m *CheckResponse) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetWaitTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CheckResponseValidationError{
+					field:  "WaitTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CheckResponseValidationError{
+					field:  "WaitTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWaitTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CheckResponseValidationError{
+				field:  "WaitTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return CheckResponseMultiError(errors)
 	}

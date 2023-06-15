@@ -61,5 +61,5 @@ it decides the percentage of flows to accept. This gives you fine-grained
 control over the flow of requests to a control point, enabling you to achieve
 the desired balance between load and performance.
 
-[sampler]: /reference/policies/spec.md#sampler
-[control-point]: /concepts/selector.md/#control-point
+[sampler]: /reference/configuration/spec.md#sampler
+[control-point]: /concepts/control-point.md

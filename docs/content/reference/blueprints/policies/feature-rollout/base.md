@@ -12,8 +12,9 @@ healthy.
 
 :::info
 
-Please see reference for the [`LoadRamp`](/reference/policies/spec.md#load-ramp)
-component that is used within this blueprint.
+Please see reference for the
+[`LoadRamp`](/reference/configuration/spec.md#load-ramp) component that is used
+within this blueprint.
 
 :::
 
@@ -28,8 +29,8 @@ to see this blueprint in use.
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
 ## Configuration

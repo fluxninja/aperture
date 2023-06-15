@@ -15,9 +15,9 @@ or more metrics, aiding in the precise detection of alert conditions.
 
 Policies are evaluated periodically and query metrics from Prometheus using
 PromQL, which are subsequently processed in a circuit to derive intermediate
-signals. A [_Decider_](/reference/policies/spec.md#decider) component can be
-used to check if a specific signal surpasses a predetermined threshold and alert
-on it.
+signals. A [_Decider_](/reference/configuration/spec.md#decider) component can
+be used to check if a specific signal surpasses a predetermined threshold and
+alert on it.
 
 The alert events are forwarded to a Prometheus Alert Manager endpoint. Operators
 can then consume notifications from these alerts through their preferred
