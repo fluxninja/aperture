@@ -1,6 +1,6 @@
 ---
 title: Aperture Agent Configuration Reference
-sidebar_position: 11
+sidebar_position: 2
 sidebar_label: Agent
 ---
 
@@ -800,6 +800,8 @@ AgentOTelConfig is the configuration for Agent's OTel collector.
 <!-- vale on -->
 
 DisableKubeletScraper disables the default metrics collection for kubelet.
+Deprecated: kubelet scraper is removed entirely, so this flag makes no
+difference.
 
 </dd>
 <dt>disable_kubernetes_scraper</dt>
@@ -813,6 +815,23 @@ DisableKubeletScraper disables the default metrics collection for kubelet.
 
 DisableKubernetesScraper disables the default metrics collection for Kubernetes
 resources.
+
+</dd>
+<dt>enable_high_cardinality_platform_metrics</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture
+platform metrics from being published to Prometheus. Filtered out metrics are:
+"grpc_server_handled_total._" "grpc_server_handling_seconds._"
+"grpc_server_handling_seconds_bucket._" "grpc_server_handling_seconds_count._"
+"grpc_server_handling_seconds_sum._" "grpc_server_msg_received_total._"
+"grpc_server_msg_sent_total._" "grpc_server_started_total._"
 
 </dd>
 <dt>batch_alerts</dt>

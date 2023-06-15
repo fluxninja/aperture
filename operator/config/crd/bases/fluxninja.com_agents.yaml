@@ -1531,12 +1531,22 @@ spec:
                             type: string
                         type: object
                       disable_kubelet_scraper:
-                        description: DisableKubeletScraper disables the default metrics
-                          collection for kubelet.
+                        description: 'DisableKubeletScraper disables the default metrics
+                          collection for kubelet. Deprecated: kubelet scraper is removed
+                          entirely, so this flag makes no difference.'
                         type: boolean
                       disable_kubernetes_scraper:
                         description: DisableKubernetesScraper disables the default
                           metrics collection for Kubernetes resources.
+                        type: boolean
+                      enable_high_cardinality_platform_metrics:
+                        description: 'EnableHighCardinalityPlatformMetrics filters
+                          out high cardinality Aperture platform metrics from being
+                          published to Prometheus. Filtered out metrics are: * "grpc_server_handled_total.*"
+                          * "grpc_server_handling_seconds.*" * "grpc_server_handling_seconds_bucket.*"
+                          * "grpc_server_handling_seconds_count.*" * "grpc_server_handling_seconds_sum.*"
+                          * "grpc_server_msg_received_total.*" * "grpc_server_msg_sent_total.*"
+                          * "grpc_server_started_total.*"'
                         type: boolean
                       ports:
                         description: Ports configures debug, health and extension

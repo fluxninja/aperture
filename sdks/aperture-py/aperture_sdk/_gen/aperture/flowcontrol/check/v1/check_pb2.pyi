@@ -1,3 +1,4 @@
+from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -23,7 +24,7 @@ class CheckRequest(_message.Message):
     def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CheckResponse(_message.Message):
-    __slots__ = ["start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions"]
+    __slots__ = ["start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions", "wait_time"]
     class RejectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         REJECT_REASON_NONE: _ClassVar[CheckResponse.RejectReason]
@@ -58,6 +59,7 @@ class CheckResponse(_message.Message):
     CLASSIFIER_INFOS_FIELD_NUMBER: _ClassVar[int]
     FLUX_METER_INFOS_FIELD_NUMBER: _ClassVar[int]
     LIMITER_DECISIONS_FIELD_NUMBER: _ClassVar[int]
+    WAIT_TIME_FIELD_NUMBER: _ClassVar[int]
     start: _timestamp_pb2.Timestamp
     end: _timestamp_pb2.Timestamp
     services: _containers.RepeatedScalarFieldContainer[str]
@@ -69,7 +71,8 @@ class CheckResponse(_message.Message):
     classifier_infos: _containers.RepeatedCompositeFieldContainer[ClassifierInfo]
     flux_meter_infos: _containers.RepeatedCompositeFieldContainer[FluxMeterInfo]
     limiter_decisions: _containers.RepeatedCompositeFieldContainer[LimiterDecision]
-    def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ...) -> None: ...
+    wait_time: _duration_pb2.Duration
+    def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class ClassifierInfo(_message.Message):
     __slots__ = ["policy_name", "policy_hash", "classifier_index", "error"]
@@ -98,7 +101,7 @@ class ClassifierInfo(_message.Message):
     def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., classifier_index: _Optional[int] = ..., error: _Optional[_Union[ClassifierInfo.Error, str]] = ...) -> None: ...
 
 class LimiterDecision(_message.Message):
-    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "rate_limiter_info", "load_scheduler_info", "regulator_info", "quota_scheduler_info"]
+    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "rate_limiter_info", "load_scheduler_info", "sampler_info", "quota_scheduler_info"]
     class LimiterReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         LIMITER_REASON_UNSPECIFIED: _ClassVar[LimiterDecision.LimiterReason]
@@ -123,7 +126,7 @@ class LimiterDecision(_message.Message):
         workload_index: str
         tokens_consumed: int
         def __init__(self, workload_index: _Optional[str] = ..., tokens_consumed: _Optional[int] = ...) -> None: ...
-    class RegulatorInfo(_message.Message):
+    class SamplerInfo(_message.Message):
         __slots__ = ["label"]
         LABEL_FIELD_NUMBER: _ClassVar[int]
         label: str
@@ -142,7 +145,7 @@ class LimiterDecision(_message.Message):
     REASON_FIELD_NUMBER: _ClassVar[int]
     RATE_LIMITER_INFO_FIELD_NUMBER: _ClassVar[int]
     LOAD_SCHEDULER_INFO_FIELD_NUMBER: _ClassVar[int]
-    REGULATOR_INFO_FIELD_NUMBER: _ClassVar[int]
+    SAMPLER_INFO_FIELD_NUMBER: _ClassVar[int]
     QUOTA_SCHEDULER_INFO_FIELD_NUMBER: _ClassVar[int]
     policy_name: str
     policy_hash: str
@@ -151,9 +154,9 @@ class LimiterDecision(_message.Message):
     reason: LimiterDecision.LimiterReason
     rate_limiter_info: LimiterDecision.RateLimiterInfo
     load_scheduler_info: LimiterDecision.SchedulerInfo
-    regulator_info: LimiterDecision.RegulatorInfo
+    sampler_info: LimiterDecision.SamplerInfo
     quota_scheduler_info: LimiterDecision.QuotaSchedulerInfo
-    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., load_scheduler_info: _Optional[_Union[LimiterDecision.SchedulerInfo, _Mapping]] = ..., regulator_info: _Optional[_Union[LimiterDecision.RegulatorInfo, _Mapping]] = ..., quota_scheduler_info: _Optional[_Union[LimiterDecision.QuotaSchedulerInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., load_scheduler_info: _Optional[_Union[LimiterDecision.SchedulerInfo, _Mapping]] = ..., sampler_info: _Optional[_Union[LimiterDecision.SamplerInfo, _Mapping]] = ..., quota_scheduler_info: _Optional[_Union[LimiterDecision.QuotaSchedulerInfo, _Mapping]] = ...) -> None: ...
 
 class FluxMeterInfo(_message.Message):
     __slots__ = ["flux_meter_name"]

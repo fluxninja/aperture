@@ -34,13 +34,13 @@ func (rltb *GlobalTokenBucket) GetPassThrough() bool {
 }
 
 // PreprocessRequest is a no-op.
-func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request Request) bool {
+func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request *Request) bool {
 	return rltb.GetPassThrough()
 }
 
 // TakeIfAvailable takes tokens if available.
 func (rltb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, tokens float64) bool {
-	ok, _, _ := rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
+	ok, _, _, _ := rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
 	return ok
 }
 

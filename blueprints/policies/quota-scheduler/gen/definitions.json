@@ -109,6 +109,11 @@
           "type": "object",
           "additionalProperties": true
         },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Quota Scheduler",
+          "type": "string"
+        },
         "datasource": {
           "type": "object",
           "additionalProperties": false,

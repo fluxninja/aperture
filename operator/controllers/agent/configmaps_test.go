@@ -104,6 +104,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 								SendBatchSize:    100,
 								SendBatchMaxSize: 200,
 							},
+							EnableHighCardinalityPlatformMetrics: false,
 						},
 					},
 				},

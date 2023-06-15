@@ -94,8 +94,7 @@ func setupLoadSchedulerFactory(
 	agentGroup := ai.GetAgentGroup()
 
 	// Scope the sync to the agent group.
-	etcdDecisionsPath := path.Join(paths.LoadSchedulerDecisionsPath,
-		paths.AgentGroupPrefix(agentGroup))
+	etcdDecisionsPath := path.Join(paths.LoadSchedulerDecisionsPath, paths.AgentGroupPrefix(agentGroup))
 	loadDecisionWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdDecisionsPath)
 	if err != nil {
 		return err
@@ -427,20 +426,29 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 
 	var wrapperMessage policysyncv1.LoadDecisionWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	loadDecision := wrapperMessage.LoadDecision
-	if err != nil || loadDecision == nil {
+	if err != nil {
 		statusMsg := "Failed to unmarshal config wrapper"
 		logger.Warn().Err(err).Msg(statusMsg)
 		ls.registry.SetStatus(status.NewStatus(nil, err))
 		return
 	}
-	commonAttributes := wrapperMessage.GetCommonAttributes()
-	if commonAttributes == nil {
-		statusMsg := "Failed to get common attributes from LoadDecisionWrapper"
-		logger.Error().Err(err).Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, err))
+
+	loadDecision := wrapperMessage.GetLoadDecision()
+	if loadDecision == nil {
+		statusMsg := "load decision is nil"
+		logger.Error().Msg(statusMsg)
+		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get load decision from LoadDecisionWrapper: %s", statusMsg)))
 		return
 	}
+
+	commonAttributes := wrapperMessage.GetCommonAttributes()
+	if commonAttributes == nil {
+		statusMsg := "common attributes is nil"
+		logger.Error().Msg(statusMsg)
+		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get common attributes from LoadDecisionWrapper: %s", statusMsg)))
+		return
+	}
+
 	// check if this decision is for the same policy id as what we have
 	if commonAttributes.PolicyHash != ls.GetPolicyHash() {
 		err = errors.New("policy id mismatch")
@@ -451,7 +459,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	}
 
 	logger.Autosample().Debug().Bool("passThrough", loadDecision.PassThrough).Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
-	ls.tokenBucket.SetLoadMultiplier(loadDecision.LoadMultiplier)
+	ls.tokenBucket.SetLoadDecisionValues(loadDecision)
 	ls.tokenBucket.SetPassThrough(loadDecision.PassThrough)
 	ls.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
 }

@@ -40,7 +40,7 @@ public final class ApertureSDK {
     private final List<String> ignoredPaths;
     private final boolean ignoredPathsMatchRegex;
 
-    private static Logger logger = LoggerFactory.getLogger(ApertureSDK.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApertureSDK.class);
 
     ApertureSDK(
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,

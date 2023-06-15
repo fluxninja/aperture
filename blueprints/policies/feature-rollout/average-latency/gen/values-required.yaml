@@ -1,6 +1,6 @@
 # Generated values file for policies/feature-rollout/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency
+# https://docs.fluxninja.com/reference/blueprints/ policies/feature-rollout/average-latency
 
 # Configuration for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy
@@ -21,7 +21,7 @@ policy:
             service: __REQUIRED_FIELD__
   evaluation_interval: "1s"
   load_ramp:
-    regulator:
+    sampler:
       label_key: ""
       selectors:
         - control_point: __REQUIRED_FIELD__

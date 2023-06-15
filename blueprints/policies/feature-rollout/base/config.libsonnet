@@ -79,7 +79,7 @@ local ema_latency_driver_defaults = {
 local rollout_policy_base_defaults = {
   policy_name: '__REQUIRED_FIELD__',
   load_ramp: {
-    regulator: {
+    sampler: {
       selectors: selectors_defaults,
       label_key: '',
     },
@@ -182,12 +182,14 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   * @param (dashboard.time_from: string) From time of dashboard.
   * @param (dashboard.time_to: string) To time of dashboard.
   * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
+  * @param (dashboard.title: string) Name of the main dashboard.
   */
   dashboard: {
     refresh_interval: '5s',
     time_from: 'now-15m',
     time_to: 'now',
     extra_filters: {},
+    title: 'Aperture Feature Rollout',
     /**
     * @param (dashboard.datasource.name: string) Datasource name.
     * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.

@@ -1,6 +1,6 @@
 # Generated values file for policies/auto-scaling/pod-auto-scaler blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/auto-scaling/pod-auto-scaler
+# https://docs.fluxninja.com/reference/blueprints/ policies/auto-scaling/pod-auto-scaler
 
 # Dynamic configuration for setting dry run mode at runtime without restarting this policy. Dry run mode ensures that no scaling is invoked by this auto scaler. This is useful for observing the behavior of auto scaler without disrupting any real deployment.
 # Type: bool
