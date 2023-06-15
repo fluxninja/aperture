@@ -44,10 +44,16 @@ func addMetricsPipeline(
 ) {
 	addPrometheusReceiver(config, controllerConfig, tlsConfig, lis)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
+	processors := []string{}
+	if !controllerConfig.EnableHighCardinalityPlatformMetrics {
+		otelconfig.AddHighCardinalityMetricsFilterProcessor(config)
+		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
+		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)
+	}
 	config.Service.AddPipeline("metrics/controller-fast", otelconfig.Pipeline{
 		Receivers:  []string{otelconsts.ReceiverPrometheus},
-		Processors: []string{},
-		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
+		Processors: processors,
+		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite, otelconsts.ExporterLogging},
 	})
 }
 

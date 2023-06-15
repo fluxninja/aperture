@@ -5,6 +5,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"go.opentelemetry.io/collector/exporter"
@@ -85,6 +86,7 @@ func ControllerOTelComponents(
 		batchprocessor.NewFactory(),
 		attributesprocessor.NewFactory(),
 		transformprocessor.NewFactory(),
+		filterprocessor.NewFactory(),
 	}
 	// processorsFactory = append(processorsFactory, otelContribProcessors()...)
 	pf = append(pf, processorFactories...)

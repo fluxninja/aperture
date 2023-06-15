@@ -151,6 +151,7 @@ otel:
     timeout: 1s
   disable_kubernetes_scraper: false
   disable_kubelet_scraper: false
+  enable_high_cardinality_platform_metrics: false
   ports:
     debug_port: 8888
     health_check_port: 13133
