@@ -45,7 +45,7 @@ func addMetricsPipeline(
 	addPrometheusReceiver(config, controllerConfig, tlsConfig, lis)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
 	processors := []string{}
-	if !controllerConfig.DisableHighCardinalityPlatformMetrics {
+	if controllerConfig.DisableHighCardinalityPlatformMetrics {
 		otelconfig.AddHighCardinalityMetricsFilterProcessor(config)
 		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
 		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)
