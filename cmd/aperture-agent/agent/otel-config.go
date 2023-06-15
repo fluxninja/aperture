@@ -178,7 +178,7 @@ func addMetricsPipeline(
 	processors := []string{
 		otelconsts.ProcessorAgentGroup,
 	}
-	if agentConfig.DisableHighCardinalityPlatformMetrics {
+	if !agentConfig.EnableHighCardinalityPlatformMetrics {
 		otelconfig.AddHighCardinalityMetricsFilterProcessor(config)
 		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
 		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)

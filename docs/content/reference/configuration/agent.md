@@ -790,23 +790,6 @@ example, Flux Meters, Rate Limiters and so on).
 AgentOTelConfig is the configuration for Agent's OTel collector.
 
 <dl>
-<dt>disable_high_cardinality_platform_metrics</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool, default: `true`)
-
-<!-- vale on -->
-
-DisableHighCardinalityPlatformMetrics filters out high cardinality Aperture
-platform metrics from being published to Prometheus. Filtered out metrics are:
-"grpc_server_handled_total._" "grpc_server_handling_seconds._"
-"grpc_server_handling_seconds_bucket._" "grpc_server_handling_seconds_count._"
-"grpc_server_handling_seconds_sum._" "grpc_server_msg_received_total._"
-"grpc_server_msg_sent_total._" "grpc_server_started_total._"
-
-</dd>
 <dt>disable_kubelet_scraper</dt>
 <dd>
 
@@ -832,6 +815,23 @@ difference.
 
 DisableKubernetesScraper disables the default metrics collection for Kubernetes
 resources.
+
+</dd>
+<dt>enable_high_cardinality_platform_metrics</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture
+platform metrics from being published to Prometheus. Filtered out metrics are:
+"grpc_server_handled_total._" "grpc_server_handling_seconds._"
+"grpc_server_handling_seconds_bucket._" "grpc_server_handling_seconds_count._"
+"grpc_server_handling_seconds_sum._" "grpc_server_msg_received_total._"
+"grpc_server_msg_sent_total._" "grpc_server_started_total._"
 
 </dd>
 <dt>batch_alerts</dt>

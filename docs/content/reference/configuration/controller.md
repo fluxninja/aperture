@@ -789,16 +789,16 @@ ClientTLSConfig is the configuration for client TLS.
 ControllerOTelConfig is the configuration for Controller's OTel collector.
 
 <dl>
-<dt>disable_high_cardinality_platform_metrics</dt>
+<dt>enable_high_cardinality_platform_metrics</dt>
 <dd>
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 
-DisableHighCardinalityPlatformMetrics filters out high cardinality Aperture
+EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture
 platform metrics from being published to Prometheus. Filtered out metrics are:
 "grpc_server_handled_total._" "grpc_server_handling_seconds._"
 "grpc_server_handling_seconds_bucket._" "grpc_server_handling_seconds_count._"

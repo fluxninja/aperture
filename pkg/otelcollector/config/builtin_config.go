@@ -117,15 +117,15 @@ func AddHighCardinalityMetricsFilterProcessor(config *Config) {
 		"metrics": map[string]interface{}{
 			"exclude": map[string]interface{}{
 				"match_type": "regexp",
+				"regexp": map[string]interface{}{
+					"cacheenabled":       true,
+					"cachemaxnumentries": 1000,
+				},
 				"metric_names": []string{
-					"grpc_server_handled_total.*",
-					"grpc_server_handling_seconds.*",
-					"grpc_server_handling_seconds_bucket.*",
-					"grpc_server_handling_seconds_count.*",
-					"grpc_server_handling_seconds_sum.*",
-					"grpc_server_msg_received_total.*",
-					"grpc_server_msg_sent_total.*",
-					"grpc_server_started_total.*",
+					"grpc_server_handled.*",
+					"grpc_server_handling.*",
+					"grpc_server_msg.*",
+					"grpc_server_started.*",
 				},
 			},
 		},

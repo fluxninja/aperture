@@ -91,7 +91,7 @@ otel:
     health_check_port: 13133
     pprof_port: 1777
     zpages_port: 55679
-  disable_high_cardinality_platform_metrics: true
+  enable_high_cardinality_platform_metrics: false
 policies:
   cr_watcher:
     enabled: false

@@ -1297,8 +1297,8 @@ spec:
                               will be sent regardless of size.
                             type: string
                         type: object
-                      disable_high_cardinality_platform_metrics:
-                        description: 'DisableHighCardinalityPlatformMetrics filters
+                      enable_high_cardinality_platform_metrics:
+                        description: 'EnableHighCardinalityPlatformMetrics filters
                           out high cardinality Aperture platform metrics from being
                           published to Prometheus. Filtered out metrics are: * "grpc_server_handled_total.*"
                           * "grpc_server_handling_seconds.*" * "grpc_server_handling_seconds_bucket.*"

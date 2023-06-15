@@ -29,7 +29,7 @@ type AgentOTelConfig struct {
 	// DisableKubeletScraper disables the default metrics collection for kubelet.
 	// Deprecated: kubelet scraper is removed entirely, so this flag makes no difference.
 	DisableKubeletScraper bool `json:"disable_kubelet_scraper" default:"false"`
-	// DisableHighCardinalityPlatformMetrics filters out high cardinality Aperture platform metrics from being
+	// EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture platform metrics from being
 	// published to Prometheus. Filtered out metrics are:
 	//   * "grpc_server_handled_total.*"
 	//   * "grpc_server_handling_seconds.*"
@@ -39,7 +39,7 @@ type AgentOTelConfig struct {
 	//   * "grpc_server_msg_received_total.*"
 	//   * "grpc_server_msg_sent_total.*"
 	//   * "grpc_server_started_total.*"
-	DisableHighCardinalityPlatformMetrics bool `json:"disable_high_cardinality_platform_metrics" default:"true"`
+	EnableHighCardinalityPlatformMetrics bool `json:"enable_high_cardinality_platform_metrics" default:"false"`
 }
 
 // BatchPrerollupConfig defines configuration for OTel batch processor.
