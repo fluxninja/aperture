@@ -118,7 +118,6 @@ func AddHighCardinalityMetricsFilterProcessor(config *Config) {
 			"exclude": map[string]interface{}{
 				"match_type": "regexp",
 				"metric_names": []string{
-					// Filter our high cardinality Aperture platform metrics.
 					"grpc_server_handled_total.*",
 					"grpc_server_handling_seconds.*",
 					"grpc_server_handling_seconds_bucket.*",
