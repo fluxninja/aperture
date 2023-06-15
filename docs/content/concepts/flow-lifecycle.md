@@ -31,8 +31,8 @@ are:
 - Classifiers: used to classify the flow based on the flow's metadata.
 - FluxMeters: These are critical instruments that quantify the flow's metrics,
   translating fluxes into a Prometheus histogram for clear data visualization.
-- Regulators: These regulate the flow's rate, based on service health and
-  capacity, and need to accept the flow before forwarding it to the next step.
+- Sampler: It regulates the flow's rate, based on service health and capacity,
+  and need to accept the flow before forwarding it to the next step.
 - Rate-Limiters: They proactively mitigate recurring overloads by regulating
   heavy-hitters according to per-label limits.
 - Schedulers: These ensure efficient handling of requests, prioritizing critical

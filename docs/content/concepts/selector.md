@@ -51,7 +51,7 @@ selectors:
   agent_group: default # Agent Group
   label_matcher: # Label Matcher
     match_labels:
-      user_tier: gold
+      user_tier: premium
       http.method: GET
     match_expressions:
       - key: query
@@ -297,10 +297,10 @@ configured as follows:
 ```yaml
 service: nginx-server.nginx.svc.cluster.local
 agent_group: default
-control_point: service1
+control_point: search-service
 label_matcher:
   match_labels:
-    http.target: "/service1"
+    http.target: "/search-service"
 ```
 
 Also, if the control point is configured uniquely for each location/route, the
@@ -309,7 +309,7 @@ rest of the fields can be omitted:
 
 ```yaml
 agent_group: default
-control_point: service1
+control_point: search-service
 ```
 
 ### Filtering out liveness/health probes, and metrics endpoints

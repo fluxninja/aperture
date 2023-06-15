@@ -17,6 +17,29 @@ Limiter_ is a component of Aperture's [policy][policies] system, and it can be
 configured to work with different labels and limits depending on the needs of
 your application.
 
+Example:
+
+```yaml
+rate_limiter:
+  bucket_capacity: 40
+  fill_amount: 2
+  selectors:
+    - agent_group: default
+      service: checkout.default.svc.cluster.local
+      control_point: ingress
+  # Parameters.
+  # Type: aperture.spec.v1.RateLimiterParameters
+  parameters:
+    # Flow label to use for rate limiting.
+    # Type: string
+    # Required: True
+    label_key: user_id
+    lazy_sync:
+      enabled: true
+      num_sync: 5
+    interval: 1s
+```
+
 ## Distributed Counters {#distributed-counters}
 
 For each configured [_Rate Limiter Component_][reference], every matching

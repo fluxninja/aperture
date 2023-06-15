@@ -17,6 +17,19 @@ The Flux Meter component provides a way to translate a flux of flows, matching a
 also gathers metrics for the traffic that matches its selector. The histogram
 created by Flux Meter measures the workload latency by default.
 
+Example:
+
+```yaml
+flux_meters:
+  cart-service1-app:
+    selectors:
+      - control_point: cart-service2-app
+        label_matcher:
+          match_labels:
+            http.target: /service3
+        service: kong-server.demoapp.svc.cluster.local
+```
+
 ## Naming Convention
 
 Each Flux Meter is identified by its unique name. It's strongly recommended

@@ -23,12 +23,12 @@ of the `user-type` HTTP header:
 
 ```yaml
 policy:
-  policy_name: POLICY_NAME
+  policy_name: checkout-service-policy
   resources:
     flow_control:
       classifiers: # resource name
         - selectors: # Selector Defining Classifier's Scope
-            - service: service1-demo-app.demoapp.svc.cluster.local
+            - service: checkout.default.svc.cluster.local
               control_point: ingress
           rules: # classification rules
             user_type: # flow label key
@@ -75,7 +75,7 @@ service:
 
 ```yaml
 selectors:
-  - service: service1.default.svc.cluster.local
+  - service: checkout.default.svc.cluster.local
     control_point: ingress
 ```
 
@@ -93,7 +93,7 @@ will handle, enabling the creation of more effective classification rules.
 For example:
 
 ```sh
-aperturectl flow-control preview --kube service1-demo-app.demoapp.svc.cluster.local ingress --http
+aperturectl flow-control preview --kube checkout.default.svc.cluster.local ingress --http
 ```
 
 Returns:
@@ -115,7 +115,7 @@ Returns:
         "request": {
           "http": {
             "headers": {
-              ":authority": "service1-demo-app.demoapp.svc.cluster.local",
+              ":authority": "checkout.default.svc.cluster.local",
               ":method": "POST",
               ":path": "/request",
               ":scheme": "http",
@@ -128,7 +128,7 @@ Returns:
               "x-forwarded-proto": "http",
               "x-request-id": "26f01736-ec45-4b07-a202-bdec8930c7f8"
             },
-            "host": "service1-demo-app.demoapp.svc.cluster.local",
+            "host": "checkout.default.svc.cluster.local",
             "id": "14553976531353216255",
             "method": "POST",
             "path": "/request",
@@ -166,7 +166,7 @@ directly on a `aperture-agent` local to the service instances (pods):
 Example:
 
 ```sh
-curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/checkout.default.svc.cluster.local/ingress?samples=1
 ```
 
 ## Classification Rules {#rules}
@@ -211,7 +211,7 @@ extractors include:
   ```yaml
   classifiers:
     - selectors:
-        - service: service1-demo-app.demoapp.svc.cluster.local
+        - service: checkout.default.svc.cluster.local
           control_point: ingress # control point
       rules: # classification rules
         user_type: # flow label key

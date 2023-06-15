@@ -5,7 +5,7 @@ sidebar_position: 6
 
 :::info
 
-See also [_Sampler_ reference][flow-sampler]
+See also [_Sampler_ reference][sampler]
 
 :::
 
@@ -15,6 +15,16 @@ flows at random or by sticky sessions. This is useful for controlling the load
 at a feature inside your service for performing controlled tests. It achieves
 this by either acting as a stateless filter or a sticky filter, depending on the
 provided configuration.
+
+Example:
+
+```yaml
+sampler:
+  selectors:
+    - control_point: ingress
+      service: user-service.default.svc.cluster.local
+  label_key: user_type
+```
 
 ## Stateless Filter {#stateless-filter}
 
@@ -51,5 +61,5 @@ it decides the percentage of flows to accept. This gives you fine-grained
 control over the flow of requests to a control point, enabling you to achieve
 the desired balance between load and performance.
 
-[flow-sampler]: /reference/policies/spec.md#flow-sampler
+[sampler]: /reference/policies/spec.md#sampler
 [control-point]: /concepts/selector.md/#control-point

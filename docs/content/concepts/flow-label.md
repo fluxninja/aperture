@@ -99,7 +99,7 @@ You can discover the labels flowing through services and control points using
 For example:
 
 ```sh
-aperturectl flow-control preview --kube service1-demo-app.demoapp.svc.cluster.local ingress
+aperturectl flow-control preview --kube checkout-app.checkout-service.svc.cluster.local ingress
 ```
 
 Returns:
@@ -110,7 +110,7 @@ Returns:
     {
       "labels": {
         "http.flavor": "1.1",
-        "http.host": "service1-demo-app.demoapp.svc.cluster.local",
+        "http.host": "checkout-app.checkout-service.svc.cluster.local",
         "http.method": "POST",
         "http.request.header.content_length": "201",
         "http.request.header.content_type": "application/json",
@@ -135,7 +135,7 @@ Alternatively, you can use the
 directly on a `aperture-agent` local to the service instances (pods):
 
 ```sh
-curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+curl -X POST localhost:8080/v1/flowcontrol/preview/labels/checkout-app.checkout-service.svc.cluster.local/ingress?samples=1
 ```
 
 ## Telemetry and Flow Labels

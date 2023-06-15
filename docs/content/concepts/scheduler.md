@@ -9,43 +9,31 @@ keywords:
 sidebar_position: 7
 ---
 
-:::info
+The Scheduler is a crucial component in Aperture, prioritizing requests based on
+their priority and size. It operates based on a
+[Weighted Fair Queue-based](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
+methodology, which ensures the fair handling of workloads, particularly during
+periods of high or overload traffic. By prioritizing critical application
+features over low priority workloads, the scheduler helps optimize user
+experience and maximize good throughput.
 
-See also
-[_Adaptive Load Scheduler_ reference](/reference/policies/spec.md#adaptive-load-scheduler)
-and
-[_Load Scheduler_ reference](/reference/policies/spec.md#adaptive-load-scheduler).
-
-:::
-
-The _Load Scheduler_ is a powerful component designed to protect your services
-from overloads and prevent cascading failures. Its **primary goal is to limit**
-the number of concurrent requests to a service, ensuring that the service can
-handle the incoming workload. By defining workloads with different priorities
-and weights, the _Load Scheduler_ can prioritize certain requests over others,
-enabling graceful degradation of service during times of high traffic.
+Each Agent instantiates an independent copy of the _Scheduler_, but output
+signals for accepted and incoming token rate are aggregated across all agents.
+The Scheduler utilizes a Load Multiplier to determine the [tokens](#tokens)
+refill rate per second, striving to maintain this rate stable between each
+controller update. If the incoming token rate in requests surpasses the desired
+rate, requests are queued within the Scheduler. Any request that cannot be
+scheduled within its designated timeout is rejected.
 
 As with other components of the Aperture platform, the _Load Scheduler_ is
 configured using a [policy][policies] component.
 
-## Scheduler {#scheduler}
+:::info
 
-The scheduler prioritizes requests based on their priority and size. Each
-Aperture Agent instantiates a
-[Weighted Fair Queue-based](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
-scheduler as a way to prioritize requests. The controller applies a _Load
-Multiplier_ that the scheduler uses to compute the refill rate of
-[tokens](#tokens) per second, which it tries to maintain between each update
-from the controller.
+Additional information can be found in the
+[Scheduler Reference](/reference/policies/spec.md#scheduler)
 
-If the rate of tokens in requests entering the scheduler exceeds the desired
-rate, requests are queued in the scheduler. If a flow cannot be scheduled within
-its specified timeout, it is rejected.
-
-The scheduler helps ensure that requests are handled in a fair and efficient
-manner, even during periods of high load or overload. By prioritizing critical
-application features over background workloads, the scheduler helps maximize
-user experience or revenue.
+:::
 
 ### Workload {#workload}
 
@@ -145,7 +133,38 @@ the flow of incoming requests. In this algorithm, every flow is required to
 obtain tokens from the bucket before a specified deadline to gain admission to
 the system.
 
-### Timeout Factor {#timeout-factor}
+The Scheduler employs two distinct types of token buckets: the Dynamic Token
+Bucket and the Fixed Token Bucket. These buckets, each with a unique method of
+operation, enhance the system's capacity to effectively adapt to various
+scheduling scenarios.
+
+#### Dynamic Token Bucket {#dynamic-bucket}
+
+The Dynamic Token Bucket is primarily used for service protection. It adjusts
+the token rate in response to the changing load signal, thereby ensuring an
+active defense for the service. Each agent maintains an individual token bucket,
+and synchronization between agents happens in lazy sync. This dynamic resizing
+enables efficient management of requests and maintains optimal service
+protection levels.
+
+#### Fixed Token Bucket {#fixed-bucket}
+
+In contrast to the Dynamic Token Bucket, the Fixed Token Bucket operates with a
+predetermined number of tokens, establishing a constant token rate. This type of
+bucket is particularly advantageous when the load or the number of tokens is
+known upfront.
+
+The Fixed Token Bucket can be employed for service protection but is especially
+useful in scenarios where there are strict rate limits. For instance, when
+scheduling access to external APIs with a global quota, the Fixed Token Bucket
+ensures that the API's rate limits are adhered to.
+
+Both the Dynamic and Fixed Token Buckets serve to manage and control the flow of
+requests, their specific usage and operation depend on the requirements and
+constraints of the system, providing versatility and adaptability in handling
+workloads.
+
+### Queue timeout {#queue-factor}
 
 The timeout factor parameter determines the duration a request in the workload
 can wait for tokens. A larger timeout factor results in a higher chance of the
