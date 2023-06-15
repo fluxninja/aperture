@@ -214,6 +214,23 @@ definitions:
                 $ref: '#/definitions/BatchAlertsConfig'
                 description: BatchAlerts configures batch alerts processor.
                 x-go-tag-json: batch_alerts
+            enable_high_cardinality_platform_metrics:
+                default: false
+                description: |-
+                    EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture platform metrics from being
+                    published to Prometheus. Filtered out metrics are:
+                    "grpc_server_handled_total.*"
+                    "grpc_server_handling_seconds.*"
+                    "grpc_server_handling_seconds_bucket.*"
+                    "grpc_server_handling_seconds_count.*"
+                    "grpc_server_handling_seconds_sum.*"
+                    "grpc_server_msg_received_total.*"
+                    "grpc_server_msg_sent_total.*"
+                    "grpc_server_started_total.*"
+                type: boolean
+                x-go-name: EnableHighCardinalityPlatformMetrics
+                x-go-tag-default: "false"
+                x-go-tag-json: enable_high_cardinality_platform_metrics
             ports:
                 $ref: '#/definitions/PortsConfig'
                 description: Ports configures debug, health and extension ports values.

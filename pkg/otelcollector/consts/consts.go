@@ -171,6 +171,8 @@ const (
 	ProcessorAlertsNamespace = "attributes/alerts"
 	// ProcessorFilterKubeletStats filters in only metrics of interest.
 	ProcessorFilterKubeletStats = "filter/kubeletstats"
+	// ProcessorFilterHighCardinalityMetrics filters out high cardinality Aperture platform metrics.
+	ProcessorFilterHighCardinalityMetrics = "filter/high_cardinality_metrics"
 	// ProcessorK8sAttributes enriches metrics with k8s metadata.
 	ProcessorK8sAttributes = "k8sattributes/kubeletstats"
 

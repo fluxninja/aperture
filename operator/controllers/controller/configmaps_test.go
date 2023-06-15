@@ -95,6 +95,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 									ZpagesPort:      55679,
 								},
 							},
+							EnableHighCardinalityPlatformMetrics: false,
 						},
 					},
 				},
