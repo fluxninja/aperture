@@ -943,6 +943,9 @@ def forward_port_delayed(workload, labels, resource_deps, namespace, service, lo
         readiness_probe=readiness_probe,
     )
 
+def get_agent_version():
+    val = str(local("git tag -l --sort='-version:refname' v* | head -n 1")).strip()
+    return val
 
 def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_extension, scenario):
     """
@@ -955,11 +958,12 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
     for resource in resources:
         resource_info = inv_dep_tree[resource]
         labels = resource_info.get("labels", [])
+        images = resource_info.get("images",{})
+        agent_version = get_agent_version()
+        if resource in ["controller", "agent"]:
+            images[0]["build_args"]["APERTURECTL_BUILD_VERSION"] = agent_version
         if race_arg:
-            images = resource_info.get("images",{})
-            if resource == "controller":
-                images[0]["build_args"]["APERTURECTL_BUILD_FLAGS"] = "['-race']"
-            if resource == "agent":
+            if resource in ["controller", "agent"]:
                 images[0]["build_args"]["APERTURECTL_BUILD_FLAGS"] = "['-race']"
         for image in resource_info.get("images", []):
             if 'tag' in image.keys():

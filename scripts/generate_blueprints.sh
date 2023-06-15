@@ -59,4 +59,4 @@ wait  # Wait for all background jobs to complete
 while IFS= read -r -d '' file
 do
     prettier --write "$file"
-done < <($FIND  "$git_root"/docs/content/reference/policies/bundled-blueprints -type f -name '*.md' -print0)
+done < <($FIND  "$git_root"/docs/content/reference/blueprints -type f -name '*.md' -print0)

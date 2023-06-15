@@ -83,18 +83,17 @@ Let's create a feature control point in the following code snippet.
 ​
 
         Flow flow = this.apertureSDK.startFlow('awesomeFeature', labels);
-        FlowResult flowResult = flow.result();
 ​
-        if (flowResult != FlowResult.Rejected) {
+        if (flow.shouldRun()) {
             // Aperture accepted the flow, now execute the business logic.
             data = this.executeBusinessLogic(spark.Request);
             res.status(200);
-            flow.end(FlowStatus.OK);
         } else {
             // Flow has been rejected by Aperture
-            res.status(flow.);
-            flow.end(FlowStatus.Error);
+            res.status(flow.getRejectionHttpStatusCode());
+            flow.setStatus(FlowStatus.Error);
         }
+        flow.end();
         return data;
     }
 ```

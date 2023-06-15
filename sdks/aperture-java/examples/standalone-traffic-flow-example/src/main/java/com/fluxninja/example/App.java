@@ -7,6 +7,8 @@ import io.grpc.ManagedChannelBuilder;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Spark;
 
 public class App {
@@ -16,6 +18,8 @@ public class App {
     public static final String DEFAULT_FEATURE_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
+
+    public static final Logger logger = LoggerFactory.getLogger(App.class);
 
     private final ApertureSDK apertureSDK;
     private final ManagedChannel channel;
@@ -114,28 +118,23 @@ public class App {
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(apertureRequest);
 
         // See whether flow was accepted by Aperture Agent.
-        if (flow.shouldRun()) {
-            // Simulate work being done
-            try {
+        try {
+            if (flow.shouldRun()) {
+                // Simulate work being done
                 res.status(202);
                 Thread.sleep(2000);
-                // Need to call end() on the Flow in order to provide telemetry to Aperture
-                // Agent for completing the control loop.
-                // The first argument captures whether the feature captured by the Flow was
-                // successful or resulted in an error.
-                // The second argument is error message for further diagnosis.
-                flow.end(FlowStatus.OK);
-            } catch (InterruptedException | ApertureSDKException e) {
-                e.printStackTrace();
-            }
-        } else {
-            // Flow has been rejected by Aperture Agent.
-            try {
+            } else {
+                // Flow has been rejected by Aperture Agent.
                 res.status(flow.getRejectionHttpStatusCode());
-                flow.end(FlowStatus.Error);
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            // Flow Status captures whether the feature captured by the Flow was
+            // successful or resulted in an error. When not explicitly set,
+            // the default value is FlowStatus.OK .
+            flow.setStatus(FlowStatus.Error);
+            logger.error("Error in flow execution", e);
+        } finally {
+            flow.end();
         }
         return "";
     }

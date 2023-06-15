@@ -1,6 +1,5 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.linecorp.armeria.common.HttpStatus;
@@ -10,11 +9,8 @@ import java.util.Map;
 
 class RpcUtils {
     protected static HttpStatus handleRejectedFlow(Flow flow) {
-        try {
-            flow.end(FlowStatus.Unset);
-        } catch (ApertureSDKException e) {
-            e.printStackTrace();
-        }
+        flow.setStatus(FlowStatus.Unset);
+        flow.end();
         return HttpStatus.valueOf(flow.getRejectionHttpStatusCode());
     }
 

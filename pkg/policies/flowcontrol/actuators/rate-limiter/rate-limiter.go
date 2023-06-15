@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 	"strconv"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -313,7 +314,7 @@ func (rl *rateLimiter) GetSelectors() []*policylangv1.Selector {
 }
 
 // Decide runs the limiter.
-func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
 	tokens := float64(1)
@@ -326,7 +327,7 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) *fl
 		}
 	}
 
-	label, ok, remaining, current := rl.TakeIfAvailable(ctx, labels, tokens)
+	label, ok, waitTime, remaining, current := rl.TakeIfAvailable(ctx, labels, tokens)
 
 	tokensConsumed := float64(0)
 	if ok {
@@ -337,20 +338,23 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) *fl
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 	}
 
-	return &flowcontrolv1.LimiterDecision{
-		PolicyName:  rl.GetPolicyName(),
-		PolicyHash:  rl.GetPolicyHash(),
-		ComponentId: rl.GetComponentId(),
-		Dropped:     !ok,
-		Reason:      reason,
-		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
-			RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
-				Label:          label,
-				Remaining:      remaining,
-				Current:        current,
-				TokensConsumed: tokensConsumed,
+	return iface.LimiterDecision{
+		LimiterDecision: &flowcontrolv1.LimiterDecision{
+			PolicyName:  rl.GetPolicyName(),
+			PolicyHash:  rl.GetPolicyHash(),
+			ComponentId: rl.GetComponentId(),
+			Dropped:     !ok,
+			Reason:      reason,
+			Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
+				RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
+					Label:          label,
+					Remaining:      remaining,
+					Current:        current,
+					TokensConsumed: tokensConsumed,
+				},
 			},
 		},
+		WaitTime: waitTime,
 	}
 }
 
@@ -365,9 +369,13 @@ func (rl *rateLimiter) Revert(ctx context.Context, labels map[string]string, dec
 }
 
 // TakeIfAvailable takes n tokens from the limiter.
-func (rl *rateLimiter) TakeIfAvailable(ctx context.Context, labels map[string]string, n float64) (label string, ok bool, remaining float64, current float64) {
+func (rl *rateLimiter) TakeIfAvailable(
+	ctx context.Context,
+	labels map[string]string,
+	n float64,
+) (label string, ok bool, waitTime time.Duration, remaining float64, current float64) {
 	if rl.limiter.GetPassThrough() {
-		return label, true, 0, 0
+		return label, true, 0, 0, 0
 	}
 
 	labelKey := rl.lbProto.Parameters.GetLabelKey()
@@ -376,12 +384,12 @@ func (rl *rateLimiter) TakeIfAvailable(ctx context.Context, labels map[string]st
 	} else {
 		labelValue, found := labels[labelKey]
 		if !found {
-			return "", true, 0, 0
+			return "", true, 0, 0, 0
 		}
 		label = labelKey + ":" + labelValue
 	}
 
-	ok, remaining, current = rl.limiter.TakeIfAvailable(ctx, label, n)
+	ok, waitTime, remaining, current = rl.limiter.TakeIfAvailable(ctx, label, n)
 	return
 }
 

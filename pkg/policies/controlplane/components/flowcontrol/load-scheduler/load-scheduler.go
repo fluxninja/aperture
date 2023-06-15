@@ -3,14 +3,15 @@ package loadscheduler
 import (
 	"fmt"
 
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
-	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 const (
@@ -44,7 +45,8 @@ func ParseLoadScheduler(
 	}
 
 	// Prepare parameters for prometheus queries
-	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%s\"",
+	policyParams := fmt.Sprintf(
+		"%s=\"%s\",%s=\"%s\",%s=\"%s\"",
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.PolicyHashLabel,
@@ -53,13 +55,17 @@ func ParseLoadScheduler(
 		componentID,
 	)
 
-	acceptedTokensQuery := fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+	acceptedTokensQuery := fmt.Sprintf(
+		"sum(rate(%s{%s}[10s]))",
 		metrics.AcceptedTokensMetricName,
-		policyParams)
+		policyParams,
+	)
 
-	incomingTokenRate := fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+	incomingTokenRate := fmt.Sprintf(
+		"sum(rate(%s{%s}[10s]))",
 		metrics.IncomingTokensMetricName,
-		policyParams)
+		policyParams,
+	)
 
 	loadActuatorAnyProto, err := anypb.New(
 		&policyprivatev1.LoadActuator{

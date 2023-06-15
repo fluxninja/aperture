@@ -79,7 +79,7 @@ local ema_latency_driver_defaults = {
 local rollout_policy_base_defaults = {
   policy_name: '__REQUIRED_FIELD__',
   load_ramp: {
-    regulator: {
+    sampler: {
       selectors: selectors_defaults,
       label_key: '',
     },

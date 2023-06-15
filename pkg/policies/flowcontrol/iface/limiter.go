@@ -2,6 +2,7 @@ package iface
 
 import (
 	"context"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -28,16 +29,25 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetSelectors() []*policylangv1.Selector
-	Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
+	Decide(ctx context.Context, labels map[string]string) LimiterDecision
 	Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision)
 	GetLimiterID() LimiterID
 	GetRequestCounter(labels map[string]string) prometheus.Counter
 }
 
+// LimiterDecision wraps flowcontrolv1.LimiterDecision with some additional
+// metadata that won't end up in the CheckResponse.
+type LimiterDecision struct {
+	*flowcontrolv1.LimiterDecision
+	// If non-zero, it's a recommended minimal time before retrying failed
+	// request.
+	WaitTime time.Duration
+}
+
 // RateLimiter interface.
 type RateLimiter interface {
 	Limiter
-	TakeIfAvailable(ctx context.Context, labels map[string]string, count float64) (label string, ok bool, remaining float64, current float64)
+	TakeIfAvailable(ctx context.Context, labels map[string]string, count float64) (label string, ok bool, waitTime time.Duration, remaining float64, current float64)
 }
 
 // Scheduler interface.

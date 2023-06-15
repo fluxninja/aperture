@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/policies/quota-scheduler/gen/definitions.json
 # Generated values file for policies/quota-scheduler blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/quota-scheduler
+# https://docs.fluxninja.com/reference/blueprints/policies/quota-scheduler
 policy:
   policy_name: quota-scheduler
   quota_scheduler:
@@ -22,11 +22,11 @@ policy:
             match_labels:
               http.request.header.user_type: guest
           parameters:
-            priority: 50
+            priority: "50"
           name: guest
         - label_matcher:
             match_labels:
               http.request.header.user_type: subscriber
           parameters:
-            priority: 200
+            priority: "200"
           name: subscriber

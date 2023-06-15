@@ -1,6 +1,6 @@
 ---
 title: Aperture Agent Configuration Reference
-sidebar_position: 11
+sidebar_position: 2
 sidebar_label: Agent
 ---
 
@@ -800,6 +800,8 @@ AgentOTelConfig is the configuration for Agent's OTel collector.
 <!-- vale on -->
 
 DisableKubeletScraper disables the default metrics collection for kubelet.
+Deprecated: kubelet scraper is removed entirely, so this flag makes no
+difference.
 
 </dd>
 <dt>disable_kubernetes_scraper</dt>

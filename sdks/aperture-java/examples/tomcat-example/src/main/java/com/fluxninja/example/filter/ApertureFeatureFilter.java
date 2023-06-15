@@ -29,22 +29,19 @@ public class ApertureFeatureFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        FlowDecision flowDecision = flow.getDecision();
-        // See whether flow was accepted by Aperture Agent.
-        if (flowDecision != FlowDecision.Rejected) {
-            try {
+        // Check whether flow was accepted by Aperture Agent
+        try {
+            if (flow.shouldRun()) {
                 chain.doFilter(request, response);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
+            } else {
+                flow.setStatus(FlowStatus.Unset);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Request denied");
-                flow.end(FlowStatus.Error);
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            flow.setStatus(FlowStatus.Error);
+            throw e;
+        } finally {
+            flow.end();
         }
     }
 

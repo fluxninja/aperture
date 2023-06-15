@@ -50,13 +50,13 @@ The created instance can then be used to start a flow:
     labels.put("key", "value");
 
     Flow flow = apertureSDK.startFlow("featureName", labels);
-    if (flow.accepted()) {
+    if (flow.shouldRun()) {
         // do actual work
-        flow.end(FlowStatus.OK);
     } else {
         // handle flow rejection by Aperture Agent
-        flow.end(FlowStatus.Error);
+        flow.setStatus(FlowStatus.Error);
     }
+    flow.end();
 ```
 
 For more context on using Aperture Java SDK to set feature control points, refer
