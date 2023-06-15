@@ -88,7 +88,7 @@ func (msg *LimiterDecision_RateLimiterInfo) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *LimiterDecision_LoadSchedulerInfo) MarshalJSON() ([]byte, error) {
+func (msg *LimiterDecision_SchedulerInfo) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -97,14 +97,14 @@ func (msg *LimiterDecision_LoadSchedulerInfo) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *LimiterDecision_LoadSchedulerInfo) UnmarshalJSON(b []byte) error {
+func (msg *LimiterDecision_SchedulerInfo) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *LimiterDecision_RegulatorInfo) MarshalJSON() ([]byte, error) {
+func (msg *LimiterDecision_SamplerInfo) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -113,7 +113,23 @@ func (msg *LimiterDecision_RegulatorInfo) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *LimiterDecision_RegulatorInfo) UnmarshalJSON(b []byte) error {
+func (msg *LimiterDecision_SamplerInfo) UnmarshalJSON(b []byte) error {
+	return protojson.UnmarshalOptions{
+		DiscardUnknown: false,
+	}.Unmarshal(b, msg)
+}
+
+// MarshalJSON implements json.Marshaler
+func (msg *LimiterDecision_QuotaSchedulerInfo) MarshalJSON() ([]byte, error) {
+	return protojson.MarshalOptions{
+		UseEnumNumbers:  false,
+		EmitUnpopulated: false,
+		UseProtoNames:   true,
+	}.Marshal(msg)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (msg *LimiterDecision_QuotaSchedulerInfo) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

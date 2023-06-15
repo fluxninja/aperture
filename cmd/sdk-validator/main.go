@@ -12,10 +12,11 @@ import (
 	"syscall"
 	"time"
 
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
 
 	"google.golang.org/grpc/credentials"
 
@@ -28,14 +29,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/cmd/sdk-validator/validator"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
-	"github.com/fluxninja/aperture/pkg/status"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/v2/cmd/sdk-validator/validator"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 var (
@@ -219,7 +219,7 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 		log.Error().Err(err).Msg("Handler returned error")
 		if info.FullMethod == "/opentelemetry.proto.collector.trace.v1.TraceService/Export" {
 			spanFailed = true
-		} else if info.FullMethod == "/envoy.service.auth.v3.Authorization/Check" {
+		} else if info.FullMethod == "/aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTP/CheckHTTP" || info.FullMethod == "/aperture.flowcontrol.check.v1.FlowControlService/Check" {
 			authzFailed = true
 		}
 	}
@@ -329,7 +329,9 @@ func startTraffic(url string, requests int) int {
 		if err != nil {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
 		}
-		res.Body.Close()
+		if res.Body != nil {
+			res.Body.Close()
+		}
 		if (res.StatusCode > 400 && res.StatusCode < 500) || (res.StatusCode > 500 && res.StatusCode < 600) {
 			rejected += 1
 		}

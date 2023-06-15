@@ -11,6 +11,12 @@ local integratorouts = import './integratorouts.libsonnet';
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
   },
+  withInitialValue(initial_value):: {
+    initial_value: initial_value,
+  },
+  withInitialValueMixin(initial_value):: {
+    initial_value+: initial_value,
+  },
   withOutPorts(out_ports):: {
     out_ports: out_ports,
   },

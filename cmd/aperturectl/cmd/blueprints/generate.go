@@ -3,6 +3,7 @@ package blueprints
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,10 +13,10 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/apply"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 var controllerConn utils.ControllerConn
@@ -32,15 +33,20 @@ func init() {
 	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 1, "Max depth of the graph when generating DOT and Mermaid files")
 }
 
+type metadata struct {
+	BlueprintsURI string `json:"blueprints_uri"`
+	BlueprintName string `json:"blueprint_name"`
+}
+
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate Aperture Policy related resources from Aperture Blueprints",
 	Long: `
 Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
-	Example: `aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
+	Example: `aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`,
+aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := utils.ReaderLock(blueprintsURIRoot)
 		if err != nil {
@@ -117,12 +123,27 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 		})
 
 		importPath := fmt.Sprintf("%s/%s", blueprintsDir, blueprintName)
-
+		var blueprintsURIMetadata string
+		url, err := url.Parse(blueprintsURI)
+		if err != nil || url.Scheme == "" {
+			blueprintsURIMetadata = "local"
+			log.Debug().Msgf("Using local blueprints directory: %s", blueprintsURI)
+		} else {
+			blueprintsURIMetadata = blueprintsURI
+		}
+		metadata, err := json.Marshal(metadata{
+			BlueprintsURI: blueprintsURIMetadata,
+			BlueprintName: blueprintName,
+		})
+		if err != nil {
+			return err
+		}
 		bundleStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s/bundle.libsonnet';
 		local config = std.parseYaml(importstr '%s');
-    bundle(config)
-		`, importPath, valuesFile))
+		local metadata = std.parseJson('%s');
+		bundle(config, metadata)
+		`, importPath, valuesFile, metadata))
 		if err != nil {
 			return err
 		}
@@ -149,12 +170,8 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 		log.Info().Msgf("Generated manifests at %s", updatedOutputDir)
 
 		if applyPolicy {
+			apply.Controller = controllerConn
 			err = apply.ApplyPolicyCmd.Flag("dir").Value.Set(updatedOutputDir)
-			if err != nil {
-				return err
-			}
-
-			err = apply.ApplyPolicyCmd.Flag("kube").Value.Set("true")
 			if err != nil {
 				return err
 			}
@@ -336,8 +353,11 @@ func generateGraphs(content []byte, outputDir string, policyPath string, depth i
 		return nil
 	}
 	defer os.Remove(policyFile)
-
-	circuit, _, err := utils.CompilePolicy(policyFile)
+	policyBytes, err := os.ReadFile(policyFile)
+	if err != nil {
+		return err
+	}
+	circuit, _, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
 	if err != nil {
 		return err
 	}

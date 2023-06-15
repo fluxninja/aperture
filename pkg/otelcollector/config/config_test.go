@@ -1,4 +1,4 @@
-package config_test
+package otelconfig_test
 
 import (
 	"encoding/json"
@@ -6,12 +6,12 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 )
 
 var _ = Describe("Config", func() {
 	It("Adds extensions properly", func() {
-		otelConfig := otelconfig.NewOTelConfig()
+		otelConfig := otelconfig.New()
 		otelConfig.AddExtension("foo", map[string]interface{}{"bar": "baz"})
 		otelConfig.AddExtension("empty", map[string]interface{}{})
 		marshalledConfig, err := json.Marshal(otelConfig)

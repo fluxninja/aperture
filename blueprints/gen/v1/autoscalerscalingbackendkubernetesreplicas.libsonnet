@@ -1,6 +1,8 @@
+local autoscalerscalingbackendkubernetesreplicasouts = import './autoscalerscalingbackendkubernetesreplicasouts.libsonnet';
 {
   new():: {
   },
+  outPorts:: autoscalerscalingbackendkubernetesreplicasouts,
   withKubernetesObjectSelector(kubernetes_object_selector):: {
     kubernetes_object_selector: kubernetes_object_selector,
   },
@@ -18,5 +20,11 @@
   },
   withMinReplicasMixin(min_replicas):: {
     min_replicas+: min_replicas,
+  },
+  withOutPorts(out_ports):: {
+    out_ports: out_ports,
+  },
+  withOutPortsMixin(out_ports):: {
+    out_ports+: out_ports,
   },
 }

@@ -4,13 +4,13 @@ deps:
   - remote: buf.build
     owner: cncf
     repository: xds
-    commit: 197fca8a74c54bc888e0ccf2da3b9f65
-    digest: shake256:cc68ed395f3531a8fa3a053a2c6f013fee057945a39b934aecdb3a204af7ea512da3e366b24ef72a9123985aeacb000291354799d8ac7dcb30e9907f30158110
+    commit: 0d869d8e763c430498070035c02ac001
+    digest: shake256:b86eabc7d6290b46989d8db4ea39f7e4932d736373960ad4bf0d3118a76d5159c40cab7086fbb82d981aad1effcf45a3ff514adfff882460aa9dd2eb6d5535f5
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: df4ea417269a4bf984aa74cf1ad000ad
-    digest: shake256:4a6e5de65c374e4ad9c01bd3324cdcf0de39d1e58a8a02c6b549caa89d40e0e5b6dc9b86952441d2a0f52e6fecba6b661031b31d26aaeae3861655ef3ca0fe95
+    commit: 58cc034434084c97baad5f683c0fb869
+    digest: shake256:2612d5c9572ac73d9a96edee6963513ecae9421f3ea9319d21607d59c1fe8951e9560588128f786b908a609fa379d75470d8abffefe3d428a55fda808c3f483d
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
@@ -24,8 +24,8 @@ deps:
   - remote: buf.build
     owner: grpc-ecosystem
     repository: grpc-gateway
-    commit: a1ecdc58eccd49aa8bea2a7a9022dc27
-    digest: shake256:efdd86fbdc42e8b7259fe461a49656827a03fb7cba0b3b9eb622ca10654ec6beccb9a051229c1553ccd89ed3e95d69ad4d7c799f1da3f3f1bd447b7947a4893e
+    commit: 11c9972ea0fd4c95a2c38d29bb1dc817
+    digest: shake256:9c7ce822dff52ad28714465396fbe98e879409677a61687b7dd9bb3d1484aa5d1704c013698b24f34c5d51023dbff47287ecd9676271953c25e646b42ebb76c5
   - remote: buf.build
     owner: opencensus
     repository: opencensus
@@ -34,8 +34,8 @@ deps:
   - remote: buf.build
     owner: opentelemetry
     repository: opentelemetry
-    commit: f09eb847644240118cb5ddaa51913b1c
-    digest: shake256:1f418a74612dee5043f03c9f2f0741a920ea9b3922e672bb90ce1a173c02f49ca9af16272802c71ed74f2d02366e1828c98fc13ba8598afb31c460ac1808e745
+    commit: b93f1c8ac18541a8a331ca1041916b78
+    digest: shake256:9724e8b27d1c1645242e3b613edf0910b3dce4796764e8d1fbe8c4b8d437a1636fe4575d1f77e27e0380808af95715ae5b49fe2fceae147a3f18d761688cde7b
   - remote: buf.build
     owner: prometheus
     repository: client-model

@@ -15,31 +15,31 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
-	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/prometheusreceiver"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/platform"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
-	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/pkg/utils"
-	"github.com/fluxninja/aperture/test/harness"
+	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
+	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent/otel/prometheusreceiver"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/platform"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
+	"github.com/fluxninja/aperture/v2/pkg/status"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
+	"github.com/fluxninja/aperture/v2/test/harness"
 )
 
 const (
@@ -146,14 +146,7 @@ var _ = BeforeSuite(func() {
 	apertureOpts := fx.Options(
 		platform.Config{MergeConfig: apertureConfig}.Module(),
 		prometheusreceiver.Module(),
-		fx.Option(
-			fx.Provide(
-				fx.Annotate(
-					provideOTelConfig,
-					fx.ResultTags(`name:"base"`),
-				),
-			),
-		),
+		fx.Provide(provideOTelConfig),
 		classifier.Module(),
 		service.Module(),
 		fx.Provide(
@@ -244,8 +237,8 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTelConfig() *otelconfig.OTelConfigProvider {
-	cfg := otelconfig.NewOTelConfig()
+func provideOTelConfig() *otelconfig.Provider {
+	cfg := otelconfig.New()
 	if phStarted {
 		cfg.AddReceiver("prometheus", map[string]interface{}{
 			"config": map[string]interface{}{
@@ -275,5 +268,5 @@ func provideOTelConfig() *otelconfig.OTelConfigProvider {
 			Exporters: []string{otelconsts.ExporterLogging},
 		})
 	}
-	return otelconfig.NewOTelConfigProvider("service", cfg)
+	return otelconfig.NewProvider("service", cfg)
 }

@@ -20,13 +20,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
 
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 )
 
 // podMutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator to mutate Pods, based on the provided parameter.

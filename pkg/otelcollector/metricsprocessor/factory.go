@@ -9,9 +9,9 @@ import (
 	"go.opentelemetry.io/collector/processor"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
-	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
+	"github.com/fluxninja/aperture/v2/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 )
 
 const (

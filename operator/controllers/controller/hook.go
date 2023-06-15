@@ -20,12 +20,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/fluxninja/aperture/operator/controllers"
-	"github.com/hashicorp/go-version"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	"github.com/clarketm/json"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
@@ -49,18 +48,6 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 
 	if controller.ObjectMeta.Annotations == nil {
 		controller.ObjectMeta.Annotations = map[string]string{}
-	}
-
-	// Adding check for older default address for backward compatibility
-	//
-	// Deprecated: 1.9.0
-	if controller.Spec.ConfigSpec.Server.GrpcGateway.GRPCAddr == "0.0.0.0:1" {
-		controllerVersion := controller.Spec.Image.Tag
-		v1, _ := version.NewVersion(controllerVersion)
-		v2, _ := version.NewVersion("1.6.0")
-		if v1 == nil || v1.GreaterThanOrEqual(v2) {
-			controller.Spec.ConfigSpec.Server.GrpcGateway.GRPCAddr = ""
-		}
 	}
 
 	controller.ObjectMeta.Annotations[controllers.DefaulterAnnotationKey] = "true"

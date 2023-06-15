@@ -25,16 +25,22 @@
   withLoadSchedulerMixin(load_scheduler):: {
     load_scheduler+: load_scheduler,
   },
+  withQuotaScheduler(quota_scheduler):: {
+    quota_scheduler: quota_scheduler,
+  },
+  withQuotaSchedulerMixin(quota_scheduler):: {
+    quota_scheduler+: quota_scheduler,
+  },
   withRateLimiter(rate_limiter):: {
     rate_limiter: rate_limiter,
   },
   withRateLimiterMixin(rate_limiter):: {
     rate_limiter+: rate_limiter,
   },
-  withRegulator(regulator):: {
-    regulator: regulator,
+  withSampler(sampler):: {
+    sampler: sampler,
   },
-  withRegulatorMixin(regulator):: {
-    regulator+: regulator,
+  withSamplerMixin(sampler):: {
+    sampler+: sampler,
   },
 }

@@ -1,16 +1,16 @@
 # Generated values file for policies/feature-rollout/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/base
+# https://docs.fluxninja.com/reference/blueprints/ policies/feature-rollout/base
 
 # Parameters for the Feature Rollout policy.
 # Type: rollout_policy
 # Required: True
 policy:
   components: []
-  drivers:
+  drivers: {}
   evaluation_interval: "1s"
   load_ramp:
-    regulator:
+    sampler:
       label_key: ""
       selectors:
         - control_point: __REQUIRED_FIELD__
@@ -22,6 +22,7 @@ policy:
   resources:
     flow_control:
       classifiers: []
+  rollout: false
 
 dashboard:
   # Refresh interval for dashboard panels.
@@ -33,6 +34,12 @@ dashboard:
   # To time of dashboard.
   # Type: string
   time_to: "now"
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters: {}
+  # Name of the main dashboard.
+  # Type: string
+  title: "Aperture Feature Rollout"
   datasource:
     # Datasource name.
     # Type: string

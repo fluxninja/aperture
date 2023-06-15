@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -32,7 +32,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
 
 // serviceForController prepares an object of Service for Controller based on the provided parameters.

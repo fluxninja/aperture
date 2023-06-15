@@ -15,14 +15,14 @@ import Zoom from 'react-medium-image-zoom';
 import {apertureVersion} from '../../apertureVersion.js';
 ```
 
-Modern web-scale apps are a complex network of interconnected microservices that
-implement features such as account management, search, payments & more. This
-decoupled architecture has advantages but introduces new complex failure modes.
-When traffic surges, it can result in a queue buildup on a critical service,
-kick-starting a positive feedback loop and causing
+Many applications consist of intricate networks of interconnected services that
+drive essential features. While both monolithic and decoupled architectures
+offer various advantages, they also introduce new challenges and complexities.
+During periods of high traffic, a critical service may experience queue buildup,
+triggering a detrimental positive feedback loop and leading to
 [cascading failures](https://sre.google/sre-book/addressing-cascading-failures/).
-The application stops serving timely responses and critical end-user
-transactions are interrupted.
+As a result, the application becomes unresponsive, causing disruptions to
+crucial end-user transactions.
 
 ![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
 ![Absence of flow control](assets/img/no-flow-control-dark.png#gh-dark-mode-only)
@@ -51,7 +51,7 @@ Aperture splits the process of flow control into two layers:
 - Governing the flow control process and making high-level decisions. This is
   done by the Aperture Controller through [_Policies_][policies].
 - Actual execution of flow control is performed by Aperture Agent through [_Load
-  Regulators_][regulator], [_Load Schedulers_][load-scheduler] and [_Rate
+  Samplers_][sampler], [_Load Schedulers_][load-scheduler] and [_Rate
   Limiters_][rate-limiter]. Additionally, the Agent handles other flow-control
   related tasks, like gathering metrics through [_Flux Meters_][flux-meter] and
   classifying traffic through [_Classifiers_][classifier]. This chapter
@@ -73,12 +73,11 @@ you need to install integrations that will communicate with the Aperture Agent.
   Integration instructions for [Istio/Envoy][istio] are provided, and the
   Control Point can be named to identify a particular filter chain in Envoy. If
   insertion is done through Istio, the
-  [default filter configuration](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
+  [default filter configuration](/integrations/istio/istio.md#envoy-filter)
   assigns _ingress_ and _egress_ Control Points as identified by
   [Istio][istio-patch-context].
 
-- _Feature_ _Control Points_:
-  [Aperture SDKs](/get-started/integrations/flow-control/sdk/sdk.md) are
+- _Feature_ _Control Points_: [Aperture SDKs](/integrations/sdk/sdk.md) are
   available for popular programming languages. Aperture SDK wraps any function
   call or code snippet inside the service code as a _Feature_ _Control Point_.
   Every invocation of the feature is a flow from the perspective of Aperture.
@@ -92,13 +91,13 @@ you need to install integrations that will communicate with the Aperture Agent.
 
 [policies]: /concepts/policy/policy.md
 [control-point]: ./selector.md#control-point
+[sampler]: ./components/sampler.md
 [load-scheduler]: ./components/load-scheduler.md
-[regulator]: ./components/regulator.md
 [rate-limiter]: ./components/rate-limiter.md
 [flux-meter]: ./resources/flux-meter.md
 [classifier]: ./resources/classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[istio]: /get-started/integrations/flow-control/envoy/istio.md
+[istio]: /integrations/istio/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [flowcontrol-proto]:

@@ -7,6 +7,12 @@
   withLabelMatcherMixin(label_matcher):: {
     label_matcher+: label_matcher,
   },
+  withName(name):: {
+    name: name,
+  },
+  withNameMixin(name):: {
+    name+: name,
+  },
   withParameters(parameters):: {
     parameters: parameters,
   },

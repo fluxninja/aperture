@@ -10,13 +10,13 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/status"
+	policymonitoringv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/monitoring/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 // CircuitModule returns fx options of Circuit for the main app.
@@ -59,7 +59,7 @@ func newCircuitMetrics() *CircuitMetrics {
 		),
 		InvalidSignalReadingsTotal: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: metrics.InvalidSignalReadingsTotal,
+				Name: metrics.InvalidSignalReadingsTotalMetricName,
 				Help: "The number of invalid readings from a signal",
 			},
 			circuitMetricsLabels,
@@ -75,7 +75,7 @@ func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.L
 	}
 	circuitMetrics := []metric{
 		{circuitMetrics.SignalSummaryVec, metrics.SignalReadingMetricName},
-		{circuitMetrics.InvalidSignalReadingsTotal, metrics.InvalidSignalReadingsTotal},
+		{circuitMetrics.InvalidSignalReadingsTotal, metrics.InvalidSignalReadingsTotalMetricName},
 	}
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {

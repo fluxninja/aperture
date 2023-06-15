@@ -1,0 +1,6 @@
+blueprint:
+  Service Protection Policy based on feedback of average feature duration or
+  response latency with overload confirmation using jmx metrics.
+sources:
+  dashboard: policies/service-protection/jmx/dashboard.libsonnet
+  policy: policies/service-protection/jmx/policy.libsonnet

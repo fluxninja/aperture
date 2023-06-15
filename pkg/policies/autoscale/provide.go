@@ -1,7 +1,7 @@
 package autoscale
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes"
 	"go.uber.org/fx"
 )
 

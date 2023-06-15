@@ -1,6 +1,6 @@
 package consts
 
-import "github.com/fluxninja/aperture/pkg/config"
+import "github.com/fluxninja/aperture/v2/pkg/config"
 
 const (
 	/* Common labels available on all flow control integrations. */
@@ -61,10 +61,10 @@ const (
 	ApertureLoadSchedulersLabel = "aperture.load_schedulers"
 	// ApertureDroppingLoadSchedulersLabel describes load schedulers dropping the traffic.
 	ApertureDroppingLoadSchedulersLabel = "aperture.dropping_load_schedulers"
-	// ApertureLoadRegulatorsLabel describes load regulators matched to the traffic.
-	ApertureLoadRegulatorsLabel = "aperture.load_regulators"
-	// ApertureDroppingLoadRegulatorsLabel describes load regulators dropping the traffic.
-	ApertureDroppingLoadRegulatorsLabel = "aperture.dropping_load_regulators"
+	// ApertureSamplersLabel describes samplers matched to the traffic.
+	ApertureSamplersLabel = "aperture.samplers"
+	// ApertureDroppingSamplersLabel describes samplers dropping the traffic.
+	ApertureDroppingSamplersLabel = "aperture.dropping_samplers"
 	// ApertureWorkloadsLabel describes workloads matched to the traffic.
 	ApertureWorkloadsLabel = "aperture.workloads"
 	// ApertureDroppingWorkloadsLabel describes workloads dropping the traffic.
@@ -171,6 +171,8 @@ const (
 	ProcessorAlertsNamespace = "attributes/alerts"
 	// ProcessorFilterKubeletStats filters in only metrics of interest.
 	ProcessorFilterKubeletStats = "filter/kubeletstats"
+	// ProcessorFilterHighCardinalityMetrics filters out high cardinality Aperture platform metrics.
+	ProcessorFilterHighCardinalityMetrics = "filter/high_cardinality_metrics"
 	// ProcessorK8sAttributes enriches metrics with k8s metadata.
 	ProcessorK8sAttributes = "k8sattributes/kubeletstats"
 

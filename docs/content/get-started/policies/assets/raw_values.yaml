@@ -1,20 +1,29 @@
-# Generated values file for policies/static-rate-limiting blueprint
+# Generated values file for policies/rate-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
+# https://docs.fluxninja.com/reference/blueprints/policies/rate-limiting
 
 policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  # List of classification rules.
-  # Type: []aperture.spec.v1.Classifier
-  classifiers: []
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   rate_limiter:
-    # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
+    # Bucket capacity.
     # Type: float64
     # Required: True
-    rate_limit: __REQUIRED_FIELD__
+    bucket_capacity: __REQUIRED_FIELD__
+    # Fill amount.
+    # Type: float64
+    # Required: True
+    fill_amount: __REQUIRED_FIELD__
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     selectors:
@@ -23,25 +32,24 @@ policy:
     # Parameters.
     # Type: aperture.spec.v1.RateLimiterParameters
     parameters:
-      # Time after which the limit for a given label value will be reset.
+      # Flow label key to use for rate limiting. If not specified, then all requests matching the selector will be rate limited.
+      # Type: string
+      label_key: ""
+      # Fill interval e.g. "1s".
       # Type: string
       # Required: True
-      limit_reset_interval: __REQUIRED_FIELD__
-      # Flow label to use for rate limiting.
-      # Type: string
-      # Required: True
-      label_key: __REQUIRED_FIELD__
-    # Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.
-    # Type: aperture.spec.v1.RateLimiterDynamicConfig
-    default_config:
-      # Allows to specify different limits for particular label values.
-      # Type: []aperture.spec.v1.RateLimiterOverride
-      overrides: []
+      interval: __REQUIRED_FIELD__
 
 dashboard:
   # Refresh interval for dashboard panels.
   # Type: string
   refresh_interval: "10s"
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters: {}
+  # Name of the main dashboard.
+  # Type: string
+  title: "Aperture Rate Limiter"
   datasource:
     # Datasource name.
     # Type: string

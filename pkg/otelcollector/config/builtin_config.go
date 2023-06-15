@@ -1,18 +1,18 @@
-package config
+package otelconfig
 
 import (
 	"crypto/tls"
 	"fmt"
 
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	promapi "github.com/prometheus/client_golang/api"
 )
 
 // AddAlertsPipeline adds reusable alerts pipeline.
-func AddAlertsPipeline(config *OTelConfig, cfg CommonOTelConfig, extraProcessors ...string) {
+func AddAlertsPipeline(config *Config, cfg CommonOTelConfig, extraProcessors ...string) {
 	config.AddReceiver(otelconsts.ReceiverAlerts, map[string]any{})
 	config.AddProcessor(otelconsts.ProcessorAlertsNamespace, map[string]interface{}{
 		"actions": []map[string]interface{}{
@@ -45,7 +45,7 @@ func AddAlertsPipeline(config *OTelConfig, cfg CommonOTelConfig, extraProcessors
 
 // AddPrometheusRemoteWriteExporter adds Prometheus remote write exporter which
 // writes to controller Prometheus instance.
-func AddPrometheusRemoteWriteExporter(config *OTelConfig, promClient promapi.Client) {
+func AddPrometheusRemoteWriteExporter(config *Config, promClient promapi.Client) {
 	endpoint := promClient.URL("api/v1/write", nil)
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTel. Need to use bare maps instead.
@@ -108,4 +108,26 @@ func BuildOTelScrapeConfig(name string, cfg CommonOTelConfig) map[string]any {
 			},
 		},
 	}
+}
+
+// AddHighCardinalityMetricsFilterProcessor adds filter processor which filters
+// out high cardinality Aperture platform metrics.
+func AddHighCardinalityMetricsFilterProcessor(config *Config) {
+	config.AddProcessor(otelconsts.ProcessorFilterHighCardinalityMetrics, map[string]any{
+		"metrics": map[string]interface{}{
+			"exclude": map[string]interface{}{
+				"match_type": "regexp",
+				"regexp": map[string]interface{}{
+					"cacheenabled":       true,
+					"cachemaxnumentries": 1000,
+				},
+				"metric_names": []string{
+					"grpc_server_handled.*",
+					"grpc_server_handling.*",
+					"grpc_server_msg.*",
+					"grpc_server_started.*",
+				},
+			},
+		},
+	})
 }

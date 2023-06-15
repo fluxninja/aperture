@@ -42,7 +42,7 @@ APERTURE_PYTHON_EXAMPLE_NS = "aperture-python-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ISTIO_NS = "istio-system"
-DEFAULT_TEST_SCENARIO = "scenarios/rate_limiting_escalation"
+DEFAULT_TEST_SCENARIO = "scenarios/java-service-protection"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 TANKA_DEPS_HANDLED = []
@@ -114,7 +114,7 @@ DEP_TREE = {
             ]
         },
         "controller": {
-           "labels": ["ApertureController"],
+            "labels": ["ApertureController"],
             "tkenv": TANKA_ROOT + "/apps/aperture-controller",
             "images": [
                 {
@@ -219,7 +219,7 @@ DEP_TREE = {
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "agents.fluxninja.com:customresourcedefinition",
-                         "aperture-agent-defaulter:mutatingwebhookconfiguration",
+                        "aperture-agent-defaulter:mutatingwebhookconfiguration",
                     ]
                 },
                 {
@@ -387,11 +387,7 @@ DEP_TREE = {
     },
 }
 
-NS_CONFIG = {
-    APERTURE_DEMOAPP_NS: {
-        "labels": ["istio-injection: enabled"],
-    }
-}
+NS_CONFIG = {}
 
 ###############
 ### HELPERS ###
@@ -897,7 +893,7 @@ def process_aperture_scenario(scenario_path):
 
 
     # Load k6 configuration and process it for inclusion into a yaml file
-    wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
+    wavepool_js = str(read_file(scenario_path + "/" + "load-generator/test.js"))
     lines = wavepool_js.replace("\"", "\\\"").split("\n")
     wavepool_js = "\\n".join(lines)
     wavepool = {
@@ -947,6 +943,9 @@ def forward_port_delayed(workload, labels, resource_deps, namespace, service, lo
         readiness_probe=readiness_probe,
     )
 
+def get_agent_version():
+    val = str(local("git tag -l --sort='-version:refname' v* | head -n 1")).strip()
+    return val
 
 def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_extension, scenario):
     """
@@ -959,11 +958,12 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
     for resource in resources:
         resource_info = inv_dep_tree[resource]
         labels = resource_info.get("labels", [])
+        images = resource_info.get("images",{})
+        agent_version = get_agent_version()
+        if resource in ["controller", "agent"]:
+            images[0]["build_args"]["APERTURECTL_BUILD_VERSION"] = agent_version
         if race_arg:
-            images = resource_info.get("images",{})
-            if resource == "controller":
-                images[0]["build_args"]["APERTURECTL_BUILD_FLAGS"] = "['-race']"
-            if resource == "agent":
+            if resource in ["controller", "agent"]:
                 images[0]["build_args"]["APERTURECTL_BUILD_FLAGS"] = "['-race']"
         for image in resource_info.get("images", []):
             if 'tag' in image.keys():

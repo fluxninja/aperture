@@ -3,11 +3,12 @@ package cmd
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 var (
@@ -57,8 +58,11 @@ aperturectl compile --policy=policy.yaml --mermaid --dot`,
 		} else {
 			policyFile = policy
 		}
-
-		circuit, _, err := utils.CompilePolicy(policyFile)
+		policyBytes, err := os.ReadFile(policyFile)
+		if err != nil {
+			return err
+		}
+		circuit, _, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
 		if err != nil {
 			log.Error().Err(err).Msg("error reading policy spec")
 			return err

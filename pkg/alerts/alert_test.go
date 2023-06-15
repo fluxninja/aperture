@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
 )
 
 var _ = Describe("Alert", func() {

@@ -10,21 +10,21 @@ import (
 	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	agentconfig "github.com/fluxninja/aperture/cmd/aperture-agent/config"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	inframeter "github.com/fluxninja/aperture/pkg/otelcollector/infra-meter"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
-	"github.com/fluxninja/aperture/pkg/utils"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	agentconfig "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	inframeter "github.com/fluxninja/aperture/v2/pkg/otelcollector/infra-meter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 func provideAgent(
@@ -36,13 +36,13 @@ func provideAgent(
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	shutdowner fx.Shutdowner,
-) (*otelconfig.OTelConfigProvider, *otelconfig.OTelConfigProvider, error) {
+) (*otelconfig.Provider, error) {
 	var agentCfg agentconfig.AgentOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
-		return nil, nil, fmt.Errorf("unmarshalling otel config: %w", err)
+		return nil, fmt.Errorf("unmarshalling otel config: %w", err)
 	}
 
-	otelCfg := otelconfig.NewOTelConfig()
+	otelCfg := otelconfig.New()
 	otelCfg.SetDebugPort(&agentCfg.CommonOTelConfig)
 	otelCfg.AddDebugExtensions(&agentCfg.CommonOTelConfig)
 
@@ -51,24 +51,23 @@ func provideAgent(
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
 
 	customConfig := map[string]*policylangv1.InfraMeter{}
-	if !agentCfg.DisableKubeletScraper {
-		customConfig[otelconsts.ReceiverKubeletStats] = inframeter.InfraMeterForKubeletStats()
-	}
-
 	if err := inframeter.AddInfraMeters(otelCfg, customConfig); err != nil {
-		return nil, nil, fmt.Errorf("adding custom metrics pipelines: %w", err)
+		return nil, fmt.Errorf("adding builtin custom metrics pipelines: %w", err)
 	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 
-	baseConfigProvider := otelconfig.NewOTelConfigProvider("service", otelCfg)
-
-	tcConfigProvider := otelconfig.NewOTelConfigProvider("telemetry-collector", otelconfig.NewOTelConfig())
+	baseOtelCfg, err := otelCfg.Copy()
+	if err != nil {
+		return nil, fmt.Errorf("failed to copy base collector config: %w", err)
+	}
+	configProvider := otelconfig.NewProvider("service", otelCfg)
 
 	allInfraMeters := map[string]map[string]*policylangv1.InfraMeter{}
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
+		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
 		tc := &policylangv1.TelemetryCollector{}
-		if err := unmarshaller.UnmarshalKey("", tc); err != nil {
+		if err = unmarshaller.UnmarshalKey("", tc); err != nil {
 			log.Error().Err(err).Msg("unmarshalling telemetry collector")
 			return
 		}
@@ -81,7 +80,9 @@ func provideAgent(
 		case notifiers.Remove:
 			delete(allInfraMeters, key)
 		}
-		otelCfg := otelconfig.NewOTelConfig()
+
+		// We already checked that the config is copiable, so MustCopy shouldn't panic.
+		otelCfg := baseOtelCfg.MustCopy()
 		ims := map[string]*policylangv1.InfraMeter{}
 		for prefix, v := range allInfraMeters {
 			for k, v := range v {
@@ -95,7 +96,7 @@ func provideAgent(
 		}
 		// trigger update
 		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(allInfraMeters))
-		tcConfigProvider.UpdateConfig(otelCfg)
+		configProvider.UpdateConfig(otelCfg)
 	}
 
 	// Get Agent Group from host info gatherer
@@ -105,21 +106,21 @@ func provideAgent(
 		paths.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	unmarshalNotifier, err := notifiers.NewUnmarshalPrefixNotifier("",
 		handleInfraMeterUpdate,
 		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller)
 	if err != nil {
-		return nil, nil, fmt.Errorf("creating unmarshal notifier: %w", err)
+		return nil, fmt.Errorf("creating unmarshal notifier: %w", err)
 	}
 	notifiers.WatcherLifecycle(lifecycle, watcher, []notifiers.PrefixNotifier{unmarshalNotifier})
 
-	return baseConfigProvider, tcConfigProvider, nil
+	return configProvider, nil
 }
 
 func addLogsPipeline(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	userConfig *agentconfig.AgentOTelConfig,
 ) {
 	// Common dependencies for pipelines
@@ -157,7 +158,7 @@ func addLogsPipeline(
 	})
 }
 
-func addTracesPipeline(config *otelconfig.OTelConfig, _ *listener.Listener) {
+func addTracesPipeline(config *otelconfig.Config, _ *listener.Listener) {
 	config.AddConnector(otelconsts.ConnectorAdapter, map[string]any{})
 	config.Service.AddPipeline("traces", otelconfig.Pipeline{
 		Receivers: []string{otelconsts.ReceiverOTLP},
@@ -166,7 +167,7 @@ func addTracesPipeline(config *otelconfig.OTelConfig, _ *listener.Listener) {
 }
 
 func addMetricsPipeline(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	agentConfig *agentconfig.AgentOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
@@ -174,17 +175,23 @@ func addMetricsPipeline(
 ) {
 	addPrometheusReceiver(config, agentConfig, tlsConfig, lis)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
+	processors := []string{
+		otelconsts.ProcessorAgentGroup,
+	}
+	if !agentConfig.EnableHighCardinalityPlatformMetrics {
+		otelconfig.AddHighCardinalityMetricsFilterProcessor(config)
+		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
+		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)
+	}
 	config.Service.AddPipeline("metrics/fast", otelconfig.Pipeline{
-		Receivers: []string{otelconsts.ReceiverPrometheus},
-		Processors: []string{
-			otelconsts.ProcessorAgentGroup,
-		},
-		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
+		Receivers:  []string{otelconsts.ReceiverPrometheus},
+		Processors: processors,
+		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
 	})
 }
 
 func addPrometheusReceiver(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	agentConfig *agentconfig.AgentOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,

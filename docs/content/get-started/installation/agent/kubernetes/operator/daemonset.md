@@ -25,7 +25,7 @@ where it will get deployed on all the nodes of the cluster.
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
@@ -222,9 +222,8 @@ Kubernetes Objects which will be created by following steps are listed
       kubectl apply -f agent.yaml
       ```
 
-5. Refer to steps on the
-   [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
-   if you do not have the
+5. Refer to steps on the [Istio Configuration](/integrations/istio/istio.md) if
+   you do not have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 

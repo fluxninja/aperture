@@ -11,16 +11,16 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
-	"github.com/fluxninja/aperture/pkg/status"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 // Module is a default set of components to enable flow classification
@@ -102,7 +102,7 @@ func ProvideClassificationEngine(in ClassificationEngineIn) (iface.Classificatio
 				return err
 			}
 			if !in.PromRegistry.Unregister(classificationEngine.counterVec) {
-				return fmt.Errorf("failed to unregister %s metric", metrics.ClassifierCounterMetricName)
+				return fmt.Errorf("failed to unregister %s metric", metrics.ClassifierCounterTotalMetricName)
 			}
 
 			return nil
@@ -181,7 +181,7 @@ func (c *ClassificationEngine) invokeMiniApp(
 
 				deleted := c.counterVec.Delete(metricLabels)
 				if !deleted {
-					errMulti = multierr.Append(errMulti, errors.New("failed to delete classifier_counter from its metric vector"))
+					errMulti = multierr.Append(errMulti, errors.New("failed to delete classifier_counter_total from its metric vector"))
 				}
 				return errMulti
 			},

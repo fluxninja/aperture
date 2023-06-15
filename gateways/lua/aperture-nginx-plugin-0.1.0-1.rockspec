@@ -19,5 +19,6 @@ build = {
    modules = {
       ["aperture-plugin.access"] = "aperture-plugin/access.lua",
       ["aperture-plugin.log"] = "aperture-plugin/log.lua",
+      ["aperture-plugin.headers"] = "aperture-plugin/headers.lua",
    },
 }

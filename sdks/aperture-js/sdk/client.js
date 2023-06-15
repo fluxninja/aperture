@@ -14,7 +14,10 @@ import {
   URL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
-import { Flow } from "./flow.js";
+import {
+  Flow,
+  FlowDecision
+} from "./flow.js";
 import { fcs } from "./utils.js";
 
 export class ApertureClient {
@@ -41,7 +44,7 @@ export class ApertureClient {
   // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
   // Return value is a Flow.
   // The call returns immediately in case connection with Aperture Agent is not established.
-  // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
+  // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
   async StartFlow(controlPointArg, labelsArg) {
     return new Promise((resolve, reject) => {
       let labelsMap = new Map();
@@ -58,12 +61,17 @@ export class ApertureClient {
       span.setAttribute(SOURCE_LABEL, "sdk");
       let flow = new Flow(span);
 
+      let checkParams = {};
+      if (this.timeout != null && this.timeout != 0) {
+        checkParams.deadline = Date.now() + this.timeout;
+      }
+
       this.fcsClient.Check(
         {
           control_point: controlPointArg,
           labels: mergedLabels,
         },
-        { deadline: Date.now() + this.timeout },
+        checkParams,
         (err, response) => {
           span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
 

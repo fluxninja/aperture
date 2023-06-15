@@ -5,11 +5,11 @@ import (
 
 	promapi "github.com/prometheus/client_golang/api"
 
-	controllerconfig "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	controllerconfig "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 func provideController(
@@ -17,27 +17,26 @@ func provideController(
 	lis *listener.Listener,
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
-) (*otelconfig.OTelConfigProvider, error) {
+) (*otelconfig.Provider, error) {
 	var controllerCfg controllerconfig.ControllerOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
 		return nil, err
 	}
 
-	otelCfg := otelconfig.NewOTelConfig()
+	otelCfg := otelconfig.New()
 	otelCfg.SetDebugPort(&controllerCfg.CommonOTelConfig)
 	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTelConfig)
 
 	addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
 	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
 	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTelConfig)
-	baseConfigProvider := otelconfig.NewOTelConfigProvider("service", otelCfg)
 
-	return baseConfigProvider, nil
+	return otelconfig.NewProvider("service", otelCfg), nil
 }
 
 // addMetricsPipeline adds metrics to pipeline for controller OTel collector.
 func addMetricsPipeline(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	controllerConfig *controllerconfig.ControllerOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
@@ -45,15 +44,21 @@ func addMetricsPipeline(
 ) {
 	addPrometheusReceiver(config, controllerConfig, tlsConfig, lis)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
+	processors := []string{}
+	if !controllerConfig.EnableHighCardinalityPlatformMetrics {
+		otelconfig.AddHighCardinalityMetricsFilterProcessor(config)
+		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
+		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)
+	}
 	config.Service.AddPipeline("metrics/controller-fast", otelconfig.Pipeline{
 		Receivers:  []string{otelconsts.ReceiverPrometheus},
-		Processors: []string{},
-		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
+		Processors: processors,
+		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite, otelconsts.ExporterLogging},
 	})
 }
 
 func addPrometheusReceiver(
-	config *otelconfig.OTelConfig,
+	config *otelconfig.Config,
 	controllerConfig *controllerconfig.ControllerOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,

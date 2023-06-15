@@ -7,7 +7,7 @@ keywords:
   - agent
   - sidecar
   - daemonset
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 ## Overview
@@ -66,4 +66,8 @@ and can result in unpredictable behavior.
 2. [**Bare Metal or VM**](bare_metal.md)
 
    The Aperture Agent can be installed as a system service on any Linux system
-   that is [supported](supported-platforms.md).
+   that is [supported](../supported-platforms.md).
+
+3. [**Docker**](docker.md)
+
+   The Aperture Agent can also be installed on Docker as containers.

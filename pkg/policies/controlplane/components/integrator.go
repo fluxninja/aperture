@@ -5,12 +5,12 @@ import (
 
 	"go.uber.org/fx"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime/tristate"
 )
 
 // Integrator is a component that accumulates sum of signal every tick.
@@ -33,16 +33,17 @@ func (in *Integrator) ShortDescription() string {
 func (*Integrator) IsActuator() bool { return false }
 
 // NewIntegrator creates an integrator component.
-func NewIntegrator() runtime.Component {
+func NewIntegrator(initialValue float64) runtime.Component {
 	integrator := &Integrator{
-		sum: 0,
+		sum: initialValue,
 	}
 	return integrator
 }
 
 // NewIntegratorAndOptions creates an integrator component and its fx options.
-func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
-	return NewIntegrator(), fx.Options(), nil
+func NewIntegratorAndOptions(integratorProto *policylangv1.Integrator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
+	initialValue := integratorProto.GetInitialValue()
+	return NewIntegrator(initialValue), fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.

@@ -1,10 +1,10 @@
 package sim
 
 import (
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 // Input is a component that will emit signal from the given array – one

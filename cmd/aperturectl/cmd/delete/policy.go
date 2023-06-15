@@ -3,18 +3,18 @@ package delete
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/operator/api"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/log"
+	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // DeletePolicyCmd is the command to apply a policy to the cluster.
@@ -23,7 +23,7 @@ var DeletePolicyCmd = &cobra.Command{
 	Short:         "Delete Aperture Policy from the cluster",
 	Long:          `Use this command to delete the Aperture Policy from the cluster.`,
 	SilenceErrors: true,
-	Example:       `aperturectl delete policy --policy=static-rate-limiting`,
+	Example:       `aperturectl delete policy --policy=rate-limiting`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		return deletePolicy()
 	},
@@ -31,38 +31,50 @@ var DeletePolicyCmd = &cobra.Command{
 
 // deletePolicy deletes the policy from the cluster.
 func deletePolicy() error {
-	deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
-	if err != nil {
-		return err
-	}
-
-	err = api.AddToScheme(scheme.Scheme)
-	if err != nil {
-		return fmt.Errorf("failed to connect to Kubernetes: %w", err)
-	}
-
-	kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
-		Scheme: scheme.Scheme,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create Kubernetes client: %w", err)
-	}
-
-	policyCR := &policyv1alpha1.Policy{}
-	policyCR.Name = policyName
-	policyCR.Namespace = deployment.GetNamespace()
-	err = kubeClient.Delete(context.Background(), policyCR)
-	if err != nil && !apierrors.IsNotFound(err) {
-		if strings.Contains(err.Error(), "no matches for kind") {
-			err = deletePolicyUsingAPI()
-		}
-
+	if controller.IsKube() {
+		deployment, err := utils.GetControllerDeployment(controller.GetKubeRestConfig(), controllerNs)
 		if err != nil {
-			return fmt.Errorf("failed to delete policy in Kubernetes: %w", err)
+			return err
+		}
+
+		err = api.AddToScheme(scheme.Scheme)
+		if err != nil {
+			return fmt.Errorf("failed to connect to Kubernetes: %w", err)
+		}
+
+		kubeClient, err := k8sclient.New(controller.GetKubeRestConfig(), k8sclient.Options{
+			Scheme: scheme.Scheme,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create Kubernetes client: %w", err)
+		}
+
+		policyCR := &policyv1alpha1.Policy{}
+		policyCR.Name = policyName
+		policyCR.Namespace = deployment.GetNamespace()
+		err = kubeClient.Delete(context.Background(), policyCR)
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				log.Info().Str("policy", policyName).Msg("Policy not found in Kubernetes")
+				return nil
+			}
+
+			if apimeta.IsNoMatchError(err) {
+				err = deletePolicyUsingAPI()
+			}
+
+			if err != nil {
+				return fmt.Errorf("failed to delete policy from Kubernetes: %w", err)
+			}
+		}
+	} else {
+		err := deletePolicyUsingAPI()
+		if err != nil {
+			return fmt.Errorf("failed to delete policy: %w", err)
 		}
 	}
 
-	log.Info().Str("policy", policyName).Str("namespace", deployment.GetNamespace()).Msg("Deleted Policy successfully")
+	log.Info().Str("policy", policyName).Msg("Deleted Policy successfully")
 	return nil
 }
 

@@ -189,7 +189,8 @@ up and sent to the analytics database in the FluxNinja ARC. This allows:
 :::note
 
 For _Classifier_ created labels, you can disable this behavior by setting
-`hidden: true` in the [classification rule](/reference/policies/spec.md#rule).
+`hidden: true` in the
+[classification rule](/reference/configuration/spec.md#rule).
 
 :::
 
@@ -205,9 +206,9 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [control-point]: ./selector.md#control-point
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
-[aperture-sdks]: /get-started/integrations/flow-control/sdk/sdk.md
-[gateways]: /get-started/integrations/flow-control/gateway/gateway.md
-[istio]: /get-started/integrations/flow-control/envoy/istio.md
+[aperture-sdks]: /integrations/sdk/sdk.md
+[gateways]: /integrations/gateway/gateway.md
+[istio]: /integrations/istio/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[aperturectl]: /get-started/aperture-cli/aperture-cli.md
+[aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
 [label-matcher]: ./selector.md#label-matcher

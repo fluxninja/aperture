@@ -7,4 +7,10 @@
   withGradientMixin(gradient):: {
     gradient+: gradient,
   },
+  withPeriodic(periodic):: {
+    periodic: periodic,
+  },
+  withPeriodicMixin(periodic):: {
+    periodic+: periodic,
+  },
 }

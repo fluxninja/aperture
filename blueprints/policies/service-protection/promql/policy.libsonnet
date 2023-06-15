@@ -2,13 +2,13 @@ local spec = import '../../../spec.libsonnet';
 local basePolicyFn = import '../base/policy.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg) {
+function(cfg, metadata={}) {
   local params = config + cfg,
 
-  local basePolicy = basePolicyFn(cfg).policyDef,
+  local basePolicy = basePolicyFn(cfg, metadata),
 
   // Add new components to basePolicy
-  local policyDef = basePolicy {
+  local policyDef = basePolicy.policyDef {
     circuit+: {
       components+: [
         spec.v1.Component.withQuery(
@@ -23,13 +23,10 @@ function(cfg) {
         ),
         spec.v1.Component.withVariable(
           spec.v1.Variable.new()
-          + spec.v1.Variable.withDefaultConfig(
-            spec.v1.VariableDynamicConfig.new()
-            + spec.v1.VariableDynamicConfig.withConstantSignal(
-              local s = params.policy.setpoint;
-              spec.v1.ConstantSignal.new()
-              + spec.v1.ConstantSignal.withValue(s)
-            )
+          + spec.v1.Variable.withConstantOutput(
+            local s = params.policy.setpoint;
+            spec.v1.ConstantSignal.new()
+            + spec.v1.ConstantSignal.withValue(s)
           )
           + spec.v1.Variable.withOutPorts({ output: spec.v1.Port.withSignalName('SETPOINT') }),
         ),
@@ -37,19 +34,8 @@ function(cfg) {
     },
   },
 
-  local policyResource = {
-    kind: 'Policy',
-    apiVersion: 'fluxninja.com/v1alpha1',
-    metadata: {
-      name: params.policy.policy_name,
-      labels: {
-        'fluxninja.com/validate': 'true',
-      },
-    },
-    spec: policyDef,
+  policyResource: basePolicy.policyResource {
+    spec+: policyDef,
   },
-
-  policyResource: policyResource,
-
   policyDef: policyDef,
 }

@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withRegulator(regulator):: {
-    regulator: regulator,
+  withSampler(sampler):: {
+    sampler: sampler,
   },
-  withRegulatorMixin(regulator):: {
-    regulator+: regulator,
+  withSamplerMixin(sampler):: {
+    sampler+: sampler,
   },
   withSteps(steps):: {
     steps:

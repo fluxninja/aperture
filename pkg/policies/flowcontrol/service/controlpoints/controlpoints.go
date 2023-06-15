@@ -5,9 +5,9 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
-	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
+	flowcontrolpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
+	"github.com/fluxninja/aperture/v2/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 )
 
 // Handler implements FlowControlPointsService.

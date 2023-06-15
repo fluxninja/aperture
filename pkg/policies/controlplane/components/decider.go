@@ -6,11 +6,11 @@ import (
 
 	"go.uber.org/fx"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 type deciderState int8
@@ -25,7 +25,7 @@ const (
 // ComparisonOperator is the type of comparison operator.
 type ComparisonOperator int8
 
-//go:generate enumer -type=ComparisonOperator -output=decider-comparison-operator-string.go
+//go:generate enumer -type=ComparisonOperator -transform=lower -output=decider-comparison-operator-string.go
 const (
 	UnknownComparison ComparisonOperator = iota
 	GT

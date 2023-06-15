@@ -3,7 +3,7 @@ package main
 import (
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/info"
 )
 
 // WARNING: This is a placeholder file and should not be edited normally.

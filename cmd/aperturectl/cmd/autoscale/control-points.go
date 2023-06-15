@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
 // ControlPointsCmd is the command to list control points.
@@ -18,7 +18,7 @@ var ControlPointsCmd = &cobra.Command{
 	Short:         "List AutoScale control points",
 	Long:          `List AutoScale control points`,
 	SilenceErrors: true,
-	Example:       `aperturectl auto-scale control-points --kube`,
+	Example:       `aperturectl auto-scale control-points`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.Client()
 		if err != nil {

@@ -2,11 +2,12 @@ package iface
 
 import (
 	"context"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 //go:generate mockgen -source=limiter.go -destination=../../mocks/mock_limiter.go -package=mocks
@@ -28,20 +29,29 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetSelectors() []*policylangv1.Selector
-	Decide(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
-	Revert(labels map[string]string, decision *flowcontrolv1.LimiterDecision)
+	Decide(ctx context.Context, labels map[string]string) LimiterDecision
+	Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision)
 	GetLimiterID() LimiterID
 	GetRequestCounter(labels map[string]string) prometheus.Counter
+}
+
+// LimiterDecision wraps flowcontrolv1.LimiterDecision with some additional
+// metadata that won't end up in the CheckResponse.
+type LimiterDecision struct {
+	*flowcontrolv1.LimiterDecision
+	// If non-zero, it's a recommended minimal time before retrying failed
+	// request.
+	WaitTime time.Duration
 }
 
 // RateLimiter interface.
 type RateLimiter interface {
 	Limiter
-	TakeN(labels map[string]string, count int) (label string, ok bool, remaining int, current int)
+	TakeIfAvailable(ctx context.Context, labels map[string]string, count float64) (label string, ok bool, waitTime time.Duration, remaining float64, current float64)
 }
 
-// LoadScheduler interface.
-type LoadScheduler interface {
+// Scheduler interface.
+type Scheduler interface {
 	Limiter
 	GetLatencyObserver(labels map[string]string) prometheus.Observer
 }

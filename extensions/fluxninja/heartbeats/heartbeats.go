@@ -17,26 +17,26 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/fluxninja/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/etcd/election"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/peers"
-	autoscalek8sdiscovery "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	flowcontrolpoints "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
-	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/pkg/utils"
+	heartbeatv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/fluxninja/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	"github.com/fluxninja/aperture/v2/pkg/peers"
+	autoscalek8sdiscovery "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
+	flowcontrolpoints "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/controlpoints"
+	"github.com/fluxninja/aperture/v2/pkg/status"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (
@@ -57,12 +57,12 @@ type Heartbeats struct {
 	statusRegistry            status.Registry
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints
 	policyFactory             *controlplane.PolicyFactory
-	ControllerInfo            *heartbeatv1.ControllerInfo
+	ControllerInfo            *heartbeatv1.ControllerInfo // set in OnStart
 	jobGroup                  *jobs.JobGroup
-	clientConn                *grpc.ClientConn
+	clientConn                *grpc.ClientConn // set in OnStart
 	peersWatcher              *peers.PeerDiscovery
 	entities                  *entities.Entities
-	clientHTTP                *http.Client
+	clientHTTP                *http.Client // set in OnStart
 	interval                  config.Duration
 	flowControlPoints         *cache.Cache[selectors.TypedControlPointID]
 	agentInfo                 *agentinfo.AgentInfo

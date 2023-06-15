@@ -7,19 +7,20 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/autoscale/podscaler"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/loadscheduler"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/regulator"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/pkg/utils"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/controller"
+	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
+	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/sampler"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // FactoryModule for component factory run via the main app.
@@ -55,6 +56,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Variable:
 		ctor = mkCtor(config.Variable, components.NewVariableAndOptions)
+	case *policylangv1.Component_BoolVariable:
+		ctor = mkCtor(config.BoolVariable, components.NewBoolVariableAndOptions)
 	case *policylangv1.Component_Decider:
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
@@ -102,10 +105,12 @@ func NewComponentAndOptions(
 	case *policylangv1.Component_FlowControl:
 		flowControl := componentProto.GetFlowControl()
 		switch flowControlConfig := flowControl.Component.(type) {
+		case *policylangv1.FlowControl_QuotaScheduler:
+			ctor = mkCtor(flowControlConfig.QuotaScheduler, quotascheduler.NewQuotaSchedulerAndOptions)
 		case *policylangv1.FlowControl_RateLimiter:
-			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
-		case *policylangv1.FlowControl_Regulator:
-			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
+			ctor = mkCtor(flowControlConfig.RateLimiter, ratelimiter.NewRateLimiterAndOptions)
+		case *policylangv1.FlowControl_Sampler:
+			ctor = mkCtor(flowControlConfig.Sampler, sampler.NewSamplerAndOptions)
 		case *policylangv1.FlowControl_Private:
 			switch flowControlConfig.Private.TypeUrl {
 			case "type.googleapis.com/aperture.policy.private.v1.LoadActuator":

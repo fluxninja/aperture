@@ -12,7 +12,7 @@
         "drivers": {},
         "evaluation_interval": "1s",
         "load_ramp": {
-          "regulator": {
+          "sampler": {
             "label_key": "",
             "selectors": [
               {
@@ -33,7 +33,8 @@
           "flow_control": {
             "classifiers": []
           }
-        }
+        },
+        "rollout": false
       },
       "type": "object",
       "$ref": "#/$defs/rollout_policy"
@@ -55,6 +56,17 @@
         "time_to": {
           "description": "To time of dashboard.",
           "default": "now",
+          "type": "string"
+        },
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Feature Rollout",
           "type": "string"
         },
         "datasource": {
@@ -365,7 +377,7 @@
         "load_ramp": {
           "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
           "default": {
-            "regulator": {
+            "sampler": {
               "label_key": "",
               "selectors": [
                 {
@@ -539,6 +551,11 @@
               }
             }
           }
+        },
+        "rollout": {
+          "description": "Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.",
+          "default": false,
+          "type": "boolean"
         }
       }
     }

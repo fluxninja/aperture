@@ -2,20 +2,22 @@ package controlplane
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path"
 
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
-	"github.com/fluxninja/aperture/pkg/utils"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // PolicyService is the implementation of policylangv1.PolicyService interface.
@@ -77,7 +79,6 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 // UpsertPolicy creates/updates policy to the system.
 func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
 	updateMask := req.UpdateMask != nil && len(req.UpdateMask.GetPaths()) > 0
-
 	policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
 	if err != nil && updateMask {
 		return nil, err
@@ -94,16 +95,25 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		}
 	}
 
-	jsonPolicy, err := s.getPolicyBytes(req.PolicyName, req.Policy)
+	policyBytes, err := s.getPolicyBytes(req.PolicyName, req.Policy)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = s.etcdClient.Client.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(jsonPolicy))
+	metadataBytes, err := json.Marshal(req.PolicyMetadata)
 	if err != nil {
-		return nil, fmt.Errorf("failed to write policy '%s' to etcd: '%s'", req.PolicyName, err)
+		return nil, err
 	}
-
+	txn := s.etcdClient.Client.Txn(s.etcdClient.Client.Ctx())
+	_, err = txn.If(
+		clientv3.Compare(clientv3.Version(path.Join(paths.PoliciesAPIConfigPath, req.PolicyName)), ">", -1),
+	).Then(
+		clientv3.OpPut(path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(policyBytes)),
+		clientv3.OpPut(path.Join(paths.PoliciesMetadataAPIConfigPath, req.PolicyName), string(metadataBytes)),
+	).Commit()
+	if err != nil {
+		return nil, err
+	}
 	return new(emptypb.Empty), nil
 }
 
@@ -130,6 +140,7 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 // DeletePolicy deletes a policy from the system.
 func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIConfigPath, policy.Name))
+	s.etcdWriter.Delete(path.Join(paths.PoliciesMetadataAPIConfigPath, policy.Name))
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
 	return &emptypb.Empty{}, nil
 }

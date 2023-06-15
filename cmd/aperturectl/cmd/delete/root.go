@@ -2,21 +2,19 @@ package delete
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/rest"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 var (
-	kubeConfig     string
-	kubeRestConfig *rest.Config
-	controller     utils.ControllerConn
-	client         cmdv1.ControllerClient
-	controllerNs   string
-	policyName     string
+	controller   utils.ControllerConn
+	client       cmdv1.ControllerClient
+	controllerNs string
+	policyName   string
 )
 
 func init() {
@@ -39,41 +37,16 @@ Use this command to delete the Aperture Policies.`,
 		}
 
 		var err error
-		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
-		if err != nil {
-			return err
-		}
-
-		controllerNs, err = cmd.Flags().GetString("controller-ns")
-		if err != nil {
-			return err
-		}
-
-		controllerAddr, err := cmd.Flags().GetString("controller")
-		if err != nil {
-			return err
-		}
-
-		kube, err := cmd.Flags().GetBool("kube")
-		if err != nil {
-			return err
-		}
-
-		if controllerAddr == "" && !kube {
-			err = cmd.Flags().Set("kube", "true")
-			if err != nil {
-				return err
-			}
-		}
-
 		err = controller.PreRunE(cmd, args)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to run controller pre-run: %w", err)
 		}
+
+		controllerNs = utils.GetControllerNs()
 
 		client, err = controller.Client()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get controller client: %w", err)
 		}
 		return nil
 	},

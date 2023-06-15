@@ -22,7 +22,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	"github.com/clarketm/json"
 	corev1 "k8s.io/api/core/v1"
@@ -35,7 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/yaml"
 
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
 
 // configMapForAgentConfig prepares the ConfigMap object for the Controller.

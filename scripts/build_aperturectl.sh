@@ -17,14 +17,14 @@ fi
 
 LDFLAGS="\
     ${LDFLAGS:-} \
-    -X 'github.com/fluxninja/aperture/pkg/info.Version=${APERTURECTL_BUILD_VERSION}' \
-    -X 'github.com/fluxninja/aperture/pkg/info.BuildHost=${HOSTNAME}' \
-    -X 'github.com/fluxninja/aperture/pkg/info.BuildOS=${GOOS}/${GOARCH}' \
-    -X 'github.com/fluxninja/aperture/pkg/info.BuildTime=${BUILD_TIME}' \
-    -X 'github.com/fluxninja/aperture/pkg/info.GitBranch=${APERTURECTL_BUILD_GIT_BRANCH}' \
-    -X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=${APERTURECTL_BUILD_GIT_COMMIT_HASH}' \
-    -X 'github.com/fluxninja/aperture/pkg/info.Service=aperturectl' \
-    -X 'github.com/fluxninja/aperture/pkg/info.Prefix=aperture' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.Version=${APERTURECTL_BUILD_VERSION}' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.BuildHost=${HOSTNAME}' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.BuildOS=${GOOS}/${GOARCH}' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.BuildTime=${BUILD_TIME}' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.GitBranch=${APERTURECTL_BUILD_GIT_BRANCH}' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.GitCommitHash=${APERTURECTL_BUILD_GIT_COMMIT_HASH}' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.Service=aperturectl' \
+    -X 'github.com/fluxninja/aperture/v2/pkg/info.Prefix=aperture' \
 "
 
 if [ -n "${RACE:-}" ]; then

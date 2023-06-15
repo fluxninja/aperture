@@ -5,11 +5,11 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/common"
-	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	sdconfig "github.com/fluxninja/aperture/pkg/discovery/static/config"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/common"
+	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	sdconfig "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 const (

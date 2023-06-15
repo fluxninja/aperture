@@ -93,6 +93,8 @@ dependencies {
     implementation(project(":lib:core"))
     implementation(project(":lib:armeria"))
     implementation(project(":lib:netty"))
+
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.0")
 }
 
 repositories {

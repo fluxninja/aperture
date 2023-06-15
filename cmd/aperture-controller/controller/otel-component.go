@@ -5,6 +5,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"go.opentelemetry.io/collector/exporter"
@@ -21,21 +22,18 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	"github.com/fluxninja/aperture/pkg/alertmanager"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	alertmanager "github.com/fluxninja/aperture/v2/pkg/alert-manager"
+	"github.com/fluxninja/aperture/v2/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsexporter"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsreceiver"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 // ModuleForControllerOTel provides fx options for ControllerOTelComponents.
 func ModuleForControllerOTel() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			fx.Annotate(
-				provideController,
-				fx.ResultTags(otelconsts.BaseFxTag),
-			),
+			provideController,
 			fx.Annotate(
 				ControllerOTelComponents,
 				fx.ParamTags(
@@ -88,6 +86,7 @@ func ControllerOTelComponents(
 		batchprocessor.NewFactory(),
 		attributesprocessor.NewFactory(),
 		transformprocessor.NewFactory(),
+		filterprocessor.NewFactory(),
 	}
 	// processorsFactory = append(processorsFactory, otelContribProcessors()...)
 	pf = append(pf, processorFactories...)

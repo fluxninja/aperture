@@ -8,9 +8,9 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/watchdog/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
+	watchdogv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/watchdog/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	watchdogconfig "github.com/fluxninja/aperture/v2/pkg/watchdog/config"
 )
 
 type usageFn func() (total uint64, usage uint64, err error)

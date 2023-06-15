@@ -7,11 +7,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	sdconfig "github.com/fluxninja/aperture/pkg/discovery/static/config"
-	"github.com/fluxninja/aperture/pkg/mocks"
-	"github.com/fluxninja/aperture/pkg/notifiers"
+	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	sdconfig "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
+	"github.com/fluxninja/aperture/v2/pkg/mocks"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 )
 
 var (

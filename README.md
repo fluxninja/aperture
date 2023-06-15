@@ -1,3 +1,5 @@
+<!-- vale off -->
+<!-- markdownlint-disable -->
 <p align="center">
   <img src="docs/content/assets/img/aperture_logo.png" alt="FluxNinja Aperture" width="75%">
   <br/>
@@ -20,74 +22,95 @@
     <img alt="Godoc Reference" src="https://img.shields.io/badge/godoc-reference-brightgreen?style=for-the-badge&logo=go&logoColor=white">
   </a>
 </p>
+<!-- markdownlint-enable -->
+<!-- vale on -->
 
-## 🥷 What is FluxNinja Aperture?
+# 🥷 FluxNinja Aperture
 
-Aperture is an intelligent load management platform for cloud native
-applications. Aperture provides capabilities such as concurrency limiting, rate
-limiting and auto-scaling.
+Aperture is an observability-driven load management platform designed for
+classifying, scheduling, and rate-limiting API traffic in cloud applications.
+Built upon a foundation of observability and a global control plane, it offers a
+comprehensive suite of load management capabilities that enhance the reliability
+and performance of cloud applications while also optimizing resource
+utilization.
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaadark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaalight.png" />
-    <img alt="Observe. Analyze. Actuate." src="https://raw.githubusercontent.com/fluxninja/aperture/main/docs/content/assets/img/oaalight.png">
-  </picture>
-</p>
-
-## 🎛️ Why is flow control needed?
-
-Modern cloud application architectures such as microservices are vulnerable to
-[cascading failures](https://sre.google/sre-book/addressing-cascading-failures/)
-in face of sudden loads, new deployments and performance issues. Reliable
-operation is impossible without
-[effective flow control](https://sre.google/sre-book/handling-overload/). In
-addition, flow control enables graceful degradation, which is the ability to
-preserve key user experience pathways even in the face of application failures.
+Aperture seamlessly integrates with existing control points such as gateways,
+service meshes, and application middlewares. Moreover, it offers SDKs for
+developers to establish control points around specific features or code sections
+inside applications
 
 ## ⚙️ Features
 
-At the fundamental level, Aperture enables flow control through observing,
-analyzing, and actuating, facilitated by agents and a controller.
+Aperture provides a variety of advanced load management features:
 
-- 🚦 Aperture Agents live next to your service instances as a sidecar and
-  provide powerful
-  [flow control](https://docs.fluxninja.com/concepts/flow-control/) components
-  such as a
-  [weighted fair queuing scheduler](https://docs.fluxninja.com/concepts/flow-control/components/concurrency-limiter)
-  for load throttling and workload prioritization and a
-  [distributed rate-limiter](https://docs.fluxninja.com/concepts/flow-control/components/rate-limiter).
-  A [flow](https://docs.fluxninja.com/concepts/flow-control/flow-label) is the
-  fundamental unit of work from the perspective of an Aperture Agent. It could
-  be an API call, a feature, or even a database query.
-
-- 🤖 Aperture Controller is the "brain" of system. It is powered by always-on,
-  [circuit graph driven policies](https://docs.fluxninja.com/concepts/policy/)
-  that continuously track deviations from service-level objectives (SLOs) and
-  calculate recovery or escalation actions.
+- **Adaptive service protection:** Enhance resource utilization and safeguard
+  against abrupt service overloads with an intelligent queue at the entry point
+  of services. This queue dynamically adjusts the rate of requests based on live
+  service health, thereby mitigating potential service disruptions and ensuring
+  optimal performance under all load conditions.
+- **Global quota management:** Maintain compliance with external API quotas with
+  a global token bucket and smart request queuing. This feature regulates
+  requests aimed at external services, ensuring that the usage remains within
+  prescribed rate limits and avoids penalties or additional costs.
+- **Workload prioritization:** Safeguard crucial user experience pathways and
+  ensure prioritized access to external APIs even during high-load conditions by
+  strategically prioritizing workloads. This is achieved through the use of
+  declarative policies that label and prioritize workload requests, such as API
+  calls. By employing
+  [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
+  for scheduling, Aperture ensures a fair distribution of resources that aligns
+  with the business value and urgency of requests.
+- **Load-based auto-scaling:** Eliminate the need for costly over-provisioning
+  and enhance efficiency with Aperture's load-based auto-scaling. Aperture's
+  policies are expressed as circuit graphs that continuously track deviations
+  from service-level objectives and calculate recovery or escalation actions.
+  Auto-scaling can be implemented as an escalation that triggers based on load
+  throttling signal.
+- **Distributed rate-limiting:** Safeguard APIs from potential abuse with
+  Aperture's high-performance, distributed rate limiter. This feature enforces
+  per-key limits based on fine-grained labels, ensuring precise control and
+  prevention of excessive usage.
+- **Automated load ramping:** Ensure a safe and gradual increment of load to new
+  features or API endpoints. Aperture continuously monitors for potential
+  performance issues, offering an automatic response mechanism to dial back load
+  in case of a performance regression. This proactive approach minimizes service
+  disruptions and maintains consistent performance, even when rolling out new
+  features.
 
 ## 🏗️ Architecture
 
 ![Aperture Architecture Overview](./docs/content/assets/diagrams/architecture/architecture_simple.mmd.svg)
+
+- 🚦 Aperture Agents are typically deployed next to the services and provide
+  high-performance load management capabilities. They are responsible for
+  scheduling and rate-limiting incoming requests based on the policies defined
+  in the Aperture Controller. In addition, they also collect service health and
+  flow metrics.
+
+- 🤖 Aperture Controller executes observability-driven control policies and
+  configures Aperture Agents. The control policies are expressed as circuit
+  graphs consisting of interconnected signal processing blocks. The Aperture
+  policies provide a programmable way to tailor sophisticated control policies
+  to match any application's needs.
 
 ## 🏁 Getting Started
 
 ### 🎮 Playground
 
 To try Aperture in a local Kubernetes environment, refer to
-[Playground docs](https://docs.fluxninja.com/get-started/playground/).
+[Playground docs](./playground/README.md).
 
-![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
+![Service Protection Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
 
 ### 🏎️ Installation
 
-To install Aperture system, please follow the
+To install the Aperture system, please follow the
 [Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
-### 📖 Tutorials
+### 📖 Use Cases
 
-To learn how to write Aperture policies, please read the
-[Tutorials](https://docs.fluxninja.com/tutorials).
+Learn about various use cases of Aperture in the
+[Use Cases](https://docs.fluxninja.com/use-cases) section.
 
 ## 🎥 Videos
 
@@ -99,12 +122,11 @@ To learn how to write Aperture policies, please read the
 ## 👷 Contributing
 
 [Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
-helps us improve Aperture to be more reliable and user friendly. Please make
+helps us improve Aperture to be more reliable and user-friendly. Please make
 sure to include all the required information to reproduce and understand the bug
-you are reporting. Follow helper questions in bug report template to make it
+you are reporting. Follow helper questions in the bug report template to make it
 easier. If you see a way to improve Aperture, use the
 [feature request](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=feature+request&template=feature_request.md&title=)
-template to create an issue. Make sure to explain the problem you are trying to
-solve and what is the expected behavior.
+template to create an issue.
 
 To contribute code, please read the [Contribution guide](CONTRIBUTING.md).

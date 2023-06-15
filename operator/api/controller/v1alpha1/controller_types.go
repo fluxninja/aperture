@@ -19,11 +19,11 @@ limitations under the License.
 package v1alpha1
 
 import (
-	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	"github.com/fluxninja/aperture/operator/api"
-	"github.com/fluxninja/aperture/operator/api/common"
-	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
+	controller "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	"github.com/fluxninja/aperture/v2/operator/api/common"
+	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/crwatcher"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

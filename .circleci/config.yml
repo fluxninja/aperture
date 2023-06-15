@@ -148,7 +148,8 @@ workflows:
             docs/.*|.github/styles/Vocab/FluxNinja/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true
             operator/config/crd/bases/.* updated-aperture-charts true
-            playground/demo_app/.* updated-demo-app true
+            playground/resources/demo-app/.* updated-demo-app true
+            playground/resources/java-demo-app/.* updated-java-demo-app true
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-js/.* updated-aperture-js true
             sdks/aperture-java/.* updated-aperture-java true

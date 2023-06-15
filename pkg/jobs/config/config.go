@@ -1,7 +1,7 @@
 // +kubebuilder:validation:Optional
 package config
 
-import "github.com/fluxninja/aperture/pkg/config"
+import "github.com/fluxninja/aperture/v2/pkg/config"
 
 // JobConfig is configuration for a periodic job
 // swagger:model

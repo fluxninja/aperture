@@ -14,21 +14,21 @@ import (
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
-	"github.com/fluxninja/aperture/pkg/agentfunctions"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/discovery"
-	"github.com/fluxninja/aperture/pkg/distcache"
-	"github.com/fluxninja/aperture/pkg/etcd/election"
-	"github.com/fluxninja/aperture/pkg/k8s"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/peers"
-	"github.com/fluxninja/aperture/pkg/platform"
-	"github.com/fluxninja/aperture/pkg/policies/autoscale"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
-	"github.com/fluxninja/aperture/pkg/prometheus"
-	"github.com/fluxninja/aperture/pkg/rpc"
+	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
+	agentfunctions "github.com/fluxninja/aperture/v2/pkg/agent-functions"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/discovery"
+	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	"github.com/fluxninja/aperture/v2/pkg/k8s"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
+	"github.com/fluxninja/aperture/v2/pkg/peers"
+	"github.com/fluxninja/aperture/v2/pkg/platform"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
+	"github.com/fluxninja/aperture/v2/pkg/prometheus"
+	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 func main() {
@@ -48,13 +48,15 @@ func main() {
 		distcache.Module(),
 		flowcontrol.Module(),
 		autoscale.Module(),
-		otelcollector.Module(),
 		agent.ModuleForAgentOTel(),
 		discovery.Module(),
 		election.Module(),
 		rpc.ClientModule,
 		agentfunctions.Module,
 		Module(),
+		// Start collector after all extensions started, so it won't
+		// immediately reload when extensions add their config.
+		otelcollector.Module(),
 	)
 
 	if err := app.Err(); err != nil {

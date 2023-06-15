@@ -10,7 +10,7 @@ package cmdv1
 
 import (
 	context "context"
-	v1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

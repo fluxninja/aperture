@@ -7,10 +7,10 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
 )
 
 // CommonHandler implements common.HandlerWithValues.

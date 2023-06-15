@@ -31,25 +31,18 @@ public class ApertureFeatureFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
 
         // Check whether flow was accepted by Aperture Agent
-        FlowResult flowResult = flow.result();
-        boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
-
-        if (flowAccepted) {
-            try {
+        try {
+            if (flow.shouldRun()) {
                 chain.doFilter(request, response);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
+            } else {
+                flow.setStatus(FlowStatus.Unset);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Request denied");
-                flow.end(FlowStatus.Error);
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            flow.setStatus(FlowStatus.Error);
+            throw e;
+        } finally {
+            flow.end();
         }
     }
 
@@ -74,7 +67,7 @@ public class ApertureFeatureFilter implements Filter {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setDuration(Duration.ofMillis(1000))
+                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertificateFile)
                             .build();

@@ -14,6 +14,8 @@ export const WrappedDescription = ({ children }) => (
 
 export const RefType = ({ type, reference }) => <a href={reference}>{type}</a>;
 
+const renderBooleanValue = (value) => <code>{value ? "true" : "false"}</code>;
+
 const renderSimpleValue = (value) => <code>{value}</code>;
 
 const renderComplexValue = (yamlValue) => (
@@ -24,10 +26,11 @@ const renderComplexValue = (yamlValue) => (
 );
 
 const renderValue = (jsonValue) => {
-  if (
+  if (typeof jsonValue === "boolean") {
+    return renderBooleanValue(jsonValue);
+  } else if (
     typeof jsonValue === "string" ||
     typeof jsonValue === "number" ||
-    typeof jsonValue === "boolean" ||
     jsonValue === null
   ) {
     return renderSimpleValue(jsonValue);

@@ -19,13 +19,13 @@ buf-generate:
 	@buf lint
 	@buf generate --path aperture --template buf.gen.aperture-langs.yaml
 	@buf generate --path aperture --template buf.gen.aperture-grpc-ecosystem.yaml
-	@buf generate --path envoy --template buf.gen.envoy.yaml --include-imports
 	@#inject go annotations
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 	@#generate sdk flowcontrol stubs and copy them over
 	@#golang
 	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol/*
 	@cp -R gen/proto/go/aperture/flowcontrol/check ../sdks/aperture-go/gen/proto/flowcontrol/
+	@cp -R gen/proto/go/aperture/flowcontrol/checkhttp ../sdks/aperture-go/gen/proto/flowcontrol/
 	@#java
 	@rm -rf ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/*
 	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
@@ -77,7 +77,9 @@ buf-generate:
 			yq eval -i "del(.tags)" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			yq eval -i ".host = \"$$process\"" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			yq eval -i '.schemes = ["https"]' $(DOCS_OPENAPI)/$$process.swagger.yaml; \
-			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --format=yaml --output=$(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --output=$(DOCS_OPENAPI)/$$process.swagger.json; \
+			go run $(DOCS_ROOT)/tools/jsonnet/json2yaml.go $(DOCS_OPENAPI)/$$process.swagger.json $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			rm $(DOCS_OPENAPI)/$$process.swagger.json; \
 		done; \
 	}
 	@git add $(DOCS_OPENAPI)

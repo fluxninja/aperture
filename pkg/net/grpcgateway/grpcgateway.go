@@ -17,10 +17,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/log"
-	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/info"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	commonhttp "github.com/fluxninja/aperture/v2/pkg/net/http"
 )
 
 const (
@@ -175,10 +175,7 @@ func (constructor Constructor) setupGRPCGateway(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			// Adding check for older default address also for backward compatibility
-			//
-			// Deprecated: 1.9.0
-			if gw.grpcAddr == "" || gw.grpcAddr == "0.0.0.0:1" {
+			if gw.grpcAddr == "" {
 				gw.grpcAddr = httpServer.Listener.GetListener().Addr().String()
 			}
 

@@ -18,16 +18,16 @@ const (
 	SignalReadingMetricName = "signal_reading"
 	// FluxMeterMetricName name of fluxmeter metrics.
 	FluxMeterMetricName = "flux_meter"
-	// InvalidSignalReadingsTotal - counts invalid signal readings.
-	InvalidSignalReadingsTotal = "invalid_signal_readings_total"
-	// InvalidFluxMeterTotal - counts invalid flux meters.
-	InvalidFluxMeterTotal = "invalid_flux_meter_total"
-	// RateLimiterCounterMetricName - name of the counter describing times rate limiter was triggered.
-	RateLimiterCounterMetricName = "rate_limiter_counter"
-	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
-	ClassifierCounterMetricName = "classifier_counter"
-	// RegulatorCounterMetricName - name of the counter describing times load regulator was triggered.
-	RegulatorCounterMetricName = "regulator_counter"
+	// InvalidSignalReadingsTotalMetricName - counts invalid signal readings.
+	InvalidSignalReadingsTotalMetricName = "invalid_signal_readings_total"
+	// InvalidFluxMeterTotalMetricName - counts invalid flux meters.
+	InvalidFluxMeterTotalMetricName = "invalid_flux_meter_total"
+	// RateLimiterCounterTotalMetricName - name of the counter describing times rate limiter was triggered.
+	RateLimiterCounterTotalMetricName = "rate_limiter_counter_total"
+	// ClassifierCounterTotalMetricName - name of the counter describing times classifier was triggered.
+	ClassifierCounterTotalMetricName = "classifier_counter_total"
+	// SamplerCounterTotalMetricName - name of the counter describing times sampler was triggered.
+	SamplerCounterTotalMetricName = "sampler_counter_total"
 
 	// DistCache metrics scraped from Olric DMaps statistics.
 
@@ -52,14 +52,13 @@ const (
 	WorkloadLatencySumMetricName = "workload_latency_ms_sum"
 	// WorkloadLatencyCountMetricName - metric from workload histogram.
 	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
-
 	// WorkloadCounterMetricName - metric used for counting workload requests.
 	WorkloadCounterMetricName = "workload_requests_total"
 
-	// AcceptedTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all accepted requests.
-	AcceptedTokensMetricName = "accepted_tokens_total"
 	// IncomingTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all incoming requests.
 	IncomingTokensMetricName = "incoming_tokens_total"
+	// AcceptedTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all accepted requests.
+	AcceptedTokensMetricName = "accepted_tokens_total"
 
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
 	WFQFlowsMetricName = "wfq_flows_total"
@@ -111,8 +110,8 @@ const (
 	WorkloadIndexLabel = "workload_index"
 	// LimiterDroppedLabel - label to indicate that the particular limiter has dropped the request.
 	LimiterDroppedLabel = "limiter_dropped"
-	// RegulatorDroppedLabel - label to indicate that the particular regulator has dropped the request.
-	RegulatorDroppedLabel = "regulator_dropped"
+	// SamplerDroppedLabel - label to indicate that the particular sampler has dropped the request.
+	SamplerDroppedLabel = "sampler_dropped"
 	// SignalNameLabel - label for saving circuit signal metrics.
 	SignalNameLabel = "signal_name"
 	// SubCircuitIDLabel - label for saving circuit id in signal metrics.

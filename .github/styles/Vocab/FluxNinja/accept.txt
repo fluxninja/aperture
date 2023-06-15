@@ -79,3 +79,5 @@ EnvoyFilter
 [Ll]aunch
 write_http
 Kubelet
+colocating
+[Oo]perator

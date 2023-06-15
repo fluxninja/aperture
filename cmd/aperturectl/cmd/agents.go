@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -16,7 +16,7 @@ func init() {
 }
 
 var agentsCmd = &cobra.Command{
-	Use:               "agents {--kube | --controller ADDRESS}",
+	Use:               "agents",
 	Short:             "List connected agents",
 	Long:              `List connected agents`,
 	SilenceErrors:     true,

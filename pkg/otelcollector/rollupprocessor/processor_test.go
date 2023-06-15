@@ -16,7 +16,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/ptrace"
 	"go.opentelemetry.io/collector/processor"
 
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 )
 
 var _ = Describe("Rollup processor", func() {

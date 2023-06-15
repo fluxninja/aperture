@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package aperture.flowcontrol.check.v1;
 
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 // FlowControlService is used to perform Flow Control operations.
@@ -54,6 +55,9 @@ message CheckResponse {
   repeated FluxMeterInfo flux_meter_infos = 11;
   // limiter_decisions contains information about decision made by each limiter.
   repeated LimiterDecision limiter_decisions = 12;
+  // Recommended minimal amount of time to wait when retrying the request, if
+  // decision_type is REJECTED. Optional.
+  google.protobuf.Duration wait_time = 13;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.
@@ -77,19 +81,24 @@ message ClassifierInfo {
 // LimiterDecision describes details for each limiter.
 message LimiterDecision {
   message RateLimiterInfo {
-    int64 remaining = 1;
-    int64 current = 2;
+    double remaining = 1;
+    double current = 2;
     string label = 3;
-    uint64 tokens_consumed = 4;
+    double tokens_consumed = 4;
   }
 
-  message LoadSchedulerInfo {
+  message SchedulerInfo {
     string workload_index = 1;
     uint64 tokens_consumed = 2;
   }
 
-  message RegulatorInfo {
+  message SamplerInfo {
     string label = 1;
+  }
+
+  message QuotaSchedulerInfo {
+    string label = 1;
+    SchedulerInfo scheduler_info = 2;
   }
 
   enum LimiterReason {
@@ -104,8 +113,9 @@ message LimiterDecision {
   LimiterReason reason = 5;
   oneof details {
     RateLimiterInfo rate_limiter_info = 6;
-    LoadSchedulerInfo load_scheduler_info = 7;
-    RegulatorInfo regulator_info = 8;
+    SchedulerInfo load_scheduler_info = 7;
+    SamplerInfo sampler_info = 8;
+    QuotaSchedulerInfo quota_scheduler_info = 9;
   }
 }
 

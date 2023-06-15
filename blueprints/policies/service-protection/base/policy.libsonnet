@@ -1,7 +1,8 @@
 local spec = import '../../../spec.libsonnet';
+local baseAutoScalingPolicyFn = import '../../auto-scaling/base/policy.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg) {
+function(cfg, metadata={}) {
   local params = config + cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
@@ -36,7 +37,7 @@ function(cfg) {
       spec.v1.FirstValid.withInPorts({
         inputs: [
           spec.v1.Port.withSignalName(confirmationSignal),
-          spec.v1.Port.withConstantSignal(0),
+          spec.v1.Port.withConstantSignal(0),  // overload confirmation is assumed false if no confirmation signal is received
         ],
       })
       + spec.v1.FirstValid.withOutPorts({
@@ -57,7 +58,7 @@ function(cfg) {
 
   local confirmationAccumulator = std.foldl(
     addOverloadConfirmation,
-    (if std.objectHas(params, 'overload_confirmations') then params.policy.overload_confirmations else []),
+    (if std.objectHas(params.policy.service_protection_core, 'overload_confirmations') then params.policy.service_protection_core.overload_confirmations else []),
     confirmationAccumulatorInitial
   ),
 
@@ -80,12 +81,8 @@ function(cfg) {
       local adaptiveLoadScheduler = params.policy.service_protection_core.adaptive_load_scheduler;
       spec.v1.AdaptiveLoadScheduler.new()
       + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
-      + spec.v1.AdaptiveLoadScheduler.withDynamicConfigKey('load_scheduler')
-      + spec.v1.AdaptiveLoadScheduler.withDefaultConfig(
-        {
-          dry_run: params.policy.service_protection_core.dry_run,
-        },
-      )
+      + spec.v1.AdaptiveLoadScheduler.withDryRunConfigKey('dry_run')
+      + spec.v1.AdaptiveLoadScheduler.withDryRun(params.policy.service_protection_core.dry_run)
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
         overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
         signal: spec.v1.Port.withSignalName('SIGNAL'),
@@ -97,6 +94,49 @@ function(cfg) {
       }),
     ),
   ),
+
+  /** Auto scale escalation **/
+
+  local scaleInControllers =
+    (if
+       std.objectHas(params.policy, 'auto_scaling') && std.objectHas(params.policy.auto_scaling, 'periodic_decrease')
+     then
+       [
+         spec.v1.ScaleInController.new()
+         + spec.v1.ScaleInController.withAlerter(
+           spec.v1.AlerterParameters.new()
+           + spec.v1.AlerterParameters.withAlertName('Periodic scale in intended')
+         )
+         + spec.v1.ScaleInController.withController(
+           spec.v1.ScaleInControllerController.new()
+           + spec.v1.ScaleInControllerController.withPeriodic(params.policy.auto_scaling.periodic_decrease)
+         ),
+       ]
+     else []),
+
+  local scaleOutControllers =
+    (if std.objectHas(params.policy, 'auto_scaling') then [
+       spec.v1.ScaleOutController.new()
+       + spec.v1.ScaleOutController.withAlerter(
+         spec.v1.AlerterParameters.new()
+         + spec.v1.AlerterParameters.withAlertName('Load based scale out intended')
+       )
+       + spec.v1.ScaleOutController.withController(
+         spec.v1.ScaleOutControllerController.new()
+         + spec.v1.ScaleOutControllerController.withGradient(
+           spec.v1.IncreasingGradient.new()
+           + spec.v1.IncreasingGradient.withInPorts(
+             spec.v1.IncreasingGradientIns.new()
+             + spec.v1.IncreasingGradientIns.withSignal(spec.v1.Port.withSignalName('DESIRED_LOAD_MULTIPLIER'))
+             + spec.v1.IncreasingGradientIns.withSetpoint(spec.v1.Port.withConstantSignal(1.0))
+           )
+           + spec.v1.IncreasingGradient.withParameters(
+             spec.v1.IncreasingGradientParameters.new()
+             + spec.v1.IncreasingGradientParameters.withSlope(-1.0)
+           )
+         )
+       ),
+     ] else []),
 
   local policyDef =
     spec.v1.Policy.new()
@@ -112,7 +152,53 @@ function(cfg) {
         ]
         + params.policy.components,
       ),
-    ),
+    ) +
+    (
+      if std.objectHas(params.policy, 'auto_scaling') then
+        local autoScalingParams = {
+          policy+: params.policy.auto_scaling {
+            policy_name: params.policy.policy_name,
+            // Set empty defaults for promql_scale_out_controllers and promql_scale_in_controllers
+            promql_scale_out_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_out_controllers') then params.policy.auto_scaling.promql_scale_out_controllers else [],
+            promql_scale_in_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_in_controllers') then params.policy.auto_scaling.promql_scale_in_controllers else [],
+          },
+        };
 
+        local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingParams).policyDef;
+        {
+          circuit+: {
+            components+: std.map(
+              function(component) if std.objectHas(component, 'auto_scale') then
+                component {
+                  auto_scale+: {
+                    auto_scaler+: {
+                      scale_out_controllers+: scaleOutControllers,
+                      scale_in_controllers+: scaleInControllers,
+                    },
+                  },
+                }
+              else component,
+              baseAutoScalingPolicy.circuit.components
+            ),
+          },
+        } else {}
+    ),
+  local policyResource = {
+    kind: 'Policy',
+    apiVersion: 'fluxninja.com/v1alpha1',
+    metadata: {
+      name: params.policy.policy_name,
+      labels: {
+        'fluxninja.com/validate': 'true',
+      },
+      annotations: {
+        [if std.objectHas(metadata, 'values') then 'fluxninja.com/values']: metadata.values,
+        [if std.objectHas(metadata, 'blueprints_uri') then 'fluxninja.com/blueprints-uri']: metadata.blueprints_uri,
+        [if std.objectHas(metadata, 'blueprint_name') then 'fluxninja.com/blueprint-name']: metadata.blueprint_name,
+      },
+    },
+    spec: policyDef,
+  },
   policyDef: policyDef,
+  policyResource: policyResource,
 }

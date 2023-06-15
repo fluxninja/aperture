@@ -10,8 +10,8 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	rpcv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/rpc/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	rpcv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/rpc/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 const defaultTimeout = 5 * time.Second

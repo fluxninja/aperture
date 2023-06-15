@@ -79,7 +79,7 @@ local ema_latency_driver_defaults = {
 local rollout_policy_base_defaults = {
   policy_name: '__REQUIRED_FIELD__',
   load_ramp: {
-    regulator: {
+    sampler: {
       selectors: selectors_defaults,
       label_key: '',
     },
@@ -92,6 +92,8 @@ local rollout_policy_base_defaults = {
   },
 
   drivers: {},
+
+  rollout: false,
 
   components: [],
 
@@ -172,17 +174,22 @@ local rollout_policy_defaults = rollout_policy_base_defaults {
   * @schema (rollout_policy.drivers.average_latency_drivers: []average_latency_driver) List of drivers that compare average latency against forward, backward and reset thresholds.
   * @schema (rollout_policy.drivers.percentile_latency_drivers: []percentile_latency_driver) List of drivers that compare percentile latency against forward, backward and reset thresholds.
   * @schema (rollout_policy.drivers.ema_latency_drivers: []ema_latency_driver) List of drivers that compare trend latency against forward, backward and reset thresholds.
+  * @schema (rollout_policy.rollout: bool) Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
   */
   rollout_policy: rollout_policy_defaults,
   /**
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
   * @param (dashboard.time_from: string) From time of dashboard.
   * @param (dashboard.time_to: string) To time of dashboard.
+  * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
+  * @param (dashboard.title: string) Name of the main dashboard.
   */
   dashboard: {
     refresh_interval: '5s',
     time_from: 'now-15m',
     time_to: 'now',
+    extra_filters: {},
+    title: 'Aperture Feature Rollout',
     /**
     * @param (dashboard.datasource.name: string) Datasource name.
     * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.

@@ -3,7 +3,7 @@ package rollupprocessor
 import (
 	"fmt"
 
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )
 

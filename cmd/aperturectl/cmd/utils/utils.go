@@ -23,11 +23,11 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 // GenerateDotFile generates a DOT file from the given circuit with the specified depth.
@@ -115,11 +115,7 @@ func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string, de
 }
 
 // CompilePolicy compiles the policy and returns the circuit.
-func CompilePolicy(path string) (*circuitfactory.Circuit, *languagev1.Policy, error) {
-	yamlFile, err := os.ReadFile(path)
-	if err != nil {
-		return nil, nil, err
-	}
+func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *languagev1.Policy, error) {
 	ctx := context.Background()
 
 	// FIXME This ValidateAndCompile function validates the policy as a whole –
@@ -127,7 +123,7 @@ func CompilePolicy(path string) (*circuitfactory.Circuit, *languagev1.Policy, er
 	// command is called "circuit-compiler" though, so it is bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
-	circuit, policy, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
+	circuit, policy, err := controlplane.ValidateAndCompile(ctx, name, policyBytes)
 	if err != nil {
 		return nil, nil, err
 	}

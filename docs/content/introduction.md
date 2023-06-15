@@ -4,8 +4,8 @@ slug: /
 sidebar_position: 1
 sidebar_class_name: introduction
 description:
-  Introduction to FluxNinja Aperture, an open source flow control and
-  reliability management platform for modern web applications.
+  Introduction to FluxNinja Aperture, an intelligent load management platform
+  for modern cloud applications.
 image: /assets/img/aperture_logo.png
 keywords:
   - reliability
@@ -18,79 +18,134 @@ keywords:
   - auto-scale
   - load management
   - flow control
+  - dark launch
+  - workload prioritization
+  - rate limiting
+  - observability
+  - feature rollout
+  - feature flag
 ---
 
 ```mdx-code-block
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
+import { Cards } from '@site/src/components/Cards';
 ```
 
-Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
-project, an open source platform that empowers platform and reliability
-engineering teams. The platform provides a unified controllability layer that
-enables platform and reliability engineering teams to manage complex
-microservices-based applications with ease.
+<!-- vale off -->
 
-## Simplify cloud native load management
+## What is Aperture?
 
-With Aperture, teams can automate load management processes, including flow
-control and auto-scaling, to ensure the reliability and stability of cloud
-native applications. These capabilities improve the overall user experience,
-while optimizing resources and reducing costs.
+<!-- vale on -->
 
-## Declarative policy language
+[Aperture](https://github.com/fluxninja/aperture) is an open source load
+management platform designed for classifying, scheduling, and rate-limiting API
+traffic in cloud applications. Built upon a foundation of observability and a
+global control plane, it offers a comprehensive suite of load management
+capabilities. These capabilities enhance the reliability and performance of
+cloud applications while also optimizing resource utilization.
 
-Aperture's declarative policy language allows teams to effortlessly develop and
-manage policies that dictate their applications' behavior under various
-circumstances. This offers a visual depiction of their policies, enabling them
-to grasp the system's behavior and self-correction intuitively.
+Aperture can seamlessly integrate with existing control points such as gateways,
+service meshes, and application middlewares. Moreover, it offers SDKs for
+developers who need to establish control points around specific features or code
+sections inside applications.
 
-## Load management capabilities
+## ⚙️ Load management capabilities
 
-Aperture offers a suite of intelligent load management capabilities that are
-applicable to a wide range of cloud-native applications. These capabilities
-ensure the reliability and stability of applications, and include:
+Aperture provides a variety of advanced load management features:
 
-- **Intelligent Workload Classification**: Aperture provides a weighted fair
-  queuing scheduler to ensure that the most critical workloads are served first
-  based on the requirements of your application.
-- **Circuit-Based policies**: Aperture provides a policy language that enables
-  teams to define how to react to different situations, such as when there is a
-  deviation from service-level objectives. These policies are expressed as a
-  signal processing circuit that enables Aperture to go from telemetry to
-  appropriate actions.
-- **Dark Launch (aka Feature Flag Rollout)**: Aperture enables teams to
-  gradually release new features to a subset of users, without impacting the
-  rest of the system, using dark launch.
-- **Distributed rate-limiting**: Aperture includes a distributed rate-limiter to
-  prevent abuse and protect the service from excessive requests by users.
-- **Intelligent Auto Scaling**: Aperture adjusts resource allocation based on
-  demand and performance to ensure that the application can scale up or down as
-  needed; However, it is different from traditional auto-scaling as it is based
-  on the policies defined by the user which take multiple factors into
-  consideration.
-- **Monitoring and telemetry**: Aperture continuously monitors service
-  performance and request attributes using an in-built telemetry system, which
-  enables the agent and controller to make informed decisions about how to
-  handle requests and prioritize workloads.
-- **Quota Scheduling**: It is an important feature of Aperture, as it helps
-  manage and allocate quotas for API requests. This feature enables teams to
-  manage costs effectively and prevent exceeding API rate limits. By using quota
-  scheduling, you can ensure that your application stays within the limits of
-  the API and prevent being perceived as a bad actor by the API provider.
+- 🛡️
+  [**Adaptive Service Protection**](./use-cases/service-protection/protection.md):
+  Enhance resource utilization and safeguard against abrupt service overloads
+  with an intelligent queue at the entry point of services. This queue
+  dynamically adjusts the rate of requests based on live service health, thereby
+  mitigating potential service disruptions and ensuring optimal performance
+  under all load conditions.
+- 📊
+  [**Intelligent Quota Management**](./use-cases/quota-scheduler/quota-scheduler.md):
+  Maintain compliance with external API quotas with a global token bucket and
+  smart request queuing. This feature regulates requests aimed at external
+  services, ensuring that the usage remains within prescribed rate limits and
+  avoids penalties or additional costs.
+- 🎯
+  [**Workload Prioritization**](./use-cases/service-protection/prioritization.md):
+  Safeguard crucial user experience pathways and ensure prioritized access to
+  external APIs even during high-load conditions by strategically prioritizing
+  workloads. This is achieved through the use of declarative policies that label
+  and prioritize workload requests, such as API calls. By employing
+  [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
+  for scheduling, Aperture ensures a fair distribution of resources that aligns
+  with the business value and urgency of requests.
+- 🔀 [**Load-based Auto Scaling**](./use-cases/auto-scale/auto-scale.md):
+  Eliminate the need for costly over-provisioning and enhance efficiency with
+  Aperture's load-based auto-scaling. Aperture's policies are expressed as
+  circuit graphs that continuously track deviations from service-level
+  objectives and calculate recovery or escalation actions. Auto-scaling can be
+  implemented as an escalation that triggers based on load throttling signal.
+- ⏱️
+  [**Distributed Rate-Limiting**](./use-cases/rate-limiting/rate-limiting.md):
+  Safeguard APIs from potential abuse with Aperture's high-performance,
+  distributed rate limiter. This feature enforces per-key limits based on
+  fine-grained labels, ensuring precise control and prevention of excessive
+  usage.
+- 🚀
+  [**Automated Load Ramping**](./use-cases/feature-rollout/feature-rollout.md):
+  Aperture enables teams to gradually release new features to a subset of users,
+  without impacting the rest of the system, using dark launch.
 
-## How it works
+## 🛠️ How it works
 
-At its core, load management involves the control loop of observing, analyzing,
-and actuating workloads to ensure the stability and reliability of cloud-native
-applications. This control loop is applied to both flow control and auto-scaling
-use cases. In flow control, the control loop is used to manage workloads and
-ensure the system remains within capacity. In auto-scaling, the control loop is
-used to adjust resource allocation based on demand and performance.
+Load management, at its core, consists of a control loop that observes,
+analyzes, and actuates workloads to ensure the stability and reliability of
+cloud-native applications.
 
-Learn more about how Aperture interfaces with your application in the
-[Architecture](/architecture/architecture.md) section.
+This control loop is pivotal in both flow control and auto-scaling use cases. In
+flow control, the loop manages workloads to maintain the system within its
+capacity. In auto-scaling scenarios, the control loop adjusts resource
+allocation in response to demand and performance fluctuations.
+
+During the observation phase, an in-built telemetry system continuously monitors
+service performance and request attributes, allowing the agent and controller to
+make informed decisions about request handling and workload prioritization.
+
+The analysis and actuation phases use
+[**Declarative policies**](./concepts/policy/policy.md) that facilitate teams in
+defining responses to different situations, such as deviations from
+service-level objectives.
 
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
+
+## ✨ Get started
+
+- [**Setting up your application**](/get-started/setting-up-application/setting-up-application.md)
+- [**Install Aperture**](/get-started/installation/installation.md)
+- [**Your first policy**](/get-started/policies/policies.md)
+- [**Use cases**](/use-cases/use-cases.md)
+
+For an in-depth understanding of how Aperture interacts with applications and
+its various integral components, explore the
+[Architecture](/architecture/architecture.md) section.
+
+## 📖 Learn
+
+The [Concepts section](/concepts/concepts.md) provides detailed insights into
+essential elements of Aperture's system and policies, offering a comprehensive
+understanding of their key components.
+
+## Additional Support
+
+Navigating Aperture's capabilities might bring up questions, and we understand
+that. Don't hesitate to engage with us for any queries or clarifications. We are
+here to assist and ensure that your experience with Aperture is smooth and
+beneficial.
+
+<!-- vale off -->
+
+[**💬 Consult with an expert**](https://calendly.com/desaijai/fluxninja-meeting)
+|
+[**👥 Join our Slack Community**](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)
+| ✉️ Email: [**support@fluxninja.com**](mailto:support@fluxninja.com)
+
+<!-- vale on -->

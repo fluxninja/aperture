@@ -1,4 +1,3 @@
-%% name: architecture_simple
 flowchart TD
     blueprints[/"Blueprints"/]
     policies[/"Policies"/]
@@ -8,6 +7,13 @@ flowchart TD
     subgraph databases["Aperture Databases"]
       prometheus[("Prometheus")]
       etcd[("etcd")]
+    end
+    subgraph discoverydb["Discovery Databases"]
+      k8sdiscovery["Kubernetes"]
+      consul["Consul"]
+    end
+    subgraph orchestrators["Orchestrators"]
+      k8s["Kubernetes"]
     end
     subgraph worker["Worker Node (Kubernetes/VM/Bare-metal)"]
       subgraph agent["Aperture Agent"]
@@ -20,19 +26,17 @@ flowchart TD
         servicelogic["Service Logic"]
         servicemesh["Service Mesh"]
       end
-    end
-    subgraph discoverydb["Discovery Databases"]
-      k8sdiscovery["Kubernetes"]
-      consul["Consul"]
-    end
-    subgraph orchestrators["Orchestrators"]
-      k8s["Kubernetes"]
+      subgraph gateways["Gateways"]
+        Kong["Kong"]
+        Nginx["Nginx"]
+      end
     end
     blueprints --> |aperturectl| policies
     policies --> |Kubernetes Custom Resource| controller
     controller<--> |Configuration/Telemetry/Flow Control| databases
     databases<-->|Configuration/Telemetry/Flow Control|agent
-    agent <-->|SDK: Telemetry/Flow Control| servicelogic
-    agent <-->|Mesh: Telemetry/Flow Control| servicemesh
+    agent <--->|SDK: Telemetry/Flow Control| servicelogic
+    agent <--->|Telemetry/Flow Control| servicemesh
+		agent <--->|Telemetry/Flow Control| gateways
     orchestrators <-->|Auto Scale| agent
     discoverydb <-->|Discovery| agent

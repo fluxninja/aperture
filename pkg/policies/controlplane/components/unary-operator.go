@@ -6,17 +6,17 @@ import (
 
 	"go.uber.org/fx"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 // UnaryOp is the type of unary operation.
 type UnaryOp int8
 
-//go:generate enumer -type=UnaryOp -output=unary-op-string.go
+//go:generate enumer -type=UnaryOp -transform=lower -output=unary-op-string.go
 const (
 	UnknownUnary UnaryOp = iota
 	Abs

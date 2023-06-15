@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
 var findBy string
@@ -24,11 +24,11 @@ var EntitiesCmd = &cobra.Command{
 	Short:         "List AutoScale control points",
 	Long:          `List AutoScale control points`,
 	SilenceErrors: true,
-	Example: `aperturectl discovery entities --kube
+	Example: `aperturectl discovery entities
 
-aperturectl discovery entities --kube --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
+aperturectl discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
 
-aperturectl discovery entities --kube --find-by=“ip=10.244.1.24”`,
+aperturectl discovery entities --find-by=“ip=10.244.1.24”`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.Client()
 		if err != nil {

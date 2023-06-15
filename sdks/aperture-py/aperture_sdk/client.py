@@ -106,7 +106,11 @@ class ApertureClient:
         try:
             # stub.Check is typed to accept an int, but it actually accepts a float
             timeout = typing.cast(int, self.timeout.total_seconds())
-            response = stub.Check(request, timeout=timeout)
+            response = (
+                stub.Check(request)
+                if timeout == 0
+                else stub.Check(request, timeout=timeout)
+            )
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
@@ -118,12 +122,13 @@ class ApertureClient:
         control_point: str,
         explicit_labels: Optional[Dict[str, str]] = None,
         on_reject: Optional[Callable] = None,
+        fail_open: bool = True,
     ) -> Callable[[TWrappedFunction], TWrappedFunction]:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
                 with self.start_flow(control_point, explicit_labels) as flow:
-                    if flow.accepted:
+                    if flow.should_run():
                         return await run_fn(fn, *args, **kwargs)
                     else:
                         if on_reject:

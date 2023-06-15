@@ -1,0 +1,12 @@
+flowchart LR
+subgraph root.0[<center>QuotaScheduler<br/>1 selectors</center>]
+subgraph root.0_inports[ ]
+style root.0_inports fill:none,stroke:none
+root.0bucket_capacity[bucket_capacity]
+root.0fill_amount[fill_amount]
+end
+end
+root.0_bucket_capacity_FakeConstantout((500.00))
+root.0_fill_amount_FakeConstantout((25.00))
+root.0_bucket_capacity_FakeConstantout --> root.0bucket_capacity
+root.0_fill_amount_FakeConstantout --> root.0fill_amount

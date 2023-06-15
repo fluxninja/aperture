@@ -21,20 +21,21 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpc"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
-	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
-	checkhttp_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp/baggage"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
+	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
+	checkhttp_baggage "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp/baggage"
 )
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
@@ -202,27 +203,31 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 		resp.Status = &status.Status{
 			Code: int32(code.Code_UNAVAILABLE),
 		}
+
+		var statusCode int32
 		switch checkResponse.RejectReason {
 		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
-			resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
-				DeniedResponse: &flowcontrolhttpv1.DeniedHttpResponse{
-					Status: http.StatusTooManyRequests,
-				},
-			}
+			statusCode = http.StatusTooManyRequests
 		case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
-			resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
-				DeniedResponse: &flowcontrolhttpv1.DeniedHttpResponse{
-					Status: http.StatusServiceUnavailable,
-				},
-			}
+			statusCode = http.StatusServiceUnavailable
 		case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
-			resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
-				DeniedResponse: &flowcontrolhttpv1.DeniedHttpResponse{
-					Status: http.StatusForbidden,
-				},
-			}
+			statusCode = http.StatusForbidden
 		default:
 			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
+		}
+
+		deniedHTTPResponse := &flowcontrolhttpv1.DeniedHttpResponse{
+			Status: statusCode,
+		}
+		if checkResponse.WaitTime != nil {
+			deniedHTTPResponse.Headers["retry-after"] = waitTimeToRetryAfter(checkResponse.WaitTime)
+			// Clear to avoid redundancy, as we're translating it into header.
+			// Logs processor doesn't read it and clients aren't supposed to
+			// peek into CheckResponse.
+			checkResponse.WaitTime = nil
+		}
+		resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
+			DeniedResponse: deniedHTTPResponse,
 		}
 	default:
 		return nil, grpc.Bug().Stringer("type", checkResponse.DecisionType).
@@ -230,6 +235,16 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	}
 
 	return resp, nil
+}
+
+func waitTimeToRetryAfter(waitTime *durationpb.Duration) string {
+	seconds := waitTime.Seconds
+	// Retry-after header doesn't have full second resolution, we need to round
+	// up to avoid clients retrying too early.
+	if waitTime.Nanos != 0 {
+		seconds += 1
+	}
+	return strconv.FormatInt(seconds, 10)
 }
 
 // RequestToInput - Converts a CheckHTTPRequest to an input map.

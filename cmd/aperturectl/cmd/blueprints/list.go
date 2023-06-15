@@ -9,7 +9,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/facebookgo/symwalk"
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 )
 

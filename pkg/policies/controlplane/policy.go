@@ -12,19 +12,19 @@ import (
 	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/yaml"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/jobs"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/resources/fluxmeter"
-	telemetrycollectors "github.com/fluxninja/aperture/pkg/policies/controlplane/resources/telemetry-collectors"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/pkg/status"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/classifier"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/fluxmeter"
+	telemetrycollectors "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/telemetry-collectors"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 // policyModule returns Fx options of Policy for the Main App.
@@ -75,7 +75,7 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
 func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (*circuitfactory.Circuit, error) {
-	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
+	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 }
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
+func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string, metadata *policylangv1.PolicyMetadata) (*policysyncv1.PolicyWrapper, error) {
 	jsonDat, marshalErr := json.Marshal(policyMessage)
 	if marshalErr != nil {
 		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
@@ -281,5 +281,6 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 			PolicyName: policyName,
 			PolicyHash: hash,
 		},
+		PolicyMetadata: metadata,
 	}, nil
 }

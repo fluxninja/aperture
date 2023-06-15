@@ -17,22 +17,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/etcd/election"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/k8s"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
-	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
-	"github.com/fluxninja/aperture/pkg/status"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/v2/pkg/k8s"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
+	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 const podScalerStatusRoot = "pod_scalers"
@@ -80,7 +80,6 @@ func provideConfigWatcher(
 type podScalerFactory struct {
 	registry             status.Registry
 	decisionsWatcher     notifiers.Watcher
-	dynamicConfigWatcher notifiers.Watcher
 	controlPointTrackers notifiers.Trackers
 	electionTrackers     notifiers.Trackers
 	k8sClient            k8s.K8sClient
@@ -105,16 +104,14 @@ func setupPodScalerFactory(
 		log.Info().Msg("Kubernetes AutoScaler is disabled")
 		return nil
 	}
+	if k8sClient == nil {
+		log.Info().Msg("Not in Kubernetes cluster, omitting AutoScaler")
+		return nil
+	}
 
 	agentGroup := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.PodScalerDecisionsPath)
 	decisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
-	if err != nil {
-		return err
-	}
-
-	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		paths.PodScalerDynamicConfigPath)
 	if err != nil {
 		return err
 	}
@@ -125,7 +122,6 @@ func setupPodScalerFactory(
 	psFactory := &podScalerFactory{
 		controlPointTrackers: controlPointTrackers,
 		decisionsWatcher:     decisionsWatcher,
-		dynamicConfigWatcher: dynamicConfigWatcher,
 		agentGroup:           agentGroup,
 		registry:             reg,
 		etcdClient:           etcdClient,
@@ -146,18 +142,10 @@ func setupPodScalerFactory(
 			if err != nil {
 				return err
 			}
-			err = dynamicConfigWatcher.Start()
-			if err != nil {
-				return err
-			}
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
 			var err, merr error
-			err = dynamicConfigWatcher.Stop()
-			if err != nil {
-				merr = multierror.Append(merr, err)
-			}
 			err = decisionsWatcher.Stop()
 			if err != nil {
 				merr = multierror.Append(merr, err)
@@ -226,7 +214,6 @@ type podScaler struct {
 	scaleWaitGroup    *conc.WaitGroup
 	controlPoint      discovery.AutoScaleControlPoint
 	statusEtcdPath    string
-	dryRun            bool
 	isLeader          bool
 }
 
@@ -254,19 +241,6 @@ func (ps *podScaler) setup(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaler,
 		ps.decisionUpdateCallback,
-	)
-	if err != nil {
-		return err
-	}
-	// dynamic config notifier
-	dynamicConfigUnmarshaler, err := config.NewProtobufUnmarshaller(nil)
-	if err != nil {
-		return err
-	}
-	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(etcdKey),
-		dynamicConfigUnmarshaler,
-		ps.dynamicConfigUpdateCallback,
 	)
 	if err != nil {
 		return err
@@ -302,7 +276,6 @@ func (ps *podScaler) setup(
 			var err error
 			ps.statusWriter = etcdwriter.NewWriter(ps.etcdClient, true)
 			ps.ctx, ps.cancel = context.WithCancel(context.Background())
-			ps.setDefaultDryRun()
 
 			// add election notifier
 			err = ps.podScalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
@@ -315,11 +288,6 @@ func (ps *podScaler) setup(
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
 				return err
-			}
-			// add dynamic config notifier
-			err = ps.podScalerFactory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to add dynamic config notifier")
 			}
 			// add control point notifier
 			err = ps.podScalerFactory.controlPointTrackers.AddKeyNotifier(controlPointNotifier)
@@ -335,12 +303,6 @@ func (ps *podScaler) setup(
 			err = ps.podScalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove election notifier")
-				merr = multierror.Append(merr, err)
-			}
-			// remove dynamic config notifier
-			err = ps.podScalerFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to remove dynamic config notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove decisions notifier
@@ -382,39 +344,6 @@ func (ps *podScaler) electionResultCallback(_ notifiers.Event) {
 	ps.isLeader = true
 }
 
-func (ps *podScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	logger := ps.registry.GetLogger()
-	if event.Type == notifiers.Remove {
-		logger.Debug().Msg("Dynamic config removed")
-		// revert to default config
-		ps.setDefaultDryRun()
-		return
-	}
-
-	var wrapperMessage policysyncv1.PodScalerDynamicConfigWrapper
-	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil {
-		return
-	}
-	commonAttributes := wrapperMessage.GetCommonAttributes()
-	if commonAttributes == nil {
-		log.Error().Msg("Common attributes not found")
-		return
-	}
-	if commonAttributes.PolicyHash != ps.GetPolicyHash() {
-		return
-	}
-	ps.setDryRun(wrapperMessage.DryRun)
-}
-
-func (ps *podScaler) setDryRun(dryRun bool) {
-	ps.dryRun = dryRun
-}
-
-func (ps *podScaler) setDefaultDryRun() {
-	ps.dryRun = ps.podScalerProto.DryRun
-}
-
 func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	ps.stateMutex.Lock()
 	defer ps.stateMutex.Unlock()
@@ -440,17 +369,15 @@ func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 		return
 	}
 	scaleDecision := wrapperMessage.ScaleDecision
-	if !ps.dryRun {
-		ps.lastScaleDecision = scaleDecision
-		if ps.isLeader {
-			ps.scale(scaleDecision)
-		}
+	ps.lastScaleDecision = scaleDecision
+	if ps.isLeader {
+		ps.scale(scaleDecision)
 	}
 }
 
 // scale scales the associated Kubernetes object. NOTE: not thread safe, needs to be called under podScaler.scaleMutex.
 func (ps *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
-	// Take mutex to prevent concurrent scale operations
+	// This is called under stateMutex to prevent concurrent scale operations
 	replicas := scaleDecision.GetDesiredReplicas()
 
 	// Cancel any existing scale operation

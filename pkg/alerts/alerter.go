@@ -3,7 +3,7 @@ package alerts
 import (
 	"strings"
 
-	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 )
 
 // AlertsFxTag - name tag for alerter in fx.

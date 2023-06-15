@@ -36,15 +36,6 @@ policy:
         infra_meters:
           METRIC_NAME:
             per_agent_group: true
-            pipeline:
-              processors:
-                - batch
-              receivers:
-                - METRIC_NAME
-            processors:
-              batch:
-                send_batch_size: 10
-                timeout: 10s
             receivers:
               METRIC_NAME: [RECEIVER_NAME configuration here]
 ```
@@ -52,6 +43,6 @@ policy:
 [build]: /reference/aperturectl/build/agent/agent.md
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/RECEIVER_NAME
-[opentelemetry-collector]: /reference/policies/spec.md#telemetry-collector
-[applying-policy]: /applying-policies/applying-policies.md
-[policy-resources]: /reference/policies/spec.md#resources
+[opentelemetry-collector]: /reference/configuration/spec.md#telemetry-collector
+[applying-policy]: /use-cases/use-cases.md
+[policy-resources]: /reference/configuration/spec.md#resources

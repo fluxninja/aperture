@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
 )
 
 // Module is a module that provides grpc health server for checking services status.

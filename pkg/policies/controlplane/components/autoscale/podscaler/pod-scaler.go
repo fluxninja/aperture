@@ -3,11 +3,11 @@ package podscaler
 import (
 	"fmt"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	policyprivatev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/private/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -55,8 +55,6 @@ func ParsePodScaler(
 					},
 				},
 			},
-			DryRun:               podScaler.DryRun,
-			DryRunConfigKey:      podScaler.DryRunConfigKey,
 			PodScalerComponentId: componentID.String(),
 			AgentGroup:           podScaler.KubernetesObjectSelector.AgentGroup,
 		},
@@ -99,6 +97,52 @@ func ParsePodScaler(
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
+				Component: &policylangv1.Component_BoolVariable{
+					BoolVariable: &policylangv1.BoolVariable{
+						ConstantOutput: podScaler.GetDryRun(),
+						ConfigKey:      podScaler.GetDryRunConfigKey(),
+						OutPorts: &policylangv1.BoolVariable_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "DRY_RUN",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Switcher{
+					Switcher: &policylangv1.Switcher{
+						InPorts: &policylangv1.Switcher_Ins{
+							Switch: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DRY_RUN",
+								},
+							},
+							OnSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_SpecialValue{
+											SpecialValue: "NaN",
+										},
+									},
+								},
+							},
+							OffSignal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "REPLICAS_INPUT",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Switcher_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "REPLICAS",
+							},
+						},
+					},
+				},
+			},
+
+			{
 				Component: &policylangv1.Component_AutoScale{
 					AutoScale: &policylangv1.AutoScale{
 						Component: &policylangv1.AutoScale_Private{
@@ -119,7 +163,7 @@ func ParsePodScaler(
 		},
 	}
 
-	components.AddNestedIngress(nestedCircuit, inputReplicasPortName, "REPLICAS")
+	components.AddNestedIngress(nestedCircuit, inputReplicasPortName, "REPLICAS_INPUT")
 	components.AddNestedEgress(nestedCircuit, outputActualReplicasPortName, "ACTUAL_REPLICAS")
 	components.AddNestedEgress(nestedCircuit, outputConfiguredReplicasPortName, "CONFIGURED_REPLICAS")
 

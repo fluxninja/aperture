@@ -7,7 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	iface "github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	iface "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	gomock "github.com/golang/mock/gomock"
 )
 

@@ -1,10 +1,6 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.ApertureSDKException;
-import com.fluxninja.aperture.sdk.FlowStatus;
-import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.aperture.sdk.Utils;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
+import com.fluxninja.aperture.sdk.*;
 import com.linecorp.armeria.common.*;
 import io.netty.util.AsciiString;
 import io.opentelemetry.api.baggage.Baggage;
@@ -16,19 +12,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 class HttpUtils {
-    protected static HttpStatus handleRejectedFlow(TrafficFlow flow) {
-        try {
-            flow.end(FlowStatus.Unset);
-        } catch (ApertureSDKException e) {
-            e.printStackTrace();
+    protected static HttpResponse handleRejectedFlow(TrafficFlow flow) {
+        flow.setStatus(FlowStatus.Unset);
+        flow.end();
+        if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
+            int httpStatusCode = flow.getRejectionHttpStatusCode();
+            HttpResponseBuilder resBuilder = HttpResponse.builder();
+            resBuilder.status(httpStatusCode);
+            for (Map.Entry<String, String> entry :
+                    flow.checkResponse().getDeniedResponse().getHeadersMap().entrySet()) {
+                resBuilder.header(entry.getKey(), entry.getValue());
+            }
+            return resBuilder.build();
         }
-        if (flow.checkResponse() != null
-                && flow.checkResponse().hasDeniedResponse()
-                && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
-            int httpStatusCode = flow.checkResponse().getDeniedResponse().getStatus();
-            return HttpStatus.valueOf(httpStatusCode);
-        }
-        return HttpStatus.FORBIDDEN;
+        return HttpResponse.of(HttpStatus.FORBIDDEN);
     }
 
     protected static Map<String, String> labelsFromRequest(HttpRequest req) {
@@ -47,7 +44,7 @@ class HttpUtils {
         return labels;
     }
 
-    protected static CheckHTTPRequest checkRequestFromRequest(
+    protected static TrafficFlowRequest trafficFlowRequestFromRequest(
             RequestContext ctx, HttpRequest req, String controlPointName) {
         Map<String, String> baggageLabels = new HashMap<>();
 
@@ -78,7 +75,7 @@ class HttpUtils {
         return req.withHeaders(newHeadersBuilder.build());
     }
 
-    private static CheckHTTPRequest.Builder addHttpAttributes(
+    private static TrafficFlowRequestBuilder addHttpAttributes(
             Map<String, String> headers,
             RequestContext ctx,
             HttpRequest req,
@@ -110,25 +107,22 @@ class HttpUtils {
             destinationPort = localAddress.getPort();
         }
 
-        CheckHTTPRequest.Builder builder = CheckHTTPRequest.newBuilder();
+        TrafficFlowRequestBuilder builder = TrafficFlowRequest.newBuilder();
 
         builder.setControlPoint(controlPointName)
-                .setRequest(
-                        CheckHTTPRequest.HttpRequest.newBuilder()
-                                .setMethod(req.method().toString())
-                                .setPath(req.path())
-                                .setHost(req.authority())
-                                .setScheme(req.scheme())
-                                .setSize(originalHeaders.contentLength())
-                                .setProtocol("HTTP/2")
-                                .putAllHeaders(headers));
+                .setHttpMethod(req.method().toString())
+                .setHttpPath(req.path())
+                .setHttpHost(req.authority())
+                .setHttpScheme(req.scheme())
+                .setHttpSize(originalHeaders.contentLength())
+                .setHttpProtocol("HTTP/2")
+                .setHttpHeaders(headers);
 
         if (sourceIp != null) {
-            builder.setSource(Utils.createSocketAddress(sourceIp, sourcePort, "TCP"));
+            builder.setSource(sourceIp, sourcePort, "TCP");
         }
         if (destinationIp != null) {
-            builder.setDestination(
-                    Utils.createSocketAddress(destinationIp, destinationPort, "TCP"));
+            builder.setDestination(destinationIp, destinationPort, "TCP");
         }
         return builder;
     }

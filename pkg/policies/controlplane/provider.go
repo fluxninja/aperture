@@ -3,20 +3,22 @@ package controlplane
 import (
 	"context"
 	"encoding/json"
+	"path"
 
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"sigs.k8s.io/yaml"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/config"
-	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
-	etcdnotifier "github.com/fluxninja/aperture/pkg/etcd/notifier"
-	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
-	"github.com/fluxninja/aperture/pkg/policies/paths"
+	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdnotifier "github.com/fluxninja/aperture/v2/pkg/etcd/notifier"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/crwatcher"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
 const (
@@ -122,13 +124,29 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage := &policylangv1.Policy{}
-			unmarshalErr := config.UnmarshalYAML(bytes, policyMessage)
+			policyMessage := &iface.PolicyMessage{
+				Policy: &languagev1.Policy{},
+			}
+			unmarshalErr := json.Unmarshal(bytes, policyMessage)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
 			}
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
+			if policyMessage.PolicyMetadata == nil {
+				resp, err := etcdClient.KV.Get(context.Background(), path.Join(paths.PoliciesMetadataAPIConfigPath, key.String()))
+				if err != nil {
+					log.Warn().Err(err).Msg("Failed to get policy metadata from etcd")
+				} else if len(resp.Kvs) > 0 {
+					policyMessage.PolicyMetadata = &languagev1.PolicyMetadata{}
+					err = json.Unmarshal(resp.Kvs[0].Value, policyMessage.PolicyMetadata)
+					if err != nil {
+						log.Warn().Err(err).Msg("Failed to unmarshal policy metadata")
+					}
+				} else {
+					log.Warn().Msgf("no policy %s metadata in response", key.String())
+				}
+			}
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.Policy, string(key), policyMessage.PolicyMetadata)
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr

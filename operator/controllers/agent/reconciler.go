@@ -24,8 +24,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/operator/controllers/mutatingwebhook"
+	"github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/operator/controllers/mutatingwebhook"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -43,9 +43,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
-	"github.com/fluxninja/aperture/operator/api"
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/v2/operator/api"
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/go-logr/logr"
 )
 

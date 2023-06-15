@@ -90,7 +90,9 @@ class Blueprint:
                 raise typer.Exit(1)
             # parameter is of the form <blueprint>:<annotation_type>:<param>
             blueprint, annotation_type, param = param.split(":")
-            docs_link = f"{policies_relative_path}/bundled-blueprints/{blueprint}#{slugify(param)}"
+            docs_link = (
+                f"{policies_relative_path}/blueprints/{blueprint}#{slugify(param)}"
+            )
             parts = param.split(".")
             json_schema_link = (
                 f"{blueprints_root_relative_path}/{blueprint}/gen/definitions.json#"
@@ -301,8 +303,6 @@ MARKDOWN_DOC_TPL = """
 {%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
 {{- 'Array of ' + render_type(param_type[2:], is_complex_type) }}
-{%- elif param_type.startswith('map[') %}
-{{- 'Map of ' + render_type(param_type[4:-1], is_complex_type) }}
 {%- elif is_complex_type %}
 {{- 'Object (' + param_type + ')' }}
 {%- elif param_type == 'bool' %}
@@ -391,8 +391,6 @@ MARKDOWN_README_TPL = """
 {%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
 {{- 'Array of ' + render_type(param_type[2:], is_complex_type) }}
-{%- elif param_type.startswith('map[') %}
-{{- 'Map of ' + render_type(param_type[4:-1], is_complex_type) }}
 {%- elif is_complex_type %}
 {{- 'Object (' + param_type + ')' }}
 {%- elif param_type == 'bool' %}
@@ -472,7 +470,7 @@ items:
   {{ render_type(param_type[2:], ref_id, is_complex_type) | indent(2) }}
 {% elif param_type.startswith('map[') %}
 type: object
-additionalProperties: {{ render_type(param_type[4:-1], ref_id, is_complex_type) }}
+additionalProperties: true
 {% elif is_complex_type %}
 type: object
 $ref: "{{- ref_id }}"
@@ -544,12 +542,16 @@ JSON_SCHEMA_DEFINITIONS_TPL = """
 YAML_TPL = """
 # Generated values file for {{ blueprint_name }} blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/{{ blueprint_name }}
+# https://docs.fluxninja.com/reference/blueprints/ {{ blueprint_name }}
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
+{%- if not value.items() %}
+{{- '{}' }}
+{%- else %}
 {%- for key, val in value.items() %}
 {{ '  ' * (level) }}{{ key }}: {{ render_value(val, level+1) }}
 {%- endfor %}
+{%- endif %}
 {%- elif value is iterable and value is not string %}
 {%- if value | length == 0 %}
 {{- '[]' }}
@@ -835,7 +837,7 @@ def main(
     # make a prefix of ../ for each part
     policies_relative_path = "/".join([".."] * len(relative_blueprint_path_parts))
     docs_root_relative_path = "/".join(
-        [".."] * (len(relative_blueprint_path_parts) + 2)
+        [".."] * (len(relative_blueprint_path_parts) + 1)
     )
 
     blueprints_root_relative_path = "/".join(
@@ -890,9 +892,7 @@ def main(
         dynamic_config_parameters,
     )
 
-    blueprints_docs_root_path = (
-        repository_root / "docs/content/reference/policies/bundled-blueprints"
-    )
+    blueprints_docs_root_path = repository_root / "docs/content/reference/blueprints"
     # check whether the blueprint_docs_root_path exists
     if blueprints_docs_root_path.exists():
         readme_path = (

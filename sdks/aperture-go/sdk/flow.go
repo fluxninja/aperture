@@ -4,49 +4,65 @@ import (
 	"errors"
 	"time"
 
-	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
+	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// FlowStatus represents status of flow execution.
-type FlowStatus uint8
-
-// User passes a code to indicate status of flow execution.
-//
-//go:generate enumer -type=FlowStatus -output=flow-status-string.go
-const (
-	// OK indicates successful flow execution.
-	OK FlowStatus = iota
-	// Error indicate error on flow execution.
-	Error
-)
-
-// Flow is the interface that is returned to the user every time a Check call through ApertureClient is made.
+// Flow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
 // The user can check the status of the check call, response from the server, and end the flow once the workload is executed.
 type Flow interface {
-	Accepted() bool
-	End(status FlowStatus) error
+	Decision() FlowDecision
+	ShouldRun() bool
+	DisableFailOpen()
+	SetStatus(status FlowStatus)
+	End() error
 	CheckResponse() *flowcontrol.CheckResponse
 }
+
+// TODO: set fail open?
 
 type flow struct {
 	span          trace.Span
 	checkResponse *flowcontrol.CheckResponse
+	statusCode    FlowStatus
 	ended         bool
+	failOpen      bool
 }
 
-// Accepted returns whether the Flow was accepted by Aperture Agent.
-func (f *flow) Accepted() bool {
+// newFlow creates a new flow with default field values.
+func newFlow(span trace.Span) *flow {
+	return &flow{
+		span:          span,
+		checkResponse: nil,
+		statusCode:    OK,
+		ended:         false,
+		failOpen:      true,
+	}
+}
+
+// Decision returns Aperture Agent's decision or information on Agent being unreachable.
+func (f *flow) Decision() FlowDecision {
 	if f.checkResponse == nil {
-		return true
+		return Unreachable
+	} else if f.checkResponse.DecisionType == flowcontrol.CheckResponse_DECISION_TYPE_ACCEPTED {
+		return Accepted
+	} else {
+		return Rejected
 	}
-	if f.checkResponse.DecisionType == flowcontrol.CheckResponse_DECISION_TYPE_ACCEPTED {
-		return true
-	}
-	return false
+}
+
+// ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
+// By default, fail-open behavior is enabled. Use DisableFailOpen to disable it.
+func (f *flow) ShouldRun() bool {
+	var decision = f.Decision()
+	return decision == Accepted || (f.failOpen && decision == Unreachable)
+}
+
+func (f *flow) DisableFailOpen() {
+	f.failOpen = false
 }
 
 // CheckResponse returns the response from the server.
@@ -54,8 +70,14 @@ func (f *flow) CheckResponse() *flowcontrol.CheckResponse {
 	return f.checkResponse
 }
 
-// End is used to end the flow, the user will have to pass a status code and an error description which will define the state and result of the flow.
-func (f *flow) End(statusCode FlowStatus) error {
+// SetStatus sets the status code of a flow.
+// If not set explicitly, defaults to FlowStatus.OK
+func (f *flow) SetStatus(statusCode FlowStatus) {
+	f.statusCode = statusCode
+}
+
+// End is used to end the flow, using the status code previously set using SetStatus method.
+func (f *flow) End() error {
 	if f.ended {
 		return errors.New("flow already ended")
 	}
@@ -66,7 +88,7 @@ func (f *flow) End(statusCode FlowStatus) error {
 		return err
 	}
 	f.span.SetAttributes(
-		attribute.String(flowStatusLabel, statusCode.String()),
+		attribute.String(flowStatusLabel, f.statusCode.String()),
 		attribute.String(checkResponseLabel, string(checkResponseJSONBytes)),
 		attribute.Int64(flowEndTimestampLabel, time.Now().UnixNano()),
 	)
