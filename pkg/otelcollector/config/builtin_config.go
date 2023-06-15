@@ -109,3 +109,26 @@ func BuildOTelScrapeConfig(name string, cfg CommonOTelConfig) map[string]any {
 		},
 	}
 }
+
+// AddHighCardinalityMetricsFilterProcessor adds filter processor which filters
+// out high cardinality Aperture platform metrics.
+func AddHighCardinalityMetricsFilterProcessor(config *Config) {
+	config.AddProcessor(otelconsts.ProcessorFilterHighCardinalityMetrics, map[string]any{
+		"metrics": map[string]interface{}{
+			"exclude": map[string]interface{}{
+				"match_type": "regexp",
+				"metric_names": []string{
+					// Filter our high cardinality Aperture platform metrics.
+					"grpc_server_handled_total.*",
+					"grpc_server_handling_seconds.*",
+					"grpc_server_handling_seconds_bucket.*",
+					"grpc_server_handling_seconds_count.*",
+					"grpc_server_handling_seconds_sum.*",
+					"grpc_server_msg_received_total.*",
+					"grpc_server_msg_sent_total.*",
+					"grpc_server_started_total.*",
+				},
+			},
+		},
+	})
+}

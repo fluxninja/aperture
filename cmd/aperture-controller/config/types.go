@@ -18,4 +18,15 @@ import (
 // +kubebuilder:object:generate=true
 type ControllerOTelConfig struct {
 	otelconfig.CommonOTelConfig `json:",inline"`
+	// DisableHighCardinalityPlatformMetrics filters out high cardinality Aperture platform metrics from being
+	// published to Prometheus. Filtered out metrics are:
+	//   * "grpc_server_handled_total.*"
+	//   * "grpc_server_handling_seconds.*"
+	//   * "grpc_server_handling_seconds_bucket.*"
+	//   * "grpc_server_handling_seconds_count.*"
+	//   * "grpc_server_handling_seconds_sum.*"
+	//   * "grpc_server_msg_received_total.*"
+	//   * "grpc_server_msg_sent_total.*"
+	//   * "grpc_server_started_total.*"
+	DisableHighCardinalityPlatformMetrics bool `json:"disable_high_cardinality_platform_metrics" default:"true"`
 }
