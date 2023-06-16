@@ -8,9 +8,11 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -178,8 +180,14 @@ func (ss SimpleService) Run() error {
 
 	http.Handle("/ui/", http.StripPrefix("/ui/", fs))
 	http.HandleFunc("/api/rate-limit", rateLimitedHandler)
+	http.Handle("/request", handlerFunc(rateLimitedHandler, handler))
 
-	http.Handle("/request", handlerFunc(handler))
+	// 1. Wrap the /request in the rate Limit handler
+	// 2. print the response to see if the header is actually there.
+	// 2. send traffic to api rate limit
+	// 3. extract the retry after header from the response
+	// 4. send the retry after header to the rate limit handler
+	// 5. send the response back to ui handler.
 
 	address := fmt.Sprintf(":%d", ss.port)
 
@@ -188,29 +196,41 @@ func (ss SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
+// RateLimitResponseBody is the response body for the rate limit endpoint.
 type RateLimitResponseBody struct {
-	Message           string `json:"message"`
-	RetryAfter        int    `json:"retryAfter"`
-	RetryLimit        int    `json:"retryLimit"`
-	Global            bool   `json:"global"`
+	Message            string `json:"message"`
+	RetryAfter         int    `json:"retryAfter"`
+	RetryLimit         int    `json:"retryLimit"`
+	Global             bool   `json:"global"`
 	RateLimitRemaining int    `json:"rateLimitRemaining"`
-	RateLimitReset    int    `json:"rateLimitReset"`
+	RateLimitReset     int    `json:"rateLimitReset"`
 }
 
 func rateLimitedHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract the waitTime from the request's headers
+	waitTimeStr := r.Header.Get("waitTime")
+	waitTime, err := strconv.Atoi(waitTimeStr)
+	if err != nil {
+		// Handle error here, maybe set a default waitTime
+		waitTime = 5
+	}
+
+	// Now use waitTime in the response body
 	responseBody := RateLimitResponseBody{
-		Message:           "Rate limit exceeded",
-		RetryAfter:        5,
-		RetryLimit:        3,
-		Global:            false,
+		Message:            "Rate limit exceeded",
+		RetryAfter:         waitTime,
+		RetryLimit:         3,
+		Global:             false,
 		RateLimitRemaining: 5,
-		RateLimitReset:    100, //int(time.Now().Add(time.Minute).Unix()),
+		RateLimitReset:     100,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", waitTimeStr) // Set Retry-After in headers
+
 	w.WriteHeader(http.StatusTooManyRequests)
 
-	err := json.NewEncoder(w).Encode(responseBody)
+	err = json.NewEncoder(w).Encode(responseBody)
 	if err != nil {
 		log.Println("Error encoding JSON:", err)
 	}
@@ -359,10 +379,70 @@ func consumeFromQueue(q amqp.Queue, cCh *amqp.Channel, handler *RequestHandler) 
 	}
 }
 
-func handlerFunc(h *RequestHandler) http.Handler {
+func handlerFunc(rateLimitedHandler http.HandlerFunc, h *RequestHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Autosample().Trace().Msg("received request")
-		h.ServeHTTP(w, r)
+
+		// capture response
+		recordResponse := httptest.NewRecorder()
+
+		rateLimitedHandler(recordResponse, r)
+
+		// Write response header to actual response writer
+		for k, v := range recordResponse.Header() {
+			w.Header()[k] = v
+		}
+
+		if recordResponse.Code != http.StatusTooManyRequests {
+			h.ServeHTTP(w, r)
+		} else {
+			w.WriteHeader(recordResponse.Code)
+			w.Write(recordResponse.Body.Bytes())
+		}
+
+		// Print the response headers to check if they are present
+		log.Autosample().Info().Msgf("response headers from handlerFunc: %v", w.Header())
+	})
+}
+
+func handlerFunc(rateLimitedHandler http.HandlerFunc, h RequestHandler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Autosample().Trace().Msg("received request")
+
+		// capture response
+		recordResponse := httptest.NewRecorder()
+
+		rateLimitedHandler(recordResponse, r)
+
+		// Write response header to actual response writer
+		for k, v := range recordResponse.Header() {
+			w.Header()[k] = v
+		}
+
+		if recordResponse.Code != http.StatusTooManyRequests {
+			h.ServeHTTP(w, r)
+		} else {
+			w.WriteHeader(recordResponse.Code)
+			w.Write(recordResponse.Body.Bytes())
+
+			// If request was rate-limited, propagate "Retry-After" header value to /api/rate-limit endpoint
+			retryAfter := recordResponse.Header().Get("Retry-After")
+			if retryAfter != "" {
+				// Create a new request to the /api/rate-limit endpoint with "Retry-After" header value
+				req, err := http.NewRequest("POST", "/api/rate-limit", nil)
+				if err != nil {
+					log.Autosample().Error().Err(err).Msg("Failed to create request to /api/rate-limit endpoint")
+					return
+				}
+				req.Header.Set("waitTime", retryAfter)
+
+				// Use a goroutine to send the request to avoid blocking the current request
+				go http.DefaultClient.Do(req)
+			}
+		}
+
+		// Print the response headers to check if they are present
+		log.Autosample().Info().Msgf("response headers: %v", w.Header())
 	})
 }
 
@@ -587,6 +667,10 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destination string, 
 	request.Header.Set("Content-Type", "application/json")
 
 	response, err := h.httpClient.Do(request)
+
+	// log the whole response headers
+	log.Autosample().Info().Msgf("response headers from forwardRequest: %v", response.Header)
+
 	if err != nil {
 		log.Autosample().Error().Err(err).Msg("Failed to send request")
 		return http.StatusInternalServerError, err
