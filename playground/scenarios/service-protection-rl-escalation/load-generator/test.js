@@ -3,31 +3,40 @@ import { check, sleep } from "k6";
 import { vu } from "k6/execution";
 import http from "k6/http";
 
-export let vuStages = [
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
-  { duration: "1m", target: 50 },
-  { duration: "2m", target: 50 },
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
-];
+// export let vuStages = [
+//   { duration: "10s", target: 50 },
+//   { duration: "2m", target: 50 },
+//   { duration: "1m", target: 50 },
+//   { duration: "2m", target: 50 },
+//   { duration: "10s", target: 5 },
+//   { duration: "2m", target: 5 },
+// ];
 
 export let options = {
   discardResponseBodies: true,
   scenarios: {
     guests: {
-      executor: "ramping-vus",
-      stages: vuStages,
+      executor: "constant-arrival-rate",
+      duration: '5m',
+      rate: 2000,
+      timeUnit: '1s',
+      preAllocatedVUs: 100,
       env: { USER_TYPE: "guest" },
     },
     subscribers: {
-      executor: "ramping-vus",
-      stages: vuStages,
+      executor: "constant-arrival-rate",
+      duration: '5m',
+      rate: 1000,
+      timeUnit: '1s',
+      preAllocatedVUs: 100,
       env: { USER_TYPE: "subscriber" },
     },
     crawlers: {
-      executor: "ramping-vus",
-      stages: vuStages,
+      executor: "constant-arrival-rate",
+      duration: '5m',
+      rate: 1000,
+      timeUnit: '1s',
+      preAllocatedVUs: 100,
       env: { USER_TYPE: "crawler" },
     },
   },

@@ -87,6 +87,8 @@ spec:
               value: "{{ .Values.rabbitmq.password }}"
             - name: SIMPLE_SERVICE_CPU_LOAD
               value: "{{ .Values.simplesrv.cpuLoadPercentage }}"
+            - name: SIMPLE_SERVICE_CONCURRENCY
+              value: "{{ .Values.simplesrv.concurrency }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

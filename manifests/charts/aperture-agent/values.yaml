@@ -533,6 +533,10 @@ agent:
   ## Agent Configuration: All the available configuration parameters can be found at https://docs.fluxninja.com/reference/configuration/agent.
   ##
   config:
+    metrics:
+      enable_go_metrics: true
+      enable_process_collector: true
+      pedantic: false
     ## Etcd parameters for Agent
     ## @param agent.config.etcd.endpoints List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty.
     ## @param agent.config.etcd.lease_ttl Lease time-to-live.
