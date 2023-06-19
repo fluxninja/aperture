@@ -23,24 +23,31 @@ Aperture.
 
 </Zoom>
 
-This diagram shows the steps that a flow goes through in Aperture. The steps
-are:
+This diagram elucidates the stages a flow undergoes within Aperture. The stages
+encompass:
 
-- Selectors: These define scoping rules, identifying and forwarding the flow to
-  the relevant components based on the rules.
-- Classifiers: used to classify the flow based on the flow's metadata.
-- FluxMeters: These are critical instruments that quantify the flow's metrics,
-  translating fluxes into a Prometheus histogram for clear data visualization.
-- Sampler: It regulates the flow's rate, based on service health and capacity,
-  and need to accept the flow before forwarding it to the next step.
-- Rate-Limiters: They proactively mitigate recurring overloads by regulating
-  heavy-hitters according to per-label limits.
-- Schedulers: These ensure efficient handling of requests, prioritizing critical
-  application features over background workloads.
-
-Note that all components have the authority to reject a flow, which will stop
-the flow from being processed further.
+- **Selectors**: Act as filters, determining the flow's path based on scoping
+  rules. They identify and direct the flow towards relevant components in line
+  with these rules.
+- **Classifiers**: Responsible for categorizing the flow, utilizing the flow's
+  metadata as their basis.
+- **FluxMeters**: Critical tools that measure the flow's metrics. They convert
+  fluxes into a Prometheus histogram format for an understandable data
+  visualization.
+- **Sampler**: Manages the flow's rate according to the service's health and
+  capacity. The sampler must approve the flow before advancing it to the
+  subsequent stage.
+- **Rate-Limiters**: Proactively guard against recurrent overloads by regulating
+  excessive requests in accordance with per-label limits.
+- **Schedulers**: Govern the efficient processing of requests, favoring critical
+  application features over background workloads. There are two types of
+  schedulers, quota and load, which operate concurrently at the same stage.
+  - The **Load Scheduler** manages the queue of flows before reaching the
+    service, ensuring active service protection and controlling the incoming
+    tokens per second.
+  - The **Quota Scheduler** utilizes a global token bucket as a ledger to manage
+    the distribution of tokens across all agents. It allows for strategic
+    prioritization of requests when hitting quota limits and is especially
+    effective in environments with strict global rate limits.
 
 Once the flow has been processed, the decision is sent back to the originator.
-
-<!-- vale on -->
