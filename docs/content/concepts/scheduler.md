@@ -139,11 +139,11 @@ virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\ri
 $$
 
 To manage prioritized requests, the scheduler seeks tokens from the token
-bucket. If tokens are available, they are used for scheduling and route requests
-to the suitable service. In cases where tokens are not readily available,
-requests are queued, waiting either until tokens become accessible or until a
-timeout occurs - the latter being dependent on the workload or `check()` call
-timeout.
+bucket. If tokens are available, they are used for scheduling and routing
+requests to the suitable service. In cases where tokens are not readily
+available, requests are queued, waiting either until tokens become accessible or
+until a timeout occurs - the latter being dependent on the workload or `check()`
+call timeout.
 
 ### Tokens {#tokens}
 
@@ -225,7 +225,7 @@ predetermined
 establishing a constant token rate. This type of bucket is particularly
 advantageous when the load or the number of tokens is known upfront.
 
-The Fixed Token Bucket can be employed for service protection but is especially
+The Fixed Token Bucket can be employed for service protection, but is especially
 useful in scenarios where there are strict rate limits. For instance, when
 scheduling access to external APIs with a global quota, the Fixed Token Bucket
 ensures that the API's rate limits are adhered to.

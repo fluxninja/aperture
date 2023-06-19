@@ -23,8 +23,8 @@ Aperture.
 
 </Zoom>
 
-This diagram elucidates the stages a flow undergoes within Aperture. The stages
-encompass:
+This diagram elucidates the stages a flow undergoes within the Aperture. The
+stages encompass:
 
 - **Selectors**: Act as filters, determining the flow's path based on scoping
   rules. They identify and direct the flow towards relevant components in line
@@ -47,7 +47,7 @@ encompass:
     tokens per second.
   - The **Quota Scheduler** utilizes a global token bucket as a ledger to manage
     the distribution of tokens across all agents. It allows for strategic
-    prioritization of requests when hitting quota limits and is especially
+    prioritization of requests when hitting quota limits, and is especially
     effective in environments with strict global rate limits.
 
 Once the flow has been processed, the decision is sent back to the originator.
