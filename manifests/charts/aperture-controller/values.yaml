@@ -603,7 +603,7 @@ prometheus:
     image:
       registry: docker.io/linuxserver
       repository: yq
-      tag: 3.1.0
+      tag: 3.2.2
       pullPolicy: IfNotPresent
   server:
     statefulSet:
@@ -611,14 +611,15 @@ prometheus:
     image:
       tag: v2.33.5
     extraFlags:
-    - web.enable-remote-write-receiver
+      - web.enable-lifecycle
+      - web.enable-remote-write-receiver
   alertmanager:
     enabled: false
-  nodeExporter:
+  prometheus-node-exporter:
     enabled: false
-  pushgateway:
+  prometheus-pushgateway:
     enabled: false
-  kubeStateMetrics:
+  kube-state-metrics:
     enabled: false
   serverFiles:
     prometheus.yml:
