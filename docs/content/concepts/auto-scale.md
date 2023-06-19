@@ -19,7 +19,7 @@ Auto-scale is a core integration in Aperture that works hand in hand with the
 flow control capabilities to provide a comprehensive load management platform.
 Aperture policies allow defining auto-scaler(s) that consider the flow control
 state for informed scaling decisions. For instance, during sudden traffic
-spikes, if a concurrency limiter on a service sheds traffic, auto-scaler can
+spikes, if a load scheduler on a service sheds traffic, auto-scaler can
 automatically add more instances to the service to handle the increased load.
 
 With the auto-scaler capability in Aperture, service operators can configure

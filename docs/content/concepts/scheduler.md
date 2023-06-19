@@ -165,20 +165,17 @@ requests, their specific usage and operation depend on the requirements and
 constraints of the system, providing versatility and adaptability in handling
 workloads.
 
-### Queue timeout {#queue-factor}
+### Queue Timeout {#queue-timeout}
 
-The timeout factor parameter determines the duration a request in the workload
-can wait for tokens. A larger timeout factor results in a higher chance of the
-request being scheduled, improving fairness. The timeout is computed as
-`timeout = timeout_factor * tokens`.
+The queue timeout is determined by the gRPC timeout provided on the `check()`
+call. When a request is made, it includes a timeout value that specifies the
+maximum duration the request can wait in the queue. If the request receives the
+necessary tokens within this timeout duration, it is admitted. Otherwise, if the
+timeout expires before the tokens are available, the request is rejected.
 
-:::info
-
-It's recommended to configure the timeouts to be in the same order of magnitude
-as the normal latency of the workload requests. This helps prevent retry storms
-during overload scenarios.
-
-:::
+The gRPC timeout on the `check()` call is set in the Envoy filter and the SDK
+during initialization. It serves as an upper bound on the queue timeout,
+preventing requests from waiting excessively long.
 
 [label-matcher]: ./selector.md#label-matcher
 [policies]: /concepts/advanced/policy.md

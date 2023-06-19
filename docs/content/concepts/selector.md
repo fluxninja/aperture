@@ -19,8 +19,8 @@ A Selector is a part of flow control components which helps determine where a
 flow control and observability component, such as a [Classifier][classifier],
 [Flux Meter][flux-meter], or [Load Scheduler][load-scheduler], should be
 applied. It does this based on a combination of factors including the control
-point, flow labels, agent group, and the service. Basically, a scoping rules
-that determine how these components should select flows for their operations.
+point, flow labels, agent group, and the service. Basically, scoping rules that
+determine how these components should select flows for their operations.
 
 :::note See also
 
