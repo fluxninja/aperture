@@ -23,7 +23,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 const (
