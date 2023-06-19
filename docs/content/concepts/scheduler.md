@@ -19,19 +19,68 @@ experience and maximize good throughput.
 
 Each Agent instantiates an independent copy of the _Scheduler_, but output
 signals for accepted and incoming token rate are aggregated across all agents.
-The Scheduler utilizes a Load Multiplier to determine the [tokens](#tokens)
-refill rate per second, striving to maintain this rate stable between each
-controller update. If the incoming token rate in requests surpasses the desired
-rate, requests are queued within the Scheduler. Any request that cannot be
-scheduled within its designated timeout is rejected.
-
-As with other components of the Aperture platform, the _Load Scheduler_ is
-configured using a [policy][policies] component.
 
 :::info
 
 Additional information can be found in the
 [Scheduler Reference](/reference/configuration/spec.md#scheduler)
+
+:::
+
+### Load Scheduler {#load-scheduler}
+
+The _Load Scheduler_ is a primary actuation component layered atop the base
+Scheduler. It provides active service protection by forming a queue for flows
+before they reach the service. Through provided match rules, flows are organized
+into Workloads, each determining the priority and cost of admitting its
+associated flows. The _Load Scheduler_ controls the incoming tokens per second,
+which, in concurrency limiting cases, can be interpreted as (avg. latency \*
+in-flight requests) according to Little's Law. The proportion of incoming tokens
+that are admitted is dictated by the signal at the `load_multiplier` port.
+
+:::info See Also
+
+Load Scheduler [Reference](/reference/configuration/spec.md#load-scheduler)
+
+:::
+
+### Adaptive Load Scheduler {#adaptive-load-scheduler}
+
+Building upon the foundation of the _Load Scheduler_, the _Adaptive Load
+Scheduler_ fine-tunes the request management process. It incorporates a gradient
+controller and integrator for computing the load multiplier, which adjusts based
+on a signal, setpoint, and overload signals. The key functionality of the
+_Adaptive Load Scheduler_ lies in its ability to adjust the accepted token rate
+based on the deviation of the input signal from the setpoint. This adaptability
+allows for greater control and precision in managing load.
+
+:::info See Also
+
+Adaptive Load Scheduler
+[Reference](/reference/configuration/spec.md#adaptive-load-scheduler)
+
+:::
+
+### Quota Scheduler {#quota-scheduler}
+
+The Quota Scheduler uses a global-level token bucket that functions as a ledger.
+This ledger maintains an account of the total available tokens that can be
+allocated across all agents. In a scenario where the total load or the total
+number of tokens is known upfront, the Quota Scheduler can be particularly
+effective. These Tokens can be thought of as a fixed quota that is distributed
+among the agents. Each agent has access to this global ledger and deducts tokens
+from it when processing requests. If the ledger runs out of tokens, new requests
+are queued or rejected until more tokens become available. The Quota Scheduler
+is useful in scenarios where there are strict global rate limits, for example,
+when scheduling access to external APIs that have a fixed rate limit.
+
+Workloads, a property of the scheduler, can be defined within the Quota
+Scheduler too, allowing for strategic prioritization of requests when hitting
+quota limits.
+
+:::info See Also
+
+Quota Scheduler [Reference](/reference/configuration/spec.md#quota-scheduler)
 
 :::
 
@@ -72,16 +121,29 @@ workload prioritization by the scheduler. It demonstrates how the Aperture
 Controller periodically adjusts the token bucket's load multiplier and refill
 rate by broadcasting signals to the Aperture Agent.
 
-In the scope of the Aperture Agent, the scheduler efficiently handles incoming
-requests, categorizing them according to their urgency. This classification
-scale ranges from 0 to 255, where 0 indicates the lowest and 255 the highest
-priority.
+The scheduler adeptly manages incoming requests. These are classified based on
+their urgency, utilizing parameters such as priority and tokens, which are
+applicable to flows within a workload.
 
-To manage a prioritized request, the scheduler obtains tokens from the token
-bucket, which either returns tokens, if available, or returns an await signal.
-Then, tokens are used to schedule and route requests to the appropriate service.
-Any requests exceeding the available token limit are strategically discarded to
-maintain optimal system performance.
+Priority varies from 0 to an unlimited positive integer, indicating the urgency
+level, with higher numbers denoting higher priority. The position of a flow in
+the queue is computed based on its virtual finish time using the following
+formula:
+
+$$
+inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+$$
+
+$$
+virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
+$$
+
+To manage prioritized requests, the scheduler seeks tokens from the token
+bucket. If tokens are available, they are used for scheduling and route requests
+to the suitable service. In cases where tokens are not readily available,
+requests are queued, waiting either until tokens become accessible or until a
+timeout occurs - the latter being dependent on the workload or `check()` call
+timeout.
 
 ### Tokens {#tokens}
 
@@ -141,19 +203,27 @@ scheduling scenarios.
 
 #### Dynamic Token Bucket {#dynamic-bucket}
 
-The Dynamic Token Bucket is primarily used for service protection. It adjusts
-the token rate in response to the changing load signal, thereby ensuring an
-active defense for the service. Each agent maintains an individual token bucket,
-and synchronization between agents happens in lazy sync. This dynamic resizing
-enables efficient management of requests and maintains optimal service
-protection levels.
+The Dynamic Token Bucket, primarily utilized for service protection, employs a
+Load Multiplier to control the [tokens](#tokens) refill rate per second in the
+Scheduler. The objective is to maintain a stable refill rate between each
+controller update. If the incoming request rate surpasses the anticipated rate,
+the Scheduler queues these requests. Any request that fails to be scheduled
+within its designated timeout is rejected. This strategy enables the adjustment
+of the token rate corresponding to varying load signals, thereby providing an
+active defense mechanism for the service.
+
+Each agent operates an individual token bucket, utilizing lazy synchronization
+for coordination among agents. This dynamic resizing functionality ensures
+effective request management while maintaining optimal levels of service
+protection.
 
 #### Fixed Token Bucket {#fixed-bucket}
 
 In contrast to the Dynamic Token Bucket, the Fixed Token Bucket operates with a
-predetermined number of tokens, establishing a constant token rate. This type of
-bucket is particularly advantageous when the load or the number of tokens is
-known upfront.
+predetermined
+[number of tokens](/reference/configuration/spec.md#rate-limiter-ins),
+establishing a constant token rate. This type of bucket is particularly
+advantageous when the load or the number of tokens is known upfront.
 
 The Fixed Token Bucket can be employed for service protection but is especially
 useful in scenarios where there are strict rate limits. For instance, when
@@ -178,4 +248,3 @@ during initialization. It serves as an upper bound on the queue timeout,
 preventing requests from waiting excessively long.
 
 [label-matcher]: ./selector.md#label-matcher
-[policies]: /concepts/advanced/policy.md
