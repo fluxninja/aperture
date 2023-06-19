@@ -94,25 +94,25 @@ public class ApertureFilter implements Filter {
         }
         controlPointName = initControlPointName;
 
-        try {
-            ApertureSDKBuilder builder = ApertureSDK.builder();
-            builder.setHost(agentHost);
-            builder.setPort(Integer.parseInt(agentPort));
-            if (timeoutMs != null) {
-                builder.setFlowTimeout(Duration.ofMillis(Integer.parseInt(timeoutMs)));
-            }
-            builder.useInsecureGrpc(insecureGrpc);
-            if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
-                builder.setRootCertificateFile(rootCertificateFile);
-            }
-            builder.addIgnoredPaths(ignoredPaths);
-            builder.setIgnoredPathsMatchRegex(ignoredPathsRegex);
-
-            this.apertureSDK = builder.build();
-        } catch (ApertureSDKException e) {
-            e.printStackTrace();
-            throw new ServletException("Couldn't create aperture SDK");
+        ApertureSDKBuilder builder = ApertureSDK.builder();
+        builder.setHost(agentHost);
+        builder.setPort(Integer.parseInt(agentPort));
+        if (timeoutMs != null) {
+            builder.setFlowTimeout(Duration.ofMillis(Integer.parseInt(timeoutMs)));
         }
+        builder.useInsecureGrpc(insecureGrpc);
+        if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
+            try {
+                builder.setRootCertificateFile(rootCertificateFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new ServletException("Couldn't create aperture SDK", e);
+            }
+        }
+        builder.addIgnoredPaths(ignoredPaths);
+        builder.setIgnoredPathsMatchRegex(ignoredPathsRegex);
+
+        this.apertureSDK = builder.build();
     }
 
     @Override
