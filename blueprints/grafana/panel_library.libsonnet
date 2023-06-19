@@ -19,6 +19,9 @@
   query: import './panels/query.libsonnet',
 
   // Grouped panels
-  auto_scale: import './panels/auto_scale/auto_scale.libsonnet',
-  signals: import './panels/signals/signals.libsonnet',
+  adaptive_load_scheduler: import './panels/grouped/adaptive_load_scheduler.libsonnet',
+  auto_scale: import './panels/grouped/auto_scale.libsonnet',
+  signals: import './panels/grouped/signals.libsonnet',
+  load_ramp: import './panels/grouped/load_ramp.libsonnet',
+  quota_scheduler: import './panels/grouped/quota_scheduler.libsonnet',
 }
