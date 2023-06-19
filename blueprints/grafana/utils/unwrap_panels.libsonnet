@@ -1,4 +1,4 @@
-local panelLibrary = import '../panels/panel_library.libsonnet';
+local panelLibrary = import '../panel_library.libsonnet';
 
 function(componentName, componentBody, config) {
   local newConfig =

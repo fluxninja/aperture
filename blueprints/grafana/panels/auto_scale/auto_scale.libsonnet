@@ -1,5 +1,5 @@
 local signal_average = import '../signal_average.libsonnet';
-local signal_frequency = import '../signal_frequency_valid.libsonnet';
+local signal_frequency = import '../signal_frequency.libsonnet';
 
 function(cfg) {
   panels: [
