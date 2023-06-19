@@ -71,9 +71,9 @@ public class ApertureFeatureFilter implements Filter {
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertificateFile)
                             .build();
-        } catch (ApertureSDKException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            throw new ServletException("Couldn't create aperture SDK");
+            throw new ServletException("Couldn't create aperture SDK", e);
         }
     }
 
