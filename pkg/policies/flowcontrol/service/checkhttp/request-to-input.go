@@ -22,6 +22,30 @@ func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) ast.Value {
 	return RequestToInputWithServices(req, nil, nil)
 }
 
+var (
+	pathStringTerm             = ast.StringTerm("path")
+	bodyStringTerm             = ast.StringTerm("body")
+	hostStringTerm             = ast.StringTerm("host")
+	methodStringTerm           = ast.StringTerm("method")
+	schemeStringTerm           = ast.StringTerm("scheme")
+	sizeStringTerm             = ast.StringTerm("size")
+	protocolStringTerm         = ast.StringTerm("protocol")
+	headersStringTerm          = ast.StringTerm("headers")
+	socketAddressStringTerm    = ast.StringTerm("socketAddress")
+	sourceFQDNsStringTerm      = ast.StringTerm("source_fqdns")
+	destinationFQDNsStringTerm = ast.StringTerm("destination_fqdns")
+	requestStringTerm          = ast.StringTerm("request")
+	sourceStringTerm           = ast.StringTerm("source")
+	destinationStringTerm      = ast.StringTerm("destination")
+	attributesStringTerm       = ast.StringTerm("attributes")
+	parsedPathStringTerm       = ast.StringTerm("parsed_path")
+	parsedQueryStringTerm      = ast.StringTerm("parsed_query")
+	parsedBodyStringTerm       = ast.StringTerm("parsed_body")
+	truncatedBodyStringTerm    = ast.StringTerm("truncated_body")
+	addressStringTerm          = ast.StringTerm("address")
+	portStringTerm             = ast.StringTerm("port")
+)
+
 // RequestToInputWithServices - Converts a CheckHTTPRequest to an input map
 // Additionally sets attributes.source.services and attributes.destination.services with discovered services.
 func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceSvcs, destinationSvcs []string) ast.Value {
@@ -31,72 +55,69 @@ func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceS
 	headers := request.GetHeaders()
 
 	http := ast.NewObject()
-	http.Insert(ast.StringTerm("path"), ast.StringTerm(path))
-	http.Insert(ast.StringTerm("body"), ast.StringTerm(body))
-	http.Insert(ast.StringTerm("host"), ast.StringTerm(request.GetHost()))
-	http.Insert(ast.StringTerm("method"), ast.StringTerm(request.GetMethod()))
-	http.Insert(ast.StringTerm("scheme"), ast.StringTerm(request.GetScheme()))
-	http.Insert(ast.StringTerm("size"),
-		ast.NumberTerm(json.Number(strconv.FormatInt(request.GetSize(), 10))))
-	http.Insert(ast.StringTerm("protocol"), ast.StringTerm(request.GetProtocol()))
+	http.Insert(pathStringTerm, ast.StringTerm(path))
+	http.Insert(bodyStringTerm, ast.StringTerm(body))
+	http.Insert(hostStringTerm, ast.StringTerm(request.GetHost()))
+	http.Insert(methodStringTerm, ast.StringTerm(request.GetMethod()))
+	http.Insert(schemeStringTerm, ast.StringTerm(request.GetScheme()))
+	http.Insert(sizeStringTerm, ast.NumberTerm(json.Number(strconv.FormatInt(request.GetSize(), 10))))
+	http.Insert(protocolStringTerm, ast.StringTerm(request.GetProtocol()))
 
 	headersObj := ast.NewObject()
 	for key, val := range headers {
 		headersObj.Insert(ast.StringTerm(key), ast.StringTerm(val))
 	}
-	http.Insert(ast.StringTerm("headers"), ast.NewTerm(headersObj))
+	http.Insert(headersStringTerm, ast.NewTerm(headersObj))
 
 	srcSocketAddress := ast.NewObject()
-	srcSocketAddress.Insert(ast.StringTerm("address"), ast.StringTerm(req.GetSource().GetAddress()))
-	srcSocketAddress.Insert(ast.StringTerm("port"),
-		ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetSource().GetPort()), 10))))
+	srcSocketAddress.Insert(addressStringTerm, ast.StringTerm(req.GetSource().GetAddress()))
+	srcSocketAddress.Insert(portStringTerm, ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetSource().GetPort()), 10))))
 
 	dstSocketAddress := ast.NewObject()
-	dstSocketAddress.Insert(ast.StringTerm("address"), ast.StringTerm(req.GetDestination().GetAddress()))
-	dstSocketAddress.Insert(ast.StringTerm("port"),
-		ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetDestination().GetPort()), 10))))
+	dstSocketAddress.Insert(addressStringTerm, ast.StringTerm(req.GetDestination().GetAddress()))
+	dstSocketAddress.Insert(portStringTerm, ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetDestination().GetPort()), 10))))
 
 	source := ast.NewObject()
-	source.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(srcSocketAddress))
+	source.Insert(socketAddressStringTerm, ast.NewTerm(srcSocketAddress))
 	if sourceSvcs != nil {
 		srcServicesArray := make([]*ast.Term, 0)
 		for _, svc := range sourceSvcs {
 			srcServicesArray = append(srcServicesArray, ast.StringTerm(svc))
 		}
-		source.Insert(ast.StringTerm("source_fqdns"), ast.NewTerm(ast.NewArray(srcServicesArray...)))
+		source.Insert(sourceFQDNsStringTerm, ast.NewTerm(ast.NewArray(srcServicesArray...)))
 	}
 
 	destination := ast.NewObject()
-	destination.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(dstSocketAddress))
+	destination.Insert(socketAddressStringTerm, ast.NewTerm(dstSocketAddress))
 	if destinationSvcs != nil {
 		dstServicesArray := make([]*ast.Term, 0)
 		for _, svc := range destinationSvcs {
 			dstServicesArray = append(dstServicesArray, ast.StringTerm(svc))
 		}
-		destination.Insert(ast.StringTerm("destination_fqdns"), ast.NewTerm(ast.NewArray(dstServicesArray...)))
+		destination.Insert(destinationFQDNsStringTerm, ast.NewTerm(ast.NewArray(dstServicesArray...)))
 	}
 
 	requestMap := ast.NewObject()
 	requestMap.Insert(ast.StringTerm("http"), ast.NewTerm(http))
 
 	attributes := ast.NewObject()
-	attributes.Insert(ast.StringTerm("request"), ast.NewTerm(requestMap))
-	attributes.Insert(ast.StringTerm("source"), ast.NewTerm(source))
-	attributes.Insert(ast.StringTerm("destination"), ast.NewTerm(destination))
+	attributes.Insert(requestStringTerm, ast.NewTerm(requestMap))
+	attributes.Insert(sourceStringTerm, ast.NewTerm(source))
+	attributes.Insert(destinationStringTerm, ast.NewTerm(destination))
 
 	input := ast.NewObject()
-	input.Insert(ast.StringTerm("attributes"), ast.NewTerm(attributes))
+	input.Insert(attributesStringTerm, ast.NewTerm(attributes))
 
 	parsedPath, parsedQuery, err := getParsedPathAndQuery(path)
 	if err == nil {
-		input.Insert(ast.StringTerm("parsed_path"), parsedPath)
-		input.Insert(ast.StringTerm("parsed_query"), parsedQuery)
+		input.Insert(parsedPathStringTerm, parsedPath)
+		input.Insert(parsedQueryStringTerm, parsedQuery)
 	}
 
 	parsedBody, isBodyTruncated, err := getParsedBody(headers, body)
 	if err == nil {
-		input.Insert(ast.StringTerm("parsed_body"), parsedBody)
-		input.Insert(ast.StringTerm("truncated_body"), ast.BooleanTerm(isBodyTruncated))
+		input.Insert(parsedBodyStringTerm, parsedBody)
+		input.Insert(truncatedBodyStringTerm, ast.BooleanTerm(isBodyTruncated))
 	}
 
 	return input
