@@ -5,11 +5,7 @@ import {
   RequestRecord,
 } from '../components/monitor-request'
 import { Box, Typography, styled } from '@mui/material'
-import {
-  GracefulError,
-  gracefulRequest,
-  useGraceful,
-} from '@fluxninja-tools/graceful-js'
+import { GracefulError, useGraceful } from '@fluxninja-tools/graceful-js'
 import { API_URL, api } from '../api'
 
 export const HomePage: FC = () => {
@@ -33,28 +29,36 @@ export const useGracefulRequestForRateLimit = () => {
   const { ctx } = useGraceful()
 
   const gracefulError = useMemo(
-    () => ctx.url === `${API_URL}/rate-limit` && ctx.isError,
+    () => ctx.url === `${API_URL}/request` && ctx.isError,
     [ctx]
   )
 
   useEffect(() => {
-    gracefulRequest(
-      'Axios',
-      () => api.get('/rate-limit'),
-      (err, res) => {
-        if (err) {
+    const requests = async () => {
+      for (let i = 0; i < 100; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 800))
+        try {
+          const res = await api.post('/request', {
+            data: {},
+          })
+
+          if (res?.status === 200) {
+            setRequestCollection((prev) => [
+              ...prev,
+              { isError: false, rateLimitInfo: null },
+            ])
+          }
+        } catch (err) {
           setRequestCollection((prev) => [
             ...prev,
-            { isError: true, rateLimitInfo: err.rateLimitInfo },
+            { isError: true, rateLimitInfo: null },
           ])
-          return
+          break
         }
-        setRequestCollection((prev) => [
-          ...prev,
-          { isError: false, rateLimitInfo: res.rateLimitInfo },
-        ])
       }
-    )
+    }
+
+    requests()
   }, [setRequestCollection])
 
   return { collection: requestCollection, gracefulError }

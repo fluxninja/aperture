@@ -69,7 +69,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
 export type SuccessRateProps = Pick<MonitorRequestProps, 'requestRecord'>
 
 export const findPercentage = (share: number, total: number) =>
-  (share / total) * 100
+  Math.round(((share / total) * 100 + Number.EPSILON) * 100) / 100
 
 export const useSuccessErrorRatePercent = (requestRecord: RequestRecord[]) => {
   const [successRate, setSuccessRate] = useState(0)
