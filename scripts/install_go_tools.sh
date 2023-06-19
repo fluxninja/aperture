@@ -39,3 +39,5 @@ if asdf where golang &>/dev/null; then
 fi
 
 popd >/dev/null
+
+find ~/ -name controller-gen
