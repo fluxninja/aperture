@@ -8,6 +8,8 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/fluxninja/aperture v1.6.0 h1:vmG5toZ7HVZ3ckpXlsLeeRJcCL85Z7Cmd+HjGjhFK1Y=
+github.com/fluxninja/aperture v1.6.0/go.mod h1:/3sJKcEUK7HeEhaj9Ue0KRHSQO5N9WMhsHacPkgIxGE=
 github.com/fluxninja/aperture/v2 v2.1.1 h1:sHoF5tvteGQRw/Jb6tchggM6PED65kpt99QHWQtzQMI=
 github.com/fluxninja/aperture/v2 v2.1.1/go.mod h1:1QqqN2McUflY435x4SICsZ3/vE9h8s5ZaozbF0Sjc2M=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=

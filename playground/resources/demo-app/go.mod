@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/castai/promwrite v0.5.0
 	github.com/cenkalti/backoff/v4 v4.2.1
+	github.com/fluxninja/aperture v1.6.0
 	github.com/fluxninja/aperture/v2 v2.1.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.4
