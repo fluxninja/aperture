@@ -17,7 +17,7 @@ function(cfg, metadata={}) {
             local q = params.policy.promql_query;
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
-            + spec.v1.PromQL.withEvaluationInterval(params.policy.evaluation_interval)
+            + spec.v1.PromQL.withEvaluationInterval('5s')
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),
