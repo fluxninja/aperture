@@ -31,7 +31,7 @@ spec:
     components:
     - query:
         promql:
-          evaluation_interval: 1s
+          evaluation_interval: 5s
           out_ports:
             output:
               signal_name: PROMQL_0
@@ -58,7 +58,7 @@ spec:
             signal_name: OVERLOAD_CONFIRMATION_0
     - query:
         promql:
-          evaluation_interval: 1s
+          evaluation_interval: 5s
           out_ports:
             output:
               signal_name: PROMQL_1
@@ -122,7 +122,7 @@ spec:
             max_load_multiplier: 2
     - query:
         promql:
-          evaluation_interval: 1s
+          evaluation_interval: 5s
           out_ports:
             output:
               signal_name: SIGNAL
