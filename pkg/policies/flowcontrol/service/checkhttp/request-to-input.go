@@ -44,6 +44,7 @@ var (
 	truncatedBodyStringTerm    = ast.StringTerm("truncated_body")
 	addressStringTerm          = ast.StringTerm("address")
 	portStringTerm             = ast.StringTerm("port")
+	httpStringTerm             = ast.StringTerm("http")
 )
 
 // RequestToInputWithServices - Converts a CheckHTTPRequest to an input map
@@ -54,71 +55,82 @@ func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceS
 	body := request.GetBody()
 	headers := request.GetHeaders()
 
-	http := ast.NewObject()
-	http.Insert(pathStringTerm, ast.StringTerm(path))
-	http.Insert(bodyStringTerm, ast.StringTerm(body))
-	http.Insert(hostStringTerm, ast.StringTerm(request.GetHost()))
-	http.Insert(methodStringTerm, ast.StringTerm(request.GetMethod()))
-	http.Insert(schemeStringTerm, ast.StringTerm(request.GetScheme()))
-	http.Insert(sizeStringTerm, ast.NumberTerm(json.Number(strconv.FormatInt(request.GetSize(), 10))))
-	http.Insert(protocolStringTerm, ast.StringTerm(request.GetProtocol()))
-
-	headersObj := ast.NewObject()
+	headersKV := make([][2]*ast.Term, 0, len(headers))
 	for key, val := range headers {
-		headersObj.Insert(ast.StringTerm(key), ast.StringTerm(val))
+		headersKV = append(headersKV, [2]*(ast.Term){ast.StringTerm(key), ast.StringTerm(val)})
 	}
-	http.Insert(headersStringTerm, ast.NewTerm(headersObj))
+	headersObj := ast.NewObject(headersKV...)
+	http := ast.NewObject(
+		[2]*ast.Term{pathStringTerm, ast.StringTerm(path)},
+		[2]*ast.Term{bodyStringTerm, ast.StringTerm(body)},
+		[2]*ast.Term{hostStringTerm, ast.StringTerm(request.GetHost())},
+		[2]*ast.Term{methodStringTerm, ast.StringTerm(request.GetMethod())},
+		[2]*ast.Term{schemeStringTerm, ast.StringTerm(request.GetScheme())},
+		[2]*ast.Term{sizeStringTerm, ast.NumberTerm(json.Number(strconv.FormatInt(request.GetSize(), 10)))},
+		[2]*ast.Term{protocolStringTerm, ast.StringTerm(request.GetProtocol())},
+		[2]*ast.Term{headersStringTerm, ast.NewTerm(headersObj)},
+	)
 
-	srcSocketAddress := ast.NewObject()
-	srcSocketAddress.Insert(addressStringTerm, ast.StringTerm(req.GetSource().GetAddress()))
-	srcSocketAddress.Insert(portStringTerm, ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetSource().GetPort()), 10))))
+	srcSocketAddress := ast.NewObject(
+		[2]*ast.Term{addressStringTerm, ast.StringTerm(req.GetSource().GetAddress())},
+		[2]*ast.Term{portStringTerm, ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetSource().GetPort()), 10)))},
+	)
 
-	dstSocketAddress := ast.NewObject()
-	dstSocketAddress.Insert(addressStringTerm, ast.StringTerm(req.GetDestination().GetAddress()))
-	dstSocketAddress.Insert(portStringTerm, ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetDestination().GetPort()), 10))))
+	dstSocketAddress := ast.NewObject(
+		[2]*ast.Term{addressStringTerm, ast.StringTerm(req.GetDestination().GetAddress())},
+		[2]*ast.Term{portStringTerm, ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetDestination().GetPort()), 10)))},
+	)
 
-	source := ast.NewObject()
-	source.Insert(socketAddressStringTerm, ast.NewTerm(srcSocketAddress))
+	// sourceKV array is used to call ast.NewObject only once (to avoid reallocations in Insert).
+	sourceKV := make([][2]*ast.Term, 0, 2)
+	sourceKV = append(sourceKV, [2]*ast.Term{socketAddressStringTerm, ast.NewTerm(srcSocketAddress)})
 	if sourceSvcs != nil {
-		srcServicesArray := make([]*ast.Term, 0)
+		srcServicesArray := make([]*ast.Term, 0, len(sourceSvcs))
 		for _, svc := range sourceSvcs {
 			srcServicesArray = append(srcServicesArray, ast.StringTerm(svc))
 		}
-		source.Insert(sourceFQDNsStringTerm, ast.NewTerm(ast.NewArray(srcServicesArray...)))
+		sourceKV = append(sourceKV, [2]*ast.Term{sourceFQDNsStringTerm, ast.NewTerm(ast.NewArray(srcServicesArray...))})
 	}
+	source := ast.NewObject(sourceKV...)
 
-	destination := ast.NewObject()
-	destination.Insert(socketAddressStringTerm, ast.NewTerm(dstSocketAddress))
+	// see comment on sourceKV
+	destinationKV := make([][2]*ast.Term, 0, 2)
+	destinationKV = append(destinationKV, [2]*ast.Term{socketAddressStringTerm, ast.NewTerm(dstSocketAddress)})
 	if destinationSvcs != nil {
-		dstServicesArray := make([]*ast.Term, 0)
+		dstServicesArray := make([]*ast.Term, 0, len(destinationSvcs))
 		for _, svc := range destinationSvcs {
 			dstServicesArray = append(dstServicesArray, ast.StringTerm(svc))
 		}
-		destination.Insert(destinationFQDNsStringTerm, ast.NewTerm(ast.NewArray(dstServicesArray...)))
+		destinationKV = append(destinationKV, [2]*ast.Term{destinationFQDNsStringTerm, ast.NewTerm(ast.NewArray(dstServicesArray...))})
 	}
+	destination := ast.NewObject(destinationKV...)
 
-	requestMap := ast.NewObject()
-	requestMap.Insert(ast.StringTerm("http"), ast.NewTerm(http))
+	requestMap := ast.NewObject(
+		[2]*ast.Term{httpStringTerm, ast.NewTerm(http)},
+	)
 
-	attributes := ast.NewObject()
-	attributes.Insert(requestStringTerm, ast.NewTerm(requestMap))
-	attributes.Insert(sourceStringTerm, ast.NewTerm(source))
-	attributes.Insert(destinationStringTerm, ast.NewTerm(destination))
+	attributes := ast.NewObject(
+		[2]*ast.Term{requestStringTerm, ast.NewTerm(requestMap)},
+		[2]*ast.Term{sourceStringTerm, ast.NewTerm(source)},
+		[2]*ast.Term{destinationStringTerm, ast.NewTerm(destination)},
+	)
 
-	input := ast.NewObject()
-	input.Insert(attributesStringTerm, ast.NewTerm(attributes))
+	// see comment on sourceKV
+	inputKV := make([][2]*ast.Term, 0, 5)
+	inputKV = append(inputKV, [2]*ast.Term{attributesStringTerm, ast.NewTerm(attributes)})
 
 	parsedPath, parsedQuery, err := getParsedPathAndQuery(path)
 	if err == nil {
-		input.Insert(parsedPathStringTerm, parsedPath)
-		input.Insert(parsedQueryStringTerm, parsedQuery)
+		inputKV = append(inputKV, [2]*ast.Term{parsedPathStringTerm, parsedPath})
+		inputKV = append(inputKV, [2]*ast.Term{parsedQueryStringTerm, parsedQuery})
 	}
 
 	parsedBody, isBodyTruncated, err := getParsedBody(headers, body)
 	if err == nil {
-		input.Insert(parsedBodyStringTerm, parsedBody)
-		input.Insert(truncatedBodyStringTerm, ast.BooleanTerm(isBodyTruncated))
+		inputKV = append(inputKV, [2]*ast.Term{parsedBodyStringTerm, parsedBody})
+		inputKV = append(inputKV, [2]*ast.Term{truncatedBodyStringTerm, ast.BooleanTerm(isBodyTruncated)})
 	}
+	input := ast.NewObject(inputKV...)
 
 	return input
 }
@@ -130,14 +142,14 @@ func getParsedPathAndQuery(path string) (*ast.Term, *ast.Term, error) {
 	}
 
 	parsedPath := strings.Split(strings.TrimLeft(parsedURL.Path, "/"), "/")
-	parsedPathSlice := make([]*ast.Term, 0)
+	parsedPathSlice := make([]*ast.Term, 0, len(parsedPath))
 	for _, v := range parsedPath {
 		parsedPathSlice = append(parsedPathSlice, ast.StringTerm(v))
 	}
 
 	parsedQueryInterface := ast.NewObject()
 	for paramKey, paramValues := range parsedURL.Query() {
-		queryValues := make([]*ast.Term, 0)
+		queryValues := make([]*ast.Term, 0, len(paramValues))
 		for _, v := range paramValues {
 			queryValues = append(queryValues, ast.StringTerm(v))
 		}
