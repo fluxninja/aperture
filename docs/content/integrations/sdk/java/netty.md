@@ -36,11 +36,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) {
         String controlPointName = "someFeature";
 
-        try {
-            sdk = ApertureSDK.builder().setHost(this.agentHost).setPort(this.agentPort).build();
-        } catch (ApertureSDKException ex) {
-            throw new RuntimeException(ex);
-        }
+        sdk = ApertureSDK.builder().setHost(this.agentHost).setPort(this.agentPort).build();
 
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());

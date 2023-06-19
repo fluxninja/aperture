@@ -32,11 +32,15 @@ public final class ApertureSDKBuilder {
     private String certFile;
     private final List<String> ignoredPaths;
     private boolean ignoredPathsMatchRegex = false;
+    private TlsChannelCredentials.Builder tlsChannelCredentialsBuilder;
+    private byte[] caCertFileContents;
 
     private static final Logger logger = LoggerFactory.getLogger(ApertureSDKBuilder.class);
 
     ApertureSDKBuilder() {
         ignoredPaths = new ArrayList<>();
+        tlsChannelCredentialsBuilder = TlsChannelCredentials.newBuilder();
+        caCertFileContents = null;
     }
 
     /**
@@ -89,9 +93,15 @@ public final class ApertureSDKBuilder {
      *
      * @param filename path to file containing custom root CA certificate.
      * @return the builder object.
+     * @throws IOException if custom root CA certificate file cannot be read.
      */
-    public ApertureSDKBuilder setRootCertificateFile(String filename) {
+    public ApertureSDKBuilder setRootCertificateFile(String filename) throws IOException {
         this.certFile = filename;
+        if (filename != null && !filename.isEmpty()) {
+            this.tlsChannelCredentialsBuilder.trustManager(new File(this.certFile));
+            this.caCertFileContents =
+                    ByteStreams.toByteArray(Files.newInputStream(Paths.get(this.certFile)));
+        }
         return this;
     }
 
@@ -185,7 +195,7 @@ public final class ApertureSDKBuilder {
      *
      * @return The constructed ApertureSDK object.
      */
-    public ApertureSDK build() throws ApertureSDKException {
+    public ApertureSDK build() {
         String host = this.host;
         if (host == null) {
             logger.warn(
@@ -218,17 +228,8 @@ public final class ApertureSDKBuilder {
             if (this.certFile == null || this.certFile.isEmpty()) {
                 creds = TlsChannelCredentials.create();
             } else {
-                try {
-                    creds =
-                            TlsChannelCredentials.newBuilder()
-                                    .trustManager(new File(this.certFile))
-                                    .build();
-                    caCertContents =
-                            ByteStreams.toByteArray(Files.newInputStream(Paths.get(this.certFile)));
-                } catch (IOException e) {
-                    // cert file not found
-                    throw new ApertureSDKException(e);
-                }
+                creds = this.tlsChannelCredentialsBuilder.build();
+                caCertContents = this.caCertFileContents;
             }
         }
 

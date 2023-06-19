@@ -5,7 +5,22 @@ local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libso
 local dashboard = grafana.dashboard;
 local prometheus = grafana.prometheus;
 local statPanel = grafana.statPanel;
+local graphPanel = grafana.graphPanel;
 
+
+local newGraphPanel(title, datasource, query, axisLabel='', unit='') =
+  graphPanel.new(
+    title=title,
+    datasource=datasource,
+    labelY1=axisLabel,
+    formatY1=unit,
+  )
+  .addTarget(
+    prometheus.target(
+      expr=query,
+      intervalFactor=1,
+    )
+  );
 
 local newStatPanel(graphTitle, datasource, graphQuery) =
   local target =
@@ -124,16 +139,41 @@ function(cfg) {
 
   local basequotaSchedular = quotaSchedular(params).dashboard,
 
-  local maxId = std.reverse(std.sort(basequotaSchedular.panels, keyF=function(panel) '%s' % panel.id))[0].id,
-  local maxPanelYAxis = std.reverse(std.sort(basequotaSchedular.panels, keyF=function(panel) panel.gridPos.y))[0].gridPos.y,
+  local overloadConfirmationPanels =
+    if std.objectHas(params.policy.service_protection_core, 'overload_confirmations') then [
+      local query = params.policy.service_protection_core.overload_confirmations[idx];
+      newGraphPanel(
+        'Overload Confirmation Query %s - %s - %s' % [(idx + 1), query.operator, query.threshold],
+        params.dashboard.datasource.name,
+        params.policy.service_protection_core.overload_confirmations[idx].query_string,
+      ) {
+        id: idx + 1,
+        gridPos: { x: 0, y: 10 + (idx * 10), w: 24, h: 10 },
+      }
+      for idx in std.range(0, std.length(params.policy.service_protection_core.overload_confirmations) - 1)
+    ] else [],
+
+  local overloadConfirmationPanelsLength = std.length(overloadConfirmationPanels),
+
+  local quotaSchedularDashboard = basequotaSchedular {
+    panels: overloadConfirmationPanels + [
+      basequotaSchedular.panels[panel_idx] {
+        id: overloadConfirmationPanelsLength + panel_idx + 1,
+        gridPos+: { y: 10 + (10 * overloadConfirmationPanelsLength) + basequotaSchedular.panels[panel_idx].gridPos.y },
+      }
+      for panel_idx in std.range(0, std.length(basequotaSchedular.panels) - 1)
+    ],
+  },
+
+  local maxId = std.reverse(std.sort(quotaSchedularDashboard.panels, keyF=function(panel) '%s' % panel.id))[0].id,
+  local maxPanelYAxis = std.reverse(std.sort(quotaSchedularDashboard.panels, keyF=function(panel) panel.gridPos.y))[0].gridPos.y,
 
   local finaldashboard =
-    basequotaSchedular {
+    quotaSchedularDashboard {
       panels+: [
         LoadSchedular.panels[panel_idx] {
           id: maxId + panel_idx + 1,
           gridPos: { y: maxPanelYAxis + 10, x: 6 * panel_idx, w: 6, h: 6 },
-
         }
         for panel_idx in std.range(0, std.length(LoadSchedular.panels) - 1)
       ],

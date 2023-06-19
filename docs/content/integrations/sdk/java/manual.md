@@ -28,16 +28,12 @@ To do so, first create an instance of ApertureSDK:
     int agentPort = 8089;
 
     ApertureSDK apertureSDK;
-    try {
-        apertureSDK = ApertureSDK.builder()
-                .setHost(agentHost)
-                .setPort(agentPort)
-                .setDuration(Duration.ofMillis(1000))
-                .build();
-    } catch (ApertureSDKException e) {
-        e.printStackTrace();
-        return;
-    }
+
+    apertureSDK = ApertureSDK.builder()
+            .setHost(agentHost)
+            .setPort(agentPort)
+            .setFlowTimeout(Duration.ofMillis(1000))
+            .build();
 ```
 
 The created instance can then be used to start a flow:
