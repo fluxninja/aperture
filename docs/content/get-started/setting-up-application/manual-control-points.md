@@ -43,16 +43,12 @@ Aperture SDK as follows:
     int agentPort = 8089; // Aperture Agent Port
 
     ApertureSDK apertureSDK;
-    try {
-        apertureSDK = ApertureSDK.builder()
-                .setHost(agentHost)
-                .setPort(agentPort)
-                .setDuration(Duration.ofMillis(1000))
-                .build();
-    } catch (ApertureSDKException e) {
-        e.printStackTrace();
-        return;
-    }
+
+    apertureSDK = ApertureSDK.builder()
+            .setHost(agentHost)
+            .setPort(agentPort)
+            .setFlowTimeout(Duration.ofMillis(1000))
+            .build();
 ```
 
 Once you have configured Aperture SDK, you can create a feature control point

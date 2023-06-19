@@ -1,5 +1,6 @@
 package com.javademoapp.javademoapp;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -40,7 +41,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.servlet.javax.*;
 
 @RestController
@@ -83,7 +83,7 @@ public class RequestController {
 
     @PostMapping("/request")
     public String handlePostRequest(@RequestBody String payload, HttpServletRequest request,
-            HttpServletResponse response) throws ApertureSDKException {
+            HttpServletResponse response) {
         // Randomly reject requests
         if (rejectRatio > 0 && Math.random() < rejectRatio) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
