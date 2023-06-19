@@ -2,6 +2,7 @@ package checkhttp_test
 
 import (
 	"encoding/json"
+	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -14,73 +15,9 @@ import (
 var _ = Describe("RequestToInput", func() {
 
 	var defaultRequest *flowcontrolhttpv1.CheckHTTPRequest
-	var commonInput map[string]interface{}
 
 	BeforeEach(func() {
-		defaultRequest = &flowcontrolhttpv1.CheckHTTPRequest{
-			ControlPoint: "ingress",
-			Source: &flowcontrolhttpv1.SocketAddress{
-				Address: "test",
-				Port:    1234,
-			},
-			Destination: &flowcontrolhttpv1.SocketAddress{
-				Address: "test2",
-				Port:    1234,
-			},
-			Request: &flowcontrolhttpv1.CheckHTTPRequest_HttpRequest{
-				Method: "GET",
-				Path:   "/test/test2?param1=val",
-				Headers: map[string]string{
-					"content-type": "application/json",
-				},
-				Host:     "localhost",
-				Body:     "{ \"myjson\": \"value\" }",
-				Protocol: "HTTP/1.1",
-				Scheme:   "http",
-				Size:     21,
-			},
-		}
-
-		commonInput = map[string]interface{}{
-			"attributes": map[string]interface{}{
-				"destination": map[string]interface{}{
-					"socketAddress": map[string]interface{}{
-						"address": "test2",
-						"port":    json.Number("1234"),
-					},
-				},
-				"source": map[string]interface{}{
-					"socketAddress": map[string]interface{}{
-						"address": "test",
-						"port":    json.Number("1234"),
-					},
-				},
-				"request": map[string]interface{}{
-					"http": map[string]interface{}{
-						"body": "{ \"myjson\": \"value\" }",
-						"headers": map[string]interface{}{
-							"content-type": "application/json",
-						},
-						"host":     "localhost",
-						"method":   "GET",
-						"path":     "/test/test2?param1=val",
-						"protocol": "HTTP/1.1",
-						"scheme":   "http",
-						"size":     json.Number("21"),
-					},
-				},
-			},
-			"parsed_body": map[string]interface{}{
-				"myjson": "value",
-			},
-			"parsed_query": map[string]interface{}{
-				"param1": []interface{}{"val"},
-			},
-			"parsed_path": []interface{}{
-				"test", "test2",
-			},
-			"truncated_body": false,
-		}
+		defaultRequest = getDefaultRequest()
 	})
 
 	It("Can process empty HTTP request", func() {
@@ -93,7 +30,7 @@ var _ = Describe("RequestToInput", func() {
 	It("Can process valid HTTP request", func() {
 		value := checkhttp.RequestToInput(defaultRequest)
 		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(commonInput))
+		Expect(iface).To(Equal(commonInput()))
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -102,7 +39,7 @@ var _ = Describe("RequestToInput", func() {
 		req.Request.Headers["content-length"] = "64"
 		value := checkhttp.RequestToInput(req)
 		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(truncatedInput(commonInput)))
+		Expect(iface).To(Equal(truncatedInput(commonInput())))
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -113,7 +50,7 @@ var _ = Describe("RequestToInput", func() {
 		req.Request.Body = "myjson=value"
 		value := checkhttp.RequestToInput(req)
 		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(urlEncoded(commonInput)))
+		Expect(iface).To(Equal(urlEncoded(commonInput())))
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -124,7 +61,7 @@ var _ = Describe("RequestToInput", func() {
 		req.Request.Body = "myjson=value"
 		value := checkhttp.RequestToInput(req)
 		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(urlEncodedTruncated(commonInput)))
+		Expect(iface).To(Equal(urlEncodedTruncated(commonInput())))
 		Expect(err).NotTo(HaveOccurred())
 	})
 })
@@ -166,6 +103,75 @@ func emptyInput() map[string]interface{} {
 	return input
 }
 
+func commonInput() map[string]interface{} {
+	return map[string]interface{}{
+		"attributes": map[string]interface{}{
+			"destination": map[string]interface{}{
+				"socketAddress": map[string]interface{}{
+					"address": "test2",
+					"port":    json.Number("1234"),
+				},
+			},
+			"source": map[string]interface{}{
+				"socketAddress": map[string]interface{}{
+					"address": "test",
+					"port":    json.Number("1234"),
+				},
+			},
+			"request": map[string]interface{}{
+				"http": map[string]interface{}{
+					"body": "{ \"myjson\": \"value\" }",
+					"headers": map[string]interface{}{
+						"content-type": "application/json",
+					},
+					"host":     "localhost",
+					"method":   "GET",
+					"path":     "/test/test2?param1=val",
+					"protocol": "HTTP/1.1",
+					"scheme":   "http",
+					"size":     json.Number("21"),
+				},
+			},
+		},
+		"parsed_body": map[string]interface{}{
+			"myjson": "value",
+		},
+		"parsed_query": map[string]interface{}{
+			"param1": []interface{}{"val"},
+		},
+		"parsed_path": []interface{}{
+			"test", "test2",
+		},
+		"truncated_body": false,
+	}
+
+}
+func getDefaultRequest() *flowcontrolhttpv1.CheckHTTPRequest {
+	return &flowcontrolhttpv1.CheckHTTPRequest{
+		ControlPoint: "ingress",
+		Source: &flowcontrolhttpv1.SocketAddress{
+			Address: "test",
+			Port:    1234,
+		},
+		Destination: &flowcontrolhttpv1.SocketAddress{
+			Address: "test2",
+			Port:    1234,
+		},
+		Request: &flowcontrolhttpv1.CheckHTTPRequest_HttpRequest{
+			Method: "GET",
+			Path:   "/test/test2?param1=val",
+			Headers: map[string]string{
+				"content-type": "application/json",
+			},
+			Host:     "localhost",
+			Body:     "{ \"myjson\": \"value\" }",
+			Protocol: "HTTP/1.1",
+			Scheme:   "http",
+			Size:     21,
+		},
+	}
+}
+
 func truncatedInput(commonInput map[string]interface{}) map[string]interface{} {
 	input := commonInput
 	input["attributes"].(map[string]interface{})["request"].(map[string]interface{})["http"].(map[string]interface{})["headers"] = map[string]interface{}{
@@ -205,6 +211,14 @@ func urlEncodedTruncated(commonInput map[string]interface{}) map[string]interfac
 	input["parsed_body"] = nil
 
 	return input
+}
+
+// Run with: go test -bench=. -run='^$' -benchmem ./...
+func BenchmarkRequestToInput(b *testing.B) {
+	request := getDefaultRequest()
+	for i := 0; i < b.N; i++ {
+		_ = checkhttp.RequestToInput(request)
+	}
 }
 
 type valueResolver struct{}
