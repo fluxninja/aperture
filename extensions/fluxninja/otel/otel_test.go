@@ -122,7 +122,7 @@ func (b configBuilder) withMetrics(pipelineName string) configBuilder {
 		"config": map[string]any{
 			"global": map[string]any{
 				// Here is different scrape interval than in the base otel config.
-				"scrape_interval": "5s",
+				"scrape_interval": "15s",
 			},
 			"scrape_configs": []string{"foo", "bar"},
 		},
@@ -149,7 +149,7 @@ func baseOTelConfig() configBuilder {
 	cfg.AddReceiver("prometheus", map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval": "5s",
+				"scrape_interval": "15s",
 			},
 			// Put some scrape configs to be sure they are not overwritten.
 			"scrape_configs": []string{"foo", "bar"},
