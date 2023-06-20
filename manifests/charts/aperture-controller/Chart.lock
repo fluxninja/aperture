@@ -4,9 +4,9 @@ dependencies:
   version: 1.17.1
 - name: etcd
   repository: https://charts.bitnami.com/bitnami
-  version: 8.12.0
+  version: 8.9.0
 - name: prometheus
   repository: https://prometheus-community.github.io/helm-charts
-  version: 22.6.4
-digest: sha256:3758f4766d64756a9009590ec02803702179220659e076a46f4ebb3a17a2b27b
-generated: "2023-06-15T10:44:09.55426-07:00"
+  version: 15.18.0
+digest: sha256:c16e0f10234a15181cdde670a1c422e17ae90020598a4e2f0b254ea391898ab3
+generated: "2023-04-21T11:34:56.926829081+05:30"
