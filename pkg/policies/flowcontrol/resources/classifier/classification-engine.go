@@ -6,7 +6,6 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -89,7 +88,7 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	flowLabels flowlabel.FlowLabels,
 	mm *multimatcher.MultiMatcher[int, multiMatcherResult],
 	labelsForMatching map[string]string,
-	input ast.Value,
+	input Input,
 ) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
 	logger := c.registry.GetLogger()
 	appendNewClassifier := func(labelerWithAttributes *compiler.LabelerWithAttributes, error flowcontrolv1.ClassifierInfo_Error) {
@@ -103,21 +102,11 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 
 	mmResult := mm.Match(labelsForMatching)
 
-	requestParsedOK := false
-	ifaceMap := make(map[string]interface{})
-	previews := mmResult.previews
-	if len(previews) > 0 {
-		// Extract interface{} from ast.Value
-		ifaceRequest, err := ast.ValueToInterface(input, valueResolver{})
-		if err != nil {
-			log.Bug().Msgf("failed to convert value to interface: %v", err)
-		} else {
-			ifaceMap, requestParsedOK = ifaceRequest.(map[string]interface{})
-		}
-	}
-	for _, preview := range previews {
-		if requestParsedOK {
+	for _, preview := range mmResult.previews {
+		if ifaceMap, ok := input.Interface().(map[string]interface{}); ok {
 			preview.AddHTTPRequestPreview(ifaceMap)
+		} else {
+			log.Bug().Msg("preview: Classify input is not a map")
 		}
 	}
 
@@ -125,7 +114,7 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 
 	for _, labelerWithSelector := range labelers {
 		labeler := labelerWithSelector.Labeler
-		resultSet, err := labeler.Query.Eval(ctx, rego.EvalParsedInput(input))
+		resultSet, err := labeler.Query.Eval(ctx, rego.EvalParsedInput(input.Value()))
 		if err != nil {
 			logger.Sample(evalFailedSampler).Warn().Msg("Rego: Evaluation failed")
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_EVAL_FAILED)
@@ -169,22 +158,14 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	return
 }
 
-type valueResolver struct{}
-
-// Resolve implements ast.ValueResolver interface.
-func (valueResolver) Resolve(ref ast.Ref) (interface{}, error) {
-	return make(map[string]interface{}), nil
-}
-
 // Classify takes rego input, performs classification, and returns a map of flow labels.
 // LabelsForMatching are additional labels to use for selector matching.
-// Request is passed as ast.Value directly instead of map[string]interface{} to avoid unnecessary json conversion.
 func (c *ClassificationEngine) Classify(
 	ctx context.Context,
 	svcs []string,
 	ctrlPt string,
 	labelsForMatching map[string]string,
-	input ast.Value,
+	input Input,
 ) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {
 	flowLabels := make(flowlabel.FlowLabels)
 

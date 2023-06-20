@@ -22,25 +22,19 @@ var _ = Describe("RequestToInput", func() {
 
 	It("Can process empty HTTP request", func() {
 		value := checkhttp.RequestToInput(&flowcontrolhttpv1.CheckHTTPRequest{})
-		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(emptyInput()))
-		Expect(err).NotTo(HaveOccurred())
+		Expect(value.Interface()).To(Equal(emptyInput()))
 	})
 
 	It("Can process valid HTTP request", func() {
 		value := checkhttp.RequestToInput(defaultRequest)
-		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(commonInput()))
-		Expect(err).NotTo(HaveOccurred())
+		Expect(value.Interface()).To(Equal(commonInput()))
 	})
 
 	It("Can process valid request with truncated body", func() {
 		req := defaultRequest
 		req.Request.Headers["content-length"] = "64"
 		value := checkhttp.RequestToInput(req)
-		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(truncatedInput(commonInput())))
-		Expect(err).NotTo(HaveOccurred())
+		Expect(value.Interface()).To(Equal(truncatedInput(commonInput())))
 	})
 
 	It("Can process valid HTTP request with content type url encoded", func() {
@@ -49,9 +43,7 @@ var _ = Describe("RequestToInput", func() {
 		req.Request.Headers["content-length"] = "12"
 		req.Request.Body = "myjson=value"
 		value := checkhttp.RequestToInput(req)
-		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(urlEncoded(commonInput())))
-		Expect(err).NotTo(HaveOccurred())
+		Expect(value.Interface()).To(Equal(urlEncoded(commonInput())))
 	})
 
 	It("Can process valid HTTP request with truncated url encoded body", func() {
@@ -60,9 +52,7 @@ var _ = Describe("RequestToInput", func() {
 		req.Request.Headers["content-length"] = "64"
 		req.Request.Body = "myjson=value"
 		value := checkhttp.RequestToInput(req)
-		iface, err := ast.ValueToInterface(value, valueResolver{})
-		Expect(iface).To(Equal(urlEncodedTruncated(commonInput())))
-		Expect(err).NotTo(HaveOccurred())
+		Expect(value.Interface()).To(Equal(urlEncodedTruncated(commonInput())))
 	})
 })
 
@@ -217,7 +207,8 @@ func urlEncodedTruncated(commonInput map[string]interface{}) map[string]interfac
 func BenchmarkRequestToInput(b *testing.B) {
 	request := getDefaultRequest()
 	for i := 0; i < b.N; i++ {
-		_ = checkhttp.RequestToInput(request)
+		input := checkhttp.RequestToInput(request)
+		input.Value() // force evaluation
 	}
 }
 

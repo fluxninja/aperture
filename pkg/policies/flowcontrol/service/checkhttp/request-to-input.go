@@ -9,16 +9,21 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/util"
 
 	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 )
 
 // RequestToInput - Converts a CheckHTTPRequest to an input map.
-func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) ast.Value {
+//
+// The given CheckHTTPRequest should not be modified while returned Input is in
+// use (because the Input will be created lazily).
+func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) classifier.Input {
 	return RequestToInputWithServices(req, nil, nil)
 }
 
@@ -49,7 +54,24 @@ var (
 
 // RequestToInputWithServices - Converts a CheckHTTPRequest to an input map
 // Additionally sets attributes.source.services and attributes.destination.services with discovered services.
-func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceSvcs, destinationSvcs []string) ast.Value {
+//
+// Arguments should not be modified while returned Input is in use (because the
+// Input will be created lazily).
+func RequestToInputWithServices(
+	req *flowcontrolhttpv1.CheckHTTPRequest,
+	sourceSvcs,
+	destinationSvcs []string,
+) classifier.Input {
+	return newLazyInput(func() ast.Value {
+		return requestToInputWithServices(req, sourceSvcs, destinationSvcs)
+	})
+}
+
+func requestToInputWithServices(
+	req *flowcontrolhttpv1.CheckHTTPRequest,
+	sourceSvcs,
+	destinationSvcs []string,
+) ast.Value {
 	request := req.GetRequest()
 	path := request.GetPath()
 	body := request.GetBody()
@@ -302,4 +324,50 @@ func checkIfHTTPBodyTruncated(contentLength string, bodyLength int64) (bool, err
 		return true, nil
 	}
 	return false, nil
+}
+
+type lazyInput struct {
+	mkValue   func() ast.Value
+	valueOnce sync.Once
+	value     ast.Value
+	ifaceOnce sync.Once
+	iface     interface{}
+}
+
+func newLazyInput(mkValueFunc func() ast.Value) classifier.Input {
+	return &lazyInput{mkValue: mkValueFunc}
+}
+
+// Value implements classifier.Input.
+func (i *lazyInput) Value() ast.Value {
+	i.valueOnce.Do(func() {
+		i.value = i.mkValue()
+	})
+	return i.value
+}
+
+// Interface implements classifier.Input.
+func (i *lazyInput) Interface() interface{} {
+	i.ifaceOnce.Do(func() {
+		var err error
+		i.iface, err = ast.ValueToInterface(i.Value(), emptyResolver{})
+		if err != nil {
+			// This should never happen as we're using only "simple" types in our
+			// Value (objects, arrays, strings, bools, ints), and resolver we
+			// use is infallible anyway. Log just in case.
+			log.Bug().Msgf("failed to convert value to interface: %v", err)
+			i.iface = map[string]interface{}{"error": "failed to convert value"}
+		}
+	})
+	return i.iface
+}
+
+type emptyResolver struct{}
+
+// Resolve implements ast.ValueResolver interface by returning empty object for
+// any unknown ref.
+//
+// Note: We assume this will never be called.
+func (emptyResolver) Resolve(ref ast.Ref) (interface{}, error) {
+	return make(map[string]interface{}), nil
 }
