@@ -140,8 +140,7 @@ function(cfg) {
   local basequotaSchedular = quotaSchedular(params).dashboard,
 
   local overloadConfirmationPanels =
-    if std.objectHas(params.policy, 'service_protection_core')
-    then if std.objectHas(params.policy.service_protection_core, 'overload_confirmations') then [
+    if std.objectHas(params.policy, 'service_protection_core') && std.objectHas(params.policy.service_protection_core, 'overload_confirmations') then [
       local query = params.policy.service_protection_core.overload_confirmations[idx];
       newGraphPanel(
         'Overload Confirmation Query %s - %s - %s' % [(idx + 1), query.operator, query.threshold],
@@ -153,7 +152,6 @@ function(cfg) {
       }
       for idx in std.range(0, std.length(params.policy.service_protection_core.overload_confirmations) - 1)
     ]
-    else []
     else [],
 
   local overloadConfirmationPanelsLength = std.length(overloadConfirmationPanels),
