@@ -46,7 +46,7 @@ policy:
     # Type: bool
     dry_run: false
     # Threshold value for CPU utilizatio if it has to be used as overload confirmation.
-    # Type: float64
+    # Type: string
     cpu_overload_confirmation_threshold: ""
   auto_scaling:
     # Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.

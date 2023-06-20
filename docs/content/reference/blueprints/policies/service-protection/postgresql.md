@@ -29,13 +29,6 @@ concurrency. The concurrency is reduced by a multiplicative factor when the
 service is overloaded, and increased by an additive factor while the service is
 no longer overloaded.
 
-This policy detects traffic overloads and cascading failure build-up by
-comparing the real-time latency with its exponential moving average. A gradient
-controller calculates a proportional response to limit accepted concurrency. The
-concurrency is reduced by a multiplicative factor when the service is
-overloaded, and increased by an additive factor while the service is no longer
-overloaded.
-
 :::info
 
 Please see reference for the
@@ -221,7 +214,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 <ParameterDescription
     name='policy.service_protection_core.cpu_overload_confirmation_threshold'
     description='Threshold value for CPU utilizatio if it has to be used as overload confirmation.'
-    type='Number (double)'
+    type='string'
     reference=''
     value='""'
 />
@@ -816,9 +809,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <a id="postgresql-tls-ca-file"></a>
 
-<ParameterDescription name='ca_file' description='A set of certificate
-authorities used to validate the database server's SSL certificate.'
-type='string' reference='' value='null' />
+<ParameterDescription
+    name='ca_file'
+    description='A set of certificate authorities used to validate the database server SSL certificate.'
+    type='string'
+    reference=''
+    value='null'
+/>
 
 <!-- vale on -->
 

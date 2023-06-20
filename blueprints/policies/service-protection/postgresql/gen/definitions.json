@@ -96,8 +96,7 @@
             "cpu_overload_confirmation_threshold": {
               "description": "Threshold value for CPU utilizatio if it has to be used as overload confirmation.",
               "default": "",
-              "type": "number",
-              "format": "double"
+              "type": "string"
             }
           }
         },
@@ -382,7 +381,7 @@
               "type": "string"
             },
             "ca_file": {
-              "description": "A set of certificate authorities used to validate the database server's SSL certificate.",
+              "description": "A set of certificate authorities used to validate the database server SSL certificate.",
               "default": null,
               "type": "string"
             }

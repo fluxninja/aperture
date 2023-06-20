@@ -51,7 +51,7 @@ promqlDefaults {
     * @schema (postgresql.tls.insecure_skip_verify: bool) Whether to validate server name and certificate if client transport security is enabled.
     * @schema (postgresql.tls.cert_file: string) A cerficate used for client authentication, if necessary.
     * @schema (postgresql.tls.key_file: string) An SSL key used for client authentication, if necessary.
-    * @schema (postgresql.tls.ca_file: string) A set of certificate authorities used to validate the database server's SSL certificate.
+    * @schema (postgresql.tls.ca_file: string) A set of certificate authorities used to validate the database server SSL certificate.
     */
     postgresql: {
       username: '__REQUIRED_FIELD__',
@@ -61,7 +61,7 @@ promqlDefaults {
     },
 
     /**
-    * @param (policy.service_protection_core.cpu_overload_confirmation_threshold: float64) Threshold value for CPU utilizatio if it has to be used as overload confirmation.
+    * @param (policy.service_protection_core.cpu_overload_confirmation_threshold: string) Threshold value for CPU utilizatio if it has to be used as overload confirmation.
     */
     service_protection_core+: {
       cpu_overload_confirmation_threshold: '',
