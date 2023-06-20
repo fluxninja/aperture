@@ -19,6 +19,8 @@ import (
 // * otelconsts.ApertureRateLimitersLabel
 // * otelconsts.ApertureDroppingRateLimitersLabel
 // * otelconsts.ApertureLoadSchedulersLabel
+// * otelconsts.ApertureQuotaSchedulersLabel
+// * otelconsts.ApertureDroppingQuotaSchedulersLabel
 // * otelconsts.ApertureDroppingLoadSchedulersLabel
 // * otelconsts.ApertureWorkloadsLabel
 // * otelconsts.ApertureDroppingWorkloadsLabel
@@ -50,18 +52,22 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	attributes.PutStr(otelconsts.ApertureControlPointLabel, checkResponse.GetControlPoint())
 
 	labels := map[string]pcommon.Value{
-		otelconsts.ApertureRateLimitersLabel:           pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingRateLimitersLabel:   pcommon.NewValueSlice(),
-		otelconsts.ApertureLoadSchedulersLabel:         pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingLoadSchedulersLabel: pcommon.NewValueSlice(),
-		otelconsts.ApertureWorkloadsLabel:              pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingWorkloadsLabel:      pcommon.NewValueSlice(),
-		otelconsts.ApertureFluxMetersLabel:             pcommon.NewValueSlice(),
-		otelconsts.ApertureFlowLabelKeysLabel:          pcommon.NewValueSlice(),
-		otelconsts.ApertureClassifiersLabel:            pcommon.NewValueSlice(),
-		otelconsts.ApertureClassifierErrorsLabel:       pcommon.NewValueSlice(),
-		otelconsts.ApertureDecisionTypeLabel:           pcommon.NewValueStr(checkResponse.DecisionType.String()),
-		otelconsts.ApertureRejectReasonLabel:           pcommon.NewValueStr(checkResponse.GetRejectReason().String()),
+		otelconsts.ApertureRateLimitersLabel:            pcommon.NewValueSlice(),
+		otelconsts.ApertureDroppingRateLimitersLabel:    pcommon.NewValueSlice(),
+		otelconsts.ApertureLoadSchedulersLabel:          pcommon.NewValueSlice(),
+		otelconsts.ApertureDroppingLoadSchedulersLabel:  pcommon.NewValueSlice(),
+		otelconsts.ApertureQuotaSchedulersLabel:         pcommon.NewValueSlice(),
+		otelconsts.ApertureDroppingQuotaSchedulersLabel: pcommon.NewValueSlice(),
+		otelconsts.ApertureWorkloadsLabel:               pcommon.NewValueSlice(),
+		otelconsts.ApertureDroppingWorkloadsLabel:       pcommon.NewValueSlice(),
+		otelconsts.ApertureSamplersLabel:                pcommon.NewValueSlice(),
+		otelconsts.ApertureDroppingSamplersLabel:        pcommon.NewValueSlice(),
+		otelconsts.ApertureFluxMetersLabel:              pcommon.NewValueSlice(),
+		otelconsts.ApertureFlowLabelKeysLabel:           pcommon.NewValueSlice(),
+		otelconsts.ApertureClassifiersLabel:             pcommon.NewValueSlice(),
+		otelconsts.ApertureClassifierErrorsLabel:        pcommon.NewValueSlice(),
+		otelconsts.ApertureDecisionTypeLabel:            pcommon.NewValueStr(checkResponse.DecisionType.String()),
+		otelconsts.ApertureRejectReasonLabel:            pcommon.NewValueStr(checkResponse.GetRejectReason().String()),
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiterInfo() != nil {
@@ -107,9 +113,33 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
-			labels[otelconsts.ApertureRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
+			labels[otelconsts.ApertureSamplersLabel].Slice().AppendEmpty().SetStr(value)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
+				labels[otelconsts.ApertureDroppingSamplersLabel].Slice().AppendEmpty().SetStr(value)
+			}
+		}
+		if cl := decision.GetQuotaSchedulerInfo(); cl != nil {
+			rawValue := []string{
+				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
+			}
+			value := strings.Join(rawValue, ",")
+			labels[otelconsts.ApertureQuotaSchedulersLabel].Slice().AppendEmpty().SetStr(value)
+			if decision.Dropped {
+				labels[otelconsts.ApertureDroppingQuotaSchedulersLabel].Slice().AppendEmpty().SetStr(value)
+			}
+
+			workloadsRawValue := []string{
+				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
+				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.SchedulerInfo.GetWorkloadIndex()),
+				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
+			}
+			value = strings.Join(workloadsRawValue, ",")
+			labels[otelconsts.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+			if decision.Dropped {
+				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
 			}
 		}
 	}
