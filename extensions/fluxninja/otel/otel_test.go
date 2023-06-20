@@ -122,7 +122,7 @@ func (b configBuilder) withMetrics(pipelineName string) configBuilder {
 		"config": map[string]any{
 			"global": map[string]any{
 				// Here is different scrape interval than in the base otel config.
-				"scrape_interval": "10s",
+				"scrape_interval": "5s",
 			},
 			"scrape_configs": []string{"foo", "bar"},
 		},

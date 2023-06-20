@@ -171,7 +171,7 @@ func addFluxNinjaPrometheusReceiver(config *otelconfig.Config) {
 	configPatch := map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval": "10s",
+				"scrape_interval": "15s",
 			},
 		},
 	}
