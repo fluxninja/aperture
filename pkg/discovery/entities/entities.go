@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
 
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -163,7 +164,7 @@ func (c *Entities) GetByIP(entityIP string) (*entitiesv1.Entity, error) {
 		return nil, errNotFound
 	}
 
-	return v.DeepCopy(), nil
+	return proto.Clone(v).(*entitiesv1.Entity), nil
 }
 
 // GetByName retrieves entity with a given name.
@@ -179,7 +180,8 @@ func (c *Entities) GetByName(entityName string) (*entitiesv1.Entity, error) {
 	if !ok {
 		return nil, errNotFound
 	}
-	return v.DeepCopy(), nil
+
+	return proto.Clone(v).(*entitiesv1.Entity), nil
 }
 
 var (
@@ -224,5 +226,6 @@ func (c *Entities) Remove(entity *entitiesv1.Entity) bool {
 func (c *Entities) GetEntities() *entitiesv1.Entities {
 	c.RLock()
 	defer c.RUnlock()
-	return c.entities.DeepCopy()
+
+	return proto.Clone(c.entities).(*entitiesv1.Entities)
 }
