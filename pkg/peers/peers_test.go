@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"google.golang.org/protobuf/proto"
 
 	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
 )
@@ -28,18 +29,21 @@ var _ = Describe("Peers", func() {
 			resp := pd.GetPeers()
 			Expect(resp.SelfPeer).To(Equal(hardCodedPeers.SelfPeer))
 			Expect(resp.Peers).To(Equal(hardCodedPeers.Peers))
-			Expect(resp).To(Equal(hardCodedPeers.DeepCopy()))
+			hardCodedPeersCopy := proto.Clone(hardCodedPeers).(*peersv1.Peers)
+			Expect(resp).To(Equal(hardCodedPeersCopy))
 		})
 		It("returns all the peers except the removed peers", func() {
 			pd.removePeer(hardCodedIPAddress1)
 			pd.removePeer(hardCodedIPAddress2)
 			resp := pd.GetPeers()
-			Expect(resp).To(Equal(createPeers(hardCodedIPAddress3, hardCodedPeer3).DeepCopy()))
+			hardCodedPeers3Copy := proto.Clone(createPeers(hardCodedIPAddress3, hardCodedPeer3)).(*peersv1.Peers)
+			Expect(resp).To(Equal(hardCodedPeers3Copy))
 
 			pd.addPeer(hardCodedPeer1)
 			pd.removePeer(hardCodedIPAddress3)
 			resp = pd.GetPeers()
-			Expect(resp).To(Equal(createPeers(hardCodedIPAddress1, hardCodedPeer1).DeepCopy()))
+			hardCodedPeers1Copy := proto.Clone(createPeers(hardCodedIPAddress1, hardCodedPeer1)).(*peersv1.Peers)
+			Expect(resp).To(Equal(hardCodedPeers1Copy))
 		})
 		It("returns all the peer keys that are added to peer discovery", func() {
 			resp := pd.GetPeerKeys()
