@@ -12,12 +12,52 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/crdsonnet/crdsonnet.git",
+          "subdir": "crdsonnet"
+        }
+      },
+      "version": "af14e3b8e958e1e4155d67689bd9d38cb7169698",
+      "sum": "HH+GjMwZCo65Q4SBG2M2Ezz+RekZmc783vZsXvVyPOA="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/grafana/grafonnet-lib.git",
           "subdir": "grafonnet"
         }
       },
       "version": "30280196507e0fe6fa978a3e0eaca3a62844f817",
       "sum": "342u++/7rViR/zj2jeJOjshzglkZ1SY+hFNuyCBFMdc="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "gen/grafonnet-v9.4.0"
+        }
+      },
+      "version": "d69eca143c137a72d6a55f078dc0eef1a47cf61c",
+      "sum": "ZpLDXjPjdY1BXZqNrFZ6sApXKALmN3m9j6pp/2xxkxY="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "grafonnet-base"
+        }
+      },
+      "version": "d69eca143c137a72d6a55f078dc0eef1a47cf61c",
+      "sum": "dnl+USRFJPZ/f+whbqA0X+qXg6xYzx3chl1rX1wgxYc="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grok.git",
+          "subdir": "jsonnet/v9.4.0"
+        }
+      },
+      "version": "f6c0c4cd6fc1902eb4f920d82315767cd61deea4",
+      "sum": "b6KSW0/Z45K0W2dF+8ZPLV32uv0ApjIsShTjk/zHEbg="
     },
     {
       "source": {
@@ -88,6 +128,16 @@
       },
       "version": "2ff9e542231fce1ba6d880d1157c81724f176bc6",
       "sum": "qJK1nFZIYKv/ttM1bZxqXJJ7AIp9UA7ytVZpC6yQYoA="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/xtd.git",
+          "subdir": ""
+        }
+      },
+      "version": "d1929c3c1728274424a21a617f1b82095685d640",
+      "sum": "DHqlMNfQH/eCWHbHD2Ouc/bH00AwTkCS86z6cgzQ7UI="
     },
     {
       "source": {

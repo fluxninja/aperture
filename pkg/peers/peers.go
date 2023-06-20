@@ -13,6 +13,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/yaml"
 
 	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
@@ -273,7 +274,7 @@ func (pd *PeerDiscovery) GetPeers() *peersv1.Peers {
 	pd.lock.RLock()
 	defer pd.lock.RUnlock()
 
-	return pd.peers.DeepCopy()
+	return proto.Clone(pd.peers).(*peersv1.Peers)
 }
 
 // RegisterService accepts a name, full address (host:port) and adds to the list of services in PeerDiscovery.
@@ -319,7 +320,7 @@ func (pd *PeerDiscovery) GetPeer(address string) (*peersv1.Peer, error) {
 		return nil, errors.New("peer not found")
 	}
 
-	return peer.DeepCopy(), nil
+	return proto.Clone(peer).(*peersv1.Peer), nil
 }
 
 // GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
