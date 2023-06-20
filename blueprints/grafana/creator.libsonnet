@@ -19,13 +19,13 @@ function(policyFile, cfg, add_signals=false) {
     for component in policyJSON.spec.circuit.components
   ])),
 
-  local flowControlPanels = std.filter(function(x) x != null, [
+  local flowControlPanels = std.flattenArrays(std.filter(function(x) x != null, [
     if flowControlComponents != null
     then if std.objectHas(panelLibrary, std.toString(component))
     then
-      panelLibrary[std.toString(component)](config).panel
+      unwrap(std.toString(component), {}, config).panel
     for component in flowControlComponents
-  ]),
+  ])),
 
   // Other first-level Panels
   local otherPanels = std.flattenArrays(std.filter(function(x) x != null, [

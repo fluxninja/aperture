@@ -17,6 +17,7 @@
   workload_decision_rejected: import './panels/workload_decision_rejected.libsonnet',
   workload_latency: import './panels/workload_latency.libsonnet',
   query: import './panels/query.libsonnet',
+  quota_checks: import './panels/quota_checks.libsonnet',
 
   // Grouped panels
   adaptive_load_scheduler: import './panels/grouped/adaptive_load_scheduler.libsonnet',

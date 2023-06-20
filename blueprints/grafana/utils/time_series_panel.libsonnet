@@ -7,6 +7,7 @@ function(title, dsName, query, strFilters, axisLabel='', unit='', h=10, w=24, ta
     + g.panel.timeSeries.datasource.withUid(dsName)
     + g.panel.timeSeries.standardOptions.withUnit(unit)
     + g.panel.timeSeries.fieldConfig.defaults.custom.withAxisLabel(axisLabel)
+    + g.panel.timeSeries.fieldConfig.defaults.custom.withFillOpacity(10)
     + g.panel.timeSeries.gridPos.withH(h)
     + g.panel.timeSeries.gridPos.withW(w),
 
