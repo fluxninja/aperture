@@ -15,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 
 	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	. "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier/compiler"
 )
@@ -462,8 +463,8 @@ func fl(s string) flowlabel.FlowLabelValue {
 	}
 }
 
-func attributesWithHeaders(headers object) ast.Value {
-	input := object{
+func attributesWithHeaders(headers object) classifier.Input {
+	return newTestInput(object{
 		"attributes": object{
 			"request": object{
 				"http": object{
@@ -471,8 +472,7 @@ func attributesWithHeaders(headers object) ast.Value {
 				},
 			},
 		},
-	}
-	return ast.MustInterfaceToValue(input)
+	})
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {
@@ -484,3 +484,18 @@ func headerExtractor(headerName string) *policylangv1.Rule_Extractor {
 		},
 	}
 }
+
+type testInput struct {
+	iface interface{}
+	value ast.Value
+}
+
+func newTestInput(input interface{}) classifier.Input {
+	return testInput{
+		iface: input,
+		value: ast.MustInterfaceToValue(input),
+	}
+}
+
+func (i testInput) Value() ast.Value       { return i.value }
+func (i testInput) Interface() interface{} { return i.iface }

@@ -79,95 +79,98 @@ public final class CheckProto {
   static {
     java.lang.String[] descriptorData = {
       "\n)aperture/flowcontrol/check/v1/check.pr" +
-      "oto\022\035aperture.flowcontrol.check.v1\032\037goog" +
-      "le/protobuf/timestamp.proto\"\277\001\n\014CheckReq" +
-      "uest\022#\n\rcontrol_point\030\001 \001(\tR\014controlPoin" +
-      "t\022O\n\006labels\030\002 \003(\01327.aperture.flowcontrol" +
-      ".check.v1.CheckRequest.LabelsEntryR\006labe" +
-      "ls\0329\n\013LabelsEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005v" +
-      "alue\030\002 \001(\tR\005value:\0028\001\"\265\010\n\rCheckResponse\022" +
-      "0\n\005start\030\001 \001(\0132\032.google.protobuf.Timesta" +
-      "mpR\005start\022,\n\003end\030\002 \001(\0132\032.google.protobuf" +
-      ".TimestampR\003end\022\032\n\010services\030\004 \003(\tR\010servi" +
-      "ces\022#\n\rcontrol_point\030\005 \001(\tR\014controlPoint" +
-      "\022&\n\017flow_label_keys\030\006 \003(\tR\rflowLabelKeys" +
-      "\022y\n\025telemetry_flow_labels\030\007 \003(\0132E.apertu" +
-      "re.flowcontrol.check.v1.CheckResponse.Te" +
-      "lemetryFlowLabelsEntryR\023telemetryFlowLab" +
-      "els\022^\n\rdecision_type\030\010 \001(\01629.aperture.fl" +
-      "owcontrol.check.v1.CheckResponse.Decisio" +
-      "nTypeR\014decisionType\022^\n\rreject_reason\030\t \001" +
-      "(\01629.aperture.flowcontrol.check.v1.Check" +
-      "Response.RejectReasonR\014rejectReason\022X\n\020c" +
-      "lassifier_infos\030\n \003(\0132-.aperture.flowcon" +
-      "trol.check.v1.ClassifierInfoR\017classifier" +
-      "Infos\022V\n\020flux_meter_infos\030\013 \003(\0132,.apertu" +
-      "re.flowcontrol.check.v1.FluxMeterInfoR\016f" +
-      "luxMeterInfos\022[\n\021limiter_decisions\030\014 \003(\013" +
-      "2..aperture.flowcontrol.check.v1.Limiter" +
-      "DecisionR\020limiterDecisions\032F\n\030TelemetryF" +
-      "lowLabelsEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005valu" +
-      "e\030\002 \001(\tR\005value:\0028\001\"\200\001\n\014RejectReason\022\026\n\022R" +
-      "EJECT_REASON_NONE\020\000\022\036\n\032REJECT_REASON_RAT" +
-      "E_LIMITED\020\001\022\033\n\027REJECT_REASON_NO_TOKENS\020\002" +
-      "\022\033\n\027REJECT_REASON_REGULATED\020\003\"F\n\014Decisio" +
-      "nType\022\032\n\026DECISION_TYPE_ACCEPTED\020\000\022\032\n\026DEC" +
-      "ISION_TYPE_REJECTED\020\001\"\355\002\n\016ClassifierInfo" +
-      "\022\037\n\013policy_name\030\001 \001(\tR\npolicyName\022\037\n\013pol" +
-      "icy_hash\030\002 \001(\tR\npolicyHash\022)\n\020classifier" +
-      "_index\030\003 \001(\003R\017classifierIndex\022I\n\005error\030\005" +
-      " \001(\01623.aperture.flowcontrol.check.v1.Cla" +
-      "ssifierInfo.ErrorR\005error\"\242\001\n\005Error\022\016\n\nER" +
-      "ROR_NONE\020\000\022\025\n\021ERROR_EVAL_FAILED\020\001\022\031\n\025ERR" +
-      "OR_EMPTY_RESULTSET\020\002\022\035\n\031ERROR_AMBIGUOUS_" +
-      "RESULTSET\020\003\022\032\n\026ERROR_MULTI_EXPRESSION\020\004\022" +
-      "\034\n\030ERROR_EXPRESSION_NOT_MAP\020\005\"\235\t\n\017Limite" +
-      "rDecision\022\037\n\013policy_name\030\001 \001(\tR\npolicyNa" +
-      "me\022\037\n\013policy_hash\030\002 \001(\tR\npolicyHash\022!\n\014c" +
-      "omponent_id\030\003 \001(\tR\013componentId\022\030\n\007droppe" +
-      "d\030\004 \001(\010R\007dropped\022T\n\006reason\030\005 \001(\0162<.apert" +
+      "oto\022\035aperture.flowcontrol.check.v1\032\036goog" +
+      "le/protobuf/duration.proto\032\037google/proto" +
+      "buf/timestamp.proto\"\277\001\n\014CheckRequest\022#\n\r" +
+      "control_point\030\001 \001(\tR\014controlPoint\022O\n\006lab" +
+      "els\030\002 \003(\01327.aperture.flowcontrol.check.v" +
+      "1.CheckRequest.LabelsEntryR\006labels\0329\n\013La" +
+      "belsEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005value\030\002 \001" +
+      "(\tR\005value:\0028\001\"\355\010\n\rCheckResponse\0220\n\005start" +
+      "\030\001 \001(\0132\032.google.protobuf.TimestampR\005star" +
+      "t\022,\n\003end\030\002 \001(\0132\032.google.protobuf.Timesta" +
+      "mpR\003end\022\032\n\010services\030\004 \003(\tR\010services\022#\n\rc" +
+      "ontrol_point\030\005 \001(\tR\014controlPoint\022&\n\017flow" +
+      "_label_keys\030\006 \003(\tR\rflowLabelKeys\022y\n\025tele" +
+      "metry_flow_labels\030\007 \003(\0132E.aperture.flowc" +
+      "ontrol.check.v1.CheckResponse.TelemetryF" +
+      "lowLabelsEntryR\023telemetryFlowLabels\022^\n\rd" +
+      "ecision_type\030\010 \001(\01629.aperture.flowcontro" +
+      "l.check.v1.CheckResponse.DecisionTypeR\014d" +
+      "ecisionType\022^\n\rreject_reason\030\t \001(\01629.ape" +
+      "rture.flowcontrol.check.v1.CheckResponse" +
+      ".RejectReasonR\014rejectReason\022X\n\020classifie" +
+      "r_infos\030\n \003(\0132-.aperture.flowcontrol.che" +
+      "ck.v1.ClassifierInfoR\017classifierInfos\022V\n" +
+      "\020flux_meter_infos\030\013 \003(\0132,.aperture.flowc" +
+      "ontrol.check.v1.FluxMeterInfoR\016fluxMeter" +
+      "Infos\022[\n\021limiter_decisions\030\014 \003(\0132..apert" +
       "ure.flowcontrol.check.v1.LimiterDecision" +
-      ".LimiterReasonR\006reason\022l\n\021rate_limiter_i" +
-      "nfo\030\006 \001(\0132>.aperture.flowcontrol.check.v" +
-      "1.LimiterDecision.RateLimiterInfoH\000R\017rat" +
-      "eLimiterInfo\022n\n\023load_scheduler_info\030\007 \001(" +
-      "\0132<.aperture.flowcontrol.check.v1.Limite" +
-      "rDecision.SchedulerInfoH\000R\021loadScheduler" +
-      "Info\022_\n\014sampler_info\030\010 \001(\0132:.aperture.fl" +
-      "owcontrol.check.v1.LimiterDecision.Sampl" +
-      "erInfoH\000R\013samplerInfo\022u\n\024quota_scheduler" +
-      "_info\030\t \001(\0132A.aperture.flowcontrol.check" +
-      ".v1.LimiterDecision.QuotaSchedulerInfoH\000" +
-      "R\022quotaSchedulerInfo\032\210\001\n\017RateLimiterInfo" +
-      "\022\034\n\tremaining\030\001 \001(\001R\tremaining\022\030\n\007curren" +
-      "t\030\002 \001(\001R\007current\022\024\n\005label\030\003 \001(\tR\005label\022\'" +
-      "\n\017tokens_consumed\030\004 \001(\001R\016tokensConsumed\032" +
-      "_\n\rSchedulerInfo\022%\n\016workload_index\030\001 \001(\t" +
-      "R\rworkloadIndex\022\'\n\017tokens_consumed\030\002 \001(\004" +
-      "R\016tokensConsumed\032#\n\013SamplerInfo\022\024\n\005label" +
-      "\030\001 \001(\tR\005label\032\217\001\n\022QuotaSchedulerInfo\022\024\n\005" +
-      "label\030\001 \001(\tR\005label\022c\n\016scheduler_info\030\002 \001" +
-      "(\0132<.aperture.flowcontrol.check.v1.Limit" +
-      "erDecision.SchedulerInfoR\rschedulerInfo\"" +
-      "Q\n\rLimiterReason\022\036\n\032LIMITER_REASON_UNSPE" +
-      "CIFIED\020\000\022 \n\034LIMITER_REASON_KEY_NOT_FOUND" +
-      "\020\001B\t\n\007details\"7\n\rFluxMeterInfo\022&\n\017flux_m" +
-      "eter_name\030\001 \001(\tR\rfluxMeterName2z\n\022FlowCo" +
-      "ntrolService\022d\n\005Check\022+.aperture.flowcon" +
-      "trol.check.v1.CheckRequest\032,.aperture.fl" +
-      "owcontrol.check.v1.CheckResponse\"\000B\263\002\n5c" +
-      "om.fluxninja.generated.aperture.flowcont" +
-      "rol.check.v1B\nCheckProtoP\001ZWgithub.com/f" +
-      "luxninja/aperture/v2/api/gen/proto/go/ap" +
-      "erture/flowcontrol/check/v1;checkv1\242\002\003AF" +
-      "C\252\002\035Aperture.Flowcontrol.Check.V1\312\002\035Aper" +
-      "ture\\Flowcontrol\\Check\\V1\342\002)Aperture\\Flo" +
-      "wcontrol\\Check\\V1\\GPBMetadata\352\002 Aperture" +
-      "::Flowcontrol::Check::V1b\006proto3"
+      "R\020limiterDecisions\0226\n\twait_time\030\r \001(\0132\031." +
+      "google.protobuf.DurationR\010waitTime\032F\n\030Te" +
+      "lemetryFlowLabelsEntry\022\020\n\003key\030\001 \001(\tR\003key" +
+      "\022\024\n\005value\030\002 \001(\tR\005value:\0028\001\"\200\001\n\014RejectRea" +
+      "son\022\026\n\022REJECT_REASON_NONE\020\000\022\036\n\032REJECT_RE" +
+      "ASON_RATE_LIMITED\020\001\022\033\n\027REJECT_REASON_NO_" +
+      "TOKENS\020\002\022\033\n\027REJECT_REASON_REGULATED\020\003\"F\n" +
+      "\014DecisionType\022\032\n\026DECISION_TYPE_ACCEPTED\020" +
+      "\000\022\032\n\026DECISION_TYPE_REJECTED\020\001\"\355\002\n\016Classi" +
+      "fierInfo\022\037\n\013policy_name\030\001 \001(\tR\npolicyNam" +
+      "e\022\037\n\013policy_hash\030\002 \001(\tR\npolicyHash\022)\n\020cl" +
+      "assifier_index\030\003 \001(\003R\017classifierIndex\022I\n" +
+      "\005error\030\005 \001(\01623.aperture.flowcontrol.chec" +
+      "k.v1.ClassifierInfo.ErrorR\005error\"\242\001\n\005Err" +
+      "or\022\016\n\nERROR_NONE\020\000\022\025\n\021ERROR_EVAL_FAILED\020" +
+      "\001\022\031\n\025ERROR_EMPTY_RESULTSET\020\002\022\035\n\031ERROR_AM" +
+      "BIGUOUS_RESULTSET\020\003\022\032\n\026ERROR_MULTI_EXPRE" +
+      "SSION\020\004\022\034\n\030ERROR_EXPRESSION_NOT_MAP\020\005\"\235\t" +
+      "\n\017LimiterDecision\022\037\n\013policy_name\030\001 \001(\tR\n" +
+      "policyName\022\037\n\013policy_hash\030\002 \001(\tR\npolicyH" +
+      "ash\022!\n\014component_id\030\003 \001(\tR\013componentId\022\030" +
+      "\n\007dropped\030\004 \001(\010R\007dropped\022T\n\006reason\030\005 \001(\016" +
+      "2<.aperture.flowcontrol.check.v1.Limiter" +
+      "Decision.LimiterReasonR\006reason\022l\n\021rate_l" +
+      "imiter_info\030\006 \001(\0132>.aperture.flowcontrol" +
+      ".check.v1.LimiterDecision.RateLimiterInf" +
+      "oH\000R\017rateLimiterInfo\022n\n\023load_scheduler_i" +
+      "nfo\030\007 \001(\0132<.aperture.flowcontrol.check.v" +
+      "1.LimiterDecision.SchedulerInfoH\000R\021loadS" +
+      "chedulerInfo\022_\n\014sampler_info\030\010 \001(\0132:.ape" +
+      "rture.flowcontrol.check.v1.LimiterDecisi" +
+      "on.SamplerInfoH\000R\013samplerInfo\022u\n\024quota_s" +
+      "cheduler_info\030\t \001(\0132A.aperture.flowcontr" +
+      "ol.check.v1.LimiterDecision.QuotaSchedul" +
+      "erInfoH\000R\022quotaSchedulerInfo\032\210\001\n\017RateLim" +
+      "iterInfo\022\034\n\tremaining\030\001 \001(\001R\tremaining\022\030" +
+      "\n\007current\030\002 \001(\001R\007current\022\024\n\005label\030\003 \001(\tR" +
+      "\005label\022\'\n\017tokens_consumed\030\004 \001(\001R\016tokensC" +
+      "onsumed\032_\n\rSchedulerInfo\022%\n\016workload_ind" +
+      "ex\030\001 \001(\tR\rworkloadIndex\022\'\n\017tokens_consum" +
+      "ed\030\002 \001(\004R\016tokensConsumed\032#\n\013SamplerInfo\022" +
+      "\024\n\005label\030\001 \001(\tR\005label\032\217\001\n\022QuotaScheduler" +
+      "Info\022\024\n\005label\030\001 \001(\tR\005label\022c\n\016scheduler_" +
+      "info\030\002 \001(\0132<.aperture.flowcontrol.check." +
+      "v1.LimiterDecision.SchedulerInfoR\rschedu" +
+      "lerInfo\"Q\n\rLimiterReason\022\036\n\032LIMITER_REAS" +
+      "ON_UNSPECIFIED\020\000\022 \n\034LIMITER_REASON_KEY_N" +
+      "OT_FOUND\020\001B\t\n\007details\"7\n\rFluxMeterInfo\022&" +
+      "\n\017flux_meter_name\030\001 \001(\tR\rfluxMeterName2z" +
+      "\n\022FlowControlService\022d\n\005Check\022+.aperture" +
+      ".flowcontrol.check.v1.CheckRequest\032,.ape" +
+      "rture.flowcontrol.check.v1.CheckResponse" +
+      "\"\000B\263\002\n5com.fluxninja.generated.aperture." +
+      "flowcontrol.check.v1B\nCheckProtoP\001ZWgith" +
+      "ub.com/fluxninja/aperture/v2/api/gen/pro" +
+      "to/go/aperture/flowcontrol/check/v1;chec" +
+      "kv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.Check.V" +
+      "1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342\002)Aper" +
+      "ture\\Flowcontrol\\Check\\V1\\GPBMetadata\352\002 " +
+      "Aperture::Flowcontrol::Check::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.DurationProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
         });
     internal_static_aperture_flowcontrol_check_v1_CheckRequest_descriptor =
@@ -187,7 +190,7 @@ public final class CheckProto {
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_CheckResponse_descriptor,
-        new java.lang.String[] { "Start", "End", "Services", "ControlPoint", "FlowLabelKeys", "TelemetryFlowLabels", "DecisionType", "RejectReason", "ClassifierInfos", "FluxMeterInfos", "LimiterDecisions", });
+        new java.lang.String[] { "Start", "End", "Services", "ControlPoint", "FlowLabelKeys", "TelemetryFlowLabels", "DecisionType", "RejectReason", "ClassifierInfos", "FluxMeterInfos", "LimiterDecisions", "WaitTime", });
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_TelemetryFlowLabelsEntry_descriptor =
       internal_static_aperture_flowcontrol_check_v1_CheckResponse_descriptor.getNestedTypes().get(0);
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_TelemetryFlowLabelsEntry_fieldAccessorTable = new
@@ -236,6 +239,7 @@ public final class CheckProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor,
         new java.lang.String[] { "FluxMeterName", });
+    com.google.protobuf.DurationProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
   }
 

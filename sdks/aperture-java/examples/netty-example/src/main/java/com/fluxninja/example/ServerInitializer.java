@@ -2,12 +2,12 @@ package com.fluxninja.example;
 
 import com.fluxninja.aperture.netty.ApertureServerHandler;
 import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import java.io.IOException;
 
 public class ServerInitializer extends ChannelInitializer<Channel> {
 
@@ -44,7 +44,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
-        } catch (ApertureSDKException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 

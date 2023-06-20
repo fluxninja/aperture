@@ -59,8 +59,12 @@ const (
 	ApertureDroppingRateLimitersLabel = "aperture.dropping_rate_limiters"
 	// ApertureLoadSchedulersLabel describes load schedulers matched to the traffic.
 	ApertureLoadSchedulersLabel = "aperture.load_schedulers"
+	// ApertureQuotaSchedulersLabel describes quota schedulers matched to the traffic.
+	ApertureQuotaSchedulersLabel = "aperture.quota_schedulers"
 	// ApertureDroppingLoadSchedulersLabel describes load schedulers dropping the traffic.
 	ApertureDroppingLoadSchedulersLabel = "aperture.dropping_load_schedulers"
+	// ApertureDroppingQuotaSchedulersLabel describes quota schedulers dropping the traffic.
+	ApertureDroppingQuotaSchedulersLabel = "aperture.dropping_quota_schedulers"
 	// ApertureSamplersLabel describes samplers matched to the traffic.
 	ApertureSamplersLabel = "aperture.samplers"
 	// ApertureDroppingSamplersLabel describes samplers dropping the traffic.
@@ -171,6 +175,8 @@ const (
 	ProcessorAlertsNamespace = "attributes/alerts"
 	// ProcessorFilterKubeletStats filters in only metrics of interest.
 	ProcessorFilterKubeletStats = "filter/kubeletstats"
+	// ProcessorFilterHighCardinalityMetrics filters out high cardinality Aperture platform metrics.
+	ProcessorFilterHighCardinalityMetrics = "filter/high_cardinality_metrics"
 	// ProcessorK8sAttributes enriches metrics with k8s metadata.
 	ProcessorK8sAttributes = "k8sattributes/kubeletstats"
 

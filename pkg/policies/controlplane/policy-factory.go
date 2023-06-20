@@ -6,6 +6,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -195,7 +196,7 @@ func (factory *PolicyFactory) GetPolicyWrappers() map[string]*policysyncv1.Polic
 	// deepcopy wrappers
 	policyWrappers := make(map[string]*policysyncv1.PolicyWrapper)
 	for k, v := range factory.policyTracker {
-		policyWrappers[k] = v.DeepCopy()
+		policyWrappers[k] = proto.Clone(v).(*policysyncv1.PolicyWrapper)
 	}
 	return policyWrappers
 }
@@ -205,7 +206,7 @@ func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
 	policyWrappers := factory.GetPolicyWrappers()
 	policies := make(map[string]*policylangv1.Policy)
 	for _, v := range policyWrappers {
-		policies[v.GetCommonAttributes().GetPolicyName()] = v.GetPolicy().DeepCopy()
+		policies[v.GetCommonAttributes().GetPolicyName()] = proto.Clone(v.GetPolicy()).(*policylangv1.Policy)
 	}
 	return &policylangv1.Policies{
 		Policies: policies,
@@ -218,7 +219,7 @@ func (factory *PolicyFactory) GetPolicy(name string) *policylangv1.Policy {
 	var policy *policylangv1.Policy
 	for _, v := range policyWrappers {
 		if v.GetCommonAttributes().GetPolicyName() == name {
-			policy = v.GetPolicy().DeepCopy()
+			policy = proto.Clone(v.GetPolicy()).(*policylangv1.Policy)
 			break
 		}
 	}

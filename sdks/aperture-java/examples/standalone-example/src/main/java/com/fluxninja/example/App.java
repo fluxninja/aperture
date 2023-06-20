@@ -4,6 +4,7 @@ import com.fluxninja.aperture.sdk.*;
 import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class App {
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
-        } catch (ApertureSDKException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return;
         }

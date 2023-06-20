@@ -29,7 +29,7 @@ func (sd *StaticDiscovery) start() error {
 	log.Debug().Msgf("Uploading %v pre-configured entities to tracker", len(sd.config.Entities))
 	for i := 0; i < len(sd.config.Entities); i++ {
 		entity := &sd.config.Entities[i]
-		key := notifiers.Key(entity.GetUid())
+		key := notifiers.Key(entity.UID)
 		value, err := json.Marshal(entity)
 		if err != nil {
 			log.Error().Msgf("Error marshaling entity: %v", err)
