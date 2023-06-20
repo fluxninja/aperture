@@ -9,7 +9,7 @@ spec:
     components:
       - query:
           promql:
-            evaluation_interval: 5s
+            evaluation_interval: 15s
             out_ports:
               output:
                 signal_name: LATENCY

@@ -9,7 +9,7 @@ function(cfg, metadata={}) {
   local addPromQLDriver = function(driverAccumulator, driver) {
     local promQLSignalName = 'PROMQL_' + std.toString(driverAccumulator.promql_driver_count),
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(driver.query_string)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval('5s')
+                                                                                 + spec.v1.PromQL.withEvaluationInterval('15s')
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(promQLSignalName),
                                                                                  }))),
@@ -64,7 +64,7 @@ function(cfg, metadata={}) {
     local averageLatencySignalName = 'AVERAGE_LATENCY_' + std.toString(driverAccumulator.average_latency_driver_count),
     local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))' % { flux_meter_name: flux_meter_name },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval('5s')
+                                                                                 + spec.v1.PromQL.withEvaluationInterval('15s')
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(averageLatencySignalName),
                                                                                  }))),
@@ -123,7 +123,7 @@ function(cfg, metadata={}) {
     local percentileLatencySignalName = 'PERCENTILE_LATENCY_' + std.toString(driverAccumulator.percentile_latency_driver_count),
     local q = 'histogram_quantile(%(percentile)f, sum(rate(flux_meter_bucket{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s])) by (le))' % { percentile: driver.percentile, flux_meter_name: flux_meter_name },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval('5s')
+                                                                                 + spec.v1.PromQL.withEvaluationInterval('15s')
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(percentileLatencySignalName),
                                                                                  }))),
@@ -183,7 +183,7 @@ function(cfg, metadata={}) {
     local latencySignalName = 'LATENCY_' + std.toString(driverAccumulator.ema_latency_driver_count),
     local q = 'sum(rate(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))/sum(rate(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s"}[5s]))' % { flux_meter_name: flux_meter_name },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval('5s')
+                                                                                 + spec.v1.PromQL.withEvaluationInterval('15s')
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(latencySignalName),
                                                                                  }))),

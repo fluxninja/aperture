@@ -94,7 +94,7 @@ spec:
             scale_out_cooldown: 30s
     - query:
         promql:
-          evaluation_interval: 5s
+          evaluation_interval: 15s
           out_ports:
             output:
               signal_name: SIGNAL

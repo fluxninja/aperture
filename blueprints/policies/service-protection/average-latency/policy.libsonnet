@@ -17,7 +17,7 @@ function(cfg, metadata={}) {
             local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: params.policy.policy_name };
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
-            + spec.v1.PromQL.withEvaluationInterval('5s')
+            + spec.v1.PromQL.withEvaluationInterval('15s')
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),

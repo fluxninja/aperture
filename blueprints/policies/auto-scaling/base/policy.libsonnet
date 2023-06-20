@@ -63,7 +63,7 @@ function(cfg) {
         local q = params.policy.promql_scale_in_controllers[controller_idx].query_string;
         promQL.new()
         + promQL.withQueryString(q)
-        + promQL.withEvaluationInterval('5s')
+        + promQL.withEvaluationInterval('15s')
         + promQL.withOutPorts({ output: port.withSignalName('PROMQL_SCALE_IN_%s' % controller_idx) }),
       ),
     )
@@ -77,7 +77,7 @@ function(cfg) {
         local q = params.policy.promql_scale_out_controllers[controller_idx].query_string;
         promQL.new()
         + promQL.withQueryString(q)
-        + promQL.withEvaluationInterval('5s')
+        + promQL.withEvaluationInterval('15s')
         + promQL.withOutPorts({ output: port.withSignalName('PROMQL_SCALE_OUT_%s' % controller_idx) }),
       ),
     )

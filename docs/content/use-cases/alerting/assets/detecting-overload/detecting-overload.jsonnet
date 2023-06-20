@@ -44,7 +44,7 @@ local policyDef =
           local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))';
           promQL.new()
           + promQL.withQueryString(q)
-          + promQL.withEvaluationInterval('5s')
+          + promQL.withEvaluationInterval('15s')
           + promQL.withOutPorts({ output: port.withSignalName('LATENCY') }),
         ),
       ),

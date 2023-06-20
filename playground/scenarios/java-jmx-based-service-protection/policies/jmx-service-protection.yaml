@@ -22,30 +22,36 @@ policy:
               prometheus:
                 config:
                   scrape_configs:
-                    - job_name: 'java-demo-app-jmx'
-                      scrape_interval: 10s
+                    - job_name: "java-demo-app-jmx"
+                      scrape_interval: 15s
                       kubernetes_sd_configs:
                         - role: pod
                           namespaces:
                             names:
                               - demoapp
                       relabel_configs:
-                        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                        - source_labels:
+                            [
+                              __meta_kubernetes_pod_annotation_prometheus_io_scrape,
+                            ]
                           action: keep
                           regex: true
                         - source_labels: [__address__]
                           action: keep
                           regex: (.*?:8087)
-                    - job_name: 'java-demo-app-micrometer'
-                      scrape_interval: 10s
-                      metrics_path: '/actuator/prometheus'
+                    - job_name: "java-demo-app-micrometer"
+                      scrape_interval: 15s
+                      metrics_path: "/actuator/prometheus"
                       kubernetes_sd_configs:
                         - role: pod
                           namespaces:
                             names:
                               - demoapp
                       relabel_configs:
-                        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                        - source_labels:
+                            [
+                              __meta_kubernetes_pod_annotation_prometheus_io_scrape,
+                            ]
                           action: keep
                           regex: true
                         - source_labels: [__address__]
