@@ -51,7 +51,7 @@ func (c *EntitiesService) GetEntityByIPAddress(ctx context.Context, req *entitie
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
-	return e.Copy(), nil
+	return e.Clone(), nil
 }
 
 // GetEntityByName returns an entity by name.
@@ -60,7 +60,7 @@ func (c *EntitiesService) GetEntityByName(ctx context.Context, req *entitiesv1.G
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
-	return e.Copy(), nil
+	return e.Clone(), nil
 }
 
 // ListDiscoveryEntities lists currently discovered entities by IP address.
@@ -81,7 +81,7 @@ func (c *EntitiesService) ListDiscoveryEntity(ctx context.Context, req *cmdv1.Li
 			return nil, err
 		}
 		return &cmdv1.ListDiscoveryEntityAgentResponse{
-			Entity: entity.Copy(),
+			Entity: entity.Clone(),
 		}, nil
 	case *cmdv1.ListDiscoveryEntityRequest_Name:
 		entity, err := c.entityCache.GetByName(req.GetName())
@@ -89,7 +89,7 @@ func (c *EntitiesService) ListDiscoveryEntity(ctx context.Context, req *cmdv1.Li
 			return nil, err
 		}
 		return &cmdv1.ListDiscoveryEntityAgentResponse{
-			Entity: entity.Copy(),
+			Entity: entity.Clone(),
 		}, nil
 	default:
 		return nil, nil
