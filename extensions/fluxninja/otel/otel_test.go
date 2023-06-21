@@ -123,7 +123,7 @@ func (b configBuilder) withMetrics(pipelineName string) configBuilder {
 		"config": map[string]any{
 			"global": map[string]any{
 				// Here is different scrape interval than in the base otel config.
-				"scrape_interval": "10s",
+				"scrape_interval": "5s",
 			},
 			"scrape_configs": []string{"foo", "bar"},
 		},
@@ -131,7 +131,7 @@ func (b configBuilder) withMetrics(pipelineName string) configBuilder {
 	b.cfg.AddProcessor("batch/metrics-slow", map[string]any{
 		"send_batch_size":     uint32(10000),
 		"send_batch_max_size": uint32(10000),
-		"timeout":             5 * time.Second,
+		"timeout":             4 * time.Second,
 	})
 	processors := []string{
 		"batch/metrics-slow",
