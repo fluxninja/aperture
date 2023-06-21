@@ -36,7 +36,7 @@ This policy monitors the latency of requests processed by the
 **`cart-service.prod.svc.cluster.local`** service. It calculates the deviations
 in current latency from a baseline historical latency, which serves as an
 indicator of service overload. A deviation of **`1.1`** from the baseline is
-considered as a signal for service overload.
+considered as a signal of service overload.
 
 To mitigate service overload, the requests to
 **`cart-service.prod.svc.cluster.local`** service are passed through a load

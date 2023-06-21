@@ -53,9 +53,9 @@ At a high level, this policy works as follows:
   `policy.auto_scaling.periodic_decrease` parameter. This allows the policy to
   periodically explore whether the service can be scaled down without impacting
   performance.
-- Additional scale out and scale in criteria can be defined on arbitrary metrics
-  using `policy.auto_scaling.promql_scale_out_controllers` and
-  `policy.auto_scaling.promql_scale_in_controllers` parameters.
+- Additional scale out and scale in criteria can be defined using parameters
+  `policy.auto_scaling.promql_scale_out_controllers` and
+  `policy.auto_scaling.promql_scale_in_controllers`, respectively.
 
 :::info
 

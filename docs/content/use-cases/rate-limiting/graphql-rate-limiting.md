@@ -21,7 +21,7 @@ GraphQL queries using the [_Classifier_][rego-rules].
 
 ## Configuration
 
-The following policy contains [_Classifier_][classifier] that extracts the
+The following policy contains a [_Classifier_][classifier] that extracts the
 **`userID`** claim from a JWT token in the request's authorization header and
 then rate limit unique users based on the extracted **`user_id`** [_Flow
 Label_][flow-label]; **`todo-service.prod.svc.cluster.local`** is selected as
