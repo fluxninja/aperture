@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
+	"go.uber.org/zap/zapcore"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -20,6 +21,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -69,6 +71,7 @@ func (w *watcher) Start() error {
 	panichandler.Go(func() {
 		defer w.waitGroup.Done()
 		operation := func() error {
+			ctrl.SetLogger(zap.New(zap.Level(zapcore.ErrorLevel)))
 			scheme := runtime.NewScheme()
 
 			utilruntime.Must(clientgoscheme.AddToScheme(scheme))

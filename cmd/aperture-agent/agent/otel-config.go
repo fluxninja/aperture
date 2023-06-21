@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	agentconfig "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
@@ -59,7 +58,7 @@ func provideAgent(
 	}
 	configProvider := otelconfig.NewProvider("service", otelCfg)
 
-	allInfraMeters := map[string]map[string]*policylangv1.InfraMeter{}
+	allInfraMeters := map[string]*policysyncv1.InfraMeterWrapper{}
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
@@ -73,20 +72,18 @@ func provideAgent(
 
 		switch event.Type {
 		case notifiers.Write:
-			allInfraMeters[key] = infraMeters
+			allInfraMeters[key] = &policysyncv1.InfraMeterWrapper{
+				PolicyName:           tc.GetPolicyName(),
+				TelemetryCollectorId: tc.GetTelemetryCollectorId(),
+				InfraMeter:           infraMeters,
+			}
 		case notifiers.Remove:
 			delete(allInfraMeters, key)
 		}
 
 		// We already checked that the config is copiable, so MustCopy shouldn't panic.
 		otelCfg := baseOtelCfg.MustCopy()
-		ims := map[string]*policylangv1.InfraMeter{}
-		for prefix, v := range allInfraMeters {
-			for k, v := range v {
-				ims[fmt.Sprintf("%s/%s", prefix, k)] = v
-			}
-		}
-		if err := inframeter.AddInfraMeters(otelCfg, tc.GetPolicyName(), tc.GetTelemetryCollectorId(), ims); err != nil {
+		if err := inframeter.AddInfraMeters(otelCfg, tc.GetPolicyName(), tc.GetTelemetryCollectorId(), allInfraMeters); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			utils.Shutdown(shutdowner)
 			return
