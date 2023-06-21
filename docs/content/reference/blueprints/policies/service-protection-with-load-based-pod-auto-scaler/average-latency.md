@@ -60,9 +60,9 @@ At a high level, this policy works as follows:
 :::info
 
 Please see reference for the
-[`AdaptiveLoadScheduler`](/reference/policies/spec.md#adaptive-load-scheduler)
-and [`AutoScale`](/reference/policies/spec.md#auto-scale) components that are
-used within this blueprint.
+[`AdaptiveLoadScheduler`](/reference/configuration/spec.md#adaptive-load-scheduler)
+and [`AutoScale`](/reference/configuration/spec.md#auto-scale) components that
+are used within this blueprint.
 
 :::
 
