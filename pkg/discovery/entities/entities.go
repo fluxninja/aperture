@@ -36,6 +36,8 @@ func NewEntity(entity *entitiesv1.Entity) Entity {
 }
 
 // NewEntityFromImmutable creates a new immutable entity, assuming given entity is immutable.
+//
+// This allows avoiding a copy compared to NewEntity.
 func NewEntityFromImmutable(entity *entitiesv1.Entity) Entity {
 	return Entity{immutableEntity: entity}
 }
@@ -44,11 +46,6 @@ func NewEntityFromImmutable(entity *entitiesv1.Entity) Entity {
 func (e Entity) Clone() *entitiesv1.Entity {
 	return proto.Clone(e.immutableEntity).(*entitiesv1.Entity)
 }
-
-// Borrow returns the inner *entitiesv1.Entity.
-//
-// The returned struct must not be mutated.
-func (e Entity) Borrow() *entitiesv1.Entity { return e.immutableEntity }
 
 // UID returns the entity's UID.
 func (e Entity) UID() string { return e.immutableEntity.Uid }
@@ -159,10 +156,10 @@ func (e *Entities) processUpdate(event notifiers.Event, unmarshaller config.Unma
 	switch event.Type {
 	case notifiers.Write:
 		log.Trace().Str("entity", entity.UID()).Str("ip", ip).Str("name", name).Msg("new entity")
-		e.PutFast(entity)
+		e.Put(entity)
 	case notifiers.Remove:
 		log.Trace().Str("entity", entity.UID()).Str("ip", ip).Str("name", name).Msg("removing entity")
-		e.Remove(entity.Borrow())
+		e.Remove(entity)
 	}
 }
 
@@ -174,13 +171,13 @@ func NewEntities() *Entities {
 	}
 }
 
-// Put maps given IP address and name to the entity it currently represents.
-func (e *Entities) Put(entity *entitiesv1.Entity) {
-	e.PutFast(NewEntity(entity))
+// PutForTest maps given IP address and name to the entity it currently represents.
+func (e *Entities) PutForTest(entity *entitiesv1.Entity) {
+	e.Put(NewEntity(entity))
 }
 
-// PutFast maps given IP address and name to the entity it currently represents.
-func (e *Entities) PutFast(entity Entity) {
+// Put maps given IP address and name to the entity it currently represents.
+func (e *Entities) Put(entity Entity) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -240,17 +237,17 @@ func (e *Entities) Clear() {
 // Remove removes entity from the cache and returns `true` if any of IP address
 // or name mapping exists.
 // If no such entity was found, returns `false`.
-func (e *Entities) Remove(entity *entitiesv1.Entity) bool {
+func (e *Entities) Remove(entity Entity) bool {
 	e.Lock()
 	defer e.Unlock()
 
-	entityIP := entity.IpAddress
+	entityIP := entity.IPAddress()
 	_, okByIP := e.byIP[entityIP]
 	if okByIP {
 		delete(e.byIP, entityIP)
 	}
 
-	entityName := entity.Name
+	entityName := entity.Name()
 	_, okByName := e.byName[entityName]
 	if okByName {
 		delete(e.byName, entityName)

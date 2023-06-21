@@ -20,7 +20,7 @@ var _ = Describe("Cache", func() {
 			ip := "1.2.3.4"
 			name := "entity_1234"
 			entity := testEntity("foo", ip, name, nil)
-			ec.PutFast(entity)
+			ec.Put(entity)
 			actual, err := ec.GetByIP(ip)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actual).To(Equal(entity))
@@ -36,9 +36,9 @@ var _ = Describe("Cache", func() {
 			ip := "1.2.3.4"
 			name := "entity_1234"
 			entity := testEntity("foo", ip, name, nil)
-			ec.PutFast(entity)
+			ec.Put(entity)
 
-			removed := ec.Remove(entity.Borrow())
+			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
 			_, err := ec.GetByIP(ip)
@@ -51,10 +51,10 @@ var _ = Describe("Cache", func() {
 			name := "entity_1234"
 			otherName := "other_entity_4321"
 			entity := testEntity("foo", ip, name, nil)
-			ec.PutFast(entity)
+			ec.Put(entity)
 
 			otherEntity := testEntity("foo2", otherIP, otherName, nil)
-			removed := ec.Remove(otherEntity.Borrow())
+			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
 			found, err := ec.GetByIP(ip)
@@ -68,7 +68,7 @@ var _ = Describe("Cache", func() {
 			uid := "foo"
 			name := "some_name"
 			entity := testEntity(uid, "", name, nil)
-			ec.PutFast(entity)
+			ec.Put(entity)
 			actual, err := ec.GetByName(name)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actual).To(Equal(entity))
@@ -84,9 +84,9 @@ var _ = Describe("Cache", func() {
 			uid := "bar"
 			name := "some_name"
 			entity := testEntity(uid, "", name, nil)
-			ec.PutFast(entity)
+			ec.Put(entity)
 
-			removed := ec.Remove(entity.Borrow())
+			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
 			_, err := ec.GetByName(name)
@@ -99,10 +99,10 @@ var _ = Describe("Cache", func() {
 			otherUid := "baz"
 			otherName := "another_name"
 			entity := testEntity(uid, "1.1.1.1", name, nil)
-			ec.PutFast(entity)
+			ec.Put(entity)
 
 			otherEntity := testEntity(otherUid, "1.1.1.2", otherName, nil)
-			removed := ec.Remove(otherEntity.Borrow())
+			removed := ec.Remove(otherEntity)
 			Expect(removed).To(BeFalse())
 
 			found, err := ec.GetByName(name)
@@ -114,7 +114,7 @@ var _ = Describe("Cache", func() {
 	It("clears all entities from the map", func() {
 		ip := "1.2.3.4"
 		entity := testEntity("foo", "", "some_name", nil)
-		ec.PutFast(entity)
+		ec.Put(entity)
 		ec.Clear()
 		_, err := ec.GetByIP(ip)
 		Expect(err).To(HaveOccurred())
