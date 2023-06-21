@@ -13,6 +13,8 @@ import (
 )
 
 // ServiceGetter can be used to query services based on client context.
+//
+// Caller should not modify slices returned from methods of ServiceGetter.
 type ServiceGetter interface {
 	ServicesFromContext(ctx context.Context) []string
 	ServicesFromSocketAddress(addr *corev3.SocketAddress) []string
@@ -69,7 +71,7 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 		return nil, false
 	}
 
-	return entity.Services, true
+	return entity.Services(), true
 }
 
 // ServicesFromSocketAddress returns list of services associated with IP extracted from SocketAddress.
@@ -91,7 +93,7 @@ func (sg *ecServiceGetter) ServicesFromAddress(addr string) []string {
 		}
 		return nil
 	}
-	return entity.Services
+	return entity.Services()
 }
 
 var noEntitySampler = log.NewRatelimitingSampler()
