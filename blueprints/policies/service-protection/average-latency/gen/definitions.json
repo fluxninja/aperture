@@ -177,7 +177,7 @@
             },
             "latency_tolerance_multiplier": {
               "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.",
-              "default": 1.1,
+              "default": "__REQUIRED_FIELD__",
               "type": "number",
               "format": "double"
             },

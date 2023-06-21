@@ -49,14 +49,6 @@ and the availability of tokens from the global token bucket. This mechanism
 ensures that high-priority requests are handled appropriately even under high
 load or when the request rate is close to the rate limit.
 
-:::note
-
-Each token bucket is owned by the partition owner of its key within the
-consistent hashing scheme. The key space of the token buckets is evenly
-distributed among agents within an agent group.
-
-:::
-
 ## Example Scenario
 
 Consider the scenario of a cloud-based database service handling requests from

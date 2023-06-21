@@ -335,7 +335,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.'
     type='Number (double)'
     reference=''
-    value='1.1'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

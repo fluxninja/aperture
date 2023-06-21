@@ -97,6 +97,7 @@ policy:
       load_multiplier_linear_increment: 0.0025
 
   latency_baseliner:
+    latency_tolerance_multiplier: 1.1
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter
     # Required: True
