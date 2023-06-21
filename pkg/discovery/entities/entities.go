@@ -25,6 +25,51 @@ func Module() fx.Option {
 	)
 }
 
+// Entity is an immutable wrapper over *entitiesv1.Entity.
+type Entity struct {
+	immutableEntity *entitiesv1.Entity
+}
+
+// NewEntity creates a new immutable entity from the copy of given entity.
+func NewEntity(entity *entitiesv1.Entity) Entity {
+	return Entity{immutableEntity: proto.Clone(entity).(*entitiesv1.Entity)}
+}
+
+// NewEntity creates a new immutable entity, assuming given entity is immutable.
+func NewEntityFromImmutable(entity *entitiesv1.Entity) Entity {
+	return Entity{immutableEntity: entity}
+}
+
+// Copy returns a mutable copy of the entity.
+func (e Entity) Copy() *entitiesv1.Entity {
+	return proto.Clone(e.immutableEntity).(*entitiesv1.Entity)
+}
+
+// Borrow returns the inner *entitiesv1.Entity.
+//
+// The returned struct must not be mutated.
+func (e Entity) Borrow() *entitiesv1.Entity { return e.immutableEntity }
+
+// UID.
+func (e Entity) UID() string { return e.immutableEntity.Uid }
+
+// IP address.
+func (e Entity) IPAddress() string { return e.immutableEntity.IpAddress }
+
+// Name.
+func (e Entity) Name() string { return e.immutableEntity.Name }
+
+// Namespace
+func (e Entity) Namespace() string { return e.immutableEntity.Namespace }
+
+// NodeName.
+func (e Entity) NodeName() string { return e.immutableEntity.NodeName }
+
+// Services returns list of services the entity belongs to.
+//
+// The returned slice must not be modified.
+func (e Entity) Services() []string { return e.immutableEntity.Services }
+
 // Entities maps IP addresses and Entity names to entities.
 type Entities struct {
 	sync.RWMutex
@@ -136,52 +181,59 @@ func NewEntities() *Entities {
 
 // Put maps given IP address and name to the entity it currently represents.
 func (c *Entities) Put(entity *entitiesv1.Entity) {
+	c.PutFast(NewEntity(entity))
+}
+
+// PutFast maps given IP address and name to the entity it currently represents.
+func (c *Entities) PutFast(entity Entity) {
 	c.Lock()
 	defer c.Unlock()
 
-	entityIP := entity.IpAddress
+	entityIP := entity.IPAddress()
 	if entityIP != "" {
-		c.entities.EntitiesByIpAddress.Entities[entityIP] = entity
+		// FIXME: would be nice to store Entity directly in the map, but that
+		// would require removing the reusal of proto-generated structs as
+		// containers.
+		c.entities.EntitiesByIpAddress.Entities[entityIP] = entity.immutableEntity
 	}
 
-	entityName := entity.Name
+	entityName := entity.Name()
 	if entityName != "" {
-		c.entities.EntitiesByName.Entities[entityName] = entity
+		c.entities.EntitiesByName.Entities[entityName] = entity.immutableEntity
 	}
 }
 
 // GetByIP retrieves entity with a given IP address.
-func (c *Entities) GetByIP(entityIP string) (*entitiesv1.Entity, error) {
+func (c *Entities) GetByIP(entityIP string) (Entity, error) {
 	c.RLock()
 	defer c.RUnlock()
 
 	if len(c.entities.EntitiesByIpAddress.Entities) == 0 {
-		return nil, errNoEntities
+		return Entity{}, errNoEntities
 	}
 
 	v, ok := c.entities.EntitiesByIpAddress.Entities[entityIP]
 	if !ok {
-		return nil, errNotFound
+		return Entity{}, errNotFound
 	}
 
-	return proto.Clone(v).(*entitiesv1.Entity), nil
+	return NewEntityFromImmutable(v), nil
 }
 
 // GetByName retrieves entity with a given name.
-func (c *Entities) GetByName(entityName string) (*entitiesv1.Entity, error) {
+func (c *Entities) GetByName(entityName string) (Entity, error) {
 	c.RLock()
 	defer c.RUnlock()
 
 	if len(c.entities.EntitiesByName.Entities) == 0 {
-		return nil, errNoEntities
+		return Entity{}, errNoEntities
 	}
 
 	v, ok := c.entities.EntitiesByName.Entities[entityName]
 	if !ok {
-		return nil, errNotFound
+		return Entity{}, errNotFound
 	}
-
-	return proto.Clone(v).(*entitiesv1.Entity), nil
+	return NewEntityFromImmutable(v), nil
 }
 
 var (
@@ -227,5 +279,6 @@ func (c *Entities) GetEntities() *entitiesv1.Entities {
 	c.RLock()
 	defer c.RUnlock()
 
+	// FIXME: This Clone could be avoided, as we store immutable entities.
 	return proto.Clone(c.entities).(*entitiesv1.Entities)
 }

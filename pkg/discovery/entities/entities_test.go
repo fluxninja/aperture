@@ -20,31 +20,29 @@ var _ = Describe("Cache", func() {
 			ip := "1.2.3.4"
 			name := "entity_1234"
 			entity := testEntity("foo", ip, name, nil)
-			ec.Put(entity)
+			ec.PutFast(entity)
 			actual, err := ec.GetByIP(ip)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actual).To(Equal(entity))
 		})
 
-		It("returns nil when no entity found", func() {
+		It("returns err when no entity found", func() {
 			ip := "1.2.3.4"
-			actual, err := ec.GetByIP(ip)
-			Expect(err).To(Not(BeNil()))
-			Expect(actual).To(BeNil())
+			_, err := ec.GetByIP(ip)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("removes an entity properly", func() {
 			ip := "1.2.3.4"
 			name := "entity_1234"
 			entity := testEntity("foo", ip, name, nil)
-			ec.Put(entity)
+			ec.PutFast(entity)
 
-			removed := ec.Remove(entity)
+			removed := ec.Remove(entity.Borrow())
 			Expect(removed).To(BeTrue())
 
-			found, err := ec.GetByIP(ip)
-			Expect(err).To(Not(BeNil()))
-			Expect(found).To(BeNil())
+			_, err := ec.GetByIP(ip)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns false if trying to remove a nonexistent entity", func() {
@@ -53,10 +51,10 @@ var _ = Describe("Cache", func() {
 			name := "entity_1234"
 			otherName := "other_entity_4321"
 			entity := testEntity("foo", ip, name, nil)
-			ec.Put(entity)
+			ec.PutFast(entity)
 
 			otherEntity := testEntity("foo2", otherIP, otherName, nil)
-			removed := ec.Remove(otherEntity)
+			removed := ec.Remove(otherEntity.Borrow())
 			Expect(removed).To(BeFalse())
 
 			found, err := ec.GetByIP(ip)
@@ -70,31 +68,29 @@ var _ = Describe("Cache", func() {
 			uid := "foo"
 			name := "some_name"
 			entity := testEntity(uid, "", name, nil)
-			ec.Put(entity)
+			ec.PutFast(entity)
 			actual, err := ec.GetByName(name)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actual).To(Equal(entity))
 		})
 
-		It("returns nil when no entity found", func() {
+		It("returns err when no entity found", func() {
 			name := "some_name"
-			actual, err := ec.GetByName(name)
-			Expect(err).To(Not(BeNil()))
-			Expect(actual).To(BeNil())
+			_, err := ec.GetByName(name)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("removes an entity properly", func() {
 			uid := "bar"
 			name := "some_name"
 			entity := testEntity(uid, "", name, nil)
-			ec.Put(entity)
+			ec.PutFast(entity)
 
-			removed := ec.Remove(entity)
+			removed := ec.Remove(entity.Borrow())
 			Expect(removed).To(BeTrue())
 
-			found, err := ec.GetByName(name)
-			Expect(err).To(Not(BeNil()))
-			Expect(found).To(BeNil())
+			_, err := ec.GetByName(name)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns false if trying to remove a nonexistent entity", func() {
@@ -103,10 +99,10 @@ var _ = Describe("Cache", func() {
 			otherUid := "baz"
 			otherName := "another_name"
 			entity := testEntity(uid, "1.1.1.1", name, nil)
-			ec.Put(entity)
+			ec.PutFast(entity)
 
 			otherEntity := testEntity(otherUid, "1.1.1.2", otherName, nil)
-			removed := ec.Remove(otherEntity)
+			removed := ec.Remove(otherEntity.Borrow())
 			Expect(removed).To(BeFalse())
 
 			found, err := ec.GetByName(name)
@@ -118,19 +114,18 @@ var _ = Describe("Cache", func() {
 	It("clears all entities from the map", func() {
 		ip := "1.2.3.4"
 		entity := testEntity("foo", "", "some_name", nil)
-		ec.Put(entity)
+		ec.PutFast(entity)
 		ec.Clear()
-		found, err := ec.GetByIP(ip)
-		Expect(err).To(Not(BeNil()))
-		Expect(found).To(BeNil())
+		_, err := ec.GetByIP(ip)
+		Expect(err).To(HaveOccurred())
 	})
 })
 
-func testEntity(uid, ipAddress, name string, services []string) *entitiesv1.Entity {
-	return &entitiesv1.Entity{
+func testEntity(uid, ipAddress, name string, services []string) entities.Entity {
+	return entities.NewEntity(&entitiesv1.Entity{
 		Uid:       uid,
 		IpAddress: ipAddress,
 		Name:      name,
 		Services:  services,
-	}
+	})
 }
