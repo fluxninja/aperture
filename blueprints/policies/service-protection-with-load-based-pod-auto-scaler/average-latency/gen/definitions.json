@@ -35,7 +35,7 @@
           }
         },
         "components": [],
-        "evaluation_interval": "1s",
+        "evaluation_interval": "5s",
         "latency_baseliner": {
           "ema": {
             "correction_factor_on_max_envelope_violation": 0.95,

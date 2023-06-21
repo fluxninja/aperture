@@ -17,7 +17,7 @@ policy:
       classifiers: []
   # The interval between successive evaluations of the Circuit.
   # Type: string
-  evaluation_interval: "1s"
+  evaluation_interval: "5s"
   service_protection_core:
     # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
     # Type: []overload_confirmation

@@ -123,12 +123,12 @@ spec:
                 http.request.header.user_type: crawler
     - query:
         promql:
-          evaluation_interval: 15s
+          evaluation_interval: 5s
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="service1-demo-app"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[15s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app"}[15s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -164,7 +164,7 @@ spec:
         out_ports:
           output:
             signal_name: SETPOINT
-    evaluation_interval: 1s
+    evaluation_interval: 5s
   resources:
     flow_control:
       classifiers:

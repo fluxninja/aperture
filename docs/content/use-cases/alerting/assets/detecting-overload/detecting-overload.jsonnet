@@ -41,10 +41,10 @@ local policyDef =
       component.withQuery(
         query.new()
         + query.withPromql(
-          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))';
+          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[15s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[15s]))';
           promQL.new()
           + promQL.withQueryString(q)
-          + promQL.withEvaluationInterval('15s')
+          + promQL.withEvaluationInterval('5s')
           + promQL.withOutPorts({ output: port.withSignalName('LATENCY') }),
         ),
       ),

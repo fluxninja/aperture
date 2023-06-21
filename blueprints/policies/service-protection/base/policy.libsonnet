@@ -10,7 +10,7 @@ function(cfg, metadata={}) {
 
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(
       spec.v1.PromQL.withQueryString(confirmation.query_string)
-      + spec.v1.PromQL.withEvaluationInterval('15s')
+      + spec.v1.PromQL.withEvaluationInterval('5s')
       + spec.v1.PromQL.withOutPorts({
         output: spec.v1.Port.withSignalName(promQLSignalName),
       })

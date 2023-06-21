@@ -9,15 +9,15 @@ spec:
     components:
       - query:
           promql:
-            evaluation_interval: 15s
+            evaluation_interval: 5s
             out_ports:
               output:
                 signal_name: LATENCY
             query_string:
               sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
               flow_status="OK",
-              flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
-              flow_status="OK", flux_meter_name="test"}[5s]))
+              flux_meter_name="test"}[15s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
+              flow_status="OK", flux_meter_name="test"}[15s]))
       - ema:
           in_ports:
             input:

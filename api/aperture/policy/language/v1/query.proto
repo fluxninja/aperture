@@ -49,5 +49,5 @@ message PromQL {
   string query_string = 2;
 
   // Describes the interval between successive evaluations of the Prometheus query.
-  google.protobuf.Duration evaluation_interval = 3; // @gotags: default:"10s"
+  google.protobuf.Duration evaluation_interval = 3; // @gotags: default:"5s"
 }

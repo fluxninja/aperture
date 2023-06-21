@@ -18,14 +18,12 @@ function(cfg) {
     graphPanel.new(
       title=variantName + ' Query',
       datasource=params.dashboard.datasource.name,
+      interval='15s',
       labelY1='Latency (ms)',
-      formatY1='ms'
+      formatY1='ms',
     ).addTarget(
       prometheus.target(
-        expr=|||
-          sum(increase(flux_meter_sum{%(filters)s}[$__rate_interval]))
-          / sum(increase(flux_meter_count{%(filters)s}[$__rate_interval]))
-        ||| % { filters: filters },
+        expr='sum(increase(flux_meter_sum{%(filters)s}[$__rate_interval]))/sum(increase(flux_meter_count{%(filters)s}[$__rate_interval]))' % { filters: filters },
         intervalFactor=1,
       )
     ),
@@ -35,7 +33,6 @@ function(cfg) {
       id: '0',
       gridPos: { x: 0, y: 0, w: 24, h: 10 },
     },
-
 
   // extend the base dashboard to add the panels
   local extendedDashboard =

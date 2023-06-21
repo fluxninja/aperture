@@ -20,6 +20,7 @@ function(cfg) {
   local quotaSchedulerPanel =
     graphPanel.new(
       title='Quota Checks',
+      interval='15s',
       datasource=dsName,
       labelY1='Decisions',
       formatY1='reqps',

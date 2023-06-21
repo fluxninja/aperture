@@ -10,6 +10,7 @@ local newGraphPanel(title, datasource, query, axisLabel='', unit='') =
   graphPanel.new(
     title=title,
     datasource=datasource,
+    interval='15s',
     labelY1=axisLabel,
     formatY1=unit,
   )

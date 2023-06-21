@@ -4,7 +4,8 @@ metadata:
   annotations:
     fluxninja.com/blueprints-uri: local
     fluxninja.com/blueprint-name: policies/rate-limiting
-    fluxninja.com/values: '{"policy": {"policy_name": "graphql-rate-limiting", "rate_limiter":
+    fluxninja.com/values:
+      '{"policy": {"policy_name": "graphql-rate-limiting", "rate_limiter":
       {"bucket_capacity": 40, "fill_amount": 2, "parameters": {"interval": "1s", "label_key":
       "user_id"}, "selectors": [{"control_point": "ingress", "service": "service-graphql-demo-app.demoapp.svc.cluster.local"}]},
       "resources": {"flow_control": {"classifiers": [{"rego": {"labels": {"user_id":
@@ -39,7 +40,7 @@ spec:
             selectors:
               - control_point: ingress
                 service: service-graphql-demo-app.demoapp.svc.cluster.local
-    evaluation_interval: 1s
+    evaluation_interval: 5s
   resources:
     flow_control:
       classifiers:

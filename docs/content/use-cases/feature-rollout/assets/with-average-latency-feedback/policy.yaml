@@ -21,13 +21,13 @@ spec:
     components:
       - query:
           promql:
-            evaluation_interval: 1s
+            evaluation_interval: 5s
             out_ports:
               output:
                 signal_name: AVERAGE_LATENCY_0
             query_string:
-              sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-              flux_meter_name="feature-rollout/average_latency/0"}[5s]))
+              sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[15s]))/sum(increase(flux_meter_count{flow_status="OK",
+              flux_meter_name="feature-rollout/average_latency/0"}[15s]))
       - decider:
           in_ports:
             lhs:
@@ -154,7 +154,7 @@ spec:
                 - duration: 300s
                   target_accept_percentage: 100
             pass_through_label_values_config_key: pass_through_label_values
-    evaluation_interval: 1s
+    evaluation_interval: 5s
   resources:
     flow_control:
       classifiers: []

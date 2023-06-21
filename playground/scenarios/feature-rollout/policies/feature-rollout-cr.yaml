@@ -9,7 +9,7 @@ metadata:
       "now"}, "policy": {"components": [ ], "drivers": {"average_latency_drivers":
       [{"criteria": {"forward": {"threshold": 75}, "reset": {"threshold": 75}}, "selectors":
       [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}]},
-      "evaluation_interval": "1s", "load_ramp": {"sampler": {"label_key": "", "selectors":
+      "evaluation_interval": "5s", "load_ramp": {"sampler": {"label_key": "", "selectors":
       [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]},
       "steps": [{"duration": "0s", "target_accept_percentage": 1}, {"duration": "300s",
       "target_accept_percentage": 100}]}, "policy_name": "feature-rollout", "resources":
@@ -22,12 +22,12 @@ spec:
     components:
     - query:
         promql:
-          evaluation_interval: 15s
+          evaluation_interval: 5s
           out_ports:
             output:
               signal_name: AVERAGE_LATENCY_0
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="feature-rollout/average_latency/0"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[15s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="feature-rollout/average_latency/0"}[15s]))
     - decider:
         in_ports:
           lhs:
@@ -154,7 +154,7 @@ spec:
             - duration: 300s
               target_accept_percentage: 100
           pass_through_label_values_config_key: pass_through_label_values
-    evaluation_interval: 1s
+    evaluation_interval: 5s
   resources:
     flow_control:
       classifiers: []

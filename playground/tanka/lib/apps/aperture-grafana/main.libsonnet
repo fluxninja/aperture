@@ -16,7 +16,7 @@ local dataSources =
         access: 'proxy',
         url: 'http://controller-prometheus-server',
         jsonData: {
-          timeInterval: '15s',
+          timeInterval: '5s',
         },
       }),
     operationsPrometheus:

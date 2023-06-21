@@ -129,7 +129,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The interval between successive evaluations of the Circuit.'
     type='string'
     reference=''
-    value='"1s"'
+    value='"5s"'
 />
 
 <!-- vale on -->

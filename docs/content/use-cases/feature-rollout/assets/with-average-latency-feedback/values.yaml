@@ -22,7 +22,7 @@ policy:
         selectors:
           - control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
-  evaluation_interval: "1s"
+  evaluation_interval: "5s"
   load_ramp:
     sampler:
       selectors:
