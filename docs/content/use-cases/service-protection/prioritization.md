@@ -27,8 +27,8 @@ scenarios.
 ## Configuration
 
 This policy defines service protection on
-**`service1-demo-app.demoapp.svc.cluster.local`** using a load scheduler and
-overload detection is based on average latency similar to the
+**`cart-service.prod.svc.cluster.local`** using a load scheduler and overload
+detection is based on average latency similar to the
 [protection policy](protection.md). In addition, workload prioritization is
 specified in the load scheduler based on user types accessing the service. User
 types are identified based on the value of a header label
@@ -66,7 +66,7 @@ priority of 200.
 
 :::
 
-### Policy in Action
+## Policy in Action
 
 The traffic generator in this scenario is configured to generate similar traffic
 pattern (number of concurrent users) for 2 types of users - subscribers and

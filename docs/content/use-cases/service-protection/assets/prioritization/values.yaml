@@ -21,7 +21,7 @@ policy:
         # Required: True
         selectors:
           - control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+            service: cart-service.prod.svc.cluster.local
         # Scheduler parameters.
         # Type: aperture.spec.v1.SchedulerParameters
         scheduler:
@@ -45,5 +45,5 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-        - service: service1-demo-app.demoapp.svc.cluster.local
+        - service: cart-service.prod.svc.cluster.local
           control_point: ingress

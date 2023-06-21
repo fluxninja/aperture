@@ -49,6 +49,13 @@ At a high level, this policy works as follows:
   Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
   scale-out based on a _Gradient Controller_ using this signal and a setpoint of
   1.0.
+- Periodic scale in can be defined using the
+  `policy.auto_scaling.periodic_decrease` parameter. This allows the policy to
+  periodically explore whether the service can be scaled down without impacting
+  performance.
+- Additional scale out and scale in criteria can be defined on arbitrary metrics
+  using `policy.auto_scaling.promql_scale_out_controllers` and
+  `policy.auto_scaling.promql_scale_in_controllers` parameters.
 
 :::info
 

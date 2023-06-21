@@ -33,15 +33,15 @@ gets restored back to an acceptable range.
 ## Configuration
 
 This policy monitors the latency of requests processed by the
-**`service1-demo-app.demoapp.svc.cluster.local`** service. It calculates the
-deviations in current latency from a baseline historical latency, which serves
-as an indicator of service overload. A deviation of **`1.1`** from the baseline
-is considered as a signal for service overload.
+**`cart-service.prod.svc.cluster.local`** service. It calculates the deviations
+in current latency from a baseline historical latency, which serves as an
+indicator of service overload. A deviation of **`1.1`** from the baseline is
+considered as a signal for service overload.
 
 To mitigate service overload, the requests to
-**`service1-demo-app.demoapp.svc.cluster.local`** service are passed through a
-load scheduler. The load scheduler reduces the request rate in overload
-scenarios, temporarily placing excess requests in a queue.
+**`cart-service.prod.svc.cluster.local`** service are passed through a load
+scheduler. The load scheduler reduces the request rate in overload scenarios,
+temporarily placing excess requests in a queue.
 
 As service latency improves, indicating a return to normal operational state,
 the request rate is incrementally increased until it matches the incoming
@@ -78,16 +78,16 @@ optimized while mitigating the risk of service disruptions due to overload.
 
 :::
 
-### Policy is Action
+## Policy is Action
 
 To see the policy in action, the traffic is generated such that it starts within
 the service's capacity and then goes beyond the capacity after some time. Such a
 traffic pattern is repeated periodically. The below dashboard demonstrates that
 when latency spikes due to high traffic at
-`service1-demo-app.demoapp.svc.cluster.local`, the controller throttles the rate
-of requests admitted into the service. This approach helps protect the service
-from becoming unresponsive and maintains the current latency within the
-tolerance limit (`1.1`) of historical latency.
+`cart-service.prod.svc.cluster.local`, the controller throttles the rate of
+requests admitted into the service. This approach helps protect the service from
+becoming unresponsive and maintains the current latency within the tolerance
+limit (`1.1`) of historical latency.
 
 <Zoom>
 

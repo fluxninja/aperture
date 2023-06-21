@@ -1,11 +1,62 @@
 ---
-title: Service Protection and Load-based Pod Auto-Scaler Based on PromQL Query
+title: Service Protection Based on PromQL Query and Load-based Pod Auto-Scaler
 keywords:
   - blueprints
 sidebar_position: 3
 sidebar_label:
-  Service Protection and Load-based Pod Auto Scaler Based on PromQL Query
+  Service Protection Based on PromQL Query and Load-based Pod Auto Scaler
 ---
+
+## Introduction
+
+This policy detects traffic overloads and cascading failure build-up by
+comparing the value of a metric against a static threshold. A gradient
+controller calculates a proportional response to limit accepted concurrency. The
+concurrency is reduced by a multiplicative factor when the service is
+overloaded, and increased by an additive factor while the service is no longer
+overloaded. An auto-scaler controller is used to dynamically adjust the number
+of instances or resources allocated to a service based on workload demands. The
+basic service protection policy protects the service from sudden traffic spikes.
+It is necessary to scale the service to meet demand in case of a persistent
+change in load.
+
+At a high level, this policy works as follows:
+
+- PromQL-based overload detection: A PromQL query on an arbitrary metric
+  generates a periodic signal. The signal is compared against a static set point
+  threshold to detect an overload.
+- Gradient Controller: Set point and signal are fed to the gradient controller
+  that calculates the proportional response to adjust the accepted concurrency
+  (Control Variable).
+- Integral Optimizer: When the service is detected to be in the normal state, an
+  integral optimizer is used to additively increase the concurrency of the
+  service in each execution cycle of the circuit. This design allows warming-up
+  a service from an initial inactive state. This also protects applications from
+  sudden spikes in traffic, as it sets an upper bound to the concurrency allowed
+  on a service in each execution cycle of the circuit based on the observed
+  incoming concurrency.
+- Load Scheduler and Actuator: The Accepted Concurrency at the service is
+  throttled by a
+  [weighted-fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md).
+  The output of the adjustments to accepted concurrency made by gradient
+  controller and optimizer logic are translated to a load multiplier that is
+  synchronized with Aperture Agents through etcd. The load multiplier adjusts
+  (increases or decreases) the token bucket fill rates based on the incoming
+  concurrency observed at each agent.
+- An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
+  Deployment for the service.
+- Load-based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
+  the blueprint. This signal measures the fraction of traffic that the _Load
+  Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
+  scale-out based on a _Gradient Controller_ using this signal and a setpoint of
+  1.0.
+- Periodic scale in can be defined using the
+  `policy.auto_scaling.periodic_decrease` parameter. This allows the policy to
+  periodically explore whether the service can be scaled down without impacting
+  performance.
+- Additional scale out and scale in criteria can be defined on arbitrary metrics
+  using `policy.auto_scaling.promql_scale_out_controllers` and
+  `policy.auto_scaling.promql_scale_in_controllers` parameters.
 
 <!-- Configuration Marker -->
 
