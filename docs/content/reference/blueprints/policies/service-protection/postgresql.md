@@ -234,9 +234,9 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 <ParameterDescription
     name='policy.service_protection_core.cpu_overload_confirmation.threshold'
     description='Threshold value for CPU utilizatio if it has to be used as overload confirmation.'
-    type='string'
+    type='Number (double)'
     reference=''
-    value='""'
+    value='null'
 />
 
 <!-- vale on -->

@@ -104,8 +104,9 @@
                 },
                 "threshold": {
                   "description": "Threshold value for CPU utilizatio if it has to be used as overload confirmation.",
-                  "default": "",
-                  "type": "string"
+                  "default": null,
+                  "type": "number",
+                  "format": "double"
                 },
                 "operator": {
                   "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.",

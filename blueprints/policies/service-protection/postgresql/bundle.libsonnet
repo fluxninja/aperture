@@ -15,58 +15,42 @@ function(params, metadata={}) {
   local postgresql = std.prune(c.policy.postgresql { agent_group: null }),
 
   local updatedConfig =
+    local addCPUOverloadConfirmation =
+      if std.objectHas(params.policy, 'service_protection_core')
+         && std.objectHas(params.policy.service_protection_core, 'cpu_overload_confirmation') then
+        assert params.policy.service_protection_core.cpu_overload_confirmation.query_string != ''
+               && params.policy.service_protection_core.cpu_overload_confirmation.query_string != null : 'query_string must be set for policy.service_protection_core.cpu_overload_confirmation';
+        assert params.policy.service_protection_core.cpu_overload_confirmation.threshold != null : 'threshold must be set for policy.service_protection_core.cpu_overload_confirmation';
+        assert params.policy.service_protection_core.cpu_overload_confirmation.operator != ''
+               && params.policy.service_protection_core.cpu_overload_confirmation.operator != null : 'operator must be set for policy.service_protection_core.cpu_overload_confirmation';
+        true else false;
     c {
       policy+: {
         resources+: {
           telemetry_collectors+: [
             {
-              agent_group: random_string,
+              agent_group: agent_group,
               infra_meters+: {
                 postgresql: {
                   receivers: {
                     postgresql: postgresql,
                   },
                 },
-              },
+              } + if addCPUOverloadConfirmation then config.kubeletstats_infra_meter else {},
             },
           ],
         },
+        service_protection_core+: if addCPUOverloadConfirmation then {
+          overload_confirmations+: [
+            updatedConfig.policy.service_protection_core.cpu_overload_confirmation,
+          ],
+        } else {},
       },
     },
 
-  local finalConfig =
-    updatedConfig +
-    if std.objectHas(params.policy, 'service_protection_core')
-       && std.objectHas(params.policy.service_protection_core, 'cpu_overload_confirmation') then
-      assert updatedConfig.policy.service_protection_core.cpu_overload_confirmation.query_string != ''
-             && updatedConfig.policy.service_protection_core.cpu_overload_confirmation.query_string != null : 'query_string must be set for policy.service_protection_core.cpu_overload_confirmation';
-      assert updatedConfig.policy.service_protection_core.cpu_overload_confirmation.threshold != ''
-             && updatedConfig.policy.service_protection_core.cpu_overload_confirmation.threshold != null : 'threshold must be set for policy.service_protection_core.cpu_overload_confirmation';
-      assert updatedConfig.policy.service_protection_core.cpu_overload_confirmation.operator != ''
-             && updatedConfig.policy.service_protection_core.cpu_overload_confirmation.operator != null : 'operator must be set for policy.service_protection_core.cpu_overload_confirmation';
-      local updatedTelemetryCollectors = std.map(
-        function(collector) if collector.agent_group == random_string then
-          collector { infra_meters+: config.kubeletstats_infra_meter, agent_group: agent_group }
-        else collector,
-        updatedConfig.policy.resources.telemetry_collectors,
-      );
-      {
-        policy+: {
-          resources+: {
-            telemetry_collectors: updatedTelemetryCollectors,
-          },
-          service_protection_core+: {
-            overload_confirmations+: [
-              updatedConfig.policy.service_protection_core.cpu_overload_confirmation,
-            ],
-          },
-        },
-      }
-    else {},
-
   local metadataWrapper = metadata { values: std.toString(params) },
-  local p = policy(finalConfig, metadataWrapper),
-  local d = dashboard(finalConfig),
+  local p = policy(updatedConfig, metadataWrapper),
+  local d = dashboard(updatedConfig),
 
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,

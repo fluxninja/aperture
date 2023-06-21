@@ -50,8 +50,8 @@ policy:
       # Type: string
       query_string: 'avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name="__REQUIRED_FIELD__"})'
       # Threshold value for CPU utilizatio if it has to be used as overload confirmation.
-      # Type: string
-      threshold: ""
+      # Type: float64
+      threshold: null
       # The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.
       # Type: string
       operator: "gte"
