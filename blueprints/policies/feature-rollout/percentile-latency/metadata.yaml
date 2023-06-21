@@ -2,5 +2,4 @@ blueprint:
   Feature Rollout Policy based on percentile of feature duration or response
   latency.
 sources:
-  dashboard: policies/feature-rollout/base/dashboard.libsonnet
   policy: policies/feature-rollout/base/policy.libsonnet
