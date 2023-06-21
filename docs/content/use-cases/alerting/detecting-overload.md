@@ -13,19 +13,19 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Policy Overview
+## Overview
 
 Monitoring the health of a service is a critical aspect of ensuring reliable
-operations. In this example, we will demonstrate how to detect an overload state
-of a service and send an alert using Aperture's declarative policy language. The
-policy will create a circuit that models the normal latency behavior of the
-service using an exponential moving average (EMA). This enables the alerting
-policy to automatically learn the normal latency threshold of each service,
-reducing the need for manual tuning of alert policies for individual services.
+operations. This policy provides a mechanism for detecting an overload state of
+a service and sending alerts using Aperture's declarative policy language. The
+policy creates a [circuit](/concepts/policy/circuit.md) that models the typical
+latency behavior of the service using an exponential moving average (EMA). This
+automated learning of the normal latency threshold for each service reduces the
+need for manual tuning of alert policies.
 
-One of the most reliable metrics to detect overload state is latency of the
-service requests. In Aperture, latency of service requests can be reported using
-a [_Flux Meter_](/concepts/flow-control/resources/flux-meter.md).
+One reliable metric for detecting overload is the latency of service requests.
+In Aperture, latency can be reported using a
+[_Flux Meter_](/concepts/flow-control/resources/flux-meter.md).
 
 :::tip
 
@@ -38,16 +38,16 @@ applying the Flux Meter to a subset of API calls for a service.
 
 :::
 
-## Policy Configuration
+## Configuration
 
-In this example, the EMA of latency is computed using metrics reported by the
-Flux Meter and obtained periodically through a
+In this example, the EMA of latency of `checkout-service.prod.svc.cluster.local`
+is computed using metrics reported by the Flux Meter and obtained periodically
+through a
 [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query.
 The EMA of latency is then multiplied by a tolerance factor to calculate the
-setpoint latency, which serves as a threshold for detecting an overloaded state.
-That is, if the real-time latency of the service exceeds this setpoint (which is
-based on the long-term EMA), the service is considered to be overloaded at that
-moment.
+setpoint latency, which serves as a threshold for detecting an overloaded
+state - if the real-time latency of the service exceeds this setpoint (which is
+based on the long-term EMA), the service is considered overloaded.
 
 ```mdx-code-block
 <Tabs>
@@ -82,12 +82,10 @@ moment.
 
 </Zoom>
 
-### Playground
+## Policy in Action
 
-When the above policy is loaded in Aperture's
-[Playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md),
-the various signal metrics collected from the execution of the policy can be
-visualized:
+As the service processes traffic, various signal metrics collected from the
+execution of the policy can be visualized:
 
 <Zoom>
 
@@ -115,8 +113,9 @@ with a tolerance factor (`LATENCY_EMA` \* `1.1`).
 <Zoom>
 
 ![IS_OVERLOAD_SWITCH](./assets/detecting-overload/is_overload_switch.png)
-`IS_OVERLOAD_SWITCH` is a signal that decides whether the overload is currently
-happening or not based on comparing `LATENCY` with `LATENCY_SETPOINT`. Its value
-is `0` when there is no overload and `1` during overloads.
+`IS_OVERLOAD_SWITCH` is a signal that represents whether the service is in an
+overloaded state. This signal is derived by comparing `LATENCY` with
+`LATENCY_SETPOINT`. A value of `0` indicates no overload, while a value of `1`
+signals an overload.
 
 </Zoom>

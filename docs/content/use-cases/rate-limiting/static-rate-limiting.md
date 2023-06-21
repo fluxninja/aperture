@@ -12,29 +12,31 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Policy Overview
+## Overview
 
-Regulating incoming traffic in the face of overwhelming requests is vital to
-maintaining the health and availability of a service. A powerful tool to achieve
-this is the implementation of static rate limiting, aimed at controlling the
-intensity of 'heavy-hitters.' This policy utilizes the
-[Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
-collect specific flow labels that go beyond their allocated quota within a
-defined time frame (limit reset interval). It is an efficient and
-straightforward mechanism for mitigating traffic congestion and preventing
-potential service degradation or downtime.
+When exposing an API to the public, it is critical to protect it from potential
+abuse by heavy hitters and malicious users. This ensures that the API remains
+available and performs optimally for all users. Aperture's rate limiter
+identifies users in the traffic using labels in the request. Distributed token
+buckets are maintained for each user, ensuring that each user stays within the
+assigned limits. The token bucket is configured with a fill rate that determines
+the maximum request rate in steady state. The bucket's capacity determines the
+magnitude of momentary surge allowed in request rates.
 
-## Policy Configuration
+## Configuration
 
-This example demonstrates rate limiting of unique users based on the
-**`user_id`** header in the HTTP traffic. Envoy proxy provides this header under
-the label key **`http.request.header.user_id`** (see
+This example applies a rate limiter to the **`ingress`** control point on the
+service **`catalog-service.prod.svc.cluster.local`**. Unique users are
+identified based on the **`user_id`** header in the HTTP traffic. This header is
+provided by the Envoy proxy and is available under the label key
+**`http.request.header.user_id`** (see
 [Flow Labels](/concepts/flow-control/flow-label.md) for more information).
 
-This configuration limits each user to a burst of **`40 requests`** and
-**`2 requests`** every **`1s`** period using the rate limiter. Additionally, the
-rate limiter applies these limits to **`ingress`** traffic on the Kubernetes
-service **`service1-demo-app.demoapp.svc.cluster.local`**.
+Each user is allowed **`2`** requests every **`1s`** (1 second) period. A burst
+of up to **`40`** requests is allowed. This means that the user can send up to
+**`40`** requests in the first second, and then **`2`** requests every second
+after that. The bucket gets replenished at the rate of **`2`** requests per
+second (the fill rate).
 
 ```mdx-code-block
 <Tabs>
@@ -55,7 +57,7 @@ service **`service1-demo-app.demoapp.svc.cluster.local`**.
 <p>
 
 ```yaml
-{@include: ./assets/static-rate-limiting/static-rate-limiting.yaml}
+{@include: ./assets/static-rate-limiting/policy.yaml}
 ```
 
 </p>
@@ -63,18 +65,17 @@ service **`service1-demo-app.demoapp.svc.cluster.local`**.
 
 :::info
 
-[Circuit Diagram](./assets/static-rate-limiting/static-rate-limiting.mmd.svg)
-for this policy.
+[Circuit Diagram](./assets/static-rate-limiting/graph.mmd.svg) for this policy.
 
 :::
 
-### Playground
+### Policy in Action
 
-When the policy above is loaded in the playground, no more than 2 requests per
-second period (after an initial burst of 40 requests) are accepted.
+When the policy is applied at a service, no more than 2 requests per second
+period (after an initial burst of 40 requests) are accepted for a user.
 
 <Zoom>
 
-![Static Rate Limiting](./assets/static-rate-limiting/static-rate-limiting-02.png)
+![Static Rate Limiting](./assets/static-rate-limiting/dashboard.png)
 
 </Zoom>

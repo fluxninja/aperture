@@ -1,5 +1,5 @@
 ---
-title: Workload Prioritization
+title: Prioritization
 keywords:
   - policies
   - scheduler
@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Policy Overview
+## Overview
 
 When dealing with services in resource-limited scenarios, it becomes paramount
 to prioritize key user experiences and business-critical features over less
@@ -24,46 +24,17 @@ enables such prioritization of flows over others based on their labels, ensuring
 user experience or revenue is maximized during overloads or other failure
 scenarios.
 
-## Policy Configuration
+## Configuration
 
-In this policy, users classified as subscribers will be given precedence over
-guest users when connecting to
-**`service1-demo-app.demoapp.svc.cluster.local`**, therefore resulting in high
-priority request being served first during overload situations. The WFQ
-Scheduler is set up to prioritize two types of workloads: **`guest`**, with a
-priority of 50, **`subscriber`** with a priority of 100.
-
-There are two distinct methods that are used to convey the **`user_type`**
-information to the scheduler:
-
-- Subscribers: The header value of **`user_type`** will be directly matched to
-  **`subscriber`**, since all HTTP headers are directly available as flow labels
-  within the scheduler.
-- Guests: To identify guest users, a classification rule will be used that
-  utilizes an
-  [extractor](/concepts/flow-control/resources/classifier.md#extractors) to
-  assign the header value to the **`user_type`** flow label key, which will then
-  be used in the scheduler to match the request against the **`guest`** value to
-  identify the workload.
-
-To conclude, the prioritization of incoming requested at
-**`service1-demo-app.demoapp.svc.cluster.local`** is determined by the latency
-measurements of **`service3-demo-app.demoapp.svc.cluster.local`**.
-
-:::tip
-
-Classification rules can be written for
-[HTTP requests](/concepts/flow-control/resources/classifier.md#live-previewing-requests),
-and scheduler priorities can be defined for
-[Flow Labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them first using introspection APIs.
-
-:::
-
-To improve fairness and prioritization across workloads, the scheduler will be
-configured to automatically assign tokens for accepting requests that match a
-given workload. This is achieved through continuous estimation of tokens (auto
-tokens) performed by the scheduler itself.
+This policy defines service protection on
+**`cart-service.prod.svc.cluster.local`** using a load scheduler and overload
+detection is based on average latency similar to the
+[protection policy](protection.md). In addition, workload prioritization is
+specified in the load scheduler based on user types accessing the service. User
+types are identified based on the value of a header label
+`http.request.header.user_type`. Requests matching label value **`guest`** are
+assigned a priority of 50, whereas those matching **`subscriber`** are given a
+priority of 200.
 
 ```mdx-code-block
 <Tabs>
@@ -71,7 +42,7 @@ tokens) performed by the scheduler itself.
 ```
 
 ```yaml
-{@include: ./assets/workload-prioritization/values.yaml}
+{@include: ./assets/prioritization/values.yaml}
 ```
 
 ```mdx-code-block
@@ -83,7 +54,7 @@ tokens) performed by the scheduler itself.
 <p>
 
 ```yaml
-{@include: ./assets/workload-prioritization/policy.yaml}
+{@include: ./assets/prioritization/policy.yaml}
 ```
 
 </p>
@@ -91,25 +62,22 @@ tokens) performed by the scheduler itself.
 
 :::info
 
-[Circuit Diagram](./assets/workload-prioritization/graph.mmd.svg) for this
-policy.
+[Circuit Diagram](./assets/prioritization/graph.mmd.svg) for this policy.
 
 :::
 
-### Playground
+## Policy in Action
 
-The traffic generator in the
-[playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md)
-is configured to generate similar traffic pattern (number of concurrent users)
-for 2 types of users - subscribers and guests.
+The traffic generator in this scenario is configured to generate similar traffic
+pattern (number of concurrent users) for 2 types of users - subscribers and
+guests.
 
-Loading the policy highlighted above in the playground will reveal that, during
-overload periods, requests from `subscriber` users have a higher acceptance rate
-than those from `guest` users.
+The below dashboard shows that, during overload periods, requests from
+`subscriber` users have a higher acceptance rate than those from `guest` users.
 
 <Zoom>
 
-![Workload Prioritization](./assets/workload-prioritization/dashboard.png)
+![Workload Prioritization](./assets/prioritization/dashboard.png)
 
 </Zoom>
 

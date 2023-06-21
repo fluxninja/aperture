@@ -21,13 +21,16 @@ policy:
             threshold: 75
         selectors:
           - control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+            service: checkout-service.prod.svc.cluster.local
+            label_matcher:
+              match_labels:
+                http.path: /checkout
   evaluation_interval: "1s"
   load_ramp:
     sampler:
       selectors:
-        - control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+        - control_point: awesome-feature
+          service: checkout-service.prod.svc.cluster.local
       label_key: ""
     steps:
       - duration: "0s"

@@ -3,15 +3,14 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/policies/quota-scheduler
 policy:
-  policy_name: quota-scheduler
+  policy_name: client-side-rate-limiting
   quota_scheduler:
     bucket_capacity: 500
     fill_amount: 25
     selectors:
-      - service: service1-demo-app.demoapp.svc.cluster.local
-        control_point: ingress
+      - control_point: some-external-api
     rate_limiter:
-      label_key: http.request.header.api_key
+      label_key: api_key
       interval: 1s
       lazy_sync:
         enabled: false
@@ -20,11 +19,11 @@ policy:
       workloads:
         - label_matcher:
             match_labels:
-              http.request.header.user_type: guest
+              call_type: background
           parameters:
             priority: 50
         - label_matcher:
             match_labels:
-              http.request.header.user_type: subscriber
+              call_type: interactive
           parameters:
             priority: 200

@@ -660,6 +660,7 @@ def update_readme_markdown(
         readme_copied += template.render(
             {"nested_parameters": dynamic_config_parameters.nested_parameters}
         )
+        readme_copied += "\n"
     readme_path.write_text(readme_copied)
 
 

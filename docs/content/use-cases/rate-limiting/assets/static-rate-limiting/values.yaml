@@ -5,7 +5,7 @@ policy:
     bucket_capacity: 40
     fill_amount: 2
     selectors:
-      - service: "service1-demo-app.demoapp.svc.cluster.local"
+      - service: "catalog-service.prod.svc.cluster.local"
         control_point: "ingress"
         agent_group: "default"
     parameters:

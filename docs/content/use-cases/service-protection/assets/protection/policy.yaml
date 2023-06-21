@@ -4,18 +4,14 @@ metadata:
   annotations:
     fluxninja.com/blueprint-name: policies/service-protection/average-latency
     fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"components": [ ], "evaluation_interval": "1s",
-      "latency_baseliner": {"flux_meter": {"selectors": [{"control_point": "ingress",
-      "service": "service3-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
-      "workload-prioritization", "service_protection_core": {"adaptive_load_scheduler":
-      {"load_scheduler": {"scheduler": {"workloads": [{"label_matcher": {"match_labels":
-      {"http.request.header.user_type": "guest"}}, "parameters": {"priority": 50}},
-      {"label_matcher": {"match_labels": {"http.request.header.user_type": "subscriber"}},
-      "parameters": {"priority": 200}}]}, "selectors": [{"control_point": "ingress",
-      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
+    fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
+      [{"control_point": "ingress", "service": "cart-service.prod.svc.cluster.local"}]},
+      "latency_tolerance_multiplier": 1.1000000000000001}, "policy_name": "basic-service-protection",
+      "service_protection_core": {"adaptive_load_scheduler": {"load_scheduler": {"selectors":
+      [{"control_point": "ingress", "service": "cart-service.prod.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
-  name: workload-prioritization
+  name: basic-service-protection
 spec:
   circuit:
     components:
@@ -45,21 +41,9 @@ spec:
               slope: -1
             load_multiplier_linear_increment: 0.0025
             load_scheduler:
-              scheduler:
-                workloads:
-                - label_matcher:
-                    match_labels:
-                      http.request.header.user_type: guest
-                  parameters:
-                    priority: 50
-                - label_matcher:
-                    match_labels:
-                      http.request.header.user_type: subscriber
-                  parameters:
-                    priority: 200
               selectors:
               - control_point: ingress
-                service: service1-demo-app.demoapp.svc.cluster.local
+                service: cart-service.prod.svc.cluster.local
             max_load_multiplier: 2
     - query:
         promql:
@@ -67,8 +51,8 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="workload-prioritization"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="basic-service-protection"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="basic-service-protection"}[5s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -109,7 +93,7 @@ spec:
     flow_control:
       classifiers: []
       flux_meters:
-        workload-prioritization:
+        basic-service-protection:
           selectors:
           - control_point: ingress
-            service: service3-demo-app.demoapp.svc.cluster.local
+            service: cart-service.prod.svc.cluster.local

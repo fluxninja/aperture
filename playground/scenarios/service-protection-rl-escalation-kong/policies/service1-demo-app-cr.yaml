@@ -16,18 +16,18 @@ metadata:
       [{"control_point": "service1-demo-app", "label_matcher": {"match_labels": {"http.request.header.user_type":
       "crawler"}}}]}}}], "latency_baseliner": {"flux_meter": {"selectors": [{"control_point":
       "service3-demo-app", "label_matcher": {"match_labels": {"http.target": "/service3"}},
-      "service": "kong-server.demoapp.svc.cluster.local"}]}}, "policy_name": "service1-demo-app",
-      "resources": {"flow_control": {"classifiers": [{"rules": {"user_type": {"extractor":
-      {"from": "request.http.headers.user-type"}}}, "selectors": [{"control_point":
-      "service1-demo-app", "label_matcher": {"match_labels": {"http.target": "/service1/request"}},
-      "service": "kong-server.demoapp.svc.cluster.local"}]}]}}, "service_protection_core":
-      {"adaptive_load_scheduler": {"load_multiplier_linear_increment": 0.0025000000000000001,
-      "load_scheduler": {"scheduler": {"workloads": [{"label_matcher": {"match_labels":
-      {"user_type": "guest"}}, "name": "guest", "parameters": {"priority": "50"}},
-      {"label_matcher": {"match_labels": {"http.request.header.user_type": "subscriber"}},
-      "name": "subscriber", "parameters": {"priority": "200"}}]}, "selectors": [{"control_point":
-      "service1-demo-app", "label_matcher": {"match_labels": {"http.target": "/service1/request"}},
-      "service": "kong-server.demoapp.svc.cluster.local"}]}}}}}'
+      "service": "kong-server.demoapp.svc.cluster.local"}]}, "latency_tolerance_multiplier":
+      1.1000000000000001}, "policy_name": "service1-demo-app", "resources": {"flow_control":
+      {"classifiers": [{"rules": {"user_type": {"extractor": {"from": "request.http.headers.user-type"}}},
+      "selectors": [{"control_point": "service1-demo-app", "label_matcher": {"match_labels":
+      {"http.target": "/service1/request"}}, "service": "kong-server.demoapp.svc.cluster.local"}]}]}},
+      "service_protection_core": {"adaptive_load_scheduler": {"load_multiplier_linear_increment":
+      0.0025000000000000001, "load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
+      {"match_labels": {"user_type": "guest"}}, "name": "guest", "parameters": {"priority":
+      "50"}}, {"label_matcher": {"match_labels": {"http.request.header.user_type":
+      "subscriber"}}, "name": "subscriber", "parameters": {"priority": "200"}}]},
+      "selectors": [{"control_point": "service1-demo-app", "label_matcher": {"match_labels":
+      {"http.target": "/service1/request"}}, "service": "kong-server.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: service1-demo-app

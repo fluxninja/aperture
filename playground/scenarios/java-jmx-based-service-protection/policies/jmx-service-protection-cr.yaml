@@ -5,13 +5,13 @@ metadata:
     fluxninja.com/blueprint-name: policies/service-protection/jmx
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
-      [{"control_point": "awesomeFeature", "service": "service3-demo-app.demoapp.svc.cluster.local"}]}},
-      "policy_name": "jmx-service-protection", "resources": {"telemetry_collectors":
-      [{"agent_group": "default", "infra_meters": {"prometheus": {"per_agent_group":
-      true, "pipeline": {"receivers": ["prometheus"]}, "receivers": {"prometheus":
-      {"config": {"scrape_configs": [{"job_name": "java-demo-app-jmx", "kubernetes_sd_configs":
-      [{"namespaces": {"names": ["demoapp"]}, "role": "pod"}], "relabel_configs":
-      [{"action": "keep", "regex": true, "source_labels": ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]},
+      [{"control_point": "awesomeFeature", "service": "service3-demo-app.demoapp.svc.cluster.local"}]},
+      "latency_tolerance_multiplier": 1.1000000000000001}, "policy_name": "jmx-service-protection",
+      "resources": {"telemetry_collectors": [{"agent_group": "default", "infra_meters":
+      {"prometheus": {"per_agent_group": true, "pipeline": {"receivers": ["prometheus"]},
+      "receivers": {"prometheus": {"config": {"scrape_configs": [{"job_name": "java-demo-app-jmx",
+      "kubernetes_sd_configs": [{"namespaces": {"names": ["demoapp"]}, "role": "pod"}],
+      "relabel_configs": [{"action": "keep", "regex": true, "source_labels": ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]},
       {"action": "keep", "regex": "(.*?:8087)", "source_labels": ["__address__"]}],
       "scrape_interval": "10s"}, {"job_name": "java-demo-app-micrometer", "kubernetes_sd_configs":
       [{"namespaces": {"names": ["demoapp"]}, "role": "pod"}], "metrics_path": "/actuator/prometheus",

@@ -49,6 +49,13 @@ At a high level, this policy works as follows:
   Scheduler_ is throttling into a queue. The _Auto Scaler_ is configured to
   scale-out based on a _Gradient Controller_ using this signal and a setpoint of
   1.0.
+- Periodic scale in can be defined using the
+  `policy.auto_scaling.periodic_decrease` parameter. This allows the policy to
+  periodically explore whether the service can be scaled down without impacting
+  performance.
+- Additional scale out and scale in criteria can be defined using parameters
+  `policy.auto_scaling.promql_scale_out_controllers` and
+  `policy.auto_scaling.promql_scale_in_controllers`, respectively.
 
 :::info
 
@@ -94,7 +101,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='Configuration for the Service Protection policy.'
     type='Object (policies/service-protection/average-latency:param:policy)'
     reference='../../../blueprints/policies/service-protection/average-latency#policy'
-    value='{"auto_scaling": {"dry_run": false, "periodic_decrease": {"period": "60s", "scale_in_percentage": 10}, "promql_scale_in_controllers": [], "promql_scale_out_controllers": [], "scaling_backend": {"kubernetes_replicas": {"kubernetes_object_selector": "__REQUIRED_FIELD__", "max_replicas": "__REQUIRED_FIELD__", "min_replicas": "__REQUIRED_FIELD__"}}, "scaling_parameters": {"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}}, "components": [], "evaluation_interval": "1s", "latency_baseliner": {"ema": {"correction_factor_on_max_envelope_violation": 0.95, "ema_window": "1500s", "warmup_window": "60s"}, "flux_meter": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "latency_ema_limit_multiplier": 2, "latency_tolerance_multiplier": 1.1}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "service_protection_core": {"adaptive_load_scheduler": {"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.0025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}, "dry_run": false, "overload_confirmations": []}}'
+    value='{"auto_scaling": {"dry_run": false, "periodic_decrease": {"period": "60s", "scale_in_percentage": 10}, "promql_scale_in_controllers": [], "promql_scale_out_controllers": [], "scaling_backend": {"kubernetes_replicas": {"kubernetes_object_selector": "__REQUIRED_FIELD__", "max_replicas": "__REQUIRED_FIELD__", "min_replicas": "__REQUIRED_FIELD__"}}, "scaling_parameters": {"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}}, "components": [], "evaluation_interval": "1s", "latency_baseliner": {"ema": {"correction_factor_on_max_envelope_violation": 0.95, "ema_window": "1500s", "warmup_window": "60s"}, "flux_meter": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "latency_ema_limit_multiplier": 2, "latency_tolerance_multiplier": "__REQUIRED_FIELD__"}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "service_protection_core": {"adaptive_load_scheduler": {"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.0025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}, "dry_run": false, "overload_confirmations": []}}'
 />
 
 <!-- vale on -->

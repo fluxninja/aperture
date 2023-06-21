@@ -21,7 +21,7 @@ within this blueprint.
 :::info
 
 See the tutorial on
-[Feature Rollout with Average Latency Feedback](/use-cases/feature-rollout/with-average-latency-feedback.md)
+[Feature Rollout with Average Latency Feedback](/use-cases/feature-rollout/average-latency-feedback.md)
 to see this blueprint in use.
 
 :::

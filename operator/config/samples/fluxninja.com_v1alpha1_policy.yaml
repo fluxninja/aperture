@@ -5,9 +5,10 @@ metadata:
     fluxninja.com/blueprint-name: policies/service-protection/average-latency
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
-      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}},
-      "policy_name": "basic-service-protection", "service_protection_core": {"adaptive_load_scheduler":
-      {"load_scheduler": {"selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
+      [{"control_point": "ingress", "service": "cart-service.prod.svc.cluster.local"}]},
+      "latency_tolerance_multiplier": 1.1000000000000001}, "policy_name": "basic-service-protection",
+      "service_protection_core": {"adaptive_load_scheduler": {"load_scheduler": {"selectors":
+      [{"control_point": "ingress", "service": "cart-service.prod.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: basic-service-protection
@@ -42,7 +43,7 @@ spec:
             load_scheduler:
               selectors:
               - control_point: ingress
-                service: service1-demo-app.demoapp.svc.cluster.local
+                service: cart-service.prod.svc.cluster.local
             max_load_multiplier: 2
     - query:
         promql:
@@ -95,4 +96,4 @@ spec:
         basic-service-protection:
           selectors:
           - control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+            service: cart-service.prod.svc.cluster.local

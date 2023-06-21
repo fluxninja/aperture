@@ -47,7 +47,7 @@ serviceProtectionDefaults {
         warmup_window: '60s',
         correction_factor_on_max_envelope_violation: 0.95,
       },
-      latency_tolerance_multiplier: 1.1,
+      latency_tolerance_multiplier: '__REQUIRED_FIELD__',
       latency_ema_limit_multiplier: 2.0,
     },
   },

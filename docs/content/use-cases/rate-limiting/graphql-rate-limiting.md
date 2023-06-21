@@ -13,19 +13,19 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Policy Overview
+## Overview
 
 This policy is an example of how to implement
 [rate limiting](../../reference/blueprints/policies/rate-limiting.md) for
 GraphQL queries using the [_Classifier_][rego-rules].
 
-## Policy Configuration
+## Configuration
 
-The following policy contains [_Classifier_][classifier] that extracts the
+The following policy contains a [_Classifier_][classifier] that extracts the
 **`userID`** claim from a JWT token in the request's authorization header and
 then rate limit unique users based on the extracted **`user_id`** [_Flow
-Label_][flow-label]; **`service1-demo-app.demoapp.svc.cluster.local** is
-selected as the target service for this policy.
+Label_][flow-label]; **`todo-service.prod.svc.cluster.local`** is selected as
+the target service for this policy.
 
 :::tip
 
@@ -55,7 +55,7 @@ by live previewing them first using introspection APIs.
 <p>
 
 ```yaml
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.yaml}
+{@include: ./assets/graphql-rate-limiting/policy.yaml}
 ```
 
 </p>
@@ -63,8 +63,7 @@ by live previewing them first using introspection APIs.
 
 :::info
 
-[Circuit Diagram](./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.mmd.svg)
-for this policy.
+[Circuit Diagram](./assets/graphql-rate-limiting/graph.mmd.svg) for this policy.
 
 :::
 
@@ -95,20 +94,20 @@ tutorial does the following:
 From there on, the Classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
-[`RateLimiter`](/concepts/flow-control/components/rate-limiter.md) component in
-the policy to limit the `createTodo` mutation query to `10 requests/second` for
-each `userID`.
+[`Rate Limiter`](/concepts/flow-control/components/rate-limiter.md) component in
+the policy to limit the `createTodo` mutation query to `2` requests per second
+with a burst capacity of `40` requests for each `userID`.
 
-### Playground
+## Policy in Action
 
-In this example, the traffic generator is configured to generate
-`50 requests/second` for 2-minutes. When loading the above policy in the
-playground, you can observe that it accepts no more than `2 requests/second` at
-any given time, and rejects the rest of the requests.
+In this example, the traffic generator is configured to generate `50` requests
+per second for 2-minutes. When loading the above policy in the playground, you
+can observe that it accepts no more than `2` requests per second at any given
+time, and rejects the rest of the requests.
 
 <Zoom>
 
-![GraphQL Status Rate Limiting](./assets/graphql-rate-limiting/graphql-rate-limiting-counter.png)
+![GraphQL Status Rate Limiting](./assets/graphql-rate-limiting/dashboard.png)
 
 </Zoom>
 
