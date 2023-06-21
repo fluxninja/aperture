@@ -25,10 +25,53 @@ func Module() fx.Option {
 	)
 }
 
+// Entity is an immutable wrapper over *entitiesv1.Entity.
+type Entity struct {
+	immutableEntity *entitiesv1.Entity
+}
+
+// NewEntity creates a new immutable entity from the copy of given entity.
+func NewEntity(entity *entitiesv1.Entity) Entity {
+	return Entity{immutableEntity: proto.Clone(entity).(*entitiesv1.Entity)}
+}
+
+// NewEntityFromImmutable creates a new immutable entity, assuming given entity is immutable.
+//
+// This allows avoiding a copy compared to NewEntity.
+func NewEntityFromImmutable(entity *entitiesv1.Entity) Entity {
+	return Entity{immutableEntity: entity}
+}
+
+// Clone returns a mutable copy of the entity.
+func (e Entity) Clone() *entitiesv1.Entity {
+	return proto.Clone(e.immutableEntity).(*entitiesv1.Entity)
+}
+
+// UID returns the entity's UID.
+func (e Entity) UID() string { return e.immutableEntity.Uid }
+
+// IPAddress returns the entity's IP address.
+func (e Entity) IPAddress() string { return e.immutableEntity.IpAddress }
+
+// Name returns the entity's name.
+func (e Entity) Name() string { return e.immutableEntity.Name }
+
+// Namespace returns the entity's namespace.
+func (e Entity) Namespace() string { return e.immutableEntity.Namespace }
+
+// NodeName returns the entity's node name.
+func (e Entity) NodeName() string { return e.immutableEntity.NodeName }
+
+// Services returns list of services the entity belongs to.
+//
+// The returned slice must not be modified.
+func (e Entity) Services() []string { return e.immutableEntity.Services }
+
 // Entities maps IP addresses and Entity names to entities.
 type Entities struct {
 	sync.RWMutex
-	entities *entitiesv1.Entities
+	byIP   map[string]Entity
+	byName map[string]Entity
 }
 
 // EntityTrackers allows to register a service discovery for entity cache
@@ -99,89 +142,83 @@ func provideEntities(in FxIn) (*Entities, *EntityTrackers, error) {
 	return entityCache, &EntityTrackers{trackers: in.EntityTrackers}, nil
 }
 
-func (c *Entities) processUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (e *Entities) processUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	log.Trace().Str("event", event.String()).Msg("Updating entity")
-	entity := &entitiesv1.Entity{}
-	if err := unmarshaller.UnmarshalKey("", entity); err != nil {
+	entityProto := &entitiesv1.Entity{}
+	if err := unmarshaller.UnmarshalKey("", entityProto); err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal entity")
 		return
 	}
-	ip := entity.IpAddress
-	name := entity.Name
+	entity := NewEntityFromImmutable(entityProto)
+	ip := entity.IPAddress()
+	name := entity.Name()
 
 	switch event.Type {
 	case notifiers.Write:
-		log.Trace().Str("entity", entity.Uid).Str("ip", ip).Str("name", name).Msg("new entity")
-		c.Put(entity)
+		log.Trace().Str("entity", entity.UID()).Str("ip", ip).Str("name", name).Msg("new entity")
+		e.Put(entity)
 	case notifiers.Remove:
-		log.Trace().Str("entity", entity.Uid).Str("ip", ip).Str("name", name).Msg("removing entity")
-		c.Remove(entity)
+		log.Trace().Str("entity", entity.UID()).Str("ip", ip).Str("name", name).Msg("removing entity")
+		e.Remove(entity)
 	}
 }
 
 // NewEntities creates a new, empty Entities.
 func NewEntities() *Entities {
-	entities := &entitiesv1.Entities{
-		EntitiesByIpAddress: &entitiesv1.Entities_Entities{
-			Entities: make(map[string]*entitiesv1.Entity),
-		},
-		EntitiesByName: &entitiesv1.Entities_Entities{
-			Entities: make(map[string]*entitiesv1.Entity),
-		},
-	}
 	return &Entities{
-		entities: entities,
+		byIP:   make(map[string]Entity),
+		byName: make(map[string]Entity),
 	}
 }
 
-// Put maps given IP address and name to the entity it currently represents.
-func (c *Entities) Put(entity *entitiesv1.Entity) {
-	c.Lock()
-	defer c.Unlock()
+// PutForTest maps given IP address and name to the entity it currently represents.
+func (e *Entities) PutForTest(entity *entitiesv1.Entity) {
+	e.Put(NewEntity(entity))
+}
 
-	entityIP := entity.IpAddress
+// Put maps given IP address and name to the entity it currently represents.
+func (e *Entities) Put(entity Entity) {
+	e.Lock()
+	defer e.Unlock()
+
+	entityIP := entity.IPAddress()
 	if entityIP != "" {
-		c.entities.EntitiesByIpAddress.Entities[entityIP] = entity
+		// FIXME: would be nice to store Entity directly in the map, but that
+		// would require removing the reusal of proto-generated structs as
+		// containers.
+		e.byIP[entityIP] = entity
 	}
 
-	entityName := entity.Name
+	entityName := entity.Name()
 	if entityName != "" {
-		c.entities.EntitiesByName.Entities[entityName] = entity
+		e.byName[entityName] = entity
 	}
 }
 
 // GetByIP retrieves entity with a given IP address.
-func (c *Entities) GetByIP(entityIP string) (*entitiesv1.Entity, error) {
-	c.RLock()
-	defer c.RUnlock()
-
-	if len(c.entities.EntitiesByIpAddress.Entities) == 0 {
-		return nil, errNoEntities
-	}
-
-	v, ok := c.entities.EntitiesByIpAddress.Entities[entityIP]
-	if !ok {
-		return nil, errNotFound
-	}
-
-	return proto.Clone(v).(*entitiesv1.Entity), nil
+func (e *Entities) GetByIP(entityIP string) (Entity, error) {
+	return e.getFromMap(e.byIP, entityIP)
 }
 
 // GetByName retrieves entity with a given name.
-func (c *Entities) GetByName(entityName string) (*entitiesv1.Entity, error) {
-	c.RLock()
-	defer c.RUnlock()
+func (e *Entities) GetByName(entityName string) (Entity, error) {
+	return e.getFromMap(e.byName, entityName)
+}
 
-	if len(c.entities.EntitiesByName.Entities) == 0 {
-		return nil, errNoEntities
+func (e *Entities) getFromMap(m map[string]Entity, k string) (Entity, error) {
+	e.RLock()
+	defer e.RUnlock()
+
+	if len(m) == 0 {
+		return Entity{}, errNoEntities
 	}
 
-	v, ok := c.entities.EntitiesByName.Entities[entityName]
+	v, ok := m[k]
 	if !ok {
-		return nil, errNotFound
+		return Entity{}, errNotFound
 	}
 
-	return proto.Clone(v).(*entitiesv1.Entity), nil
+	return v, nil
 }
 
 var (
@@ -190,42 +227,52 @@ var (
 )
 
 // Clear removes all entities from the cache.
-func (c *Entities) Clear() {
-	c.RLock()
-	defer c.RUnlock()
-	c.entities.EntitiesByIpAddress = &entitiesv1.Entities_Entities{
-		Entities: make(map[string]*entitiesv1.Entity),
-	}
-	c.entities.EntitiesByName = &entitiesv1.Entities_Entities{
-		Entities: make(map[string]*entitiesv1.Entity),
-	}
+func (e *Entities) Clear() {
+	e.Lock()
+	defer e.Unlock()
+	e.byIP = make(map[string]Entity)
+	e.byName = make(map[string]Entity)
 }
 
 // Remove removes entity from the cache and returns `true` if any of IP address
 // or name mapping exists.
 // If no such entity was found, returns `false`.
-func (c *Entities) Remove(entity *entitiesv1.Entity) bool {
-	c.Lock()
-	defer c.Unlock()
+func (e *Entities) Remove(entity Entity) bool {
+	e.Lock()
+	defer e.Unlock()
 
-	entityIP := entity.IpAddress
-	_, okByIP := c.entities.EntitiesByIpAddress.Entities[entityIP]
+	entityIP := entity.IPAddress()
+	_, okByIP := e.byIP[entityIP]
 	if okByIP {
-		delete(c.entities.EntitiesByIpAddress.Entities, entityIP)
+		delete(e.byIP, entityIP)
 	}
 
-	entityName := entity.Name
-	_, okByName := c.entities.EntitiesByName.Entities[entityName]
+	entityName := entity.Name()
+	_, okByName := e.byName[entityName]
 	if okByName {
-		delete(c.entities.EntitiesByName.Entities, entityName)
+		delete(e.byName, entityName)
 	}
 	return okByIP || okByName
 }
 
 // GetEntities returns *entitiesv1.EntitiyCache entities.
-func (c *Entities) GetEntities() *entitiesv1.Entities {
-	c.RLock()
-	defer c.RUnlock()
+func (e *Entities) GetEntities() *entitiesv1.Entities {
+	e.RLock()
+	defer e.RUnlock()
 
-	return proto.Clone(c.entities).(*entitiesv1.Entities)
+	// Not sure what caller will do with the result, let's clone
+	return &entitiesv1.Entities{
+		EntitiesByIpAddress: cloneEntitiesMap(e.byIP),
+		EntitiesByName:      cloneEntitiesMap(e.byName),
+	}
+}
+
+func cloneEntitiesMap(m map[string]Entity) *entitiesv1.Entities_Entities {
+	clones := make(map[string]*entitiesv1.Entity, len(m))
+	for k, entity := range m {
+		clones[k] = entity.Clone()
+	}
+	return &entitiesv1.Entities_Entities{
+		Entities: clones,
+	}
 }
