@@ -1,4 +1,3 @@
 blueprint: Service Protection Policy based on feedback of a PromQL query.
 sources:
-  dashboard: policies/service-protection/promql/dashboard.libsonnet
   policy: policies/service-protection/promql/policy.libsonnet
