@@ -45,9 +45,16 @@ policy:
     # Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
     # Type: bool
     dry_run: false
-    # Threshold value for CPU utilizatio if it has to be used as overload confirmation.
-    # Type: string
-    cpu_overload_confirmation_threshold: ""
+    cpu_overload_confirmation:
+      # The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.
+      # Type: string
+      query_string: 'avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name="__REQUIRED_FIELD__"})'
+      # Threshold value for CPU utilizatio if it has to be used as overload confirmation.
+      # Type: string
+      threshold: ""
+      # The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.
+      # Type: string
+      operator: "gte"
   auto_scaling:
     # Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.
     # Type: bool

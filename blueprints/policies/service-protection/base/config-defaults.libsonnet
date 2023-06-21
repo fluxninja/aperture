@@ -45,8 +45,8 @@ local kubernetes_replicas_defaults = {
   max_replicas: '__REQUIRED_FIELD__',
 };
 
-local kube_stat_infra_meter = {
-  kubetstats: {
+local kubeletstats_infra_meter = {
+  kubeletstats: {
     per_agent_group: true,
     pipeline: {
       processors: [
@@ -92,7 +92,7 @@ local kube_stat_infra_meter = {
     },
     receivers: {
       kubeletstats: {
-        collection_interval: '1s',
+        collection_interval: '15s',
         auth_type: 'serviceAccount',
         endpoint: 'https://${NODE_NAME}:10250',
         insecure_skip_verify: true,
@@ -143,5 +143,5 @@ local kube_stat_infra_meter = {
     },
   },
 
-  kube_stat_infra_meter: kube_stat_infra_meter,
+  kubeletstats_infra_meter: kubeletstats_infra_meter,
 }

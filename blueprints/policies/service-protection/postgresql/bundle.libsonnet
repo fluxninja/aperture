@@ -11,6 +11,7 @@ function(params, metadata={}) {
 
   local c = std.mergePatch(config, params),
   local agent_group = c.policy.postgresql.agent_group,
+  local random_string = std.substr(std.md5(std.toString(params)), 0, 5),
   local postgresql = std.prune(c.policy.postgresql { agent_group: null }),
 
   local updatedConfig =
@@ -19,8 +20,8 @@ function(params, metadata={}) {
         resources+: {
           telemetry_collectors+: [
             {
-              agent_group: agent_group,
-              infra_meters: config.kube_stat_infra_meter {
+              agent_group: random_string,
+              infra_meters+: {
                 postgresql: {
                   receivers: {
                     postgresql: postgresql,
@@ -35,12 +36,19 @@ function(params, metadata={}) {
 
   local finalConfig =
     updatedConfig +
-    if c.policy.service_protection_core.cpu_overload_confirmation_threshold != '' || c.policy.service_protection_core.cpu_overload_confirmation_threshold != null then
+    if std.objectHas(params.policy, 'service_protection_core')
+       && std.objectHas(params.policy.service_protection_core, 'cpu_overload_confirmation') then
+      assert updatedConfig.policy.service_protection_core.cpu_overload_confirmation.query_string != ''
+             && updatedConfig.policy.service_protection_core.cpu_overload_confirmation.query_string != null : 'query_string must be set for policy.service_protection_core.cpu_overload_confirmation';
+      assert updatedConfig.policy.service_protection_core.cpu_overload_confirmation.threshold != ''
+             && updatedConfig.policy.service_protection_core.cpu_overload_confirmation.threshold != null : 'threshold must be set for policy.service_protection_core.cpu_overload_confirmation';
+      assert updatedConfig.policy.service_protection_core.cpu_overload_confirmation.operator != ''
+             && updatedConfig.policy.service_protection_core.cpu_overload_confirmation.operator != null : 'operator must be set for policy.service_protection_core.cpu_overload_confirmation';
       local updatedTelemetryCollectors = std.map(
-        function(c) if c.agent_group == agent_group then
-          c { infra_meters+: config.kube_stat_infra_meter }
-        else c,
-        c.policy.resources.telemetry_collectors,
+        function(collector) if collector.agent_group == random_string then
+          collector { infra_meters+: config.kubeletstats_infra_meter, agent_group: agent_group }
+        else collector,
+        updatedConfig.policy.resources.telemetry_collectors,
       );
       {
         policy+: {
@@ -49,11 +57,7 @@ function(params, metadata={}) {
           },
           service_protection_core+: {
             overload_confirmations+: [
-              {
-                query_string: 'max(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name="hasura-postgresql"})',
-                threshold: c.policy.service_protection_core.cpu_overload_confirmation_threshold,
-                operator: 'gte',
-              },
+              updatedConfig.policy.service_protection_core.cpu_overload_confirmation,
             ],
           },
         },
@@ -61,8 +65,8 @@ function(params, metadata={}) {
     else {},
 
   local metadataWrapper = metadata { values: std.toString(params) },
-  local p = policy(updatedConfig, metadataWrapper),
-  local d = dashboard(updatedConfig),
+  local p = policy(finalConfig, metadataWrapper),
+  local d = dashboard(finalConfig),
 
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,

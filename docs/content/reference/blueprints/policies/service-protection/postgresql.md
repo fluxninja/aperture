@@ -209,14 +209,48 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+###### policy.service_protection_core.cpu_overload_confirmation {#policy-service-protection-core-cpu-overload-confirmation}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-cpu-overload-confirmation-query-string"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.cpu_overload_confirmation.query_string'
+    description='The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.'
+    type='string'
+    reference=''
+    value='"avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name=\"__REQUIRED_FIELD__\"})"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-service-protection-core-cpu-overload-confirmation-threshold"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation_threshold'
+    name='policy.service_protection_core.cpu_overload_confirmation.threshold'
     description='Threshold value for CPU utilizatio if it has to be used as overload confirmation.'
     type='string'
     reference=''
     value='""'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-cpu-overload-confirmation-operator"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.cpu_overload_confirmation.operator'
+    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.'
+    type='string'
+    reference=''
+    value='"gte"'
 />
 
 <!-- vale on -->
