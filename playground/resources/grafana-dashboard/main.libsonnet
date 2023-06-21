@@ -26,7 +26,6 @@ function(dashboardMixin) {
         inputName: 'datasource',
         datasourceName: 'controller-prometheus',
       }),
-
       dashboard.new('%s-dashboard' % policyName) +
       dashboard.metadata.withNamespace('aperture-controller') +
       dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +

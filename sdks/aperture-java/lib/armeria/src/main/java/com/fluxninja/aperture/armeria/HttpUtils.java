@@ -13,11 +13,8 @@ import java.util.Map;
 
 class HttpUtils {
     protected static HttpResponse handleRejectedFlow(TrafficFlow flow) {
-        try {
-            flow.end(FlowStatus.Unset);
-        } catch (ApertureSDKException e) {
-            e.printStackTrace();
-        }
+        flow.setStatus(FlowStatus.Unset);
+        flow.end();
         if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
             int httpStatusCode = flow.getRejectionHttpStatusCode();
             HttpResponseBuilder resBuilder = HttpResponse.builder();

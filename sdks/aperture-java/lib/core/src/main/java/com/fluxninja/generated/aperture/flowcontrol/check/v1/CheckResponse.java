@@ -865,6 +865,47 @@ java.lang.String defaultValue) {
     return limiterDecisions_.get(index);
   }
 
+  public static final int WAIT_TIME_FIELD_NUMBER = 13;
+  private com.google.protobuf.Duration waitTime_;
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   * @return Whether the waitTime field is set.
+   */
+  @java.lang.Override
+  public boolean hasWaitTime() {
+    return waitTime_ != null;
+  }
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   * @return The waitTime.
+   */
+  @java.lang.Override
+  public com.google.protobuf.Duration getWaitTime() {
+    return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+  }
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   */
+  @java.lang.Override
+  public com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder() {
+    return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -914,6 +955,9 @@ java.lang.String defaultValue) {
     }
     for (int i = 0; i < limiterDecisions_.size(); i++) {
       output.writeMessage(12, limiterDecisions_.get(i));
+    }
+    if (waitTime_ != null) {
+      output.writeMessage(13, getWaitTime());
     }
     getUnknownFields().writeTo(output);
   }
@@ -981,6 +1025,10 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(12, limiterDecisions_.get(i));
     }
+    if (waitTime_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(13, getWaitTime());
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -1022,6 +1070,11 @@ java.lang.String defaultValue) {
         .equals(other.getFluxMeterInfosList())) return false;
     if (!getLimiterDecisionsList()
         .equals(other.getLimiterDecisionsList())) return false;
+    if (hasWaitTime() != other.hasWaitTime()) return false;
+    if (hasWaitTime()) {
+      if (!getWaitTime()
+          .equals(other.getWaitTime())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -1070,6 +1123,10 @@ java.lang.String defaultValue) {
     if (getLimiterDecisionsCount() > 0) {
       hash = (37 * hash) + LIMITER_DECISIONS_FIELD_NUMBER;
       hash = (53 * hash) + getLimiterDecisionsList().hashCode();
+    }
+    if (hasWaitTime()) {
+      hash = (37 * hash) + WAIT_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + getWaitTime().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -1267,6 +1324,11 @@ java.lang.String defaultValue) {
         limiterDecisionsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000400);
+      waitTime_ = null;
+      if (waitTimeBuilder_ != null) {
+        waitTimeBuilder_.dispose();
+        waitTimeBuilder_ = null;
+      }
       return this;
     }
 
@@ -1361,6 +1423,11 @@ java.lang.String defaultValue) {
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
         result.rejectReason_ = rejectReason_;
+      }
+      if (((from_bitField0_ & 0x00000800) != 0)) {
+        result.waitTime_ = waitTimeBuilder_ == null
+            ? waitTime_
+            : waitTimeBuilder_.build();
       }
     }
 
@@ -1526,6 +1593,9 @@ java.lang.String defaultValue) {
           }
         }
       }
+      if (other.hasWaitTime()) {
+        mergeWaitTime(other.getWaitTime());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -1641,6 +1711,13 @@ java.lang.String defaultValue) {
               }
               break;
             } // case 98
+            case 106: {
+              input.readMessage(
+                  getWaitTimeFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000800;
+              break;
+            } // case 106
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -3589,6 +3666,170 @@ java.lang.String defaultValue) {
         limiterDecisions_ = null;
       }
       return limiterDecisionsBuilder_;
+    }
+
+    private com.google.protobuf.Duration waitTime_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> waitTimeBuilder_;
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     * @return Whether the waitTime field is set.
+     */
+    public boolean hasWaitTime() {
+      return ((bitField0_ & 0x00000800) != 0);
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     * @return The waitTime.
+     */
+    public com.google.protobuf.Duration getWaitTime() {
+      if (waitTimeBuilder_ == null) {
+        return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+      } else {
+        return waitTimeBuilder_.getMessage();
+      }
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder setWaitTime(com.google.protobuf.Duration value) {
+      if (waitTimeBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        waitTime_ = value;
+      } else {
+        waitTimeBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder setWaitTime(
+        com.google.protobuf.Duration.Builder builderForValue) {
+      if (waitTimeBuilder_ == null) {
+        waitTime_ = builderForValue.build();
+      } else {
+        waitTimeBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder mergeWaitTime(com.google.protobuf.Duration value) {
+      if (waitTimeBuilder_ == null) {
+        if (((bitField0_ & 0x00000800) != 0) &&
+          waitTime_ != null &&
+          waitTime_ != com.google.protobuf.Duration.getDefaultInstance()) {
+          getWaitTimeBuilder().mergeFrom(value);
+        } else {
+          waitTime_ = value;
+        }
+      } else {
+        waitTimeBuilder_.mergeFrom(value);
+      }
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder clearWaitTime() {
+      bitField0_ = (bitField0_ & ~0x00000800);
+      waitTime_ = null;
+      if (waitTimeBuilder_ != null) {
+        waitTimeBuilder_.dispose();
+        waitTimeBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public com.google.protobuf.Duration.Builder getWaitTimeBuilder() {
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return getWaitTimeFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder() {
+      if (waitTimeBuilder_ != null) {
+        return waitTimeBuilder_.getMessageOrBuilder();
+      } else {
+        return waitTime_ == null ?
+            com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+      }
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+        getWaitTimeFieldBuilder() {
+      if (waitTimeBuilder_ == null) {
+        waitTimeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                getWaitTime(),
+                getParentForChildren(),
+                isClean());
+        waitTime_ = null;
+      }
+      return waitTimeBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

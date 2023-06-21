@@ -71,7 +71,9 @@ definitions:
                 x-go-tag-json: batch_prerollup
             disable_kubelet_scraper:
                 default: false
-                description: DisableKubeletScraper disables the default metrics collection for kubelet.
+                description: |-
+                    DisableKubeletScraper disables the default metrics collection for kubelet.
+                    Deprecated: kubelet scraper is removed entirely, so this flag makes no difference.
                 type: boolean
                 x-go-name: DisableKubeletScraper
                 x-go-tag-default: "false"
@@ -83,6 +85,23 @@ definitions:
                 x-go-name: DisableKubernetesScraper
                 x-go-tag-default: "false"
                 x-go-tag-json: disable_kubernetes_scraper
+            enable_high_cardinality_platform_metrics:
+                default: false
+                description: |-
+                    EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture platform metrics from being
+                    published to Prometheus. Filtered out metrics are:
+                    "grpc_server_handled_total.*"
+                    "grpc_server_handling_seconds.*"
+                    "grpc_server_handling_seconds_bucket.*"
+                    "grpc_server_handling_seconds_count.*"
+                    "grpc_server_handling_seconds_sum.*"
+                    "grpc_server_msg_received_total.*"
+                    "grpc_server_msg_sent_total.*"
+                    "grpc_server_started_total.*"
+                type: boolean
+                x-go-name: EnableHighCardinalityPlatformMetrics
+                x-go-tag-default: "false"
+                x-go-tag-json: enable_high_cardinality_platform_metrics
             ports:
                 $ref: '#/definitions/PortsConfig'
                 description: Ports configures debug, health and extension ports values.
@@ -415,9 +434,8 @@ definitions:
                 description: IP address of the entity.
                 pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
                 type: string
-                x-go-name: IpAddress
+                x-go-name: IPAddress
                 x-go-tag-json: ip_address,omitempty
-                x-go-tag-protobuf: bytes,2,opt,name=ip_address,json=ipAddress,proto3
                 x-go-tag-validate: required,ip
                 x-pattern-rules: ip
             name:
@@ -425,19 +443,16 @@ definitions:
                 type: string
                 x-go-name: Name
                 x-go-tag-json: name,omitempty
-                x-go-tag-protobuf: bytes,3,opt,name=name,proto3
             namespace:
                 description: Namespace of the entity. For example, pod namespace.
                 type: string
                 x-go-name: Namespace
                 x-go-tag-json: namespace,omitempty
-                x-go-tag-protobuf: bytes,4,opt,name=namespace,proto3
             node_name:
                 description: Node name of the entity. For example, hostname.
                 type: string
                 x-go-name: NodeName
                 x-go-tag-json: node_name,omitempty
-                x-go-tag-protobuf: bytes,5,opt,name=node_name,json=nodeName,proto3
             services:
                 description: Services of the entity.
                 items:
@@ -446,21 +461,19 @@ definitions:
                 type: array
                 x-go-name: Services
                 x-go-tag-json: services,omitempty
-                x-go-tag-protobuf: bytes,6,rep,name=services,proto3
                 x-go-tag-validate: gt=0
             uid:
                 description: Unique identifier of the entity.
                 type: string
-                x-go-name: Uid
+                x-go-name: UID
                 x-go-tag-json: uid,omitempty
-                x-go-tag-protobuf: bytes,1,opt,name=uid,proto3
                 x-go-tag-validate: required
         required:
             - ip_address
             - uid
         title: Entity represents a pod, VM, and so on.
         type: object
-        x-go-package: github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/discovery/static/config
     EtcdConfig:
         properties:
             endpoints:

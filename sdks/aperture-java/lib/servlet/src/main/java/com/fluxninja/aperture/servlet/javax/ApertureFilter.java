@@ -50,18 +50,11 @@ public class ApertureFilter implements Filter {
                 }
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
             } catch (Exception e) {
-                try {
-                    flow.end(FlowStatus.Error);
-                } catch (ApertureSDKException ae) {
-                    e.printStackTrace();
-                    ae.printStackTrace();
-                }
+                flow.setStatus(FlowStatus.Error);
                 throw e;
+            } finally {
+                flow.end();
             }
         } else {
             ServletUtils.handleRejectedFlow(flow, response);
@@ -101,25 +94,25 @@ public class ApertureFilter implements Filter {
         }
         controlPointName = initControlPointName;
 
-        try {
-            ApertureSDKBuilder builder = ApertureSDK.builder();
-            builder.setHost(agentHost);
-            builder.setPort(Integer.parseInt(agentPort));
-            if (timeoutMs != null) {
-                builder.setFlowTimeout(Duration.ofMillis(Integer.parseInt(timeoutMs)));
-            }
-            builder.useInsecureGrpc(insecureGrpc);
-            if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
-                builder.setRootCertificateFile(rootCertificateFile);
-            }
-            builder.addIgnoredPaths(ignoredPaths);
-            builder.setIgnoredPathsMatchRegex(ignoredPathsRegex);
-
-            this.apertureSDK = builder.build();
-        } catch (ApertureSDKException e) {
-            e.printStackTrace();
-            throw new ServletException("Couldn't create aperture SDK");
+        ApertureSDKBuilder builder = ApertureSDK.builder();
+        builder.setHost(agentHost);
+        builder.setPort(Integer.parseInt(agentPort));
+        if (timeoutMs != null) {
+            builder.setFlowTimeout(Duration.ofMillis(Integer.parseInt(timeoutMs)));
         }
+        builder.useInsecureGrpc(insecureGrpc);
+        if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
+            try {
+                builder.setRootCertificateFile(rootCertificateFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new ServletException("Couldn't create aperture SDK", e);
+            }
+        }
+        builder.addIgnoredPaths(ignoredPaths);
+        builder.setIgnoredPathsMatchRegex(ignoredPathsRegex);
+
+        this.apertureSDK = builder.build();
     }
 
     @Override

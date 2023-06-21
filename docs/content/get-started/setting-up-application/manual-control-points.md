@@ -43,16 +43,12 @@ Aperture SDK as follows:
     int agentPort = 8089; // Aperture Agent Port
 
     ApertureSDK apertureSDK;
-    try {
-        apertureSDK = ApertureSDK.builder()
-                .setHost(agentHost)
-                .setPort(agentPort)
-                .setDuration(Duration.ofMillis(1000))
-                .build();
-    } catch (ApertureSDKException e) {
-        e.printStackTrace();
-        return;
-    }
+
+    apertureSDK = ApertureSDK.builder()
+            .setHost(agentHost)
+            .setPort(agentPort)
+            .setFlowTimeout(Duration.ofMillis(1000))
+            .build();
 ```
 
 Once you have configured Aperture SDK, you can create a feature control point
@@ -83,18 +79,17 @@ Let's create a feature control point in the following code snippet.
 ​
 
         Flow flow = this.apertureSDK.startFlow('awesomeFeature', labels);
-        FlowResult flowResult = flow.result();
 ​
-        if (flowResult != FlowResult.Rejected) {
+        if (flow.shouldRun()) {
             // Aperture accepted the flow, now execute the business logic.
             data = this.executeBusinessLogic(spark.Request);
             res.status(200);
-            flow.end(FlowStatus.OK);
         } else {
             // Flow has been rejected by Aperture
-            res.status(flow.);
-            flow.end(FlowStatus.Error);
+            res.status(flow.getRejectionHttpStatusCode());
+            flow.setStatus(FlowStatus.Error);
         }
+        flow.end();
         return data;
     }
 ```
@@ -106,7 +101,7 @@ complete code snippet is available
 :::info
 
 Aperture SDKs are available for multiple languages, you choose the one that fits
-your needs. [See all SDKs](/integrations/flow-control/sdk/sdk.md).
+your needs. [See all SDKs](/integrations/sdk/sdk.md).
 
 :::
 

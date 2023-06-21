@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
 # Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/service-protection/average-latency
+# https://docs.fluxninja.com/reference/blueprints/policies/service-protection/average-latency
 policy:
   # Name of the policy.
   # Type: string
@@ -57,6 +57,10 @@ policy:
       classifiers:
         - selectors:
             - control_point: service1-demo-app
+              service: nginx-server.demoapp.svc.cluster.local
+              label_matcher:
+                match_labels:
+                  http.target: "/service1"
           rules:
             user_type:
               extractor:
@@ -70,20 +74,26 @@ policy:
         # Required: True
         selectors:
           - control_point: service1-demo-app
+            service: nginx-server.demoapp.svc.cluster.local
+            label_matcher:
+              match_labels:
+                http.target: "/service1"
         # Scheduler parameters.
         # Type: aperture.spec.v1.SchedulerParameters
         scheduler:
           workloads:
             - parameters:
-                priority: 50
+                priority: "50"
               label_matcher:
                 match_labels:
                   user_type: guest
+              name: guest
             - parameters:
-                priority: 200
+                priority: "200"
               label_matcher:
                 match_labels:
                   http.request.header.user_type: subscriber
+              name: subscriber
       # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
       # Type: float64
       load_multiplier_linear_increment: 0.0025
@@ -96,3 +106,7 @@ policy:
     flux_meter:
       selectors:
         - control_point: service3-demo-app
+          service: nginx-server.demoapp.svc.cluster.local
+          label_matcher:
+            match_labels:
+              http.target: "/service3"

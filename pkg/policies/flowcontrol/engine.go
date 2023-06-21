@@ -6,9 +6,11 @@ import (
 	"sort"
 	"strconv"
 	"sync"
+	"time"
 
 	"go.uber.org/multierr"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -25,7 +27,7 @@ type multiMatchResult struct {
 	schedulers    map[iface.Limiter]struct{}
 	fluxMeters    map[iface.FluxMeter]struct{}
 	rateLimiters  map[iface.Limiter]struct{}
-	regulators    map[iface.Limiter]struct{}
+	samplers      map[iface.Limiter]struct{}
 	labelPreviews map[iface.LabelPreview]struct{}
 }
 
@@ -35,7 +37,7 @@ func newMultiMatchResult() *multiMatchResult {
 		schedulers:    make(map[iface.Limiter]struct{}),
 		fluxMeters:    make(map[iface.FluxMeter]struct{}),
 		rateLimiters:  make(map[iface.Limiter]struct{}),
-		regulators:    make(map[iface.Limiter]struct{}),
+		samplers:      make(map[iface.Limiter]struct{}),
 		labelPreviews: make(map[iface.LabelPreview]struct{}),
 	}
 }
@@ -51,7 +53,7 @@ func NewEngine(agentInfo *agentinfo.AgentInfo) iface.Engine {
 		fluxMeters:    make(map[iface.FluxMeterID]iface.FluxMeter),
 		schedulers:    make(map[iface.LimiterID]iface.Scheduler),
 		rateLimiters:  make(map[iface.LimiterID]iface.RateLimiter),
-		regulators:    make(map[iface.LimiterID]iface.Limiter),
+		samplers:      make(map[iface.LimiterID]iface.Limiter),
 		labelPreviews: make(map[iface.PreviewID]iface.LabelPreview),
 	}
 	return e
@@ -70,7 +72,7 @@ type Engine struct {
 	fluxMeters    map[iface.FluxMeterID]iface.FluxMeter
 	schedulers    map[iface.LimiterID]iface.Scheduler
 	rateLimiters  map[iface.LimiterID]iface.RateLimiter
-	regulators    map[iface.LimiterID]iface.Limiter
+	samplers      map[iface.LimiterID]iface.Limiter
 	labelPreviews map[iface.PreviewID]iface.LabelPreview
 	multiMatchers map[selectors.ControlPointID]*multiMatcher
 	mutex         sync.RWMutex
@@ -118,13 +120,13 @@ func (e *Engine) ProcessRequest(
 		limiters     map[iface.Limiter]struct{}
 		rejectReason flowcontrolv1.CheckResponse_RejectReason
 	}{
-		{mmr.regulators, flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED},
+		{mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED},
 		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
 		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS},
 	}
 
 	for _, limiterType := range limiterTypes {
-		limiterDecisions, decisionType := runLimiters(ctx, limiterType.limiters, flowLabels)
+		limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
 		for _, limiterDecision := range limiterDecisions {
 			response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
 		}
@@ -138,6 +140,9 @@ func (e *Engine) ProcessRequest(
 		if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
 			response.DecisionType = decisionType
 			response.RejectReason = limiterType.rejectReason
+			if waitTime != 0 {
+				response.WaitTime = durationpb.New(waitTime)
+			}
 			return
 		}
 	}
@@ -145,12 +150,18 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
+// Runs limiters in parallel.
+//
+// The returned duration, if non-zero, represents recommended minimal amount of
+// time before retrying rejected request.
 func runLimiters(
 	ctx context.Context,
 	limiters map[iface.Limiter]struct{},
-	labels map[string]string) (
+	labels map[string]string,
+) (
 	map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
+	time.Duration,
 ) {
 	var wg sync.WaitGroup
 	var once sync.Once
@@ -169,7 +180,8 @@ func runLimiters(
 		cancel()
 	}
 
-	lock := &sync.Mutex{}
+	var lock sync.Mutex
+	var waitTime time.Duration
 
 	execLimiter := func(limiter iface.Limiter) func() {
 		return func() {
@@ -180,7 +192,10 @@ func runLimiters(
 			}
 			lock.Lock()
 			defer lock.Unlock()
-			decisions[limiter] = decision
+			decisions[limiter] = decision.LimiterDecision
+			if decision.WaitTime > waitTime {
+				waitTime = decision.WaitTime
+			}
 		}
 	}
 
@@ -197,7 +212,7 @@ func runLimiters(
 	}
 	wg.Wait()
 
-	return decisions, decisionType
+	return decisions, decisionType, waitTime
 }
 
 func revertRemaining(
@@ -350,38 +365,38 @@ func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 	return e.rateLimiters[limiterID]
 }
 
-// RegisterRegulator adds limiter actuator to multimatcher.
-func (e *Engine) RegisterRegulator(l iface.Limiter) error {
+// RegisterSampler adds limiter actuator to multimatcher.
+func (e *Engine) RegisterSampler(l iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	if _, ok := e.regulators[l.GetLimiterID()]; !ok {
-		e.regulators[l.GetLimiterID()] = l
+	if _, ok := e.samplers[l.GetLimiterID()]; !ok {
+		e.samplers[l.GetLimiterID()] = l
 	} else {
-		return fmt.Errorf("regulator already registered")
+		return fmt.Errorf("sampler already registered")
 	}
 
-	regulatorMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
-		mmr.regulators[l] = struct{}{}
+	samplerMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
+		mmr.samplers[l] = struct{}{}
 		return mmr
 	}
 
-	return e.register(l.GetLimiterID().String(), l.GetSelectors(), regulatorMatchedCB)
+	return e.register(l.GetLimiterID().String(), l.GetSelectors(), samplerMatchedCB)
 }
 
-// UnregisterRegulator removes limiter actuator from multimatcher.
-func (e *Engine) UnregisterRegulator(rl iface.Limiter) error {
+// UnregisterSampler removes limiter actuator from multimatcher.
+func (e *Engine) UnregisterSampler(rl iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.regulators, rl.GetLimiterID())
+	delete(e.samplers, rl.GetLimiterID())
 
 	return e.unregister(rl.GetLimiterID().String(), rl.GetSelectors())
 }
 
-// GetRegulator Lookup function for getting regulator.
-func (e *Engine) GetRegulator(limiterID iface.LimiterID) iface.Limiter {
+// GetSampler Lookup function for getting sampler.
+func (e *Engine) GetSampler(limiterID iface.LimiterID) iface.Limiter {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
-	return e.regulators[limiterID]
+	return e.samplers[limiterID]
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.

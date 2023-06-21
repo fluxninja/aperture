@@ -6,7 +6,7 @@ keywords:
   - otel
   - opentelemetry
   - collector
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 Aperture enables feeding custom metrics to the Aperture Controller's Prometheus
@@ -77,5 +77,5 @@ import DocCardList from '@theme/DocCardList';
 
 <DocCardList />
 
-[config]: /reference/policies/spec.md#resources
+[config]: /reference/configuration/spec.md#resources
 [rabbitmq]: /integrations/metrics/rabbitmq.md

@@ -1,1003 +1,997 @@
 consumes:
-- application/json
-produces:
-- application/json
-schemes:
-- https
-swagger: "2.0"
-info:
-  title: Aperture API
-  version: "1.0"
-host: aperture-agent
-paths:
-  /v1/autoscale/kubernetes/controlpoints:
-    get:
-      tags:
-      - aperture-agent
-      operationId: AutoScaleKubernetesControlPointsService_GetControlPoints
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/AutoScaleKubernetesControlPoints'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/discovery/entities:
-    get:
-      tags:
-      - aperture-agent
-      operationId: EntitiesService_GetEntities
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/Entities'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/discovery/entities/ip-address/{ip_address}:
-    get:
-      tags:
-      - aperture-agent
-      operationId: EntitiesService_GetEntityByIPAddress
-      parameters:
-      - type: string
-        name: ip_address
-        in: path
-        required: true
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/Entity'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/discovery/entities/name/{name}:
-    get:
-      tags:
-      - aperture-agent
-      operationId: EntitiesService_GetEntityByName
-      parameters:
-      - type: string
-        name: name
-        in: path
-        required: true
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/Entity'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/distcache/stats:
-    get:
-      tags:
-      - aperture-agent
-      operationId: DistCacheService_GetStats
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            type: object
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/checkhttp:
-    post:
-      tags:
-      - aperture-agent
-      operationId: FlowControlServiceHTTP_CheckHTTP
-      parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/CheckHTTPRequest'
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/CheckHTTPResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/controlpoints:
-    get:
-      tags:
-      - aperture-agent
-      operationId: FlowControlPointsService_GetControlPoints
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/FlowControlPoints'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/http_requests/{control_point}:
-    post:
-      tags:
-      - aperture-agent
-      operationId: FlowPreviewService_PreviewHTTPRequests2
-      parameters:
-      - type: string
-        description: Control point to preview.
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/LabelMatcher'
-      - type: string
-        format: int64
-        description: Number of samples to collect.
-        name: samples
-        in: query
-      - type: string
-        description: Service to preview.
-        name: service
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PreviewHTTPRequestsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
-    post:
-      tags:
-      - aperture-agent
-      operationId: FlowPreviewService_PreviewHTTPRequests
-      parameters:
-      - type: string
-        description: Service to preview.
-        name: service
-        in: path
-        required: true
-      - type: string
-        description: Control point to preview.
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/LabelMatcher'
-      - type: string
-        format: int64
-        description: Number of samples to collect.
-        name: samples
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PreviewHTTPRequestsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/labels/{control_point}:
-    post:
-      tags:
-      - aperture-agent
-      operationId: FlowPreviewService_PreviewFlowLabels2
-      parameters:
-      - type: string
-        description: Control point to preview.
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/LabelMatcher'
-      - type: string
-        format: int64
-        description: Number of samples to collect.
-        name: samples
-        in: query
-      - type: string
-        description: Service to preview.
-        name: service
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PreviewFlowLabelsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/labels/{service}/{control_point}:
-    post:
-      tags:
-      - aperture-agent
-      operationId: FlowPreviewService_PreviewFlowLabels
-      parameters:
-      - type: string
-        description: Service to preview.
-        name: service
-        in: path
-        required: true
-      - type: string
-        description: Control point to preview.
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/LabelMatcher'
-      - type: string
-        format: int64
-        description: Number of samples to collect.
-        name: samples
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/PreviewFlowLabelsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/info/host:
-    get:
-      tags:
-      - aperture-agent
-      - aperture-controller
-      operationId: InfoService_Host
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/HostInfo'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/info/process:
-    get:
-      tags:
-      - aperture-agent
-      - aperture-controller
-      operationId: InfoService_Process
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/ProcessInfo'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/info/version:
-    get:
-      tags:
-      - aperture-agent
-      - aperture-controller
-      operationId: InfoService_Version
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/VersionInfo'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/peers:
-    get:
-      tags:
-      - aperture-agent
-      operationId: PeerDiscoveryService_GetPeers
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/Peers'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/peers/address/{address}:
-    get:
-      tags:
-      - aperture-agent
-      operationId: PeerDiscoveryService_GetPeer
-      parameters:
-      - type: string
-        name: address
-        in: path
-        required: true
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/Peer'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/status/{path}:
-    get:
-      tags:
-      - aperture-agent
-      - aperture-controller
-      operationId: StatusService_GetGroupStatus
-      parameters:
-      - pattern: .+
-        type: string
-        name: path
-        in: path
-        required: true
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/GroupStatus'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
+    - application/json
 definitions:
-  AutoScaleKubernetesControlPoint:
-    type: object
-    properties:
-      api_version:
-        type: string
-      kind:
-        type: string
-      name:
-        type: string
-      namespace:
-        type: string
-  AutoScaleKubernetesControlPoints:
-    type: object
-    properties:
-      auto_scale_kubernetes_control_points:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/AutoScaleKubernetesControlPoint'
-  CheckHTTPRequest:
-    type: object
-    properties:
-      control_point:
-        description: |-
-          For an SDK based insertion, a Control Point can represent a particular feature or execution block within a Service.
-          In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners or filter chains.
-        type: string
-      destination:
-        description: |-
-          The destination of a network activity, such as accepting a TCP connection.
-          In a multi hop network activity, the destination represents the receiver of
-          the last hop.
-        $ref: '#/definitions/SocketAddress'
-      request:
-        description: Represents a network request, such as an HTTP request.
-        $ref: '#/definitions/CheckHTTPRequestHttpRequest'
-      source:
-        description: |-
-          The source of a network activity, such as starting a TCP connection.
-          In a multi hop network activity, the source represents the sender of the
-          last hop.
-        $ref: '#/definitions/SocketAddress'
-  CheckHTTPRequestHttpRequest:
-    description: |-
-      This message defines attributes for an HTTP request.
-      HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
-    type: object
-    properties:
-      body:
-        description: The HTTP request body.
-        type: string
-      headers:
-        description: The HTTP request headers.
+    AutoScaleKubernetesControlPoint:
+        properties:
+            api_version:
+                type: string
+            kind:
+                type: string
+            name:
+                type: string
+            namespace:
+                type: string
         type: object
-        additionalProperties:
-          type: string
-      host:
-        description: The HTTP request `Host` header value.
-        type: string
-      method:
-        description: The HTTP request method, such as `GET`, `POST`.
-        type: string
-      path:
-        description: |-
-          The request target, as it appears in the first line of the HTTP request. This includes
-          the URL path and query-string. No decoding is performed.
-        type: string
-      protocol:
-        description: The network protocol used with the request, such as "HTTP/1.0",
-          "HTTP/1.1", or "HTTP/2".
-        type: string
-      scheme:
-        description: The HTTP URL scheme, such as `http` and `https`.
-        type: string
-      size:
-        description: The HTTP request size in bytes. If unknown, it must be -1.
-        type: string
-        format: int64
-  CheckHTTPResponse:
-    type: object
-    properties:
-      denied_response:
-        description: Supplies http attributes for a denied response.
-        $ref: '#/definitions/DeniedHttpResponse'
-      dynamic_metadata:
-        description: |-
-          Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
-          filter.
+    AutoScaleKubernetesControlPoints:
+        properties:
+            auto_scale_kubernetes_control_points:
+                items:
+                    $ref: '#/definitions/AutoScaleKubernetesControlPoint'
+                    type: object
+                type: array
         type: object
-      ok_response:
-        description: Supplies http attributes for an ok response.
-        $ref: '#/definitions/OkHttpResponse'
-      status:
-        title: Status `OK` allows the request. Any other status indicates the request
-          should be denied
-        $ref: '#/definitions/googlerpcStatus'
-  DeniedHttpResponse:
-    description: HTTP attributes for a denied response.
-    type: object
-    properties:
-      body:
-        description: |-
-          This field allows the authorization service to send a response body data
-          to the downstream client.
-        type: string
-      headers:
-        description: |-
-          This field allows the authorization service to send HTTP response headers
-          to the downstream client.
+    CheckHTTPRequest:
+        properties:
+            control_point:
+                description: |-
+                    For an SDK based insertion, a Control Point can represent a particular feature or execution block within a Service.
+                    In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners or filter chains.
+                type: string
+            destination:
+                $ref: '#/definitions/SocketAddress'
+                description: |-
+                    The destination of a network activity, such as accepting a TCP connection.
+                    In a multi hop network activity, the destination represents the receiver of
+                    the last hop.
+            request:
+                $ref: '#/definitions/CheckHTTPRequestHttpRequest'
+                description: Represents a network request, such as an HTTP request.
+            source:
+                $ref: '#/definitions/SocketAddress'
+                description: |-
+                    The source of a network activity, such as starting a TCP connection.
+                    In a multi hop network activity, the source represents the sender of the
+                    last hop.
         type: object
-        additionalProperties:
-          type: string
-      status:
+    CheckHTTPRequestHttpRequest:
         description: |-
-          This field allows the authorization service to send an HTTP response status code to the
-          downstream client. If not set, Envoy sends `403 Forbidden` HTTP status code by default.
-        type: integer
-        format: int32
-  Entities:
-    description: Entities contains both mappings of ip address to entity and entity
-      name to entity.
-    type: object
-    properties:
-      entities_by_ip_address:
-        $ref: '#/definitions/EntitiesEntities'
-      entities_by_name:
-        $ref: '#/definitions/EntitiesEntities'
-  EntitiesEntities:
-    description: Entities defines mapping of entities.
-    type: object
-    properties:
-      entities:
+            This message defines attributes for an HTTP request.
+            HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
+        properties:
+            body:
+                description: The HTTP request body.
+                type: string
+            headers:
+                additionalProperties:
+                    type: string
+                description: The HTTP request headers.
+                type: object
+            host:
+                description: The HTTP request `Host` header value.
+                type: string
+            method:
+                description: The HTTP request method, such as `GET`, `POST`.
+                type: string
+            path:
+                description: |-
+                    The request target, as it appears in the first line of the HTTP request. This includes
+                    the URL path and query-string. No decoding is performed.
+                type: string
+            protocol:
+                description: The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
+                type: string
+            scheme:
+                description: The HTTP URL scheme, such as `http` and `https`.
+                type: string
+            size:
+                description: The HTTP request size in bytes. If unknown, it must be -1.
+                format: int64
+                type: string
         type: object
-        additionalProperties:
-          $ref: '#/definitions/Entity'
-  Entity:
-    description: Entity represents a pod, VM, and so on.
-    type: object
-    required:
-    - ip_address
-    - uid
-    properties:
-      ip_address:
-        description: |+
-          IP address of the entity.
-
-        type: string
-        pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-        x-go-tag-validate: required,ip
-        x-pattern-rules: ip
-      name:
-        description: Name of the entity. For example, pod name.
-        type: string
-      namespace:
-        description: Namespace of the entity. For example, pod namespace.
-        type: string
-      node_name:
-        description: Node name of the entity. For example, hostname.
-        type: string
-      services:
-        description: |+
-          Services of the entity.
-
-        type: array
-        minItems: 1
-        items:
-          type: string
-        x-go-tag-validate: gt=0
-      uid:
-        description: |+
-          Unique identifier of the entity.
-
-        type: string
-        x-go-tag-validate: required
-  EqualsMatchExpression:
-    description: Label selector expression of the equal form `label == value`.
-    type: object
-    required:
-    - label
-    properties:
-      label:
-        description: |+
-          Name of the label to equal match the value.
-
-        type: string
-        x-go-tag-validate: required
-      value:
-        description: Exact value that the label should be equal to.
-        type: string
-  FlowControlPoint:
-    type: object
-    properties:
-      control_point:
-        type: string
-      service:
-        type: string
-      type:
-        type: string
-  FlowControlPoints:
-    type: object
-    properties:
-      flow_control_points:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/FlowControlPoint'
-  GroupStatus:
-    description: |-
-      Groups is nested structure that holds status information about the node and a
-      pointer to the next node.
-    type: object
-    properties:
-      groups:
+    CheckHTTPResponse:
+        properties:
+            denied_response:
+                $ref: '#/definitions/DeniedHttpResponse'
+                description: Supplies http attributes for a denied response.
+            dynamic_metadata:
+                description: |-
+                    Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
+                    filter.
+                type: object
+            ok_response:
+                $ref: '#/definitions/OkHttpResponse'
+                description: Supplies http attributes for an ok response.
+            status:
+                $ref: '#/definitions/googlerpcStatus'
+                title: Status `OK` allows the request. Any other status indicates the request should be denied
         type: object
-        additionalProperties:
-          $ref: '#/definitions/GroupStatus'
-      status:
-        $ref: '#/definitions/Status'
-  HostInfo:
-    type: object
-    properties:
-      hostname:
-        type: string
-      local_ip:
-        type: string
-      uuid:
-        type: string
-  K8sLabelMatcherRequirement:
-    description: Label selector requirement which is a selector that contains values,
-      a key, and an operator that relates the key and values.
-    type: object
-    required:
-    - key
-    properties:
-      key:
-        description: |+
-          Label key that the selector applies to.
+    DeniedHttpResponse:
+        description: HTTP attributes for a denied response.
+        properties:
+            body:
+                description: |-
+                    This field allows the authorization service to send a response body data
+                    to the downstream client.
+                type: string
+            headers:
+                additionalProperties:
+                    type: string
+                description: |-
+                    This field allows the authorization service to send HTTP response headers
+                    to the downstream client.
+                type: object
+            status:
+                description: |-
+                    This field allows the authorization service to send an HTTP response status code to the
+                    downstream client. If not set, Envoy sends `403 Forbidden` HTTP status code by default.
+                format: int32
+                type: integer
+        type: object
+    Entities:
+        description: Entities contains both mappings of ip address to entity and entity name to entity.
+        properties:
+            entities_by_ip_address:
+                $ref: '#/definitions/EntitiesEntities'
+            entities_by_name:
+                $ref: '#/definitions/EntitiesEntities'
+        type: object
+    EntitiesEntities:
+        description: Entities defines mapping of entities.
+        properties:
+            entities:
+                additionalProperties:
+                    $ref: '#/definitions/Entity'
+                type: object
+        type: object
+    Entity:
+        description: Entity represents a pod, VM, and so on.
+        properties:
+            ip_address:
+                description: |+
+                    IP address of the entity.
 
-        type: string
-        x-go-tag-validate: required
-      operator:
-        description: |+
-          Logical operator which represents a key's relationship to a set of values.
-          Valid operators are In, NotIn, Exists and DoesNotExist.
+                pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+                type: string
+                x-go-tag-validate: required,ip
+                x-pattern-rules: ip
+            name:
+                description: Name of the entity. For example, pod name.
+                type: string
+            namespace:
+                description: Namespace of the entity. For example, pod namespace.
+                type: string
+            node_name:
+                description: Node name of the entity. For example, hostname.
+                type: string
+            services:
+                description: |+
+                    Services of the entity.
 
-        type: string
+                items:
+                    type: string
+                minItems: 1
+                type: array
+                x-go-tag-validate: gt=0
+            uid:
+                description: |+
+                    Unique identifier of the entity.
+
+                type: string
+                x-go-tag-validate: required
+        required:
+            - ip_address
+            - uid
+        type: object
+    EqualsMatchExpression:
+        description: Label selector expression of the equal form `label == value`.
+        properties:
+            label:
+                description: |+
+                    Name of the label to equal match the value.
+
+                type: string
+                x-go-tag-validate: required
+            value:
+                description: Exact value that the label should be equal to.
+                type: string
+        required:
+            - label
+        type: object
+    FlowControlPoint:
+        properties:
+            control_point:
+                type: string
+            service:
+                type: string
+            type:
+                type: string
+        type: object
+    FlowControlPoints:
+        properties:
+            flow_control_points:
+                items:
+                    $ref: '#/definitions/FlowControlPoint'
+                    type: object
+                type: array
+        type: object
+    GroupStatus:
+        description: |-
+            Groups is nested structure that holds status information about the node and a
+            pointer to the next node.
+        properties:
+            groups:
+                additionalProperties:
+                    $ref: '#/definitions/GroupStatus'
+                type: object
+            status:
+                $ref: '#/definitions/Status'
+        type: object
+    HostInfo:
+        properties:
+            hostname:
+                type: string
+            local_ip:
+                type: string
+            uuid:
+                type: string
+        type: object
+    K8sLabelMatcherRequirement:
+        description: Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
+        properties:
+            key:
+                description: |+
+                    Label key that the selector applies to.
+
+                type: string
+                x-go-tag-validate: required
+            operator:
+                description: |+
+                    Logical operator which represents a key's relationship to a set of values.
+                    Valid operators are In, NotIn, Exists and DoesNotExist.
+
+                enum:
+                    - In
+                    - NotIn
+                    - Exists
+                    - DoesNotExists
+                type: string
+                x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
+                x-oneof: In | NotIn | Exists | DoesNotExists
+            values:
+                description: |-
+                    An array of string values that relates to the key by an operator.
+                    If the operator is In or NotIn, the values array must be non-empty.
+                    If the operator is Exists or DoesNotExist, the values array must be empty.
+                items:
+                    type: string
+                type: array
+        required:
+            - key
+        type: object
+    LabelMatcher:
+        description: |-
+            It provides three ways to define requirements:
+            - match labels
+            - match expressions
+            - arbitrary expression
+
+            If multiple requirements are set, they're all combined using the logical AND operator.
+            An empty label matcher always matches.
+        properties:
+            expression:
+                $ref: '#/definitions/MatchExpression'
+                description: An arbitrary expression to be evaluated on the labels.
+            match_expressions:
+                description: |-
+                    List of Kubernetes-style label matcher requirements.
+
+                    Note: The requirements are combined using the logical AND operator.
+                items:
+                    $ref: '#/definitions/K8sLabelMatcherRequirement'
+                    type: object
+                type: array
+            match_labels:
+                additionalProperties:
+                    type: string
+                description: |-
+                    A map of {key,value} pairs representing labels to be matched.
+                    A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
+
+                    Note: The requirements are combined using the logical AND operator.
+                type: object
+        title: |-
+            Allows to define rules whether a map of
+            [labels](/concepts/flow-control/flow-label.md)
+            should be considered a match or not
+        type: object
+    MatchExpression:
+        description: |-
+            MatchExpression has multiple variants, exactly one should be set.
+
+            Example:
+            ```yaml
+            all:
+              of:
+                - label_exists: foo
+                - label_equals:
+                    label: app
+                    value: frobnicator
+            ```
+        properties:
+            all:
+                $ref: '#/definitions/MatchExpressionList'
+                description: The expression is true when all sub expressions are true.
+            any:
+                $ref: '#/definitions/MatchExpressionList'
+                description: The expression is true when any sub expression is true.
+            label_equals:
+                $ref: '#/definitions/EqualsMatchExpression'
+                description: The expression is true when label value equals given value.
+            label_exists:
+                description: The expression is true when label with given name exists.
+                type: string
+            label_matches:
+                $ref: '#/definitions/MatchesMatchExpression'
+                description: The expression is true when label matches given regular expression.
+            not:
+                $ref: '#/definitions/MatchExpression'
+                description: The expression negates the result of sub expression.
+        title: Defines a `[map<string, string> → bool]` expression to be evaluated on labels
+        type: object
+    MatchExpressionList:
+        description: 'for example, `{any: {of: [expr1, expr2]}}`.'
+        properties:
+            of:
+                description: List of sub expressions of the match expression.
+                items:
+                    $ref: '#/definitions/MatchExpression'
+                    type: object
+                type: array
+        title: List of MatchExpressions that is used for all or any matching
+        type: object
+    MatchesMatchExpression:
+        description: Label selector expression of the form `label matches regex`.
+        properties:
+            label:
+                description: |+
+                    Name of the label to match the regular expression.
+
+                type: string
+                x-go-tag-validate: required
+            regex:
+                description: |+
+                    Regular expression that should match the label value.
+                    It uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+
+                type: string
+                x-go-tag-validate: required
+        required:
+            - label
+            - regex
+        type: object
+    OkHttpResponse:
+        description: HTTP attributes for an OK response.
+        properties:
+            dynamic_metadata:
+                type: object
+            headers:
+                additionalProperties:
+                    type: string
+                description: HTTP entity headers in addition to the original request headers.
+                type: object
+        type: object
+    Peer:
+        description: Peer holds peer info and services.
+        properties:
+            address:
+                type: string
+            hostname:
+                type: string
+            services:
+                additionalProperties:
+                    type: string
+                type: object
+        type: object
+    Peers:
+        description: Peers holds the peer info of this peer and a mapping of address to other peers.
+        properties:
+            peers:
+                additionalProperties:
+                    $ref: '#/definitions/Peer'
+                type: object
+            self_peer:
+                $ref: '#/definitions/Peer'
+        type: object
+    PreviewFlowLabelsResponse:
+        properties:
+            samples:
+                items:
+                    $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
+                    type: object
+                type: array
+        type: object
+    PreviewFlowLabelsResponseFlowLabels:
+        properties:
+            labels:
+                additionalProperties:
+                    type: string
+                type: object
+        type: object
+    PreviewHTTPRequestsResponse:
+        properties:
+            samples:
+                items:
+                    type: object
+                type: array
+        type: object
+    ProcessInfo:
+        properties:
+            extensions:
+                items:
+                    type: string
+                type: array
+            start_time:
+                format: date-time
+                type: string
+            uptime:
+                type: string
+        type: object
+    SocketAddress:
+        properties:
+            address:
+                description: The address for this socket.
+                type: string
+            port:
+                description: The port for this socket.
+                format: int64
+                type: integer
+            protocol:
+                $ref: '#/definitions/SocketAddressProtocol'
+        type: object
+    SocketAddressProtocol:
+        default: TCP
         enum:
-        - In
-        - NotIn
-        - Exists
-        - DoesNotExists
-        x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
-        x-oneof: In | NotIn | Exists | DoesNotExists
-      values:
-        description: |-
-          An array of string values that relates to the key by an operator.
-          If the operator is In or NotIn, the values array must be non-empty.
-          If the operator is Exists or DoesNotExist, the values array must be empty.
-        type: array
-        items:
-          type: string
-  LabelMatcher:
-    description: |-
-      It provides three ways to define requirements:
-      - match labels
-      - match expressions
-      - arbitrary expression
-
-      If multiple requirements are set, they're all combined using the logical AND operator.
-      An empty label matcher always matches.
-    type: object
-    title: |-
-      Allows to define rules whether a map of
-      [labels](/concepts/flow-control/flow-label.md)
-      should be considered a match or not
-    properties:
-      expression:
-        description: An arbitrary expression to be evaluated on the labels.
-        $ref: '#/definitions/MatchExpression'
-      match_expressions:
-        description: |-
-          List of Kubernetes-style label matcher requirements.
-
-          Note: The requirements are combined using the logical AND operator.
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/K8sLabelMatcherRequirement'
-      match_labels:
-        description: |-
-          A map of {key,value} pairs representing labels to be matched.
-          A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
-
-          Note: The requirements are combined using the logical AND operator.
+            - TCP
+            - UDP
+        type: string
+    Status:
+        description: Status holds details about a status that can be reported to the registry.
+        properties:
+            error:
+                $ref: '#/definitions/StatusError'
+            message:
+                $ref: '#/definitions/googleprotobufAny'
+            timestamp:
+                format: date-time
+                type: string
         type: object
-        additionalProperties:
-          type: string
-  MatchExpression:
-    description: |-
-      MatchExpression has multiple variants, exactly one should be set.
-
-      Example:
-      ```yaml
-      all:
-        of:
-          - label_exists: foo
-          - label_equals:
-              label: app
-              value: frobnicator
-      ```
-    type: object
-    title: Defines a `[map<string, string> → bool]` expression to be evaluated on
-      labels
-    properties:
-      all:
-        description: The expression is true when all sub expressions are true.
-        $ref: '#/definitions/MatchExpressionList'
-      any:
-        description: The expression is true when any sub expression is true.
-        $ref: '#/definitions/MatchExpressionList'
-      label_equals:
-        description: The expression is true when label value equals given value.
-        $ref: '#/definitions/EqualsMatchExpression'
-      label_exists:
-        description: The expression is true when label with given name exists.
-        type: string
-      label_matches:
-        description: The expression is true when label matches given regular expression.
-        $ref: '#/definitions/MatchesMatchExpression'
-      not:
-        description: The expression negates the result of sub expression.
-        $ref: '#/definitions/MatchExpression'
-  MatchExpressionList:
-    description: 'for example, `{any: {of: [expr1, expr2]}}`.'
-    type: object
-    title: List of MatchExpressions that is used for all or any matching
-    properties:
-      of:
-        description: List of sub expressions of the match expression.
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/MatchExpression'
-  MatchesMatchExpression:
-    description: Label selector expression of the form `label matches regex`.
-    type: object
-    required:
-    - label
-    - regex
-    properties:
-      label:
-        description: |+
-          Name of the label to match the regular expression.
-
-        type: string
-        x-go-tag-validate: required
-      regex:
-        description: |+
-          Regular expression that should match the label value.
-          It uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
-
-        type: string
-        x-go-tag-validate: required
-  OkHttpResponse:
-    description: HTTP attributes for an OK response.
-    type: object
-    properties:
-      dynamic_metadata:
+    StatusError:
+        description: Error holds raw error message and its cause in a nested field.
+        properties:
+            message:
+                type: string
         type: object
-      headers:
-        description: HTTP entity headers in addition to the original request headers.
+    VersionInfo:
+        properties:
+            build_host:
+                type: string
+            build_os:
+                type: string
+            build_time:
+                type: string
+            git_branch:
+                type: string
+            git_commit_hash:
+                type: string
+            service:
+                type: string
+            version:
+                type: string
         type: object
-        additionalProperties:
-          type: string
-  Peer:
-    description: Peer holds peer info and services.
-    type: object
-    properties:
-      address:
-        type: string
-      hostname:
-        type: string
-      services:
-        type: object
-        additionalProperties:
-          type: string
-  Peers:
-    description: Peers holds the peer info of this peer and a mapping of address to
-      other peers.
-    type: object
-    properties:
-      peers:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/Peer'
-      self_peer:
-        $ref: '#/definitions/Peer'
-  PreviewFlowLabelsResponse:
-    type: object
-    properties:
-      samples:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
-  PreviewFlowLabelsResponseFlowLabels:
-    type: object
-    properties:
-      labels:
-        type: object
-        additionalProperties:
-          type: string
-  PreviewHTTPRequestsResponse:
-    type: object
-    properties:
-      samples:
-        type: array
-        items:
-          type: object
-  ProcessInfo:
-    type: object
-    properties:
-      extensions:
-        type: array
-        items:
-          type: string
-      start_time:
-        type: string
-        format: date-time
-      uptime:
-        type: string
-  SocketAddress:
-    type: object
-    properties:
-      address:
-        description: The address for this socket.
-        type: string
-      port:
-        description: The port for this socket.
-        type: integer
-        format: int64
-      protocol:
-        $ref: '#/definitions/SocketAddressProtocol'
-  SocketAddressProtocol:
-    type: string
-    default: TCP
-    enum:
-    - TCP
-    - UDP
-  Status:
-    description: Status holds details about a status that can be reported to the registry.
-    type: object
-    properties:
-      error:
-        $ref: '#/definitions/StatusError'
-      message:
-        $ref: '#/definitions/googleprotobufAny'
-      timestamp:
-        type: string
-        format: date-time
-  StatusError:
-    description: Error holds raw error message and its cause in a nested field.
-    type: object
-    properties:
-      message:
-        type: string
-  VersionInfo:
-    type: object
-    properties:
-      build_host:
-        type: string
-      build_os:
-        type: string
-      build_time:
-        type: string
-      git_branch:
-        type: string
-      git_commit_hash:
-        type: string
-      service:
-        type: string
-      version:
-        type: string
-  googleprotobufAny:
-    description: |-
-      `Any` contains an arbitrary serialized protocol buffer message along with a
-      URL that describes the type of the serialized message.
-
-      Protobuf library provides support to pack/unpack Any values in the form
-      of utility functions or additional generated methods of the Any type.
-
-      Example 1: Pack and unpack a message in C++.
-
-          Foo foo = ...;
-          Any any;
-          any.PackFrom(foo);
-          ...
-          if (any.UnpackTo(&foo)) {
-            ...
-          }
-
-      Example 2: Pack and unpack a message in Java.
-
-          Foo foo = ...;
-          Any any = Any.pack(foo);
-          ...
-          if (any.is(Foo.class)) {
-            foo = any.unpack(Foo.class);
-          }
-          // or ...
-          if (any.isSameTypeAs(Foo.getDefaultInstance())) {
-            foo = any.unpack(Foo.getDefaultInstance());
-          }
-
-      Example 3: Pack and unpack a message in Python.
-
-          foo = Foo(...)
-          any = Any()
-          any.Pack(foo)
-          ...
-          if any.Is(Foo.DESCRIPTOR):
-            any.Unpack(foo)
-            ...
-
-      Example 4: Pack and unpack a message in Go
-
-           foo := &pb.Foo{...}
-           any, err := anypb.New(foo)
-           if err != nil {
-             ...
-           }
-           ...
-           foo := &pb.Foo{}
-           if err := any.UnmarshalTo(foo); err != nil {
-             ...
-           }
-
-      The pack methods provided by protobuf library will by default use
-      'type.googleapis.com/full.type.name' as the type URL and the unpack
-      methods only use the fully qualified type name after the last '/'
-      in the type URL, for example "foo.bar.com/x/y.z" will yield type
-      name "y.z".
-
-      JSON
-
-      The JSON representation of an `Any` value uses the regular
-      representation of the deserialized, embedded message, with an
-      additional field `@type` which contains the type URL. Example:
-
-          package google.profile;
-          message Person {
-            string first_name = 1;
-            string last_name = 2;
-          }
-
-          {
-            "@type": "type.googleapis.com/google.profile.Person",
-            "firstName": <string>,
-            "lastName": <string>
-          }
-
-      If the embedded message type is well-known and has a custom JSON
-      representation, that representation will be embedded adding a field
-      `value` which holds the custom JSON in addition to the `@type`
-      field. Example (for message [google.protobuf.Duration][]):
-
-          {
-            "@type": "type.googleapis.com/google.protobuf.Duration",
-            "value": "1.212s"
-          }
-    type: object
-    properties:
-      '@type':
+    googleprotobufAny:
+        additionalProperties: false
         description: |-
-          A URL/resource name that uniquely identifies the type of the serialized
-          protocol buffer message. This string must contain at least
-          one "/" character. The last segment of the URL's path must represent
-          the fully qualified name of the type (as in
-          `path/google.protobuf.Duration`). The name should be in a canonical form
-          (e.g., leading "." is not accepted).
+            `Any` contains an arbitrary serialized protocol buffer message along with a
+            URL that describes the type of the serialized message.
 
-          In practice, teams usually precompile into the binary all types that they
-          expect it to use in the context of Any. However, for URLs which use the
-          scheme `http`, `https`, or no scheme, one can optionally set up a type
-          server that maps type URLs to message definitions as follows:
+            Protobuf library provides support to pack/unpack Any values in the form
+            of utility functions or additional generated methods of the Any type.
 
-          * If no scheme is provided, `https` is assumed.
-          * An HTTP GET on the URL must yield a [google.protobuf.Type][]
-            value in binary format, or produce an error.
-          * Applications are allowed to cache lookup results based on the
-            URL, or have them precompiled into a binary to avoid any
-            lookup. Therefore, binary compatibility needs to be preserved
-            on changes to types. (Use versioned type names to manage
-            breaking changes.)
+            Example 1: Pack and unpack a message in C++.
 
-          Note: this functionality is not currently available in the official
-          protobuf release, and it is not used for type URLs beginning with
-          type.googleapis.com.
+                Foo foo = ...;
+                Any any;
+                any.PackFrom(foo);
+                ...
+                if (any.UnpackTo(&foo)) {
+                  ...
+                }
 
-          Schemes other than `http`, `https` (or the empty scheme) might be
-          used with implementation specific semantics.
-        type: string
-    additionalProperties: false
-  googlerpcStatus:
-    description: |-
-      The `Status` type defines a logical error model that is suitable for
-      different programming environments, including REST APIs and RPC APIs. It is
-      used by [gRPC](https://github.com/grpc). Each `Status` message contains
-      three pieces of data: error code, error message, and error details.
+            Example 2: Pack and unpack a message in Java.
 
-      You can find out more about this error model and how to work with it in the
-      [API Design Guide](https://cloud.google.com/apis/design/errors).
-    type: object
-    properties:
-      code:
+                Foo foo = ...;
+                Any any = Any.pack(foo);
+                ...
+                if (any.is(Foo.class)) {
+                  foo = any.unpack(Foo.class);
+                }
+                // or ...
+                if (any.isSameTypeAs(Foo.getDefaultInstance())) {
+                  foo = any.unpack(Foo.getDefaultInstance());
+                }
+
+            Example 3: Pack and unpack a message in Python.
+
+                foo = Foo(...)
+                any = Any()
+                any.Pack(foo)
+                ...
+                if any.Is(Foo.DESCRIPTOR):
+                  any.Unpack(foo)
+                  ...
+
+            Example 4: Pack and unpack a message in Go
+
+                 foo := &pb.Foo{...}
+                 any, err := anypb.New(foo)
+                 if err != nil {
+                   ...
+                 }
+                 ...
+                 foo := &pb.Foo{}
+                 if err := any.UnmarshalTo(foo); err != nil {
+                   ...
+                 }
+
+            The pack methods provided by protobuf library will by default use
+            'type.googleapis.com/full.type.name' as the type URL and the unpack
+            methods only use the fully qualified type name after the last '/'
+            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            name "y.z".
+
+            JSON
+
+            The JSON representation of an `Any` value uses the regular
+            representation of the deserialized, embedded message, with an
+            additional field `@type` which contains the type URL. Example:
+
+                package google.profile;
+                message Person {
+                  string first_name = 1;
+                  string last_name = 2;
+                }
+
+                {
+                  "@type": "type.googleapis.com/google.profile.Person",
+                  "firstName": <string>,
+                  "lastName": <string>
+                }
+
+            If the embedded message type is well-known and has a custom JSON
+            representation, that representation will be embedded adding a field
+            `value` which holds the custom JSON in addition to the `@type`
+            field. Example (for message [google.protobuf.Duration][]):
+
+                {
+                  "@type": "type.googleapis.com/google.protobuf.Duration",
+                  "value": "1.212s"
+                }
+        properties:
+            '@type':
+                description: |-
+                    A URL/resource name that uniquely identifies the type of the serialized
+                    protocol buffer message. This string must contain at least
+                    one "/" character. The last segment of the URL's path must represent
+                    the fully qualified name of the type (as in
+                    `path/google.protobuf.Duration`). The name should be in a canonical form
+                    (e.g., leading "." is not accepted).
+
+                    In practice, teams usually precompile into the binary all types that they
+                    expect it to use in the context of Any. However, for URLs which use the
+                    scheme `http`, `https`, or no scheme, one can optionally set up a type
+                    server that maps type URLs to message definitions as follows:
+
+                    * If no scheme is provided, `https` is assumed.
+                    * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                      value in binary format, or produce an error.
+                    * Applications are allowed to cache lookup results based on the
+                      URL, or have them precompiled into a binary to avoid any
+                      lookup. Therefore, binary compatibility needs to be preserved
+                      on changes to types. (Use versioned type names to manage
+                      breaking changes.)
+
+                    Note: this functionality is not currently available in the official
+                    protobuf release, and it is not used for type URLs beginning with
+                    type.googleapis.com.
+
+                    Schemes other than `http`, `https` (or the empty scheme) might be
+                    used with implementation specific semantics.
+                type: string
+        type: object
+    googlerpcStatus:
         description: |-
-          The status code, which should be an enum value of
-          [google.rpc.Code][google.rpc.Code].
-        type: integer
-        format: int32
-      details:
-        description: |-
-          A list of messages that carry the error details.  There is a common set of
-          message types for APIs to use.
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/googleprotobufAny'
-      message:
-        description: |-
-          A developer-facing error message, which should be in English. Any
-          user-facing error message should be localized and sent in the
-          [google.rpc.Status.details][google.rpc.Status.details] field, or localized
-          by the client.
-        type: string
+            The `Status` type defines a logical error model that is suitable for
+            different programming environments, including REST APIs and RPC APIs. It is
+            used by [gRPC](https://github.com/grpc). Each `Status` message contains
+            three pieces of data: error code, error message, and error details.
+
+            You can find out more about this error model and how to work with it in the
+            [API Design Guide](https://cloud.google.com/apis/design/errors).
+        properties:
+            code:
+                description: |-
+                    The status code, which should be an enum value of
+                    [google.rpc.Code][google.rpc.Code].
+                format: int32
+                type: integer
+            details:
+                description: |-
+                    A list of messages that carry the error details.  There is a common set of
+                    message types for APIs to use.
+                items:
+                    $ref: '#/definitions/googleprotobufAny'
+                    type: object
+                type: array
+            message:
+                description: |-
+                    A developer-facing error message, which should be in English. Any
+                    user-facing error message should be localized and sent in the
+                    [google.rpc.Status.details][google.rpc.Status.details] field, or localized
+                    by the client.
+                type: string
+        type: object
+host: aperture-agent
+info:
+    title: Aperture API
+    version: "1.0"
+paths:
+    /v1/autoscale/kubernetes/controlpoints:
+        get:
+            operationId: AutoScaleKubernetesControlPointsService_GetControlPoints
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/AutoScaleKubernetesControlPoints'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities:
+        get:
+            operationId: EntitiesService_GetEntities
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entities'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities/ip-address/{ip_address}:
+        get:
+            operationId: EntitiesService_GetEntityByIPAddress
+            parameters:
+                - in: path
+                  name: ip_address
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entity'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities/name/{name}:
+        get:
+            operationId: EntitiesService_GetEntityByName
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entity'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/distcache/stats:
+        get:
+            operationId: DistCacheService_GetStats
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/checkhttp:
+        post:
+            operationId: FlowControlServiceHTTP_CheckHTTP
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CheckHTTPRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/CheckHTTPResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/controlpoints:
+        get:
+            operationId: FlowControlPointsService_GetControlPoints
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/FlowControlPoints'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/http_requests/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewHTTPRequests2
+            parameters:
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewHTTPRequestsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewHTTPRequests
+            parameters:
+                - description: Service to preview.
+                  in: path
+                  name: service
+                  required: true
+                  type: string
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewHTTPRequestsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/labels/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewFlowLabels2
+            parameters:
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewFlowLabelsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/labels/{service}/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewFlowLabels
+            parameters:
+                - description: Service to preview.
+                  in: path
+                  name: service
+                  required: true
+                  type: string
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewFlowLabelsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/info/host:
+        get:
+            operationId: InfoService_Host
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/HostInfo'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+                - aperture-controller
+    /v1/info/process:
+        get:
+            operationId: InfoService_Process
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/ProcessInfo'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+                - aperture-controller
+    /v1/info/version:
+        get:
+            operationId: InfoService_Version
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/VersionInfo'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+                - aperture-controller
+    /v1/peers:
+        get:
+            operationId: PeerDiscoveryService_GetPeers
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Peers'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/peers/address/{address}:
+        get:
+            operationId: PeerDiscoveryService_GetPeer
+            parameters:
+                - in: path
+                  name: address
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Peer'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/status/{path}:
+        get:
+            operationId: StatusService_GetGroupStatus
+            parameters:
+                - in: path
+                  name: path
+                  pattern: .+
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GroupStatus'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+                - aperture-controller
+produces:
+    - application/json
+schemes:
+    - https
+swagger: "2.0"

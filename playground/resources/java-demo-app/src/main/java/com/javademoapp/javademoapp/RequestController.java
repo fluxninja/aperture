@@ -1,5 +1,6 @@
 package com.javademoapp.javademoapp;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
+import com.fluxninja.aperture.servlet.javax.*;
 
 @RestController
 public class RequestController {
@@ -57,7 +58,7 @@ public class RequestController {
 
     // Semaphore for limiting concurrent clients
     private Semaphore limitClients = new Semaphore(concurrency);
-    private ApertureFeatureFilter apertureFilter = new ApertureFeatureFilter();
+    private ApertureFilter apertureFilter = new ApertureFilter();
 
     @RequestMapping(value = "/health", method = RequestMethod.GET)
     public String health() {
@@ -82,7 +83,7 @@ public class RequestController {
 
     @PostMapping("/request")
     public String handlePostRequest(@RequestBody String payload, HttpServletRequest request,
-            HttpServletResponse response) throws ApertureSDKException {
+            HttpServletResponse response) {
         // Randomly reject requests
         if (rejectRatio > 0 && Math.random() < rejectRatio) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -136,14 +137,17 @@ public class RequestController {
     }
 
     @Bean
-    public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env) {
-        FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<ApertureFilter> apertureFeatureFilter(Environment env) {
+        FilterRegistrationBean<ApertureFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(apertureFilter);
         registrationBean.addUrlPatterns("/request");
         registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
         registrationBean.addInitParameter("agent_port",
                 System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
+        registrationBean.addInitParameter("control_point_name", "awesomeFeature");
+        registrationBean.addInitParameter("enable_fail_open", "true");
+        registrationBean.addInitParameter("insecure_grpc", "true");
 
         return registrationBean;
     }

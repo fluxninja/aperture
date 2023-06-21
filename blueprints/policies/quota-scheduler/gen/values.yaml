@@ -1,6 +1,6 @@
 # Generated values file for policies/quota-scheduler blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/quota-scheduler
+# https://docs.fluxninja.com/reference/blueprints/ policies/quota-scheduler
 
 policy:
   # Name of the policy.
@@ -51,6 +51,9 @@ dashboard:
   # Additional filters to pass to each query to Grafana datasource.
   # Type: map[string]string
   extra_filters: {}
+  # Name of the main dashboard.
+  # Type: string
+  title: "Aperture Quota Scheduler"
   datasource:
     # Datasource name.
     # Type: string

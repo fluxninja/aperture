@@ -32,19 +32,19 @@ functionality on fine-grained features inside service code.
  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
  flow, err := a.apertureClient.StartFlow(ctx, "awesomeFeature", labels)
  if err != nil {
-  log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.Accepted(): %t", flow.Accepted())
+  log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.ShouldRun(): %t", flow.ShouldRun())
  }
 
  // See whether flow was accepted by Aperture Agent.
- if flow.Accepted() {
+ if flow.ShouldRun() {
   // Simulate work being done
   time.Sleep(5 * time.Second)
-  // Need to call End on the Flow in order to provide telemetry to Aperture Agent for completing the control loop. The first argument captures whether the feature captured by the Flow was successful or resulted in an error. The second argument is error message for further diagnosis.
-  _ = flow.End(aperture.OK)
  } else {
   // Flow has been rejected by Aperture Agent.
-  _ = flow.End(aperture.Error)
+  flow.SetStatus(aperture.Error)
  }
+ // Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop. SetStatus() method of Flow object can be used to capture whether the Flow was successful or resulted in an error. If not set, status defaults to OK.
+ _ = flow.End()
 ```
 
 ## Relevant Resources

@@ -1,6 +1,6 @@
 {
   "name": "aperture-js",
-  "version": "2.1.0",
+  "version": "2.4.0",
   "description": "",
   "main": "./example/example.js",
   "scripts": {

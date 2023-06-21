@@ -69,7 +69,7 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 				randomLimiterIndex := rand.Intn(len(fr.limiters))
 				limiter := fr.limiters[randomLimiterIndex]
 				atomic.AddInt32(&f.totalRequests, 1)
-				accepted, _, _ := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
+				accepted, _, _, _ := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
 				if accepted {
 					atomic.AddInt32(&f.acceptedRequests, 1)
 				}

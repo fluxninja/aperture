@@ -16,7 +16,7 @@ import {
 } from "./consts.js";
 import {
   Flow,
-  FlowResult
+  FlowDecision
 } from "./flow.js";
 import { fcs } from "./utils.js";
 
@@ -44,7 +44,7 @@ export class ApertureClient {
   // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
   // Return value is a Flow.
   // The call returns immediately in case connection with Aperture Agent is not established.
-  // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
+  // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
   async StartFlow(controlPointArg, labelsArg) {
     return new Promise((resolve, reject) => {
       let labelsMap = new Map();

@@ -51,10 +51,6 @@ func provideAgent(
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
 
 	customConfig := map[string]*policylangv1.InfraMeter{}
-	if !agentCfg.DisableKubeletScraper {
-		customConfig[otelconsts.ReceiverKubeletStats] = inframeter.InfraMeterForKubeletStats()
-	}
-
 	if err := inframeter.AddInfraMeters(otelCfg, customConfig); err != nil {
 		return nil, fmt.Errorf("adding builtin custom metrics pipelines: %w", err)
 	}
@@ -179,12 +175,18 @@ func addMetricsPipeline(
 ) {
 	addPrometheusReceiver(config, agentConfig, tlsConfig, lis)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
+	processors := []string{
+		otelconsts.ProcessorAgentGroup,
+	}
+	if !agentConfig.EnableHighCardinalityPlatformMetrics {
+		otelconfig.AddHighCardinalityMetricsFilterProcessor(config)
+		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
+		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)
+	}
 	config.Service.AddPipeline("metrics/fast", otelconfig.Pipeline{
-		Receivers: []string{otelconsts.ReceiverPrometheus},
-		Processors: []string{
-			otelconsts.ProcessorAgentGroup,
-		},
-		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
+		Receivers:  []string{otelconsts.ReceiverPrometheus},
+		Processors: processors,
+		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
 	})
 }
 
