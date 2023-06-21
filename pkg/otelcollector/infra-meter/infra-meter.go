@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
@@ -16,6 +17,8 @@ import (
 // AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
 func AddInfraMeters(
 	config *otelconfig.Config,
+	policyName string,
+	telemetryCollectorID int64,
 	infraMeters map[string]*policylangv1.InfraMeter,
 ) error {
 	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
@@ -31,7 +34,28 @@ func AddInfraMeters(
 		infraMeters = map[string]*policylangv1.InfraMeter{}
 	}
 	for pipelineName, metricConfig := range infraMeters {
-		if err := addInfraMeter(config, pipelineName, metricConfig); err != nil {
+		infraMeterName := strings.Split(pipelineName, "/")[1]
+		processorName := fmt.Sprintf("%s-%s-%s-%d", otelconsts.ProcessorTelemetryCollector, policyName, infraMeterName, telemetryCollectorID)
+		config.AddProcessor(processorName, map[string]any{
+			"attributes": []map[string]interface{}{
+				{
+					"key":    "aperture_infra_meter_name",
+					"action": "upsert",
+					"value":  infraMeterName,
+				},
+				{
+					"key":    metrics.PolicyNameLabel,
+					"action": "upsert",
+					"value":  policyName,
+				},
+				{
+					"key":    "aperture_telemetry_collector_id",
+					"action": "upsert",
+					"value":  telemetryCollectorID,
+				},
+			},
+		})
+		if err := addInfraMeter(config, pipelineName, processorName, metricConfig); err != nil {
 			return fmt.Errorf("failed to add infra metric pipeline %s: %w", pipelineName, err)
 		}
 	}
@@ -41,6 +65,7 @@ func AddInfraMeters(
 func addInfraMeter(
 	config *otelconfig.Config,
 	pipelineName string,
+	processorName string,
 	infraMeter *policylangv1.InfraMeter,
 ) error {
 	pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
@@ -99,6 +124,7 @@ func addInfraMeter(
 		Processors: append(
 			mapSlice(processorIDs, infraMeter.Pipeline.Processors),
 			otelconsts.ProcessorInfraMeter,
+			processorName,
 			otelconsts.ProcessorAgentResourceLabels,
 		),
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},

@@ -26,8 +26,9 @@ spec:
           out_ports:
             output:
               signal_name: AVERAGE_LATENCY_0
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="feature-rollout/average_latency/0"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0",
+            policy_name="feature-rollout"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="feature-rollout/average_latency/0", policy_name="feature-rollout"}[5s]))
     - decider:
         in_ports:
           lhs:

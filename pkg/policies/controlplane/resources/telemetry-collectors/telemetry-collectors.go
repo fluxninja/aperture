@@ -6,6 +6,7 @@ import (
 	"path"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
@@ -14,6 +15,7 @@ import (
 )
 
 type tcConfigSync struct {
+	id             int64
 	policyReadAPI  iface.Policy
 	tcProto        *policylangv1.TelemetryCollector
 	etcdPath       string
@@ -32,6 +34,7 @@ func NewTelemetryCollectorsOptions(
 		etcdPath := path.Join(paths.TelemetryCollectorConfigPath,
 			paths.TelemetryCollectorKey(agentGroup, policyBaseAPI.GetPolicyName(), i))
 		configSync := &tcConfigSync{
+			id:             int64(i),
 			tcProto:        tcProto,
 			policyReadAPI:  policyBaseAPI,
 			agentGroupName: agentGroup,
@@ -51,8 +54,15 @@ func (configSync *tcConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle 
 	lifecycle.Append(fx.Hook{
 		// OnStart hook will be called when the application starts.
 		OnStart: func(ctx context.Context) error {
+			// Create a FluxMeterWrapper using the fluxMeterName and fluxMeterProto provided.
+			wrapper := &policysyncv1.TelemetryCollectorWrapper{
+				TelemetryCollector:   configSync.tcProto,
+				TelemetryCollectorId: configSync.id,
+				PolicyName:           configSync.policyReadAPI.GetPolicyName(),
+			}
+
 			// Marshal the telemetry collector using json marshaler.
-			dat, err := json.Marshal(configSync.tcProto)
+			dat, err := json.Marshal(wrapper)
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to marshal telemetry collector config")

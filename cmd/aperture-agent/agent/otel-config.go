@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	agentconfig "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -50,10 +51,6 @@ func provideAgent(
 	addTracesPipeline(otelCfg, lis)
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
 
-	customConfig := map[string]*policylangv1.InfraMeter{}
-	if err := inframeter.AddInfraMeters(otelCfg, customConfig); err != nil {
-		return nil, fmt.Errorf("adding builtin custom metrics pipelines: %w", err)
-	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 
 	baseOtelCfg, err := otelCfg.Copy()
@@ -66,12 +63,12 @@ func provideAgent(
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
-		tc := &policylangv1.TelemetryCollector{}
+		tc := &policysyncv1.TelemetryCollectorWrapper{}
 		if err = unmarshaller.UnmarshalKey("", tc); err != nil {
 			log.Error().Err(err).Msg("unmarshalling telemetry collector")
 			return
 		}
-		infraMeters := tc.GetInfraMeters()
+		infraMeters := tc.GetTelemetryCollector().GetInfraMeters()
 		key := string(event.Key)
 
 		switch event.Type {
@@ -89,7 +86,7 @@ func provideAgent(
 				ims[fmt.Sprintf("%s/%s", prefix, k)] = v
 			}
 		}
-		if err := inframeter.AddInfraMeters(otelCfg, ims); err != nil {
+		if err := inframeter.AddInfraMeters(otelCfg, tc.GetPolicyName(), tc.GetTelemetryCollectorId(), ims); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			utils.Shutdown(shutdowner)
 			return
