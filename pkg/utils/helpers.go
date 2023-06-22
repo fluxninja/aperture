@@ -39,8 +39,8 @@ func RemoveFromSlice(a []string, x string) []string {
 	return a
 }
 
-// SliceToSet converts a slice of string to a map[string]struct{}.
-func SliceToSet(a []string) map[string]struct{} {
+// SliceToSet converts a slice of strings to a set.
+func SliceToSet(a []string) Set[string] {
 	m := make(map[string]struct{}, len(a))
 	for _, n := range a {
 		m[n] = struct{}{}
