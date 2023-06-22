@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"strings"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
@@ -71,75 +70,75 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	}
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiterInfo() != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
 			labels[otelconsts.ApertureRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
 			if decision.Dropped {
 				labels[otelconsts.ApertureDroppingRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
 			}
 		}
 		if cl := decision.GetLoadSchedulerInfo(); cl != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
 			labels[otelconsts.ApertureLoadSchedulersLabel].Slice().AppendEmpty().SetStr(value)
 			if decision.Dropped {
 				labels[otelconsts.ApertureDroppingLoadSchedulersLabel].Slice().AppendEmpty().SetStr(value)
 			}
 
-			workloadsRawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value = strings.Join(workloadsRawValue, ",")
-			labels[otelconsts.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+			workloadsValue := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.WorkloadIndexLabel, cl.GetWorkloadIndex(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			labels[otelconsts.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(workloadsValue)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(workloadsValue)
 			}
 		}
 		if decision.GetSamplerInfo() != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
 			labels[otelconsts.ApertureSamplersLabel].Slice().AppendEmpty().SetStr(value)
 			if decision.Dropped {
 				labels[otelconsts.ApertureDroppingSamplersLabel].Slice().AppendEmpty().SetStr(value)
 			}
 		}
 		if cl := decision.GetQuotaSchedulerInfo(); cl != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
 			labels[otelconsts.ApertureQuotaSchedulersLabel].Slice().AppendEmpty().SetStr(value)
 			if decision.Dropped {
 				labels[otelconsts.ApertureDroppingQuotaSchedulersLabel].Slice().AppendEmpty().SetStr(value)
 			}
 
-			workloadsRawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.SchedulerInfo.GetWorkloadIndex()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value = strings.Join(workloadsRawValue, ",")
-			labels[otelconsts.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+			workloadsValue := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.WorkloadIndexLabel, cl.SchedulerInfo.GetWorkloadIndex(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			labels[otelconsts.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(workloadsValue)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(workloadsValue)
 			}
 		}
 	}
@@ -153,23 +152,23 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	}
 
 	for _, classifier := range checkResponse.ClassifierInfos {
-		rawValue := []string{
-			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
-			fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
-		}
-		value := strings.Join(rawValue, ",")
+		value := fmt.Sprintf(
+			"%s:%v,%s:%v",
+			metrics.PolicyNameLabel, classifier.PolicyName,
+			metrics.ClassifierIndexLabel, classifier.ClassifierIndex,
+		)
 		labels[otelconsts.ApertureClassifiersLabel].Slice().AppendEmpty().SetStr(value)
 
 		// add errors as attributes as well
 		if classifier.Error != flowcontrolv1.ClassifierInfo_ERROR_NONE {
-			errorsValue := []string{
+			errorsValue := fmt.Sprintf(
+				"%s,%s:%v,%s:%v,%s:%v",
 				classifier.Error.String(),
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
-				fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, classifier.PolicyHash),
-			}
-			joinedValue := strings.Join(errorsValue, ",")
-			labels[otelconsts.ApertureClassifierErrorsLabel].Slice().AppendEmpty().SetStr(joinedValue)
+				metrics.PolicyNameLabel, classifier.PolicyName,
+				metrics.ClassifierIndexLabel, classifier.ClassifierIndex,
+				metrics.PolicyHashLabel, classifier.PolicyHash,
+			)
+			labels[otelconsts.ApertureClassifierErrorsLabel].Slice().AppendEmpty().SetStr(errorsValue)
 		}
 	}
 
