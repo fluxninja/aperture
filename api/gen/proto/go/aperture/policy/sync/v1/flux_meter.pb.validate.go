@@ -88,6 +88,8 @@ func (m *FluxMeterWrapper) validate(all bool) error {
 
 	// no validation rules for FluxMeterName
 
+	// no validation rules for PolicyName
+
 	if len(errors) > 0 {
 		return FluxMeterWrapperMultiError(errors)
 	}

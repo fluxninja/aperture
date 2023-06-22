@@ -4,13 +4,14 @@ import (
 	"crypto/tls"
 	"fmt"
 	"path"
+	"sync"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	agentconfig "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -50,10 +51,6 @@ func provideAgent(
 	addTracesPipeline(otelCfg, lis)
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
 
-	customConfig := map[string]*policylangv1.InfraMeter{}
-	if err := inframeter.AddInfraMeters(otelCfg, customConfig); err != nil {
-		return nil, fmt.Errorf("adding builtin custom metrics pipelines: %w", err)
-	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 
 	baseOtelCfg, err := otelCfg.Copy()
@@ -62,34 +59,35 @@ func provideAgent(
 	}
 	configProvider := otelconfig.NewProvider("service", otelCfg)
 
-	allInfraMeters := map[string]map[string]*policylangv1.InfraMeter{}
+	allInfraMeters := map[string]*policysyncv1.InfraMeterWrapper{}
+	var allInfraMetersMutex sync.Mutex
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
-		tc := &policylangv1.TelemetryCollector{}
+		tc := &policysyncv1.TelemetryCollectorWrapper{}
 		if err = unmarshaller.UnmarshalKey("", tc); err != nil {
 			log.Error().Err(err).Msg("unmarshalling telemetry collector")
 			return
 		}
-		infraMeters := tc.GetInfraMeters()
+		infraMeters := tc.GetTelemetryCollector().GetInfraMeters()
 		key := string(event.Key)
 
+		allInfraMetersMutex.Lock()
+		defer allInfraMetersMutex.Unlock()
 		switch event.Type {
 		case notifiers.Write:
-			allInfraMeters[key] = infraMeters
+			allInfraMeters[key] = &policysyncv1.InfraMeterWrapper{
+				PolicyName:           tc.GetPolicyName(),
+				TelemetryCollectorId: tc.GetTelemetryCollectorId(),
+				InfraMeter:           infraMeters,
+			}
 		case notifiers.Remove:
 			delete(allInfraMeters, key)
 		}
 
 		// We already checked that the config is copiable, so MustCopy shouldn't panic.
 		otelCfg := baseOtelCfg.MustCopy()
-		ims := map[string]*policylangv1.InfraMeter{}
-		for prefix, v := range allInfraMeters {
-			for k, v := range v {
-				ims[fmt.Sprintf("%s/%s", prefix, k)] = v
-			}
-		}
-		if err := inframeter.AddInfraMeters(otelCfg, ims); err != nil {
+		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			utils.Shutdown(shutdowner)
 			return
