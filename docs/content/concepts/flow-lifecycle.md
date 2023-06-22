@@ -11,9 +11,16 @@ keywords:
 
 ## Flow Lifecycle
 
-To better understand how flows work in Aperture, it is essential to understand
-the lifecycle of a flow. The following diagram shows the lifecycle of a flow in
-Aperture.
+The lifecycle of a flow begins when a service initiates it, requesting a
+decision from the Aperture agent. As the flow enters the Aperture agent, it
+embarks on a journey through multiple stages before a final decision is made.
+The following diagram illustrates these stages and the sequence they follow.
+
+While some stages primarily serve to augment the flow with additional labels or
+provide telemetry, others actively participate in the decision to accept or
+reject the flow. Should a flow be rejected at any such active stage, its journey
+through the subsequent stages is halted, and an immediate decision is dispatched
+back to the service.
 
 <Zoom>
 
@@ -23,31 +30,42 @@ Aperture.
 
 </Zoom>
 
-This diagram elucidates the stages a flow undergoes within the Aperture. The
-stages encompass:
+Outlined below is the sequence of stages in detail, along with their respective
+roles:
 
-- **Selectors**: Act as filters, determining the flow's path based on scoping
-  rules. They identify and direct the flow towards relevant components in line
-  with these rules.
-- **Classifiers**: Responsible for categorizing the flow, utilizing the flow's
-  metadata as their basis.
-- **FluxMeters**: Critical tools that measure the flow's metrics. They convert
-  fluxes into a Prometheus histogram format for an understandable data
-  visualization.
-- **Sampler**: Manages the flow's rate according to the service's health and
-  capacity. The sampler must approve the flow before advancing it to the
-  subsequent stage.
-- **Rate-Limiters**: Proactively guard against recurrent overloads by regulating
-  excessive requests in accordance with per-label limits.
-- **Schedulers**: Govern the efficient processing of requests, favoring critical
-  application features over background workloads. There are two types of
-  schedulers, quota and load, which operate concurrently at the same stage.
-  - The **Load Scheduler** manages the queue of flows before reaching the
-    service, ensuring active service protection and controlling the incoming
-    tokens per second.
-  - The **Quota Scheduler** utilizes a global token bucket as a ledger to manage
-    the distribution of tokens across all agents. It allows for strategic
-    prioritization of requests when hitting quota limits, and is especially
-    effective in environments with strict global rate limits.
+:::note
 
-Once the flow has been processed, the decision is sent back to the originator.
+Remember, a flow may bypass certain or all stages if there are no matching
+components for that stage.
+
+:::
+
+- **Selectors** are the criteria used to determine the components that will be
+  applied to a flow in the subsequent stages.
+- **Classifiers** perform the task of assigning labels to the flow based on the
+  HTTP attributes of the request. However, classifiers are only pertinent for
+  HTTP or gRPC _Control Points_ and do not apply to flows associated with
+  feature _Control Points_.
+- **FluxMeters** are employed to meter the flows, generating metrics like
+  latency, request counts, or other arbitrary telemetry based on access logs.
+  They transform request flux that matches certain criteria into Prometheus
+  histograms, enabling enhanced observability and control.
+- **Samplers** manage load by permitting a portion of flows to be accepted,
+  while immediately dropping the remainder with a forbidden status code. They
+  are particularly useful in scenarios such as feature rollouts.
+- **Rate-Limiters** proactively guard against abuse by regulating excessive
+  requests in accordance with per-label limits.
+- **Schedulers** offer on-demand queuing based on a token bucket algorithm, and
+  prioritize requests using weighted fair queuing. Multiple matching schedulers
+  can evaluate concurrently, with each having the power to drop a flow. There
+  are two variants:
+  - The **Load Scheduler** oversees the current token rate in relation to the
+    past token rate, adjusting as required based on health signals from a
+    service. This scheduler type facilitates active service protection.
+  - The **Quota Scheduler** uses a global token bucket as a ledger, managing the
+    token distribution across all agents. It proves especially effective in
+    environments with strict global rate limits, as it allows for strategic
+    prioritization of requests when reaching quota limits.
+
+After traversing these stages, the flow's decision is sent back to the
+initiating service.
