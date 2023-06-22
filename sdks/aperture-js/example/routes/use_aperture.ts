@@ -1,17 +1,15 @@
 import express from "express";
+
 import { ApertureClient } from "../../sdk/client.js";
-import {
-  FlowStatus,
-  FlowDecision,
-} from "../../sdk/flow.js";
+import { FlowStatus } from "../../sdk/flow.js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient();
 
 export const apertureRoute = express.Router();
-apertureRoute.get("/", function (req, res) {
+apertureRoute.get("/", function (_: express.Request, res: express.Response) {
   // do some business logic to collect labels
-  var labelsMap = new Map().set("user", "kenobi");
+  var labelsMap = new Map<string, string>().set("user", "kenobi");
 
   // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
   apertureClient
@@ -39,6 +37,6 @@ apertureRoute.get("/", function (req, res) {
     });
 });
 
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -2,10 +2,12 @@ import grpc from "@grpc/grpc-js";
 import * as otelApi from "@opentelemetry/api";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { Resource } from "@opentelemetry/resources";
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 
+import { Flow } from "./flow.js";
+import { fcs, FlowControlService } from "./utils.js";
 import {
   FLOW_START_TIMESTAMP_LABEL,
   LIBRARY_NAME,
@@ -14,13 +16,26 @@ import {
   URL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
-import {
-  Flow,
-  FlowDecision
-} from "./flow.js";
-import { fcs } from "./utils.js";
+
+/**
+ * Types to be exported from package
+ */
+export type { FlowControlService, Flow };
+
+type ControlPoint = unknown;
+type Label = [string, string];
 
 export class ApertureClient {
+  public readonly fcsClient: FlowControlService;
+
+  public readonly exporter: OTLPTraceExporter;
+
+  public readonly tracerProvider: NodeTracerProvider;
+
+  public readonly tracer: Tracer;
+
+  public readonly timeout: number;
+
   constructor(timeout = 200) {
     this.fcsClient = new fcs.FlowControlService(
       URL,
@@ -45,25 +60,27 @@ export class ApertureClient {
   // Return value is a Flow.
   // The call returns immediately in case connection with Aperture Agent is not established.
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-  async StartFlow(controlPointArg, labelsArg) {
-    return new Promise((resolve, reject) => {
-      let labelsMap = new Map();
+  async StartFlow(controlPointArg: ControlPoint, labelsArg: Iterable<Label>) {
+    return new Promise<Flow>((resolve, reject) => {
+      let labelsMap = new Map<string, string>();
       let baggage = otelApi.propagation.getBaggage(otelApi.context.active());
+
       if (baggage !== undefined) {
         for (const member of baggage.getAllEntries()) {
-          labelsMap[member[0]] = member[1].value;
+          labelsMap.set(member[0], member[1].value);
         }
       }
 
-      let mergedLabels = new Map([...labelsMap, ...labelsArg]);
+      let mergedLabels = new Map<string, string>([...labelsMap, ...labelsArg]);
       let span = this.tracer.startSpan("Aperture Check");
       span.setAttribute(FLOW_START_TIMESTAMP_LABEL, Date.now());
       span.setAttribute(SOURCE_LABEL, "sdk");
       let flow = new Flow(span);
 
-      let checkParams = {};
+      let checkParams = { deadline: 0};
       if (this.timeout != null && this.timeout != 0) {
-        checkParams.deadline = Date.now() + this.timeout;
+        checkParams =
+        { deadline : Date.now() + this.timeout };
       }
 
       this.fcsClient.Check(
