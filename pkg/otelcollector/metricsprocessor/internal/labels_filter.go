@@ -5,6 +5,7 @@ import (
 
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 /*
@@ -47,8 +48,8 @@ var (
 		otelconsts.ApertureFlowStatusLabel,
 	}
 
-	includeListHTTP = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesHTTP...))
-	includeListSDK  = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesSDK...))
+	includeListHTTP = utils.SliceToSet(append(_includeAttributesCommon, _includeAttributesHTTP...))
+	includeListSDK  = utils.SliceToSet(append(_includeAttributesCommon, _includeAttributesSDK...))
 )
 
 // EnforceIncludeListHTTP filters attributes for HTTP telemetry.
