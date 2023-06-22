@@ -60,7 +60,7 @@ func provideAgent(
 	configProvider := otelconfig.NewProvider("service", otelCfg)
 
 	allInfraMeters := map[string]*policysyncv1.InfraMeterWrapper{}
-	var allInfraMetersMutex sync.Mutex
+	var allInfraMetersMutex sync.RWMutex
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
@@ -89,11 +89,14 @@ func provideAgent(
 
 		// We already checked that the config is copiable, so MustCopy shouldn't panic.
 		otelCfg := baseOtelCfg.MustCopy()
-		if err := inframeter.AddInfraMeters(otelCfg, tc.GetPolicyName(), tc.GetTelemetryCollectorId(), allInfraMeters); err != nil {
+		allInfraMetersMutex.RLock()
+		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
+			allInfraMetersMutex.RUnlock()
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			utils.Shutdown(shutdowner)
 			return
 		}
+		allInfraMetersMutex.RUnlock()
 		// trigger update
 		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(allInfraMeters))
 		configProvider.UpdateConfig(otelCfg)

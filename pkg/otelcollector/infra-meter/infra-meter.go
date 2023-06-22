@@ -18,8 +18,6 @@ import (
 // AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
 func AddInfraMeters(
 	config *otelconfig.Config,
-	policyName string,
-	telemetryCollectorID int64,
 	infraMeters map[string]*policysyncv1.InfraMeterWrapper,
 ) error {
 	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
