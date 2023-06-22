@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"path"
+	"sync"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
@@ -59,6 +60,7 @@ func provideAgent(
 	configProvider := otelconfig.NewProvider("service", otelCfg)
 
 	allInfraMeters := map[string]*policysyncv1.InfraMeterWrapper{}
+	var allInfraMetersMutex sync.Mutex
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
@@ -72,13 +74,17 @@ func provideAgent(
 
 		switch event.Type {
 		case notifiers.Write:
+			allInfraMetersMutex.Lock()
 			allInfraMeters[key] = &policysyncv1.InfraMeterWrapper{
 				PolicyName:           tc.GetPolicyName(),
 				TelemetryCollectorId: tc.GetTelemetryCollectorId(),
 				InfraMeter:           infraMeters,
 			}
+			allInfraMetersMutex.Unlock()
 		case notifiers.Remove:
+			allInfraMetersMutex.Lock()
 			delete(allInfraMeters, key)
+			allInfraMetersMutex.Unlock()
 		}
 
 		// We already checked that the config is copiable, so MustCopy shouldn't panic.
