@@ -59,14 +59,15 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		// CheckResponse
 		checkResponse := &flowcontrolv1.CheckResponse{}
 
-		enusureCapacity := func() {
+		ensureCapacity := func() {
 			capacity := attributes.Len() +
 				5 + // EnvoySpecificLabels
 				1 + // FlowStatus
 				17 + // CheckResponse
 				len(checkResponse.GetTelemetryFlowLabels())
 			_ = capacity
-			// pcommon.Map.EnsureCapcity is broken!
+			// Not calling EnsureCapacity as it's broken:
+			// https://github.com/open-telemetry/opentelemetry-collector/issues/7955
 			// attributes.EnsureCapacity(capacity)
 		}
 
@@ -85,7 +86,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				return otelcollector.Discard
 			}
 
-			enusureCapacity()
+			ensureCapacity()
 			internal.AddSDKSpecificLabels(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
@@ -95,7 +96,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				return otelcollector.Discard
 			}
 
-			enusureCapacity()
+			ensureCapacity()
 			internal.AddEnvoySpecificLabels(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceLua {
 			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{""})
@@ -105,7 +106,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				return otelcollector.Discard
 			}
 
-			enusureCapacity()
+			ensureCapacity()
 			internal.AddLuaSpecificLabels(attributes)
 		} else {
 			log.Sample(unrecognizedSourceLabelSampler).Warn().
