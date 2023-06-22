@@ -59,6 +59,17 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		// CheckResponse
 		checkResponse := &flowcontrolv1.CheckResponse{}
 
+		enusureCapacity := func() {
+			capacity := attributes.Len() +
+				5 + // EnvoySpecificLabels
+				1 + // FlowStatus
+				17 + // CheckResponse
+				len(checkResponse.GetTelemetryFlowLabels())
+			_ = capacity
+			// pcommon.Map.EnsureCapcity is broken!
+			// attributes.EnsureCapacity(capacity)
+		}
+
 		// Source specific processing
 		source, exists := attributes.Get(otelconsts.ApertureSourceLabel)
 		if !exists {
@@ -74,6 +85,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				return otelcollector.Discard
 			}
 
+			enusureCapacity()
 			internal.AddSDKSpecificLabels(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
 			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
@@ -83,6 +95,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				return otelcollector.Discard
 			}
 
+			enusureCapacity()
 			internal.AddEnvoySpecificLabels(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceLua {
 			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{""})
@@ -92,6 +105,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				return otelcollector.Discard
 			}
 
+			enusureCapacity()
 			internal.AddLuaSpecificLabels(attributes)
 		} else {
 			log.Sample(unrecognizedSourceLabelSampler).Warn().
