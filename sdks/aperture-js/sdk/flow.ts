@@ -28,9 +28,8 @@ export class Flow {
   ) {}
 
   ShouldRun() {
-    if (this.checkResponse === undefined || this.checkResponse === null) {
-      return true;
-    }
+    var decision = this.Decision();
+    return decision === FlowDecision.Accepted || (this.failOpen && decision === FlowDecision.Unreachable)
   }
 
   DisableFailOpen() {
@@ -38,10 +37,10 @@ export class Flow {
     }
 
   Decision() {
-    if (this.checkResponse === undefined) {
+    if (this.checkResponse === undefined || this.checkResponse === null) {
       return FlowDecision.Unreachable;
     }
-    if (this.checkResponse!.decisionType === "DECISION_TYPE_ACCEPTED") {
+    if (this.checkResponse.decisionType === "DECISION_TYPE_ACCEPTED") {
       return FlowDecision.Accepted;
     }
     return FlowDecision.Rejected;
