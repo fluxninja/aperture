@@ -22,7 +22,7 @@ metadata:
       "selectors": [{"control_point": "service1-demo-app", "label_matcher": {"match_labels":
       {"http.target": "/service1/request"}}, "service": "kong-server.demoapp.svc.cluster.local"}]}]}},
       "service_protection_core": {"adaptive_load_scheduler": {"load_multiplier_linear_increment":
-      0.0025000000000000001, "load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
+      0.025000000000000001, "load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
       {"match_labels": {"user_type": "guest"}}, "name": "guest", "parameters": {"priority":
       "50"}}, {"label_matcher": {"match_labels": {"http.request.header.user_type":
       "subscriber"}}, "name": "subscriber", "parameters": {"priority": "200"}}]},
@@ -58,7 +58,7 @@ spec:
               max_gradient: 1
               min_gradient: 0.1
               slope: -1
-            load_multiplier_linear_increment: 0.0025
+            load_multiplier_linear_increment: 0.025
             load_scheduler:
               scheduler:
                 workloads:

@@ -47,7 +47,7 @@ spec:
               max_gradient: 1
               min_gradient: 0.1
               slope: -1
-            load_multiplier_linear_increment: 0.0025
+            load_multiplier_linear_increment: 0.025
             load_scheduler:
               scheduler:
                 workloads:
