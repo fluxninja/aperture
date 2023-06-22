@@ -262,12 +262,13 @@ def update_param_defaults(
         parts = name.split(".")
         config = root
         for idx, part in enumerate(parts):
+            # logger.info(f"part = {part}, idx = {idx}, len(parts) = {len(parts)-1}")
             if idx == len(parts) - 1:
                 try:
                     return config[part]
                 except KeyError:
                     # fatal exit
-                    logger.error(f"Unable to find param {name} in rendered config")
+                    # logger.error(f"Unable to find param {name} in rendered config")
                     raise typer.Exit(1)
             else:
                 try:
@@ -277,18 +278,22 @@ def update_param_defaults(
                     # Also, when specific param is a map (map[string]type) and there is no default
                     # then we return None here, which will be converted into an empty map later.
                     return None
+                
+    # logger.info(rendered_config)
 
-    logger.trace(rendered_config)
     # walk nested_parameters and update defaults
-
     def update_nested_param_defaults(node, prefix=""):
+        logger.info(f"\n Updating default for {prefix} in {node}")
         if node.parameter.param_type != "intermediate_node":
+            # logger.info(f"Updating default for {prefix} not intermediate node")
             default = get_param_default_from_rendered_config(
                 rendered_config["_config"], prefix
             )
+            logger.info(f"Default for {prefix} is {default}")
             if default is not None:
                 node.parameter.default = default
         for key, child in node.children.items():
+            # logger.info(f"Updating default for {prefix}")
             if prefix != "":
                 keyPrefix = f"{prefix}.{key}"
             else:
@@ -296,8 +301,15 @@ def update_param_defaults(
             update_nested_param_defaults(child, keyPrefix)
 
     update_nested_param_defaults(parameters.nested_parameters)
+    # build a list of keys to delete if the default is None
+    delete = [key for key in parameters.nested_parameters.children if parameters.nested_parameters.children[key].parameter.default is None]
+    # delete the keys
+    for key in delete: del parameters.nested_parameters.children[key]
     update_nested_param_defaults(parameters.nested_required_parameters)
-
+    # build a list of keys to delete if the default is None
+    delete = [key for key in parameters.nested_required_parameters.children if parameters.nested_required_parameters.children[key].parameter.default is None]
+    # delete the keys
+    for key in delete: del parameters.nested_required_parameters.children[key]
 
 MARKDOWN_DOC_TPL = """
 {%- macro render_type(param_type, is_complex_type) %}
