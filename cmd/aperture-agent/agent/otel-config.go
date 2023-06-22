@@ -72,23 +72,22 @@ func provideAgent(
 		infraMeters := tc.GetTelemetryCollector().GetInfraMeters()
 		key := string(event.Key)
 
+		allInfraMetersMutex.Lock()
+		defer allInfraMetersMutex.Unlock()
 		switch event.Type {
 		case notifiers.Write:
-			allInfraMetersMutex.Lock()
 			allInfraMeters[key] = &policysyncv1.InfraMeterWrapper{
 				PolicyName:           tc.GetPolicyName(),
 				TelemetryCollectorId: tc.GetTelemetryCollectorId(),
 				InfraMeter:           infraMeters,
 			}
 		case notifiers.Remove:
-			allInfraMetersMutex.Lock()
 			delete(allInfraMeters, key)
 		}
 
 		// We already checked that the config is copiable, so MustCopy shouldn't panic.
 		otelCfg := baseOtelCfg.MustCopy()
 		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
-			allInfraMetersMutex.Unlock()
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			utils.Shutdown(shutdowner)
 			return
@@ -96,7 +95,6 @@ func provideAgent(
 		// trigger update
 		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(allInfraMeters))
 		configProvider.UpdateConfig(otelCfg)
-		allInfraMetersMutex.Unlock()
 	}
 
 	// Get Agent Group from host info gatherer
