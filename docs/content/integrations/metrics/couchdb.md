@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          couchdb:
-            per_agent_group: true
-            receivers:
-              couchdb: [couchdbreceiver configuration here]
+    infra_meters:
+      couchdb:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          couchdb: [couchdbreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

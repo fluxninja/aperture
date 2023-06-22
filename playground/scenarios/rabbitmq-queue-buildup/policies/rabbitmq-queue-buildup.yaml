@@ -9,19 +9,18 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-          - agent_group: default
-            control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+        - agent_group: default
+          control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local
   setpoint: 1000
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
+    infra_meters:
+      rabbitmq:
+        agent_group: default
+        per_agent_group: true
+        receivers:
           rabbitmq:
-            per_agent_group: true
-            receivers:
-              rabbitmq:
-                endpoint: http://rabbitmq.rabbitmq.svc.cluster.local:15672
-                username: admin
-                password: secretpassword
-                collection_interval: 1s
+            endpoint: http://rabbitmq.rabbitmq.svc.cluster.local:15672
+            username: admin
+            password: secretpassword
+            collection_interval: 1s

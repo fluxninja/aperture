@@ -32,13 +32,12 @@ Pure Storage FlashBlade as part of [Policy resources][policy-resources] while
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          purefb:
-            per_agent_group: true
-            receivers:
-              purefb: [purefbreceiver configuration here]
+    infra_meters:
+      purefb:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          purefb: [purefbreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

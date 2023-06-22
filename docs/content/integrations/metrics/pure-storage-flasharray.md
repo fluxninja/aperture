@@ -32,13 +32,12 @@ Pure Storage FlashArray as part of [Policy resources][policy-resources] while
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          purefa:
-            per_agent_group: true
-            receivers:
-              purefa: [purefareceiver configuration here]
+    infra_meters:
+      purefa:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          purefa: [purefareceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

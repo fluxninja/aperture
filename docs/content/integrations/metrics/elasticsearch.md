@@ -32,13 +32,12 @@ the policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          elasticsearch:
-            per_agent_group: true
-            receivers:
-              elasticsearch: [elasticsearchreceiver configuration here]
+    infra_meters:
+      elasticsearch:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          elasticsearch: [elasticsearchreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

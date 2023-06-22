@@ -31,13 +31,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          riak:
-            per_agent_group: true
-            receivers:
-              riak: [riakreceiver configuration here]
+    infra_meters:
+      riak:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          riak: [riakreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

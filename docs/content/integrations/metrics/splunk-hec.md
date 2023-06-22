@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          splunk_hec:
-            per_agent_group: true
-            receivers:
-              splunk_hec: [splunkhecreceiver configuration here]
+    infra_meters:
+      splunk_hec:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          splunk_hec: [splunkhecreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
