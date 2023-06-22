@@ -5,7 +5,8 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const PROTO_PATH = path.resolve(
   path.dirname(__filename),
-  "../proto/flowcontrol/check/v1/check.proto",
+  // NOTE: path valid for js files (nested in "lib" directory)
+  "../../proto/flowcontrol/check/v1/check.proto",
 );
 
 const fn_host = process.env.FN_AGENT_HOST
