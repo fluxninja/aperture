@@ -37,6 +37,15 @@ module.exports = {
       },
     ],
   },
+  devServer: {
+    port: 9099,
+    proxy: {
+      '/request': {
+        target: 'http://service1-demo-app.demoapp.svc.cluster.local',
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
