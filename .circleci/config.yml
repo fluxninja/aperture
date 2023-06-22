@@ -140,7 +140,7 @@ workflows:
           config-path: .circleci/continue-workflows.yml
           mapping: |
             .dockerignore updated-aperture true
-            (cmd|pkg|plugins|api|test)/.* updated-aperture true
+            (cmd|pkg|extensions|api|test)/.* updated-aperture true
             packaging/agent/.* updated-aperture-agent-packaging true
             packaging/cli/.* updated-aperturectl-packaging true
             operator/(api|config|controllers|hack)/.*|operator/main.go updated-aperture-operator true
