@@ -56,6 +56,11 @@ local kubernetes_replicas_defaults = {
     },
     evaluation_interval: '1s',
     service_protection_core: service_protection_core_defaults,
+    auto_scaling: auto_scaling_defaults {
+      scaling_backend+: {
+        kubernetes_replicas: kubernetes_replicas_defaults,
+      },
+    },
   },
 
   dashboard: {
@@ -70,12 +75,6 @@ local kubernetes_replicas_defaults = {
   },
 
   selectors: selectors_defaults,
-
-  auto_scaling: auto_scaling_defaults {
-    scaling_backend+: {
-      kubernetes_replicas: kubernetes_replicas_defaults,
-    },
-  },
 
   auto_scaling_pods: auto_scaling_defaults {
     scaling_backend+: {
