@@ -127,8 +127,9 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="service1-demo-app"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app",
+            policy_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app", policy_name="service1-demo-app"}[5s]))
     - arithmetic_combinator:
         in_ports:
           lhs:

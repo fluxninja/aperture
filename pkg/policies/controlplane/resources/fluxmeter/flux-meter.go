@@ -67,6 +67,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 			wrapper := &policysyncv1.FluxMeterWrapper{
 				FluxMeterName: configSync.fluxMeterName,
 				FluxMeter:     configSync.fluxMeterProto,
+				PolicyName:    configSync.policyReadAPI.GetPolicyName(),
 			}
 
 			// Marshal the wrapper using protobuf.

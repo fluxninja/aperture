@@ -9,4 +9,6 @@ message FluxMeterWrapper {
   policy.language.v1.FluxMeter flux_meter = 1;
   // Name of Flux Meter metric.
   string flux_meter_name = 4;
+  // Name of the Policy.
+  string policy_name = 5;
 }
