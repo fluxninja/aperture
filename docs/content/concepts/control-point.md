@@ -38,15 +38,16 @@ HTTP Control Points use web framework and service-mesh-based integrations to
 establish Control Points in the traffic path of a service.
 
 In principle, any web proxy or web framework can be integrated with Aperture
-using this method. These integrations use Envoy's External Authorization API,
-and there are ready integrations available for many popular web frameworks.
+using this method. There are ready integrations available for many popular web
+frameworks.
 
-For example, instructions for integration with
-[Istio/Envoy](/integrations/istio/istio.md) are provided. In such a setup, the
-Control Point can be labeled to identify a specific filter chain in Envoy. If
-insertion is achieved via Istio, the default filter configuration designates
-ingress and egress Control Points as identified by
-[Istio](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext).
+The integration with Envoy uses the External Authorization API. In such a setup,
+the Control Point can be labeled to identify a specific filter chain in Envoy.
+If insertion is achieved using the
+[Istio integration](/integrations/istio/istio.md), the default filter
+configuration designates `ingress` and `egress` Control Points as identified by
+[PatchContext](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext)
+of Istio's EnvoyFilter CRD.
 
 ### Feature Control Points
 
