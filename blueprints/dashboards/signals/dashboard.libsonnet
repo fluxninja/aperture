@@ -18,7 +18,7 @@ function(cfg) {
     graphPanel.new(
       title='Signal Average - ${signal_name} (${sub_circuit_id})',
       datasource=dsName,
-      interval='15s',
+      interval='30s',
     )
     .addTarget(
       prometheus.target(
@@ -35,7 +35,7 @@ function(cfg) {
     graphPanel.new(
       title='Signal Validity (Frequency) - ${signal_name} (${sub_circuit_id})',
       datasource=dsName,
-      interval='15s',
+      interval='30s',
       stack=true,
       bars=true,
     )

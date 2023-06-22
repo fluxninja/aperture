@@ -10,7 +10,7 @@ local newGraphPanel(title, datasource, query, axisLabel='', unit='') =
   graphPanel.new(
     title=title,
     datasource=datasource,
-    interval='15s',
+    interval='30s',
     labelY1=axisLabel,
     formatY1=unit,
   )
@@ -63,7 +63,7 @@ local dashboardWithPanels(dashboardParams, filters) =
 function(cfg) {
   local params = config + cfg,
   local policyName = params.policy.policy_name,
-  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { flux_meter_name: policyName, flow_status: 'OK' }),
+  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { flux_meter_name: policyName, policy_name: policyName, flow_status: 'OK' }),
 
   local dashboardDef = dashboardWithPanels(params.dashboard, filters),
 

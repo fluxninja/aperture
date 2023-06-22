@@ -35,7 +35,7 @@
           }
         },
         "components": [],
-        "evaluation_interval": "5s",
+        "evaluation_interval": "10s",
         "policy_name": "__REQUIRED_FIELD__",
         "promql_query": "__REQUIRED_FIELD__",
         "resources": {
@@ -80,7 +80,7 @@
           "name": "$datasource"
         },
         "extra_filters": {},
-        "refresh_interval": "15s",
+        "refresh_interval": "5s",
         "time_from": "now-15m",
         "time_to": "now",
         "title": "Aperture Service Protection",

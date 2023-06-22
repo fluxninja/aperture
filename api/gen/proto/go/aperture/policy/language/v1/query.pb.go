@@ -122,7 +122,7 @@ type PromQL struct {
 	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`
 	// Describes the interval between successive evaluations of the Prometheus query.
-	EvaluationInterval *durationpb.Duration `protobuf:"bytes,3,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"5s"` // @gotags: default:"5s"
+	EvaluationInterval *durationpb.Duration `protobuf:"bytes,3,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"10s"` // @gotags: default:"10s"
 }
 
 func (x *PromQL) Reset() {

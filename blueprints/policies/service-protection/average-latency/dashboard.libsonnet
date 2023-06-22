@@ -10,7 +10,7 @@ function(cfg) {
   local params = config + cfg,
   local policyName = params.policy.policy_name,
   local variantName = params.dashboard.variant_name,
-  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { flux_meter_name: policyName, flow_status: 'OK' }),
+  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { flux_meter_name: policyName, policy_name: policyName, flow_status: 'OK' }),
 
   local baseDashboard = baseDashboardFn(params),
 
@@ -18,7 +18,7 @@ function(cfg) {
     graphPanel.new(
       title=variantName + ' Query',
       datasource=params.dashboard.datasource.name,
-      interval='15s',
+      interval='30s',
       labelY1='Latency (ms)',
       formatY1='ms',
     ).addTarget(

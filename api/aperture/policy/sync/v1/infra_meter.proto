@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/telemetry_collector.proto";
+
+message InfraMeterWrapper {
+  // Infra Meters
+  map<string, policy.language.v1.InfraMeter> infra_meter = 1;
+  // Name of Flux Meter metric.
+  int64 telemetry_collector_id = 2;
+  // Name of the Policy.
+  string policy_name = 3;
+}

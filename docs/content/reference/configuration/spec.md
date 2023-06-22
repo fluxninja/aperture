@@ -1170,7 +1170,7 @@ Defines a signal processing graph as a list of components.
 
 <!-- vale off -->
 
-(string, default: `"5s"`)
+(string, default: `"10s"`)
 
 <!-- vale on -->
 
@@ -5807,7 +5807,7 @@ output signal
 
 <!-- vale off -->
 
-(string, default: `"5s"`)
+(string, default: `"10s"`)
 
 <!-- vale on -->
 

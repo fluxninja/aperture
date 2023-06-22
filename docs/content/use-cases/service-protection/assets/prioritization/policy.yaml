@@ -64,13 +64,13 @@ spec:
               max_load_multiplier: 2
       - query:
           promql:
-            evaluation_interval: 5s
+            evaluation_interval: 10s
             out_ports:
               output:
                 signal_name: SIGNAL
             query_string:
-              sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization"}[15s]))/sum(increase(flux_meter_count{flow_status="OK",
-              flux_meter_name="workload-prioritization"}[15s]))
+              sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+              flux_meter_name="workload-prioritization"}[30s]))
       - arithmetic_combinator:
           in_ports:
             lhs:
@@ -107,7 +107,7 @@ spec:
             max_load_multiplier: 2
       - query:
           promql:
-            evaluation_interval: 5s
+            evaluation_interval: 10s
             out_ports:
               output:
                 signal_name: MAX_EMA
@@ -135,7 +135,7 @@ spec:
           out_ports:
             output:
               signal_name: SETPOINT
-    evaluation_interval: 5s
+    evaluation_interval: 10s
   resources:
     flow_control:
       classifiers: []

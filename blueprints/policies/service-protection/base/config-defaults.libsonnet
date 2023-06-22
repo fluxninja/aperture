@@ -54,7 +54,7 @@ local kubernetes_replicas_defaults = {
         classifiers: [],
       },
     },
-    evaluation_interval: '5s',
+    evaluation_interval: '10s',
     service_protection_core: service_protection_core_defaults,
   },
 

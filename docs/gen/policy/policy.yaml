@@ -499,13 +499,13 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
-                default: 5s
+                default: 10s
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
                 type: string
-                x-go-tag-default: 5s
+                x-go-tag-default: 10s
         type: object
     Classifier:
         description: |-
@@ -2396,12 +2396,12 @@ definitions:
     PromQL:
         properties:
             evaluation_interval:
-                default: 5s
+                default: 10s
                 description: |+
                     Describes the interval between successive evaluations of the Prometheus query.
 
                 type: string
-                x-go-tag-default: 5s
+                x-go-tag-default: 10s
             out_ports:
                 $ref: '#/definitions/PromQLOuts'
                 description: Output ports for the PromQL component.

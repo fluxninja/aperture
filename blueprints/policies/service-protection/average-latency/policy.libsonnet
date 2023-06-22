@@ -14,10 +14,10 @@ function(cfg, metadata={}) {
         spec.v1.Component.withQuery(
           spec.v1.Query.new()
           + spec.v1.Query.withPromql(
-            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s"}[15s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s"}[15s]))' % { policy_name: params.policy.policy_name };
+            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[30s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[30s]))' % { policy_name: params.policy.policy_name };
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
-            + spec.v1.PromQL.withEvaluationInterval('5s')
+            + spec.v1.PromQL.withEvaluationInterval('10s')
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),

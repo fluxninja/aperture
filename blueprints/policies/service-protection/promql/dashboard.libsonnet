@@ -16,7 +16,7 @@ function(cfg) {
     graphPanel.new(
       title=variantName + ' Query',
       datasource=params.dashboard.datasource.name,
-      interval='15s',
+      interval='30s',
       labelY1='Messages',
     ).addTarget(
       prometheus.target(

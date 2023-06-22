@@ -95,7 +95,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The interval between successive evaluations of the Circuit.'
     type='string'
     reference=''
-    value='"5s"'
+    value='"10s"'
 />
 
 <!-- vale on -->
@@ -289,7 +289,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='Refresh interval for dashboard panels.'
     type='string'
     reference=''
-    value='"15s"'
+    value='"5s"'
 />
 
 <!-- vale on -->

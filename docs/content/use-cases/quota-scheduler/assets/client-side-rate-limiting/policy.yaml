@@ -47,7 +47,7 @@ spec:
                     priority: 200
             selectors:
               - control_point: some-external-api
-    evaluation_interval: 5s
+    evaluation_interval: 10s
   resources:
     flow_control:
       classifiers: []

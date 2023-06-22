@@ -31,7 +31,7 @@ spec:
               - agent_group: default
                 control_point: ingress
                 service: catalog-service.prod.svc.cluster.local
-    evaluation_interval: 5s
+    evaluation_interval: 10s
   resources:
     flow_control:
       classifiers: []
