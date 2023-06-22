@@ -17,6 +17,7 @@ policy:
           - control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
   latency_baseliner:
+    latency_tolerance_multiplier: 1.1
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter
     # Required: True

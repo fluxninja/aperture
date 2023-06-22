@@ -22,39 +22,47 @@ blueprint.
 
 :::
 
-## Policy Overview
+## Overview
 
 Responding to fluctuating service demand is a common challenge for maintaining
-stable and responsive services. This policy, based on the Service Protection
-with Load-based Pod Auto-Scaler
-[blueprint](/reference/blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md),
-presents an evolved strategy to tackle the surges of service demands. It
-introduces a mechanism to dynamically scale the service resources based on
-observed load, thereby optimizing resource allocation and maintaining a balanced
-system.
+stable and responsive services. This policy introduces a mechanism to
+dynamically scale service resources based on observed load, optimizing resource
+allocation and ensuring that the service remains responsive even under high
+load.
 
-This policy employs two key strategies: it protects the service from sudden
-traffic spikes, and it ensures the service scales proportionally to accommodate
-sustained load changes. An
-[_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component is
-used to dynamically adjust the number of service instances in response to
-changes in load and CPU utilization. This load-based auto-scaling is enacted by
-a scale-out Controller that reads
-[_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md) signals,
-effectively throttling traffic into a queue and scaling resources to match the
-demand.
+This policy employs two key strategies: service protection and auto-scaling.
 
-## Policy Configuration
+1. Service Protection: Based on the trend of observed latency, the service gets
+   protected from sudden traffic spikes using a
+   [_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md)
+   component. Load on the service is throttled when the observed latency exceeds
+   the long-term trend by a certain percentage threshold. This ensures the
+   service stays responsive even under high load.
+2. Auto-Scaling: The auto-scaling strategy is based on the throttling behavior
+   of the service protection policy. An
+   [_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component is
+   used to dynamically adjust the number of service instances in response to
+   changes in load. This load-based auto-scaling is enacted by a scale-out
+   Controller that reads Load Scheduler signals. The service replicas are scaled
+   out when the load is being throttled, effectively scaling resources to match
+   the demand. During periods of low load, the policy attempts to scale in after
+   periodic intervals to reduce excess replicas.
 
-This policy, ensures optimized performance at the selected
-**`service1-demo-app.demoapp.svc.cluster.local`**, by applying a service
-protection policy based on the average latency of the service. Based on the
-latency, it performs auto-scaling of Kubernetes replicas for the selected
-service, with a minimum of 1 and a maximum of 10 replicas.
+By combining service protection with auto-scaling, this policy ensures that the
+number of service replicas is adjusted to match persistent changes in demand,
+maintaining service stability and responsiveness.
 
-To prevent frequent fluctuation, scale-in and scale-out cooldown periods of 40
-and 30 seconds are defined. The **`dry_run`** parameter is set to false, meaning
-the auto-scaling function is active.
+## Configuration
+
+This policy, provides protection against overloads at the
+**`search-service.prod.svc.cluster.local`** service. Auto-scaling is applied to
+the Deployment `search-service` with a minimum of `1` and a maximum of `10`
+replicas.
+
+To prevent frequent fluctuation in replicas, scale-in and scale-out cooldown
+periods are set to `40` and `30` seconds, respectively. A periodic scale-in
+interval of `60` seconds is also set to reduce excess replicas during periods of
+low load.
 
 ```mdx-code-block
 <Tabs>
@@ -86,21 +94,20 @@ the auto-scaling function is active.
 
 :::
 
-### Playground
+### Policy in Action
 
-When the above policy is loaded in Aperture's
-[Playground](https://github.com/fluxninja/aperture/blob/main/playground/README.md),
-it can be observed that as the response latency increases, the service
-protection policy queues a proportion of requests. The _Auto Scaler_ makes a
-scale-out decision as the `OBSERVED_LOAD_MULTIPLIER` becomes less than 1. As
-replicas get added to the deployment, the `OBSERVED_LOAD_MULTIPLIER` increases
-to more than 1, allowing the service to meet increased demand. The response
-latency returns to a normal range, and the _Load Scheduler_ won't throttle any
-traffic.
+During transient load spikes, the response latency on the service increases. The
+service protection policy queues a proportion of the incoming requests. The
+_Auto Scaler_ makes a scale-out decision as the `OBSERVED_LOAD_MULTIPLIER` falls
+below 1. This triggers the auto-scale policy, which scales up the deployment.
+With the additional replicas in the deployment, the service is now better
+equipped to handle the increased load. The `OBSERVED_LOAD_MULTIPLIER` rises
+above 1, enabling the service to meet the heightened demand. As a result, the
+response latency returns to a normal range, and the Load Scheduler ceases
+throttling.
 
-After the scale-out cooldown period, the scale-in based on CPU utilization gets
-triggered, which will cause the replicas to decrease. Once the traffic ramps up
-again, the above cycle continues.
+After the scale-out cooldown period, the periodic scale-in function is
+triggered, which reduces the number of replicas in response to decreased load.
 
 <Zoom>
 

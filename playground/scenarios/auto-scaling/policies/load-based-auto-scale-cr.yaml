@@ -12,9 +12,10 @@ metadata:
       {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter":
       {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}},
       "latency_baseliner": {"flux_meter": {"selectors": [{"control_point": "ingress",
-      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
-      "load-based-auto-scale", "service_protection_core": {"adaptive_load_scheduler":
-      {"load_scheduler": {"selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
+      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}, "latency_tolerance_multiplier":
+      1.1000000000000001}, "policy_name": "load-based-auto-scale", "service_protection_core":
+      {"adaptive_load_scheduler": {"load_scheduler": {"selectors": [{"control_point":
+      "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: load-based-auto-scale
@@ -98,8 +99,9 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="load-based-auto-scale"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="load-based-auto-scale"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="load-based-auto-scale",
+            policy_name="load-based-auto-scale"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="load-based-auto-scale", policy_name="load-based-auto-scale"}[5s]))
     - arithmetic_combinator:
         in_ports:
           lhs:

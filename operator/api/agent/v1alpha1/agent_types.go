@@ -19,6 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	"github.com/fluxninja/aperture/v2/operator/api/common"
@@ -29,7 +31,6 @@ import (
 	peers "github.com/fluxninja/aperture/v2/pkg/peers/config"
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.

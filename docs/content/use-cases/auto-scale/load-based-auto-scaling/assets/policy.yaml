@@ -7,14 +7,15 @@ metadata:
     fluxninja.com/values: '{"policy": {"auto_scaling": {"dry_run": false, "periodic_decrease":
       {"period": "60s", "scale_in_percentage": 10}, "scaling_backend": {"kubernetes_replicas":
       {"kubernetes_object_selector": {"agent_group": "default", "api_version": "apps/v1",
-      "kind": "Deployment", "name": "service1-demo-app", "namespace": "demoapp"},
-      "max_replicas": "10", "min_replicas": "1"}}, "scaling_parameters": {"scale_in_alerter":
-      {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter":
+      "kind": "Deployment", "name": "search-service", "namespace": "prod"}, "max_replicas":
+      "10", "min_replicas": "1"}}, "scaling_parameters": {"scale_in_alerter": {"alert_name":
+      "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter":
       {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}},
       "latency_baseliner": {"flux_meter": {"selectors": [{"control_point": "ingress",
-      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}, "policy_name":
-      "load-based-auto-scale", "service_protection_core": {"adaptive_load_scheduler":
-      {"load_scheduler": {"selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
+      "service": "search-service.prod.svc.cluster.local"}]}, "latency_tolerance_multiplier":
+      1.1000000000000001}, "policy_name": "load-based-auto-scale", "service_protection_core":
+      {"adaptive_load_scheduler": {"load_scheduler": {"selectors": [{"control_point":
+      "ingress", "service": "search-service.prod.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: load-based-auto-scale
@@ -49,7 +50,7 @@ spec:
             load_scheduler:
               selectors:
               - control_point: ingress
-                service: service1-demo-app.demoapp.svc.cluster.local
+                service: search-service.prod.svc.cluster.local
             max_load_multiplier: 2
     - auto_scale:
         auto_scaler:
@@ -81,8 +82,8 @@ spec:
                 agent_group: default
                 api_version: apps/v1
                 kind: Deployment
-                name: service1-demo-app
-                namespace: demoapp
+                name: search-service
+                namespace: prod
               max_replicas: "10"
               min_replicas: "1"
           scaling_parameters:
@@ -143,4 +144,4 @@ spec:
         load-based-auto-scale:
           selectors:
           - control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
+            service: search-service.prod.svc.cluster.local
