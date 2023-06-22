@@ -137,8 +137,12 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 				infraMeters = make(map[string]*policylangv1.InfraMeter)
 			}
 			for name, infraMeter := range tc.GetInfraMeters() {
-				infraMeter.AgentGroup = tc.GetAgentGroup()
-				infraMeters[name] = infraMeter
+				if _, exists := infraMeters[name]; !exists {
+					infraMeter.AgentGroup = tc.GetAgentGroup()
+					infraMeters[name] = infraMeter
+				} else {
+					return nil, nil, nil, fmt.Errorf("duplicate infra meter name '%s' found in telemetry_collectors and infra_meters", name)
+				}
 			}
 		}
 

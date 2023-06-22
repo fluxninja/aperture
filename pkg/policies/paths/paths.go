@@ -72,7 +72,7 @@ func FluxMeterKey(agentGroupName, fluxMeterName string) string {
 	return AgentGroupPrefix(agentGroupName) + "-flux_meter-" + fluxMeterName
 }
 
-// InfraMeterKey returns the identifier for TelemetryCollector in etcd.
+// InfraMeterKey returns the identifier for InfraMeter in etcd.
 func InfraMeterKey(agentGroupName, policyName, infraMeterName string) string {
 	return PolicyPrefix(agentGroupName, policyName) + "-infra_meter-" + infraMeterName
 }
