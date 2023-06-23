@@ -3650,6 +3650,18 @@ See also
 :::
 
 <dl>
+<dt>agent_group</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+AgentGroup is the agent group to sync this InfraMeter with.
+
+</dd>
 <dt>per_agent_group</dt>
 <dd>
 
@@ -6425,6 +6437,50 @@ FlowControlResources are resources that are provided by flow control
 integration.
 
 </dd>
+<dt>infra_meters</dt>
+<dd>
+
+<!-- vale off -->
+
+(map of [InfraMeter](#infra-meter))
+
+<!-- vale on -->
+
+_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which
+will receive and process telemetry at the agents and send metrics to the
+configured Prometheus. Key in this map refers to OTel pipeline name. Prefixing
+pipeline name with `metrics/` is optional, as all the components and pipeline
+names would be normalized.
+
+Example:
+
+```yaml
+infra_meters:
+  rabbitmq:
+    agent_group: default
+    per_agent_group: true
+    processors:
+	     batch:
+	       send_batch_size: 10
+	       timeout: 10s
+	   receivers:
+	     rabbitmq:
+	       collection_interval: 10s
+        endpoint: http://<rabbitmq-svc-fqdn>:15672
+        password: secretpassword
+        username: admin
+
+```
+
+:::caution
+
+Validate the OTel configuration before applying it to the production cluster.
+Incorrect configuration will get rejected at the agents and might cause shutdown
+of the agent(s).
+
+:::
+
+</dd>
 <dt>telemetry_collectors</dt>
 <dd>
 
@@ -6434,7 +6490,8 @@ integration.
 
 <!-- vale on -->
 
-TelemetryCollector configures OpenTelemetry collector integration.
+TelemetryCollector configures OpenTelemetry collector integration. Deprecated:
+v2.8.0. Use `infra_meters` instead.
 
 </dd>
 </dl>
@@ -7554,7 +7611,7 @@ Selected signal (`on_signal` or `off_signal`).
 <!-- vale on -->
 
 TelemetryCollector defines the telemetry configuration to be synced with the
-agents. It consists of two parts:
+agents. Deprecated: v2.8.0. Use `InfraMeter` instead. It consists of two parts:
 
 - Agent Group: Agent group to sync telemetry configuration with
 - Infra Meters: OTel compatible metrics pipelines

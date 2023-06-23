@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          memcached:
-            per_agent_group: true
-            receivers:
-              memcached: [memcachedreceiver configuration here]
+    infra_meters:
+      memcached:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          memcached: [memcachedreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

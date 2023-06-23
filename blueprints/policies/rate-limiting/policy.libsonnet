@@ -1,4 +1,5 @@
 local spec = import '../../spec.libsonnet';
+local utils = import '../../utils/utils.libsonnet';
 local config = import './config.libsonnet';
 
 local policy = spec.v1.Policy;
@@ -14,7 +15,7 @@ function(cfg, metadata={}) {
   local params = config + cfg,
   local policyDef =
     policy.new()
-    + policy.withResources(params.policy.resources)
+    + policy.withResources(utils.resources(params.policy.resources).updatedResources)
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')

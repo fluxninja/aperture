@@ -330,6 +330,8 @@ func (m *InfraMeter) validate(all bool) error {
 
 	// no validation rules for PerAgentGroup
 
+	// no validation rules for AgentGroup
+
 	if len(errors) > 0 {
 		return InfraMeterMultiError(errors)
 	}

@@ -1893,6 +1893,13 @@ definitions:
 
             :::
         properties:
+            agent_group:
+                default: default
+                description: |+
+                    AgentGroup is the agent group to sync this InfraMeter with.
+
+                type: string
+                x-go-tag-default: default
             per_agent_group:
                 default: false
                 description: |+
@@ -1904,7 +1911,7 @@ definitions:
                 x-go-tag-default: "false"
             pipeline:
                 $ref: '#/definitions/InfraMeterMetricsPipeline'
-                description: |+
+                description: |-
                     Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
                     and processors defined above. Exporter would be added automatically.
 
@@ -1913,8 +1920,6 @@ definitions:
                     automatically use all given receivers and the defined processor (if
                     any).  However, if there are more than one processor, the pipeline must
                     be defined explicitly.
-
-                x-go-tag-validate: required
             processors:
                 additionalProperties:
                     type: object
@@ -3397,8 +3402,48 @@ definitions:
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
+            infra_meters:
+                additionalProperties:
+                    $ref: '#/definitions/InfraMeter'
+                description: |-
+                    _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
+                    receive and process telemetry at the agents and send metrics to the configured Prometheus.
+                    Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
+                    is optional, as all the components and pipeline names would be normalized.
+
+                    Example:
+
+                    ```yaml
+                    infra_meters:
+                      rabbitmq:
+                        agent_group: default
+                        per_agent_group: true
+                        processors:
+                    	     batch:
+                    	       send_batch_size: 10
+                    	       timeout: 10s
+                    	   receivers:
+                    	     rabbitmq:
+                    	       collection_interval: 10s
+                            endpoint: http://<rabbitmq-svc-fqdn>:15672
+                            password: secretpassword
+                            username: admin
+
+                    ```
+
+                    :::caution
+
+                    Validate the OTel configuration before applying it to the
+                    production cluster.
+                    Incorrect configuration will get rejected at the agents and might cause
+                    shutdown of the agent(s).
+
+                    :::
+                type: object
             telemetry_collectors:
-                description: TelemetryCollector configures OpenTelemetry collector integration.
+                description: |-
+                    TelemetryCollector configures OpenTelemetry collector integration.
+                    Deprecated: v2.8.0. Use `infra_meters` instead.
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
@@ -4037,6 +4082,7 @@ definitions:
                 type: object
         title: |-
             TelemetryCollector defines the telemetry configuration to be synced with the agents.
+            Deprecated: v2.8.0. Use `InfraMeter` instead.
             It consists of two parts:
             - Agent Group: Agent group to sync telemetry configuration with
             - Infra Meters: OTel compatible metrics pipelines

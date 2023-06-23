@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          vcenter:
-            per_agent_group: true
-            receivers:
-              vcenter: [vcenterreceiver configuration here]
+    infra_meters:
+      vcenter:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          vcenter: [vcenterreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

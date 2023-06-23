@@ -32,13 +32,12 @@ Kubernetes Cluster as part of [Policy resources][policy-resources] while
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          k8s_cluster:
-            per_agent_group: true
-            receivers:
-              k8s_cluster: [k8sclusterreceiver configuration here]
+    infra_meters:
+      k8s_cluster:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          k8s_cluster: [k8sclusterreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

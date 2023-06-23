@@ -24,17 +24,16 @@ below:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
+    infra_meters:
+      agent_group: default
+      rabbitmq:
+        per_agent_group: true
+        receivers:
           rabbitmq:
-            per_agent_group: true
-            receivers:
-              rabbitmq:
-                endpoint: ${RABBITMQ_ENDPOINT}
-                username: ${RABBITMQ_USERNAME}
-                password: ${RABBITMQ_PASSWORD}
-                collection_interval: 1s
+            endpoint: ${RABBITMQ_ENDPOINT}
+            username: ${RABBITMQ_USERNAME}
+            password: ${RABBITMQ_PASSWORD}
+            collection_interval: 1s
 ```
 
 If you are installing the Aperture Agent on Kubernetes, you can use a Secret and

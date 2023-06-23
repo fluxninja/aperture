@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withAgentGroup(agent_group):: {
+    agent_group: agent_group,
+  },
+  withAgentGroupMixin(agent_group):: {
+    agent_group+: agent_group,
+  },
   withPerAgentGroup(per_agent_group):: {
     per_agent_group: per_agent_group,
   },

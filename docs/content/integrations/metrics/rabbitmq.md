@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          rabbitmq:
-            per_agent_group: true
-            receivers:
-              rabbitmq: [rabbitmqreceiver configuration here]
+    infra_meters:
+      rabbitmq:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          rabbitmq: [rabbitmqreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
