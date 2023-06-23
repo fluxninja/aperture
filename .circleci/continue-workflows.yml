@@ -1450,6 +1450,12 @@ commands:
             - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
+          name: check the home dir
+          command: |
+            echo $HOME
+            pwd
+            ls -al
+      - run:
           name: Install ASDF tools
           environment:
             TOOLS: << parameters.tools >>
