@@ -32,13 +32,12 @@ the policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          cloudfoundry:
-            per_agent_group: true
-            receivers:
-              cloudfoundry: [cloudfoundryreceiver configuration here]
+    infra_meters:
+      cloudfoundry:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          cloudfoundry: [cloudfoundryreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

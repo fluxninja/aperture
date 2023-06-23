@@ -1,6 +1,6 @@
 # Generated values file for policies/service-protection-with-load-based-pod-auto-scaler/promql blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/ policies/service-protection-with-load-based-pod-auto-scaler/promql
+# https://docs.fluxninja.com/reference/blueprints/policies/service-protection-with-load-based-pod-auto-scaler/promql
 
 # Configuration for the Service Protection policy.
 # Type: policies/service-protection/promql:param:policy

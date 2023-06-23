@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          httpcheck:
-            per_agent_group: true
-            receivers:
-              httpcheck: [httpcheckreceiver configuration here]
+    infra_meters:
+      httpcheck:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          httpcheck: [httpcheckreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

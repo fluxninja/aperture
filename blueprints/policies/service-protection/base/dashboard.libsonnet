@@ -2,15 +2,15 @@ local baseAutoScalingDashboardFn = import '../../../../blueprints/dashboards/aut
 local adaptiveLoadSchedulerDashboard = import '../../../../blueprints/dashboards/flow-control/adaptive-load-scheduler/dashboard.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg) {
-  local params = config + cfg,
-  local protectionDashboard = adaptiveLoadSchedulerDashboard(params).dashboard,
+function(cfg, params={}) {
+  local updatedConfig = config + cfg,
+  local protectionDashboard = adaptiveLoadSchedulerDashboard(updatedConfig).dashboard,
   local autoScalingParams = {
-    policy+: params.policy.auto_scaling {
-      policy_name: params.policy.policy_name,
+    policy+: updatedConfig.policy.auto_scaling {
+      policy_name: updatedConfig.policy.policy_name,
     },
 
-    dashboard: params.dashboard,
+    dashboard: updatedConfig.dashboard,
   },
 
   local baseAutoScalingDashboard = baseAutoScalingDashboardFn(autoScalingParams).dashboard,
@@ -30,5 +30,5 @@ function(cfg) {
       ],
     },
 
-  dashboard: if std.objectHas(params.policy, 'auto_scaling') then protectionAndEscalationDashboard else protectionDashboard,
+  dashboard: if std.objectHas(params, 'policy') && std.objectHas(params.policy, 'auto_scaling') then protectionAndEscalationDashboard else protectionDashboard,
 }
