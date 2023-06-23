@@ -302,7 +302,7 @@ jobs:
             helm
             java
             jb
-            jsonnet
+            go-jsonnet
             kustomize
             mockery
             nodejs
