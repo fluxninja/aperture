@@ -542,7 +542,7 @@ JSON_SCHEMA_DEFINITIONS_TPL = """
 YAML_TPL = """
 # Generated values file for {{ blueprint_name }} blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/ {{ blueprint_name }}
+# https://docs.fluxninja.com/reference/blueprints/{{ blueprint_name }}
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
 {%- if not value.items() %}

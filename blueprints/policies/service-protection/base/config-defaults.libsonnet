@@ -45,6 +45,66 @@ local kubernetes_replicas_defaults = {
   max_replicas: '__REQUIRED_FIELD__',
 };
 
+local kubeletstats_infra_meter = {
+  kubeletstats: {
+    per_agent_group: true,
+    pipeline: {
+      processors: [
+        'k8sattributes',
+      ],
+      receivers: [
+        'kubeletstats',
+      ],
+    },
+    processors: {
+      k8sattributes: {
+        auth_type: 'serviceAccount',
+        passthrough: false,
+        filter: {
+          node_from_env_var: 'NODE_NAME',
+        },
+        extract: {
+          metadata: [
+            'k8s.cronjob.name',
+            'k8s.daemonset.name',
+            'k8s.deployment.name',
+            'k8s.job.name',
+            'k8s.namespace.name',
+            'k8s.node.name',
+            'k8s.pod.name',
+            'k8s.pod.uid',
+            'k8s.replicaset.name',
+            'k8s.statefulset.name',
+            'k8s.container.name',
+          ],
+        },
+        pod_association: [
+          {
+            sources: [
+              {
+                from: 'resource_attribute',
+                name: 'k8s.pod.uid',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    receivers: {
+      kubeletstats: {
+        collection_interval: '15s',
+        auth_type: 'serviceAccount',
+        endpoint: 'https://${NODE_NAME}:10250',
+        insecure_skip_verify: true,
+        metric_groups: [
+          'pod',
+          'container',
+        ],
+      },
+    },
+  },
+};
+
 {
   policy: {
     policy_name: '__REQUIRED_FIELD__',
@@ -82,4 +142,6 @@ local kubernetes_replicas_defaults = {
       kubernetes_replicas: kubernetes_replicas_defaults,
     },
   },
+
+  kubeletstats_infra_meter: kubeletstats_infra_meter,
 }
