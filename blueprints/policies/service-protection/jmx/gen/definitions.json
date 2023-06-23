@@ -40,7 +40,7 @@
         },
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
-          "default": "1s",
+          "default": "10s",
           "type": "string"
         },
         "service_protection_core": {
@@ -68,7 +68,7 @@
                   "min_gradient": 0.1,
                   "slope": -1
                 },
-                "load_multiplier_linear_increment": 0.0025,
+                "load_multiplier_linear_increment": 0.025,
                 "load_scheduler": {
                   "selectors": [
                     {
@@ -212,7 +212,7 @@
       "properties": {
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "15s",
+          "default": "5s",
           "type": "string"
         },
         "time_from": {

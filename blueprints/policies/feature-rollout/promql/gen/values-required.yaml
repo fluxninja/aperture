@@ -20,7 +20,7 @@ policy:
             operator: __REQUIRED_FIELD__
             threshold: __REQUIRED_FIELD__
         query_string: __REQUIRED_FIELD__
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   load_ramp:
     sampler:
       label_key: ""

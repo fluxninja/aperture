@@ -117,13 +117,13 @@ spec:
             service: service1-demo-app.demoapp.svc.cluster.local
     - query:
         promql:
-          evaluation_interval: 1s
+          evaluation_interval: 10s
           out_ports:
             output:
               signal_name: SIGNAL
           query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service-protection",
-            policy_name="service-protection"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="service-protection", policy_name="service-protection"}[5s]))
+            policy_name="service-protection"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service-protection", policy_name="service-protection"}[30s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -159,7 +159,7 @@ spec:
         out_ports:
           output:
             signal_name: SETPOINT
-    evaluation_interval: 1s
+    evaluation_interval: 10s
   resources:
     flow_control:
       classifiers:

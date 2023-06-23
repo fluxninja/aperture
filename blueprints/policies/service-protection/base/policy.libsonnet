@@ -7,13 +7,11 @@ function(cfg, params={}, metadata={}) {
   local updatedConfig = config + cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
-    local evaluationInterval = updatedConfig.policy.evaluation_interval,
-
     local promQLSignalName = 'PROMQL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
 
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(
       spec.v1.PromQL.withQueryString(confirmation.query_string)
-      + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
+      + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
       + spec.v1.PromQL.withOutPorts({
         output: spec.v1.Port.withSignalName(promQLSignalName),
       })

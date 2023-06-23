@@ -154,7 +154,7 @@ message Policy {
 message Circuit {
   // Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
   // This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"0.5s"
+  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"10s"
 
   // Defines a signal processing graph as a list of components.
   repeated Component components = 2; // @gotags: validate:"dive"

@@ -496,7 +496,7 @@ type Circuit struct {
 
 	// Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
 	// This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-	EvaluationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"0.5s"` // @gotags: default:"0.5s"
+	EvaluationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"10s"` // @gotags: default:"10s"
 	// Defines a signal processing graph as a list of components.
 	Components []*Component `protobuf:"bytes,2,rep,name=components,proto3" json:"components,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }

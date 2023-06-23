@@ -34,7 +34,7 @@ policy:
               - 5000
               - 10000
         percentile: 95
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   load_ramp:
     sampler:
       label_key: ""

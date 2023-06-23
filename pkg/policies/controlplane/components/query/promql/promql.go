@@ -426,7 +426,6 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToReading,
 		// Launch job only if previous one is completed
 		// Quantize endTimestamp of query based on tick interval
 		endTimestamp := tickInfo.Timestamp().Truncate(tickInfo.Interval())
-
 		// Register jobFunc with jobExecutor
 		promQL.jobRegisterer.registerJob(endTimestamp)
 	}

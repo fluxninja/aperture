@@ -103,7 +103,7 @@ local rollout_policy_base_defaults = {
     },
   },
 
-  evaluation_interval: '1s',
+  evaluation_interval: '10s',
 };
 
 local rollout_policy_defaults = rollout_policy_base_defaults {

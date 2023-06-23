@@ -4,7 +4,8 @@ metadata:
   annotations:
     fluxninja.com/blueprint-name: policies/service-protection-with-load-based-pod-auto-scaler/average-latency
     fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"auto_scaling": {"dry_run": false, "periodic_decrease":
+    fluxninja.com/values:
+      '{"policy": {"auto_scaling": {"dry_run": false, "periodic_decrease":
       {"period": "60s", "scale_in_percentage": 10}, "scaling_backend": {"kubernetes_replicas":
       {"kubernetes_object_selector": {"agent_group": "default", "api_version": "apps/v1",
       "kind": "Deployment", "name": "search-service", "namespace": "prod"}, "max_replicas":
@@ -22,126 +23,113 @@ metadata:
 spec:
   circuit:
     components:
-    - flow_control:
-        adaptive_load_scheduler:
-          dry_run: false
-          dry_run_config_key: dry_run
-          in_ports:
-            overload_confirmation:
-              constant_signal:
-                value: 1
-            setpoint:
-              signal_name: SETPOINT
-            signal:
-              signal_name: SIGNAL
-          out_ports:
-            desired_load_multiplier:
-              signal_name: DESIRED_LOAD_MULTIPLIER
-            observed_load_multiplier:
-              signal_name: OBSERVED_LOAD_MULTIPLIER
-          parameters:
-            alerter:
-              alert_name: Load Throttling Event
-            gradient:
-              max_gradient: 1
-              min_gradient: 0.1
-              slope: -1
-            load_multiplier_linear_increment: 0.0025
-            load_scheduler:
-              selectors:
-              - control_point: ingress
-                service: search-service.prod.svc.cluster.local
-            max_load_multiplier: 2
-    - auto_scale:
-        auto_scaler:
-          dry_run: false
-          dry_run_config_key: dry_run
-          scale_in_controllers:
-          - alerter:
-              alert_name: Periodic scale in intended
-            controller:
-              periodic:
-                period: 60s
-                scale_in_percentage: 10
-          scale_out_controllers:
-          - alerter:
-              alert_name: Load based scale out intended
-            controller:
+      - flow_control:
+          adaptive_load_scheduler:
+            dry_run: false
+            dry_run_config_key: dry_run
+            in_ports:
+              overload_confirmation:
+                constant_signal:
+                  value: 1
+              setpoint:
+                signal_name: SETPOINT
+              signal:
+                signal_name: SIGNAL
+            out_ports:
+              desired_load_multiplier:
+                signal_name: DESIRED_LOAD_MULTIPLIER
+              observed_load_multiplier:
+                signal_name: OBSERVED_LOAD_MULTIPLIER
+            parameters:
+              alerter:
+                alert_name: Load Throttling Event
               gradient:
-                in_ports:
-                  setpoint:
-                    constant_signal:
-                      value: 1
-                  signal:
-                    signal_name: DESIRED_LOAD_MULTIPLIER
-                parameters:
-                  slope: -1
-          scaling_backend:
-            kubernetes_replicas:
-              kubernetes_object_selector:
-                agent_group: default
-                api_version: apps/v1
-                kind: Deployment
-                name: search-service
-                namespace: prod
-              max_replicas: "10"
-              min_replicas: "1"
-          scaling_parameters:
-            scale_in_alerter:
-              alert_name: Auto-scaler is scaling in
-            scale_in_cooldown: 40s
-            scale_out_alerter:
-              alert_name: Auto-scaler is scaling out
-            scale_out_cooldown: 30s
-    - query:
-        promql:
-          evaluation_interval: 1s
+                max_gradient: 1
+                min_gradient: 0.1
+                slope: -1
+              load_multiplier_linear_increment: 0.0025
+              load_scheduler:
+                selectors:
+                  - control_point: ingress
+                    service: search-service.prod.svc.cluster.local
+              max_load_multiplier: 2
+      - auto_scale:
+          auto_scaler:
+            dry_run: false
+            dry_run_config_key: dry_run
+            scale_in_controllers:
+              - alerter:
+                  alert_name: Periodic scale in intended
+                controller:
+                  periodic:
+                    period: 60s
+                    scale_in_percentage: 10
+            scale_out_controllers:
+              - alerter:
+                  alert_name: Load based scale out intended
+                controller:
+                  gradient:
+                    in_ports:
+                      setpoint:
+                        constant_signal:
+                          value: 1
+                      signal:
+                        signal_name: DESIRED_LOAD_MULTIPLIER
+                    parameters:
+                      slope: -1
+            scaling_backend:
+              kubernetes_replicas:
+                kubernetes_object_selector:
+                  agent_group: default
+                  api_version: apps/v1
+                  kind: Deployment
+                  name: search-service
+                  namespace: prod
+                max_replicas: "10"
+                min_replicas: "1"
+            scaling_parameters:
+              scale_in_alerter:
+                alert_name: Auto-scaler is scaling in
+              scale_in_cooldown: 40s
+              scale_out_alerter:
+                alert_name: Auto-scaler is scaling out
+              scale_out_cooldown: 30s
+      - query:
+          promql:
+            evaluation_interval: 10s
+            out_ports:
+              output:
+                signal_name: MAX_EMA
+      - ema:
+          in_ports:
+            input:
+              signal_name: SIGNAL
+            max_envelope:
+              signal_name: MAX_EMA
           out_ports:
             output:
-              signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="load-based-auto-scale"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="load-based-auto-scale"}[5s]))
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL
-          rhs:
-            constant_signal:
-              value: 2
-        operator: mul
-        out_ports:
-          output:
-            signal_name: MAX_EMA
-    - ema:
-        in_ports:
-          input:
-            signal_name: SIGNAL
-          max_envelope:
-            signal_name: MAX_EMA
-        out_ports:
-          output:
-            signal_name: SIGNAL_EMA
-        parameters:
-          correction_factor_on_max_envelope_violation: 0.95
-          ema_window: 1500s
-          warmup_window: 60s
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL_EMA
-          rhs:
-            constant_signal:
-              value: 1.1
-        operator: mul
-        out_ports:
-          output:
-            signal_name: SETPOINT
-    evaluation_interval: 1s
+              signal_name: SIGNAL_EMA
+          parameters:
+            correction_factor_on_max_envelope_violation: 0.95
+            ema_window: 1500s
+            warmup_window: 60s
+      - arithmetic_combinator:
+          in_ports:
+            lhs:
+              signal_name: SIGNAL_EMA
+            rhs:
+              constant_signal:
+                value: 1.1
+          operator: mul
+          out_ports:
+            output:
+              signal_name: SETPOINT
+    evaluation_interval: 10s
   resources:
     flow_control:
       classifiers: []
       flux_meters:
         load-based-auto-scale:
           selectors:
-          - control_point: ingress
-            service: search-service.prod.svc.cluster.local
+            - control_point: ingress
+              service: search-service.prod.svc.cluster.local

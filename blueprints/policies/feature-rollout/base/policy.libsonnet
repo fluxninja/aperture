@@ -8,10 +8,9 @@ function(cfg, metadata={}) {
   local policyName = params.policy.policy_name,
 
   local addPromQLDriver = function(driverAccumulator, driver) {
-    local evaluationInterval = params.policy.evaluation_interval,
     local promQLSignalName = 'PROMQL_' + std.toString(driverAccumulator.promql_driver_count),
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(driver.query_string)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
+                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(promQLSignalName),
                                                                                  }))),
@@ -63,11 +62,10 @@ function(cfg, metadata={}) {
 
   local addAverageLatencyDriver = function(driverAccumulator, driver) {
     local flux_meter_name = policyName + '/average_latency/' + std.toString(driverAccumulator.average_latency_driver_count),
-    local evaluationInterval = params.policy.evaluation_interval,
     local averageLatencySignalName = 'AVERAGE_LATENCY_' + std.toString(driverAccumulator.average_latency_driver_count),
-    local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[5s]))' % { flux_meter_name: flux_meter_name, policy_name: policyName },
+    local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))' % { flux_meter_name: flux_meter_name, policy_name: policyName },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
+                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(averageLatencySignalName),
                                                                                  }))),
@@ -123,11 +121,10 @@ function(cfg, metadata={}) {
 
   local addPercentileLatencyDriver = function(driverAccumulator, driver) {
     local flux_meter_name = policyName + '/percentile_latency/' + std.toString(driverAccumulator.percentile_latency_driver_count),
-    local evaluationInterval = params.policy.evaluation_interval,
     local percentileLatencySignalName = 'PERCENTILE_LATENCY_' + std.toString(driverAccumulator.percentile_latency_driver_count),
-    local q = 'histogram_quantile(%(percentile)f, sum(rate(flux_meter_bucket{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[5s])) by (le))' % { percentile: driver.percentile, flux_meter_name: flux_meter_name, policy_name: policyName },
+    local q = 'histogram_quantile(%(percentile)f, sum(rate(flux_meter_bucket{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s])) by (le))' % { percentile: driver.percentile, flux_meter_name: flux_meter_name, policy_name: policyName },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
+                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(percentileLatencySignalName),
                                                                                  }))),
@@ -184,11 +181,10 @@ function(cfg, metadata={}) {
 
   local addEMALatencyDriver = function(driverAccumulator, driver) {
     local flux_meter_name = policyName + '/ema_latency/' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local evaluationInterval = params.policy.evaluation_interval,
     local latencySignalName = 'LATENCY_' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local q = 'sum(rate(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[5s]))/sum(rate(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[5s]))' % { flux_meter_name: flux_meter_name, policy_name: policyName },
+    local q = 'sum(rate(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))/sum(rate(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))' % { flux_meter_name: flux_meter_name, policy_name: policyName },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluationInterval)
+                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(latencySignalName),
                                                                                  }))),

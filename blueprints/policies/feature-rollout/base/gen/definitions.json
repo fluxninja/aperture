@@ -10,7 +10,7 @@
       "default": {
         "components": [],
         "drivers": {},
-        "evaluation_interval": "1s",
+        "evaluation_interval": "10s",
         "load_ramp": {
           "sampler": {
             "label_key": "",
@@ -417,7 +417,7 @@
         },
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
-          "default": "1s",
+          "default": "10s",
           "type": "string"
         },
         "drivers": {

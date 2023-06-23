@@ -46,7 +46,7 @@ serviceProtectionDefaults {
   * @param (dashboard.title: string) Name of the main dashboard.
   */
   dashboard: {
-    refresh_interval: '15s',
+    refresh_interval: '5s',
     time_from: 'now-15m',
     time_to: 'now',
     extra_filters: {},

@@ -486,10 +486,10 @@
           "x-go-tag-validate": "dive"
         },
         "evaluation_interval": {
-          "default": "0.5s",
+          "default": "10s",
           "description": "Evaluation interval (tick) is the time between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\n\n",
           "type": "string",
-          "x-go-tag-default": "0.5s"
+          "x-go-tag-default": "10s"
         }
       },
       "type": "object",

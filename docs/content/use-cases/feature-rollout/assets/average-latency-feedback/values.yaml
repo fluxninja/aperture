@@ -25,7 +25,7 @@ policy:
             label_matcher:
               match_labels:
                 http.path: /checkout
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   load_ramp:
     sampler:
       selectors:

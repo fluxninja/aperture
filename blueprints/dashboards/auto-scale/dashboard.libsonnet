@@ -5,8 +5,6 @@ local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libso
 
 local dashboard = grafana.dashboard;
 local prometheus = grafana.prometheus;
-local barGaugePanel = grafana.barGaugePanel;
-local statPanel = grafana.statPanel;
 local graphPanel = grafana.graphPanel;
 
 
@@ -14,6 +12,7 @@ local newGraphPanel(title, datasource, query, axisLabel='', unit='') =
   graphPanel.new(
     title=title,
     datasource=datasource,
+    interval='30s',
     labelY1=axisLabel,
     formatY1=unit,
   )

@@ -9,7 +9,7 @@ local auto_scaling_base_defaults = {
     },
   },
 
-  evaluation_interval: '1s',
+  evaluation_interval: '10s',
 };
 
 local promql_scale_out_controller_defaults = {

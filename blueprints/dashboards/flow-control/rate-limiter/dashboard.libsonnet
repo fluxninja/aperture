@@ -18,6 +18,7 @@ function(cfg) {
       datasource=dsName,
       labelY1='Decisions',
       formatY1='reqps',
+      interval='30s',
     )
     .addTarget(
       prometheus.target(
