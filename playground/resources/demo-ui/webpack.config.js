@@ -37,6 +37,15 @@ module.exports = {
       },
     ],
   },
+  devServer: {
+    port: 8099,
+    proxy: {
+      '/request': {
+        target: 'http://localhost:8088',
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
