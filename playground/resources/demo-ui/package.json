@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "rm -rf ./dist && webpack --mode production && rm -rf ../demo-app/public/* && cp -r ./dist/* ../public",
+    "build": "rm -rf ./dist && webpack --mode production && rm -rf ../demo-app/public/* && cp -r ./dist/* ../demo-app/public",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/**/*.+(js|jsx|ts|tsx)\""
