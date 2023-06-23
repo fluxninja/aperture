@@ -58,26 +58,36 @@ policy:
   auto_scaling:
     # Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.
     # Type: bool
-    dry_run: null
+    dry_run: false
     # List of scale out controllers.
     # Type: []promql_scale_out_controller
-    promql_scale_out_controllers: null
+    promql_scale_out_controllers: []
     # List of scale in controllers.
     # Type: []promql_scale_in_controller
-    promql_scale_in_controllers: null
+    promql_scale_in_controllers: []
     # Parameters that define the scaling behavior.
     # Type: aperture.spec.v1.AutoScalerScalingParameters
-    scaling_parameters: null
+    scaling_parameters:
+      scale_in_alerter:
+        alert_name: "Auto-scaler is scaling in"
+      scale_in_cooldown: "40s"
+      scale_out_alerter:
+        alert_name: "Auto-scaler is scaling out"
+      scale_out_cooldown: "30s"
     # Scaling backend for the policy.
     # Type: aperture.spec.v1.AutoScalerScalingBackend
-    scaling_backend: null
+    scaling_backend:
+      kubernetes_replicas:
+        kubernetes_object_selector: __REQUIRED_FIELD__
+        max_replicas: __REQUIRED_FIELD__
+        min_replicas: __REQUIRED_FIELD__
     periodic_decrease:
       # Period for periodic scale in.
       # Type: string
-      period: null
+      period: "60s"
       # Percentage of replicas to scale in.
       # Type: float64
-      scale_in_percentage: null
+      scale_in_percentage: 10
   # Setpoint.
   # Type: float64
   # Required: True
