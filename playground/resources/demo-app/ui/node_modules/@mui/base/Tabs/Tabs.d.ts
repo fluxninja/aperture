@@ -1,0 +1,14 @@
+import { PolymorphicComponent } from '../utils';
+import { TabsTypeMap } from './Tabs.types';
+/**
+ *
+ * Demos:
+ *
+ * - [Tabs](https://mui.com/base/react-tabs/)
+ *
+ * API:
+ *
+ * - [Tabs API](https://mui.com/base/react-tabs/components-api/#tabs)
+ */
+declare const Tabs: PolymorphicComponent<TabsTypeMap<{}, "div">>;
+export default Tabs;

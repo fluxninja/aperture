@@ -1,0 +1,12 @@
+import { UseOptionParameters, UseOptionReturnValue } from './useOption.types';
+/**
+ *
+ * Demos:
+ *
+ * - [Select](https://mui.com/base/react-select/#hooks)
+ *
+ * API:
+ *
+ * - [useOption API](https://mui.com/base/react-select/hooks-api/#use-option)
+ */
+export default function useOption<Value>(params: UseOptionParameters<Value>): UseOptionReturnValue;

@@ -1,0 +1,14 @@
+import { PolymorphicComponent } from '../utils';
+import { TabPanelTypeMap } from './TabPanel.types';
+/**
+ *
+ * Demos:
+ *
+ * - [Tabs](https://mui.com/base/react-tabs/)
+ *
+ * API:
+ *
+ * - [TabPanel API](https://mui.com/base/react-tabs/components-api/#tab-panel)
+ */
+declare const TabPanel: PolymorphicComponent<TabPanelTypeMap<{}, "div">>;
+export default TabPanel;

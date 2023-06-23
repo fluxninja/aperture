@@ -1,0 +1,44 @@
+import { unstable_useId as useId } from '@mui/utils';
+import { useTabsContext } from '../Tabs';
+import { useCompoundItem } from '../utils/useCompoundItem';
+function tabPanelValueGenerator(otherTabPanelValues) {
+  return otherTabPanelValues.size;
+}
+
+/**
+ *
+ * Demos:
+ *
+ * - [Tabs](https://mui.com/base/react-tabs/#hooks)
+ *
+ * API:
+ *
+ * - [useTabPanel API](https://mui.com/base/react-tabs/hooks-api/#use-tab-panel)
+ */
+function useTabPanel(parameters) {
+  var valueParam = parameters.value,
+    idParam = parameters.id;
+  var context = useTabsContext();
+  if (context === null) {
+    throw new Error('No TabContext provided');
+  }
+  var selectedTabValue = context.value,
+    getTabId = context.getTabId;
+  var id = useId(idParam);
+  var _useCompoundItem = useCompoundItem(valueParam, id, tabPanelValueGenerator),
+    value = _useCompoundItem.id;
+  var hidden = value !== selectedTabValue;
+  var correspondingTabId = value !== undefined ? getTabId(value) : undefined;
+  var getRootProps = function getRootProps() {
+    return {
+      'aria-labelledby': correspondingTabId != null ? correspondingTabId : undefined,
+      hidden: hidden,
+      id: id != null ? id : undefined
+    };
+  };
+  return {
+    hidden: hidden,
+    getRootProps: getRootProps
+  };
+}
+export default useTabPanel;

@@ -1,0 +1,14 @@
+import { PolymorphicComponent } from '../utils/PolymorphicComponent';
+import { MenuTypeMap } from './Menu.types';
+/**
+ *
+ * Demos:
+ *
+ * - [Menu](https://mui.com/base/react-menu/)
+ *
+ * API:
+ *
+ * - [Menu API](https://mui.com/base/react-menu/components-api/#menu)
+ */
+declare const Menu: PolymorphicComponent<MenuTypeMap<{}, "ul">>;
+export default Menu;

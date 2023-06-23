@@ -1,0 +1,69 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CompoundComponentContext = void 0;
+exports.useCompoundParent = useCompoundParent;
+var React = _interopRequireWildcard(require("react"));
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+const CompoundComponentContext = /*#__PURE__*/React.createContext(null);
+exports.CompoundComponentContext = CompoundComponentContext;
+CompoundComponentContext.displayName = 'CompoundComponentContext';
+/**
+ * Provides a way for a component to know about its children.
+ *
+ * Child components register themselves with the `useCompoundItem` hook, passing in arbitrary metadata to the parent.
+ *
+ * This is a more powerful altervantive to `children` traversal, as child components don't have to be placed
+ * directly inside the parent component. They can be anywhere in the tree (and even rendered by other components).
+ *
+ * The downside is that this doesn't work with SSR as it relies on the useEffect hook.
+ *
+ * @ignore - internal hook.
+ */
+function useCompoundParent() {
+  const [subitems, setSubitems] = React.useState(new Map());
+  const subitemKeys = React.useRef(new Set());
+  const deregisterItem = React.useCallback(function deregisterItem(id) {
+    subitemKeys.current.delete(id);
+    setSubitems(previousState => {
+      const newState = new Map(previousState);
+      newState.delete(id);
+      return newState;
+    });
+  }, []);
+  const registerItem = React.useCallback(function registerItem(id, item, missingKeyGenerator) {
+    let providedOrGeneratedId;
+    if (id === undefined) {
+      if (missingKeyGenerator === undefined) {
+        throw new Error("The compound component's child doesn't have a key. You need to provide a missingKeyGenerator to generate it.");
+      }
+      providedOrGeneratedId = missingKeyGenerator(subitemKeys.current);
+    } else {
+      providedOrGeneratedId = id;
+    }
+    subitemKeys.current.add(providedOrGeneratedId);
+    setSubitems(previousState => {
+      const newState = new Map(previousState);
+      newState.set(providedOrGeneratedId, item);
+      return newState;
+    });
+    return {
+      id: providedOrGeneratedId,
+      deregister: () => deregisterItem(providedOrGeneratedId)
+    };
+  }, [deregisterItem]);
+  const getItemIndex = React.useCallback(function getItemIndex(id) {
+    return Array.from(subitems.keys()).indexOf(id);
+  }, [subitems]);
+  return {
+    contextValue: {
+      getItemIndex,
+      registerItem,
+      totalSubitemCount: subitems.size
+    },
+    subitems
+  };
+}

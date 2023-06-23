@@ -1,0 +1,7 @@
+import generateUtilityClass from '../generateUtilityClass';
+import generateUtilityClasses from '../generateUtilityClasses';
+export function getPopperUtilityClass(slot) {
+  return generateUtilityClass('MuiPopper', slot);
+}
+const popperClasses = generateUtilityClasses('MuiPopper', ['root']);
+export default popperClasses;

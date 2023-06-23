@@ -1,0 +1,13 @@
+export const ListActionTypes = {
+  blur: 'list:blur',
+  focus: 'list:focus',
+  keyDown: 'list:keyDown',
+  itemClick: 'list:itemClick',
+  itemHover: 'list:itemHover',
+  itemsChange: 'list:itemsChange',
+  textNavigation: 'list:textNavigation'
+};
+
+/**
+ * A union of all standard actions that can be dispatched to the list reducer.
+ */

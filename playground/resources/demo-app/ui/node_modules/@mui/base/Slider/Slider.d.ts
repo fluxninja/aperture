@@ -1,0 +1,14 @@
+import { PolymorphicComponent } from '../utils/PolymorphicComponent';
+import { SliderTypeMap } from './Slider.types';
+/**
+ *
+ * Demos:
+ *
+ * - [Slider](https://mui.com/base/react-slider/)
+ *
+ * API:
+ *
+ * - [Slider API](https://mui.com/base/react-slider/components-api/#slider)
+ */
+declare const Slider: PolymorphicComponent<SliderTypeMap<{}, "span">>;
+export default Slider;

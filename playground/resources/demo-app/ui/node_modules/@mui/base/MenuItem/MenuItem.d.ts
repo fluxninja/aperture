@@ -1,0 +1,14 @@
+import { PolymorphicComponent } from '../utils/PolymorphicComponent';
+import { MenuItemTypeMap } from './MenuItem.types';
+/**
+ *
+ * Demos:
+ *
+ * - [Menu](https://mui.com/base/react-menu/)
+ *
+ * API:
+ *
+ * - [MenuItem API](https://mui.com/base/react-menu/components-api/#menu-item)
+ */
+declare const MenuItem: PolymorphicComponent<MenuItemTypeMap<{}, "li">>;
+export default MenuItem;

@@ -1,0 +1,7 @@
+import generateUtilityClass from '../generateUtilityClass';
+import generateUtilityClasses from '../generateUtilityClasses';
+export function getTabsUtilityClass(slot) {
+  return generateUtilityClass('MuiTabs', slot);
+}
+const tabsClasses = generateUtilityClasses('MuiTabs', ['root', 'horizontal', 'vertical']);
+export default tabsClasses;

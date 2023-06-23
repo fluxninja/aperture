@@ -1,0 +1,16 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+exports.getInputUtilityClass = getInputUtilityClass;
+var _generateUtilityClass = _interopRequireDefault(require("../generateUtilityClass"));
+var _generateUtilityClasses = _interopRequireDefault(require("../generateUtilityClasses"));
+function getInputUtilityClass(slot) {
+  return (0, _generateUtilityClass.default)('MuiInput', slot);
+}
+const inputClasses = (0, _generateUtilityClasses.default)('MuiInput', ['root', 'formControl', 'focused', 'disabled', 'error', 'multiline', 'input', 'inputMultiline', 'inputTypeSearch', 'adornedStart', 'adornedEnd']);
+var _default = inputClasses;
+exports.default = _default;

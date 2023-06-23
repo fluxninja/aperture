@@ -1,0 +1,12 @@
+import { UseMenuParameters, UseMenuReturnValue } from './useMenu.types';
+/**
+ *
+ * Demos:
+ *
+ * - [Menu](https://mui.com/base/react-menu/#hooks)
+ *
+ * API:
+ *
+ * - [useMenu API](https://mui.com/base/react-menu/hooks-api/#use-menu)
+ */
+export default function useMenu(parameters?: UseMenuParameters): UseMenuReturnValue;

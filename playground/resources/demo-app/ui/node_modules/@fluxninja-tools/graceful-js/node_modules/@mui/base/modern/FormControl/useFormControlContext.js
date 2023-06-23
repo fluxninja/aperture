@@ -1,0 +1,15 @@
+import * as React from 'react';
+import FormControlContext from './FormControlContext';
+/**
+ *
+ * Demos:
+ *
+ * - [Form Control](https://mui.com/base/react-form-control/#hook)
+ *
+ * API:
+ *
+ * - [useFormControlContext API](https://mui.com/base/react-form-control/hooks-api/#use-form-control-context)
+ */
+export default function useFormControlContext() {
+  return React.useContext(FormControlContext);
+}

@@ -1,0 +1,16 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+exports.getOptionGroupUtilityClass = getOptionGroupUtilityClass;
+var _generateUtilityClass = _interopRequireDefault(require("../generateUtilityClass"));
+var _generateUtilityClasses = _interopRequireDefault(require("../generateUtilityClasses"));
+function getOptionGroupUtilityClass(slot) {
+  return (0, _generateUtilityClass.default)('MuiOptionGroup', slot);
+}
+const optionGroupClasses = (0, _generateUtilityClasses.default)('MuiOptionGroup', ['root', 'disabled', 'label', 'list']);
+var _default = optionGroupClasses;
+exports.default = _default;

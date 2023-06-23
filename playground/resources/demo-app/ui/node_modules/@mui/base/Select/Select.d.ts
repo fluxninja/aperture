@@ -1,0 +1,14 @@
+import { SelectType } from './Select.types';
+/**
+ * The foundation for building custom-styled select components.
+ *
+ * Demos:
+ *
+ * - [Select](https://mui.com/base/react-select/)
+ *
+ * API:
+ *
+ * - [Select API](https://mui.com/base/react-select/components-api/#select)
+ */
+declare const Select: SelectType;
+export default Select;

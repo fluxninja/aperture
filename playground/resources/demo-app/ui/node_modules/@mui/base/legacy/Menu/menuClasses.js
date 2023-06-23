@@ -1,0 +1,7 @@
+import generateUtilityClass from '../generateUtilityClass';
+import generateUtilityClasses from '../generateUtilityClasses';
+export function getMenuUtilityClass(slot) {
+  return generateUtilityClass('MuiMenu', slot);
+}
+var menuClasses = generateUtilityClasses('MuiMenu', ['root', 'listbox', 'expanded']);
+export default menuClasses;
