@@ -34,7 +34,7 @@ function(params, metadata={}) {
                 postgresql: postgresql,
               },
             },
-          } + if addCPUOverloadConfirmation then config.kubeletstats_infra_meter { agent_group: agent_group } else {},
+          } + if addCPUOverloadConfirmation then config.kubeletstats_infra_meter(agent_group) else {},
         },
         service_protection_core+: if addCPUOverloadConfirmation then {
           overload_confirmations+: [

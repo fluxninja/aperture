@@ -45,8 +45,9 @@ local kubernetes_replicas_defaults = {
   max_replicas: '__REQUIRED_FIELD__',
 };
 
-local kubeletstats_infra_meter = {
+local kubeletstats_infra_meter = function(agent_group) {
   kubeletstats: {
+    agent_group: agent_group,
     per_agent_group: true,
     pipeline: {
       processors: [
