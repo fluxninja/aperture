@@ -570,21 +570,21 @@ type Resources struct {
 	// Example:
 	//
 	// ```yaml
+	// infra_meters:
 	//
-	//	 infra_meters:
-	//		  rabbitmq:
-	//	     agent_group: default
-	//		    processors:
-	//		      batch:
-	//		        send_batch_size: 10
-	//		        timeout: 10s
-	//		    receivers:
-	//		      rabbitmq:
-	//		        collection_interval: 10s
-	//		        endpoint: http://<rabbitmq-svc-fqdn>:15672
-	//		        password: secretpassword
-	//		        username: admin
+	//	  rabbitmq:
+	//	    agent_group: default
 	//	    per_agent_group: true
+	//	    processors:
+	//		     batch:
+	//		       send_batch_size: 10
+	//		       timeout: 10s
+	//		   receivers:
+	//		     rabbitmq:
+	//		       collection_interval: 10s
+	//	        endpoint: http://<rabbitmq-svc-fqdn>:15672
+	//	        password: secretpassword
+	//	        username: admin
 	//
 	// ```
 	//
