@@ -117,11 +117,6 @@ local kubeletstats_infra_meter = function(agent_group) {
     },
     evaluation_interval: '10s',
     service_protection_core: service_protection_core_defaults,
-    auto_scaling: auto_scaling_defaults {
-      scaling_backend+: {
-        kubernetes_replicas: kubernetes_replicas_defaults,
-      },
-    },
   },
 
   dashboard: {
@@ -136,6 +131,12 @@ local kubeletstats_infra_meter = function(agent_group) {
   },
 
   selectors: selectors_defaults,
+
+  auto_scaling: auto_scaling_defaults {
+    scaling_backend+: {
+      kubernetes_replicas: kubernetes_replicas_defaults,
+    },
+  },
 
   auto_scaling_pods: auto_scaling_defaults {
     scaling_backend+: {

@@ -5,17 +5,17 @@ local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libso
 local graphPanel = grafana.graphPanel;
 local prometheus = grafana.prometheus;
 
-function(cfg, params={}) {
-  local updatedConfig = config + cfg,
-  local variantName = updatedConfig.dashboard.variant_name,
-  local query = updatedConfig.policy.promql_query,
+function(cfg) {
+  local params = config + cfg,
+  local variantName = params.dashboard.variant_name,
+  local query = params.policy.promql_query,
 
-  local baseDashboard = baseDashboardFn(updatedConfig, params),
+  local baseDashboard = baseDashboardFn(params),
 
   local queryPanel =
     graphPanel.new(
       title=variantName + ' Query',
-      datasource=updatedConfig.dashboard.datasource.name,
+      datasource=params.dashboard.datasource.name,
       interval='30s',
       labelY1='Messages',
     ).addTarget(

@@ -11,8 +11,8 @@ function(params, metadata={}) {
 
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
-  local p = policy(c, params, metadataWrapper),
-  local d = dashboard(c, params),
+  local p = policy(c, metadataWrapper),
+  local d = dashboard(c),
 
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,
