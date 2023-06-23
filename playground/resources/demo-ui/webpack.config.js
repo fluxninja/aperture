@@ -38,10 +38,10 @@ module.exports = {
     ],
   },
   devServer: {
-    port: 9099,
+    port: 8099,
     proxy: {
       '/request': {
-        target: 'http://service1-demo-app.demoapp.svc.cluster.local',
+        target: 'http://localhost:8088',
         changeOrigin: true,
       },
     },

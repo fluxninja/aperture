@@ -6,7 +6,9 @@ import {
 } from '../components/monitor-request'
 import { Box, Typography, styled } from '@mui/material'
 import { GracefulError, useGraceful } from '@fluxninja-tools/graceful-js'
-import { API_URL, api } from '../api'
+import { API_URL } from '../api'
+import axios from 'axios'
+// import { kApi } from '../k-api'
 
 export const HomePage: FC = () => {
   const { collection, gracefulError } = useGracefulRequestForRateLimit()
@@ -38,7 +40,9 @@ export const useGracefulRequestForRateLimit = () => {
       for (let i = 0; i < 100; i++) {
         await new Promise((resolve) => setTimeout(resolve, 800))
         try {
-          const res = await api.post('/request', {
+          // await kApi()
+          const res = await axios.post('/request', {
+            headers: { 'Content-Type': 'application/json', 'user-id': 'foo' },
             data: {},
           })
 
