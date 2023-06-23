@@ -22,7 +22,7 @@ policy:
         selectors:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   load_ramp:
     sampler:
       label_key: ""

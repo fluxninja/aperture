@@ -129,7 +129,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='The interval between successive evaluations of the Circuit.'
     type='string'
     reference=''
-    value='"1s"'
+    value='"10s"'
 />
 
 <!-- vale on -->
@@ -163,7 +163,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='Parameters for Adaptive Load Scheduler.'
     type='Object (aperture.spec.v1.AdaptiveLoadSchedulerParameters)'
     reference='../../../spec#adaptive-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.0025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
+    value='{"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
 />
 
 <!-- vale on -->

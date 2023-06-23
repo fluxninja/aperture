@@ -26,7 +26,7 @@ policy:
         alert_name: "Auto-scaler is scaling out"
       scale_out_cooldown: "30s"
   components: []
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   policy_name: __REQUIRED_FIELD__
   promql_query: __REQUIRED_FIELD__
   resources:
@@ -40,7 +40,7 @@ policy:
         max_gradient: 1
         min_gradient: 0.1
         slope: -1
-      load_multiplier_linear_increment: 0.0025
+      load_multiplier_linear_increment: 0.025
       load_scheduler:
         selectors:
           - control_point: __REQUIRED_FIELD__

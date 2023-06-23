@@ -21,7 +21,7 @@ metadata:
       "resources": {"flow_control": {"classifiers": [{"rules": {"user_type": {"extractor":
       {"from": "request.http.headers.user-type"}}}, "selectors": [{"control_point":
       "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}]}}, "service_protection_core":
-      {"adaptive_load_scheduler": {"load_multiplier_linear_increment": 0.0025000000000000001,
+      {"adaptive_load_scheduler": {"load_multiplier_linear_increment": 0.025000000000000001,
       "load_scheduler": {"scheduler": {"workloads": [{"label_matcher": {"match_labels":
       {"user_type": "guest"}}, "name": "guest", "parameters": {"priority": "50"}},
       {"label_matcher": {"match_labels": {"http.request.header.user_type": "subscriber"}},
@@ -57,7 +57,7 @@ spec:
               max_gradient: 1
               min_gradient: 0.1
               slope: -1
-            load_multiplier_linear_increment: 0.0025
+            load_multiplier_linear_increment: 0.025
             load_scheduler:
               scheduler:
                 workloads:
@@ -123,13 +123,13 @@ spec:
             service: service1-demo-app.demoapp.svc.cluster.local
     - query:
         promql:
-          evaluation_interval: 1s
+          evaluation_interval: 10s
           out_ports:
             output:
               signal_name: SIGNAL
           query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app",
-            policy_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="service1-demo-app", policy_name="service1-demo-app"}[5s]))
+            policy_name="service1-demo-app"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app", policy_name="service1-demo-app"}[30s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -165,7 +165,7 @@ spec:
         out_ports:
           output:
             signal_name: SETPOINT
-    evaluation_interval: 1s
+    evaluation_interval: 10s
   resources:
     flow_control:
       classifiers:

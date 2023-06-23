@@ -22,6 +22,7 @@ function(cfg) {
     graphPanel.new(
       title='Throughput - Accept/Reject',
       datasource=dsName,
+      interval='30',
     )
     .addTarget(
       prometheus.target(
@@ -37,6 +38,7 @@ function(cfg) {
     graphPanel.new(
       title='Accept Percentage',
       datasource=dsName,
+      interval='30s',
     )
     .addTarget(
       prometheus.target(

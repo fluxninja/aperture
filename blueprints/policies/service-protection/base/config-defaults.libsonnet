@@ -21,7 +21,7 @@ local service_protection_core_defaults = {
       alert_name: 'Load Throttling Event',
     },
     max_load_multiplier: 2.0,
-    load_multiplier_linear_increment: 0.0025,
+    load_multiplier_linear_increment: 0.025,
   },
 
   dry_run: false,
@@ -115,7 +115,7 @@ local kubeletstats_infra_meter = function(agent_group) {
         classifiers: [],
       },
     },
-    evaluation_interval: '1s',
+    evaluation_interval: '10s',
     service_protection_core: service_protection_core_defaults,
     auto_scaling: auto_scaling_defaults {
       scaling_backend+: {

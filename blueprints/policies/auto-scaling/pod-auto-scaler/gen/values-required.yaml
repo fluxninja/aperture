@@ -55,7 +55,7 @@ policy:
       classifiers: []
   # The interval between successive evaluations of the Circuit.
   # Type: string
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   # Dry run mode ensures that no scaling is invoked by this auto scaler.
   # Type: bool
   dry_run: false

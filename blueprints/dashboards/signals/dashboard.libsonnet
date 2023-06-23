@@ -18,6 +18,7 @@ function(cfg) {
     graphPanel.new(
       title='Signal Average - ${signal_name} (${sub_circuit_id})',
       datasource=dsName,
+      interval='30s',
     )
     .addTarget(
       prometheus.target(
@@ -30,10 +31,11 @@ function(cfg) {
       ),
     ),
 
-  local InvalidFrequencyPanel =
+  local invalidFrequencyPanel =
     graphPanel.new(
       title='Signal Validity (Frequency) - ${signal_name} (${sub_circuit_id})',
       datasource=dsName,
+      interval='30s',
       stack=true,
       bars=true,
     )
@@ -112,7 +114,7 @@ function(cfg) {
       gridPos={ x: 0, y: 0, w: 24, h: 10 },
     )
     .addPanel(
-      panel=InvalidFrequencyPanel,
+      panel=invalidFrequencyPanel,
       gridPos={ x: 0, y: 15, w: 24, h: 10 },
     ),
 

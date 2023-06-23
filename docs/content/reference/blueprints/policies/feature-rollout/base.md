@@ -53,7 +53,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Parameters for the Feature Rollout policy.'
     type='Object (rollout_policy)'
     reference='#rollout-policy'
-    value='{"components": [], "drivers": {}, "evaluation_interval": "1s", "load_ramp": {"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "rollout": false}'
+    value='{"components": [], "drivers": {}, "evaluation_interval": "10s", "load_ramp": {"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "rollout": false}'
 />
 
 <!-- vale on -->
@@ -667,7 +667,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='The interval between successive evaluations of the Circuit.'
     type='string'
     reference=''
-    value='"1s"'
+    value='"10s"'
 />
 
 <!-- vale on -->

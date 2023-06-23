@@ -94,7 +94,7 @@ policy:
               name: subscriber
       # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
       # Type: float64
-      load_multiplier_linear_increment: 0.0025
+      load_multiplier_linear_increment: 0.025
 
   latency_baseliner:
     latency_tolerance_multiplier: 1.1

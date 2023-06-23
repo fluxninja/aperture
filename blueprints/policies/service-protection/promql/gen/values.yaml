@@ -21,7 +21,7 @@ policy:
       classifiers: []
   # The interval between successive evaluations of the Circuit.
   # Type: string
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   service_protection_core:
     # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
     # Type: []overload_confirmation
@@ -36,7 +36,7 @@ policy:
         max_gradient: 1
         min_gradient: 0.1
         slope: -1
-      load_multiplier_linear_increment: 0.0025
+      load_multiplier_linear_increment: 0.025
       load_scheduler:
         selectors:
           - control_point: __REQUIRED_FIELD__
@@ -86,7 +86,7 @@ policy:
 dashboard:
   # Refresh interval for dashboard panels.
   # Type: string
-  refresh_interval: "15s"
+  refresh_interval: "5s"
   # Time from of dashboard.
   # Type: string
   time_from: "now-15m"
