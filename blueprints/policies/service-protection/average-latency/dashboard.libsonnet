@@ -6,18 +6,18 @@ local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libso
 local graphPanel = grafana.graphPanel;
 local prometheus = grafana.prometheus;
 
-function(cfg) {
-  local params = config + cfg,
-  local policyName = params.policy.policy_name,
-  local variantName = params.dashboard.variant_name,
-  local filters = utils.dictToPrometheusFilter(params.dashboard.extra_filters { flux_meter_name: policyName, policy_name: policyName, flow_status: 'OK' }),
+function(cfg, params={}) {
+  local updatedConfig = config + cfg,
+  local policyName = updatedConfig.policy.policy_name,
+  local variantName = updatedConfig.dashboard.variant_name,
+  local filters = utils.dictToPrometheusFilter(updatedConfig.dashboard.extra_filters { flux_meter_name: policyName, flow_status: 'OK' }),
 
-  local baseDashboard = baseDashboardFn(params),
+  local baseDashboard = baseDashboardFn(updatedConfig, params),
 
   local fluxMeterPanel =
     graphPanel.new(
       title=variantName + ' Query',
-      datasource=params.dashboard.datasource.name,
+      datasource=updatedConfig.dashboard.datasource.name,
       labelY1='Latency (ms)',
       formatY1='ms'
     ).addTarget(

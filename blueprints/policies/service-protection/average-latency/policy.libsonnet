@@ -2,10 +2,10 @@ local spec = import '../../../spec.libsonnet';
 local basePolicyFn = import '../base/policy.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg, metadata={}) {
-  local params = config + cfg,
+function(cfg, params={}, metadata={}) {
+  local updatedConfig = config + cfg,
 
-  local basePolicy = basePolicyFn(cfg, metadata),
+  local basePolicy = basePolicyFn(cfg, params, metadata),
 
   // Add new components to basePolicy
   local policyDef = basePolicy.policyDef {
@@ -23,11 +23,11 @@ function(cfg, metadata={}) {
         ),
         spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.mul(
           spec.v1.Port.withSignalName('SIGNAL'),
-          spec.v1.Port.withConstantSignal(params.policy.latency_baseliner.latency_ema_limit_multiplier),
+          spec.v1.Port.withConstantSignal(updatedConfig.policy.latency_baseliner.latency_ema_limit_multiplier),
           output=spec.v1.Port.withSignalName('MAX_EMA')
         )),
         spec.v1.Component.withEma(
-          spec.v1.EMA.withParameters(params.policy.latency_baseliner.ema)
+          spec.v1.EMA.withParameters(updatedConfig.policy.latency_baseliner.ema)
           + spec.v1.EMA.withInPortsMixin(
             spec.v1.EMA.inPorts.withInput(spec.v1.Port.withSignalName('SIGNAL'))
             + spec.v1.EMA.inPorts.withMaxEnvelope(spec.v1.Port.withSignalName('MAX_EMA'))
@@ -36,14 +36,14 @@ function(cfg, metadata={}) {
         ),
         spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.mul(
           spec.v1.Port.withSignalName('SIGNAL_EMA'),
-          spec.v1.Port.withConstantSignal(params.policy.latency_baseliner.latency_tolerance_multiplier),
+          spec.v1.Port.withConstantSignal(updatedConfig.policy.latency_baseliner.latency_tolerance_multiplier),
           output=spec.v1.Port.withSignalName('SETPOINT')
         )),
       ],
     },
     resources+: {
       flow_control+: {
-        flux_meters+: { [params.policy.policy_name]: params.policy.latency_baseliner.flux_meter },
+        flux_meters+: { [updatedConfig.policy.policy_name]: updatedConfig.policy.latency_baseliner.flux_meter },
       },
     },
   },

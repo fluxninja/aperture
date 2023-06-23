@@ -266,7 +266,7 @@ def update_param_defaults(
                 try:
                     return config[part]
                 except KeyError:
-                    # fatal exit
+                    # fatal
                     logger.error(f"Unable to find param {name} in rendered config")
                     raise typer.Exit(1)
             else:
@@ -279,8 +279,8 @@ def update_param_defaults(
                     return None
 
     logger.trace(rendered_config)
-    # walk nested_parameters and update defaults
 
+    # walk nested_parameters and update defaults
     def update_nested_param_defaults(node, prefix=""):
         if node.parameter.param_type != "intermediate_node":
             default = get_param_default_from_rendered_config(
@@ -510,7 +510,9 @@ type: "{{ param_type }}"
 {% else %}
 {{ node.parameter.param_name }}:
   description: "{{ node.parameter.description }}"
+  {% if node.parameter.default != None %}
   default: {{ node.parameter.default | quote_value }}
+  {% endif %}
   {{ render_type(node.parameter.param_type, node.parameter.json_schema_link,
                  node.parameter.is_complex_type) | indent(2, true) }}
 {% endif %}
