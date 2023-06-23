@@ -143,7 +143,7 @@ function(cfg) {
     if std.objectHas(params.policy, 'service_protection_core') && std.objectHas(params.policy.service_protection_core, 'overload_confirmations') then [
       local query = params.policy.service_protection_core.overload_confirmations[idx];
       newGraphPanel(
-        'Overload Confirmation Query %s - %s - %s' % [(idx + 1), query.operator, query.threshold],
+        'Overload Confirmation Query %s - %s - %0.3f' % [(idx + 1), query.operator, query.threshold],
         params.dashboard.datasource.name,
         params.policy.service_protection_core.overload_confirmations[idx].query_string,
       ) {
