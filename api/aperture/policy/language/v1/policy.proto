@@ -169,7 +169,43 @@ message Circuit {
 // :::
 message Resources {
   // TelemetryCollector configures OpenTelemetry collector integration.
+  // Deprecated: v2.8.0. Use `infra_meters` instead.
   repeated TelemetryCollector telemetry_collectors = 1;
+
+  // _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
+  // receive and process telemetry at the agents and send metrics to the configured Prometheus.
+  // Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
+  // is optional, as all the components and pipeline names would be normalized.
+  //
+  // Example:
+  //
+  // ```yaml
+  // infra_meters:
+  //   rabbitmq:
+  //     agent_group: default
+  //     per_agent_group: true
+  //     processors:
+  //	     batch:
+  //	       send_batch_size: 10
+  //	       timeout: 10s
+  //	   receivers:
+  //	     rabbitmq:
+  //	       collection_interval: 10s
+  //         endpoint: http://<rabbitmq-svc-fqdn>:15672
+  //         password: secretpassword
+  //         username: admin
+  //
+  // ```
+  //
+  // :::caution
+  //
+  // Validate the OTel configuration before applying it to the
+  // production cluster.
+  // Incorrect configuration will get rejected at the agents and might cause
+  // shutdown of the agent(s).
+  //
+  // :::
+  map<string, InfraMeter> infra_meters = 2;
   // FlowControlResources are resources that are provided by flow control integration.
   FlowControlResources flow_control = 101;
 }

@@ -64,23 +64,18 @@ func provideAgent(
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
-		tc := &policysyncv1.TelemetryCollectorWrapper{}
-		if err = unmarshaller.UnmarshalKey("", tc); err != nil {
-			log.Error().Err(err).Msg("unmarshalling telemetry collector")
+		im := &policysyncv1.InfraMeterWrapper{}
+		if err = unmarshaller.UnmarshalKey("", im); err != nil {
+			log.Error().Err(err).Msg("unmarshalling infra meter")
 			return
 		}
-		infraMeters := tc.GetTelemetryCollector().GetInfraMeters()
 		key := string(event.Key)
 
 		allInfraMetersMutex.Lock()
 		defer allInfraMetersMutex.Unlock()
 		switch event.Type {
 		case notifiers.Write:
-			allInfraMeters[key] = &policysyncv1.InfraMeterWrapper{
-				PolicyName:           tc.GetPolicyName(),
-				TelemetryCollectorId: tc.GetTelemetryCollectorId(),
-				InfraMeter:           infraMeters,
-			}
+			allInfraMeters[key] = im
 		case notifiers.Remove:
 			delete(allInfraMeters, key)
 		}
@@ -100,7 +95,7 @@ func provideAgent(
 	// Get Agent Group from host info gatherer
 	agentGroupName := ai.GetAgentGroup()
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.TelemetryCollectorConfigPath,
+	etcdPath := path.Join(paths.InfraMeterConfigPath,
 		paths.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {

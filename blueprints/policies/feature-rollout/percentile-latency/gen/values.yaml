@@ -1,6 +1,6 @@
 # Generated values file for policies/feature-rollout/percentile-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/ policies/feature-rollout/percentile-latency
+# https://docs.fluxninja.com/reference/blueprints/policies/feature-rollout/percentile-latency
 
 # Parameters for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy

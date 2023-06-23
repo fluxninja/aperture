@@ -1,4 +1,4 @@
-package telemetrycollectors
+package inframeters
 
 import (
 	"context"
@@ -14,31 +14,31 @@ import (
 	"go.uber.org/fx"
 )
 
-type tcConfigSync struct {
-	id             int64
-	policyReadAPI  iface.Policy
-	tcProto        *policylangv1.TelemetryCollector
-	etcdPath       string
-	agentGroupName string
+type infraMeterConfigSync struct {
+	name            string
+	policyReadAPI   iface.Policy
+	infraMeterProto *policylangv1.InfraMeter
+	etcdPath        string
+	agentGroupName  string
 }
 
-// NewTelemetryCollectorsOptions creates fx options InfraMeters.
-func NewTelemetryCollectorsOptions(
-	tcProtos []*policylangv1.TelemetryCollector,
+// NewInfraMetersOptions creates fx options InfraMeters.
+func NewInfraMetersOptions(
+	infraMeters map[string]*policylangv1.InfraMeter,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
 	var options []fx.Option
 
-	for i, tcProto := range tcProtos {
-		agentGroup := tcProto.GetAgentGroup()
-		etcdPath := path.Join(paths.TelemetryCollectorConfigPath,
-			paths.TelemetryCollectorKey(agentGroup, policyBaseAPI.GetPolicyName(), i))
-		configSync := &tcConfigSync{
-			id:             int64(i),
-			tcProto:        tcProto,
-			policyReadAPI:  policyBaseAPI,
-			agentGroupName: agentGroup,
-			etcdPath:       etcdPath,
+	for name, infraMeter := range infraMeters {
+		agentGroup := infraMeter.GetAgentGroup()
+		etcdPath := path.Join(paths.InfraMeterConfigPath,
+			paths.InfraMeterKey(agentGroup, policyBaseAPI.GetPolicyName(), name))
+		configSync := &infraMeterConfigSync{
+			name:            name,
+			infraMeterProto: infraMeter,
+			policyReadAPI:   policyBaseAPI,
+			agentGroupName:  agentGroup,
+			etcdPath:        etcdPath,
 		}
 		options = append(options, fx.Invoke(configSync.doSync))
 	}
@@ -46,7 +46,7 @@ func NewTelemetryCollectorsOptions(
 	return fx.Options(options...), nil
 }
 
-func (configSync *tcConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (configSync *infraMeterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	// Get the logger instance from the status registry.
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 
@@ -54,18 +54,17 @@ func (configSync *tcConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle 
 	lifecycle.Append(fx.Hook{
 		// OnStart hook will be called when the application starts.
 		OnStart: func(ctx context.Context) error {
-			// Create a FluxMeterWrapper using the fluxMeterName and fluxMeterProto provided.
-			wrapper := &policysyncv1.TelemetryCollectorWrapper{
-				TelemetryCollector:   configSync.tcProto,
-				TelemetryCollectorId: configSync.id,
-				PolicyName:           configSync.policyReadAPI.GetPolicyName(),
+			wrapper := &policysyncv1.InfraMeterWrapper{
+				InfraMeter:     configSync.infraMeterProto,
+				InfraMeterName: configSync.name,
+				PolicyName:     configSync.policyReadAPI.GetPolicyName(),
 			}
 
-			// Marshal the telemetry collector using json marshaler.
+			// Marshal the infra meter using json marshaler.
 			dat, err := json.Marshal(wrapper)
 			if err != nil {
 				// Log the error and return it in case of any failure.
-				logger.Error().Err(err).Msg("Failed to marshal telemetry collector config")
+				logger.Error().Err(err).Msg("Failed to marshal infra meter config")
 				return err
 			}
 
@@ -75,7 +74,7 @@ func (configSync *tcConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle 
 				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
 			if err != nil {
 				// Log the error and return it in case of any failure.
-				logger.Error().Err(err).Msg("Failed to put telemetry collector config")
+				logger.Error().Err(err).Msg("Failed to put infra meter config")
 				return err
 			}
 
@@ -90,7 +89,7 @@ func (configSync *tcConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle 
 			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
 			if err != nil {
 				// Log the error and return it in case of any failure.
-				logger.Error().Err(err).Msg("Failed to delete telemetry collector config")
+				logger.Error().Err(err).Msg("Failed to delete infra meter config")
 				return err
 			}
 

@@ -302,7 +302,7 @@ jobs:
             helm
             java
             jb
-            jsonnet
+            go-jsonnet
             kustomize
             mockery
             nodejs
@@ -1449,6 +1449,10 @@ commands:
               checksum "tools/go/go.mod" }}
             - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
+      - run:
+          name: Copy tool-versions in HOME dir
+          command: |
+            cp .tool-versions ~/.tool-versions
       - run:
           name: Install ASDF tools
           environment:

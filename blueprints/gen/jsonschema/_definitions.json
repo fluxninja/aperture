@@ -1450,6 +1450,12 @@
     "InfraMeter": {
       "description": "InfraMeter is a resource that sets up OpenTelemetry pipelines.\nIt defines receivers, processors, and a single metrics pipeline\nwhich will be exported to the configured Prometheus instance.\nEnvironment variables can be used in the configuration using format `${ENV_VAR_NAME}`.\n\n:::info\n\nSee also [Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).\n\n:::",
       "properties": {
+        "agent_group": {
+          "default": "default",
+          "description": "AgentGroup is the agent group to sync this InfraMeter with.\n\n",
+          "type": "string",
+          "x-go-tag-default": "default"
+        },
         "per_agent_group": {
           "default": false,
           "description": "PerAgentGroup marks the pipeline to be instantiated only once per agent\ngroup. This is helpful for receivers that scrape for example, some cluster-wide\nmetrics. When not set, pipeline will be instantiated on every Agent.\n\n",
@@ -1458,8 +1464,7 @@
         },
         "pipeline": {
           "$ref": "#/definitions/InfraMeterMetricsPipeline",
-          "description": "Pipeline is an OTel metrics pipeline definition, which **only** uses receivers\nand processors defined above. Exporter would be added automatically.\n\nIf there are no processors defined or only one processor is defined, the\npipeline definition can be omitted. In such cases, the pipeline will\nautomatically use all given receivers and the defined processor (if\nany).  However, if there are more than one processor, the pipeline must\nbe defined explicitly.\n\n",
-          "x-go-tag-validate": "required"
+          "description": "Pipeline is an OTel metrics pipeline definition, which **only** uses receivers\nand processors defined above. Exporter would be added automatically.\n\nIf there are no processors defined or only one processor is defined, the\npipeline definition can be omitted. In such cases, the pipeline will\nautomatically use all given receivers and the defined processor (if\nany).  However, if there are more than one processor, the pipeline must\nbe defined explicitly."
         },
         "processors": {
           "additionalProperties": {
@@ -2621,8 +2626,15 @@
           "$ref": "#/definitions/FlowControlResources",
           "description": "FlowControlResources are resources that are provided by flow control integration."
         },
+        "infra_meters": {
+          "additionalProperties": {
+            "$ref": "#/definitions/InfraMeter"
+          },
+          "description": "_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will\nreceive and process telemetry at the agents and send metrics to the configured Prometheus.\nKey in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`\nis optional, as all the components and pipeline names would be normalized.\n\nExample:\n\n```yaml\ninfra_meters:\n  rabbitmq:\n    agent_group: default\n    per_agent_group: true\n    processors:\n\t     batch:\n\t       send_batch_size: 10\n\t       timeout: 10s\n\t   receivers:\n\t     rabbitmq:\n\t       collection_interval: 10s\n        endpoint: http://<rabbitmq-svc-fqdn>:15672\n        password: secretpassword\n        username: admin\n\n```\n\n:::caution\n\nValidate the OTel configuration before applying it to the\nproduction cluster.\nIncorrect configuration will get rejected at the agents and might cause\nshutdown of the agent(s).\n\n:::",
+          "type": "object"
+        },
         "telemetry_collectors": {
-          "description": "TelemetryCollector configures OpenTelemetry collector integration.",
+          "description": "TelemetryCollector configures OpenTelemetry collector integration.\nDeprecated: v2.8.0. Use `infra_meters` instead.",
           "items": {
             "$ref": "#/definitions/TelemetryCollector",
             "type": "object"
@@ -3075,7 +3087,7 @@
           "type": "object"
         }
       },
-      "title": "TelemetryCollector defines the telemetry configuration to be synced with the agents.\nIt consists of two parts:\n- Agent Group: Agent group to sync telemetry configuration with\n- Infra Meters: OTel compatible metrics pipelines",
+      "title": "TelemetryCollector defines the telemetry configuration to be synced with the agents.\nDeprecated: v2.8.0. Use `InfraMeter` instead.\nIt consists of two parts:\n- Agent Group: Agent group to sync telemetry configuration with\n- Infra Meters: OTel compatible metrics pipelines",
       "type": "object",
       "additionalProperties": false
     },

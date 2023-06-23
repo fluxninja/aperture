@@ -1,16 +1,17 @@
 local spec = import '../../../spec.libsonnet';
+local utils = import '../../../utils/utils.libsonnet';
 local baseAutoScalingPolicyFn = import '../../auto-scaling/base/policy.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg, metadata={}) {
-  local params = config + cfg,
+function(cfg, params={}, metadata={}) {
+  local updatedConfig = config + cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
     local promQLSignalName = 'PROMQL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
 
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(
       spec.v1.PromQL.withQueryString(confirmation.query_string)
-      + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+      + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
       + spec.v1.PromQL.withOutPorts({
         output: spec.v1.Port.withSignalName(promQLSignalName),
       })
@@ -56,7 +57,7 @@ function(cfg, metadata={}) {
 
   local confirmationAccumulator = std.foldl(
     addOverloadConfirmation,
-    (if std.objectHas(params.policy.service_protection_core, 'overload_confirmations') then params.policy.service_protection_core.overload_confirmations else []),
+    (if std.objectHas(updatedConfig.policy.service_protection_core, 'overload_confirmations') then updatedConfig.policy.service_protection_core.overload_confirmations else []),
     confirmationAccumulatorInitial
   ),
 
@@ -76,11 +77,11 @@ function(cfg, metadata={}) {
 
   local adaptiveLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
-      local adaptiveLoadScheduler = params.policy.service_protection_core.adaptive_load_scheduler;
+      local adaptiveLoadScheduler = updatedConfig.policy.service_protection_core.adaptive_load_scheduler;
       spec.v1.AdaptiveLoadScheduler.new()
       + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
       + spec.v1.AdaptiveLoadScheduler.withDryRunConfigKey('dry_run')
-      + spec.v1.AdaptiveLoadScheduler.withDryRun(params.policy.service_protection_core.dry_run)
+      + spec.v1.AdaptiveLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
         overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
         signal: spec.v1.Port.withSignalName('SIGNAL'),
@@ -96,8 +97,9 @@ function(cfg, metadata={}) {
   /** Auto scale escalation **/
 
   local scaleInControllers =
-    (if
-       std.objectHas(params.policy, 'auto_scaling') && std.objectHas(params.policy.auto_scaling, 'periodic_decrease')
+    (if std.objectHas(params, 'policy') &&
+        std.objectHas(params.policy, 'auto_scaling') &&
+        std.objectHas(updatedConfig.policy.auto_scaling, 'periodic_decrease')
      then
        [
          spec.v1.ScaleInController.new()
@@ -107,13 +109,14 @@ function(cfg, metadata={}) {
          )
          + spec.v1.ScaleInController.withController(
            spec.v1.ScaleInControllerController.new()
-           + spec.v1.ScaleInControllerController.withPeriodic(params.policy.auto_scaling.periodic_decrease)
+           + spec.v1.ScaleInControllerController.withPeriodic(updatedConfig.policy.auto_scaling.periodic_decrease)
          ),
        ]
      else []),
 
   local scaleOutControllers =
-    (if std.objectHas(params.policy, 'auto_scaling') then [
+    (if std.objectHas(params, 'policy') &&
+        std.objectHas(params.policy, 'auto_scaling') then [
        spec.v1.ScaleOutController.new()
        + spec.v1.ScaleOutController.withAlerter(
          spec.v1.AlerterParameters.new()
@@ -138,31 +141,32 @@ function(cfg, metadata={}) {
 
   local policyDef =
     spec.v1.Policy.new()
-    + spec.v1.Policy.withResources(params.policy.resources)
+    + spec.v1.Policy.withResources(utils.resources(updatedConfig.policy.resources).updatedResources)
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
-      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
       + spec.v1.Circuit.withComponents(
         confirmationAccumulator.components
         + (if isConfirmationCriteria then [overloadConfirmationAnd] else [])
         + [
           adaptiveLoadSchedulerComponent,
         ]
-        + params.policy.components,
+        + updatedConfig.policy.components,
       ),
     ) +
     (
-      if std.objectHas(params.policy, 'auto_scaling') then
-        local autoScalingParams = {
-          policy+: params.policy.auto_scaling {
-            policy_name: params.policy.policy_name,
+      if std.objectHas(params, 'policy') &&
+         std.objectHas(params.policy, 'auto_scaling') then
+        local autoScalingUpdatedConfig = {
+          policy+: updatedConfig.policy.auto_scaling {
+            policy_name: updatedConfig.policy.policy_name,
             // Set empty defaults for promql_scale_out_controllers and promql_scale_in_controllers
-            promql_scale_out_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_out_controllers') then params.policy.auto_scaling.promql_scale_out_controllers else [],
-            promql_scale_in_controllers: if std.objectHas(params.policy.auto_scaling, 'promql_scale_in_controllers') then params.policy.auto_scaling.promql_scale_in_controllers else [],
+            promql_scale_out_controllers: if std.objectHas(updatedConfig.policy.auto_scaling, 'promql_scale_out_controllers') then updatedConfig.policy.auto_scaling.promql_scale_out_controllers else [],
+            promql_scale_in_controllers: if std.objectHas(updatedConfig.policy.auto_scaling, 'promql_scale_in_controllers') then updatedConfig.policy.auto_scaling.promql_scale_in_controllers else [],
           },
         };
 
-        local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingParams).policyDef;
+        local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingUpdatedConfig).policyDef;
         {
           circuit+: {
             components+: std.map(
@@ -185,7 +189,7 @@ function(cfg, metadata={}) {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
     metadata: {
-      name: params.policy.policy_name,
+      name: updatedConfig.policy.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
       },

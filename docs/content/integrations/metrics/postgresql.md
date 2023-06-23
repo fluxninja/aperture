@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          postgresql:
-            per_agent_group: true
-            receivers:
-              postgresql: [postgresqlreceiver configuration here]
+    infra_meters:
+      postgresql:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          postgresql: [postgresqlreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

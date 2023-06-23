@@ -11,7 +11,7 @@ function(params, metadata={}) {
 
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
-  local p = policy(c, metadataWrapper),
+  local p = policy(c, params, metadataWrapper),
   local d = dashboard(c),
 
   policies: {

@@ -176,24 +176,20 @@
       "properties": {
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
-          "default": null,
           "type": "string"
         },
         "threshold": {
           "description": "Threshold for the controller.",
-          "default": null,
           "type": "number",
           "format": "double"
         },
         "gradient": {
           "description": "Gradient parameters for the controller.",
-          "default": null,
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
         },
         "alerter": {
           "description": "Alerter parameters for the controller.",
-          "default": null,
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         }
@@ -206,24 +202,20 @@
       "properties": {
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
-          "default": null,
           "type": "string"
         },
         "threshold": {
           "description": "Threshold for the controller.",
-          "default": null,
           "type": "number",
           "format": "double"
         },
         "gradient": {
           "description": "Gradient parameters for the controller.",
-          "default": null,
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
         },
         "alerter": {
           "description": "Alerter parameters for the controller.",
-          "default": null,
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         }

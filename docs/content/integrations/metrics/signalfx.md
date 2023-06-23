@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          signalfx:
-            per_agent_group: true
-            receivers:
-              signalfx: [signalfxreceiver configuration here]
+    infra_meters:
+      signalfx:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          signalfx: [signalfxreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

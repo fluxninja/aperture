@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          haproxy:
-            per_agent_group: true
-            receivers:
-              haproxy: [haproxyreceiver configuration here]
+    infra_meters:
+      haproxy:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          haproxy: [haproxyreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
