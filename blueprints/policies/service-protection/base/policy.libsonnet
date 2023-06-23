@@ -158,7 +158,7 @@ function(cfg, params={}, metadata={}) {
     (
       if std.objectHas(params, 'policy') &&
          std.objectHas(params.policy, 'auto_scaling') then
-        local autoScalingupdatedConfig = {
+        local autoScalingUpdatedConfig = {
           policy+: updatedConfig.policy.auto_scaling {
             policy_name: updatedConfig.policy.policy_name,
             // Set empty defaults for promql_scale_out_controllers and promql_scale_in_controllers
@@ -167,7 +167,7 @@ function(cfg, params={}, metadata={}) {
           },
         };
 
-        local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingupdatedConfig).policyDef;
+        local baseAutoScalingPolicy = baseAutoScalingPolicyFn(autoScalingUpdatedConfig).policyDef;
         {
           circuit+: {
             components+: std.map(

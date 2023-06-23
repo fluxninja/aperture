@@ -266,7 +266,8 @@ def update_param_defaults(
                 try:
                     return config[part]
                 except KeyError:
-                    # fatal exit
+                    # fatal
+                    logger.error(f"Unable to find param {name} in rendered config")
                     raise typer.Exit(1)
             else:
                 try:
