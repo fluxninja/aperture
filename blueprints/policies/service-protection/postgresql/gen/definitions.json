@@ -46,7 +46,7 @@
         },
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
-          "default": "1s",
+          "default": "10s",
           "type": "string"
         },
         "service_protection_core": {
@@ -74,7 +74,7 @@
                   "min_gradient": 0.1,
                   "slope": -1
                 },
-                "load_multiplier_linear_increment": 0.0025,
+                "load_multiplier_linear_increment": 0.025,
                 "load_scheduler": {
                   "selectors": [
                     {
@@ -111,79 +111,6 @@
                   "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.",
                   "default": "gte",
                   "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "auto_scaling": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "dry_run": {
-              "description": "Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.",
-              "default": false,
-              "type": "boolean"
-            },
-            "promql_scale_out_controllers": {
-              "description": "List of scale out controllers.",
-              "default": [],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/$defs/promql_scale_out_controller"
-              }
-            },
-            "promql_scale_in_controllers": {
-              "description": "List of scale in controllers.",
-              "default": [],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/$defs/promql_scale_in_controller"
-              }
-            },
-            "scaling_parameters": {
-              "description": "Parameters that define the scaling behavior.",
-              "default": {
-                "scale_in_alerter": {
-                  "alert_name": "Auto-scaler is scaling in"
-                },
-                "scale_in_cooldown": "40s",
-                "scale_out_alerter": {
-                  "alert_name": "Auto-scaler is scaling out"
-                },
-                "scale_out_cooldown": "30s"
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
-            },
-            "scaling_backend": {
-              "description": "Scaling backend for the policy.",
-              "default": {
-                "kubernetes_replicas": {
-                  "kubernetes_object_selector": "__REQUIRED_FIELD__",
-                  "max_replicas": "__REQUIRED_FIELD__",
-                  "min_replicas": "__REQUIRED_FIELD__"
-                }
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackend"
-            },
-            "periodic_decrease": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "period": {
-                  "description": "Period for periodic scale in.",
-                  "default": "60s",
-                  "type": "string"
-                },
-                "scale_in_percentage": {
-                  "description": "Percentage of replicas to scale in.",
-                  "default": 10,
-                  "type": "number",
-                  "format": "double"
                 }
               }
             }
@@ -275,56 +202,6 @@
         "operator": {
           "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
           "type": "string"
-        }
-      }
-    },
-    "promql_scale_out_controller": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "query_string": {
-          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
-          "type": "string"
-        },
-        "threshold": {
-          "description": "Threshold for the controller.",
-          "type": "number",
-          "format": "double"
-        },
-        "gradient": {
-          "description": "Gradient parameters for the controller.",
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
-        },
-        "alerter": {
-          "description": "Alerter parameters for the controller.",
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
-        }
-      }
-    },
-    "promql_scale_in_controller": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "query_string": {
-          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
-          "type": "string"
-        },
-        "threshold": {
-          "description": "Threshold for the controller.",
-          "type": "number",
-          "format": "double"
-        },
-        "gradient": {
-          "description": "Gradient parameters for the controller.",
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
-        },
-        "alerter": {
-          "description": "Alerter parameters for the controller.",
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         }
       }
     },
