@@ -97,7 +97,7 @@ function(cfg) {
   local params = config + cfg,
   local policyName = params.policy.policy_name,
 
-  local dashboardDef = dashboardWithPanels(params.dashboard, policyName, params.dashboard.extra_filters),
+  local dashboardDef = dashboardWithPanels(params.dashboard, policyName, params.dashboard.extra_filters).dashboard,
 
   dashboard: dashboardDef,
 }

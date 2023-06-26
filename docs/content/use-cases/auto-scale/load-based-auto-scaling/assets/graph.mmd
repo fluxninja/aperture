@@ -1,0 +1,74 @@
+flowchart LR
+subgraph root.0[<center>AdaptiveLoadScheduler<br/>1 selectors</center>]
+subgraph root.0_inports[ ]
+style root.0_inports fill:none,stroke:none
+root.0overload_confirmation[overload_confirmation]
+root.0setpoint[setpoint]
+root.0signal[signal]
+end
+subgraph root.0_outports[ ]
+style root.0_outports fill:none,stroke:none
+root.0desired_load_multiplier[desired_load_multiplier]
+end
+end
+root.0_overload_confirmation_FakeConstantout((1.00))
+subgraph root.1[<center>AutoScaler<br/>prod:Deployment/search-serv...</center>]
+subgraph root.1_inports[ ]
+style root.1_inports fill:none,stroke:none
+root.1scale_out_setpoint_0[scale_out_setpoint_0]
+root.1scale_out_signal_0[scale_out_signal_0]
+end
+end
+root.1_scale_out_setpoint_0_FakeConstantout((1.00))
+subgraph root.2[<center>PromQL<br/>every 1s</center>]
+subgraph root.2_outports[ ]
+style root.2_outports fill:none,stroke:none
+root.2output[output]
+end
+end
+subgraph root.3[<center>ArithmeticCombinator<br/>mul</center>]
+subgraph root.3_inports[ ]
+style root.3_inports fill:none,stroke:none
+root.3lhs[lhs]
+root.3rhs[rhs]
+end
+subgraph root.3_outports[ ]
+style root.3_outports fill:none,stroke:none
+root.3output[output]
+end
+end
+root.3_rhs_FakeConstantout((2.00))
+subgraph root.4[<center>EMA<br/>win: 1500</center>]
+subgraph root.4_inports[ ]
+style root.4_inports fill:none,stroke:none
+root.4input[input]
+root.4max_envelope[max_envelope]
+end
+subgraph root.4_outports[ ]
+style root.4_outports fill:none,stroke:none
+root.4output[output]
+end
+end
+subgraph root.5[<center>ArithmeticCombinator<br/>mul</center>]
+subgraph root.5_inports[ ]
+style root.5_inports fill:none,stroke:none
+root.5lhs[lhs]
+root.5rhs[rhs]
+end
+subgraph root.5_outports[ ]
+style root.5_outports fill:none,stroke:none
+root.5output[output]
+end
+end
+root.5_rhs_FakeConstantout((1.10))
+root.0desired_load_multiplier --> |DESIRED_LOAD_MULTIPLIER| root.1scale_out_signal_0
+root.0_overload_confirmation_FakeConstantout --> root.0overload_confirmation
+root.1_scale_out_setpoint_0_FakeConstantout --> root.1scale_out_setpoint_0
+root.2output --> |SIGNAL| root.0signal
+root.2output --> |SIGNAL| root.3lhs
+root.2output --> |SIGNAL| root.4input
+root.3output --> |MAX_EMA| root.4max_envelope
+root.3_rhs_FakeConstantout --> root.3rhs
+root.4output --> |SIGNAL_EMA| root.5lhs
+root.5output --> |SETPOINT| root.0setpoint
+root.5_rhs_FakeConstantout --> root.5rhs
