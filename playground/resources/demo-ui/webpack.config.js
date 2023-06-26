@@ -38,11 +38,14 @@ module.exports = {
     ],
   },
   devServer: {
-    port: 8099,
+    port: 3010,
+    hot: true,
+    open: true,
     proxy: {
-      '/request': {
-        target: 'http://localhost:8088',
-        changeOrigin: true,
+      '/api': {
+        target: 'http://localhost:3010',
+        router: () => 'http://service1-demo-app.demoapp.svc.cluster.local',
+        logLevel: 'debug',
       },
     },
   },

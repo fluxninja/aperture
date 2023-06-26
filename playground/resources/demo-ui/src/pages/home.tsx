@@ -41,7 +41,7 @@ export const useGracefulRequestForRateLimit = () => {
         await new Promise((resolve) => setTimeout(resolve, 800))
         try {
           // await kApi()
-          const res = await axios.post('/request', {
+          const res = await axios.post(`${API_URL}/rate-limit`, {
             headers: { 'Content-Type': 'application/json', 'user-id': 'foo' },
             data: {},
           })
@@ -83,7 +83,7 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
     </HomePageColumnBox>
     <HomePageColumnBox>
       {isErrored ? (
-        <GracefulError />
+        <GracefulError url="http://localhost:8099/request" />
       ) : (
         <Typography
           variant="h5"

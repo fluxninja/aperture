@@ -21,6 +21,11 @@
       "ref": "demo-app",
       "context": "playground/resources/demo-app/",
       "ssh": "default"
+    },
+    {
+      "ref": "demo-ui",
+      "context": "playground/resources/demo-ui/",
+      "ssh": "default"
     }
   ],
   "child_resources": [
