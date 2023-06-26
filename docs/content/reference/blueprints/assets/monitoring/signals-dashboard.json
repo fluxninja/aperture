@@ -19,6 +19,7 @@
         "w": 24
       },
       "id": 1,
+      "interval": "30s",
       "targets": [
         {
           "datasource": {
@@ -51,6 +52,7 @@
         "w": 24
       },
       "id": 2,
+      "interval": "30s",
       "targets": [
         {
           "datasource": {
