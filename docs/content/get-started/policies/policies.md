@@ -64,8 +64,6 @@ policies/feature-rollout/percentile-latency
 policies/feature-rollout/promql
 policies/service-protection/average-latency
 policies/service-protection/promql
-policies/service-protection-with-load-based-pod-auto-scaler/average-latency
-policies/service-protection-with-load-based-pod-auto-scaler/promql
 policies/rate-limiting
 ```
 
