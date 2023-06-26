@@ -7,7 +7,6 @@ local config = blueprint.config;
 local kubeletstats_infra_meter = function(agent_group='default') {
   kubeletstats: {
     agent_group: agent_group,
-    per_agent_group: true,
     pipeline: {
       processors: [
         'k8sattributes',
@@ -20,9 +19,6 @@ local kubeletstats_infra_meter = function(agent_group='default') {
       k8sattributes: {
         auth_type: 'serviceAccount',
         passthrough: false,
-        filter: {
-          node_from_env_var: 'NODE_NAME',
-        },
         extract: {
           metadata: [
             'k8s.cronjob.name',
@@ -91,6 +87,7 @@ function(params, metadata={}) {
           infra_meters+: {
             postgresql: {
               agent_group: agent_group,
+              per_agent_group: true,
               receivers: {
                 postgresql: postgresql,
               },
