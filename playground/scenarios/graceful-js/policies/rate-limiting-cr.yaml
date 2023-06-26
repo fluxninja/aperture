@@ -5,9 +5,10 @@ metadata:
     fluxninja.com/blueprint-name: policies/rate-limiting
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"policy_name": "rate-limiting", "rate_limiter":
-      {"bucket_capacity": 40, "fill_amount": 2, "parameters": {"interval": "1s", "label_key":
-      "http.request.header.user_id"}, "selectors": [{"control_point": "ingress", "label_matcher":
-      {"match_labels": {"http.path": "/api/rate-limit"}}, "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}'
+      {"bucket_capacity": 30, "fill_amount": 2, "parameters": {"interval": "60s",
+      "label_key": "http.request.header.user_id"}, "selectors": [{"control_point":
+      "ingress", "label_matcher": {"match_labels": {"http.path": "/api/rate-limit"}},
+      "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}'
   labels:
     fluxninja.com/validate: "true"
   name: rate-limiting
@@ -19,12 +20,12 @@ spec:
           in_ports:
             bucket_capacity:
               constant_signal:
-                value: 40
+                value: 30
             fill_amount:
               constant_signal:
                 value: 2
           parameters:
-            interval: 1s
+            interval: 60s
             label_key: http.request.header.user_id
           selectors:
           - control_point: ingress
