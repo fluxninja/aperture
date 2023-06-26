@@ -24,6 +24,11 @@ plugins:
     out: gen/proto/go
     opt:
       - paths=source_relative
+  - plugin: buf.build/community/planetscale-vtprotobuf:v0.4.0
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
+      - features=marshal+unmarshal+size+pool
   - plugin: buf.build/grpc/go
     out: gen/proto/go
     opt:
