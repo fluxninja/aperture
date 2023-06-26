@@ -77,12 +77,12 @@ Aperture provides a variety of advanced load management features:
   [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
   for scheduling, Aperture ensures a fair distribution of resources that aligns
   with the business value and urgency of requests.
-- 🔀 [**Load-based Auto Scaling**](./use-cases/auto-scale/auto-scale.md):
-  Eliminate the need for costly over-provisioning and enhance efficiency with
-  Aperture's load-based auto-scaling. Aperture's policies are expressed as
-  circuit graphs that continuously track deviations from service-level
-  objectives and calculate recovery or escalation actions. Auto-scaling can be
-  implemented as an escalation that triggers based on load throttling signal.
+- 🔀 **Load-based Auto Scaling**: Eliminate the need for costly
+  over-provisioning and enhance efficiency with Aperture's load-based
+  auto-scaling. Aperture's policies are expressed as circuit graphs that
+  continuously track deviations from service-level objectives and calculate
+  recovery or escalation actions. Auto-scaling can be implemented as an
+  escalation that triggers based on load throttling signal.
 - ⏱️
   [**Distributed Rate-Limiting**](./use-cases/rate-limiting/rate-limiting.md):
   Safeguard APIs from potential abuse with Aperture's high-performance,
