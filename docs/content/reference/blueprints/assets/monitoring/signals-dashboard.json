@@ -1,215 +1,91 @@
 {
-  "__inputs": [],
-  "__requires": [],
-  "annotations": {
-    "list": []
-  },
-  "editable": true,
-  "gnetId": null,
-  "graphTooltip": 0,
-  "hideControls": false,
-  "id": null,
-  "links": [],
   "panels": [
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "controller-prometheus",
-      "fill": 1,
-      "fillGradient": 0,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "controller-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "",
+            "fillOpacity": 10
+          },
+          "unit": ""
+        }
+      },
       "gridPos": {
         "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 0
+        "w": 24
+      },
+      "id": 1,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "controller-prometheus"
+          },
+          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",sub_circuit_id=\"${sub_circuit_id}\"}[$__rate_interval]) / increase(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",sub_circuit_id=\"${sub_circuit_id}\"}[$__rate_interval])",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Signal Average - ${signal_name} (${sub_circuit_id})",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "controller-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "",
+            "fillOpacity": 10
+          },
+          "unit": ""
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24
       },
       "id": 2,
       "interval": "30s",
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "repeat": null,
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
-          "expr": "increase(signal_reading_sum{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",sub_circuit_id=\"${sub_circuit_id}\"}[$__rate_interval])/increase(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",sub_circuit_id=\"${sub_circuit_id}\"}[$__rate_interval])",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Signal Average - ${signal_name} (${sub_circuit_id})",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ]
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "controller-prometheus",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 15
-      },
-      "id": 3,
-      "interval": "30s",
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "repeat": null,
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "controller-prometheus"
+          },
           "expr": "avg(rate(signal_reading_count{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",sub_circuit_id=\"${sub_circuit_id}\"}[$__rate_interval]))",
-          "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "Valid",
-          "refId": "A"
+          "legendFormat": "Valid"
         },
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "controller-prometheus"
+          },
           "expr": "sum(rate(invalid_signal_readings_total{policy_name=\"signal-processing\",signal_name=\"${signal_name}\",sub_circuit_id=\"${sub_circuit_id}\"}[$__rate_interval]))",
-          "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "Invalid",
-          "refId": "B"
+          "legendFormat": "Invalid"
         }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "Signal Validity (Frequency) - ${signal_name} (${sub_circuit_id})",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ]
+      "type": "timeseries"
     }
   ],
   "refresh": "5s",
-  "rows": [],
-  "schemaVersion": 36,
-  "style": "dark",
-  "tags": [],
   "templating": {
     "list": [
       {
-        "current": {
-          "text": "controller-prometheus",
-          "value": "controller-prometheus"
-        },
-        "hide": 2,
+        "includeAll": false,
         "label": "Data Source",
+        "multi": false,
         "name": "datasource",
-        "options": [],
         "query": "prometheus",
-        "refresh": 1,
-        "regex": "",
         "type": "datasource"
       },
       {
@@ -217,17 +93,12 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Signal Name",
         "multi": false,
         "name": "signal_name",
-        "options": [],
         "query": "label_values(signal_reading{policy_name=\"signal-processing\"}, signal_name)",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       },
       {
@@ -235,17 +106,12 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Sub Circuit ID",
         "multi": false,
         "name": "sub_circuit_id",
-        "options": [],
         "query": "label_values(signal_reading{policy_name=\"signal-processing\",signal_name=\"${signal_name}\"}, sub_circuit_id)",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       }
     ]
@@ -254,22 +120,6 @@
     "from": "now-15m",
     "to": "now"
   },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ],
-    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
-  },
   "timezone": "browser",
-  "title": "Signals",
-  "version": 0
+  "title": "Aperture Dashboard"
 }

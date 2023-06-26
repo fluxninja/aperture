@@ -11,19 +11,27 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonn
 
 function(cfg) {
   panels: [
-    quota_checks(cfg).panel,
-    workload_accepted(cfg).panel,
-    workload_rejected(cfg).panel,
-    workload_latency(cfg).panel,
-    incoming_concurrency(cfg).panel,
+    quota_checks(cfg).panel
+    + g.panel.timeSeries.gridPos.withY(10),
+    workload_accepted(cfg).panel
+    + g.panel.timeSeries.gridPos.withY(20),
+    workload_rejected(cfg).panel
+    + g.panel.timeSeries.gridPos.withY(30),
+    workload_latency(cfg).panel
+    + g.panel.timeSeries.gridPos.withY(40),
+    incoming_concurrency(cfg).panel
+    + g.panel.timeSeries.gridPos.withY(50),
     accepted_concurrency(cfg).panel
-    + g.panel.timeSeries.gridPos.withX(12),
+    + g.panel.timeSeries.gridPos.withX(12)
+    + g.panel.timeSeries.gridPos.withY(50),
     wfq_scheduler_flows(cfg).panel
     + g.panel.barGauge.gridPos.withH(6)
-    + g.panel.barGauge.gridPos.withW(12),
+    + g.panel.barGauge.gridPos.withW(12)
+    + g.panel.timeSeries.gridPos.withY(60),
     wfq_scheduler_heap_requests(cfg).panel
     + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
-    + g.panel.barGauge.gridPos.withX(12),
+    + g.panel.barGauge.gridPos.withX(12)
+    + g.panel.timeSeries.gridPos.withY(60),
   ],
 }

@@ -1,9 +1,0 @@
-# Generated values file for dashboards/flow-control/rate-limiter blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/dashboards/flow-control/rate-limiter
-
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: __REQUIRED_FIELD__

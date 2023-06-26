@@ -1,3 +1,0 @@
-blueprint: Rate-limiter
-sources:
-  dashboard: dashboards/flow-control/rate-limiter/dashboard.libsonnet
