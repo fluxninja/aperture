@@ -2,7 +2,6 @@ local creator = import '../../../grafana/creator.libsonnet';
 local blueprint = import './postgresql.libsonnet';
 
 local policy = blueprint.policy;
-local dashboard = blueprint.dashboard;
 local config = blueprint.config;
 
 local kubeletstats_infra_meter = function(agent_group='default') {
