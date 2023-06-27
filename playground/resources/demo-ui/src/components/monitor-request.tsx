@@ -14,6 +14,7 @@ import { FC } from 'react'
 export declare type RequestRecord = {
   isError: boolean
   rateLimitInfo?: RateLimitInfo
+  isRetry?: boolean
 }
 
 export interface MonitorRequestProps {
@@ -34,7 +35,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
     </Typography>
     <Divider />
     <Typography>Request made by app:</Typography>
-    <Box display="flex" flexDirection="row" gap={0.3} justifyContent="center">
+    <Box display="flex" gap={0.3}>
       {requestRecord.map((record, index) => (
         <MonitorRequestItem key={index} {...record} />
       ))}
@@ -57,11 +58,24 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
         <Box {...boxFlex}>
           <Button
             variant="contained"
-            color="secondary"
+            color="primary"
             sx={{ alignSelf: 'center' }}
             onClick={refetch}
           >
             Start
+          </Button>
+        </Box>
+      </ColumnBoxStyled>
+      <ColumnBoxStyled component={Paper}>
+        <InfoHeading>Reset</InfoHeading>
+        <Box {...boxFlex}>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ alignSelf: 'center' }}
+            onClick={() => window.location.reload()}
+          >
+            Reset
           </Button>
         </Box>
       </ColumnBoxStyled>
@@ -97,7 +111,7 @@ export const SuccessRate: FC<SuccessRateProps> = ({ requestRecord }) => {
   const { successRate } = useSuccessErrorRatePercent(requestRecord)
   return (
     <SuccessErrorRateStyled isError={false}>
-      {successRate}%
+      {successRate || 0}%
     </SuccessErrorRateStyled>
   )
 }
@@ -105,7 +119,9 @@ export const SuccessRate: FC<SuccessRateProps> = ({ requestRecord }) => {
 export const ErrorRate: FC<SuccessRateProps> = ({ requestRecord }) => {
   const { errorRate } = useSuccessErrorRatePercent(requestRecord)
   return (
-    <SuccessErrorRateStyled isError={true}>{errorRate}%</SuccessErrorRateStyled>
+    <SuccessErrorRateStyled isError={true}>
+      {errorRate || 0}%
+    </SuccessErrorRateStyled>
   )
 }
 
@@ -160,12 +176,15 @@ export const SuccessErrorRateStyled = styled(Box, {
 }))
 
 export const MonitorRequestItem = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'isError',
-})<RequestRecord>(({ theme, isError }) => ({
+  shouldForwardProp: (prop) =>
+    prop !== 'isError' && prop !== 'rateLimitInfo' && prop !== 'isRetry',
+})<RequestRecord>(({ theme, isError, isRetry }) => ({
   height: 50,
   width: 5,
   backgroundColor: isError
     ? theme.palette.error.main
+    : isRetry
+    ? theme.palette.warning.main
     : theme.palette.success.main,
   borderRadius: theme.spacing(1),
 }))

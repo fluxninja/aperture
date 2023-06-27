@@ -9,6 +9,7 @@ import { api } from './api'
 
 const gracefulJsConfig: GracefulJsConfig = {
   axios: api,
+  maxBackOffTime: 25,
 }
 
 export const App: FC = () => {

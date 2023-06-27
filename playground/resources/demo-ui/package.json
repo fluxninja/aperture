@@ -20,7 +20,6 @@
     "@emotion/react": "11.11.0",
     "@emotion/styled": "11.11.0",
     "@fluxninja-tools/graceful-js": "^0.1.4",
-    "@kubernetes/client-node": "0.18.1",
     "@mui/material": "5.13.2",
     "axios": "1.4.0",
     "react": "18.2.0",
