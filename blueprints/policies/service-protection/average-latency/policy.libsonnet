@@ -7,6 +7,8 @@ function(cfg, params={}, metadata={}) {
 
   local basePolicy = basePolicyFn(cfg, params, metadata),
 
+  local createQuery = function(policy_name, interval) 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: policy_name, interval: interval },
+
   // Add new components to basePolicy
   local policyDef = basePolicy.policyDef {
     circuit+: {
@@ -14,7 +16,7 @@ function(cfg, params={}, metadata={}) {
         spec.v1.Component.withQuery(
           spec.v1.Query.new()
           + spec.v1.Query.withPromql(
-            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: updatedConfig.policy.policy_name, interval: '30s' };
+            local q = createQuery(updatedConfig.policy.policy_name, '30s');
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
             + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
@@ -24,7 +26,7 @@ function(cfg, params={}, metadata={}) {
         spec.v1.Component.withQuery(
           spec.v1.Query.new()
           + spec.v1.Query.withPromql(
-            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: updatedConfig.policy.policy_name, interval: updatedConfig.policy.latency_baseliner.long_term_query_interval };
+            local q = createQuery(updatedConfig.policy.policy_name, updatedConfig.policy.latency_baseliner.long_term_query_interval);
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
             + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.latency_baseliner.long_term_query_periodic_interval)
