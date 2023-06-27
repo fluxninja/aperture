@@ -208,7 +208,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.latency_baseliner.latency_tolerance_multiplier'
-    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if long-term average of latency is 50ms and if the tolerance is 1.1, then the service is considered to be in an overloaded state if short-term average of latency is more than 55ms.'
+    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.'
     type='Number (double)'
     reference=''
     value='1.25'
@@ -222,7 +222,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.latency_baseliner.long_term_query_interval'
-    description='Interval for long-term latency query, i.e. how far back in time the query is run.'
+    description='Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.'
     type='string'
     reference=''
     value='"1800s"'
@@ -236,7 +236,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.latency_baseliner.long_term_query_periodic_interval'
-    description='Periodic interval for long-term latency query, i.e. how often the query is run.'
+    description='Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.'
     type='string'
     reference=''
     value='"30s"'

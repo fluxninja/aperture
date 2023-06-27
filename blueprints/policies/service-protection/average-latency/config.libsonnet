@@ -23,9 +23,9 @@ serviceProtectionDefaults {
         selectors: serviceProtectionDefaults.selectors,
       },
       /**
-      * @param (policy.latency_baseliner.long_term_query_interval: string) Interval for long-term latency query, i.e. how far back in time the query is run.
-      * @param (policy.latency_baseliner.long_term_query_periodic_interval: string) Periodic interval for long-term latency query, i.e. how often the query is run.
-      * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if long-term average of latency is 50ms and if the tolerance is 1.1, then the service is considered to be in an overloaded state if short-term average of latency is more than 55ms.
+      * @param (policy.latency_baseliner.long_term_query_interval: string) Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.
+      * @param (policy.latency_baseliner.long_term_query_periodic_interval: string) Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.
+      * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.
       */
       long_term_query_interval: '1800s',
       long_term_query_periodic_interval: '30s',
