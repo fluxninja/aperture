@@ -38,6 +38,7 @@ var (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(providePrometheusClient),
+		fx.Provide(providePrometheusEnforcer),
 		commonhttp.ClientConstructor{Name: "prometheus.http-client", ConfigKey: httpConfigKey}.Annotate(),
 	)
 }

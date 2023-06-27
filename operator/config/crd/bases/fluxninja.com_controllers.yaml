@@ -1018,6 +1018,9 @@ spec:
                       lease_ttl:
                         description: Lease time-to-live
                         type: string
+                      namespace:
+                        description: Etcd namespace
+                        type: string
                       password:
                         type: string
                       tls:
@@ -1386,6 +1389,19 @@ spec:
                       address:
                         description: Address of the Prometheus server
                         type: string
+                      labels:
+                        description: A list of labels to be attached to every query
+                        items:
+                          description: PrometheusLabel holds Name->Value mapping for
+                            the label that will be attached to every PromQL query
+                            executed by the controller.
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
                     type: object
                   readiness:
                     description: Readiness probe configuration.
