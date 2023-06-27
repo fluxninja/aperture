@@ -13,20 +13,19 @@ import {
 } from '@fluxninja-tools/graceful-js'
 import { api, RequestSpec } from '../api'
 
-
 export const HomePage: FC = () => {
+  const [value, setValue] = useState('1')
 
-  const [value, setValue] = useState('1');
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue)
+  }
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
-    setValue(newValue);
-  };
   const reqSpec: RequestSpec = {
-    method: 'POST',git
+    method: 'POST',
     endpoint: '/rate-limit',
     userType: 'Guest',
     userId: 'Vu',
-  };
+  }
 
   // Request to rate-limit endpoint with Guest user
   const {
@@ -37,22 +36,27 @@ export const HomePage: FC = () => {
   } = makeRequestToEndpoint(reqSpec)
 
   // Request to workload-prioritization endpoint with Guest user
-  reqSpec.endpoint = '/workload-prioritization'
+  const reqSpec2: RequestSpec = {
+    method: 'POST',
+    endpoint: '/workload-prioritization',
+    userType: 'Guest',
+    userId: 'Vu',
+  }
   const {
     refetch: refetchSubscriber,
     isError: isErrorSubscriber,
     requestRecord: subscriberRequestRecord,
     isLoading: isLoadingSubscriber,
-  } = makeRequestToEndpoint(reqSpec)
+  } = makeRequestToEndpoint(reqSpec2)
 
   // Request to workload-prioritization endpoint with Subscriber user
-  reqSpec.userType = 'Subscriber'
+  reqSpec2.userType = 'Subscriber'
   const {
     refetch: refetchSubscriber2,
     isError: isErrorSubscriber2,
     requestRecord: subscriberRequestRecord2,
     isLoading: isLoadingSubscriber2,
-  } = makeRequestToEndpoint(reqSpec)
+  } = makeRequestToEndpoint(reqSpec2)
 
   return (
     <TabContext value={value}>
@@ -132,7 +136,16 @@ export const makeRequestToEndpoint = (reqSpec: RequestSpec) => {
     useGracefulRequest<'Axios'>({
       typeOfRequest: 'Axios',
       requestFnc: () =>
-        api.post(reqSpec.endpoint, {}, { headers: { 'User-Id': reqSpec.userId, 'User-Type': reqSpec.userType} }),
+        api.post(
+          reqSpec.endpoint,
+          {},
+          {
+            headers: {
+              'User-Id': reqSpec.userId,
+              'User-Type': reqSpec.userType,
+            },
+          }
+        ),
       options: {
         disabled: true,
       },
@@ -195,28 +208,26 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   isLoading,
   errorComponentProps,
 }) => (
-
-
-    <HomePageWrapper>
-      <HomePageColumnBox>
-        <MonitorRequest {...monitorRequestProps} />
-      </HomePageColumnBox>
-      <HomePageColumnBox>
-        {isErrored && !isLoading ? (
-          <GracefulError {...errorComponentProps} /> // TODO: not rendering right error component. Only default error component is rendering
-        ) : (
-          <Typography
-            variant="h5"
-            sx={(theme) => ({ color: theme.palette.grey[400] })}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            200
-          </Typography>
-        )}
-      </HomePageColumnBox>
-    </HomePageWrapper>
+  <HomePageWrapper>
+    <HomePageColumnBox>
+      <MonitorRequest {...monitorRequestProps} />
+    </HomePageColumnBox>
+    <HomePageColumnBox>
+      {isErrored && !isLoading ? (
+        <GracefulError {...errorComponentProps} /> // TODO: not rendering right error component. Only default error component is rendering
+      ) : (
+        <Typography
+          variant="h5"
+          sx={(theme) => ({ color: theme.palette.grey[400] })}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          200
+        </Typography>
+      )}
+    </HomePageColumnBox>
+  </HomePageWrapper>
 )
 
 export const HomePageWrapper = styled(Box)(({ theme }) => ({
