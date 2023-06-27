@@ -135,6 +135,7 @@ class Blueprint:
         comment: List[str],
     ) -> Blueprint:
         nested_parameters = ParameterNode()
+        comment.sort()
         for line in comment:
             if ANNOTATION_RE.match(line.strip()):
                 inner = ANNOTATION_DETAILED_RE.match(line.strip())
@@ -166,11 +167,15 @@ class Blueprint:
                         try:
                             param_default = config[part]
                         except KeyError:
-                            # fatal
-                            logger.error(
-                                f"Unable to find param {param_name} in rendered config"
-                            )
-                            raise typer.Exit(1)
+                            if annotation_type == "@param":
+                                # fatal
+                                logger.error(
+                                    f"Unable to find param {param_name} in rendered config"
+                                )
+                                raise typer.Exit(1)
+                            else:
+                                # non-fatal
+                                param_default = None
                     else:
                         try:
                             config = config[part]
@@ -199,6 +204,13 @@ class Blueprint:
 
                 if param_required and annotation_type == "@param":
                     nested_parameters.required_children.add(parts[0])
+
+                if param_default and json_schema_link:
+                    if param_type.startswith("["):
+                        # Add with the first element of the array
+                        rendered_config[param_type.split("]")[1]] = param_default[0]
+                    else:
+                        rendered_config[param_type] = param_default
 
                 parent = nested_parameters.children
 

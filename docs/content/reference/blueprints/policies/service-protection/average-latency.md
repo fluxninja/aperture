@@ -80,20 +80,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-policy-name"></a>
-
-<ParameterDescription
-    name='policy.policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-components"></a>
 
 <ParameterDescription
@@ -102,20 +88,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Array of Object (aperture.spec.v1.Component)'
     reference='../../../spec#component'
     value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-resources"></a>
-
-<ParameterDescription
-    name='policy.resources'
-    description='Additional resources.'
-    type='Object (aperture.spec.v1.Resources)'
-    reference='../../../spec#resources'
-    value='{"flow_control": {"classifiers": []}}'
 />
 
 <!-- vale on -->
@@ -136,21 +108,35 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-##### policy.service_protection_core {#policy-service-protection-core}
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-overload-confirmations"></a>
+<a id="policy-resources"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.overload_confirmations'
-    description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
-    type='Array of Object (overload_confirmation)'
-    reference='#overload-confirmation'
-    value='[]'
+    name='policy.resources'
+    description='Additional resources.'
+    type='Object (aperture.spec.v1.Resources)'
+    reference='../../../spec#resources'
+    value='{"flow_control": {"classifiers": []}}'
 />
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.service_protection_core {#policy-service-protection-core}
 
 <!-- vale on -->
 
@@ -178,6 +164,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Boolean'
     reference=''
     value='false'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-overload-confirmations"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.overload_confirmations'
+    description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
+    type='Array of Object (overload_confirmation)'
+    reference='#overload-confirmation'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -218,20 +218,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-latency-baseliner-latency-tolerance-multiplier"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.latency_tolerance_multiplier'
-    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-latency-baseliner-latency-ema-limit-multiplier"></a>
 
 <ParameterDescription
@@ -244,11 +230,39 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale on -->
 
+<!-- vale off -->
+
+<a id="policy-latency-baseliner-latency-tolerance-multiplier"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.latency_tolerance_multiplier'
+    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
 ---
 
 <!-- vale off -->
 
 #### dashboard {#dashboard}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
+/>
 
 <!-- vale on -->
 
@@ -296,20 +310,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="dashboard-extra-filters"></a>
-
-<ParameterDescription
-    name='dashboard.extra_filters'
-    description='Additional filters to pass to each query to Grafana datasource.'
-    type='Object (map[string]string)'
-    reference='#map-string-string'
-    value='{}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-title"></a>
 
 <ParameterDescription
@@ -330,20 +330,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-name"></a>
-
-<ParameterDescription
-    name='dashboard.datasource.name'
-    description='Datasource name.'
-    type='string'
-    reference=''
-    value='"$datasource"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-datasource-filter-regex"></a>
 
 <ParameterDescription
@@ -356,6 +342,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale on -->
 
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
+/>
+
+<!-- vale on -->
+
 ---
 
 ### Schemas
@@ -363,6 +363,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 <!-- vale off -->
 
 #### overload_confirmation {#overload-confirmation}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    type='string'
+    reference=''
+    value='null'
+/>
 
 <!-- vale on -->
 
@@ -388,20 +402,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     name='threshold'
     description='The threshold for the overload confirmation criteria.'
     type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="overload-confirmation-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
     reference=''
     value='null'
 />

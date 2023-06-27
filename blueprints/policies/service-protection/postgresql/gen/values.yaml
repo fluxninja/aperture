@@ -3,6 +3,12 @@
 # https://docs.fluxninja.com/reference/blueprints/policies/service-protection/postgresql
 
 policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # The interval between successive evaluations of the Circuit.
+  # Type: string
+  evaluation_interval: "10s"
   # Name of the policy.
   # Type: string
   # Required: True
@@ -11,21 +17,12 @@ policy:
   # Type: string
   promql_query:
     "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"
-  # List of additional circuit components.
-  # Type: []aperture.spec.v1.Component
-  components: []
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:
     flow_control:
       classifiers: []
-  # The interval between successive evaluations of the Circuit.
-  # Type: string
-  evaluation_interval: "10s"
   service_protection_core:
-    # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
-    # Type: []overload_confirmation
-    overload_confirmations: []
     # Parameters for Adaptive Load Scheduler.
     # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
     # Required: True
@@ -45,16 +42,19 @@ policy:
     # Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
     # Type: bool
     dry_run: false
+    # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
+    # Type: []overload_confirmation
+    overload_confirmations: []
     cpu_overload_confirmation:
+      # The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.
+      # Type: string
+      operator: "gte"
       # The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.
       # Type: string
       query_string: 'avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name="__REQUIRED_FIELD__"})'
       # Threshold value for CPU utilizatio if it has to be used as overload confirmation.
       # Type: float64
       threshold: null
-      # The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.
-      # Type: string
-      operator: "gte"
   # Setpoint.
   # Type: float64
   # Required: True
@@ -69,6 +69,9 @@ policy:
     username: __REQUIRED_FIELD__
 
 dashboard:
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters: {}
   # Refresh interval for dashboard panels.
   # Type: string
   refresh_interval: "15s"
@@ -78,16 +81,13 @@ dashboard:
   # Time to of dashboard.
   # Type: string
   time_to: "now"
-  # Additional filters to pass to each query to Grafana datasource.
-  # Type: map[string]string
-  extra_filters: {}
   # Name of the main dashboard.
   # Type: string
   title: "Aperture Service Protection for PostgreSQL"
   datasource:
-    # Datasource name.
-    # Type: string
-    name: "$datasource"
     # Datasource filter regex.
     # Type: string
     filter_regex: ""
+    # Datasource name.
+    # Type: string
+    name: "$datasource"

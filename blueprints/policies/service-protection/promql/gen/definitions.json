@@ -15,6 +15,20 @@
         "setpoint"
       ],
       "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "10s",
+          "type": "string"
+        },
         "policy_name": {
           "description": "Name of the policy.",
           "default": "__REQUIRED_FIELD__",
@@ -24,15 +38,6 @@
           "description": "PromQL query.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
-        },
-        "components": {
-          "description": "List of additional circuit components.",
-          "default": [],
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
-          }
         },
         "resources": {
           "description": "Additional resources.",
@@ -44,25 +49,11 @@
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
-        "evaluation_interval": {
-          "description": "The interval between successive evaluations of the Circuit.",
-          "default": "10s",
-          "type": "string"
-        },
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
           "required": ["adaptive_load_scheduler"],
           "properties": {
-            "overload_confirmations": {
-              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
-              "default": [],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/$defs/overload_confirmation"
-              }
-            },
             "adaptive_load_scheduler": {
               "description": "Parameters for Adaptive Load Scheduler.",
               "default": {
@@ -92,6 +83,15 @@
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
               "default": false,
               "type": "boolean"
+            },
+            "overload_confirmations": {
+              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/overload_confirmation"
+              }
             }
           }
         },
@@ -107,6 +107,12 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
           "default": "5s",
@@ -122,12 +128,6 @@
           "default": "now",
           "type": "string"
         },
-        "extra_filters": {
-          "description": "Additional filters to pass to each query to Grafana datasource.",
-          "default": {},
-          "type": "object",
-          "additionalProperties": true
-        },
         "title": {
           "description": "Name of the main dashboard.",
           "default": "Aperture Service Protection",
@@ -137,14 +137,14 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "name": {
-              "description": "Datasource name.",
-              "default": "$datasource",
-              "type": "string"
-            },
             "filter_regex": {
               "description": "Datasource filter regex.",
               "default": "",
+              "type": "string"
+            },
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
               "type": "string"
             }
           }
@@ -157,6 +157,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "operator": {
+          "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+          "type": "string"
+        },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
           "type": "string"
@@ -165,10 +169,6 @@
           "description": "The threshold for the overload confirmation criteria.",
           "type": "number",
           "format": "double"
-        },
-        "operator": {
-          "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-          "type": "string"
         }
       }
     }

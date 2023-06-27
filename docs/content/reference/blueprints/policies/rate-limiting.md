@@ -39,20 +39,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-policy-name"></a>
-
-<ParameterDescription
-    name='policy.policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-components"></a>
 
 <ParameterDescription
@@ -61,6 +47,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
     type='Array of Object (aperture.spec.v1.Component)'
     reference='../../spec#component'
     value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -115,20 +115,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="policy-rate-limiter-selectors"></a>
-
-<ParameterDescription
-    name='policy.rate_limiter.selectors'
-    description='Flow selectors to match requests against'
-    type='Array of Object (aperture.spec.v1.Selector)'
-    reference='../../spec#selector'
-    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-rate-limiter-parameters"></a>
 
 <ParameterDescription
@@ -137,6 +123,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../spec#rate-limiter-parameters'
     value='{"interval": "__REQUIRED_FIELD__", "label_key": ""}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rate-limiter-selectors"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.selectors'
+    description='Flow selectors to match requests against'
+    type='Array of Object (aperture.spec.v1.Selector)'
+    reference='../../spec#selector'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->
@@ -151,20 +151,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="dashboard-refresh-interval"></a>
-
-<ParameterDescription
-    name='dashboard.refresh_interval'
-    description='Refresh interval for dashboard panels.'
-    type='string'
-    reference=''
-    value='"10s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-extra-filters"></a>
 
 <ParameterDescription
@@ -173,6 +159,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
     type='Object (map[string]string)'
     reference='#map-string-string'
     value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-refresh-interval"></a>
+
+<ParameterDescription
+    name='dashboard.refresh_interval'
+    description='Refresh interval for dashboard panels.'
+    type='string'
+    reference=''
+    value='"10s"'
 />
 
 <!-- vale on -->
@@ -199,20 +199,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-name"></a>
-
-<ParameterDescription
-    name='dashboard.datasource.name'
-    description='Datasource name.'
-    type='string'
-    reference=''
-    value='"$datasource"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-datasource-filter-regex"></a>
 
 <ParameterDescription
@@ -221,6 +207,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ra
     type='string'
     reference=''
     value='""'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
 />
 
 <!-- vale on -->

@@ -15,6 +15,20 @@
         "postgresql"
       ],
       "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "10s",
+          "type": "string"
+        },
         "policy_name": {
           "description": "Name of the policy.",
           "default": "__REQUIRED_FIELD__",
@@ -24,15 +38,6 @@
           "description": "PromQL query to detect PostgreSQL overload.",
           "default": "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100",
           "type": "string"
-        },
-        "components": {
-          "description": "List of additional circuit components.",
-          "default": [],
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
-          }
         },
         "resources": {
           "description": "Additional resources.",
@@ -44,25 +49,11 @@
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
-        "evaluation_interval": {
-          "description": "The interval between successive evaluations of the Circuit.",
-          "default": "10s",
-          "type": "string"
-        },
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
           "required": ["adaptive_load_scheduler"],
           "properties": {
-            "overload_confirmations": {
-              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
-              "default": [],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/$defs/overload_confirmation"
-              }
-            },
             "adaptive_load_scheduler": {
               "description": "Parameters for Adaptive Load Scheduler.",
               "default": {
@@ -93,10 +84,24 @@
               "default": false,
               "type": "boolean"
             },
+            "overload_confirmations": {
+              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/overload_confirmation"
+              }
+            },
             "cpu_overload_confirmation": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "operator": {
+                  "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.",
+                  "default": "gte",
+                  "type": "string"
+                },
                 "query_string": {
                   "description": "The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.",
                   "default": "avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name=\"__REQUIRED_FIELD__\"})",
@@ -106,11 +111,6 @@
                   "description": "Threshold value for CPU utilizatio if it has to be used as overload confirmation.",
                   "type": "number",
                   "format": "double"
-                },
-                "operator": {
-                  "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.",
-                  "default": "gte",
-                  "type": "string"
                 }
               }
             }
@@ -139,6 +139,12 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
           "default": "15s",
@@ -154,12 +160,6 @@
           "default": "now",
           "type": "string"
         },
-        "extra_filters": {
-          "description": "Additional filters to pass to each query to Grafana datasource.",
-          "default": {},
-          "type": "object",
-          "additionalProperties": true
-        },
         "title": {
           "description": "Name of the main dashboard.",
           "default": "Aperture Service Protection for PostgreSQL",
@@ -169,14 +169,14 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "name": {
-              "description": "Datasource name.",
-              "default": "$datasource",
-              "type": "string"
-            },
             "filter_regex": {
               "description": "Datasource filter regex.",
               "default": "",
+              "type": "string"
+            },
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
               "type": "string"
             }
           }
@@ -189,6 +189,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "operator": {
+          "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+          "type": "string"
+        },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
           "type": "string"
@@ -197,31 +201,21 @@
           "description": "The threshold for the overload confirmation criteria.",
           "type": "number",
           "format": "double"
-        },
-        "operator": {
-          "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-          "type": "string"
         }
       }
     },
     "postgresql": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["endpoint", "password", "username"],
       "properties": {
-        "username": {
-          "description": "Username of the PostgreSQL.",
+        "agent_group": {
+          "description": "Name of the Aperture Agent group.",
+          "default": "default",
           "type": "string"
         },
-        "password": {
-          "description": "Password of the PostgreSQL.",
-          "type": "string"
-        },
-        "endpoint": {
-          "description": "Endpoint of the PostgreSQL.",
-          "type": "string"
-        },
-        "transport": {
-          "description": "The transport protocol being used to connect to postgresql. Available options are tcp and unix.",
+        "collection_interval": {
+          "description": "This receiver collects metrics on an interval.",
           "type": "string"
         },
         "database": {
@@ -231,22 +225,32 @@
             "type": "string"
           }
         },
-        "collection_interval": {
-          "description": "This receiver collects metrics on an interval.",
+        "endpoint": {
+          "description": "Endpoint of the PostgreSQL.",
+          "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
         "initial_delay": {
           "description": "Defines how long this receiver waits before starting.",
           "type": "string"
         },
-        "agent_group": {
-          "description": "Name of the Aperture Agent group.",
+        "password": {
+          "description": "Password of the PostgreSQL.",
+          "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
         "tls": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
+            "ca_file": {
+              "description": "A set of certificate authorities used to validate the database server SSL certificate.",
+              "type": "string"
+            },
+            "cert_file": {
+              "description": "A cerficate used for client authentication, if necessary.",
+              "type": "string"
+            },
             "insecure": {
               "description": "Whether to enable client transport security for the postgresql connection.",
               "type": "boolean"
@@ -255,19 +259,20 @@
               "description": "Whether to validate server name and certificate if client transport security is enabled.",
               "type": "boolean"
             },
-            "cert_file": {
-              "description": "A cerficate used for client authentication, if necessary.",
-              "type": "string"
-            },
             "key_file": {
               "description": "An SSL key used for client authentication, if necessary.",
               "type": "string"
-            },
-            "ca_file": {
-              "description": "A set of certificate authorities used to validate the database server SSL certificate.",
-              "type": "string"
             }
           }
+        },
+        "transport": {
+          "description": "The transport protocol being used to connect to postgresql. Available options are tcp and unix.",
+          "type": "string"
+        },
+        "username": {
+          "description": "Username of the PostgreSQL.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
         }
       }
     }
