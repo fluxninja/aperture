@@ -61,8 +61,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
 <ParameterDescription
     name='policy.promql_scale_out_controllers'
     description='List of scale out controllers.'
-    type='Array of Object (promql_scale_out_controller)'
-    reference='#promql-scale-out-controller'
+    type='Array of Object (promql_scale_controller)'
+    reference='#promql-scale-controller'
     value='[]'
 />
 
@@ -75,8 +75,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
 <ParameterDescription
     name='policy.promql_scale_in_controllers'
     description='List of scale in controllers.'
-    type='Array of Object (promql_scale_in_controller)'
-    reference='#promql-scale-in-controller'
+    type='Array of Object (promql_scale_controller)'
+    reference='#promql-scale-controller'
     value='[]'
 />
 
@@ -284,13 +284,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
 
 <!-- vale off -->
 
-#### promql_scale_out_controller {#promql-scale-out-controller}
+#### promql_scale_controller {#promql-scale-controller}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-scale-out-controller-query-string"></a>
+<a id="promql-scale-controller-query-string"></a>
 
 <ParameterDescription
     name='query_string'
@@ -304,11 +304,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
 
 <!-- vale off -->
 
-<a id="promql-scale-out-controller-threshold"></a>
+<a id="promql-scale-controller-setpoint"></a>
 
 <ParameterDescription
-    name='threshold'
-    description='Threshold for the controller.'
+    name='setpoint'
+    description='Setpoint for the controller.'
     type='Number (double)'
     reference=''
     value='null'
@@ -318,7 +318,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
 
 <!-- vale off -->
 
-<a id="promql-scale-out-controller-gradient"></a>
+<a id="promql-scale-controller-gradient"></a>
 
 <ParameterDescription
     name='gradient'
@@ -332,71 +332,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
 
 <!-- vale off -->
 
-<a id="promql-scale-out-controller-alerter"></a>
-
-<ParameterDescription
-    name='alerter'
-    description='Alerter parameters for the controller.'
-    type='Object (aperture.spec.v1.AlerterParameters)'
-    reference='../../../spec#alerter-parameters'
-    value='null'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### promql_scale_in_controller {#promql-scale-in-controller}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-scale-in-controller-query-string"></a>
-
-<ParameterDescription
-    name='query_string'
-    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-scale-in-controller-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='Threshold for the controller.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-scale-in-controller-gradient"></a>
-
-<ParameterDescription
-    name='gradient'
-    description='Gradient parameters for the controller.'
-    type='Object (aperture.spec.v1.DecreasingGradientParameters)'
-    reference='../../../spec#decreasing-gradient-parameters'
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-scale-in-controller-alerter"></a>
+<a id="promql-scale-controller-alerter"></a>
 
 <ParameterDescription
     name='alerter'

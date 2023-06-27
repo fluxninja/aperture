@@ -31,7 +31,7 @@ function(cfg) {
         + decreasingGradient.withInPorts(
           decreasingGradientInPort.new()
           + decreasingGradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_IN_%s' % controller_idx))
-          + decreasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_in_controllers[controller_idx].threshold))
+          + decreasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_in_controllers[controller_idx].setpoint))
         )
         + decreasingGradient.withParameters(params.policy.promql_scale_in_controllers[controller_idx].gradient)
       )
@@ -49,7 +49,7 @@ function(cfg) {
         + increasingGradient.withInPorts(
           increasingGradientInPort.new()
           + increasingGradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_OUT_%s' % controller_idx))
-          + increasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_out_controllers[controller_idx].threshold))
+          + increasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_out_controllers[controller_idx].setpoint))
         )
         + increasingGradient.withParameters(params.policy.promql_scale_out_controllers[controller_idx].gradient)
       )

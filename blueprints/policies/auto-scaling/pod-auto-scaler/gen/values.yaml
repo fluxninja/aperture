@@ -8,10 +8,10 @@ policy:
   # Required: True
   policy_name: __REQUIRED_FIELD__
   # List of scale out controllers.
-  # Type: []promql_scale_out_controller
+  # Type: []promql_scale_controller
   promql_scale_out_controllers: []
   # List of scale in controllers.
-  # Type: []promql_scale_in_controller
+  # Type: []promql_scale_controller
   promql_scale_in_controllers: []
   # Parameters that define the scaling behavior.
   # Type: aperture.spec.v1.AutoScalerScalingParameters
