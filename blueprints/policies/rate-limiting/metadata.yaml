@@ -1,4 +1,3 @@
 blueprint: Rate Limiting Policy
 sources:
-  dashboard: policies/rate-limiting/dashboard.libsonnet
   policy: policies/rate-limiting/policy.libsonnet

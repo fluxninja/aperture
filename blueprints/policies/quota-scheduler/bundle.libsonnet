@@ -1,7 +1,7 @@
+local creator = import '../../grafana/creator.libsonnet';
 local blueprint = import './quota-scheduler.libsonnet';
 
 local policy = blueprint.policy;
-local dashboard = blueprint.dashboard;
 local config = blueprint.config;
 
 function(params, metadata={}) {
@@ -13,7 +13,7 @@ function(params, metadata={}) {
 
   local metadataWrapper = metadata { values: std.toString(params) },
   local p = policy(c, metadataWrapper),
-  local d = dashboard(c),
+  local d = creator(p.policyResource, c),
 
   dashboards: {
     [std.format('%s.json', c.policy.policy_name)]: d.dashboard,

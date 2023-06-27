@@ -1,5 +1,3 @@
-local autoScalingDefaults = import '../../auto-scaling/base/config-defaults.libsonnet';
-
 local selectors_defaults = [{
   service: '__REQUIRED_FIELD__',
   control_point: '__REQUIRED_FIELD__',
@@ -21,28 +19,10 @@ local service_protection_core_defaults = {
       alert_name: 'Load Throttling Event',
     },
     max_load_multiplier: 2.0,
-    load_multiplier_linear_increment: 0.0025,
+    load_multiplier_linear_increment: 0.025,
   },
 
   dry_run: false,
-};
-
-local auto_scaling_defaults = {
-  dry_run: false,
-  scaling_backend: {},
-  promql_scale_out_controllers: [],
-  promql_scale_in_controllers: [],
-  scaling_parameters: autoScalingDefaults.policy.scaling_parameters,
-  periodic_decrease: {
-    period: '60s',
-    scale_in_percentage: 10,
-  },
-};
-
-local kubernetes_replicas_defaults = {
-  kubernetes_object_selector: '__REQUIRED_FIELD__',
-  min_replicas: '__REQUIRED_FIELD__',
-  max_replicas: '__REQUIRED_FIELD__',
 };
 
 {
@@ -54,7 +34,7 @@ local kubernetes_replicas_defaults = {
         classifiers: [],
       },
     },
-    evaluation_interval: '1s',
+    evaluation_interval: '10s',
     service_protection_core: service_protection_core_defaults,
   },
 
@@ -68,18 +48,5 @@ local kubernetes_replicas_defaults = {
     },
     variant_name: 'Service Protection',
   },
-
   selectors: selectors_defaults,
-
-  auto_scaling: auto_scaling_defaults {
-    scaling_backend+: {
-      kubernetes_replicas: kubernetes_replicas_defaults,
-    },
-  },
-
-  auto_scaling_pods: auto_scaling_defaults {
-    scaling_backend+: {
-      kubernetes_replicas: kubernetes_replicas_defaults,
-    },
-  },
 }

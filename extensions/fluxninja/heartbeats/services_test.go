@@ -18,8 +18,8 @@ var _ = Describe("Services", func() {
 
 	Context("Services", func() {
 		It("reads same service from two entities", func() {
-			ec.Put(testEntity("1", "1.1.1.1", "some_name", []string{"baz"}))
-			ec.Put(testEntity("2", "1.1.1.2", "some_name", []string{"baz"}))
+			ec.PutForTest(testEntity("1", "1.1.1.1", "some_name", []string{"baz"}))
+			ec.PutForTest(testEntity("2", "1.1.1.2", "some_name", []string{"baz"}))
 			sl := populateServicesList(ec)
 			Expect(sl.Services).To(HaveLen(1))
 			Expect(sl.Services).To(ContainElement(&heartbeatv1.Service{
@@ -32,7 +32,7 @@ var _ = Describe("Services", func() {
 			ip := "1.1.1.1"
 			serviceNames := []string{"baz1", "baz2"}
 			name := "entity_1234"
-			ec.Put(testEntity("1", ip, name, serviceNames))
+			ec.PutForTest(testEntity("1", ip, name, serviceNames))
 			sl := populateServicesList(ec)
 			Expect(sl.Services).To(HaveLen(2))
 			Expect(sl.Services).To(ContainElement(&heartbeatv1.Service{
@@ -49,7 +49,7 @@ var _ = Describe("Services", func() {
 			ip := "1.1.1.1"
 			serviceNames := []string{"baz"}
 			name := "entity_1234"
-			ec.Put(testEntity("1", ip, name, serviceNames))
+			ec.PutForTest(testEntity("1", ip, name, serviceNames))
 			ec.Clear()
 			sl := populateServicesList(ec)
 			Expect(sl.Services).To(HaveLen(0))

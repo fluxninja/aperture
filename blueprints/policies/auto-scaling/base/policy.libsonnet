@@ -1,4 +1,5 @@
 local spec = import '../../../spec.libsonnet';
+local utils = import '../../../utils/utils.libsonnet';
 local config = import './config-defaults.libsonnet';
 
 local component = spec.v1.Component;
@@ -30,7 +31,7 @@ function(cfg) {
         + decreasingGradient.withInPorts(
           decreasingGradientInPort.new()
           + decreasingGradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_IN_%s' % controller_idx))
-          + decreasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_in_controllers[controller_idx].threshold))
+          + decreasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_in_controllers[controller_idx].setpoint))
         )
         + decreasingGradient.withParameters(params.policy.promql_scale_in_controllers[controller_idx].gradient)
       )
@@ -48,7 +49,7 @@ function(cfg) {
         + increasingGradient.withInPorts(
           increasingGradientInPort.new()
           + increasingGradientInPort.withSignal(port.withSignalName('PROMQL_SCALE_OUT_%s' % controller_idx))
-          + increasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_out_controllers[controller_idx].threshold))
+          + increasingGradientInPort.withSetpoint(port.withConstantSignal(params.policy.promql_scale_out_controllers[controller_idx].setpoint))
         )
         + increasingGradient.withParameters(params.policy.promql_scale_out_controllers[controller_idx].gradient)
       )
@@ -63,7 +64,7 @@ function(cfg) {
         local q = params.policy.promql_scale_in_controllers[controller_idx].query_string;
         promQL.new()
         + promQL.withQueryString(q)
-        + promQL.withEvaluationInterval('1s')
+        + promQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
         + promQL.withOutPorts({ output: port.withSignalName('PROMQL_SCALE_IN_%s' % controller_idx) }),
       ),
     )
@@ -77,7 +78,7 @@ function(cfg) {
         local q = params.policy.promql_scale_out_controllers[controller_idx].query_string;
         promQL.new()
         + promQL.withQueryString(q)
-        + promQL.withEvaluationInterval('1s')
+        + promQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
         + promQL.withOutPorts({ output: port.withSignalName('PROMQL_SCALE_OUT_%s' % controller_idx) }),
       ),
     )
@@ -86,7 +87,7 @@ function(cfg) {
 
   local policyDef =
     spec.v1.Policy.new()
-    + spec.v1.Policy.withResources(params.policy.resources)
+    + spec.v1.Policy.withResources(utils.resources(params.policy.resources).updatedResources)
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
       + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)

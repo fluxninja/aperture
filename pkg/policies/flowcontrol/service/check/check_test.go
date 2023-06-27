@@ -28,7 +28,7 @@ var (
 
 var _ = BeforeEach(func() {
 	entities := entities.NewEntities()
-	entities.Put(&entitiesv1.Entity{
+	entities.PutForTest(&entitiesv1.Entity{
 		Uid:       "",
 		IpAddress: hardCodedIPAddress,
 		Name:      hardCodedEntityName,

@@ -97,7 +97,7 @@ func NewActuatorAndOptions(
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencyCountMetricName,
 				policyParams),
-			10*policyReadAPI.GetEvaluationInterval(),
+			5*policyReadAPI.GetEvaluationInterval(),
 			runtime.NewComponentID(loadSchedulerComponentID),
 			policyReadAPI,
 			"Tokens",

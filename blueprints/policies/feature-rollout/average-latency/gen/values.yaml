@@ -1,6 +1,6 @@
 # Generated values file for policies/feature-rollout/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/ policies/feature-rollout/average-latency
+# https://docs.fluxninja.com/reference/blueprints/policies/feature-rollout/average-latency
 
 # Configuration for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy
@@ -10,16 +10,12 @@ policy:
   drivers:
     average_latency_drivers:
       - criteria:
-          backward:
-            threshold: __REQUIRED_FIELD__
           forward:
-            threshold: __REQUIRED_FIELD__
-          reset:
             threshold: __REQUIRED_FIELD__
         selectors:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
-  evaluation_interval: "1s"
+  evaluation_interval: "10s"
   load_ramp:
     sampler:
       label_key: ""

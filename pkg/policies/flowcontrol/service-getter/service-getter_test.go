@@ -10,12 +10,12 @@ import (
 	"google.golang.org/grpc/peer"
 
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
-	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
+	discoveryentities "github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 )
 
 func TestServiceGetter(t *testing.T) {
-	entities := entities.NewEntities()
+	entities := discoveryentities.NewEntities()
 	sg := servicegetter.FromEntities(entities)
 
 	t.Run("ServicesFromContext with no peer information", func(t *testing.T) {
@@ -39,13 +39,16 @@ func TestServiceGetter(t *testing.T) {
 
 	t.Run("ServicesFromContext with valid IP address and entity", func(t *testing.T) {
 		ip := "192.168.1.2"
-		entity := &entitiesv1.Entity{IpAddress: ip, Services: []string{"svc1", "svc2"}}
+		entity := discoveryentities.NewEntity(&entitiesv1.Entity{
+			IpAddress: ip,
+			Services:  []string{"svc1", "svc2"},
+		})
 		entities.Put(entity)
 		defer entities.Remove(entity)
 
 		ctx := peerContext(ip)
 		services := sg.ServicesFromContext(ctx)
-		assert.Equal(t, entity.Services, services)
+		assert.Equal(t, entity.Services(), services)
 	})
 
 	t.Run("ServicesFromSocketAddress with invalid IP address", func(t *testing.T) {
@@ -63,13 +66,16 @@ func TestServiceGetter(t *testing.T) {
 
 	t.Run("ServicesFromSocketAddress with valid IP address and entity", func(t *testing.T) {
 		ip := "192.168.1.4"
-		entity := &entitiesv1.Entity{IpAddress: ip, Services: []string{"svc3", "svc4"}}
+		entity := discoveryentities.NewEntity(&entitiesv1.Entity{
+			IpAddress: ip,
+			Services:  []string{"svc3", "svc4"},
+		})
 		entities.Put(entity)
 		defer entities.Remove(entity)
 
 		addr := &corev3.SocketAddress{Address: ip}
 		services := sg.ServicesFromSocketAddress(addr)
-		assert.Equal(t, entity.Services, services)
+		assert.Equal(t, entity.Services(), services)
 	})
 
 	t.Run("ServicesFromAddress with invalid IP address", func(t *testing.T) {
@@ -85,12 +91,15 @@ func TestServiceGetter(t *testing.T) {
 
 	t.Run("ServicesFromAddress with valid IP address and entity", func(t *testing.T) {
 		ip := "192.168.1.6"
-		entity := &entitiesv1.Entity{IpAddress: ip, Services: []string{"svc5", "svc6"}}
+		entity := discoveryentities.NewEntity(&entitiesv1.Entity{
+			IpAddress: ip,
+			Services:  []string{"svc5", "svc6"},
+		})
 		entities.Put(entity)
 		defer entities.Remove(entity)
 
 		services := sg.ServicesFromAddress(ip)
-		assert.Equal(t, entity.Services, services)
+		assert.Equal(t, entity.Services(), services)
 	})
 }
 

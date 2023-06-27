@@ -31,13 +31,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          bigip:
-            per_agent_group: true
-            receivers:
-              bigip: [bigipreceiver configuration here]
+    infra_meters:
+      bigip:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          bigip: [bigipreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

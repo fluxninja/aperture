@@ -67,7 +67,7 @@ var _ = Describe("Authorization handler", func() {
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
 			entities := entities.NewEntities()
-			entities.Put(&entitiesv1.Entity{
+			entities.PutForTest(&entitiesv1.Entity{
 				IpAddress: "1.2.3.4",
 				Services:  []string{service1Selector.Service},
 			})

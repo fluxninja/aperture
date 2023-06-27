@@ -6,7 +6,7 @@ policy:
     fill_amount: 2
     selectors:
       - control_point: ingress
-        service: service-graphql-demo-app.demoapp.svc.cluster.local
+        service: todo-service.svc.cluster.local
     parameters:
       label_key: user_id
       interval: 1s
@@ -15,7 +15,7 @@ policy:
       classifiers:
         - selectors:
             - control_point: ingress
-              service: service-graphql-demo-app.demoapp.svc.cluster.local
+              service: todo-service.svc.cluster.local
           rego:
             labels:
               user_id:

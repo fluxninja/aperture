@@ -56,13 +56,13 @@ func ParseLoadScheduler(
 	)
 
 	acceptedTokensQuery := fmt.Sprintf(
-		"sum(rate(%s{%s}[10s]))",
+		"sum(rate(%s{%s}[30s]))",
 		metrics.AcceptedTokensMetricName,
 		policyParams,
 	)
 
 	incomingTokenRate := fmt.Sprintf(
-		"sum(rate(%s{%s}[10s]))",
+		"sum(rate(%s{%s}[30s]))",
 		metrics.IncomingTokensMetricName,
 		policyParams,
 	)

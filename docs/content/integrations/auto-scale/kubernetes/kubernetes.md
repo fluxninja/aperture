@@ -30,8 +30,3 @@ the
 or
 [aperturectl](/reference/aperturectl/auto-scale/control-points/control-points.md)
 to view this information.
-
-## Configure Auto Scaling Policies
-
-Auto-scaling policies are configured at the Aperture Controller. Refer to
-[tutorials](/use-cases/auto-scale/auto-scale.md) for some example policies.

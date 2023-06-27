@@ -42,6 +42,20 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 		map[string]interface{}{otelconsts.ApertureControlPointLabel: "ingress"},
 	),
 
+	Entry("Sets decision type",
+		&flowcontrolv1.CheckResponse{
+			DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
+		},
+		map[string]interface{}{otelconsts.ApertureDecisionTypeLabel: "DECISION_TYPE_REJECTED"},
+	),
+
+	Entry("Sets reason",
+		&flowcontrolv1.CheckResponse{
+			RejectReason: flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS,
+		},
+		map[string]interface{}{otelconsts.ApertureRejectReasonLabel: "REJECT_REASON_NO_TOKENS"},
+	),
+
 	Entry("Sets rate limiters",
 		&flowcontrolv1.CheckResponse{
 			LimiterDecisions: []*flowcontrolv1.LimiterDecision{

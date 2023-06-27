@@ -3,8 +3,9 @@ package utils
 import (
 	"regexp"
 
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"go.uber.org/fx"
+
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // SliceFind returns the smallest index i at which x == a[i],
@@ -38,13 +39,22 @@ func RemoveFromSlice(a []string, x string) []string {
 	return a
 }
 
-// SliceToMap converts a slice of string to a map[string]bool.
-func SliceToMap(a []string) map[string]bool {
-	m := make(map[string]bool)
+// SliceToSet converts a slice of strings to a set.
+func SliceToSet(a []string) Set[string] {
+	m := make(map[string]struct{}, len(a))
 	for _, n := range a {
-		m[n] = true
+		m[n] = struct{}{}
 	}
-	return m
+	return Set[string](m)
+}
+
+// Set represents set of values.
+type Set[T comparable] map[T]struct{}
+
+// Contains returns whether the set contains given element.
+func (s Set[T]) Contains(x T) bool {
+	_, exists := s[x]
+	return exists
 }
 
 // IsHTTPUrl returns true if the given string is an HTTP(S) URL.

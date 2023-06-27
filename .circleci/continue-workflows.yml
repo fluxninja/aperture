@@ -154,8 +154,12 @@ jobs:
         default: 20m
         description: |
           Pass through a default timeout if your Docker build does not output anything for more than 10 minutes.
+      resource-class:
+        type: string
+        default: small
+        description: Resource class for executor.
     executor: <<parameters.executor>>
-    resource_class: small
+    resource_class: <<parameters.resource-class>>
     environment:
       DOCKER_BUILDKIT: 1
       GOMAXPROCS: 1
@@ -298,7 +302,7 @@ jobs:
             helm
             java
             jb
-            jsonnet
+            go-jsonnet
             kustomize
             mockery
             nodejs
@@ -1142,6 +1146,7 @@ workflows:
           docker-context: .
           dockerfile: cmd/aperture-agent/Dockerfile
           use-docker-layer-caching: true
+          resource-class: large
       - update-environment:
           filters:
             branches:
@@ -1162,6 +1167,7 @@ workflows:
           docker-context: .
           dockerfile: cmd/aperture-controller/Dockerfile
           use-docker-layer-caching: true
+          resource-class: large
       - update-environment:
           filters:
             branches:
@@ -1443,6 +1449,10 @@ commands:
               checksum "tools/go/go.mod" }}
             - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
+      - run:
+          name: Copy tool-versions in HOME dir
+          command: |
+            cp .tool-versions ~/.tool-versions
       - run:
           name: Install ASDF tools
           environment:

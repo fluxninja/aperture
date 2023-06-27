@@ -32,14 +32,13 @@ while [applying the policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
+    infra_meters:
+      awscontainerinsightreceiver:
+        agent_group: default
+        per_agent_group: true
+        receivers:
           awscontainerinsightreceiver:
-            per_agent_group: true
-            receivers:
-              awscontainerinsightreceiver:
-                [awscontainerinsightreceiver configuration here]
+            [awscontainerinsightreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

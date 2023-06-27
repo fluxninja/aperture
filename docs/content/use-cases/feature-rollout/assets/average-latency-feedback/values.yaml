@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=../../../../../../blueprints/policies/feature-rollout/average-latency/gen/definitions.json
+# Generated values file for policies/feature-rollout/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/policies/feature-rollout/average-latency
+
+# Parameters for the Feature Rollout policy.
+# Type: policies/feature-rollout/base:schema:rollout_policy
+# Required: True
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "feature-rollout"
+  components: []
+  drivers:
+    average_latency_drivers:
+      - criteria:
+          forward:
+            threshold: 75
+          reset:
+            threshold: 75
+        selectors:
+          - control_point: ingress
+            service: checkout-service.prod.svc.cluster.local
+            label_matcher:
+              match_labels:
+                http.path: /checkout
+  evaluation_interval: "10s"
+  load_ramp:
+    sampler:
+      selectors:
+        - control_point: awesome-feature
+          service: checkout-service.prod.svc.cluster.local
+      label_key: ""
+    steps:
+      - duration: "0s"
+        target_accept_percentage: 1.0
+      - duration: "300s"
+        target_accept_percentage: 100.0
+  resources:
+    flow_control:
+      classifiers: []

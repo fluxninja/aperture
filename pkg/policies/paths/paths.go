@@ -38,8 +38,8 @@ var (
 	QuotaSchedulerDecisionsPath = path.Join(DecisionsPrefix, "quota_scheduler")
 	// FluxMeterConfigPath is config path in etcd for flux meters.
 	FluxMeterConfigPath = path.Join(ConfigPrefix, "flux_meter")
-	// TelemetryCollectorConfigPath is config path in etcd for telemetry collector.
-	TelemetryCollectorConfigPath = path.Join(ConfigPrefix, "telemetry_collector")
+	// InfraMeterConfigPath is config path in etcd for infra meter.
+	InfraMeterConfigPath = path.Join(ConfigPrefix, "infra_meter")
 	// PodScalerConfigPath is config path in etcd for pod scaler.
 	PodScalerConfigPath = path.Join(ConfigPrefix, "pod_scaler")
 	// PodScalerDecisionsPath is decision path in etcd for pod scaler decisions.
@@ -72,9 +72,9 @@ func FluxMeterKey(agentGroupName, fluxMeterName string) string {
 	return AgentGroupPrefix(agentGroupName) + "-flux_meter-" + fluxMeterName
 }
 
-// TelemetryCollectorKey returns the identifier for TelemetryCollector in etcd.
-func TelemetryCollectorKey(agentGroupName string, policyName string, index int) string {
-	return PolicyPrefix(agentGroupName, policyName) + "-telemetry_collector-" + strconv.Itoa(index)
+// InfraMeterKey returns the identifier for InfraMeter in etcd.
+func InfraMeterKey(agentGroupName, policyName, infraMeterName string) string {
+	return PolicyPrefix(agentGroupName, policyName) + "-infra_meter-" + infraMeterName
 }
 
 // ClassifierKey returns the identifier for a Classifier in etcd.

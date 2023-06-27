@@ -1,6 +1,7 @@
 {
   spec: import 'spec.libsonnet',
   policies: import 'policies/policies.libsonnet',
-  dashboards: import 'dashboards/dashboards.libsonnet',
-  circuits: import 'circuits/circuits.libsonnet',
+  signalsDashboardCreator: import 'grafana/signals_dashboard.libsonnet',
+  dashboardPanelLibrary: import 'grafana/panel_library.libsonnet',
+  dashboardCreator: import 'grafana/creator.libsonnet',
 }
