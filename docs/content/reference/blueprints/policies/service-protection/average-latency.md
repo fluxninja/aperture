@@ -204,42 +204,42 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-latency-baseliner-ema"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.ema'
-    description='EMA parameters.'
-    type='Object (aperture.spec.v1.EMAParameters)'
-    reference='../../../spec#e-m-a-parameters'
-    value='{"correction_factor_on_max_envelope_violation": 0.95, "ema_window": "1500s", "warmup_window": "60s"}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-latency-ema-limit-multiplier"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.latency_ema_limit_multiplier'
-    description='Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.'
-    type='Number (double)'
-    reference=''
-    value='2'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-latency-baseliner-latency-tolerance-multiplier"></a>
 
 <ParameterDescription
     name='policy.latency_baseliner.latency_tolerance_multiplier'
-    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.'
+    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.'
     type='Number (double)'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='1.25'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-latency-baseliner-long-term-query-interval"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.long_term_query_interval'
+    description='Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.'
+    type='string'
+    reference=''
+    value='"1800s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-latency-baseliner-long-term-query-periodic-interval"></a>
+
+<ParameterDescription
+    name='policy.latency_baseliner.long_term_query_periodic_interval'
+    description='Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.'
+    type='string'
+    reference=''
+    value='"30s"'
 />
 
 <!-- vale on -->

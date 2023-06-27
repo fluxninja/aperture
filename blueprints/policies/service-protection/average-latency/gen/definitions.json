@@ -92,7 +92,7 @@
         "latency_baseliner": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["flux_meter", "latency_tolerance_multiplier"],
+          "required": ["flux_meter"],
           "properties": {
             "flux_meter": {
               "description": "Flux Meter defines the scope of latency measurements.",
@@ -107,27 +107,21 @@
               "type": "object",
               "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
             },
-            "ema": {
-              "description": "EMA parameters.",
-              "default": {
-                "correction_factor_on_max_envelope_violation": 0.95,
-                "ema_window": "1500s",
-                "warmup_window": "60s"
-              },
-              "type": "object",
-              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/EMAParameters"
-            },
-            "latency_ema_limit_multiplier": {
-              "description": "Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.",
-              "default": 2,
-              "type": "number",
-              "format": "double"
-            },
             "latency_tolerance_multiplier": {
-              "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.",
-              "default": "__REQUIRED_FIELD__",
+              "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.",
+              "default": 1.25,
               "type": "number",
               "format": "double"
+            },
+            "long_term_query_interval": {
+              "description": "Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.",
+              "default": "1800s",
+              "type": "string"
+            },
+            "long_term_query_periodic_interval": {
+              "description": "Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.",
+              "default": "30s",
+              "type": "string"
             }
           }
         }

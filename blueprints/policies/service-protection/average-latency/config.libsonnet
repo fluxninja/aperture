@@ -23,17 +23,13 @@ serviceProtectionDefaults {
         selectors: serviceProtectionDefaults.selectors,
       },
       /**
-      * @param (policy.latency_baseliner.ema: aperture.spec.v1.EMAParameters) EMA parameters.
-      * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
-      * @param (policy.latency_baseliner.latency_ema_limit_multiplier: float64) Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
+      * @param (policy.latency_baseliner.long_term_query_interval: string) Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.
+      * @param (policy.latency_baseliner.long_term_query_periodic_interval: string) Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.
+      * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.
       */
-      ema: {
-        ema_window: '1500s',
-        warmup_window: '60s',
-        correction_factor_on_max_envelope_violation: 0.95,
-      },
-      latency_tolerance_multiplier: '__REQUIRED_FIELD__',
-      latency_ema_limit_multiplier: 2.0,
+      long_term_query_interval: '1800s',
+      long_term_query_periodic_interval: '30s',
+      latency_tolerance_multiplier: 1.25,
     },
   },
 

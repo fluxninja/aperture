@@ -83,34 +83,19 @@ spec:
           query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="prometheus-workload-prioritization",
             policy_name="prometheus-workload-prioritization"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
             flux_meter_name="prometheus-workload-prioritization", policy_name="prometheus-workload-prioritization"}[30s]))
+    - query:
+        promql:
+          evaluation_interval: 30s
+          out_ports:
+            output:
+              signal_name: SIGNAL_LONG_TERM
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="prometheus-workload-prioritization",
+            policy_name="prometheus-workload-prioritization"}[1800s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="prometheus-workload-prioritization", policy_name="prometheus-workload-prioritization"}[1800s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
-            signal_name: SIGNAL
-          rhs:
-            constant_signal:
-              value: 2
-        operator: mul
-        out_ports:
-          output:
-            signal_name: MAX_EMA
-    - ema:
-        in_ports:
-          input:
-            signal_name: SIGNAL
-          max_envelope:
-            signal_name: MAX_EMA
-        out_ports:
-          output:
-            signal_name: SIGNAL_EMA
-        parameters:
-          correction_factor_on_max_envelope_violation: 0.95
-          ema_window: 1500s
-          warmup_window: 60s
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL_EMA
+            signal_name: SIGNAL_LONG_TERM
           rhs:
             constant_signal:
               value: 1.1
