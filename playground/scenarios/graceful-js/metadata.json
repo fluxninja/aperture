@@ -14,6 +14,12 @@
       "policy_name": "feature-rollout",
       "values_file": "policies/feature-rollout/feature-rollout.yaml",
       "dashboard_mixin_dir": "dashboards/"
+    },
+    {
+      "blueprint_name": "policies/service-protection/average-latency",
+      "policy_name": "workload-prioritization",
+      "values_file": "policies/workload-prioritization/workload-prioritization.yaml",
+      "dashboard_mixin_dir": "dashboards/"
     }
   ],
   "images": [

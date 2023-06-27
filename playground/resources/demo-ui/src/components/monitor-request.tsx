@@ -18,7 +18,7 @@ export declare type RequestRecord = {
 
 export interface MonitorRequestProps {
   requestRecord: RequestRecord[]
-  userType: 'Subscriber' | 'Guest'
+  userType: 'Subscriber' | 'Guest' | 'Crawler'
 }
 
 export const MonitorRequest: FC<MonitorRequestProps> = ({

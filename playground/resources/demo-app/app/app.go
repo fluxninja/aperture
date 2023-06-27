@@ -177,8 +177,9 @@ func (ss SimpleService) Run() error {
 	fs := http.FileServer(http.Dir("./public"))
 
 	http.Handle("/ui/", http.StripPrefix("/ui/", fs))
-	http.HandleFunc("/api/rate-limit", rateLimitedHandler)
-
+	http.Handle("/api/rate-limit", handlerFunc(handler))
+	http.Handle("/api/feature-rollout", handlerFunc(handler))
+	http.Handle("/api/workload-prioritization", handlerFunc(handler))
 	http.Handle("/request", handlerFunc(handler))
 
 	address := fmt.Sprintf(":%d", ss.port)

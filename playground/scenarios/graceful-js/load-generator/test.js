@@ -5,9 +5,11 @@ import http from "k6/http";
 
 export let vuStages = [
   { duration: "10s", target: 5 },
-  { duration: "5m", target: 5 },
-  { duration: "0s", target: 15 },
-  { duration: "10m", target: 15 },
+  { duration: "2m", target: 5 },
+  { duration: "1m", target: 50 },
+  { duration: "2m", target: 50 },
+  { duration: "10s", target: 5 },
+  { duration: "2m", target: 5 },
 ];
 
 export let options = {
@@ -23,22 +25,14 @@ export let options = {
       stages: vuStages,
       env: { USER_TYPE: "subscriber" },
     },
-    crawlers: {
-      executor: "ramping-vus",
-      stages: vuStages,
-      env: { USER_TYPE: "crawler" },
-    },
   },
 };
 
 export default function () {
   let userType = __ENV.USER_TYPE;
   let userId = vu.idInTest;
-
-  let endpoint =
-    userType === "crawler" ? "/api/rate-limit" : "/api/feature-rollout";
-
-  const url = `http://service1-demo-app.demoapp.svc.cluster.local${endpoint}`;
+  const url =
+    "http://service1-demo-app.demoapp.svc.cluster.local/workload-prioritization";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
@@ -50,13 +44,16 @@ export default function () {
     request: [
       [
         {
-          destination: `service1-demo-app.demoapp.svc.cluster.local${endpoint}`,
+          destination:
+            "service1-demo-app.demoapp.svc.cluster.local/workload-prioritization",
         },
         {
-          destination: `service2-demo-app.demoapp.svc.cluster.local${endpoint}`,
+          destination:
+            "service2-demo-app.demoapp.svc.cluster.local/workload-prirotization",
         },
         {
-          destination: `service3-demo-app.demoapp.svc.cluster.local${endpoint}`,
+          destination:
+            "service3-demo-app.demoapp.svc.cluster.local/workload-prirotization",
         },
       ],
     ],
