@@ -10,11 +10,7 @@ policy:
   drivers:
     percentile_latency_drivers:
       - criteria:
-          backward:
-            threshold: __REQUIRED_FIELD__
           forward:
-            threshold: __REQUIRED_FIELD__
-          reset:
             threshold: __REQUIRED_FIELD__
         flux_meter:
           selector:

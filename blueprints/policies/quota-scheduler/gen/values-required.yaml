@@ -26,11 +26,13 @@ policy:
     fill_amount: __REQUIRED_FIELD__
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
+    # Required: True
     selectors:
       - control_point: __REQUIRED_FIELD__
         service: __REQUIRED_FIELD__
     # Rate Limiter Parameters.
     # Type: aperture.spec.v1.RateLimiterParameters
+    # Required: True
     rate_limiter:
       interval: __REQUIRED_FIELD__
       label_key: ""

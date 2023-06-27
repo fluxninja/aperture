@@ -63,7 +63,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale out controllers.'
     type='Array of Object (promql_scale_out_controller)'
     reference='#promql-scale-out-controller'
-    value='[{"alerter": {"alert_name": "A controller intends to scale out"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 1}]'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -77,7 +77,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale in controllers.'
     type='Array of Object (promql_scale_in_controller)'
     reference='#promql-scale-in-controller'
-    value='[{"alerter": {"alert_name": "A controller intends to scale in"}, "gradient": {"slope": 1}, "query_string": "__REQUIRED_FIELD__", "threshold": 0.5}]'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -91,7 +91,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Parameters that define the scaling behavior.'
     type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
     reference='../../../spec#auto-scaler-scaling-parameters'
-    value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_in_cooldown": "40s", "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}, "scale_out_cooldown": "30s"}'
+    value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}}'
 />
 
 <!-- vale on -->
@@ -105,7 +105,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Scaling backend for the policy.'
     type='Object (aperture.spec.v1.AutoScalerScalingBackend)'
     reference='../../../spec#auto-scaler-scaling-backend'
-    value='{"kubernetes_replicas": {"kubernetes_object_selector": "__REQUIRED_FIELD__", "max_replicas": "__REQUIRED_FIELD__", "min_replicas": "__REQUIRED_FIELD__"}}'
+    value='{"kubernetes_replicas": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

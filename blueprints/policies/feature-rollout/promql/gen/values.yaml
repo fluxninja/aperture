@@ -10,13 +10,7 @@ policy:
   drivers:
     promql_drivers:
       - criteria:
-          backward:
-            operator: __REQUIRED_FIELD__
-            threshold: __REQUIRED_FIELD__
           forward:
-            operator: __REQUIRED_FIELD__
-            threshold: __REQUIRED_FIELD__
-          reset:
             operator: __REQUIRED_FIELD__
             threshold: __REQUIRED_FIELD__
         query_string: __REQUIRED_FIELD__

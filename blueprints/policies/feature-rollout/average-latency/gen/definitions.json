@@ -13,13 +13,7 @@
           "average_latency_drivers": [
             {
               "criteria": {
-                "backward": {
-                  "threshold": "__REQUIRED_FIELD__"
-                },
                 "forward": {
-                  "threshold": "__REQUIRED_FIELD__"
-                },
-                "reset": {
                   "threshold": "__REQUIRED_FIELD__"
                 }
               },

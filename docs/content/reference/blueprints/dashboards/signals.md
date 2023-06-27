@@ -4,9 +4,8 @@ title: Signals
 
 ## Introduction
 
-This blueprint provides a
-[policy monitoring](/reference/observability/monitoring.md) dashboard that
-visualizes Signals flowing through the [Circuit](/concepts/policy/circuit.md).
+This blueprint provides a policy monitoring dashboard that visualizes Signals
+flowing through the [Circuit](/concepts/policy/circuit.md).
 
 <!-- Configuration Marker -->
 
