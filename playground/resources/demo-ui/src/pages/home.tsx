@@ -4,61 +4,126 @@ import {
   MonitorRequestProps,
   RequestRecord,
 } from '../components/monitor-request'
-import { Box, Typography, styled } from '@mui/material'
+import { Box, Typography, styled, Tabs, Tab } from '@mui/material'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
   GracefulError,
   GracefulErrorProps,
   useGracefulRequest,
 } from '@fluxninja-tools/graceful-js'
-import { api } from '../api'
+import { api, RequestSpec } from '../api'
+
 
 export const HomePage: FC = () => {
+
+  const [value, setValue] = useState('1');
+
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
+    setValue(newValue);
+  };
+  const reqSpec: RequestSpec = {
+    method: 'POST',git
+    endpoint: '/rate-limit',
+    userType: 'Guest',
+    userId: 'Vu',
+  };
+
+  // Request to rate-limit endpoint with Guest user
   const {
     refetch,
     isError,
-    requestRecord: crawlerRequestRecord,
-    isLoading: isLoadingCrawler,
-  } = useGracefulRequestForRateLimit('Crawler')
+    requestRecord: requestRecord,
+    isLoading: isLoadingRequest,
+  } = makeRequestToEndpoint(reqSpec)
+
+  // Request to workload-prioritization endpoint with Guest user
+  reqSpec.endpoint = '/workload-prioritization'
   const {
     refetch: refetchSubscriber,
     isError: isErrorSubscriber,
     requestRecord: subscriberRequestRecord,
     isLoading: isLoadingSubscriber,
-  } = useGracefulRequestForRateLimit('Subscriber')
+  } = makeRequestToEndpoint(reqSpec)
+
+  // Request to workload-prioritization endpoint with Subscriber user
+  reqSpec.userType = 'Subscriber'
+  const {
+    refetch: refetchSubscriber2,
+    isError: isErrorSubscriber2,
+    requestRecord: subscriberRequestRecord2,
+    isLoading: isLoadingSubscriber2,
+  } = makeRequestToEndpoint(reqSpec)
 
   return (
-    <>
-      <RequestMonitorPanel
-        monitorRequestProps={{
-          requestRecord: crawlerRequestRecord,
-          userType: 'Crawler',
-          refetch,
-        }}
-        isErrored={isError}
-        isLoading={isLoadingCrawler}
-        errorComponentProps={{
-          url: '/api/rate-limit',
-          requestBody: {},
-        }}
-      />
-      <RequestMonitorPanel
-        monitorRequestProps={{
-          requestRecord: subscriberRequestRecord,
-          refetch: refetchSubscriber,
-          userType: 'Subscriber',
-        }}
-        isErrored={isErrorSubscriber}
-        isLoading={isLoadingSubscriber}
-        errorComponentProps={{
-          url: '/api/rate-limit',
-          requestBody: {},
-        }}
-      />
-    </>
+    <TabContext value={value}>
+      <TabList onChange={handleChange} aria-label="GracefulJS Tabs">
+        <Tab label="Rate Limit" value="1" />
+        <Tab label="Workload Prioritization" value="2" />
+        <Tab label="TODO" value="3" />
+      </TabList>
+      <TabPanel value="1">
+        <RequestMonitorPanel
+          monitorRequestProps={{
+            requestRecord: requestRecord,
+            userType: 'Guest',
+            refetch,
+          }}
+          isErrored={isError}
+          isLoading={isLoadingRequest}
+          errorComponentProps={{
+            url: '/api/rate-limit',
+            requestBody: {},
+          }}
+        />
+      </TabPanel>
+      <TabPanel value="2">
+        <RequestMonitorPanel
+          monitorRequestProps={{
+            requestRecord: subscriberRequestRecord,
+            refetch: refetchSubscriber,
+            userType: 'Guest',
+          }}
+          isErrored={isErrorSubscriber}
+          isLoading={isLoadingSubscriber}
+          errorComponentProps={{
+            url: '/api/workload-prioritization',
+            requestBody: {},
+          }}
+        />
+        <RequestMonitorPanel
+          monitorRequestProps={{
+            requestRecord: subscriberRequestRecord2,
+            refetch: refetchSubscriber2,
+            userType: 'Subscriber',
+          }}
+          isErrored={isErrorSubscriber2}
+          isLoading={isLoadingSubscriber2}
+          errorComponentProps={{
+            url: '/api/workload-prioritization',
+            requestBody: {},
+          }}
+        />
+      </TabPanel>
+      <TabPanel value="3">
+        <RequestMonitorPanel
+          monitorRequestProps={{
+            requestRecord: subscriberRequestRecord2,
+            refetch: refetchSubscriber2,
+            userType: 'Subscriber',
+          }}
+          isErrored={isErrorSubscriber2}
+          isLoading={isLoadingSubscriber2}
+          errorComponentProps={{
+            url: '/api/workload-prioritization',
+            requestBody: {},
+          }}
+        />
+      </TabPanel>
+    </TabContext>
   )
 }
 
-export const useGracefulRequestForRateLimit = (userID: string) => {
+export const makeRequestToEndpoint = (reqSpec: RequestSpec) => {
   const [requestRecord, setRequestRecord] = useState<RequestRecord[]>([]) // record state for each request
   const [requestCount, setRequestCount] = useState(0) // number of request count state
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null) // interval id state, used to clear interval
@@ -67,7 +132,7 @@ export const useGracefulRequestForRateLimit = (userID: string) => {
     useGracefulRequest<'Axios'>({
       typeOfRequest: 'Axios',
       requestFnc: () =>
-        api.post(`/rate-limit`, {}, { headers: { 'user-id': userID } }),
+        api.post(reqSpec.endpoint, {}, { headers: { 'User-Id': reqSpec.userId, 'User-Type': reqSpec.userType} }),
       options: {
         disabled: true,
       },
@@ -130,26 +195,28 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   isLoading,
   errorComponentProps,
 }) => (
-  <HomePageWrapper>
-    <HomePageColumnBox>
-      <MonitorRequest {...monitorRequestProps} />
-    </HomePageColumnBox>
-    <HomePageColumnBox>
-      {isErrored && !isLoading ? (
-        <GracefulError {...errorComponentProps} /> // TODO: not rendering right error component. Only default error component is rendering
-      ) : (
-        <Typography
-          variant="h5"
-          sx={(theme) => ({ color: theme.palette.grey[400] })}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          200
-        </Typography>
-      )}
-    </HomePageColumnBox>
-  </HomePageWrapper>
+
+
+    <HomePageWrapper>
+      <HomePageColumnBox>
+        <MonitorRequest {...monitorRequestProps} />
+      </HomePageColumnBox>
+      <HomePageColumnBox>
+        {isErrored && !isLoading ? (
+          <GracefulError {...errorComponentProps} /> // TODO: not rendering right error component. Only default error component is rendering
+        ) : (
+          <Typography
+            variant="h5"
+            sx={(theme) => ({ color: theme.palette.grey[400] })}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            200
+          </Typography>
+        )}
+      </HomePageColumnBox>
+    </HomePageWrapper>
 )
 
 export const HomePageWrapper = styled(Box)(({ theme }) => ({
@@ -175,4 +242,13 @@ export const HomePageColumnBox = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   gap: theme.spacing(2),
   minHeight: 500,
+}))
+
+export const HomePageTabs = styled(Tabs)(({ theme }) => ({
+  width: '100%',
+  minHeight: 500,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  gap: theme.spacing(2),
 }))

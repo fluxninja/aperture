@@ -29,58 +29,58 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
   userType,
   refetch,
 }) => (
-  <MonitorRequestWrapper component={Paper}>
-    <Typography variant="h6" textAlign="center">
-      {userType}
-    </Typography>
-    <Divider />
-    <Typography>Request made by app:</Typography>
-    <Box display="flex" gap={0.3}>
-      {requestRecord.map((record, index) => (
-        <MonitorRequestItem key={index} {...record} />
-      ))}
-    </Box>
-    <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1}>
-      <ColumnBoxStyled component={Paper}>
-        <InfoHeading>Success</InfoHeading>
-        <Box {...boxFlex}>
-          <SuccessRate requestRecord={requestRecord} />
-        </Box>
-      </ColumnBoxStyled>
-      <ColumnBoxStyled component={Paper}>
-        <InfoHeading>Error</InfoHeading>
-        <Box {...boxFlex}>
-          <ErrorRate requestRecord={requestRecord} />
-        </Box>
-      </ColumnBoxStyled>
-      <ColumnBoxStyled component={Paper}>
-        <InfoHeading>Start Test</InfoHeading>
-        <Box {...boxFlex}>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ alignSelf: 'center' }}
-            onClick={refetch}
-          >
-            Start
-          </Button>
-        </Box>
-      </ColumnBoxStyled>
-      <ColumnBoxStyled component={Paper}>
-        <InfoHeading>Reset</InfoHeading>
-        <Box {...boxFlex}>
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.reload()}
-          >
-            Reset
-          </Button>
-        </Box>
-      </ColumnBoxStyled>
-    </Box>
-  </MonitorRequestWrapper>
+    <MonitorRequestWrapper component={Paper}>
+      <Typography variant="h6" textAlign="center">
+        {userType}
+      </Typography>
+      <Divider />
+      <Typography>User Request:</Typography>
+      <Box display="flex" gap={0.3}>
+        {requestRecord.map((record, index) => (
+          <MonitorRequestItem key={index} {...record} />
+        ))}
+      </Box>
+      <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1}>
+        <ColumnBoxStyled component={Paper}>
+          <InfoHeading>Success</InfoHeading>
+          <Box {...boxFlex}>
+            <SuccessRate requestRecord={requestRecord} />
+          </Box>
+        </ColumnBoxStyled>
+        <ColumnBoxStyled component={Paper}>
+          <InfoHeading>Error</InfoHeading>
+          <Box {...boxFlex}>
+            <ErrorRate requestRecord={requestRecord} />
+          </Box>
+        </ColumnBoxStyled>
+        <ColumnBoxStyled component={Paper}>
+          <InfoHeading>Start Test</InfoHeading>
+          <Box {...boxFlex}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ alignSelf: 'center' }}
+              onClick={refetch}
+            >
+              Start
+            </Button>
+          </Box>
+        </ColumnBoxStyled>
+        <ColumnBoxStyled component={Paper}>
+          <InfoHeading>Reset</InfoHeading>
+          <Box {...boxFlex}>
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ alignSelf: 'center' }}
+              onClick={() => window.location.reload()}
+            >
+              Reset
+            </Button>
+          </Box>
+        </ColumnBoxStyled>
+      </Box>
+    </MonitorRequestWrapper>
 )
 
 export type SuccessRateProps = Pick<MonitorRequestProps, 'requestRecord'>
