@@ -405,6 +405,10 @@ commands:
             - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
+          name: Copy tool-versions in HOME dir
+          command: |
+            cp .tool-versions ~/.tool-versions
+      - run:
           name: Install ASDF tools
           environment:
             TOOLS: << parameters.tools >>
