@@ -1,0 +1,11 @@
+applicationName: com.fluxninja.controller
+publisher: "fluxninja"
+description: "FluxNinja Controller on AKS"
+version: 1.0.1 #Must be in the format of #.#.#
+helmChart: "../../manifests/charts/aperture-controller/"
+clusterArmTemplate: "./mainTemplate.json"
+uiDefinition: "./createUIDefinition.json"
+registryServer: "youracr.azurecr.io"
+extensionRegistrationParameters:
+  defaultScope: "cluster" # cluster or namespace
+  namespace: "aperture-controller"

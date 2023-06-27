@@ -1,0 +1,239 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "globalImageRegistery": {
+      "type": "string",
+      "defaultValue": "marketplace.azurecr.io",
+      "metadata": {
+        "description": "The name of the global registery."
+      }
+    },
+    "extensionResourceName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the extension."
+      }
+    },
+    "clusterResourceName": {
+      "type": "String",
+      "metadata": {
+        "description": "The name of the Managed Cluster resource."
+      }
+    },
+    "createNewCluster": {
+      "type": "Bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "When set to 'true', creates new AKS cluster. Otherwise, an existing cluster is used."
+      }
+    },
+    "location": {
+      "type": "String",
+      "metadata": {
+        "description": "The location of AKS resource."
+      }
+    },
+    "dynamicSettings": {
+      "type": "array"
+    },
+    "vmSize": {
+      "type": "String",
+      "defaultValue": "Standard_DS2_v2",
+      "metadata": {
+        "description": "VM size"
+      }
+    },
+    "vmEnableAutoScale": {
+      "type": "Bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "enable auto scaling"
+      }
+    },
+    "vmCount": {
+      "type": "Int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "VM count"
+      }
+    },
+    "dnsPrefix": {
+      "defaultValue": "[concat(parameters('clusterResourceName'),'-dns')]",
+      "type": "String",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+      }
+    },
+    "osDiskSizeGB": {
+      "defaultValue": 0,
+      "minValue": 0,
+      "maxValue": 1023,
+      "type": "Int",
+      "metadata": {
+        "description": "Disk size (in GiB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
+      }
+    },
+    "kubernetesVersion": {
+      "type": "String",
+      "defaultValue": "1.26.0",
+      "metadata": {
+        "description": "The version of Kubernetes."
+      }
+    },
+    "networkPlugin": {
+      "defaultValue": "kubenet",
+      "allowedValues": ["azure", "kubenet"],
+      "type": "String",
+      "metadata": {
+        "description": "Network plugin used for building Kubernetes network."
+      }
+    },
+    "enableRBAC": {
+      "defaultValue": true,
+      "type": "Bool",
+      "metadata": {
+        "description": "Boolean flag to turn on and off of RBAC."
+      }
+    },
+    "enablePrivateCluster": {
+      "defaultValue": false,
+      "type": "Bool",
+      "metadata": {
+        "description": "Enable private network access to the Kubernetes cluster."
+      }
+    },
+    "enableHttpApplicationRouting": {
+      "defaultValue": true,
+      "type": "Bool",
+      "metadata": {
+        "description": "Boolean flag to turn on and off http application routing."
+      }
+    },
+    "enableAzurePolicy": {
+      "defaultValue": false,
+      "type": "Bool",
+      "metadata": {
+        "description": "Boolean flag to turn on and off Azure Policy addon."
+      }
+    },
+    "enableSecretStoreCSIDriver": {
+      "defaultValue": false,
+      "type": "Bool",
+      "metadata": {
+        "description": "Boolean flag to turn on and off secret store CSI driver."
+      }
+    }
+  },
+  "variables": {
+    "plan-name": "DONOTMODIFY",
+    "plan-publisher": "DONOTMODIFY",
+    "plan-offerID": "DONOTMODIFY",
+    "releaseTrain": "DONOTMODIFY",
+    "clusterExtensionTypeName": "DONOTMODIFY",
+
+    "copy": [
+      {
+        "count": "[length(parameters('dynamicSettings'))]",
+        "input": "[createObject(concat('labels.', parameters('dynamicSettings')[copyIndex('dynamicSettings_array')].labelName), union(createObject('value', ''), parameters('dynamicSettings')[copyIndex('dynamicSettings_array')]).labelValue)]",
+        "name": "dynamicSettings_array"
+      }
+    ],
+    "dynamicSettings_string": "[concat(string(variables('dynamicSettings_array')), '_END_')]",
+    "dynamicSettings_trim1": "[replace(variables('dynamicSettings_string'), '[{\"', '{\"')]",
+    "dynamicSettings_trim2": "[replace(variables('dynamicSettings_trim1'), '}]_END_', '}')]",
+    "dynamicSettings_trim3": "[replace(variables('dynamicSettings_trim2'), '},{\"', ',\"')]",
+    "dynamicSettings_json": "[json(variables('dynamicSettings_trim3'))]",
+
+    "is_dynamicSettings_empty": "[or(variables('is_dynamicSettings_defaultState'), empty(parameters('dynamicSettings')))]",
+    "is_dynamicSettings_defaultState": "[equals(replace(string(parameters('dynamicSettings')), ' ', ''), '[{\"labelName\":\"\",\"labelValue\":\"\"}]')]",
+
+    "mandatory_setting_inputs": {
+      "global.imageRegistry": "[parameters('globalImageRegistery')]"
+    },
+
+    "configurationSettings": "[if(variables('is_dynamicSettings_empty'), variables('mandatory_setting_inputs'), union(variables('mandatory_setting_inputs'), variables('dynamicSettings_json') ))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "condition": "[parameters('createNewCluster')]",
+      "apiVersion": "2022-11-01",
+      "name": "[parameters('clusterResourceName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [],
+      "tags": {},
+      "sku": {
+        "name": "Basic",
+        "tier": "Free"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "kubernetesVersion": "[parameters('kubernetesVersion')]",
+        "enableRBAC": "[parameters('enableRBAC')]",
+        "dnsPrefix": "[parameters('dnsPrefix')]",
+        "agentPoolProfiles": [
+          {
+            "name": "agentpool",
+            "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+            "count": "[parameters('vmCount')]",
+            "enableAutoScaling": "[parameters('vmEnableAutoScale')]",
+            "minCount": 1,
+            "maxCount": 10,
+            "vmSize": "[parameters('vmSize')]",
+            "osType": "Linux",
+            "storageProfile": "ManagedDisks",
+            "type": "VirtualMachineScaleSets",
+            "mode": "System",
+            "maxPods": 110,
+            "availabilityZones": [],
+            "enableNodePublicIP": false,
+            "tags": {}
+          }
+        ],
+        "networkProfile": {
+          "loadBalancerSku": "standard",
+          "networkPlugin": "[parameters('networkPlugin')]"
+        },
+        "apiServerAccessProfile": {
+          "enablePrivateCluster": "[parameters('enablePrivateCluster')]"
+        },
+        "addonProfiles": {
+          "httpApplicationRouting": {
+            "enabled": "[parameters('enableHttpApplicationRouting')]"
+          },
+          "azurepolicy": {
+            "enabled": "[parameters('enableAzurePolicy')]"
+          },
+          "azureKeyvaultSecretsProvider": {
+            "enabled": "[parameters('enableSecretStoreCSIDriver')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KubernetesConfiguration/extensions",
+      "apiVersion": "2022-11-01",
+      "name": "[parameters('extensionResourceName')]",
+      "properties": {
+        "extensionType": "[variables('clusterExtensionTypeName')]",
+        "autoUpgradeMinorVersion": true,
+        "releaseTrain": "[variables('releaseTrain')]",
+        "configurationSettings": "[variables('configurationSettings')]",
+        "configurationProtectedSettings": {}
+      },
+      "plan": {
+        "name": "[variables('plan-name')]",
+        "publisher": "[variables('plan-publisher')]",
+        "product": "[variables('plan-offerID')]"
+      },
+      "scope": "[concat('Microsoft.ContainerService/managedClusters/', parameters('clusterResourceName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('clusterResourceName'))]"
+      ]
+    }
+  ],
+  "outputs": {}
+}
