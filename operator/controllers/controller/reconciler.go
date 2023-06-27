@@ -51,11 +51,12 @@ import (
 // ControllerReconciler reconciles a Controller object.
 type ControllerReconciler struct {
 	client.Client
-	DynamicClient    dynamic.Interface
-	Scheme           *runtime.Scheme
-	Recorder         record.EventRecorder
-	resourcesDeleted bool
-	defaultsExecuted bool
+	DynamicClient       dynamic.Interface
+	Scheme              *runtime.Scheme
+	Recorder            record.EventRecorder
+	MultipleControllers bool
+	resourcesDeleted    bool
+	defaultsExecuted    bool
 }
 
 var (
@@ -63,6 +64,29 @@ var (
 	controllerKey        *bytes.Buffer
 	controllerClientCert *bytes.Buffer
 )
+
+func (r *ControllerReconciler) verifySingletonControllerExists(ctx context.Context, instance *controllerv1alpha1.Controller, instances *controllerv1alpha1.ControllerList) (bool, error) {
+	// Check if this is an update request. If not, skip the resource creation as only single Controller is required in a cluster.
+	if instances.Items != nil && len(instances.Items) != 0 {
+		for _, ins := range instances.Items {
+			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
+				continue
+			}
+			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
+				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
+					"The required resources are already deployed. Skipping resource creation as currently, the Controller does not support multiple replicas.")
+
+				instance.Status.Resources = "skipped"
+				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+					return false, err
+				}
+
+				return false, nil
+			}
+		}
+	}
+	return true, nil
+}
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=validatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
@@ -133,23 +157,13 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	// Check if this is an update request. If not, skip the resource creation as only single Controller is required in a cluster.
-	if instances.Items != nil && len(instances.Items) != 0 {
-		for _, ins := range instances.Items {
-			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
-				continue
-			}
-			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
-				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
-					"The required resources are already deployed. Skipping resource creation as currently, the Controller does not support multiple replicas.")
-
-				instance.Status.Resources = "skipped"
-				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
-					return ctrl.Result{}, err
-				}
-
-				return ctrl.Result{}, nil
-			}
+	if !r.MultipleControllers {
+		passed, innerErr := r.verifySingletonControllerExists(ctx, instance, instances)
+		if innerErr != nil {
+			return ctrl.Result{}, innerErr
+		}
+		if !passed {
+			return ctrl.Result{}, nil
 		}
 	}
 
@@ -330,28 +344,30 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 		Enabled:  true,
 	}
 
-	instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
+	if !r.MultipleControllers {
+		instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
+		if err := r.reconcileService(ctx, log, instance); err != nil {
+			return err
+		}
+
+		if err := r.reconcileClusterRole(ctx, instance); err != nil {
+			return err
+		}
+
+		if err := r.reconcileClusterRoleBinding(ctx, instance); err != nil {
+			return err
+		}
+
+		if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
+			return err
+		}
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
 
-	if err := r.reconcileService(ctx, log, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileClusterRole(ctx, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileClusterRoleBinding(ctx, instance); err != nil {
-		return err
-	}
-
 	if err := r.reconcileServiceAccount(ctx, log, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
 		return err
 	}
 
@@ -366,10 +382,19 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 	return nil
 }
 
+func (r *ControllerReconciler) createNameForConfigMap(instance *controllerv1alpha1.Controller) string {
+	if !r.MultipleControllers {
+		return controllers.ControllerServiceName
+	}
+
+	return fmt.Sprintf("controller-%s", instance.GetName())
+}
+
 // reconcileConfigMap prepares the desired states for Controller configmaps and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance *controllerv1alpha1.Controller) error {
-	configMap, err := configMapForControllerConfig(instance.DeepCopy(), r.Scheme)
+	name := r.createNameForConfigMap(instance)
+	configMap, err := configMapForControllerConfig(instance.DeepCopy(), name, r.Scheme)
 	if err != nil {
 		return err
 	}
@@ -460,13 +485,23 @@ func (r *ControllerReconciler) reconcileClusterRoleBinding(ctx context.Context, 
 	return nil
 }
 
+func (r *ControllerReconciler) createNameForServiceAccount(instance *controllerv1alpha1.Controller) string {
+	if !r.MultipleControllers {
+		return controllers.ControllerServiceName
+	}
+
+	return fmt.Sprintf("controller-%s", instance.GetName())
+}
+
 // reconcileServiceAccount prepares the desired states for Controller ServiceAccount and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
 	if !instance.Spec.ServiceAccountSpec.Create {
 		return nil
 	}
-	sa, err := serviceAccountForController(instance.DeepCopy(), r.Scheme)
+
+	name := r.createNameForServiceAccount(instance)
+	sa, err := serviceAccountForController(instance.DeepCopy(), name, r.Scheme)
 	if err != nil {
 		return err
 	}
@@ -477,10 +512,28 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	return nil
 }
 
+func (r *ControllerReconciler) createNameForDeployment(instance *controllerv1alpha1.Controller) string {
+	if !r.MultipleControllers {
+		return controllers.ControllerServiceName
+	}
+
+	return fmt.Sprintf("controller-%s", instance.GetName())
+}
+
 // reconcileDeployment prepares the desired states for Controller Deployment and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	dep, err := deploymentForController(instance.DeepCopy(), log, r.Scheme)
+	name := r.createNameForDeployment(instance)
+
+	// FIXME: Manage per-controller tls certificates with cert-manager
+	var tlsEnabled bool
+	if r.MultipleControllers {
+		tlsEnabled = false
+	} else {
+		tlsEnabled = true
+	}
+
+	dep, err := deploymentForController(instance.DeepCopy(), name, tlsEnabled, log, r.Scheme)
 	if err != nil {
 		return err
 	}

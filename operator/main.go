@@ -63,6 +63,7 @@ func main() {
 	var agentManager bool
 	var controllerManager bool
 	var probeAddr string
+	var multipleControllersEnabled bool
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -74,6 +75,8 @@ func main() {
 	flag.BoolVar(&controllerManager, "controller", false,
 		"Enable manager for Aperture Controller. "+
 			"Enabling this will ensure that Controller Custom Resource is monitored by the Operator.")
+	flag.BoolVar(&multipleControllersEnabled, "experimental-multiple-controllers", false,
+		"Experimental support for deployment of multiple controllers.")
 
 	opts := zap.Options{
 		Development: true,
@@ -82,6 +85,10 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	if multipleControllersEnabled {
+		setupLog.Info("Experimental support for managing multiple controllers enabled.")
+	}
 
 	if !agentManager && !controllerManager {
 		setupLog.Info("One of the --agent or --controller flag is required.")
@@ -191,10 +198,11 @@ func main() {
 
 	if controllerManager {
 		if err = (&controller.ControllerReconciler{
-			Client:        mgr.GetClient(),
-			DynamicClient: dynamicClient,
-			Scheme:        mgr.GetScheme(),
-			Recorder:      mgr.GetEventRecorderFor("aperture-controller"),
+			Client:              mgr.GetClient(),
+			DynamicClient:       dynamicClient,
+			Scheme:              mgr.GetScheme(),
+			Recorder:            mgr.GetEventRecorderFor("aperture-controller"),
+			MultipleControllers: multipleControllersEnabled,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Controller")
 			os.Exit(1)

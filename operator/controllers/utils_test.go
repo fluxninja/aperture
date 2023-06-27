@@ -919,7 +919,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 			}
 
-			result := ControllerVolumeMounts(instance.Spec.CommonSpec)
+			result := ControllerVolumeMounts(true, instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -959,7 +959,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 			}
 
-			result := ControllerVolumeMounts(instance.Spec.CommonSpec)
+			result := ControllerVolumeMounts(true, instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})

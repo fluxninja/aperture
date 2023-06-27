@@ -343,24 +343,27 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 }
 
 // ControllerVolumeMounts prepares volumeMounts for Controllers' container.
-func ControllerVolumeMounts(controllerSpec common.CommonSpec) []corev1.VolumeMount {
+func ControllerVolumeMounts(tlsEnabled bool, controllerSpec common.CommonSpec) []corev1.VolumeMount {
 	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "aperture-controller-config",
 			MountPath: "/etc/aperture/aperture-controller/config",
 		},
-		{
+	}
+
+	if tlsEnabled {
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
 			Name:      "server-cert",
 			MountPath: "/etc/aperture/aperture-controller/certs",
 			ReadOnly:  true,
-		},
+		})
 	}
 
 	return MergeVolumeMounts(volumeMounts, controllerSpec.ExtraVolumeMounts)
 }
 
 // ControllerVolumes prepares volumes for Controller.
-func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume {
+func ControllerVolumes(tlsEnabled bool, instance *controllerv1alpha1.Controller) []corev1.Volume {
 	volumes := []corev1.Volume{
 		{
 			Name: "aperture-controller-config",
@@ -373,7 +376,10 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 				},
 			},
 		},
-		{
+	}
+
+	if tlsEnabled {
+		volumes = append(volumes, corev1.Volume{
 			Name: "server-cert",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
@@ -381,7 +387,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 					SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 				},
 			},
-		},
+		})
 	}
 
 	return MergeVolumes(volumes, instance.Spec.ExtraVolumes)

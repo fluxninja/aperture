@@ -36,7 +36,7 @@ import (
 )
 
 // deploymentForAPIService prepares the Deployment object for the Controller.
-func deploymentForController(instance *controllerv1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+func deploymentForController(instance *controllerv1alpha1.Controller, name string, tlsEnabled bool, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	spec := instance.Spec
 
 	podLabels := controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName)
@@ -66,7 +66,7 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerServiceName,
+			Name:        name,
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: spec.Annotations,
@@ -85,7 +85,7 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
-					ServiceAccountName:            controllers.ControllerServiceName,
+					ServiceAccountName:            name,
 					HostAliases:                   spec.HostAliases,
 					ImagePullSecrets:              controllers.ImagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
@@ -137,10 +137,10 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 							LivenessProbe:            livenessProbe,
 							ReadinessProbe:           readinessProbe,
 							Lifecycle:                spec.LifecycleHooks,
-							VolumeMounts:             controllers.ControllerVolumeMounts(spec.CommonSpec),
+							VolumeMounts:             controllers.ControllerVolumeMounts(tlsEnabled, spec.CommonSpec),
 						},
 					},
-					Volumes: controllers.ControllerVolumes(instance),
+					Volumes: controllers.ControllerVolumes(tlsEnabled, instance),
 				},
 			},
 		},

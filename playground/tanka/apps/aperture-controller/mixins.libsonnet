@@ -18,6 +18,7 @@ local apertureControllerMixin =
       },
       controller+: {
         createUninstallHook: false,
+
         config+: {
           fluxninja+: {
             endpoint: 'aperture.latest.dev.fluxninja.com' + ':443',
