@@ -14,28 +14,25 @@ function(cfg, params={}, metadata={}) {
         spec.v1.Component.withQuery(
           spec.v1.Query.new()
           + spec.v1.Query.withPromql(
-            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[30s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[30s]))' % { policy_name: updatedConfig.policy.policy_name };
+            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: updatedConfig.policy.policy_name, interval: '30s' };
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
             + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),
-        spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.mul(
-          spec.v1.Port.withSignalName('SIGNAL'),
-          spec.v1.Port.withConstantSignal(updatedConfig.policy.latency_baseliner.latency_ema_limit_multiplier),
-          output=spec.v1.Port.withSignalName('MAX_EMA')
-        )),
-        spec.v1.Component.withEma(
-          spec.v1.EMA.withParameters(updatedConfig.policy.latency_baseliner.ema)
-          + spec.v1.EMA.withInPortsMixin(
-            spec.v1.EMA.inPorts.withInput(spec.v1.Port.withSignalName('SIGNAL'))
-            + spec.v1.EMA.inPorts.withMaxEnvelope(spec.v1.Port.withSignalName('MAX_EMA'))
-          )
-          + spec.v1.EMA.withOutPortsMixin(spec.v1.EMA.outPorts.withOutput(spec.v1.Port.withSignalName('SIGNAL_EMA')))
+        spec.v1.Component.withQuery(
+          spec.v1.Query.new()
+          + spec.v1.Query.withPromql(
+            local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: updatedConfig.policy.policy_name, interval: updatedConfig.policy.latency_baseliner.long_term_query_interval };
+            spec.v1.PromQL.new()
+            + spec.v1.PromQL.withQueryString(q)
+            + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.latency_baseliner.long_term_query_periodic_interval)
+            + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL_LONG_TERM') }),
+          ),
         ),
         spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.mul(
-          spec.v1.Port.withSignalName('SIGNAL_EMA'),
+          spec.v1.Port.withSignalName('SIGNAL_LONG_TERM'),
           spec.v1.Port.withConstantSignal(updatedConfig.policy.latency_baseliner.latency_tolerance_multiplier),
           output=spec.v1.Port.withSignalName('SETPOINT')
         )),
