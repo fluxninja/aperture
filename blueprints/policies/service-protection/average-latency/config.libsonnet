@@ -1,38 +1,23 @@
 local serviceProtectionDefaults = import '../base/config-defaults.libsonnet';
 
 /**
-* @param (policy.policy_name: string required) Name of the policy.
+* @param (policy.policy_name: string) Name of the policy.
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
 * @param (policy.service_protection_core.overload_confirmations: []overload_confirmation) List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
-* @schema (overload_confirmation.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
+* @schema (overload_confirmation.query_string: string) The Prometheus query to be run. Must return a scalar or a vector with a single element.
 * @schema (overload_confirmation.threshold: float64) The threshold for the overload confirmation criteria.
 * @schema (overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`
-* @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters required) Parameters for Adaptive Load Scheduler.
+* @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters) Parameters for Adaptive Load Scheduler.
 * @param (policy.service_protection_core.dry_run: bool) Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
-* @param (policy.auto_scaling.dry_run: bool) Dry run mode ensures that no scaling is invoked by the auto scaler escalation. This config can be updated at runtime without restarting the policy.
-* @schema (promql_scale_out_controller.query_string: string) The Prometheus query to be run. Must return a scalar or a vector with a single element.
-* @schema (promql_scale_out_controller.threshold: float64) Threshold for the controller.
-* @schema (promql_scale_out_controller.gradient: aperture.spec.v1.IncreasingGradientParameters) Gradient parameters for the controller.
-* @schema (promql_scale_out_controller.alerter: aperture.spec.v1.AlerterParameters) Alerter parameters for the controller.
-* @param (policy.auto_scaling.promql_scale_out_controllers: []promql_scale_out_controller) List of scale out controllers.
-* @schema (promql_scale_in_controller.query_string: string) The Prometheus query to be run. Must return a scalar or a vector with a single element.
-* @schema (promql_scale_in_controller.threshold: float64) Threshold for the controller.
-* @schema (promql_scale_in_controller.gradient: aperture.spec.v1.DecreasingGradientParameters) Gradient parameters for the controller.
-* @schema (promql_scale_in_controller.alerter: aperture.spec.v1.AlerterParameters) Alerter parameters for the controller.
-* @param (policy.auto_scaling.promql_scale_in_controllers: []promql_scale_in_controller) List of scale in controllers.
-* @param (policy.auto_scaling.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters) Parameters that define the scaling behavior.
-* @param (policy.auto_scaling.scaling_backend: aperture.spec.v1.AutoScalerScalingBackend) Scaling backend for the policy.
-* @param (policy.auto_scaling.periodic_decrease.period: string) Period for periodic scale in.
-* @param (policy.auto_scaling.periodic_decrease.scale_in_percentage: float64) Percentage of replicas to scale in.
 */
 
 serviceProtectionDefaults {
   policy+: {
     latency_baseliner: {
       /**
-      * @param (policy.latency_baseliner.flux_meter: aperture.spec.v1.FluxMeter required) Flux Meter defines the scope of latency measurements.
+      * @param (policy.latency_baseliner.flux_meter: aperture.spec.v1.FluxMeter) Flux Meter defines the scope of latency measurements.
       */
       flux_meter: {
         selectors: serviceProtectionDefaults.selectors,

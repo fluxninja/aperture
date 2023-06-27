@@ -9,15 +9,15 @@ spec:
     components:
       - query:
           promql:
-            evaluation_interval: 1s
+            evaluation_interval: 10s
             out_ports:
               output:
                 signal_name: LATENCY
             query_string:
               sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
               flow_status="OK",
-              flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
-              flow_status="OK", flux_meter_name="test"}[5s]))
+              flux_meter_name="test"}[30s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
+              flow_status="OK", flux_meter_name="test"}[30s]))
       - ema:
           in_ports:
             input:
@@ -56,7 +56,7 @@ spec:
           parameters:
             alert_name: overload
             severity: crit
-    evaluation_interval: 0.5s
+    evaluation_interval: 10s
   resources:
     flow_control:
       flux_meters:

@@ -1,7 +1,7 @@
+local creator = import '../../../grafana/creator.libsonnet';
 local blueprint = import './average-latency.libsonnet';
 
 local policy = blueprint.policy;
-local dashboard = blueprint.dashboard;
 local config = blueprint.config;
 
 function(params, metadata={}) {
@@ -12,7 +12,7 @@ function(params, metadata={}) {
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
   local p = policy(c, params, metadataWrapper),
-  local d = dashboard(c, params),
+  local d = creator(p.policyResource, c),
 
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,

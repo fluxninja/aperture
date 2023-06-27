@@ -2,5 +2,4 @@ blueprint:
   Service Protection Policy based on feedback of average feature duration or
   response latency.
 sources:
-  dashboard: policies/service-protection/average-latency/dashboard.libsonnet
   policy: policies/service-protection/average-latency/policy.libsonnet

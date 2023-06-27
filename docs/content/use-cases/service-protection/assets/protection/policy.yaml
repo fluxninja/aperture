@@ -4,7 +4,8 @@ metadata:
   annotations:
     fluxninja.com/blueprint-name: policies/service-protection/average-latency
     fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
+    fluxninja.com/values:
+      '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
       [{"control_point": "ingress", "service": "cart-service.prod.svc.cluster.local"}]},
       "latency_tolerance_multiplier": 1.1000000000000001}, "policy_name": "basic-service-protection",
       "service_protection_core": {"adaptive_load_scheduler": {"load_scheduler": {"selectors":
@@ -15,17 +16,48 @@ metadata:
 spec:
   circuit:
     components:
-    - flow_control:
-        adaptive_load_scheduler:
-          dry_run: false
-          dry_run_config_key: dry_run
+      - flow_control:
+          adaptive_load_scheduler:
+            dry_run: false
+            dry_run_config_key: dry_run
+            in_ports:
+              overload_confirmation:
+                constant_signal:
+                  value: 1
+              setpoint:
+                signal_name: SETPOINT
+              signal:
+                signal_name: SIGNAL
+            out_ports:
+              desired_load_multiplier:
+                signal_name: DESIRED_LOAD_MULTIPLIER
+              observed_load_multiplier:
+                signal_name: OBSERVED_LOAD_MULTIPLIER
+            parameters:
+              alerter:
+                alert_name: Load Throttling Event
+              gradient:
+                max_gradient: 1
+                min_gradient: 0.1
+                slope: -1
+              load_multiplier_linear_increment: 0.0025
+              load_scheduler:
+                selectors:
+                  - control_point: ingress
+                    service: service1-demo-app.demoapp.svc.cluster.local
+              max_load_multiplier: 2
+      - query:
+          promql:
+            evaluation_interval: 10s
+            out_ports:
+              output:
+                signal_name: SIGNAL
+            query_string:
+              sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="basic-service-protection"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+              flux_meter_name="basic-service-protection"}[30s]))
+      - arithmetic_combinator:
           in_ports:
-            overload_confirmation:
-              constant_signal:
-                value: 1
-            setpoint:
-              signal_name: SETPOINT
-            signal:
+            lhs:
               signal_name: SIGNAL
           out_ports:
             desired_load_multiplier:
@@ -42,58 +74,45 @@ spec:
             load_multiplier_linear_increment: 0.0025
             load_scheduler:
               selectors:
-              - control_point: ingress
-                service: cart-service.prod.svc.cluster.local
+                - control_point: ingress
+                  service: cart-service.prod.svc.cluster.local
             max_load_multiplier: 2
-    - query:
-        promql:
-          evaluation_interval: 1s
+      - query:
+          promql:
+            evaluation_interval: 10s
+            out_ports:
+              output:
+                signal_name: MAX_EMA
+      - ema:
+          in_ports:
+            input:
+              signal_name: SIGNAL
+            max_envelope:
+              signal_name: MAX_EMA
           out_ports:
             output:
-              signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="basic-service-protection"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="basic-service-protection"}[5s]))
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL
-          rhs:
-            constant_signal:
-              value: 2
-        operator: mul
-        out_ports:
-          output:
-            signal_name: MAX_EMA
-    - ema:
-        in_ports:
-          input:
-            signal_name: SIGNAL
-          max_envelope:
-            signal_name: MAX_EMA
-        out_ports:
-          output:
-            signal_name: SIGNAL_EMA
-        parameters:
-          correction_factor_on_max_envelope_violation: 0.95
-          ema_window: 1500s
-          warmup_window: 60s
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL_EMA
-          rhs:
-            constant_signal:
-              value: 1.1
-        operator: mul
-        out_ports:
-          output:
-            signal_name: SETPOINT
-    evaluation_interval: 1s
+              signal_name: SIGNAL_EMA
+          parameters:
+            correction_factor_on_max_envelope_violation: 0.95
+            ema_window: 1500s
+            warmup_window: 60s
+      - arithmetic_combinator:
+          in_ports:
+            lhs:
+              signal_name: SIGNAL_EMA
+            rhs:
+              constant_signal:
+                value: 1.1
+          operator: mul
+          out_ports:
+            output:
+              signal_name: SETPOINT
+    evaluation_interval: 10s
   resources:
     flow_control:
       classifiers: []
       flux_meters:
         basic-service-protection:
           selectors:
-          - control_point: ingress
-            service: cart-service.prod.svc.cluster.local
+            - control_point: ingress
+              service: cart-service.prod.svc.cluster.local

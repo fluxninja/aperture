@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Service Protection with Load-based Pod Auto-Scaler](/reference/blueprints/policies/service-protection-with-load-based-pod-auto-scaler/average-latency.md)
+[Service Protection with Average Latency Feedback](/reference/blueprints/policies/service-protection/average-latency.md)
 blueprint.
 
 :::

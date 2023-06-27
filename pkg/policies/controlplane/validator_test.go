@@ -175,12 +175,12 @@ spec:
             service: service1-demo-app.demoapp.svc.cluster.local
     - query:
         promql:
-          evaluation_interval: 1s
+          evaluation_interval: 10s
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="service1-demo-app"}[5s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="service1-demo-app"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="service1-demo-app"}[30s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -280,7 +280,7 @@ metadata:
     fluxninja.com/validate: "true"
 spec:
   circuit:
-    evaluation_interval: "0.5s"
+    evaluation_interval: "10s"
     components:
       - variable:
           constant_output:

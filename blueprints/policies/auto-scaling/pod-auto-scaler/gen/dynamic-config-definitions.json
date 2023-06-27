@@ -3,6 +3,7 @@
   "type": "object",
   "title": "policies/auto-scaling/pod-auto-scaler blueprint",
   "additionalProperties": false,
+  "required": ["dry_run"],
   "properties": {
     "dry_run": {
       "description": "Dynamic configuration for setting dry run mode at runtime without restarting this policy. Dry run mode ensures that no scaling is invoked by this auto scaler. This is useful for observing the behavior of auto scaler without disrupting any real deployment.",

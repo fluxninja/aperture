@@ -24,8 +24,6 @@ aperturectl blueprints values [flags]
 
 ```
 aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml
-
-aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml --only-required
 ```
 
 ### Options
@@ -34,7 +32,6 @@ aperturectl blueprints values --name=policies/rate-limiting --output-file=values
   -h, --help                 help for values
       --name string          Name of the Aperture Blueprint to provide values file for
       --no-yaml-modeline     Do not add YAML language server modeline to generated YAML files
-      --only-required        Show only required values
       --output-file string   Path to the output values file
       --overwrite            Overwrite existing values file
 ```

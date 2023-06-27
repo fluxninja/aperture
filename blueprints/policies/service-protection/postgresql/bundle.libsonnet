@@ -1,8 +1,65 @@
+local creator = import '../../../grafana/creator.libsonnet';
 local blueprint = import './postgresql.libsonnet';
 
 local policy = blueprint.policy;
-local dashboard = blueprint.dashboard;
 local config = blueprint.config;
+
+local kubeletstats_infra_meter = function(agent_group='default') {
+  kubeletstats: {
+    agent_group: agent_group,
+    pipeline: {
+      processors: [
+        'k8sattributes',
+      ],
+      receivers: [
+        'kubeletstats',
+      ],
+    },
+    processors: {
+      k8sattributes: {
+        auth_type: 'serviceAccount',
+        passthrough: false,
+        extract: {
+          metadata: [
+            'k8s.cronjob.name',
+            'k8s.daemonset.name',
+            'k8s.deployment.name',
+            'k8s.job.name',
+            'k8s.namespace.name',
+            'k8s.node.name',
+            'k8s.pod.name',
+            'k8s.pod.uid',
+            'k8s.replicaset.name',
+            'k8s.statefulset.name',
+            'k8s.container.name',
+          ],
+        },
+        pod_association: [
+          {
+            sources: [
+              {
+                from: 'resource_attribute',
+                name: 'k8s.pod.uid',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    receivers: {
+      kubeletstats: {
+        collection_interval: '15s',
+        auth_type: 'serviceAccount',
+        endpoint: 'https://${NODE_NAME}:10250',
+        insecure_skip_verify: true,
+        metric_groups: [
+          'pod',
+          'container',
+        ],
+      },
+    },
+  },
+};
 
 function(params, metadata={}) {
   // make sure param object contains fields that are in config
@@ -30,11 +87,12 @@ function(params, metadata={}) {
           infra_meters+: {
             postgresql: {
               agent_group: agent_group,
+              per_agent_group: true,
               receivers: {
                 postgresql: postgresql,
               },
             },
-          } + if addCPUOverloadConfirmation then config.kubeletstats_infra_meter(agent_group) else {},
+          } + if addCPUOverloadConfirmation then kubeletstats_infra_meter(agent_group) else {},
         },
         service_protection_core+: if addCPUOverloadConfirmation then {
           overload_confirmations+: [
@@ -46,7 +104,7 @@ function(params, metadata={}) {
 
   local metadataWrapper = metadata { values: std.toString(params) },
   local p = policy(updatedConfig, metadataWrapper),
-  local d = dashboard(updatedConfig),
+  local d = creator(p.policyResource, updatedConfig),
 
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,

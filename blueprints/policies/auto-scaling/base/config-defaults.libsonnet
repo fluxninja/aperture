@@ -9,34 +9,10 @@ local auto_scaling_base_defaults = {
     },
   },
 
-  evaluation_interval: '1s',
-};
-
-local promql_scale_out_controller_defaults = {
-  query_string: '__REQUIRED_FIELD__',
-  threshold: 1.0,
-  gradient: {
-    slope: 1.0,
-  },
-  alerter: {
-    alert_name: 'A controller intends to scale out',
-  },
-};
-
-local promql_scale_in_controller_defaults = {
-  query_string: '__REQUIRED_FIELD__',
-  threshold: 0.5,
-  gradient: {
-    slope: 1.0,
-  },
-  alerter: {
-    alert_name: 'A controller intends to scale in',
-  },
+  evaluation_interval: '10s',
 };
 
 local scaling_parameters_defaults = {
-  scale_in_cooldown: '40s',
-  scale_out_cooldown: '30s',
   scale_in_alerter: {
     alert_name: 'Auto-scaler is scaling in',
   },
@@ -45,14 +21,17 @@ local scaling_parameters_defaults = {
   },
 };
 
-local auto_scaling_defaults = auto_scaling_base_defaults {
-  promql_scale_out_controllers: [
-    promql_scale_out_controller_defaults,
-  ],
+local promql_scale_controller_defaults = {
+  query_string: '__REQUIRED_FIELD__',
+  setpoint: '__REQUIRED_FIELD__',
+  gradient: '__REQUIRED_FIELD__',
+  alerter: '__REQUIRED_FIELD__',
+};
 
-  promql_scale_in_controllers: [
-    promql_scale_in_controller_defaults,
-  ],
+local auto_scaling_defaults = auto_scaling_base_defaults {
+  promql_scale_out_controllers: [promql_scale_controller_defaults],
+
+  promql_scale_in_controllers: [promql_scale_controller_defaults],
 
   scaling_parameters: scaling_parameters_defaults,
 
