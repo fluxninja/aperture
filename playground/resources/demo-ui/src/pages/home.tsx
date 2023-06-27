@@ -1,58 +1,68 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useState } from 'react'
 import {
   MonitorRequest,
   MonitorRequestProps,
   RequestRecord,
 } from '../components/monitor-request'
-import { Button, Box, Typography, styled } from '@mui/material'
-import {
-  GracefulError,
-  useGraceful,
-  useGracefulRequest,
-} from '@fluxninja-tools/graceful-js'
-import { API_URL } from '../api'
-import axios from 'axios'
-// import { kApi } from '../k-api'
+import { Box, Typography, styled } from '@mui/material'
+import { GracefulError, useGracefulRequest } from '@fluxninja-tools/graceful-js'
+import { api } from '../api'
 
 export const HomePage: FC = () => {
-  const { refetch, isError, isErroredType } =
-    useGracefulRequestForRateLimit('Crawler')
+  const {
+    refetch,
+    isError,
+    requestRecord: crawlerRequestRecord,
+  } = useGracefulRequestForRateLimit('Crawler')
   const {
     refetch: refetchSubscriber,
     isError: isErrorSubscriber,
-    isErroredType: isErroredTypeSubscriber,
+    requestRecord: subscriberRequestRecord,
   } = useGracefulRequestForRateLimit('Subscriber')
 
   return (
     <>
       <RequestMonitorPanel
         monitorRequestProps={{
-          requestRecord: isErroredType,
+          requestRecord: crawlerRequestRecord,
           userType: 'Crawler',
+          refetch,
         }}
+        gracefulError={
+          <GracefulError
+            {...{
+              url: `${window.location.origin}/api/rate-limit`,
+            }}
+          />
+        }
         isErrored={isError}
-        refetch={refetch}
       />
       <RequestMonitorPanel
         monitorRequestProps={{
-          requestRecord: isErroredTypeSubscriber,
+          requestRecord: subscriberRequestRecord,
           userType: 'Subscriber',
+          refetch: refetchSubscriber,
         }}
+        gracefulError={
+          <GracefulError
+            {...{
+              url: `${window.location.origin}/api/rate-limit`,
+            }}
+          />
+        }
         isErrored={isErrorSubscriber}
-        refetch={refetchSubscriber}
       />
     </>
   )
 }
 
 export const useGracefulRequestForRateLimit = (userID: string) => {
-  const [isErroredType, setIsErroredType] = useState<RequestRecord[]>([])
-  const isErrorRef = useRef(false)
+  const [requestRecord, setRequestRecord] = useState<RequestRecord[]>([])
 
-  const { isError, refetch } = useGracefulRequest<'Axios'>({
+  const { isError, refetch, error } = useGracefulRequest<'Axios'>({
     typeOfRequest: 'Axios',
     requestFnc: () =>
-      axios.post(`${API_URL}/rate-limit`, {
+      api.post(`/rate-limit`, {
         headers: { 'Content-Type': 'application/json', 'user-id': userID },
         data: {},
       }),
@@ -61,52 +71,47 @@ export const useGracefulRequestForRateLimit = (userID: string) => {
     },
   })
 
-  isErrorRef.current = isError
+  const updateRecord = useCallback(() => {
+    setRequestRecord((prevErrors) => [
+      ...prevErrors,
+      { isError, rateLimitInfo: error?.rateLimitInfo || null },
+    ])
+  }, [isError, error])
 
-  useEffect(() => {
-    const requests = async () => {
-      for (let i = 0; i < 100; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 800))
+  const startFetch = useCallback(async () => {
+    loop: for (let i = 0; i < 60; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 800))
 
-        refetch()
-
-        if (isErrorRef.current) {
-          setIsErroredType((prevErrors) => [
-            ...prevErrors,
-            { isError: true, rateLimitInfo: null },
-          ])
-          break
-        }
+      refetch()
+      updateRecord()
+      // TODO: fix loop to break on error and request per second
+      if (isError) {
+        break loop
       }
     }
+  }, [refetch, isError, updateRecord])
 
-    requests()
-  }, [refetch])
-
-  return { isError, refetch, isErroredType }
+  return { isError, refetch: startFetch, requestRecord }
 }
 
 export interface RequestMonitorPanelProps {
   monitorRequestProps: MonitorRequestProps
   isErrored: boolean
-  refetch?: () => void
+  gracefulError: JSX.Element
 }
 
 export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   monitorRequestProps,
   isErrored,
-  refetch,
+  gracefulError,
 }) => (
   <HomePageWrapper>
     <HomePageColumnBox>
       <MonitorRequest {...monitorRequestProps} />
-      <Button variant="contained" color="primary" onClick={refetch}>
-        Start Refetch
-      </Button>
     </HomePageColumnBox>
     <HomePageColumnBox>
       {isErrored ? (
-        <GracefulError url="http://localhost:8099/api/rate-limit" />
+        gracefulError
       ) : (
         <Typography
           variant="h5"

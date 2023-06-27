@@ -19,11 +19,14 @@ export declare type RequestRecord = {
 export interface MonitorRequestProps {
   requestRecord: RequestRecord[]
   userType: 'Subscriber' | 'Guest' | 'Crawler'
+  refetch: () => void
 }
 
+// fix where is showing NaN% when there is no request
 export const MonitorRequest: FC<MonitorRequestProps> = ({
   requestRecord,
   userType,
+  refetch,
 }) => (
   <MonitorRequestWrapper component={Paper}>
     <Typography variant="h6" textAlign="center">
@@ -50,15 +53,15 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
         </Box>
       </ColumnBoxStyled>
       <ColumnBoxStyled component={Paper}>
-        <InfoHeading>Reset app</InfoHeading>
+        <InfoHeading>Start Test</InfoHeading>
         <Box {...boxFlex}>
           <Button
             variant="contained"
             color="secondary"
             sx={{ alignSelf: 'center' }}
-            onClick={() => window.location.reload()}
+            onClick={refetch}
           >
-            Reset
+            Start
           </Button>
         </Box>
       </ColumnBoxStyled>
