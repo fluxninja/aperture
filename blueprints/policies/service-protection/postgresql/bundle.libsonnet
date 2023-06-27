@@ -1,7 +1,7 @@
+local creator = import '../../../grafana/creator.libsonnet';
 local blueprint = import './postgresql.libsonnet';
 
 local policy = blueprint.policy;
-local dashboard = blueprint.dashboard;
 local config = blueprint.config;
 
 local kubeletstats_infra_meter = function(agent_group='default') {
@@ -104,7 +104,7 @@ function(params, metadata={}) {
 
   local metadataWrapper = metadata { values: std.toString(params) },
   local p = policy(updatedConfig, metadataWrapper),
-  local d = dashboard(updatedConfig),
+  local d = creator(p.policyResource, updatedConfig),
 
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,

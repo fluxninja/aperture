@@ -25,6 +25,9 @@ policy:
   rollout: false
 
 dashboard:
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters: {}
   # Refresh interval for dashboard panels.
   # Type: string
   refresh_interval: "5s"
@@ -34,16 +37,13 @@ dashboard:
   # To time of dashboard.
   # Type: string
   time_to: "now"
-  # Additional filters to pass to each query to Grafana datasource.
-  # Type: map[string]string
-  extra_filters: {}
   # Name of the main dashboard.
   # Type: string
   title: "Aperture Feature Rollout"
   datasource:
-    # Datasource name.
-    # Type: string
-    name: "$datasource"
     # Datasource filter regex.
     # Type: string
     filter_regex: ""
+    # Datasource name.
+    # Type: string
+    name: "$datasource"

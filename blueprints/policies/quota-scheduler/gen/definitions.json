@@ -10,11 +10,6 @@
       "additionalProperties": false,
       "required": ["policy_name", "quota_scheduler"],
       "properties": {
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
         "components": {
           "description": "List of additional circuit components.",
           "default": [],
@@ -23,6 +18,11 @@
             "type": "object",
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
         },
         "resources": {
           "description": "Additional resources.",
@@ -40,8 +40,8 @@
           "required": [
             "bucket_capacity",
             "fill_amount",
-            "selectors",
-            "rate_limiter"
+            "rate_limiter",
+            "selectors"
           ],
           "properties": {
             "bucket_capacity": {
@@ -55,20 +55,6 @@
               "default": "__REQUIRED_FIELD__",
               "type": "number",
               "format": "double"
-            },
-            "selectors": {
-              "description": "Flow selectors to match requests against",
-              "default": [
-                {
-                  "control_point": "__REQUIRED_FIELD__",
-                  "service": "__REQUIRED_FIELD__"
-                }
-              ],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
-              }
             },
             "rate_limiter": {
               "description": "Rate Limiter Parameters.",
@@ -84,6 +70,20 @@
               "default": {},
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
+            },
+            "selectors": {
+              "description": "Flow selectors to match requests against",
+              "default": [
+                {
+                  "control_point": "__REQUIRED_FIELD__",
+                  "service": "__REQUIRED_FIELD__"
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+              }
             }
           }
         }
@@ -93,6 +93,12 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
           "default": "10s",
@@ -108,12 +114,6 @@
           "default": "now",
           "type": "string"
         },
-        "extra_filters": {
-          "description": "Additional filters to pass to each query to Grafana datasource.",
-          "default": {},
-          "type": "object",
-          "additionalProperties": true
-        },
         "title": {
           "description": "Name of the main dashboard.",
           "default": "Aperture Quota Scheduler",
@@ -123,14 +123,14 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "name": {
-              "description": "Datasource name.",
-              "default": "$datasource",
-              "type": "string"
-            },
             "filter_regex": {
               "description": "Datasource filter regex.",
               "default": "",
+              "type": "string"
+            },
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
               "type": "string"
             }
           }

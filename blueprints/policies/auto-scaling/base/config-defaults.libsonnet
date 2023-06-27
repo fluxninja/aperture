@@ -21,10 +21,17 @@ local scaling_parameters_defaults = {
   },
 };
 
-local auto_scaling_defaults = auto_scaling_base_defaults {
-  promql_scale_out_controllers: [],
+local promql_scale_controller_defaults = {
+  query_string: '__REQUIRED_FIELD__',
+  setpoint: '__REQUIRED_FIELD__',
+  gradient: '__REQUIRED_FIELD__',
+  alerter: '__REQUIRED_FIELD__',
+};
 
-  promql_scale_in_controllers: [],
+local auto_scaling_defaults = auto_scaling_base_defaults {
+  promql_scale_out_controllers: [promql_scale_controller_defaults],
+
+  promql_scale_in_controllers: [promql_scale_controller_defaults],
 
   scaling_parameters: scaling_parameters_defaults,
 

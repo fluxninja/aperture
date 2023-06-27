@@ -63,6 +63,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+<a id="policy-components"></a>
+
+<ParameterDescription
+    name='policy.components'
+    description='List of additional circuit components.'
+    type='Array of Object (aperture.spec.v1.Component)'
+    reference='../../../spec#component'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-evaluation-interval"></a>
+
+<ParameterDescription
+    name='policy.evaluation_interval'
+    description='The interval between successive evaluations of the Circuit.'
+    type='string'
+    reference=''
+    value='"10s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-policy-name"></a>
 
 <ParameterDescription
@@ -91,20 +119,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-components"></a>
-
-<ParameterDescription
-    name='policy.components'
-    description='List of additional circuit components.'
-    type='Array of Object (aperture.spec.v1.Component)'
-    reference='../../../spec#component'
-    value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-resources"></a>
 
 <ParameterDescription
@@ -113,20 +127,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Object (aperture.spec.v1.Resources)'
     reference='../../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
 />
 
 <!-- vale on -->
@@ -167,20 +167,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-overload-confirmations"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.overload_confirmations'
-    description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
-    type='Array of Object (overload_confirmation)'
-    reference='#overload-confirmation'
-    value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-service-protection-core-adaptive-load-scheduler"></a>
 
 <ParameterDescription
@@ -209,7 +195,35 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+<a id="policy-service-protection-core-overload-confirmations"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.overload_confirmations'
+    description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
+    type='Array of Object (overload_confirmation)'
+    reference='#overload-confirmation'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ###### policy.service_protection_core.cpu_overload_confirmation {#policy-service-protection-core-cpu-overload-confirmation}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-cpu-overload-confirmation-operator"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.cpu_overload_confirmation.operator'
+    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.'
+    type='string'
+    reference=''
+    value='"gte"'
+/>
 
 <!-- vale on -->
 
@@ -241,25 +255,25 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale on -->
 
-<!-- vale off -->
-
-<a id="policy-service-protection-core-cpu-overload-confirmation-operator"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation.operator'
-    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.'
-    type='string'
-    reference=''
-    value='"gte"'
-/>
-
-<!-- vale on -->
-
 ---
 
 <!-- vale off -->
 
 #### dashboard {#dashboard}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
+/>
 
 <!-- vale on -->
 
@@ -307,20 +321,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="dashboard-extra-filters"></a>
-
-<ParameterDescription
-    name='dashboard.extra_filters'
-    description='Additional filters to pass to each query to Grafana datasource.'
-    type='Object (map[string]string)'
-    reference='#map-string-string'
-    value='{}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-title"></a>
 
 <ParameterDescription
@@ -341,20 +341,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-name"></a>
-
-<ParameterDescription
-    name='dashboard.datasource.name'
-    description='Datasource name.'
-    type='string'
-    reference=''
-    value='"$datasource"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-datasource-filter-regex"></a>
 
 <ParameterDescription
@@ -367,6 +353,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale on -->
 
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
+/>
+
+<!-- vale on -->
+
 ---
 
 ### Schemas
@@ -374,6 +374,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 <!-- vale off -->
 
 #### overload_confirmation {#overload-confirmation}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    type='string'
+    reference=''
+    value='null'
+/>
 
 <!-- vale on -->
 
@@ -405,20 +419,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale on -->
 
-<!-- vale off -->
-
-<a id="overload-confirmation-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
 ---
 
 <!-- vale off -->
@@ -429,53 +429,25 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="postgresql-username"></a>
+<a id="postgresql-agent-group"></a>
 
 <ParameterDescription
-    name='username'
-    description='Username of the PostgreSQL.'
+    name='agent_group'
+    description='Name of the Aperture Agent group.'
     type='string'
     reference=''
-    value='null'
+    value='"default"'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="postgresql-password"></a>
+<a id="postgresql-collection-interval"></a>
 
 <ParameterDescription
-    name='password'
-    description='Password of the PostgreSQL.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-endpoint"></a>
-
-<ParameterDescription
-    name='endpoint'
-    description='Endpoint of the PostgreSQL.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-transport"></a>
-
-<ParameterDescription
-    name='transport'
-    description='The transport protocol being used to connect to postgresql. Available options are tcp and unix.'
+    name='collection_interval'
+    description='This receiver collects metrics on an interval.'
     type='string'
     reference=''
     value='null'
@@ -499,14 +471,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="postgresql-collection-interval"></a>
+<a id="postgresql-endpoint"></a>
 
 <ParameterDescription
-    name='collection_interval'
-    description='This receiver collects metrics on an interval.'
+    name='endpoint'
+    description='Endpoint of the PostgreSQL.'
     type='string'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -527,11 +499,25 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="postgresql-agent-group"></a>
+<a id="postgresql-password"></a>
 
 <ParameterDescription
-    name='agent_group'
-    description='Name of the Aperture Agent group.'
+    name='password'
+    description='Password of the PostgreSQL.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="postgresql-transport"></a>
+
+<ParameterDescription
+    name='transport'
+    description='The transport protocol being used to connect to postgresql. Available options are tcp and unix.'
     type='string'
     reference=''
     value='null'
@@ -541,7 +527,49 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
+<a id="postgresql-username"></a>
+
+<ParameterDescription
+    name='username'
+    description='Username of the PostgreSQL.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### tls {#postgresql-tls}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="postgresql-tls-ca-file"></a>
+
+<ParameterDescription
+    name='ca_file'
+    description='A set of certificate authorities used to validate the database server SSL certificate.'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="postgresql-tls-cert-file"></a>
+
+<ParameterDescription
+    name='cert_file'
+    description='A cerficate used for client authentication, if necessary.'
+    type='string'
+    reference=''
+    value='null'
+/>
 
 <!-- vale on -->
 
@@ -575,39 +603,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="postgresql-tls-cert-file"></a>
-
-<ParameterDescription
-    name='cert_file'
-    description='A cerficate used for client authentication, if necessary.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="postgresql-tls-key-file"></a>
 
 <ParameterDescription
     name='key_file'
     description='An SSL key used for client authentication, if necessary.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-tls-ca-file"></a>
-
-<ParameterDescription
-    name='ca_file'
-    description='A set of certificate authorities used to validate the database server SSL certificate.'
     type='string'
     reference=''
     value='null'

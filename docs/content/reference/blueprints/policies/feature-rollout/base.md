@@ -68,6 +68,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="dashboard-refresh-interval"></a>
 
 <ParameterDescription
@@ -110,20 +124,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="dashboard-extra-filters"></a>
-
-<ParameterDescription
-    name='dashboard.extra_filters'
-    description='Additional filters to pass to each query to Grafana datasource.'
-    type='Object (map[string]string)'
-    reference='#map-string-string'
-    value='{}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-title"></a>
 
 <ParameterDescription
@@ -144,20 +144,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-name"></a>
-
-<ParameterDescription
-    name='dashboard.datasource.name'
-    description='Datasource name.'
-    type='string'
-    reference=''
-    value='"$datasource"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-datasource-filter-regex"></a>
 
 <ParameterDescription
@@ -166,6 +152,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     type='string'
     reference=''
     value='""'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
 />
 
 <!-- vale on -->
@@ -202,55 +202,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-###### forward {#promql-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-forward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-forward-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ###### backward {#promql-driver-criteria-backward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-backward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the backward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
 
 <!-- vale on -->
 
@@ -270,21 +222,55 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-###### reset {#promql-driver-criteria-reset}
+<a id="promql-driver-criteria-backward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the backward criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-criteria-reset-threshold"></a>
+###### forward {#promql-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-forward-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-forward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
-    description='The threshold for the reset criteria.'
+    description='The threshold for the forward criteria.'
     type='Number (double)'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### reset {#promql-driver-criteria-reset}
 
 <!-- vale on -->
 
@@ -296,6 +282,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     name='operator'
     description='The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`'
     type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-reset-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the reset criteria.'
+    type='Number (double)'
     reference=''
     value='null'
 />
@@ -332,26 +332,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-###### forward {#average-latency-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="average-latency-driver-criteria-forward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ###### backward {#average-latency-driver-criteria-backward}
 
 <!-- vale on -->
@@ -366,6 +346,26 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     type='Number (double)'
     reference=''
     value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### forward {#average-latency-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="average-latency-driver-criteria-forward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the forward criteria.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -434,26 +434,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-###### forward {#percentile-latency-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria-forward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ###### backward {#percentile-latency-driver-criteria-backward}
 
 <!-- vale on -->
@@ -468,6 +448,26 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     type='Number (double)'
     reference=''
     value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### forward {#percentile-latency-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="percentile-latency-driver-criteria-forward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the forward criteria.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -502,14 +502,28 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="rollout-policy-policy-name"></a>
+<a id="rollout-policy-components"></a>
 
 <ParameterDescription
-    name='policy_name'
-    description='Name of the policy.'
+    name='components'
+    description='List of additional circuit components.'
+    type='Array of Object (aperture.spec.v1.Component)'
+    reference='../../../spec#component'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="rollout-policy-evaluation-interval"></a>
+
+<ParameterDescription
+    name='evaluation_interval'
+    description='The interval between successive evaluations of the Circuit.'
     type='string'
     reference=''
-    value='"__REQUIRED_FIELD__"'
+    value='"10s"'
 />
 
 <!-- vale on -->
@@ -530,14 +544,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="rollout-policy-components"></a>
+<a id="rollout-policy-policy-name"></a>
 
 <ParameterDescription
-    name='components'
-    description='List of additional circuit components.'
-    type='Array of Object (aperture.spec.v1.Component)'
-    reference='../../../spec#component'
-    value='[]'
+    name='policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -552,20 +566,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     type='Object (aperture.spec.v1.Resources)'
     reference='../../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
 />
 
 <!-- vale on -->
@@ -592,20 +592,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="rollout-policy-drivers-promql-drivers"></a>
-
-<ParameterDescription
-    name='promql_drivers'
-    description='List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.'
-    type='Array of Object (promql_driver)'
-    reference='#promql-driver'
-    value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="rollout-policy-drivers-average-latency-drivers"></a>
 
 <ParameterDescription
@@ -613,7 +599,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='List of drivers that compare average latency against forward, backward and reset thresholds.'
     type='Array of Object (average_latency_driver)'
     reference='#average-latency-driver'
-    value='[]'
+    value='null'
 />
 
 <!-- vale on -->
@@ -627,7 +613,21 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='List of drivers that compare percentile latency against forward, backward and reset thresholds.'
     type='Array of Object (percentile_latency_driver)'
     reference='#percentile-latency-driver'
-    value='[]'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="rollout-policy-drivers-promql-drivers"></a>
+
+<ParameterDescription
+    name='promql_drivers'
+    description='List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.'
+    type='Array of Object (promql_driver)'
+    reference='#promql-driver'
+    value='null'
 />
 
 <!-- vale on -->
@@ -664,11 +664,11 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="rollout"></a>
+<a id="reset"></a>
 
 <ParameterDescription
-    name='rollout'
-    description='Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.'
+    name='reset'
+    description='Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.'
     type='Boolean'
     reference=''
     value='false'
@@ -680,11 +680,11 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="reset"></a>
+<a id="rollout"></a>
 
 <ParameterDescription
-    name='reset'
-    description='Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.'
+    name='rollout'
+    description='Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.'
     type='Boolean'
     reference=''
     value='false'

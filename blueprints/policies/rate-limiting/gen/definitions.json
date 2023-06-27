@@ -10,11 +10,6 @@
       "additionalProperties": false,
       "required": ["policy_name", "rate_limiter"],
       "properties": {
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
         "components": {
           "description": "List of additional circuit components.",
           "default": [],
@@ -23,6 +18,11 @@
             "type": "object",
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
         },
         "resources": {
           "description": "Additional resources.",
@@ -40,8 +40,8 @@
           "required": [
             "bucket_capacity",
             "fill_amount",
-            "selectors",
-            "parameters"
+            "parameters",
+            "selectors"
           ],
           "properties": {
             "bucket_capacity": {
@@ -56,6 +56,15 @@
               "type": "number",
               "format": "double"
             },
+            "parameters": {
+              "description": "Parameters.",
+              "default": {
+                "interval": "__REQUIRED_FIELD__",
+                "label_key": ""
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+            },
             "selectors": {
               "description": "Flow selectors to match requests against",
               "default": [
@@ -69,15 +78,6 @@
                 "type": "object",
                 "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
               }
-            },
-            "parameters": {
-              "description": "Parameters.",
-              "default": {
-                "interval": "__REQUIRED_FIELD__",
-                "label_key": ""
-              },
-              "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
             }
           }
         }
@@ -87,16 +87,16 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "refresh_interval": {
-          "description": "Refresh interval for dashboard panels.",
-          "default": "10s",
-          "type": "string"
-        },
         "extra_filters": {
           "description": "Additional filters to pass to each query to Grafana datasource.",
           "default": {},
           "type": "object",
           "additionalProperties": true
+        },
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "10s",
+          "type": "string"
         },
         "title": {
           "description": "Name of the main dashboard.",
@@ -107,14 +107,14 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "name": {
-              "description": "Datasource name.",
-              "default": "$datasource",
-              "type": "string"
-            },
             "filter_regex": {
               "description": "Datasource filter regex.",
               "default": "",
+              "type": "string"
+            },
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
               "type": "string"
             }
           }

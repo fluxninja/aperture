@@ -39,20 +39,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale off -->
 
-<a id="policy-policy-name"></a>
-
-<ParameterDescription
-    name='policy.policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-components"></a>
 
 <ParameterDescription
@@ -61,6 +47,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
     type='Array of Object (aperture.spec.v1.Component)'
     reference='../../spec#component'
     value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -115,20 +115,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale off -->
 
-<a id="policy-quota-scheduler-selectors"></a>
-
-<ParameterDescription
-    name='policy.quota_scheduler.selectors'
-    description='Flow selectors to match requests against'
-    type='Array of Object (aperture.spec.v1.Selector)'
-    reference='../../spec#selector'
-    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-quota-scheduler-rate-limiter"></a>
 
 <ParameterDescription
@@ -155,11 +141,39 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale on -->
 
+<!-- vale off -->
+
+<a id="policy-quota-scheduler-selectors"></a>
+
+<ParameterDescription
+    name='policy.quota_scheduler.selectors'
+    description='Flow selectors to match requests against'
+    type='Array of Object (aperture.spec.v1.Selector)'
+    reference='../../spec#selector'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
+/>
+
+<!-- vale on -->
+
 ---
 
 <!-- vale off -->
 
 #### dashboard {#dashboard}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-extra-filters"></a>
+
+<ParameterDescription
+    name='dashboard.extra_filters'
+    description='Additional filters to pass to each query to Grafana datasource.'
+    type='Object (map[string]string)'
+    reference='#map-string-string'
+    value='{}'
+/>
 
 <!-- vale on -->
 
@@ -207,20 +221,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale off -->
 
-<a id="dashboard-extra-filters"></a>
-
-<ParameterDescription
-    name='dashboard.extra_filters'
-    description='Additional filters to pass to each query to Grafana datasource.'
-    type='Object (map[string]string)'
-    reference='#map-string-string'
-    value='{}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-title"></a>
 
 <ParameterDescription
@@ -241,20 +241,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
 
 <!-- vale off -->
 
-<a id="dashboard-datasource-name"></a>
-
-<ParameterDescription
-    name='dashboard.datasource.name'
-    description='Datasource name.'
-    type='string'
-    reference=''
-    value='"$datasource"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="dashboard-datasource-filter-regex"></a>
 
 <ParameterDescription
@@ -263,6 +249,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/qu
     type='string'
     reference=''
     value='""'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-datasource-name"></a>
+
+<ParameterDescription
+    name='dashboard.datasource.name'
+    description='Datasource name.'
+    type='string'
+    reference=''
+    value='"$datasource"'
 />
 
 <!-- vale on -->
