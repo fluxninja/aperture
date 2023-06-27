@@ -37,7 +37,12 @@
         "quota_scheduler": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["bucket_capacity", "fill_amount"],
+          "required": [
+            "bucket_capacity",
+            "fill_amount",
+            "selectors",
+            "rate_limiter"
+          ],
           "properties": {
             "bucket_capacity": {
               "description": "Bucket capacity.",

@@ -1,16 +1,16 @@
 local promqlDefaults = import '../promql/config.libsonnet';
 
 /**
-* @param (policy.policy_name: string required) Name of the policy.
+* @param (policy.policy_name: string) Name of the policy.
 * @param (policy.promql_query: string) PromQL query to detect PostgreSQL overload.
 * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
 * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
 * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
 * @param (policy.service_protection_core.overload_confirmations: []overload_confirmation) List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
-* @schema (overload_confirmation.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
+* @schema (overload_confirmation.query_string: string) The Prometheus query to be run. Must return a scalar or a vector with a single element.
 * @schema (overload_confirmation.threshold: float64) The threshold for the overload confirmation criteria.
 * @schema (overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`
-* @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters required) Parameters for Adaptive Load Scheduler.
+* @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters) Parameters for Adaptive Load Scheduler.
 * @param (policy.service_protection_core.dry_run: bool) Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
 */
 
@@ -18,15 +18,15 @@ promqlDefaults {
   policy+: {
     promql_query: '(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100',
     /**
-    * @param (policy.setpoint: float64 required) Setpoint.
+    * @param (policy.setpoint: float64) Setpoint.
     */
     setpoint: '__REQUIRED_FIELD__',
 
     /**
-    * @param (policy.postgresql: postgresql required) Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.
-    * @schema (postgresql.username: string required) Username of the PostgreSQL.
-    * @schema (postgresql.password: string required) Password of the PostgreSQL.
-    * @schema (postgresql.endpoint: string required) Endpoint of the PostgreSQL.
+    * @param (policy.postgresql: postgresql) Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.
+    * @schema (postgresql.username: string) Username of the PostgreSQL.
+    * @schema (postgresql.password: string) Password of the PostgreSQL.
+    * @schema (postgresql.endpoint: string) Endpoint of the PostgreSQL.
     * @schema (postgresql.transport: string) The transport protocol being used to connect to postgresql. Available options are tcp and unix.
     * @schema (postgresql.database: []string) The list of databases for which the receiver will attempt to collect statistics.
     * @schema (postgresql.collection_interval: string) This receiver collects metrics on an interval.

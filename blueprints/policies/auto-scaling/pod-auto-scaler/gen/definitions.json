@@ -8,13 +8,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "promql_scale_out_controllers",
-        "promql_scale_in_controllers",
-        "scaling_parameters",
-        "scaling_backend"
-      ],
+      "required": ["policy_name", "scaling_backend"],
       "properties": {
         "policy_name": {
           "description": "Name of the policy.",
@@ -23,42 +17,20 @@
         },
         "promql_scale_out_controllers": {
           "description": "List of scale out controllers.",
-          "default": [
-            {
-              "alerter": {
-                "alert_name": "A controller intends to scale out"
-              },
-              "gradient": {
-                "slope": 1
-              },
-              "query_string": "__REQUIRED_FIELD__",
-              "threshold": 1
-            }
-          ],
+          "default": [],
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/$defs/promql_scale_out_controller"
+            "$ref": "#/$defs/promql_scale_controller"
           }
         },
         "promql_scale_in_controllers": {
           "description": "List of scale in controllers.",
-          "default": [
-            {
-              "alerter": {
-                "alert_name": "A controller intends to scale in"
-              },
-              "gradient": {
-                "slope": 1
-              },
-              "query_string": "__REQUIRED_FIELD__",
-              "threshold": 0.5
-            }
-          ],
+          "default": [],
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/$defs/promql_scale_in_controller"
+            "$ref": "#/$defs/promql_scale_controller"
           }
         },
         "scaling_parameters": {
@@ -67,11 +39,9 @@
             "scale_in_alerter": {
               "alert_name": "Auto-scaler is scaling in"
             },
-            "scale_in_cooldown": "40s",
             "scale_out_alerter": {
               "alert_name": "Auto-scaler is scaling out"
-            },
-            "scale_out_cooldown": "30s"
+            }
           },
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
@@ -79,11 +49,7 @@
         "scaling_backend": {
           "description": "Scaling backend for the policy.",
           "default": {
-            "kubernetes_replicas": {
-              "kubernetes_object_selector": "__REQUIRED_FIELD__",
-              "max_replicas": "__REQUIRED_FIELD__",
-              "min_replicas": "__REQUIRED_FIELD__"
-            }
+            "kubernetes_replicas": "__REQUIRED_FIELD__"
           },
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackend"
@@ -169,17 +135,16 @@
     }
   },
   "$defs": {
-    "promql_scale_out_controller": {
+    "promql_scale_controller": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["query_string", "threshold", "gradient", "alerter"],
       "properties": {
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
           "type": "string"
         },
-        "threshold": {
-          "description": "Threshold for the controller.",
+        "setpoint": {
+          "description": "Setpoint for the controller.",
           "type": "number",
           "format": "double"
         },
@@ -187,32 +152,6 @@
           "description": "Gradient parameters for the controller.",
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
-        },
-        "alerter": {
-          "description": "Alerter parameters for the controller.",
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
-        }
-      }
-    },
-    "promql_scale_in_controller": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["query_string", "threshold", "gradient", "alerter"],
-      "properties": {
-        "query_string": {
-          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
-          "type": "string"
-        },
-        "threshold": {
-          "description": "Threshold for the controller.",
-          "type": "number",
-          "format": "double"
-        },
-        "gradient": {
-          "description": "Gradient parameters for the controller.",
-          "type": "object",
-          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
         },
         "alerter": {
           "description": "Alerter parameters for the controller.",

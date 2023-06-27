@@ -12,7 +12,7 @@ local rollout_policy_defaults = featureRolloutConfig.rollout_policy_base {
 
 {
   /**
-  * @param (policy: policies/feature-rollout/base:schema:rollout_policy required) Configuration for the Feature Rollout policy.
+  * @param (policy: policies/feature-rollout/base:schema:rollout_policy) Configuration for the Feature Rollout policy.
   */
   policy: rollout_policy_defaults,
   /**

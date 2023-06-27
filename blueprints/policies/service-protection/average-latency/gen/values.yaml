@@ -57,6 +57,7 @@ policy:
       warmup_window: "60s"
     # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
     # Type: float64
+    # Required: True
     latency_tolerance_multiplier: __REQUIRED_FIELD__
     # Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
     # Type: float64

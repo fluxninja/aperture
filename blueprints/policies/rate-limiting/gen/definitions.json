@@ -37,7 +37,12 @@
         "rate_limiter": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["bucket_capacity", "fill_amount", "parameters"],
+          "required": [
+            "bucket_capacity",
+            "fill_amount",
+            "selectors",
+            "parameters"
+          ],
           "properties": {
             "bucket_capacity": {
               "description": "Bucket capacity.",

@@ -188,7 +188,6 @@
     "overload_confirmation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["query_string"],
       "properties": {
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
@@ -208,7 +207,6 @@
     "postgresql": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["username", "password", "endpoint"],
       "properties": {
         "username": {
           "description": "Username of the PostgreSQL.",

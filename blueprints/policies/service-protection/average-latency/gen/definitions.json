@@ -92,7 +92,7 @@
         "latency_baseliner": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["flux_meter"],
+          "required": ["flux_meter", "latency_tolerance_multiplier"],
           "properties": {
             "flux_meter": {
               "description": "Flux Meter defines the scope of latency measurements.",
@@ -186,7 +186,6 @@
     "overload_confirmation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["query_string"],
       "properties": {
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",

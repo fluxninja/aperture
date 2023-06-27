@@ -9,15 +9,13 @@ import (
 )
 
 const (
-	valuesFileName         = "values.yaml"
-	requiredValuesFileName = "values-required.yaml"
-	fallbackEditor         = "vi"
+	valuesFileName = "values.yaml"
+	fallbackEditor = "vi"
 )
 
 func init() {
 	valuesCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to provide values file for")
 	valuesCmd.Flags().StringVar(&valuesFile, "output-file", "", "Path to the output values file")
-	valuesCmd.Flags().BoolVar(&onlyRequired, "only-required", false, "Show only required values")
 	valuesCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	valuesCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing values file")
 }
@@ -48,9 +46,7 @@ var valuesCmd = &cobra.Command{
 	Long: `
 Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
 	SilenceErrors: true,
-	Example: `aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml
-
-aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml --only-required`,
+	Example:       `aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")

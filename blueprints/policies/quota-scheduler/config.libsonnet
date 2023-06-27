@@ -1,7 +1,7 @@
 {
   policy: {
     /**
-    * @param (policy.policy_name: string required) Name of the policy.
+    * @param (policy.policy_name: string) Name of the policy.
     * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
     * @param (policy.resources: aperture.spec.v1.Resources) Additional resources.
     */
@@ -13,8 +13,8 @@
       },
     },
     /**
-    * @param (policy.quota_scheduler.bucket_capacity: float64 required) Bucket capacity.
-    * @param (policy.quota_scheduler.fill_amount: float64 required) Fill amount.
+    * @param (policy.quota_scheduler.bucket_capacity: float64) Bucket capacity.
+    * @param (policy.quota_scheduler.fill_amount: float64) Fill amount.
     * @param (policy.quota_scheduler.selectors: []aperture.spec.v1.Selector) Flow selectors to match requests against
     * @param (policy.quota_scheduler.rate_limiter: aperture.spec.v1.RateLimiterParameters) Rate Limiter Parameters.
     * @param (policy.quota_scheduler.scheduler: aperture.spec.v1.Scheduler) Scheduler configuration.
