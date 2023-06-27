@@ -61,10 +61,6 @@ class ParameterNode:
 class Blueprint:
     # nested dictionary of parameters
     nested_parameters: ParameterNode = dataclasses.field(default_factory=ParameterNode)
-    # nested dictionary of required parameters
-    nested_required_parameters: ParameterNode = dataclasses.field(
-        default_factory=ParameterNode
-    )
     # deprecated is a string
     deprecation_message: Optional[str] = None
 
@@ -139,7 +135,6 @@ class Blueprint:
         comment: List[str],
     ) -> Blueprint:
         nested_parameters = ParameterNode()
-        nested_required_parameters = ParameterNode()
         for line in comment:
             if ANNOTATION_RE.match(line.strip()):
                 inner = ANNOTATION_DETAILED_RE.match(line.strip())
@@ -204,10 +199,8 @@ class Blueprint:
 
                 if param_required and annotation_type == "@param":
                     nested_parameters.required_children.add(parts[0])
-                    nested_required_parameters.required_children.add(parts[0])
 
                 parent = nested_parameters.children
-                parent_required = nested_required_parameters.children
 
                 for idx, part in enumerate(parts):
                     if idx == len(parts) - 1:
@@ -225,8 +218,6 @@ class Blueprint:
                             )
                         )
                         parent[part] = node
-                        if param_required:
-                            parent_required[part] = node
                     else:
                         next_part = parts[idx + 1]
                         node = ParameterNode(Parameter(annotation_type, part))
@@ -235,19 +226,13 @@ class Blueprint:
                         if param_required:
                             parent[part].required_children.add(next_part)
                         parent = parent[part].children
-                        if param_required:
-                            if part not in parent_required:
-                                parent_required[part] = node
-                            parent_required[part].required_children.add(next_part)
-                            parent_required = parent_required[part].children
 
-        if not nested_parameters or not nested_required_parameters:
+        if not nested_parameters:
             logger.error("Unable to find parameters in comments")
             raise ValueError()
 
         return cls(
             nested_parameters,
-            nested_required_parameters,
         )
 
 
@@ -703,15 +688,10 @@ def update_docs_markdown(
 def render_sample_config_yaml(
     blueprint_name: Path,
     sample_config_path: Path,
-    only_required: bool,
     parameters: Blueprint,
 ):
     """Render sample config YAML file from blocks"""
-    sample_config_data = ParameterNode()
-    if only_required is False:
-        sample_config_data = parameters.nested_parameters
-    else:
-        sample_config_data = parameters.nested_required_parameters
+    sample_config_data = parameters.nested_parameters
 
     env = get_jinja2_environment()
     template = env.get_template("values.yaml.j2")
@@ -819,11 +799,6 @@ def parse_annotations(
         merge_parameternodes(
             merged_parameters.nested_parameters, block.nested_parameters
         )
-        merge_parameternodes(
-            merged_parameters.nested_required_parameters,
-            block.nested_required_parameters,
-        )
-
     return merged_parameters
 
 
@@ -872,13 +847,7 @@ def main(
         blueprint_name, blueprint_gen_path / "definitions.json", config_parameters
     )
     render_sample_config_yaml(
-        blueprint_name, blueprint_gen_path / "values.yaml", False, config_parameters
-    )
-    render_sample_config_yaml(
-        blueprint_name,
-        blueprint_gen_path / "values-required.yaml",
-        True,
-        config_parameters,
+        blueprint_name, blueprint_gen_path / "values.yaml", config_parameters
     )
 
     dynamic_config_parameters = parse_dynamic_config_docblocks(
@@ -895,13 +864,6 @@ def main(
     render_sample_config_yaml(
         blueprint_name,
         blueprint_gen_path / "dynamic-config-values.yaml",
-        False,
-        dynamic_config_parameters,
-    )
-    render_sample_config_yaml(
-        blueprint_name,
-        blueprint_gen_path / "dynamic-config-values-required.yaml",
-        True,
         dynamic_config_parameters,
     )
 
