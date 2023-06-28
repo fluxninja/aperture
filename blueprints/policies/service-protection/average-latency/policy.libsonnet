@@ -1,16 +1,16 @@
 local spec = import '../../../spec.libsonnet';
-local basePolicyFn = import '../base/policy.libsonnet';
+local commonPolicyFn = import '../common/policy.libsonnet';
 local config = import './config.libsonnet';
 
 function(cfg, params={}, metadata={}) {
   local updatedConfig = config + cfg,
 
-  local basePolicy = basePolicyFn(cfg, params, metadata),
+  local commonPolicy = commonPolicyFn(cfg, params, metadata),
 
   local createQuery = function(policy_name, interval) 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: policy_name, interval: interval },
 
-  // Add new components to basePolicy
-  local policyDef = basePolicy.policyDef {
+  // Add new components to commonPolicy
+  local policyDef = commonPolicy.policyDef {
     circuit+: {
       components+: [
         spec.v1.Component.withQuery(
@@ -47,7 +47,7 @@ function(cfg, params={}, metadata={}) {
     },
   },
 
-  policyResource: basePolicy.policyResource {
+  policyResource: commonPolicy.policyResource {
     spec+: policyDef,
   },
   policyDef: policyDef,

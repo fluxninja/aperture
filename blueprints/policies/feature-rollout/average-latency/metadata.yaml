@@ -1,5 +1,0 @@
-blueprint:
-  Feature Rollout Policy based on feedback of average feature duration or
-  response latency.
-sources:
-  policy: policies/feature-rollout/base/policy.libsonnet

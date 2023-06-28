@@ -1,4 +1,4 @@
-local autoScalingDefaults = import '../base/config-defaults.libsonnet';
+local autoScalingDefaults = import '../common/config-defaults.libsonnet';
 
 autoScalingDefaults {
   policy+: {

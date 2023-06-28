@@ -1,4 +1,1 @@
-# Feature Rollout Base
-
-This directory contains the base for other feature rollout blueprints. It cannot
-be used directly.
+[Documentation](https://docs.fluxninja.com/reference/blueprints/policies/feature-rollout/base)

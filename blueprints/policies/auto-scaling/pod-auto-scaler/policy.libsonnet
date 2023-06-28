@@ -1,11 +1,11 @@
 local spec = import '../../../spec.libsonnet';
-local basePolicyFn = import '../base/policy.libsonnet';
+local commonPolicyFn = import '../common/policy.libsonnet';
 local config = import './config.libsonnet';
 
 function(cfg, metadata={}) {
   local params = config + cfg,
 
-  local policyDef = basePolicyFn(cfg).policyDef,
+  local policyDef = commonPolicyFn(cfg).policyDef,
 
   local policyResource = {
     kind: 'Policy',

@@ -1,5 +1,5 @@
 {
   config: import 'config.libsonnet',
-  policy: import '../base/policy.libsonnet',
+  policy: import 'policy.libsonnet',
   bundle: import 'bundle.libsonnet',
 }

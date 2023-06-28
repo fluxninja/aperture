@@ -1,6 +1,6 @@
 local spec = import '../../../spec.libsonnet';
 local utils = import '../../../utils/utils.libsonnet';
-local config = import './config-defaults.libsonnet';
+local config = import './config.libsonnet';
 
 function(cfg, metadata={}) {
   local params = config + cfg,
@@ -57,7 +57,6 @@ function(cfg, metadata={}) {
     promql_driver_count: driverAccumulator.promql_driver_count + 1,
     average_latency_driver_count: driverAccumulator.average_latency_driver_count,
     percentile_latency_driver_count: driverAccumulator.percentile_latency_driver_count,
-    ema_latency_driver_count: driverAccumulator.ema_latency_driver_count,
   },
 
   local addAverageLatencyDriver = function(driverAccumulator, driver) {
@@ -116,7 +115,6 @@ function(cfg, metadata={}) {
     promql_driver_count: driverAccumulator.promql_driver_count,
     average_latency_driver_count: driverAccumulator.average_latency_driver_count + 1,
     percentile_latency_driver_count: driverAccumulator.percentile_latency_driver_count,
-    ema_latency_driver_count: driverAccumulator.ema_latency_driver_count,
   },
 
   local addPercentileLatencyDriver = function(driverAccumulator, driver) {
@@ -176,105 +174,6 @@ function(cfg, metadata={}) {
     promql_driver_count: driverAccumulator.promql_driver_count,
     average_latency_driver_count: driverAccumulator.average_latency_driver_count,
     percentile_latency_driver_count: driverAccumulator.percentile_latency_driver_count + 1,
-    ema_latency_driver_count: driverAccumulator.ema_latency_driver_count,
-  },
-
-  local addEMALatencyDriver = function(driverAccumulator, driver) {
-    local flux_meter_name = policyName + '/ema_latency/' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local latencySignalName = 'LATENCY_' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local q = 'sum(rate(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))/sum(rate(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))' % { flux_meter_name: flux_meter_name, policy_name: policyName },
-    local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
-                                                                                 + spec.v1.PromQL.withOutPorts({
-                                                                                   output: spec.v1.Port.withSignalName(latencySignalName),
-                                                                                 }))),
-
-    local emaLatencySignalName = 'EMA_LATENCY_' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local emaComponent = spec.v1.Component.withEma(
-      spec.v1.EMA.withParameters(driver.ema)
-      + spec.v1.EMA.withInPortsMixin(
-        spec.v1.EMA.inPorts.withInput(spec.v1.Port.withSignalName(latencySignalName))
-      )
-      + spec.v1.EMA.withOutPortsMixin(
-        spec.v1.EMA.outPorts.withOutput(spec.v1.Port.withSignalName(emaLatencySignalName))
-      )
-    ),
-
-    local criteria = (if std.objectHas(driver, 'criteria') then driver.criteria else {}),
-    local isForward = (if std.objectHas(criteria, 'forward') then criteria.forward != null else false),
-    local forwardLatencySetpoint = 'FORWARD_LATENCY_SETPOINT_' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local forwardSignal = 'FORWARD_' + std.toString(driverAccumulator.forward_signals_count),
-    local forwardMultiplier = spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.withOperator('mul')
-                                                                         + spec.v1.ArithmeticCombinator.withInPorts({
-                                                                           lhs: spec.v1.Port.withSignalName(emaLatencySignalName),
-                                                                           rhs: spec.v1.Port.withConstantSignal(criteria.forward.latency_tolerance_multiplier),
-                                                                         })
-                                                                         + spec.v1.ArithmeticCombinator.withOutPorts({
-                                                                           output: spec.v1.Port.withSignalName(forwardLatencySetpoint),
-                                                                         })),
-    local forwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('lt')
-                                                         + spec.v1.Decider.withInPorts({
-                                                           lhs: spec.v1.Port.withSignalName(latencySignalName),
-                                                           rhs: spec.v1.Port.withSignalName(forwardLatencySetpoint),
-                                                         })
-                                                         + spec.v1.Decider.withOutPorts({
-                                                           output: spec.v1.Port.withSignalName(forwardSignal),
-                                                         })),
-    local isBackward = (if std.objectHas(criteria, 'backward') then criteria.backward != null else false),
-    local backwardLatencySetpoint = 'BACKWARD_LATENCY_SETPOINT_' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local backwardSignal = 'BACKWARD_' + std.toString(driverAccumulator.backward_signals_count),
-    local backwardMultiplier = spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.withOperator('mul')
-                                                                          + spec.v1.ArithmeticCombinator.withInPorts({
-                                                                            lhs: spec.v1.Port.withSignalName(emaLatencySignalName),
-                                                                            rhs: spec.v1.Port.withConstantSignal(criteria.backward.latency_tolerance_multiplier),
-                                                                          })
-                                                                          + spec.v1.ArithmeticCombinator.withOutPorts({
-                                                                            output: spec.v1.Port.withSignalName(backwardLatencySetpoint),
-                                                                          })),
-    local backwardDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('gt')
-                                                          + spec.v1.Decider.withInPorts({
-                                                            lhs: spec.v1.Port.withSignalName(latencySignalName),
-                                                            rhs: spec.v1.Port.withSignalName(backwardLatencySetpoint),
-                                                          })
-                                                          + spec.v1.Decider.withOutPorts({
-                                                            output: spec.v1.Port.withSignalName(backwardSignal),
-                                                          })),
-    local isReset = (if std.objectHas(criteria, 'reset') then criteria.reset != null else false),
-    local resetLatencySetpoint = 'RESET_LATENCY_SETPOINT_' + std.toString(driverAccumulator.ema_latency_driver_count),
-    local resetSignal = 'RESET_' + std.toString(driverAccumulator.reset_signals_count),
-    local resetMultiplier = spec.v1.Component.withArithmeticCombinator(spec.v1.ArithmeticCombinator.withOperator('mul')
-                                                                       + spec.v1.ArithmeticCombinator.withInPorts({
-                                                                         lhs: spec.v1.Port.withSignalName(emaLatencySignalName),
-                                                                         rhs: spec.v1.Port.withConstantSignal(criteria.reset.latency_tolerance_multiplier),
-                                                                       })
-                                                                       + spec.v1.ArithmeticCombinator.withOutPorts({
-                                                                         output: spec.v1.Port.withSignalName(resetLatencySetpoint),
-                                                                       })),
-    local resetDecider = spec.v1.Component.withDecider(spec.v1.Decider.withOperator('gt')
-                                                       + spec.v1.Decider.withInPorts({
-                                                         lhs: spec.v1.Port.withSignalName(latencySignalName),
-                                                         rhs: spec.v1.Port.withSignalName(resetLatencySetpoint),
-                                                       })
-                                                       + spec.v1.Decider.withOutPorts({
-                                                         output: spec.v1.Port.withSignalName(resetSignal),
-                                                       })),
-
-    local newFluxMeters = {
-      [flux_meter_name]: spec.v1.FluxMeter.withSelectors(driver.selectors),
-    },
-
-    flux_meters: driverAccumulator.flux_meters + newFluxMeters,
-    forward_signals: driverAccumulator.forward_signals + (if isForward then [forwardSignal] else []),
-    backward_signals: driverAccumulator.backward_signals + (if isBackward then [backwardSignal] else []),
-    reset_signals: driverAccumulator.reset_signals + (if isReset then [resetSignal] else []),
-    forward_signals_count: driverAccumulator.forward_signals_count + (if isForward then 1 else 0),
-    backward_signals_count: driverAccumulator.backward_signals_count + (if isBackward then 1 else 0),
-    reset_signals_count: driverAccumulator.reset_signals_count + (if isReset then 1 else 0),
-    components: driverAccumulator.components + [promQLComponent, emaComponent] + (if isForward then [forwardMultiplier, forwardDecider] else []) + (if isBackward then [backwardMultiplier, backwardDecider] else []) + (if isReset then [resetMultiplier, resetDecider] else []),
-    promql_driver_count: driverAccumulator.promql_driver_count,
-    average_latency_driver_count: driverAccumulator.average_latency_driver_count,
-    percentile_latency_driver_count: driverAccumulator.percentile_latency_driver_count,
-    ema_latency_driver_count: driverAccumulator.ema_latency_driver_count + 1,
   },
 
   local driverAccumulatorInitial = {
@@ -289,7 +188,6 @@ function(cfg, metadata={}) {
     promql_driver_count: 0,
     average_latency_driver_count: 0,
     percentile_latency_driver_count: 0,
-    ema_latency_driver_count: 0,
   },
 
 
@@ -303,15 +201,10 @@ function(cfg, metadata={}) {
     (if std.objectHas(params.policy.drivers, 'average_latency_drivers') then params.policy.drivers.average_latency_drivers else []),
     driverAccumulatorStep1
   ),
-  local driverAccumulatorStep3 = std.foldl(
+  local driverAccumulator = std.foldl(
     addPercentileLatencyDriver,
     (if std.objectHas(params.policy.drivers, 'percentile_latency_drivers') then params.policy.drivers.percentile_latency_drivers else []),
     driverAccumulatorStep2
-  ),
-  local driverAccumulator = std.foldl(
-    addEMALatencyDriver,
-    (if std.objectHas(params.policy.drivers, 'ema_latency_drivers') then params.policy.drivers.ema_latency_drivers else []),
-    driverAccumulatorStep3
   ),
 
   local userRolloutControlComponent = spec.v1.Component.withBoolVariable(
@@ -330,7 +223,7 @@ function(cfg, metadata={}) {
     }),
   ),
 
-  local allwaysForward =
+  local alwaysForward =
     if std.length(driverAccumulator.forward_signals) > 0 then
       false
     else
@@ -409,7 +302,7 @@ function(cfg, metadata={}) {
         ]
         +
         (
-          if allwaysForward then
+          if alwaysForward then
             []
           else
             [spec.v1.Port.withSignalName('FORWARD_INTENT')]
@@ -463,7 +356,7 @@ function(cfg, metadata={}) {
           backwardIntentComponent,
           resetIntentComponent,
         ] +
-        (if allwaysForward
+        (if alwaysForward
          then []
          else [forwardIntentComponent]) +
         notBackwardIntentComponents + notResetComponents + [

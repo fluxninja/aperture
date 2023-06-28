@@ -1,5 +1,5 @@
 local creator = import '../../../grafana/creator.libsonnet';
-local blueprint = import './percentile-latency.libsonnet';
+local blueprint = import './feature-rollout.libsonnet';
 
 local policy = blueprint.policy;
 local config = blueprint.config;

@@ -1,14 +1,30 @@
 ---
-title: Feature Rollout with Percentile Latency Feedback
+title: Feature Rollout Policy
 ---
 
 ## Introduction
 
-This policy rolls out new features based on percentile of latency as the rollout
-criteria. The percentile of latency is compared with thresholds to determine
-conditions for advancing, reversing, or resetting the rollout to its initial
-state. The rollout process consists of a series of steps that progress if the
-feature is considered healthy.
+This policy rolls out new features based on closed loop feedback. The rollout
+criteria are defined by drivers that determine conditions for advancing,
+reversing, or resetting the rollout to its initial state. The rollout process
+consists of a series of steps that progress if the feature is considered
+healthy.
+
+:::info
+
+Please see reference for the
+[`LoadRamp`](/reference/configuration/spec.md#load-ramp) component that is used
+within this blueprint.
+
+:::
+
+:::info
+
+See the tutorial on
+[Feature Rollout with Average Latency Feedback](/use-cases/feature-rollout/average-latency-feedback.md)
+to see this blueprint in use.
+
+:::
 
 <!-- Configuration Marker -->
 
@@ -22,7 +38,7 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/percentile-latency`}>policies/feature-rollout/percentile-latency</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/base`}>policies/feature-rollout/base</a>
 
 <!-- vale on -->
 
@@ -126,6 +142,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
+<a id="policy-drivers-average-latency-drivers"></a>
+
+<ParameterDescription
+    name='policy.drivers.average_latency_drivers'
+    description='List of drivers that compare average latency against forward, backward and reset thresholds.'
+    type='Array of Object (average_latency_driver)'
+    reference='#average-latency-driver'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-drivers-percentile-latency-drivers"></a>
 
 <ParameterDescription
@@ -133,7 +163,21 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='List of drivers that compare percentile latency against forward, backward and reset thresholds.'
     type='Array of Object (percentile_latency_driver)'
     reference='#percentile-latency-driver'
-    value='[{"criteria": {"forward": {"threshold": "__REQUIRED_FIELD__"}}, "flux_meter": {"selector": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}], "static_buckets": {"buckets": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, "percentile": 95}]'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-drivers-promql-drivers"></a>
+
+<ParameterDescription
+    name='policy.drivers.promql_drivers'
+    description='List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.'
+    type='Array of Object (promql_driver)'
+    reference='#promql-driver'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -256,19 +300,39 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-#### criteria {#criteria}
+#### average_latency_driver {#average-latency-driver}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-##### backward {#criteria-backward}
+<a id="average-latency-driver-selectors"></a>
+
+<ParameterDescription
+    name='selectors'
+    description='Identify the service and flows whose latency needs to be measured.'
+    type='Array of Object (aperture.spec.v1.Selector)'
+    reference='../../../spec#selector'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
+/>
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="criteria-backward-threshold"></a>
+##### criteria {#average-latency-driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### backward {#average-latency-driver-criteria-backward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="average-latency-driver-criteria-backward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -282,33 +346,33 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-##### forward {#criteria-forward}
+###### forward {#average-latency-driver-criteria-forward}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="criteria-forward-threshold"></a>
+<a id="average-latency-driver-criteria-forward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
     description='The threshold for the forward criteria.'
     type='Number (double)'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-##### reset {#criteria-reset}
+###### reset {#average-latency-driver-criteria-reset}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="criteria-reset-threshold"></a>
+<a id="average-latency-driver-criteria-reset-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -325,20 +389,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 <!-- vale off -->
 
 #### percentile_latency_driver {#percentile-latency-driver}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria"></a>
-
-<ParameterDescription
-    name='criteria'
-    description='The criteria for percentile latency comparison.'
-    type='Object (criteria)'
-    reference='#criteria'
-    value='{"forward": {"threshold": "__REQUIRED_FIELD__"}}'
-/>
 
 <!-- vale on -->
 
@@ -366,6 +416,202 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     type='Number (double)'
     reference=''
     value='95'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### criteria {#percentile-latency-driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### backward {#percentile-latency-driver-criteria-backward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="percentile-latency-driver-criteria-backward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the backward criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### forward {#percentile-latency-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="percentile-latency-driver-criteria-forward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the forward criteria.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### reset {#percentile-latency-driver-criteria-reset}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="percentile-latency-driver-criteria-reset-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the reset criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### promql_driver {#promql-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-query-string"></a>
+
+<ParameterDescription
+    name='query_string'
+    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### criteria {#promql-driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### backward {#promql-driver-criteria-backward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-backward-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-backward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the backward criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### forward {#promql-driver-criteria-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-forward-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-forward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the forward criteria.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### reset {#promql-driver-criteria-reset}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-reset-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-reset-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the reset criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
 />
 
 <!-- vale on -->
