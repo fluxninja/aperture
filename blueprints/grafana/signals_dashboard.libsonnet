@@ -4,7 +4,6 @@ local unwrap = import './utils/unwrap_panels.libsonnet';
 local queryVariable = import './utils/variable_template.libsonnet';
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
-local var = g.dashboard.variable;
 
 function(cfg) {
   local config = defaultConfig + cfg,
