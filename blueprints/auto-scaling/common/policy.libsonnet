@@ -16,7 +16,6 @@ local decreasingGradientInPort = spec.v1.DecreasingGradientIns;
 local port = spec.v1.Port;
 local query = spec.v1.Query;
 local promQL = spec.v1.PromQL;
-local alerterParameters = spec.v1.AlerterParameters;
 
 function(cfg) {
   local params = config + cfg,

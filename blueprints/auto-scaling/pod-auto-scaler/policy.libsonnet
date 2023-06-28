@@ -1,4 +1,3 @@
-local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common/policy.libsonnet';
 local config = import './config.libsonnet';
 

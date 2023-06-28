@@ -1,9 +1,7 @@
 {
-  RateLimiting: import 'rate-limiting/rate-limiting.libsonnet',
-  QuotaScheduler: import 'quota-scheduler/quota-scheduler.libsonnet',
-  FeatureRolloutAverageLatency: import 'feature-rollout/average-latency/average-latency.libsonnet',
-  FeatureRolloutPercentileLatency: import 'feature-rollout/percentile-latency/percentile-latency.libsonnet',
-  FeatureRolloutPromQL: import 'feature-rollout/promql/promql.libsonnet',
+  RateLimiting: import 'rate-limiting/base/rate-limiting.libsonnet',
+  QuotaScheduler: import 'quota-scheduler/base/quota-scheduler.libsonnet',
+  FeatureRollout: import 'feature-rollout/base/feature-rollout.libsonnet',
   ServiceProtectionPromQL: import 'service-protection/promql/promql.libsonnet',
   ServiceProtectionPostgreSQL: import 'service-protection/postgresql/postgresql.libsonnet',
   ServiceProtectionAverageLatency: import 'service-protection/average-latency/average-latency.libsonnet',
