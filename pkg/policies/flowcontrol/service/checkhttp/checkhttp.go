@@ -75,7 +75,7 @@ type Handler struct {
 // whether to accept the traffic after running the algorithms.
 func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTTPRequest) (*flowcontrolhttpv1.CheckHTTPResponse, error) {
 	// Put inner fields back into pool.
-	// Note: Not pulling the whole CheckHTTPRequest, as we don't control the object creation.
+	// Note: Not pooling the whole CheckHTTPRequest, as we don't control the object creation.
 	defer req.ResetVT()
 	// record the start time of the request
 	start := time.Now()
