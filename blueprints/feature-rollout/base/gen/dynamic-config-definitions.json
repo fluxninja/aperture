@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "feature-rollout/base blueprint",
+  "additionalProperties": false,
+  "required": ["pass_through_label_values"],
+  "properties": {
+    "pass_through_label_values": {
+      "description": "Specify certain label values to be always accepted by the _Sampler_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.",
+      "default": ["__REQUIRED_FIELD__"],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reset": {
+      "description": "Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.",
+      "default": false,
+      "type": "boolean"
+    },
+    "rollout": {
+      "description": "Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.",
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "$defs": null
+}

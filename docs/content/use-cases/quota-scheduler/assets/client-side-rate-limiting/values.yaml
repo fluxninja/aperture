@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../../../../../blueprints/policies/quota-scheduler/gen/definitions.json
 # Generated values file for policies/quota-scheduler blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/policies/quota-scheduler
+# https://docs.fluxninja.com/reference/blueprints/quota-scheduler
 policy:
   policy_name: client-side-rate-limiting
   quota_scheduler:

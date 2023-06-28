@@ -3,7 +3,7 @@
   "tkenv": "playground/tanka/apps/java-demo-app",
   "aperture_policies": [
     {
-      "blueprint_name": "policies/service-protection/average-latency",
+      "blueprint_name": "service-protection/average-latency",
       "policy_name": "service-protection",
       "values_file": "policies/service-protection.yaml",
       "dashboard_mixin_dir": "dashboards/"
