@@ -39,9 +39,9 @@ local promql_scale_controller_defaults = {
 };
 
 local auto_scaling_defaults = auto_scaling_base_defaults {
-  promql_scale_out_controllers: [promql_scale_controller_defaults],
+  promql_scale_out_controllers: [],
 
-  promql_scale_in_controllers: [promql_scale_controller_defaults],
+  promql_scale_in_controllers: [],
 
   scaling_parameters: scaling_parameters_defaults,
 
@@ -86,4 +86,8 @@ local auto_scaling_defaults = auto_scaling_base_defaults {
       filter_regex: '',
     },
   },
+
+  // schema defaults are below
+  promql_scale_out_controller: promql_scale_controller_defaults,
+  promql_scale_in_controller: promql_scale_controller_defaults,
 }

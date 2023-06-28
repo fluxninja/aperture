@@ -105,7 +105,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale in controllers.'
     type='Array of Object (promql_scale_in_controller)'
     reference='#promql-scale-in-controller'
-    value='[{"alerter": "__REQUIRED_FIELD__", "gradient": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "setpoint": "__REQUIRED_FIELD__"}]'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -119,7 +119,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='List of scale out controllers.'
     type='Array of Object (promql_scale_out_controller)'
     reference='#promql-scale-out-controller'
-    value='[{"alerter": "__REQUIRED_FIELD__", "gradient": "__REQUIRED_FIELD__", "query_string": "__REQUIRED_FIELD__", "setpoint": "__REQUIRED_FIELD__"}]'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -297,7 +297,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Alerter parameters for the controller.'
     type='Object (aperture.spec.v1.AlerterParameters)'
     reference='../../../spec#alerter-parameters'
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -311,7 +311,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Gradient parameters for the controller.'
     type='Object (aperture.spec.v1.DecreasingGradientParameters)'
     reference='../../../spec#decreasing-gradient-parameters'
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -325,7 +325,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
     type='string'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -339,7 +339,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Setpoint for the controller.'
     type='Number (double)'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -361,7 +361,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Alerter parameters for the controller.'
     type='Object (aperture.spec.v1.AlerterParameters)'
     reference='../../../spec#alerter-parameters'
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -375,7 +375,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Gradient parameters for the controller.'
     type='Object (aperture.spec.v1.IncreasingGradientParameters)'
     reference='../../../spec#increasing-gradient-parameters'
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -389,7 +389,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
     type='string'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -403,7 +403,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/au
     description='Setpoint for the controller.'
     type='Number (double)'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

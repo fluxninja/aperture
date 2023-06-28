@@ -18,20 +18,10 @@ policy:
   policy_name: __REQUIRED_FIELD__
   # List of scale in controllers.
   # Type: []promql_scale_in_controller
-  # Required: True
-  promql_scale_in_controllers:
-    - alerter: __REQUIRED_FIELD__
-      gradient: __REQUIRED_FIELD__
-      query_string: __REQUIRED_FIELD__
-      setpoint: __REQUIRED_FIELD__
+  promql_scale_in_controllers: []
   # List of scale out controllers.
   # Type: []promql_scale_out_controller
-  # Required: True
-  promql_scale_out_controllers:
-    - alerter: __REQUIRED_FIELD__
-      gradient: __REQUIRED_FIELD__
-      query_string: __REQUIRED_FIELD__
-      setpoint: __REQUIRED_FIELD__
+  promql_scale_out_controllers: []
   # List of additional resources.
   # Type: aperture.spec.v1.Resources
   resources:

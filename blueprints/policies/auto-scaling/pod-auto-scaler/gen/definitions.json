@@ -8,12 +8,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "promql_scale_in_controllers",
-        "promql_scale_out_controllers",
-        "scaling_backend"
-      ],
+      "required": ["policy_name", "scaling_backend"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -41,14 +36,7 @@
         },
         "promql_scale_in_controllers": {
           "description": "List of scale in controllers.",
-          "default": [
-            {
-              "alerter": "__REQUIRED_FIELD__",
-              "gradient": "__REQUIRED_FIELD__",
-              "query_string": "__REQUIRED_FIELD__",
-              "setpoint": "__REQUIRED_FIELD__"
-            }
-          ],
+          "default": [],
           "type": "array",
           "items": {
             "type": "object",
@@ -57,14 +45,7 @@
         },
         "promql_scale_out_controllers": {
           "description": "List of scale out controllers.",
-          "default": [
-            {
-              "alerter": "__REQUIRED_FIELD__",
-              "gradient": "__REQUIRED_FIELD__",
-              "query_string": "__REQUIRED_FIELD__",
-              "setpoint": "__REQUIRED_FIELD__"
-            }
-          ],
+          "default": [],
           "type": "array",
           "items": {
             "type": "object",
@@ -157,23 +138,28 @@
     "promql_scale_in_controller": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["alerter", "gradient", "query_string", "setpoint"],
       "properties": {
         "alerter": {
           "description": "Alerter parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         },
         "gradient": {
           "description": "Gradient parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
         },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
         "setpoint": {
           "description": "Setpoint for the controller.",
+          "default": "__REQUIRED_FIELD__",
           "type": "number",
           "format": "double"
         }
@@ -182,23 +168,28 @@
     "promql_scale_out_controller": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["alerter", "gradient", "query_string", "setpoint"],
       "properties": {
         "alerter": {
           "description": "Alerter parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         },
         "gradient": {
           "description": "Gradient parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
         },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
         "setpoint": {
           "description": "Setpoint for the controller.",
+          "default": "__REQUIRED_FIELD__",
           "type": "number",
           "format": "double"
         }
