@@ -12,6 +12,7 @@ import (
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	io "io"
 	bits "math/bits"
+	sync "sync"
 )
 
 const (
@@ -512,6 +513,66 @@ func encodeVarint(dAtA []byte, offset int, v uint64) int {
 	}
 	dAtA[offset] = uint8(v)
 	return base
+}
+
+var vtprotoPool_CheckHTTPRequest_HttpRequest = sync.Pool{
+	New: func() interface{} {
+		return &CheckHTTPRequest_HttpRequest{}
+	},
+}
+
+func (m *CheckHTTPRequest_HttpRequest) ResetVT() {
+	m.Reset()
+}
+func (m *CheckHTTPRequest_HttpRequest) ReturnToVTPool() {
+	if m != nil {
+		m.ResetVT()
+		vtprotoPool_CheckHTTPRequest_HttpRequest.Put(m)
+	}
+}
+func CheckHTTPRequest_HttpRequestFromVTPool() *CheckHTTPRequest_HttpRequest {
+	return vtprotoPool_CheckHTTPRequest_HttpRequest.Get().(*CheckHTTPRequest_HttpRequest)
+}
+
+var vtprotoPool_CheckHTTPRequest = sync.Pool{
+	New: func() interface{} {
+		return &CheckHTTPRequest{}
+	},
+}
+
+func (m *CheckHTTPRequest) ResetVT() {
+	m.Source.ReturnToVTPool()
+	m.Destination.ReturnToVTPool()
+	m.Request.ReturnToVTPool()
+	m.Reset()
+}
+func (m *CheckHTTPRequest) ReturnToVTPool() {
+	if m != nil {
+		m.ResetVT()
+		vtprotoPool_CheckHTTPRequest.Put(m)
+	}
+}
+func CheckHTTPRequestFromVTPool() *CheckHTTPRequest {
+	return vtprotoPool_CheckHTTPRequest.Get().(*CheckHTTPRequest)
+}
+
+var vtprotoPool_SocketAddress = sync.Pool{
+	New: func() interface{} {
+		return &SocketAddress{}
+	},
+}
+
+func (m *SocketAddress) ResetVT() {
+	m.Reset()
+}
+func (m *SocketAddress) ReturnToVTPool() {
+	if m != nil {
+		m.ResetVT()
+		vtprotoPool_SocketAddress.Put(m)
+	}
+}
+func SocketAddressFromVTPool() *SocketAddress {
+	return vtprotoPool_SocketAddress.Get().(*SocketAddress)
 }
 func (m *CheckHTTPRequest_HttpRequest) SizeVT() (n int) {
 	if m == nil {
@@ -1168,7 +1229,7 @@ func (m *CheckHTTPRequest) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Source == nil {
-				m.Source = &SocketAddress{}
+				m.Source = SocketAddressFromVTPool()
 			}
 			if err := m.Source.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1204,7 +1265,7 @@ func (m *CheckHTTPRequest) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Destination == nil {
-				m.Destination = &SocketAddress{}
+				m.Destination = SocketAddressFromVTPool()
 			}
 			if err := m.Destination.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1240,7 +1301,7 @@ func (m *CheckHTTPRequest) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Request == nil {
-				m.Request = &CheckHTTPRequest_HttpRequest{}
+				m.Request = CheckHTTPRequest_HttpRequestFromVTPool()
 			}
 			if err := m.Request.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err

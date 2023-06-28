@@ -14,6 +14,7 @@ import (
 	io "io"
 	math "math"
 	bits "math/bits"
+	sync "sync"
 )
 
 const (
@@ -725,6 +726,48 @@ func encodeVarint(dAtA []byte, offset int, v uint64) int {
 	}
 	dAtA[offset] = uint8(v)
 	return base
+}
+
+var vtprotoPool_CheckResponse = sync.Pool{
+	New: func() interface{} {
+		return &CheckResponse{}
+	},
+}
+
+func (m *CheckResponse) ResetVT() {
+	f0 := m.Services[:0]
+	f1 := m.FlowLabelKeys[:0]
+	m.Reset()
+	m.Services = f0
+	m.FlowLabelKeys = f1
+}
+func (m *CheckResponse) ReturnToVTPool() {
+	if m != nil {
+		m.ResetVT()
+		vtprotoPool_CheckResponse.Put(m)
+	}
+}
+func CheckResponseFromVTPool() *CheckResponse {
+	return vtprotoPool_CheckResponse.Get().(*CheckResponse)
+}
+
+var vtprotoPool_LimiterDecision_SchedulerInfo = sync.Pool{
+	New: func() interface{} {
+		return &LimiterDecision_SchedulerInfo{}
+	},
+}
+
+func (m *LimiterDecision_SchedulerInfo) ResetVT() {
+	m.Reset()
+}
+func (m *LimiterDecision_SchedulerInfo) ReturnToVTPool() {
+	if m != nil {
+		m.ResetVT()
+		vtprotoPool_LimiterDecision_SchedulerInfo.Put(m)
+	}
+}
+func LimiterDecision_SchedulerInfoFromVTPool() *LimiterDecision_SchedulerInfo {
+	return vtprotoPool_LimiterDecision_SchedulerInfo.Get().(*LimiterDecision_SchedulerInfo)
 }
 func (m *CheckRequest) SizeVT() (n int) {
 	if m == nil {
@@ -1648,7 +1691,14 @@ func (m *CheckResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ClassifierInfos = append(m.ClassifierInfos, &ClassifierInfo{})
+			if len(m.ClassifierInfos) == cap(m.ClassifierInfos) {
+				m.ClassifierInfos = append(m.ClassifierInfos, &ClassifierInfo{})
+			} else {
+				m.ClassifierInfos = m.ClassifierInfos[:len(m.ClassifierInfos)+1]
+				if m.ClassifierInfos[len(m.ClassifierInfos)-1] == nil {
+					m.ClassifierInfos[len(m.ClassifierInfos)-1] = &ClassifierInfo{}
+				}
+			}
 			if err := m.ClassifierInfos[len(m.ClassifierInfos)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1682,7 +1732,14 @@ func (m *CheckResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.FluxMeterInfos = append(m.FluxMeterInfos, &FluxMeterInfo{})
+			if len(m.FluxMeterInfos) == cap(m.FluxMeterInfos) {
+				m.FluxMeterInfos = append(m.FluxMeterInfos, &FluxMeterInfo{})
+			} else {
+				m.FluxMeterInfos = m.FluxMeterInfos[:len(m.FluxMeterInfos)+1]
+				if m.FluxMeterInfos[len(m.FluxMeterInfos)-1] == nil {
+					m.FluxMeterInfos[len(m.FluxMeterInfos)-1] = &FluxMeterInfo{}
+				}
+			}
 			if err := m.FluxMeterInfos[len(m.FluxMeterInfos)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1716,7 +1773,14 @@ func (m *CheckResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LimiterDecisions = append(m.LimiterDecisions, &LimiterDecision{})
+			if len(m.LimiterDecisions) == cap(m.LimiterDecisions) {
+				m.LimiterDecisions = append(m.LimiterDecisions, &LimiterDecision{})
+			} else {
+				m.LimiterDecisions = m.LimiterDecisions[:len(m.LimiterDecisions)+1]
+				if m.LimiterDecisions[len(m.LimiterDecisions)-1] == nil {
+					m.LimiterDecisions[len(m.LimiterDecisions)-1] = &LimiterDecision{}
+				}
+			}
 			if err := m.LimiterDecisions[len(m.LimiterDecisions)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
