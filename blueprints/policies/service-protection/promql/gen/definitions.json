@@ -10,8 +10,8 @@
       "additionalProperties": false,
       "required": [
         "policy_name",
-        "promql_query",
         "service_protection_core",
+        "promql_query",
         "setpoint"
       ],
       "properties": {
@@ -31,11 +31,6 @@
         },
         "policy_name": {
           "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
-        "promql_query": {
-          "description": "PromQL query.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
@@ -95,6 +90,11 @@
             }
           }
         },
+        "promql_query": {
+          "description": "PromQL query.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
         "setpoint": {
           "description": "Setpoint.",
           "default": "__REQUIRED_FIELD__",
@@ -115,7 +115,7 @@
         },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "5s",
+          "default": "15s",
           "type": "string"
         },
         "time_from": {

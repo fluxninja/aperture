@@ -74,20 +74,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-promql-query"></a>
-
-<ParameterDescription
-    name='policy.promql_query'
-    description='PromQL query.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-resources"></a>
 
 <ParameterDescription
@@ -96,6 +82,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Object (aperture.spec.v1.Resources)'
     reference='../../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-promql-query"></a>
+
+<ParameterDescription
+    name='policy.promql_query'
+    description='PromQL query.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -193,7 +193,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     description='Refresh interval for dashboard panels.'
     type='string'
     reference=''
-    value='"5s"'
+    value='"15s"'
 />
 
 <!-- vale on -->

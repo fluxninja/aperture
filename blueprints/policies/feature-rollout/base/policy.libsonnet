@@ -1,6 +1,6 @@
 local spec = import '../../../spec.libsonnet';
 local utils = import '../../../utils/utils.libsonnet';
-local config = import './config.libsonnet';
+local config = import './config-defaults.libsonnet';
 
 function(cfg, metadata={}) {
   local params = config + cfg,

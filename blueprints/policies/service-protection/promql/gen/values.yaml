@@ -13,10 +13,6 @@ policy:
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  # PromQL query.
-  # Type: string
-  # Required: True
-  promql_query: __REQUIRED_FIELD__
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:
@@ -45,6 +41,10 @@ policy:
     # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
     # Type: []overload_confirmation
     overload_confirmations: []
+  # PromQL query.
+  # Type: string
+  # Required: True
+  promql_query: __REQUIRED_FIELD__
   # Setpoint.
   # Type: float64
   # Required: True
@@ -56,7 +56,7 @@ dashboard:
   extra_filters: {}
   # Refresh interval for dashboard panels.
   # Type: string
-  refresh_interval: "5s"
+  refresh_interval: "15s"
   # Time from of dashboard.
   # Type: string
   time_from: "now-15m"

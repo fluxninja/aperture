@@ -13,10 +13,6 @@ policy:
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  # PromQL query.
-  # Type: string
-  promql_query:
-    "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:
@@ -55,6 +51,10 @@ policy:
       # Threshold value for CPU utilizatio if it has to be used as overload confirmation.
       # Type: float64
       threshold: null
+  # PromQL query to detect PostgreSQL overload.
+  # Type: string
+  promql_query:
+    "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"
   # Setpoint.
   # Type: float64
   # Required: True

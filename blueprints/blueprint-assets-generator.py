@@ -991,6 +991,7 @@ def merge_parameternodes(params1: ParameterNode, params2: ParameterNode):
     for key, value in params2.children.items():
         if key in params1.children:
             merge_parameternodes(params1.children[key], value)
+            params1.children[key].parameter = value.parameter
         else:
             params1.children[key] = value
 

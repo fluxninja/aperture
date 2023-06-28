@@ -105,20 +105,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <!-- vale off -->
 
-<a id="policy-promql-query"></a>
-
-<ParameterDescription
-    name='policy.promql_query'
-    description='PromQL query.'
-    type='string'
-    reference=''
-    value='"(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-resources"></a>
 
 <ParameterDescription
@@ -127,6 +113,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
     type='Object (aperture.spec.v1.Resources)'
     reference='../../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-promql-query"></a>
+
+<ParameterDescription
+    name='policy.promql_query'
+    description='PromQL query to detect PostgreSQL overload.'
+    type='string'
+    reference=''
+    value='"(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"'
 />
 
 <!-- vale on -->

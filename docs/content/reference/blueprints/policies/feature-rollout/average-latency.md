@@ -12,13 +12,6 @@ feature is considered healthy.
 
 :::info
 
-This blueprint is the same as [`Feature Rollout blueprint`](base.md), with
-relevant fields highlighted in the aperturectl generated values file.
-
-:::
-
-:::info
-
 See the tutorial on
 [Feature Rollout with Average Latency Feedback](/use-cases/feature-rollout/average-latency-feedback.md)
 to see this blueprint in use.
@@ -45,14 +38,110 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-<a id="policy"></a>
+#### policy {#policy}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-components"></a>
 
 <ParameterDescription
-    name='policy'
-    description='Parameters for the Feature Rollout policy.'
-    type='Object (rollout_policy)'
-    reference='#rollout-policy'
-    value='{"components": [], "drivers": {"average_latency_drivers": [{"criteria": {"forward": {"threshold": "__REQUIRED_FIELD__"}}, "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}]}, "evaluation_interval": "10s", "load_ramp": {"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}, "policy_name": "__REQUIRED_FIELD__", "resources": {"flow_control": {"classifiers": []}}, "rollout": false}'
+    name='policy.components'
+    description='List of additional circuit components.'
+    type='Array of Object (aperture.spec.v1.Component)'
+    reference='../../../spec#component'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-evaluation-interval"></a>
+
+<ParameterDescription
+    name='policy.evaluation_interval'
+    description='The interval between successive evaluations of the Circuit.'
+    type='string'
+    reference=''
+    value='"10s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-load-ramp"></a>
+
+<ParameterDescription
+    name='policy.load_ramp'
+    description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.'
+    type='Object (aperture.spec.v1.LoadRampParameters)'
+    reference='../../../spec#load-ramp-parameters'
+    value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-resources"></a>
+
+<ParameterDescription
+    name='policy.resources'
+    description='List of additional resources.'
+    type='Object (aperture.spec.v1.Resources)'
+    reference='../../../spec#resources'
+    value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-rollout"></a>
+
+<ParameterDescription
+    name='policy.rollout'
+    description='Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.drivers {#policy-drivers}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-drivers-average-latency-drivers"></a>
+
+<ParameterDescription
+    name='policy.drivers.average_latency_drivers'
+    description='List of drivers that compare average latency against forward, backward and reset thresholds.'
+    type='Array of Object (average_latency_driver)'
+    reference='#average-latency-driver'
+    value='[{"criteria": {"forward": {"threshold": "__REQUIRED_FIELD__"}}, "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}]'
 />
 
 <!-- vale on -->
@@ -175,53 +264,19 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-#### promql_driver {#promql-driver}
+#### criteria {#criteria}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-query-string"></a>
-
-<ParameterDescription
-    name='query_string'
-    description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
-    type='string'
-    reference=''
-    value='null'
-/>
+##### backward {#criteria-backward}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-##### criteria {#promql-driver-criteria}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### backward {#promql-driver-criteria-backward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-backward-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-backward-threshold"></a>
+<a id="criteria-backward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -235,27 +290,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-###### forward {#promql-driver-criteria-forward}
+##### forward {#criteria-forward}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-criteria-forward-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-forward-threshold"></a>
+<a id="criteria-forward-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -269,27 +310,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
-###### reset {#promql-driver-criteria-reset}
+##### reset {#criteria-reset}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="promql-driver-criteria-reset-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-reset-threshold"></a>
+<a id="criteria-reset-threshold"></a>
 
 <ParameterDescription
     name='threshold'
@@ -311,6 +338,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
 
 <!-- vale off -->
 
+<a id="average-latency-driver-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='The criteria for average latency comparison.'
+    type='Object (criteria)'
+    reference='#criteria'
+    value='{"forward": {"threshold": "__REQUIRED_FIELD__"}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="average-latency-driver-selectors"></a>
 
 <ParameterDescription
@@ -318,315 +359,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/fe
     description='Identify the service and flows whose latency needs to be measured.'
     type='Array of Object (aperture.spec.v1.Selector)'
     reference='../../../spec#selector'
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### criteria {#average-latency-driver-criteria}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### backward {#average-latency-driver-criteria-backward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="average-latency-driver-criteria-backward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the backward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### forward {#average-latency-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="average-latency-driver-criteria-forward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### reset {#average-latency-driver-criteria-reset}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="average-latency-driver-criteria-reset-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the reset criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### percentile_latency_driver {#percentile-latency-driver}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-flux-meter"></a>
-
-<ParameterDescription
-    name='flux_meter'
-    description='FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.'
-    type='Object (aperture.spec.v1.FluxMeter)'
-    reference='../../../spec#flux-meter'
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-percentile"></a>
-
-<ParameterDescription
-    name='percentile'
-    description='The percentile to be used for latency measurement.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### criteria {#percentile-latency-driver-criteria}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### backward {#percentile-latency-driver-criteria-backward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria-backward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the backward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### forward {#percentile-latency-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria-forward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### reset {#percentile-latency-driver-criteria-reset}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria-reset-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the reset criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### rollout_policy {#rollout-policy}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-components"></a>
-
-<ParameterDescription
-    name='components'
-    description='List of additional circuit components.'
-    type='Array of Object (aperture.spec.v1.Component)'
-    reference='../../../spec#component'
-    value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-load-ramp"></a>
-
-<ParameterDescription
-    name='load_ramp'
-    description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.'
-    type='Object (aperture.spec.v1.LoadRampParameters)'
-    reference='../../../spec#load-ramp-parameters'
-    value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-policy-name"></a>
-
-<ParameterDescription
-    name='policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-resources"></a>
-
-<ParameterDescription
-    name='resources'
-    description='List of additional resources.'
-    type='Object (aperture.spec.v1.Resources)'
-    reference='../../../spec#resources'
-    value='{"flow_control": {"classifiers": []}}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-rollout"></a>
-
-<ParameterDescription
-    name='rollout'
-    description='Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.'
-    type='Boolean'
-    reference=''
-    value='false'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### drivers {#rollout-policy-drivers}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-drivers-average-latency-drivers"></a>
-
-<ParameterDescription
-    name='average_latency_drivers'
-    description='List of drivers that compare average latency against forward, backward and reset thresholds.'
-    type='Array of Object (average_latency_driver)'
-    reference='#average-latency-driver'
-    value='[{"criteria": {"forward": {"threshold": "__REQUIRED_FIELD__"}}, "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-drivers-percentile-latency-drivers"></a>
-
-<ParameterDescription
-    name='percentile_latency_drivers'
-    description='List of drivers that compare percentile latency against forward, backward and reset thresholds.'
-    type='Array of Object (percentile_latency_driver)'
-    reference='#percentile-latency-driver'
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="rollout-policy-drivers-promql-drivers"></a>
-
-<ParameterDescription
-    name='promql_drivers'
-    description='List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.'
-    type='Array of Object (promql_driver)'
-    reference='#promql-driver'
-    value='null'
+    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->

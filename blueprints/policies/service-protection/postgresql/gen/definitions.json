@@ -34,11 +34,6 @@
           "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
-        "promql_query": {
-          "description": "PromQL query.",
-          "default": "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100",
-          "type": "string"
-        },
         "resources": {
           "description": "Additional resources.",
           "default": {
@@ -115,6 +110,11 @@
               }
             }
           }
+        },
+        "promql_query": {
+          "description": "PromQL query to detect PostgreSQL overload.",
+          "default": "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100",
+          "type": "string"
         },
         "setpoint": {
           "description": "Setpoint.",

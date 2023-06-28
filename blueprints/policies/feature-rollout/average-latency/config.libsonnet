@@ -1,22 +1,19 @@
-local featureRolloutConfig = import '../base/config.libsonnet';
+local featureRolloutConfig = import '../base/config-defaults.libsonnet';
 
-
-local rollout_policy_defaults = featureRolloutConfig.rollout_policy_base {
-  drivers: {
-    average_latency_drivers: [
-      featureRolloutConfig.average_latency_driver,
-    ],
+featureRolloutConfig {
+  policy+: {
+    drivers+: {
+      /**
+      * @param (policy.drivers.average_latency_drivers: []average_latency_driver) List of drivers that compare average latency against forward, backward and reset thresholds.
+      * @schema (average_latency_driver.selectors: []aperture.spec.v1.Selector) Identify the service and flows whose latency needs to be measured.
+      * @schema (average_latency_driver.criteria: criteria) The criteria for average latency comparison.
+      */
+      average_latency_drivers: [
+        {
+          selectors: featureRolloutConfig.selectors_defaults,
+          criteria: featureRolloutConfig.criteria_defaults,
+        },
+      ],
+    },
   },
-};
-
-
-{
-  /**
-  * @param (policy: policies/feature-rollout/base:schema:rollout_policy) Configuration for the Feature Rollout policy.
-  */
-  policy: rollout_policy_defaults,
-  /**
-  * @param (dashboard: policies/feature-rollout/base:param:dashboard) Configuration for the Grafana dashboard accompanying this policy.
-  */
-  dashboard: featureRolloutConfig.dashboard,
 }
