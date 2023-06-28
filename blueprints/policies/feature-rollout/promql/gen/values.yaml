@@ -3,7 +3,7 @@
 # https://docs.fluxninja.com/reference/blueprints/policies/feature-rollout/promql
 
 # Parameters for the Feature Rollout policy.
-# Type: policies/feature-rollout/base:schema:rollout_policy
+# Type: rollout_policy
 # Required: True
 policy:
   components: []
@@ -30,14 +30,26 @@ policy:
       classifiers: []
   rollout: false
 
-# Configuration for the Grafana dashboard accompanying this policy.
-# Type: policies/feature-rollout/base:param:dashboard
 dashboard:
-  datasource:
-    filter_regex: ""
-    name: "$datasource"
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
   extra_filters: {}
+  # Refresh interval for dashboard panels.
+  # Type: string
   refresh_interval: "5s"
+  # From time of dashboard.
+  # Type: string
   time_from: "now-15m"
+  # To time of dashboard.
+  # Type: string
   time_to: "now"
+  # Name of the main dashboard.
+  # Type: string
   title: "Aperture Feature Rollout"
+  datasource:
+    # Datasource filter regex.
+    # Type: string
+    filter_regex: ""
+    # Datasource name.
+    # Type: string
+    name: "$datasource"

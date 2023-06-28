@@ -109,7 +109,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/se
 
 <ParameterDescription
     name='policy.promql_query'
-    description='PromQL query to detect PostgreSQL overload.'
+    description='PromQL query.'
     type='string'
     reference=''
     value='"(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"'

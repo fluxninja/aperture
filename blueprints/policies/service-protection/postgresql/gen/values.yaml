@@ -13,7 +13,7 @@ policy:
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  # PromQL query to detect PostgreSQL overload.
+  # PromQL query.
   # Type: string
   promql_query:
     "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"

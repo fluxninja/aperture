@@ -35,7 +35,7 @@
           "type": "string"
         },
         "promql_query": {
-          "description": "PromQL query to detect PostgreSQL overload.",
+          "description": "PromQL query.",
           "default": "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100",
           "type": "string"
         },
