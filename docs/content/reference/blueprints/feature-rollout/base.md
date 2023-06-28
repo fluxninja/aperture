@@ -1,8 +1,8 @@
 ---
-title: Feature Rollout Policy
+title: Base Feature Rollout Policy
 keywords:
   - blueprints
-sidebar_label: Feature Rollout
+sidebar_label: Base Feature Rollout Policy
 ---
 
 ## Introduction

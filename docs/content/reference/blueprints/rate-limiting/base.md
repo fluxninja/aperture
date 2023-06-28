@@ -1,8 +1,8 @@
 ---
-title: Rate Limiting Policy
+title: Base Rate Limiting Policy
 keywords:
   - blueprints
-sidebar_label: Rate Limiting
+sidebar_label: Base Rate Limiting Policy
 ---
 
 ## Introduction

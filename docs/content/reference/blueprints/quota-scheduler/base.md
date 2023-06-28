@@ -1,8 +1,8 @@
 ---
-title: Quota Scheduler Policy
+title: Base Quota Scheduler Policy
 keywords:
   - blueprints
-sidebar_label: Quota Scheduler
+sidebar_label: Base Quota Scheduler Policy
 ---
 
 ## Introduction
