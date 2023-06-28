@@ -19,7 +19,7 @@ export declare type RequestRecord = {
 
 export interface MonitorRequestProps {
   requestRecord: RequestRecord[]
-  userType: 'Subscriber' | 'Guest' | 'Crawler'
+  userType: 'Subscriber' | 'Guest' | 'Crawler' | 'FluxNinja Executive'
   refetch: () => void
 }
 
@@ -34,7 +34,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
       {userType}
     </Typography>
     <Divider />
-    <Typography>User Request:</Typography>
+    <Typography>Request Info:</Typography>
     <Box display="flex" gap={0.3}>
       {requestRecord.map((record, index) => (
         <MonitorRequestItem key={index} {...record} />
@@ -54,7 +54,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
         </Box>
       </ColumnBoxStyled>
       <ColumnBoxStyled component={Paper}>
-        <InfoHeading>Start Test</InfoHeading>
+        <InfoHeading>Start Request</InfoHeading>
         <Box {...boxFlex}>
           <Button
             variant="contained"

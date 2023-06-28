@@ -20,64 +20,63 @@ export const HomePage: FC = () => {
     setValue(newValue)
   }
 
+  // Request Spec for rate-limit endpoint with Executive user to retrieve fluxninja founders info
   const reqSpec: RequestSpec = {
-    method: 'POST',
+    method: 'GET',
     endpoint: '/rate-limit',
-    userType: 'Guest',
-    userId: 'Vu',
+    userType: 'executive',
+    userId: 'CEO',
   }
-
   // Request to rate-limit endpoint with Guest user
   const {
     refetch,
     isError,
     requestRecord: requestRecord,
     isLoading: isLoadingRequest,
-  } = makeRequestToEndpoint(reqSpec)
+    data: requestResponse,
+  } = useRequestToEndpoint(reqSpec)
 
-  // Request to workload-prioritization endpoint with Guest user
+  // Request to workload-prioritization endpoint with Guest user and Subscriber user
   const reqSpec2: RequestSpec = {
     method: 'POST',
     endpoint: '/workload-prioritization',
-    userType: 'Guest',
-    userId: 'Vu',
+    userType: 'subscriber',
+    userId: 'Test',
   }
   const {
     refetch: refetchSubscriber,
     isError: isErrorSubscriber,
     requestRecord: subscriberRequestRecord,
     isLoading: isLoadingSubscriber,
-  } = makeRequestToEndpoint(reqSpec2)
-
-  // Request to workload-prioritization endpoint with Subscriber user
-  reqSpec2.userType = 'Subscriber'
+  } = useRequestToEndpoint(reqSpec2)
+  reqSpec2.userType = 'guest'
   const {
-    refetch: refetchSubscriber2,
-    isError: isErrorSubscriber2,
-    requestRecord: subscriberRequestRecord2,
-    isLoading: isLoadingSubscriber2,
-  } = makeRequestToEndpoint(reqSpec2)
+    refetch: refetchGuest,
+    isError: isErrorGuest,
+    requestRecord: GuestRequestRecord,
+    isLoading: isLoadingGuest,
+  } = useRequestToEndpoint(reqSpec2)
 
   return (
     <TabContext value={value}>
-      <TabList onChange={handleChange} aria-label="GracefulJS Tabs">
-        <Tab label="Rate Limit" value="1" />
+      <TabList onChange={handleChange} aria-label="FluxNinja Scenarios" variant="fullWidth">
+        <Tab label="Rate Limit" value="1"/>
         <Tab label="Workload Prioritization" value="2" />
-        <Tab label="TODO" value="3" />
       </TabList>
       <TabPanel value="1">
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: requestRecord,
-            userType: 'Guest',
+            userType: 'FluxNinja Executive',
             refetch,
           }}
           isErrored={isError}
           isLoading={isLoadingRequest}
           errorComponentProps={{
-            url: '/api/rate-limit',
+            url: '/api' + reqSpec.endpoint,
             requestBody: {},
           }}
+          responseData={requestResponse}
         />
       </TabPanel>
       <TabPanel value="2">
@@ -85,71 +84,68 @@ export const HomePage: FC = () => {
           monitorRequestProps={{
             requestRecord: subscriberRequestRecord,
             refetch: refetchSubscriber,
-            userType: 'Guest',
+            userType: 'Subscriber',
           }}
           isErrored={isErrorSubscriber}
           isLoading={isLoadingSubscriber}
           errorComponentProps={{
-            url: '/api/workload-prioritization',
+            url: '/api/' + reqSpec2.endpoint,
             requestBody: {},
           }}
+          responseData={200}
         />
         <RequestMonitorPanel
           monitorRequestProps={{
-            requestRecord: subscriberRequestRecord2,
-            refetch: refetchSubscriber2,
-            userType: 'Subscriber',
+            requestRecord: GuestRequestRecord,
+            refetch: refetchGuest,
+            userType: 'Guest',
           }}
-          isErrored={isErrorSubscriber2}
-          isLoading={isLoadingSubscriber2}
+          isErrored={isErrorGuest}
+          isLoading={isLoadingGuest}
           errorComponentProps={{
-            url: '/api/workload-prioritization',
+            url: '/api' + reqSpec2.endpoint,
             requestBody: {},
           }}
-        />
-      </TabPanel>
-      <TabPanel value="3">
-        <RequestMonitorPanel
-          monitorRequestProps={{
-            requestRecord: subscriberRequestRecord2,
-            refetch: refetchSubscriber2,
-            userType: 'Subscriber',
-          }}
-          isErrored={isErrorSubscriber2}
-          isLoading={isLoadingSubscriber2}
-          errorComponentProps={{
-            url: '/api/workload-prioritization',
-            requestBody: {},
-          }}
+          responseData={200}
         />
       </TabPanel>
     </TabContext>
   )
 }
 
-export const makeRequestToEndpoint = (reqSpec: RequestSpec) => {
+export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   const [requestRecord, setRequestRecord] = useState<RequestRecord[]>([]) // record state for each request
   const [requestCount, setRequestCount] = useState(0) // number of request count state
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null) // interval id state, used to clear interval
 
-  const { isError, refetch, error, isRetry, isLoading } =
-    useGracefulRequest<'Axios'>({
-      typeOfRequest: 'Axios',
-      requestFnc: () =>
-        api.post(
-          reqSpec.endpoint,
-          {},
-          {
-            headers: {
-              'User-Id': reqSpec.userId,
-              'User-Type': reqSpec.userType,
-            },
-          }
-        ),
-      options: {
-        disabled: true,
-      },
-    })
+  const { isError, refetch, error, data, isRetry, isLoading } =
+
+  useGracefulRequest<'Axios'>({
+    typeOfRequest: 'Axios',
+    requestFnc: () => {
+      if (reqSpec.method === 'POST') {
+        return api.post(reqSpec.endpoint, reqSpec.body, {
+          headers: {
+            'User-Id': reqSpec.userId,
+            'User-Type': reqSpec.userType,
+          },
+        })
+      } else if (reqSpec.method === 'GET') {
+        return api.get(reqSpec.endpoint, {
+          headers: {
+            'User-Id': reqSpec.userId,
+            'User-Type': reqSpec.userType,
+          },
+        })
+      } else {
+        throw new Error(`Invalid method: ${reqSpec.method}`)
+      }
+    },
+    options: {
+      disabled: true,
+    },
+  });
+
 
   // update record state if request counter is not 0
   const updateRecord = useCallback(() => {
@@ -192,7 +188,7 @@ export const makeRequestToEndpoint = (reqSpec: RequestSpec) => {
     }
   }, [requestCount, intervalId, isError])
 
-  return { isError, refetch: startFetch, requestRecord, isLoading }
+  return { isError, refetch: startFetch, requestRecord, isLoading, data }
 }
 
 export interface RequestMonitorPanelProps {
@@ -200,6 +196,7 @@ export interface RequestMonitorPanelProps {
   isErrored: boolean
   isLoading: boolean
   errorComponentProps: GracefulErrorProps
+  responseData: any
 }
 
 export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
@@ -207,6 +204,7 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   isErrored,
   isLoading,
   errorComponentProps,
+  responseData,
 }) => (
   <HomePageWrapper>
     <HomePageColumnBox>
@@ -214,17 +212,21 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
     </HomePageColumnBox>
     <HomePageColumnBox>
       {isErrored && !isLoading ? (
-        <GracefulError {...errorComponentProps} /> // TODO: not rendering right error component. Only default error component is rendering
+        <GracefulError {...errorComponentProps} />
       ) : (
-        <Typography
-          variant="h5"
-          sx={(theme) => ({ color: theme.palette.grey[400] })}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
+        <div
+          sx={(theme) => ({
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            color: theme.palette.grey[400],
+          })}
         >
-          200
-        </Typography>
+          <Typography variant="h5">{responseData?.data?.role}</Typography>
+          <Typography variant="h5">{responseData?.data?.name}</Typography>
+          <Typography variant="h5">{responseData?.data?.education}</Typography>
+        </div>
       )}
     </HomePageColumnBox>
   </HomePageWrapper>
@@ -259,6 +261,7 @@ export const HomePageTabs = styled(Tabs)(({ theme }) => ({
   width: '100%',
   minHeight: 500,
   display: 'flex',
+  alignItems: 'center',
   flexDirection: 'column',
   justifyContent: 'center',
   gap: theme.spacing(2),

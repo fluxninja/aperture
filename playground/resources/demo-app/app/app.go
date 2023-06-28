@@ -177,7 +177,8 @@ func (ss SimpleService) Run() error {
 	fs := http.FileServer(http.Dir("./public"))
 
 	http.Handle("/ui/", http.StripPrefix("/ui/", fs))
-	http.Handle("/api/rate-limit", handlerFunc(handler))
+	// http.Handle("/api/rate-limit", handlerFunc(handler))
+	http.HandleFunc("/api/rate-limit", rateLimitedHandler)
 	http.Handle("/api/feature-rollout", handlerFunc(handler))
 	http.Handle("/api/workload-prioritization", handlerFunc(handler))
 	http.Handle("/request", handlerFunc(handler))
@@ -191,17 +192,32 @@ func (ss SimpleService) Run() error {
 
 // RateLimitResponseBody is a response body for rate limit endpoint.
 type RateLimitResponseBody struct {
-	Message            string `json:"message"`
-	RetryAfter         int    `json:"retryAfter"`
-	RetryLimit         int    `json:"retryLimit"`
-	Global             bool   `json:"global"`
-	RateLimitRemaining int    `json:"rateLimitRemaining"`
-	RateLimitReset     int    `json:"rateLimitReset"`
+	Role      string `json:"role"`
+	Name      string `json:"name"`
+	Education string `json:"education"`
 }
 
 func rateLimitedHandler(w http.ResponseWriter, r *http.Request) {
-	responseBody := RateLimitResponseBody{
-		Message: "Request accepted",
+	// Extract info from request headers, if user_id is CEO, CTO, COO return so and so info in the response message
+	userID := r.Header.Get("User-Id")
+	responseBody := RateLimitResponseBody{}
+
+	if userID == "CEO" {
+		responseBody.Role = "CEO"
+		responseBody.Name = "Harjot Gill"
+		responseBody.Education = "MSc. Computer Science UPenn"
+	} else if userID == "CTO" {
+		responseBody.Role = "CTO"
+		responseBody.Name = "Tanveer Gill"
+		responseBody.Education = "MSc. Computer Science UPenn"
+	} else if userID == "COO" {
+		responseBody.Role = "COO"
+		responseBody.Name = "Jai Desai"
+		responseBody.Education = "MSc. Computer Science USC"
+	} else {
+		responseBody.Role = "Not supported yet"
+		responseBody.Name = "Foo"
+		responseBody.Education = "Bar"
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -211,6 +227,7 @@ func rateLimitedHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error encoding JSON:", err)
 	}
+
 }
 
 func getOrCreateCounter(userID, userType string) *Counter {
