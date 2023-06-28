@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "policies/quota-scheduler blueprint",
+  "title": "policies/quota-scheduler/base blueprint",
   "additionalProperties": false,
   "required": ["policy"],
   "properties": {
@@ -16,7 +16,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+            "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
         },
         "policy_name": {
@@ -32,7 +32,7 @@
             }
           },
           "type": "object",
-          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+          "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
         "quota_scheduler": {
           "type": "object",
@@ -63,13 +63,13 @@
                 "label_key": ""
               },
               "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
             },
             "scheduler": {
               "description": "Scheduler configuration.",
               "default": {},
               "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
+              "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
             },
             "selectors": {
               "description": "Flow selectors to match requests against",
@@ -82,7 +82,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+                "$ref": "../../../../gen/jsonschema/_definitions.json#/definitions/Selector"
               }
             }
           }

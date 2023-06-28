@@ -1,0 +1,3 @@
+blueprint: Rate Limiting Policy
+sources:
+  policy: policies/rate-limiting/base/policy.libsonnet

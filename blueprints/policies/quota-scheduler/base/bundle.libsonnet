@@ -1,5 +1,5 @@
-local creator = import '../../grafana/creator.libsonnet';
-local blueprint = import './rate-limiting.libsonnet';
+local creator = import '../../../grafana/creator.libsonnet';
+local blueprint = import './quota-scheduler.libsonnet';
 
 local policy = blueprint.policy;
 local config = blueprint.config;

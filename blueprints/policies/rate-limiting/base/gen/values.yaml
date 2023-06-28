@@ -1,6 +1,6 @@
-# Generated values file for policies/quota-scheduler blueprint
+# Generated values file for policies/rate-limiting/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/policies/quota-scheduler
+# https://docs.fluxninja.com/reference/blueprints/policies/rate-limiting/base
 
 policy:
   # List of additional circuit components.
@@ -15,7 +15,7 @@ policy:
   resources:
     flow_control:
       classifiers: []
-  quota_scheduler:
+  rate_limiter:
     # Bucket capacity.
     # Type: float64
     # Required: True
@@ -24,15 +24,12 @@ policy:
     # Type: float64
     # Required: True
     fill_amount: __REQUIRED_FIELD__
-    # Rate Limiter Parameters.
+    # Parameters.
     # Type: aperture.spec.v1.RateLimiterParameters
     # Required: True
-    rate_limiter:
+    parameters:
       interval: __REQUIRED_FIELD__
       label_key: ""
-    # Scheduler configuration.
-    # Type: aperture.spec.v1.Scheduler
-    scheduler: {}
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     # Required: True
@@ -47,15 +44,9 @@ dashboard:
   # Refresh interval for dashboard panels.
   # Type: string
   refresh_interval: "10s"
-  # Time from of dashboard.
-  # Type: string
-  time_from: "now-15m"
-  # Time to of dashboard.
-  # Type: string
-  time_to: "now"
   # Name of the main dashboard.
   # Type: string
-  title: "Aperture Quota Scheduler"
+  title: "Aperture Rate Limiter"
   datasource:
     # Datasource filter regex.
     # Type: string

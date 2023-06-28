@@ -1,5 +1,5 @@
-local spec = import '../../spec.libsonnet';
-local utils = import '../../utils/utils.libsonnet';
+local spec = import '../../../spec.libsonnet';
+local utils = import '../../../utils/utils.libsonnet';
 local config = import './config.libsonnet';
 
 local policy = spec.v1.Policy;
