@@ -39,6 +39,9 @@ plugins:
       # Doesn't compile, hit some bug in vtproto.
       # - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision
       - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision_SchedulerInfo
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest_HttpRequest
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.SocketAddress
   - plugin: buf.build/grpc/go
     out: gen/proto/go
     opt:
