@@ -4,7 +4,7 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "policies/service-protection/average-latency",
+      "blueprint_name": "service-protection/average-latency",
       "policy_name": "workload-prioritization",
       "values_file": "policies/workload-prioritization.yaml",
       "dashboard_mixin_dir": "dashboards/"

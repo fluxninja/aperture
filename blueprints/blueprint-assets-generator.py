@@ -35,6 +35,7 @@ ANNOTATION_RE = re.compile(r".*@param.*|.*@schema.*")
 ANNOTATION_DETAILED_RE = re.compile(
     r".*(?P<annotation_type>@schema|@param) \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]/:-]+)\) ?(?P<param_description>.+)?"
 )
+JSONNET_IMPORT_RE = re.compile(r".*import ['\"](?P<import_path>.+)['\"].*")
 
 
 @dataclasses.dataclass
@@ -730,7 +731,7 @@ def render_json_schema(
     json_schema_path.write_text(rendered)
 
 
-def parse_annotations(
+def parse_root_config(
     repository_root: Path,
     blueprints_root_relative_path: str,
     policies_relative_path: str,
@@ -775,6 +776,24 @@ def parse_annotations(
 
     logger.trace(rendered_config)
 
+    blueprint = parse_config_file(
+        repository_root,
+        blueprints_root_relative_path,
+        policies_relative_path,
+        config_path,
+        rendered_config,
+    )
+    blueprint.deprecation_message = metadata.get("deprecation_message", None)
+    return blueprint
+
+
+def parse_config_file(
+    repository_root: Path,
+    blueprints_root_relative_path: str,
+    policies_relative_path: str,
+    config_path: Path,
+    rendered_config: dict = dict(),
+) -> Blueprint:
     config_data = config_path.read_text()
     docblock_start_re = r".*\/\*\*$"
     docblock_end_re = r".*\*\/$"
@@ -783,7 +802,23 @@ def parse_annotations(
     inside_docblock = False
     docblock_data = []
     for line in config_data.split("\n"):
-        if re.match(docblock_start_re, line):
+        if JSONNET_IMPORT_RE.match(line):
+            import_matches = JSONNET_IMPORT_RE.match(line.strip())
+            if not import_matches:
+                logger.error(f"Error while parsing import: {line}")
+                raise typer.Exit(1)
+            import_groupdict = import_matches.groupdict()
+            import_path = import_groupdict["import_path"]
+            docblocks.append(
+                parse_config_file(
+                    repository_root,
+                    blueprints_root_relative_path,
+                    policies_relative_path,
+                    config_path.parent / import_path,
+                    rendered_config,
+                )
+            )
+        elif re.match(docblock_start_re, line):
             assert not inside_docblock
             inside_docblock = True
         elif re.match(docblock_end_re, line):
@@ -804,8 +839,6 @@ def parse_annotations(
 
     # merge docblocks
     merged_parameters = Blueprint()
-
-    merged_parameters.deprecation_message = metadata.get("deprecation_message", None)
 
     for block in docblocks:
         merge_parameternodes(
@@ -918,7 +951,7 @@ def parse_config_parameters(
 
     metadata = yaml.safe_load(metadata_path.read_text())
 
-    parameters = parse_annotations(
+    parameters = parse_root_config(
         repository_root,
         blueprints_root_relative_path,
         policies_relative_path,
@@ -939,7 +972,7 @@ def parse_dynamic_config_docblocks(
     if not config_path.exists():
         return Blueprint()
 
-    dynamic_config_parameters = parse_annotations(
+    dynamic_config_parameters = parse_root_config(
         repository_root,
         blueprints_root_relative_path,
         policies_relative_path,
@@ -958,6 +991,7 @@ def merge_parameternodes(params1: ParameterNode, params2: ParameterNode):
     for key, value in params2.children.items():
         if key in params1.children:
             merge_parameternodes(params1.children[key], value)
+            params1.children[key].parameter = value.parameter
         else:
             params1.children[key] = value
 

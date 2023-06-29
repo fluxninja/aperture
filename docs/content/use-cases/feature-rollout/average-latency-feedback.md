@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Feature Rollout with Average Latency Feedback](/reference/blueprints/policies/feature-rollout/average-latency.md)
+[Feature Rollout with Average Latency Feedback](/reference/blueprints/feature-rollout/base.md)
 blueprint.
 
 :::

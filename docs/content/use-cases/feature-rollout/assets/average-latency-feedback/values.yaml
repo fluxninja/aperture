@@ -1,17 +1,9 @@
-# yaml-language-server: $schema=../../../../../../blueprints/policies/feature-rollout/average-latency/gen/definitions.json
-# Generated values file for policies/feature-rollout/average-latency blueprint
+# yaml-language-server: $schema=file:/Users/gillh/Work/fluxninja/aperture/blueprints/policies/feature-rollout/base/gen/definitions.json
+# Generated values file for policies/feature-rollout/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/policies/feature-rollout/average-latency
+# https://docs.fluxninja.com/reference/blueprints/feature-rollout/base
 
-# Parameters for the Feature Rollout policy.
-# Type: policies/feature-rollout/base:schema:rollout_policy
-# Required: True
 policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: "feature-rollout"
-  components: []
   drivers:
     average_latency_drivers:
       - criteria:
@@ -25,7 +17,15 @@ policy:
             label_matcher:
               match_labels:
                 http.path: /checkout
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # The interval between successive evaluations of the Circuit.
+  # Type: string
   evaluation_interval: "10s"
+  # Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
+  # Type: aperture.spec.v1.LoadRampParameters
+  # Required: True
   load_ramp:
     sampler:
       selectors:
@@ -37,6 +37,15 @@ policy:
         target_accept_percentage: 1.0
       - duration: "300s"
         target_accept_percentage: 100.0
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "feature-rollout"
+  # List of additional resources.
+  # Type: aperture.spec.v1.Resources
   resources:
     flow_control:
       classifiers: []
+  # Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
+  # Type: bool
+  rollout: false

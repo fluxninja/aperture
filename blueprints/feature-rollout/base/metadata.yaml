@@ -1,0 +1,3 @@
+blueprint: Feature Rollout Policy
+sources:
+  policy: feature-rollout/base/policy.libsonnet

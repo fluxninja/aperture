@@ -1,0 +1,69 @@
+# Generated values file for feature-rollout/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/feature-rollout/base
+
+policy:
+  drivers:
+    # List of drivers that compare average latency against forward, backward and reset thresholds.
+    # Type: []average_latency_driver
+    average_latency_drivers: []
+    # List of drivers that compare percentile latency against forward, backward and reset thresholds.
+    # Type: []percentile_latency_driver
+    percentile_latency_drivers: []
+    # List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.
+    # Type: []promql_driver
+    promql_drivers: []
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # The interval between successive evaluations of the Circuit.
+  # Type: string
+  evaluation_interval: "10s"
+  # Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
+  # Type: aperture.spec.v1.LoadRampParameters
+  # Required: True
+  load_ramp:
+    sampler:
+      label_key: ""
+      selectors:
+        - control_point: __REQUIRED_FIELD__
+          service: __REQUIRED_FIELD__
+    steps:
+      - duration: __REQUIRED_FIELD__
+        target_accept_percentage: __REQUIRED_FIELD__
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # List of additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
+  # Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
+  # Type: bool
+  rollout: false
+
+dashboard:
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters: {}
+  # Refresh interval for dashboard panels.
+  # Type: string
+  refresh_interval: "5s"
+  # From time of dashboard.
+  # Type: string
+  time_from: "now-15m"
+  # To time of dashboard.
+  # Type: string
+  time_to: "now"
+  # Name of the main dashboard.
+  # Type: string
+  title: "Aperture Feature Rollout"
+  datasource:
+    # Datasource filter regex.
+    # Type: string
+    filter_regex: ""
+    # Datasource name.
+    # Type: string
+    name: "$datasource"

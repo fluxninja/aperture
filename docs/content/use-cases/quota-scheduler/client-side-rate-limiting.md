@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Quota Scheduler](/reference/blueprints/policies/quota-scheduler.md#policy-quota-scheduler)
+[Quota Scheduler](/reference/blueprints/quota-scheduler/base.md#policy-quota-scheduler)
 blueprint.
 
 :::

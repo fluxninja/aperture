@@ -4,7 +4,7 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "policies/quota-scheduler",
+      "blueprint_name": "quota-scheduler/base",
       "policy_name": "quota-scheduler",
       "values_file": "policies/quota-scheduler.yaml",
       "dashboard_mixin_dir": "dashboards/"

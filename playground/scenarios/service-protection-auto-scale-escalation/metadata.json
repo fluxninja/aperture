@@ -4,7 +4,7 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "policies/service-protection/average-latency",
+      "blueprint_name": "service-protection/average-latency",
       "policy_name": "load-based-auto-scale",
       "values_file": "policies/load-based-auto-scale.yaml",
       "dashboard_mixin_dir": "dashboards/"

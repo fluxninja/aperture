@@ -1,3 +1,0 @@
-blueprint: Feature Rollout Policy based on feedback of PromQL query
-sources:
-  policy: policies/feature-rollout/base/policy.libsonnet

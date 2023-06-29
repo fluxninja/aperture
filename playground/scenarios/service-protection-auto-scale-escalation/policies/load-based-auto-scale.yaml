@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
 # Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/policies/service-protection/average-latency
+# https://docs.fluxninja.com/reference/blueprints/service-protection/average-latency
 
 policy:
   # Name of the policy.
@@ -15,8 +15,8 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-        - control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
   latency_baseliner:
     latency_tolerance_multiplier: 1.1
     # Flux Meter defines the scope of latency measurements.
@@ -24,47 +24,47 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-      - control_point: ingress
-        service: service1-demo-app.demoapp.svc.cluster.local
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local
   components:
-  - auto_scale:
-      auto_scaler:
-        dry_run: false
-        dry_run_config_key: dry_run
-        scaling_backend:
-          kubernetes_replicas:
-            kubernetes_object_selector:
-              agent_group: default
-              api_version: apps/v1
-              kind: Deployment
-              name: service1-demo-app
-              namespace: demoapp
-            max_replicas: "10"
-            min_replicas: "1"
-        scale_in_controllers:
-        - alerter:
-            alert_name: Auto-scaler is scaling in
-          controller:
-            periodic:
-              period: "60s"
-              scale_in_percentage: 10
-        scale_out_controllers:
-        - alerter:
-            alert_name: Auto-scaler is scaling out
-          controller:
-            gradient:
-              in_ports:
-                setpoint:
-                  constant_signal:
-                    value: 1
-                signal:
-                  signal_name: DESIRED_LOAD_MULTIPLIER
-              parameters:
-                slope: -1
-        scaling_parameters:
-          scale_in_alerter:
-            alert_name: Auto scaler is scaling in
-          scale_in_cooldown: "40s"
-          scale_out_alerter:
-            alert_name: Auto scaler is scaling out
-          scale_out_cooldown: "30s"
+    - auto_scale:
+        auto_scaler:
+          dry_run: false
+          dry_run_config_key: dry_run
+          scaling_backend:
+            kubernetes_replicas:
+              kubernetes_object_selector:
+                agent_group: default
+                api_version: apps/v1
+                kind: Deployment
+                name: service1-demo-app
+                namespace: demoapp
+              max_replicas: "10"
+              min_replicas: "1"
+          scale_in_controllers:
+            - alerter:
+                alert_name: Auto-scaler is scaling in
+              controller:
+                periodic:
+                  period: "60s"
+                  scale_in_percentage: 10
+          scale_out_controllers:
+            - alerter:
+                alert_name: Auto-scaler is scaling out
+              controller:
+                gradient:
+                  in_ports:
+                    setpoint:
+                      constant_signal:
+                        value: 1
+                    signal:
+                      signal_name: DESIRED_LOAD_MULTIPLIER
+                  parameters:
+                    slope: -1
+          scaling_parameters:
+            scale_in_alerter:
+              alert_name: Auto scaler is scaling in
+            scale_in_cooldown: "40s"
+            scale_out_alerter:
+              alert_name: Auto scaler is scaling out
+            scale_out_cooldown: "30s"

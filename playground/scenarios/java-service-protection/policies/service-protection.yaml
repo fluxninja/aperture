@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
 # Generated values file for policies/service-protection/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/policies/service-protection/average-latency
+# https://docs.fluxninja.com/reference/blueprints/service-protection/average-latency
 policy:
   # Name of the policy.
   # Type: string
@@ -89,7 +89,7 @@ policy:
                   user_type: subscriber
       # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
       # Type: float64
-      load_multiplier_linear_increment: 0.0025
+      load_multiplier_linear_increment: 0.025
 
   latency_baseliner:
     latency_tolerance_multiplier: 1.1
