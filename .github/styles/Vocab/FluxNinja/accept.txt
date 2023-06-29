@@ -80,4 +80,4 @@ EnvoyFilter
 Kubelet
 colocating
 [Oo]perator
-Scaler
+[Ss]caler
