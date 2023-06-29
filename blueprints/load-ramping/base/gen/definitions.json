@@ -8,8 +8,32 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["load_ramp", "policy_name"],
+      "required": ["policy_name", "load_ramp"],
       "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
         "drivers": {
           "type": "object",
           "additionalProperties": false,
@@ -43,15 +67,6 @@
             }
           }
         },
-        "components": {
-          "description": "List of additional circuit components.",
-          "default": [],
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
-          }
-        },
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
           "default": "10s",
@@ -79,21 +94,6 @@
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadRampParameters"
         },
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
-        "resources": {
-          "description": "List of additional resources.",
-          "default": {
-            "flow_control": {
-              "classifiers": []
-            }
-          },
-          "type": "object",
-          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
-        },
         "start": {
           "description": "Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.",
           "default": false,
@@ -113,7 +113,7 @@
         },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "5s",
+          "default": "15s",
           "type": "string"
         },
         "time_from": {

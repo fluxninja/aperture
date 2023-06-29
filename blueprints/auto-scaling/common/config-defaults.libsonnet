@@ -1,16 +1,4 @@
-local auto_scaling_base_defaults = {
-  policy_name: '__REQUIRED_FIELD__',
-
-  components: [],
-
-  resources: {
-    flow_control: {
-      classifiers: [],
-    },
-  },
-
-  evaluation_interval: '10s',
-};
+local commonConfig = import '../../common/config-defaults.libsonnet';
 
 local scaling_parameters_defaults = {
   scale_in_alerter: {
@@ -19,6 +7,25 @@ local scaling_parameters_defaults = {
   scale_out_alerter: {
     alert_name: 'Auto-scaler is scaling out',
   },
+};
+
+/**
+* @schema (kubeletstats_infra_meter_label_filter.key: string) Key represents the key or name of the field or labels that a filter can apply on.
+* @schema (kubeletstats_infra_meter_label_filter.value: string) Value represents the value associated with the key that a filter operation specified by the `Op` field applies on.
+* @schema (kubeletstats_infra_meter_label_filter.op: string) Op represents the filter operation to apply on the given Key: Value pair. The supported operations are: equals, not-equals, exists, does-not-exist.
+* @schema (kubeletstats_infra_meter_filter.node: string) Node represents a k8s node or host. If specified, any pods not running on the specified node will be ignored by the tagger.
+* @schema (kubeletstats_infra_meter_filter.node_from_env_var: string) odeFromEnv can be used to extract the node name from an environment variable. For example: `NODE_NAME`.
+* @schema (kubeletstats_infra_meter_filter.namespace: string) Namespace filters all pods by the provided namespace. All other pods are ignored.
+* @schema (kubeletstats_infra_meter_filter.fields: []kubeletstats_infra_meter_label_filter) Fields allows to filter pods by generic k8s fields. Supported operations are: equals, not-equals.
+* @schema (kubeletstats_infra_meter_filter.labels: []kubeletstats_infra_meter_label_filter) Labels allows to filter pods by generic k8s pod labels.
+* @schema (kubeletstats_infra_meter.enabled: bool) Adds infra_meter for scraping Kubelet metrics.
+* @schema (kubeletstats_infra_meter.agent_group: string) Agent group to be used for the infra_meter.
+* @schema (kubeletstats_infra_meter.filter: kubeletstats_infra_meter_filter) Filter to be applied to the infra_meter.
+*/
+local kubeletstats_infra_meter = {
+  enabled: true,
+  agent_group: 'default',
+  filter: {},
 };
 
 /**
@@ -38,7 +45,7 @@ local promql_scale_controller_defaults = {
   alerter: '__REQUIRED_FIELD__',
 };
 
-local auto_scaling_defaults = auto_scaling_base_defaults {
+local auto_scaling_defaults = {
   promql_scale_out_controllers: [],
 
   promql_scale_in_controllers: [],
@@ -48,46 +55,27 @@ local auto_scaling_defaults = auto_scaling_base_defaults {
   scaling_backend: '__REQUIRED_FIELD__',
 
   dry_run: false,
+
+  kubeletstats_infra_meter: kubeletstats_infra_meter,
 };
 
-{
+commonConfig {
   /**
-  * @param (policy.policy_name: string) Name of the policy.
   * @param (policy.promql_scale_out_controllers: []promql_scale_out_controller) List of scale out controllers.
   * @param (policy.promql_scale_in_controllers: []promql_scale_in_controller) List of scale in controllers.
   * @param (policy.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters) Parameters that define the scaling behavior.
   * @param (policy.scaling_backend: aperture.spec.v1.AutoScalerScalingBackend) Scaling backend for the policy.
-  * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
-  * @param (policy.resources: aperture.spec.v1.Resources) List of additional resources.
-  * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
   * @param (policy.dry_run: bool) Dry run mode ensures that no scaling is invoked by this auto scaler.
+  * @param (policy.kubeletstats_infra_meter: kubeletstats_infra_meter) Infra meter for scraping Kubelet metrics.
   */
-  policy: auto_scaling_defaults,
+  policy+: auto_scaling_defaults,
 
-  /**
-  * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
-  * @param (dashboard.time_from: string) Time from of dashboard.
-  * @param (dashboard.time_to: string) Time to of dashboard.
-  * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
-  * @param (dashboard.title: string) Name of the main dashboard.
-  */
-  dashboard: {
-    refresh_interval: '5s',
-    time_from: 'now-15m',
-    time_to: 'now',
-    extra_filters: {},
+  dashboard+: {
     title: 'Aperture Auto-scale',
-    /**
-    * @param (dashboard.datasource.name: string) Datasource name.
-    * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
-    */
-    datasource: {
-      name: '$datasource',
-      filter_regex: '',
-    },
   },
 
   // schema defaults are below
   promql_scale_out_controller: promql_scale_controller_defaults,
   promql_scale_in_controller: promql_scale_controller_defaults,
+  kubeletstats_infra_meter: kubeletstats_infra_meter,
 }

@@ -7,7 +7,7 @@ serviceProtectionDefaults {
       * @param (policy.latency_baseliner.flux_meter: aperture.spec.v1.FluxMeter) Flux Meter defines the scope of latency measurements.
       */
       flux_meter: {
-        selectors: serviceProtectionDefaults.selectors,
+        selectors: serviceProtectionDefaults.selectors_defaults,
       },
       /**
       * @param (policy.latency_baseliner.long_term_query_interval: string) Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.
