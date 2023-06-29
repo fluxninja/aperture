@@ -392,11 +392,19 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *cont
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	// Always enable TLS on the controller
-	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-		CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
-		KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
-		Enabled:  true,
+	if r.tlsEnabled() {
+		// When controller TLS is enabled, force the TLS configuration
+		instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+			CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
+			KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
+			Enabled:  true,
+		}
+	} else {
+		instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+			CertFile: "",
+			KeyFile:  "",
+			Enabled:  false,
+		}
 	}
 
 	if !r.MultipleControllers {
