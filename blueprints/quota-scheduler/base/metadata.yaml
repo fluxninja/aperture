@@ -1,3 +1,0 @@
-blueprint: Quota Scheduler Policy
-sources:
-  policy: quota-scheduler/base/policy.libsonnet

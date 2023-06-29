@@ -2,7 +2,7 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-name: service-protection/average-latency
+    fluxninja.com/blueprint-name: load-scheduling/average-latency
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"components": [{"decider": {"in_ports": {"lhs":
       {"signal_name": "DESIRED_LOAD_MULTIPLIER"}, "rhs": {"constant_signal": {"value":

@@ -317,7 +317,7 @@ clicked.
 
 There are other playground scenarios under the `playground/scenarios/`
 directory, and they can be loaded during `Tilt` setup by passing a relative path
-to the scenario, e.g. `tilt up -- --scenario scenarios/feature-rollout`
+to the scenario, e.g. `tilt up -- --scenario scenarios/load-ramping`
 
 > 📍 You can skip building of aperture container images to speed up your work on
 > the scenario, by passing `-- --dockerhub-image` to the `tilt up` command. In

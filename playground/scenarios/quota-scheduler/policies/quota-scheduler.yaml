@@ -1,7 +1,7 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/quota-scheduler/gen/definitions.json
-# Generated values file for policies/quota-scheduler blueprint
+# yaml-language-server: $schema=../../../../blueprints/quota-scheduling/base/gen/definitions.json
+# Generated values file for quota-scheduling/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduler
+# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
 policy:
   policy_name: quota-scheduler
   quota_scheduler:

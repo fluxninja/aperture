@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../../../../../blueprints/policies/load-scheduling/average-latency/gen/definitions.json
+# Generated values file for load-scheduling/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: workload-prioritization
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # The interval between successive evaluations of the Circuit.
+  # Type: string
+  evaluation_interval: "10s"
+  service_protection_core:
+    adaptive_load_scheduler:
+      load_scheduler:
+        # The selectors determine the flows that are protected by this policy.
+        # Type: []aperture.spec.v1.Selector
+        # Required: True
+        selectors:
+          - control_point: ingress
+            service: cart-service.prod.svc.cluster.local
+        # Scheduler parameters.
+        # Type: aperture.spec.v1.SchedulerParameters
+        scheduler:
+          workloads:
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: guest
+              parameters:
+                priority: 50
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: subscriber
+              parameters:
+                priority: 200
+  latency_baseliner:
+    # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
+    # Type: float64
+    latency_tolerance_multiplier: 1.1
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - service: cart-service.prod.svc.cluster.local
+          control_point: ingress

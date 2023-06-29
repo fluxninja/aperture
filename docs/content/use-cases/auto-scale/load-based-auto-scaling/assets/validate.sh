@@ -8,7 +8,7 @@ git_root=$(git rev-parse --show-toplevel)
 source "$git_root"/docs/tools/aperturectl/validate_common.sh
 
 generate_from_values \
-	policies/service-protection/average-latency \
+	load-scheduling/average-latency \
 	values.yaml \
 	tmp
 
