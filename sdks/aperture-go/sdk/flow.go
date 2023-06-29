@@ -8,7 +8,6 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // Flow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
@@ -84,7 +83,7 @@ func (f *flow) End() error {
 	}
 	f.ended = true
 
-	checkResponseJSONBytes, err := protojson.Marshal(f.checkResponse)
+	checkResponseJSONBytes, err := f.checkResponse.MarshalVT()
 	if err != nil {
 		return err
 	}
