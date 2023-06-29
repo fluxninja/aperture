@@ -23,6 +23,7 @@ type PromErrorCallback func(error, ...interface{}) (proto.Message, error)
 type promQuery struct {
 	endTimestamp   time.Time
 	promAPI        prometheusv1.API
+	enforcer       PrometheusEnforcer
 	resultCallback PromResultCallback
 	errorCallback  PromErrorCallback
 	query          string
@@ -38,12 +39,13 @@ func NewPromQueryJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer PrometheusEnforcer,
 	timeout time.Duration,
 	resultCallback PromResultCallback,
 	errorCallback PromErrorCallback,
 	cbArgs ...interface{},
 ) jobs.JobCallback {
-	pQuery := &promQuery{query: query, promAPI: promAPI, timeout: timeout, endTimestamp: endTimestamp, resultCallback: resultCallback, errorCallback: errorCallback, cbArgs: cbArgs}
+	pQuery := &promQuery{query: query, promAPI: promAPI, enforcer: enforcer, timeout: timeout, endTimestamp: endTimestamp, resultCallback: resultCallback, errorCallback: errorCallback, cbArgs: cbArgs}
 	return pQuery.execute
 }
 
@@ -56,7 +58,12 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 		ctx, cancel := context.WithTimeout(jobCtxt, pq.timeout)
 		defer cancel()
 
-		result, warnings, err = pq.promAPI.Query(ctx, pq.query, pq.endTimestamp)
+		query, innerErr := pq.enforcer.EnforceLabels(pq.query)
+		if innerErr != nil {
+			return err
+		}
+
+		result, warnings, err = pq.promAPI.Query(ctx, query, pq.endTimestamp)
 		// if jobCtxt is closed, return PermanentError
 		if jobCtxt.Err() != nil {
 			return backoff.Permanent(jobCtxt.Err())

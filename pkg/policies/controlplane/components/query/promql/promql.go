@@ -139,6 +139,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer prometheus.PrometheusEnforcer,
 	timeout time.Duration,
 	cb scalarResultCallback,
 ) {
@@ -152,6 +153,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 			query,
 			endTimestamp,
 			promAPI,
+			enforcer,
 			timeout,
 			scalarResBroker.handleResult,
 			scalarResBroker.handleError,
@@ -165,6 +167,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer prometheus.PrometheusEnforcer,
 	timeout time.Duration,
 	cb promResultCallback,
 ) {
@@ -178,6 +181,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 			query,
 			endTimestamp,
 			promAPI,
+			enforcer,
 			timeout,
 			taggedResBroker.handleResult,
 			taggedResBroker.handleError,
@@ -337,6 +341,8 @@ type PromQL struct {
 	tickInfo runtime.TickInfo
 	// Prometheus API
 	promAPI prometheusv1.API
+	// Prometheus Labels Enforcer
+	enforcer prometheus.PrometheusEnforcer
 	// Policy read API
 	policyReadAPI iface.Policy
 	// Current error
@@ -453,6 +459,7 @@ func (promQL *PromQL) registerJob(endTimestamp time.Time) {
 		promQL.queryString,
 		endTimestamp,
 		promQL.promAPI,
+		promQL.enforcer,
 		promTimeout,
 		promQL.onScalarResult,
 	)
@@ -552,6 +559,7 @@ func (taggedQuery *TaggedQuery) registerJob(endTimestamp time.Time) {
 		taggedQuery.scalarQuery.promQL.queryString,
 		endTimestamp,
 		taggedQuery.scalarQuery.promQL.promAPI,
+		taggedQuery.scalarQuery.promQL.enforcer,
 		promTimeout,
 		taggedQuery.onTaggedResult,
 	)

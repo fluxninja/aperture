@@ -1421,6 +1421,18 @@ List of etcd server endpoints
 Lease time-to-live
 
 </dd>
+<dt>namespace</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"aperture"`)
+
+<!-- vale on -->
+
+Etcd namespace
+
+</dd>
 <dt>password</dt>
 <dd>
 
@@ -2634,6 +2646,52 @@ PrometheusConfig holds configuration for Prometheus Server.
 <!-- vale on -->
 
 Address of the Prometheus server
+
+</dd>
+<dt>labels</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]PrometheusLabel](#prometheus-label))
+
+<!-- vale on -->
+
+A list of labels to be attached to every query
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PrometheusLabel {#prometheus-label}
+
+<!-- vale on -->
+
+PrometheusLabel holds Name->Value mapping for the label that will be attached to
+every PromQL query executed by the controller.
+
+<dl>
+<dt>name</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+</dd>
+<dt>value</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
 
 </dd>
 </dl>
