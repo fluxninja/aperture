@@ -57,10 +57,11 @@ func (f *flow) Decision() FlowDecision {
 // ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
 // By default, fail-open behavior is enabled. Use DisableFailOpen to disable it.
 func (f *flow) ShouldRun() bool {
-	var decision = f.Decision()
+	decision := f.Decision()
 	return decision == Accepted || (f.failOpen && decision == Unreachable)
 }
 
+// DisableFailOpen disables fail-open behavior for the flow.
 func (f *flow) DisableFailOpen() {
 	f.failOpen = false
 }
@@ -71,7 +72,7 @@ func (f *flow) CheckResponse() *flowcontrol.CheckResponse {
 }
 
 // SetStatus sets the status code of a flow.
-// If not set explicitly, defaults to FlowStatus.OK
+// If not set explicitly, defaults to FlowStatus.OK.
 func (f *flow) SetStatus(statusCode FlowStatus) {
 	f.statusCode = statusCode
 }
