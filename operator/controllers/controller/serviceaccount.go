@@ -34,7 +34,7 @@ import (
 )
 
 // serviceAccountForController prepares the ServiceAccount object for the Controller based on the provided parameter.
-func serviceAccountForController(instance *controllerv1alpha1.Controller, name string, scheme *runtime.Scheme) (*corev1.ServiceAccount, error) {
+func serviceAccountForController(instance *controllerv1alpha1.Controller, scheme *runtime.Scheme) (*corev1.ServiceAccount, error) {
 	saSpec := instance.Spec.ServiceAccountSpec
 
 	annotations := instance.Spec.Annotations
@@ -48,7 +48,7 @@ func serviceAccountForController(instance *controllerv1alpha1.Controller, name s
 
 	sa := &corev1.ServiceAccount{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        name,
+			Name:        controllers.ServiceAccountName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: annotations,

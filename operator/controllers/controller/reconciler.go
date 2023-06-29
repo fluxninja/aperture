@@ -382,19 +382,10 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 	return nil
 }
 
-func (r *ControllerReconciler) createNameForConfigMap(instance *controllerv1alpha1.Controller) string {
-	if !r.MultipleControllers {
-		return controllers.ControllerServiceName
-	}
-
-	return fmt.Sprintf("controller-%s", instance.GetName())
-}
-
 // reconcileConfigMap prepares the desired states for Controller configmaps and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance *controllerv1alpha1.Controller) error {
-	name := r.createNameForConfigMap(instance)
-	configMap, err := configMapForControllerConfig(instance.DeepCopy(), name, r.Scheme)
+	configMap, err := configMapForControllerConfig(instance.DeepCopy(), r.Scheme)
 	if err != nil {
 		return err
 	}
@@ -485,14 +476,6 @@ func (r *ControllerReconciler) reconcileClusterRoleBinding(ctx context.Context, 
 	return nil
 }
 
-func (r *ControllerReconciler) createNameForServiceAccount(instance *controllerv1alpha1.Controller) string {
-	if !r.MultipleControllers {
-		return controllers.ControllerServiceName
-	}
-
-	return fmt.Sprintf("controller-%s", instance.GetName())
-}
-
 // reconcileServiceAccount prepares the desired states for Controller ServiceAccount and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
@@ -500,8 +483,7 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 		return nil
 	}
 
-	name := r.createNameForServiceAccount(instance)
-	sa, err := serviceAccountForController(instance.DeepCopy(), name, r.Scheme)
+	sa, err := serviceAccountForController(instance.DeepCopy(), r.Scheme)
 	if err != nil {
 		return err
 	}
@@ -512,19 +494,9 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	return nil
 }
 
-func (r *ControllerReconciler) createNameForDeployment(instance *controllerv1alpha1.Controller) string {
-	if !r.MultipleControllers {
-		return controllers.ControllerServiceName
-	}
-
-	return fmt.Sprintf("controller-%s", instance.GetName())
-}
-
 // reconcileDeployment prepares the desired states for Controller Deployment and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	name := r.createNameForDeployment(instance)
-
 	// FIXME: Manage per-controller tls certificates with cert-manager
 	var tlsEnabled bool
 	if r.MultipleControllers {
@@ -533,7 +505,7 @@ func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr
 		tlsEnabled = true
 	}
 
-	dep, err := deploymentForController(instance.DeepCopy(), name, tlsEnabled, log, r.Scheme)
+	dep, err := deploymentForController(instance.DeepCopy(), tlsEnabled, log, r.Scheme)
 	if err != nil {
 		return err
 	}

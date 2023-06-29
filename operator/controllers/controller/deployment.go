@@ -36,7 +36,7 @@ import (
 )
 
 // deploymentForAPIService prepares the Deployment object for the Controller.
-func deploymentForController(instance *controllerv1alpha1.Controller, name string, tlsEnabled bool, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+func deploymentForController(instance *controllerv1alpha1.Controller, tlsEnabled bool, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	spec := instance.Spec
 
 	podLabels := controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName)
@@ -66,7 +66,7 @@ func deploymentForController(instance *controllerv1alpha1.Controller, name strin
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        name,
+			Name:        controllers.DeploymentName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: spec.Annotations,
@@ -85,7 +85,7 @@ func deploymentForController(instance *controllerv1alpha1.Controller, name strin
 					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
-					ServiceAccountName:            name,
+					ServiceAccountName:            controllers.ServiceAccountName(instance),
 					HostAliases:                   spec.HostAliases,
 					ImagePullSecrets:              controllers.ImagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,

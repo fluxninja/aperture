@@ -39,7 +39,7 @@ import (
 )
 
 // configMapForAgentConfig prepares the ConfigMap object for the Controller.
-func configMapForControllerConfig(instance *controllerv1alpha1.Controller, name string, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
+func configMapForControllerConfig(instance *controllerv1alpha1.Controller, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
 	jsonConfig, err := json.Marshal(instance.Spec.ConfigSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Controller config to JSON. Error: '%s'", err.Error())
@@ -52,7 +52,7 @@ func configMapForControllerConfig(instance *controllerv1alpha1.Controller, name 
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        name,
+			Name:        controllers.ConfigMapName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: instance.Spec.Annotations,

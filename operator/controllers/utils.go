@@ -371,7 +371,7 @@ func ControllerVolumes(tlsEnabled bool, instance *controllerv1alpha1.Controller)
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 					DefaultMode: pointer.Int32(420),
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: ControllerServiceName,
+						Name: ConfigMapName(instance),
 					},
 				},
 			},
@@ -454,7 +454,22 @@ func SecretName(instance, component string, spec *common.APIKeySecret) string {
 		return name
 	}
 
-	return fmt.Sprintf("%s-%s-apikey", instance, component)
+	return fmt.Sprintf("%s-%s-%s-apikey", AppName, instance, component)
+}
+
+// DeploymentName generates a name for the controller deployment.
+func DeploymentName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
+}
+
+// ConfigMapName generates a name for the controller config map.
+func ConfigMapName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
+}
+
+// ServiceAccountName generate a name for the controller service account.
+func ServiceAccountName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
 }
 
 // SecretDataKey fetches Key for ApiKey secret from config or generates the Key if not present in config.
