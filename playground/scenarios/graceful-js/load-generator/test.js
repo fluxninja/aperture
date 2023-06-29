@@ -4,8 +4,8 @@ import { vu } from "k6/execution";
 import http from "k6/http";
 
 export let vuStages = [
-  { duration: "1m", target: 10 },
-  { duration: "1m", target: 15 },
+  { duration: "2m", target: 5 },
+  { duration: "2m", target: 15 },
   { duration: "1m", target: 20 },
   { duration: "1m", target: 25 },
 ];
@@ -30,7 +30,7 @@ export default function () {
   let userType = __ENV.USER_TYPE;
   let userId = vu.idInTest;
   const url =
-    "http://service1-demo-app.demoapp.svc.cluster.local/workload-prioritization";
+    "http://service1-demo-app.demoapp.svc.cluster.local/api/workload-prioritization";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
@@ -47,11 +47,11 @@ export default function () {
         },
         {
           destination:
-            "service2-demo-app.demoapp.svc.cluster.local/workload-prirotization",
+            "service2-demo-app.demoapp.svc.cluster.local/workload-prioritization",
         },
         {
           destination:
-            "service3-demo-app.demoapp.svc.cluster.local/workload-prirotization",
+            "service3-demo-app.demoapp.svc.cluster.local/workload-prioritization",
         },
       ],
     ],

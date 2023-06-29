@@ -4,21 +4,21 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "policies/rate-limiting",
+      "blueprint_name": "rate-limiting/base",
       "policy_name": "rate-limiting",
-      "values_file": "policies/rate-limiting/rate-limiting.yaml",
+      "values_file": "policies/rate-limiting.yaml",
       "dashboard_mixin_dir": "dashboards/"
     },
     {
-      "blueprint_name": "policies/feature-rollout/average-latency",
+      "blueprint_name": "load-ramping/base",
       "policy_name": "feature-rollout",
-      "values_file": "policies/feature-rollout/feature-rollout.yaml",
+      "values_file": "policies/feature-rollout.yaml",
       "dashboard_mixin_dir": "dashboards/"
     },
     {
-      "blueprint_name": "policies/service-protection/average-latency",
+      "blueprint_name": "load-scheduling/average-latency",
       "policy_name": "workload-prioritization",
-      "values_file": "policies/workload-prioritization/workload-prioritization.yaml",
+      "values_file": "policies/workload-prioritization.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

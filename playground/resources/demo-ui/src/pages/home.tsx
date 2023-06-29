@@ -4,7 +4,7 @@ import {
   MonitorRequestProps,
   RequestRecord,
 } from '../components/monitor-request'
-import { Box, Typography, styled, Tabs, Tab } from '@mui/material'
+import { Box, Typography, styled, Tabs, Tab, RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
   GracefulError,
@@ -16,6 +16,12 @@ import { SuccessIcon } from './success-icon'
 
 export const HomePage: FC = () => {
   const [value, setValue] = useState('1')
+
+  const [userType, setUserType] = useState<'guest' | 'subscriber'>('guest')
+
+  const handleUserTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUserType((event.target as HTMLInputElement).value as 'guest' | 'subscriber');
+  };
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue)
@@ -45,19 +51,11 @@ export const HomePage: FC = () => {
     userId: 'DemoUI',
   }
   const {
-    refetch: refetchSubscriber,
-    isError: isErrorSubscriber,
-    requestRecord: subscriberRequestRecord,
-    isLoading: isLoadingSubscriber,
-    data: subscriberRequestResponse,
-  } = useRequestToEndpoint(reqSpec2)
-  reqSpec2.userType = 'guest'
-  const {
-    refetch: refetchGuest,
-    isError: isErrorGuest,
-    requestRecord: GuestRequestRecord,
-    isLoading: isLoadingGuest,
-    data: GuestRequestResponse,
+    refetch: refetchUser,
+    isError: isErrorUser,
+    requestRecord: userRequestRecord,
+    isLoading: isLoadingUser,
+    data: userRequestResponse,
   } = useRequestToEndpoint(reqSpec2)
 
   return (
@@ -80,40 +78,30 @@ export const HomePage: FC = () => {
           isErrored={isError}
           isLoading={isLoadingRequest}
           errorComponentProps={{
-            url: '/api' + reqSpec.endpoint,
+            url: `/api${reqSpec.endpoint}`,
             requestBody: {},
           }}
           responseData={requestResponse}
         />
       </TabPanel>
       <TabPanel value="2">
+        <RadioGroup aria-label="userType" name="userType" value={userType} onChange={handleUserTypeChange}>
+          <FormControlLabel value="guest" control={<Radio />} label="Guest" />
+          <FormControlLabel value="subscriber" control={<Radio />} label="Subscriber" />
+        </RadioGroup>
         <RequestMonitorPanel
           monitorRequestProps={{
-            requestRecord: subscriberRequestRecord,
-            refetch: refetchSubscriber,
-            userType: 'Subscriber',
+            requestRecord: userRequestRecord,
+            refetch: refetchUser,
+            userType: userType === 'subscriber' ? 'Subscriber' : 'Guest',
           }}
-          isErrored={isErrorSubscriber}
-          isLoading={isLoadingSubscriber}
+          isErrored={isErrorUser}
+          isLoading={isLoadingUser}
           errorComponentProps={{
             url: `/api${reqSpec2.endpoint}`,
             requestBody: {},
           }}
-          responseData={subscriberRequestResponse}
-        />
-        <RequestMonitorPanel
-          monitorRequestProps={{
-            requestRecord: GuestRequestRecord,
-            refetch: refetchGuest,
-            userType: 'Guest',
-          }}
-          isErrored={isErrorGuest}
-          isLoading={isLoadingGuest}
-          errorComponentProps={{
-            url: '/api' + reqSpec2.endpoint,
-            requestBody: {},
-          }}
-          responseData={GuestRequestResponse}
+          responseData={userRequestResponse}
         />
       </TabPanel>
     </TabContext>
@@ -177,6 +165,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
     }
   }, [refetch])
 
+
   // stop making request if isError is true or requestCount is greater than 50
   useEffect(() => {
     updateRecord()
@@ -191,7 +180,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       clearInterval(intervalId)
       return
     }
-  }, [requestCount, intervalId, isError])
+  }, [requestCount, intervalId, isError, reqSpec.userType])
 
   return { isError, refetch: startFetch, requestRecord, isLoading, data }
 }
