@@ -49,10 +49,11 @@ func Module() fx.Option {
 	)
 }
 
-func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API) notifiers.FxOptionsFunc {
+func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API, enforcer *prometheus.PrometheusEnforcer) notifiers.FxOptionsFunc {
 	return func(key notifiers.Key, _ config.Unmarshaller, _ status.Registry) (fx.Option, error) {
 		return fx.Supply(fx.Annotated{Name: promQLJobGroupTag, Target: promQLJobGroup},
 			fx.Annotate(promAPI, fx.As(new(prometheusv1.API))),
+			fx.Annotate(enforcer, fx.As(new(*prometheus.PrometheusEnforcer))),
 		), nil
 	}
 }
@@ -139,7 +140,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
-	enforcer prometheus.PrometheusEnforcer,
+	enforcer *prometheus.PrometheusEnforcer,
 	timeout time.Duration,
 	cb scalarResultCallback,
 ) {
@@ -167,7 +168,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
-	enforcer prometheus.PrometheusEnforcer,
+	enforcer *prometheus.PrometheusEnforcer,
 	timeout time.Duration,
 	cb promResultCallback,
 ) {
@@ -342,7 +343,7 @@ type PromQL struct {
 	// Prometheus API
 	promAPI prometheusv1.API
 	// Prometheus Labels Enforcer
-	enforcer prometheus.PrometheusEnforcer
+	enforcer *prometheus.PrometheusEnforcer
 	// Policy read API
 	policyReadAPI iface.Policy
 	// Current error
@@ -414,8 +415,9 @@ func NewPromQLAndOptions(
 	return promQL, options, nil
 }
 
-func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) error {
+func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API, enforcer *prometheus.PrometheusEnforcer) error {
 	promQL.promAPI = promAPI
+	promQL.enforcer = enforcer
 	promQL.jobExecutor = pje
 
 	return nil

@@ -40,7 +40,7 @@ func NewAlertQueryJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
-	enforcer PrometheusEnforcer,
+	enforcer *PrometheusEnforcer,
 	timeout time.Duration,
 	forDuration time.Duration,
 	alertActiveCallback,

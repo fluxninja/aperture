@@ -29,7 +29,7 @@ func NewScalarQueryJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
-	enforcer PrometheusEnforcer,
+	enforcer *PrometheusEnforcer,
 	timeout time.Duration,
 	resultCallback ScalarResultCallback,
 	errorCallback PromErrorCallback,

@@ -23,7 +23,7 @@ type PromErrorCallback func(error, ...interface{}) (proto.Message, error)
 type promQuery struct {
 	endTimestamp   time.Time
 	promAPI        prometheusv1.API
-	enforcer       PrometheusEnforcer
+	enforcer       *PrometheusEnforcer
 	resultCallback PromResultCallback
 	errorCallback  PromErrorCallback
 	query          string
@@ -39,7 +39,7 @@ func NewPromQueryJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
-	enforcer PrometheusEnforcer,
+	enforcer *PrometheusEnforcer,
 	timeout time.Duration,
 	resultCallback PromResultCallback,
 	errorCallback PromErrorCallback,
