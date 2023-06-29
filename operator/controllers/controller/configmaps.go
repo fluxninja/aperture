@@ -52,7 +52,7 @@ func configMapForControllerConfig(instance *controllerv1alpha1.Controller, schem
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerServiceName,
+			Name:        controllers.ConfigMapName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: instance.Spec.Annotations,
