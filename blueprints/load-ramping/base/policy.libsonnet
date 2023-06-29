@@ -206,11 +206,11 @@ function(cfg, metadata={}) {
     driverAccumulatorStep2
   ),
 
-  local userRolloutControlComponent = spec.v1.Component.withBoolVariable(
-    spec.v1.BoolVariable.withConstantOutput(params.policy.rollout) +
-    spec.v1.BoolVariable.withConfigKey('rollout') +
+  local userStartControlComponent = spec.v1.Component.withBoolVariable(
+    spec.v1.BoolVariable.withConstantOutput(params.policy.start) +
+    spec.v1.BoolVariable.withConfigKey('start') +
     spec.v1.BoolVariable.withOutPorts({
-      output: spec.v1.Port.withSignalName('USER_ROLLOUT_CONTROL'),
+      output: spec.v1.Port.withSignalName('USER_START_CONTROL'),
     }),
   ),
 
@@ -297,7 +297,7 @@ function(cfg, metadata={}) {
         [
           spec.v1.Port.withSignalName('NOT_BACKWARD'),
           spec.v1.Port.withSignalName('NOT_RESET'),
-          spec.v1.Port.withSignalName('USER_ROLLOUT_CONTROL'),
+          spec.v1.Port.withSignalName('USER_START_CONTROL'),
         ]
         +
         (
@@ -350,7 +350,7 @@ function(cfg, metadata={}) {
       + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
       + spec.v1.Circuit.withComponents(
         driverAccumulator.components + [
-          userRolloutControlComponent,
+          userStartControlComponent,
           userResetControlComponent,
           backwardIntentComponent,
           resetIntentComponent,

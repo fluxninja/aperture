@@ -1,5 +1,5 @@
 ---
-title: Protection
+title: Average Latency Feedback
 keywords:
   - policies
   - concurrency
@@ -16,7 +16,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Service Protection with Average Latency Feedback](/reference/blueprints/load-scheduling/average-latency.md)
+[Load Scheduling with Average Latency Feedback](/reference/blueprints/load-scheduling/average-latency.md)
 blueprint.
 
 :::
@@ -38,7 +38,7 @@ in current latency from a baseline historical latency, which serves as an
 indicator of service overload. A deviation of **`1.1`** from the baseline is
 considered as a signal of service overload.
 
-To mitigate service overload, the requests to
+To mitigate service overload, the requests to the
 **`cart-service.prod.svc.cluster.local`** service are passed through a load
 scheduler. The load scheduler reduces the request rate in overload scenarios,
 temporarily placing excess requests in a queue.
@@ -54,7 +54,7 @@ optimized while mitigating the risk of service disruptions due to overload.
 ```
 
 ```yaml
-{@include: ./assets/protection/values.yaml}
+{@include: ./assets/average-latency-feedback/values.yaml}
 ```
 
 ```mdx-code-block
@@ -66,7 +66,7 @@ optimized while mitigating the risk of service disruptions due to overload.
 <p>
 
 ```yaml
-{@include: ./assets/protection/policy.yaml}
+{@include: ./assets/average-latency-feedback/policy.yaml}
 ```
 
 </p>
@@ -74,7 +74,8 @@ optimized while mitigating the risk of service disruptions due to overload.
 
 :::info
 
-[Circuit Diagram](./assets/protection/graph.mmd.svg) for this policy.
+[Circuit Diagram](./assets/average-latency-feedback/graph.mmd.svg) for this
+policy.
 
 :::
 
@@ -91,7 +92,7 @@ limit (`1.1`) of historical latency.
 
 <Zoom>
 
-![Basic Service Protection](./assets/protection/dashboard.png)
+![Basic Service Protection](./assets/average-latency-feedback/dashboard.png)
 
 </Zoom>
 

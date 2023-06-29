@@ -77,7 +77,7 @@ OpenTelemetry
 EnvoyFilter
 [Gg]oodput
 [Ll]aunch
-write_http
 Kubelet
 colocating
 [Oo]perator
+[Ss]caler

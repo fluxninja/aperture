@@ -5,8 +5,8 @@
   "aperture_policies": [
     {
       "blueprint_name": "load-ramping/base",
-      "policy_name": "feature-rollout",
-      "values_file": "policies/feature-rollout.yaml",
+      "policy_name": "load-ramping",
+      "values_file": "policies/load-ramping.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

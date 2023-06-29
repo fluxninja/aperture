@@ -1,18 +1,18 @@
 ---
-title: Load Ramping
+title: Percentage Rollouts
 keywords:
   - tutorial
   - feature-flags
 sidebar_position: 3
-sidebar_label: Load Ramping
+sidebar_label: Percentage Rollouts
 ---
 
 ## Overview
 
-Load ramping is a systematic procedure of gradually introducing a new feature to
-a segment of users. This practice mitigates potential risks associated with a
-full-scale release, allowing the team to gather user feedback and implement
-requisite modifications before launching the feature universally.
+Percentage rollout is a systematic procedure of gradually introducing a new
+feature to a segment of users. This practice mitigates potential risks
+associated with a full-scale release, allowing the team to gather user feedback
+and implement requisite modifications before launching the feature universally.
 
 With Aperture, teams are empowered to control the launch of new features,
 gradually ramp up the load, and adjust in real-time based on service health
@@ -22,7 +22,7 @@ cause any performance regressions, thereby reducing operational risk.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/feature-rollout.mmd}
+{@include: ./assets/percentage-rollouts/percentage-rollouts.mmd}
 ```
 
 </Zoom>

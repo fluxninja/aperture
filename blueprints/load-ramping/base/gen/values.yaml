@@ -19,7 +19,7 @@ policy:
   # The interval between successive evaluations of the Circuit.
   # Type: string
   evaluation_interval: "10s"
-  # Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
+  # Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.
   # Type: aperture.spec.v1.LoadRampParameters
   # Required: True
   load_ramp:
@@ -40,9 +40,9 @@ policy:
   resources:
     flow_control:
       classifiers: []
-  # Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
+  # Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.
   # Type: bool
-  rollout: false
+  start: false
 
 dashboard:
   # Additional filters to pass to each query to Grafana datasource.
@@ -59,7 +59,7 @@ dashboard:
   time_to: "now"
   # Name of the main dashboard.
   # Type: string
-  title: "Aperture Feature Rollout"
+  title: "Aperture Load Ramp"
   datasource:
     # Datasource filter regex.
     # Type: string
