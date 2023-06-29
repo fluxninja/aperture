@@ -12,7 +12,7 @@ import {
   useGracefulRequest,
 } from '@fluxninja-tools/graceful-js'
 import { api, RequestSpec } from '../api'
-import FluxNinjaLogo from '../assets/flux-ninja.svg'
+import { SuccessIcon } from './success-icon'
 
 export const HomePage: FC = () => {
   const [value, setValue] = useState('1')
@@ -96,7 +96,7 @@ export const HomePage: FC = () => {
           isErrored={isErrorSubscriber}
           isLoading={isLoadingSubscriber}
           errorComponentProps={{
-            url: '/api/' + reqSpec2.endpoint,
+            url: `/api${reqSpec2.endpoint}`,
             requestBody: {},
           }}
           responseData={subscriberRequestResponse}
@@ -215,11 +215,12 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
     <HomePageColumnBox>
       <MonitorRequest {...monitorRequestProps} />
     </HomePageColumnBox>
+    <SuccessIcon />
     <HomePageColumnBox>
       {isErrored && !isLoading ? (
         <GracefulError {...errorComponentProps} />
       ) : (
-        <div
+        <Box
           sx={(theme) => ({
             display: 'flex',
             flexDirection: 'column',
@@ -229,10 +230,8 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
           })}
         >
           <Typography variant="h5">{responseData?.data?.message}</Typography>
-          {responseData?.status === 200 && (
-            <img src={FluxNinjaLogo} alt="FluxNinja Logo" />
-          )}
-        </div>
+          {responseData?.status === 200 && <SuccessIcon />}
+        </Box>
       )}
     </HomePageColumnBox>
   </HomePageWrapper>
