@@ -63,6 +63,10 @@ type ServerConstructor struct {
 	ConfigKey string
 	// Additional server Options
 	ServerOptions []grpc.ServerOption
+	// UnaryServerInterceptors add after all built-in unary interceptors
+	UnaryServerInterceptors []grpc.UnaryServerInterceptor
+	// StreamServerInterceptors add after all built-in unary interceptors
+	StreamServerInterceptors []grpc.StreamServerInterceptor
 	// Default Server Config
 	DefaultConfig GRPCServerConfig
 }
@@ -118,12 +122,14 @@ func (constructor ServerConstructor) provideServer(
 		otelgrpc.UnaryServerInterceptor(),
 		validatorUnaryInterceptor(),
 	}
+	unaryServerInterceptors = append(unaryServerInterceptors, constructor.UnaryServerInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
 		grpcServerMetrics.StreamServerInterceptor(),
 		otelgrpc.StreamServerInterceptor(),
 	}
+	streamServerInterceptors = append(streamServerInterceptors, constructor.StreamServerInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
 
 	// add additionalOptions
