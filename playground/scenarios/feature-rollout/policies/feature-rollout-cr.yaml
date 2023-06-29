@@ -1,19 +1,6 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
-  annotations:
-    fluxninja.com/blueprint-name: load-ramping/base
-    fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"dashboard": {"datasource": {"filter_regex": "", "name":
-      "$datasource"}, "refresh_interval": "5s", "time_from": "now-15m", "time_to":
-      "now"}, "policy": {"components": [ ], "drivers": {"average_latency_drivers":
-      [{"criteria": {"forward": {"threshold": 75}, "reset": {"threshold": 75}}, "selectors":
-      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}]},
-      "evaluation_interval": "10s", "load_ramp": {"sampler": {"label_key": "", "selectors":
-      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]},
-      "steps": [{"duration": "0s", "target_accept_percentage": 1}, {"duration": "300s",
-      "target_accept_percentage": 100}]}, "policy_name": "feature-rollout", "resources":
-      {"flow_control": {"classifiers": [ ]}}, "rollout": true}}'
   labels:
     fluxninja.com/validate: "true"
   name: feature-rollout

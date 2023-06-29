@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../../../blueprints/policies/rate-limiting/base/gen/definitions.json
+# yaml-language-server: $schema=../../../../../../blueprints/rate-limiting/base/gen/definitions.json
 policy:
   policy_name: "graphql-rate-limiting"
   rate_limiter:

@@ -48,16 +48,6 @@ func (m *PolicyWrapper) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.PolicyMetadata != nil {
-		size, err := m.PolicyMetadata.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x1a
-	}
 	if m.Policy != nil {
 		size, err := m.Policy.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
@@ -148,10 +138,6 @@ func (m *PolicyWrapper) SizeVT() (n int) {
 	}
 	if m.Policy != nil {
 		l = m.Policy.SizeVT()
-		n += 1 + l + sov(uint64(l))
-	}
-	if m.PolicyMetadata != nil {
-		l = m.PolicyMetadata.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
@@ -279,42 +265,6 @@ func (m *PolicyWrapper) UnmarshalVT(dAtA []byte) error {
 				m.Policy = &v1.Policy{}
 			}
 			if err := m.Policy.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PolicyMetadata", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PolicyMetadata == nil {
-				m.PolicyMetadata = &v1.PolicyMetadata{}
-			}
-			if err := m.PolicyMetadata.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

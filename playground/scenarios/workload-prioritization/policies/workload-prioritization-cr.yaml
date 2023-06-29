@@ -1,20 +1,6 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
-  annotations:
-    fluxninja.com/blueprint-name: load-scheduling/average-latency
-    fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
-      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]},
-      "latency_tolerance_multiplier": 1.1000000000000001}, "policy_name": "workload-prioritization",
-      "resources": {"flow_control": {"classifiers": [{"rules": {"user_type": {"extractor":
-      {"from": "request.http.headers.user-type"}}}, "selectors": [{"control_point":
-      "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}]}}, "service_protection_core":
-      {"adaptive_load_scheduler": {"load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
-      {"match_labels": {"user_type": "guest"}}, "name": "guest", "parameters": {"priority":
-      "50"}}, {"label_matcher": {"match_labels": {"http.request.header.user_type":
-      "subscriber"}}, "name": "subscriber", "parameters": {"priority": "200"}}]},
-      "selectors": [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: workload-prioritization

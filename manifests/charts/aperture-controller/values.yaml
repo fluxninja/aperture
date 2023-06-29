@@ -571,7 +571,7 @@ etcd:
     image:
       registry: docker.io/bitnami
       repository: etcd
-      tag: 3.5
+      tag: 3.5.8-debian-11-r0
       pullPolicy: IfNotPresent
   pdb:
     create: false
