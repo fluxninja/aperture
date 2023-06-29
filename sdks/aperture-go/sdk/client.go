@@ -220,7 +220,7 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 				w.WriteHeader(http.StatusServiceUnavailable)
 				_, perr := fmt.Fprint(w, flow.CheckResponse().GetRejectReason().String())
 				if perr != nil {
-					c.log.Info("Aperture flow control end got error.", "error", err)
+					c.log.Info("Aperture flow control end got error.", "error", perr)
 				}
 			}
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
