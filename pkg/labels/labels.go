@@ -16,6 +16,8 @@ type Labels interface {
 }
 
 // PlainMap implements Labels for a plain map.
+//
+// Nil map is ok.
 type PlainMap map[string]string
 
 // Get implements FlowLabels.
