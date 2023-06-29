@@ -13,7 +13,7 @@ type PrometheusLabel struct {
 // +kubebuilder:object:generate=true
 type PrometheusConfig struct {
 	// A list of labels to be attached to every query
-	Labels []PrometheusLabel `json:"labels"`
+	Labels []PrometheusLabel `json:"labels,omitempty"`
 	// Address of the Prometheus server
 	Address string `json:"address" validate:"required,hostname_port|url|fqdn"`
 }

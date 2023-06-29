@@ -1301,7 +1301,7 @@ definitions:
                     $ref: '#/definitions/PrometheusLabel'
                 type: array
                 x-go-name: Labels
-                x-go-tag-json: labels
+                x-go-tag-json: labels,omitempty
         required:
             - address
         title: PrometheusConfig holds configuration for Prometheus Server.
