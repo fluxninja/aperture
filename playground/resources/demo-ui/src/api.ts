@@ -9,7 +9,7 @@ export const api = axios.create({
 export interface RequestSpec {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE'
   endpoint: string
-  userType: 'subscriber' | 'guest' | 'crawler' | 'executive'
+  userType: 'subscriber' | 'guest' | 'crawler' | 'user'
   userId: string
-  body?: any,
+  body?: any
 }

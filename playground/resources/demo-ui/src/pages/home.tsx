@@ -12,6 +12,7 @@ import {
   useGracefulRequest,
 } from '@fluxninja-tools/graceful-js'
 import { api, RequestSpec } from '../api'
+import FluxNinjaLogo from '../assets/flux-ninja.svg'
 
 export const HomePage: FC = () => {
   const [value, setValue] = useState('1')
@@ -24,8 +25,8 @@ export const HomePage: FC = () => {
   const reqSpec: RequestSpec = {
     method: 'GET',
     endpoint: '/rate-limit',
-    userType: 'executive',
-    userId: 'CEO',
+    userType: 'user',
+    userId: 'DemoUI',
   }
   // Request to rate-limit endpoint with Guest user
   const {
@@ -38,16 +39,17 @@ export const HomePage: FC = () => {
 
   // Request to workload-prioritization endpoint with Guest user and Subscriber user
   const reqSpec2: RequestSpec = {
-    method: 'POST',
+    method: 'GET',
     endpoint: '/workload-prioritization',
     userType: 'subscriber',
-    userId: 'Test',
+    userId: 'DemoUI',
   }
   const {
     refetch: refetchSubscriber,
     isError: isErrorSubscriber,
     requestRecord: subscriberRequestRecord,
     isLoading: isLoadingSubscriber,
+    data: subscriberRequestResponse,
   } = useRequestToEndpoint(reqSpec2)
   reqSpec2.userType = 'guest'
   const {
@@ -55,19 +57,24 @@ export const HomePage: FC = () => {
     isError: isErrorGuest,
     requestRecord: GuestRequestRecord,
     isLoading: isLoadingGuest,
+    data: GuestRequestResponse,
   } = useRequestToEndpoint(reqSpec2)
 
   return (
     <TabContext value={value}>
-      <TabList onChange={handleChange} aria-label="FluxNinja Scenarios" variant="fullWidth">
-        <Tab label="Rate Limit" value="1"/>
+      <TabList
+        onChange={handleChange}
+        aria-label="FluxNinja Scenarios"
+        variant="fullWidth"
+      >
+        <Tab label="Rate Limit" value="1" />
         <Tab label="Workload Prioritization" value="2" />
       </TabList>
       <TabPanel value="1">
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: requestRecord,
-            userType: 'FluxNinja Executive',
+            userType: 'User',
             refetch,
           }}
           isErrored={isError}
@@ -92,7 +99,7 @@ export const HomePage: FC = () => {
             url: '/api/' + reqSpec2.endpoint,
             requestBody: {},
           }}
-          responseData={200}
+          responseData={subscriberRequestResponse}
         />
         <RequestMonitorPanel
           monitorRequestProps={{
@@ -106,7 +113,7 @@ export const HomePage: FC = () => {
             url: '/api' + reqSpec2.endpoint,
             requestBody: {},
           }}
-          responseData={200}
+          responseData={GuestRequestResponse}
         />
       </TabPanel>
     </TabContext>
@@ -119,33 +126,31 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null) // interval id state, used to clear interval
 
   const { isError, refetch, error, data, isRetry, isLoading } =
-
-  useGracefulRequest<'Axios'>({
-    typeOfRequest: 'Axios',
-    requestFnc: () => {
-      if (reqSpec.method === 'POST') {
-        return api.post(reqSpec.endpoint, reqSpec.body, {
-          headers: {
-            'User-Id': reqSpec.userId,
-            'User-Type': reqSpec.userType,
-          },
-        })
-      } else if (reqSpec.method === 'GET') {
-        return api.get(reqSpec.endpoint, {
-          headers: {
-            'User-Id': reqSpec.userId,
-            'User-Type': reqSpec.userType,
-          },
-        })
-      } else {
-        throw new Error(`Invalid method: ${reqSpec.method}`)
-      }
-    },
-    options: {
-      disabled: true,
-    },
-  });
-
+    useGracefulRequest<'Axios'>({
+      typeOfRequest: 'Axios',
+      requestFnc: () => {
+        if (reqSpec.method === 'POST') {
+          return api.post(reqSpec.endpoint, reqSpec.body, {
+            headers: {
+              'User-Id': reqSpec.userId,
+              'User-Type': reqSpec.userType,
+            },
+          })
+        } else if (reqSpec.method === 'GET') {
+          return api.get(reqSpec.endpoint, {
+            headers: {
+              'User-Id': reqSpec.userId,
+              'User-Type': reqSpec.userType,
+            },
+          })
+        } else {
+          throw new Error(`Invalid method: ${reqSpec.method}`)
+        }
+      },
+      options: {
+        disabled: true,
+      },
+    })
 
   // update record state if request counter is not 0
   const updateRecord = useCallback(() => {
@@ -216,16 +221,17 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
       ) : (
         <div
           sx={(theme) => ({
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
             color: theme.palette.grey[400],
           })}
         >
-          <Typography variant="h5">{responseData?.data?.role}</Typography>
-          <Typography variant="h5">{responseData?.data?.name}</Typography>
-          <Typography variant="h5">{responseData?.data?.education}</Typography>
+          <Typography variant="h5">{responseData?.data?.message}</Typography>
+          {responseData?.status === 200 && (
+            <img src={FluxNinjaLogo} alt="FluxNinja Logo" />
+          )}
         </div>
       )}
     </HomePageColumnBox>

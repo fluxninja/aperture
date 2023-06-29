@@ -54,3 +54,6 @@ policy:
       selectors:
         - control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
+          label_matcher:
+            match_labels:
+              http.path: /api/workload-prioritization

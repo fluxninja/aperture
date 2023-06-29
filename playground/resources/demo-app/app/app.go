@@ -60,6 +60,11 @@ type SimpleService struct {
 	cpuLoadPercentage int           // Percentage of CPU to be loaded
 }
 
+// ResponseBody is a response body for returning a response to all requests made on api endpoints
+type ResponseBody struct {
+	Message string `json:"message"`
+}
+
 // NewSimpleService creates a SimpleService instance.
 func NewSimpleService(
 	hostname string,
@@ -177,10 +182,9 @@ func (ss SimpleService) Run() error {
 	fs := http.FileServer(http.Dir("./public"))
 
 	http.Handle("/ui/", http.StripPrefix("/ui/", fs))
-	// http.Handle("/api/rate-limit", handlerFunc(handler))
-	http.HandleFunc("/api/rate-limit", rateLimitedHandler)
-	http.Handle("/api/feature-rollout", handlerFunc(handler))
-	http.Handle("/api/workload-prioritization", handlerFunc(handler))
+	http.HandleFunc("/api/rate-limit", apiEndpointHandler)
+	http.HandleFunc("/api/feature-rollout", apiEndpointHandler)
+	http.HandleFunc("/api/workload-prioritization", apiEndpointHandler)
 	http.Handle("/request", handlerFunc(handler))
 
 	address := fmt.Sprintf(":%d", ss.port)
@@ -190,44 +194,31 @@ func (ss SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
-// RateLimitResponseBody is a response body for rate limit endpoint.
-type RateLimitResponseBody struct {
-	Role      string `json:"role"`
-	Name      string `json:"name"`
-	Education string `json:"education"`
-}
+func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
 
-func rateLimitedHandler(w http.ResponseWriter, r *http.Request) {
-	// Extract info from request headers, if user_id is CEO, CTO, COO return so and so info in the response message
-	userID := r.Header.Get("User-Id")
-	responseBody := RateLimitResponseBody{}
+	// Extract baggage and trace context from headers
+	ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
+	// Start a new span (not needed if we want "just passthrough")
+	ctx, span := otel.Tracer(libraryName).Start(ctx, "ServeHTTP")
+	defer span.End()
 
-	if userID == "CEO" {
-		responseBody.Role = "CEO"
-		responseBody.Name = "Harjot Gill"
-		responseBody.Education = "MSc. Computer Science UPenn"
-	} else if userID == "CTO" {
-		responseBody.Role = "CTO"
-		responseBody.Name = "Tanveer Gill"
-		responseBody.Education = "MSc. Computer Science UPenn"
-	} else if userID == "COO" {
-		responseBody.Role = "COO"
-		responseBody.Name = "Jai Desai"
-		responseBody.Education = "MSc. Computer Science USC"
-	} else {
-		responseBody.Role = "Not supported yet"
-		responseBody.Name = "Foo"
-		responseBody.Education = "Bar"
+	responseBody := ResponseBody{
+		Message: "Request accepted",
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	err := json.NewEncoder(w).Encode(responseBody)
 	if err != nil {
-		log.Println("Error encoding JSON:", err)
+		log.Autosample().Error().Err(err).Msg("Error encoding JSON")
+		span.SetStatus(codes.Error, "rejected")
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+	span.SetStatus(codes.Ok, "accepted")
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
 
 func getOrCreateCounter(userID, userType string) *Counter {
