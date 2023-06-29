@@ -23,13 +23,24 @@ Get image tag for operator.
 {{ include "agent-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $) }}
 */}}
 {{- define "agent-operator.image" -}}
-{{- $tag := get .image "tag" -}}
-{{- $newImage := .image -}}
-{{- if (not $tag) -}}
-    {{- $tag = trimPrefix "v" .context.Chart.AppVersion -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- if not (empty $globalAzure) -}}
+    {{- $out := "" -}}
+    {{- if  .operator -}}
+        {{- $out = (printf "%s/%s@%s" .context.Values.global.azure.images.operator.registry  .context.Values.global.azure.images.operator.image .context.Values.global.azure.images.operator.digest) -}}
+    {{- else -}}
+        {{- $out = (printf "%s/%s@%s" .context.Values.global.azure.images.agent.registry  .context.Values.global.azure.images.agent.image .context.Values.global.azure.images.agent.digest) -}}
+    {{- end -}}
+    {{ print $out }}
+{{- else -}}
+    {{- $tag := get .image "tag" -}}
+    {{- $newImage := .image -}}
+    {{- if (not $tag) -}}
+        {{- $tag = trimPrefix "v" .context.Chart.AppVersion -}}
+    {{- end -}}
+    {{- $_ := set $newImage "tag" $tag -}}
+    {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
 {{- end -}}
-{{- $_ := set $newImage "tag" $tag -}}
-{{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
 {{- end -}}
 
 {{/*

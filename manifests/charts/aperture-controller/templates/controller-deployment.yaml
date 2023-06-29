@@ -59,7 +59,7 @@ spec:
       initContainers:
         {{- if and .Values.etcd.enabled .Values.etcd.initContainer.enabled }}
         - name: wait-for-etcd
-          image: {{ include "common.images.image" (dict "imageRoot" .Values.etcd.initContainer.image "global" .Values.global) }}
+          image: {{- include "etcd.initContainer.image" (dict "image" .Values.etcd.initContainer.image "context" . $) }}
           imagePullPolicy: {{ .Values.etcd.initContainer.image.pullPolicy }}
           {{- if .Values.etcd.initContainer.resources }}
           resources: {{- toYaml .Values.etcd.initContainer.resources | nindent 12 }}
@@ -78,7 +78,7 @@ spec:
         {{- end }}
         {{- if and .Values.prometheus.enabled .Values.prometheus.initContainer.enabled }}
         - name: wait-for-prometheus
-          image: {{ include "common.images.image" (dict "imageRoot" .Values.prometheus.initContainer.image "global" .Values.global) }}
+          image: {{- include "prometheus.initContainer.image" (dict "image" .Values.prometheus.initContainer.image "context" . $) }}
           imagePullPolicy: {{ .Values.prometheus.initContainer.image.pullPolicy }}
           {{- if .Values.prometheus.initContainer.resources }}
           resources: {{- toYaml .Values.prometheus.initContainer.resources | nindent 12 }}

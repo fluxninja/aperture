@@ -23,13 +23,54 @@ Get image tag for operator.
 {{ include "controller-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
 */}}
 {{- define "controller-operator.image" -}}
-{{- $tag := get .image "tag" -}}
-{{- $newImage := .image -}}
-{{- if (not $tag) -}}
-    {{- $tag = trimPrefix "v" .context.Chart.AppVersion -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- if not (empty $globalAzure) -}}
+    {{- $azureImage := "" -}}
+    {{- if  .operator -}}
+        {{- $azureImage = (printf "%s/%s@%s" .context.Values.global.azure.images.operator.registry  .context.Values.global.azure.images.operator.image .context.Values.global.azure.images.operator.digest) -}}
+    {{- else -}}
+        {{- $azureImage = (printf "%s/%s@%s" .context.Values.global.azure.images.controller.registry  .context.Values.global.azure.images.controller.image .context.Values.global.azure.images.controller.digest) -}}
+    {{- end -}}
+    {{ print $azureImage }}
+{{- else -}}
+    {{- $tag := get .image "tag" -}}
+    {{- $newImage := .image -}}
+    {{- if (not $tag) -}}
+        {{- $tag = trimPrefix "v" .context.Chart.AppVersion -}}
+    {{- end -}}
+    {{- $_ := set $newImage "tag" $tag -}}
+    {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
 {{- end -}}
-{{- $_ := set $newImage "tag" $tag -}}
-{{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
+{{- end -}}
+
+{{/*
+Check of etcd at global level.
+{{ include "etcd.initContainer.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
+*/}}
+{{- define "etcd.initContainer.image" -}}
+{{- $globalAzure := get .context.Values.global.azure.images "etcd" -}}
+{{- if not (empty $globalAzure) -}}
+    {{- $azureImage := (printf "%s/%s@%s" .context.Values.global.azure.images.etcd.registry  .context.Values.global.azure.images.etcd.image .context.Values.global.azure.images.etcd.digest) -}}
+    {{ print $azureImage }}
+{{- else -}}
+    {{- $newImage := .image -}}
+    {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Check of prometheus at global level.
+{{ include "etcd.initContainer.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
+*/}}
+{{- define "prometheus.initContainer.image" -}}
+{{- $globalAzure := get .context.Values.global.azure.images "prometheus" -}}
+{{- if not (empty $globalAzure) -}}
+    {{- $azureImage := (printf "%s/%s@%s" .context.Values.global.azure.images.prometheus.registry  .context.Values.global.azure.images.prometheus.image .context.Values.global.azure.images.prometheus.digest) -}}
+    {{ print $azureImage }}
+{{- else -}}
+    {{- $newImage := .image -}}
+    {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
+{{- end -}}
 {{- end -}}
 
 {{/*

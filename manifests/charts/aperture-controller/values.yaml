@@ -1,6 +1,16 @@
 ## @section Global Parameters
 ##
 global:
+  azure:
+    images:
+      operator:
+        registry: docker.io
+        image: fluxninja/aperture-operator
+        digest: sha256:156c72d8b5761d4eef890d8ffe56bbeb7758a6492bf9998339adfd264a7e78c4
+      controller:
+        registry: docker.io
+        image: fluxninja/aperture-controller
+        digest: sha256:2c401906bca77e500d37dca2606e8fb65f728301de816192eda87072c637c1a8
   ## @param global.imageRegistry Global Docker image registry
   ##
   imageRegistry: ~

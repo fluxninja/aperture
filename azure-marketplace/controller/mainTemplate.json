@@ -2,11 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "globalImageRegistery": {
-      "type": "string",
-      "defaultValue": "marketplace.azurecr.io",
+    "autoUpgradeMinorVersion": {
+      "defaultValue": false,
+      "type": "Bool",
       "metadata": {
-        "description": "The name of the global registery."
+        "description": "Allow auto upgrade of minor version for the extension."
       }
     },
     "extensionResourceName": {
@@ -34,8 +34,12 @@
         "description": "The location of AKS resource."
       }
     },
-    "dynamicSettings": {
-      "type": "array"
+    "inputs": {
+      "defaultValue": [],
+      "type": "Array",
+      "metadata": {
+        "description": "Parameters for configuring the extension."
+      }
     },
     "vmSize": {
       "type": "String",
@@ -126,33 +130,25 @@
     }
   },
   "variables": {
-    "plan-name": "DONOTMODIFY",
-    "plan-publisher": "DONOTMODIFY",
-    "plan-offerID": "DONOTMODIFY",
-    "releaseTrain": "DONOTMODIFY",
-    "clusterExtensionTypeName": "DONOTMODIFY",
+    "plan-name": "main",
+    "plan-publisher": "fluxninja",
+    "plan-offerID": "controller-cnab",
+    "releaseTrain": "stable",
+    "clusterExtensionTypeName": "Fluxninja.ControllerMain",
 
     "copy": [
       {
-        "count": "[length(parameters('dynamicSettings'))]",
-        "input": "[createObject(concat('labels.', parameters('dynamicSettings')[copyIndex('dynamicSettings_array')].labelName), union(createObject('value', ''), parameters('dynamicSettings')[copyIndex('dynamicSettings_array')]).labelValue)]",
-        "name": "dynamicSettings_array"
+        "count": "[length(parameters('inputs'))]",
+        "input": "[createObject(concat('labels.', parameters('inputs')[copyIndex('inputs_array')].labelName), union(createObject('value', ''), parameters('inputs')[copyIndex('inputs_array')]).labelValue)]",
+        "name": "inputs_array"
       }
     ],
-    "dynamicSettings_string": "[concat(string(variables('dynamicSettings_array')), '_END_')]",
-    "dynamicSettings_trim1": "[replace(variables('dynamicSettings_string'), '[{\"', '{\"')]",
-    "dynamicSettings_trim2": "[replace(variables('dynamicSettings_trim1'), '}]_END_', '}')]",
-    "dynamicSettings_trim3": "[replace(variables('dynamicSettings_trim2'), '},{\"', ',\"')]",
-    "dynamicSettings_json": "[json(variables('dynamicSettings_trim3'))]",
+    "inputs": "[if(empty(parameters('inputs')), createObject(), json(variables('inputs_t3')))]",
 
-    "is_dynamicSettings_empty": "[or(variables('is_dynamicSettings_defaultState'), empty(parameters('dynamicSettings')))]",
-    "is_dynamicSettings_defaultState": "[equals(replace(string(parameters('dynamicSettings')), ' ', ''), '[{\"labelName\":\"\",\"labelValue\":\"\"}]')]",
-
-    "mandatory_setting_inputs": {
-      "global.imageRegistry": "[parameters('globalImageRegistery')]"
-    },
-
-    "configurationSettings": "[if(variables('is_dynamicSettings_empty'), variables('mandatory_setting_inputs'), union(variables('mandatory_setting_inputs'), variables('dynamicSettings_json') ))]"
+    "inputs_string": "[concat(string(variables('inputs_array')), '_END_')]",
+    "inputs_t1": "[replace(variables('inputs_string'), '[{\"', '{\"')]",
+    "inputs_t2": "[replace(variables('inputs_t1'), '}]_END_', '}')]",
+    "inputs_t3": "[replace(variables('inputs_t2'), '},{\"', ',\"')]"
   },
   "resources": [
     {
@@ -219,9 +215,9 @@
       "name": "[parameters('extensionResourceName')]",
       "properties": {
         "extensionType": "[variables('clusterExtensionTypeName')]",
-        "autoUpgradeMinorVersion": true,
+        "autoUpgradeMinorVersion": "[parameters('autoUpgradeMinorVersion')]",
         "releaseTrain": "[variables('releaseTrain')]",
-        "configurationSettings": "[variables('configurationSettings')]",
+        "configurationSettings": "[variables('inputs')]",
         "configurationProtectedSettings": {}
       },
       "plan": {

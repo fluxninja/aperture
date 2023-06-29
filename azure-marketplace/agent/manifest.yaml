@@ -5,7 +5,7 @@ version: 1.0.1 #Must be in the format of #.#.#
 helmChart: "../../manifests/charts/aperture-agent/"
 clusterArmTemplate: "./mainTemplate.json"
 uiDefinition: "./createUIDefinition.json"
-registryServer: "youracr.azurecr.io"
+registryServer: "fluxninja.azurecr.io"
 extensionRegistrationParameters:
   defaultScope: "cluster" # cluster or namespace
   namespace: "aperture-agent"

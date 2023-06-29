@@ -191,7 +191,7 @@
                 }
               },
               {
-                "name": "dynamicSettings",
+                "name": "inputs",
                 "type": "Microsoft.Common.EditableGrid",
                 "label": "Additional labels",
                 "toolTip": "Labels",
@@ -247,7 +247,7 @@
       "vmSize": "[steps('clusterDetails').newClusterSection.vmSize]",
       "vmEnableAutoScale": "[steps('clusterDetails').newClusterSection.enableAutoScaling]",
       "vmCount": "[steps('clusterDetails').newClusterSection.vmCount]",
-      "dynamicSettings": "[steps('controllerDetails').dynamicSettingsSection.dynamicSettings]"
+      "inputs": "[steps('controllerDetails').dynamicSettingsSection.inputs]"
     }
   }
 }

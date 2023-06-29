@@ -14,8 +14,16 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
   {{- end }}
 spec:
+  {{- $globalAzure := get .Values.global "azure" }}
+  {{- if not (empty $globalAzure) }}
+  image:
+    registry: {{ .Values.global.azure.images.controller.registry }}
+    repository: {{ .Values.global.azure.images.controller.image }}
+    tag: {{ .Values.global.azure.images.controller.digest }}
+  {{- else }}
   image: {{ omit .Values.controller.image "tag" | toYaml | nindent 4 }}
     tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.controller.image.tag | quote }}
+  {{- end }}
   {{- if .Values.controller.service.annotations }}
   service:
     annotations: {{ .Values.controller.service.annotations | toYaml | nindent 6 }}
@@ -129,7 +137,7 @@ spec:
   initContainers:
     {{- if and .Values.etcd.enabled .Values.etcd.initContainer.enabled }}
     - name: wait-for-etcd
-      image: {{ include "common.images.image" (dict "imageRoot" .Values.etcd.initContainer.image "global" .Values.global) }}
+      image: {{ include "etcd.initContainer.image" (dict "image" .Values.etcd.initContainer.image "context" . $) }}
       imagePullPolicy: {{ .Values.etcd.initContainer.image.pullPolicy }}
       {{- if .Values.etcd.initContainer.resources }}
       resources: {{- toYaml .Values.etcd.initContainer.resources | nindent 8 }}
@@ -150,7 +158,7 @@ spec:
     {{- end }}
     {{- if and .Values.prometheus.enabled .Values.prometheus.initContainer.enabled }}
     - name: wait-for-prometheus
-      image: {{ include "common.images.image" (dict "imageRoot" .Values.prometheus.initContainer.image "global" .Values.global) }}
+      image: {{ include "prometheus.initContainer.image" (dict "image" .Values.prometheus.initContainer.image "context" . $) }}
       imagePullPolicy: {{ .Values.prometheus.initContainer.image.pullPolicy }}
       {{- if .Values.etcd.initContainer.resources }}
       resources: {{- toYaml .Values.prometheus.initContainer.resources | nindent 8 }}
