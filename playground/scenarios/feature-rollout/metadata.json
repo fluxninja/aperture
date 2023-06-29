@@ -4,7 +4,7 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "feature-rollout/base",
+      "blueprint_name": "load-ramping/base",
       "policy_name": "feature-rollout",
       "values_file": "policies/feature-rollout.yaml",
       "dashboard_mixin_dir": "dashboards/"

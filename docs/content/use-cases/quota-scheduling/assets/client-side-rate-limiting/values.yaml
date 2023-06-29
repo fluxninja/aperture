@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=../../../../../../blueprints/policies/quota-scheduling/gen/definitions.json
+# Generated values file for quota-scheduling blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/quota-scheduling
+policy:
+  policy_name: client-side-rate-limiting
+  quota_scheduler:
+    bucket_capacity: 500
+    fill_amount: 25
+    selectors:
+      - control_point: some-external-api
+    rate_limiter:
+      label_key: api_key
+      interval: 1s
+      lazy_sync:
+        enabled: false
+        num_sync: 4
+    scheduler:
+      workloads:
+        - label_matcher:
+            match_labels:
+              call_type: background
+          parameters:
+            priority: 50
+        - label_matcher:
+            match_labels:
+              call_type: interactive
+          parameters:
+            priority: 200

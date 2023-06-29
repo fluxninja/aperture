@@ -1,0 +1,3 @@
+blueprint: Service Protection Policy for PostgreSQL.
+sources:
+  policy: load-scheduling/postgresql/policy.libsonnet
