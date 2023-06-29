@@ -8,7 +8,7 @@ which could be an API call, a feature, or a database query. This is akin to an
 [OpenTelemetry span][span]. Each flow is tagged with a set of 'Flow Labels',
 which are key-value pairs. For instance, if a flow is tagged with
 `user_tier:gold`, `user_tier` is the label key and `gold` is the label value.
-`user_tier` is a Flow Label.
+`user_tier` is a flow label.
 
 _Example:_
 
@@ -22,9 +22,9 @@ _Example:_
 
 ## Usage of Flow Labels
 
-Flow Labels serve various purposes within Aperture:
+Flow labels serve various purposes within Aperture:
 
-- The [_Selector_][selectors] can select flows based on _Flow Labels_, to narrow
+- The [_Selector_][selectors] can select flows based on flow labels, to narrow
   the scope of [_Classifiers_][classifier], [_Flux Meters_][flux-meter] and so
   on.
 - They assist in mapping a flow to a [Workload][workload].
@@ -93,7 +93,7 @@ takes an explicit `labels` map in the `Check()` call.
 
 ## Live Preview of Flow Labels
 
-You can discover the labels flowing through services and control points using
+Discover labels flowing through services and control points using
 [`aperturectl`][aperturectl].
 
 For example:
@@ -210,9 +210,9 @@ For _Classifier_ created labels, you can disable this behavior by setting
 
 [selectors]: ./selector.md
 [classifier]: ./classifier.md
-[workload]: ./scheduler.md#workload
+[workload]: ./scheduler/scheduler.md#workload
 [ratelimiter]: ./rate-limiter.md
-[scheduler]: ./scheduler.md#scheduler
+[scheduler]: ./scheduler/scheduler.md#scheduler
 [flux-meter]: ./flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
@@ -224,6 +224,6 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [gateways]: /integrations/gateway/gateway.md
 [istio]: /integrations/istio/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md
+[aperturectl]: ../reference/aperturectl/flow-control/preview/
 [label-matcher]: ./selector.md#label-matcher
 [otel-baggage]: https://opentelemetry.io/docs/concepts/signals/baggage/

@@ -32,7 +32,7 @@ application, and maintaining prioritized access for critical workloads during
 external rate limiting is of paramount importance. The policy leverages the
 [`Quota Scheduler`](/reference/blueprints/policies/quota-scheduler.md)
 Blueprint, which brings together the token bucket rate limiting and a
-[Weighted Fair Queuing (WFQ)](/concepts/scheduler.md#scheduler) based Workload
+[Weighted Fair Queuing (WFQ)](/concepts/scheduler/scheduler.md) based Workload
 Scheduler to balance quota limits and priority-based access efficiently.
 
 ## Policy Configuration

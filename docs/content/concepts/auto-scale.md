@@ -1,6 +1,6 @@
 ---
 title: Auto Scale
-sidebar_position: 10
+sidebar_position: 12
 keywords:
   - auto-scaling
   - Autoscaling
@@ -39,14 +39,14 @@ ensuring optimal performance while minimizing infrastructure costs.
 
 ## Insertion
 
-Aperture Agents interface with cloud infrastructure APIs, such as Kubernetes
+Aperture agents interface with cloud infrastructure APIs, such as Kubernetes
 API, to discover, monitor, and scale infrastructure resources. The Aperture
-Controller uses the information from the Agents to make informed auto-scaling
-decisions that are then acted on by the Agents.
+Controller uses the information from the agents to make informed auto-scaling
+decisions that are then acted on by the agents.
 
-In an Agent group, the leader Agent is responsible for interfacing with the
+In an agent group, the leader agent is responsible for interfacing with the
 cloud infrastructure APIs. For example, by maintaining a watch on scalable
-Kubernetes resources, the Agent group leader can monitor changes to the resource
+Kubernetes resources, the agent group leader can monitor changes to the resource
 status, such as the number of replicas configured and currently deployed. The
 up-to-date information is then used by the Aperture Controller to make informed
 auto-scaling decisions.
@@ -63,9 +63,9 @@ auto-scaling decisions.
 
 Components involved in the auto-scaling process:
 
-:::info
+:::info See also
 
-See also [_Auto Scaler_ reference](/reference/configuration/spec.md#auto-scaler)
+[_Auto Scaler_ reference](/reference/configuration/spec.md#auto-scaler)
 
 :::
 
@@ -82,15 +82,15 @@ availability.
   either scaling in or out, and defines the criteria that determine when to
   scale. Controllers process one or more input signals to compute a desired
   scale value. By configuring Controllers, you can fine-tune the auto-scaling
-  behavior to meet the specific needs of your service. See
+  behavior to meet the specific scaling of a service. See
   [Gradient Controller](#gradient-controller) for more details.
 - A scale-in Controller is active only when its output is smaller than the
   actual scale value. A scale-out Controller is active only when its output is
   larger than the actual scale value. For example, the actual number of replicas
   of a Kubernetes Deployment. An inactive Controller does not contribute to the
   scaling decision.
-- Scale decisions from multiple active Controllers are combined by the Auto
-  Scaler by taking the largest scale value.
+- Scale decisions from multiple active Controllers are combined by the _Auto
+  Scaler_ by taking the largest scale value.
 - Maximum scale-in and scale-out step sizes: The amount of scaling that happens
   at a time is limited by the maximum scale-in and scale-out step sizes. This is
   to prevent large-scale changes from happening at once.
@@ -100,8 +100,9 @@ availability.
   the changes gradually and observe their effect to prevent overdoing either
   scale-in or scale-out.
   - Scale-in cooldown: The _Auto Scaler_ won't scale-in again until the cooldown
-    period has elapsed. If there is a scale-out decision, the scale-in cooldown
-    is reset. This immediately corrects excessive scale-in.
+    period has elapsed. If there is a scale-out decision, it is allowed to
+    proceed, effectively resetting the scale-in cooldown. Essentially, scale out
+    is given a higher priority than scale in to maintain safe operations.
   - Scale-out cooldown: The _Auto Scaler_ won't scale-out again until the
     cooldown period has elapsed. If there is a scale-out decision which is much
     larger than the current scale value, the scale-out cooldown is reset. This
@@ -131,9 +132,9 @@ $$
 
 ## Pod Scaler
 
-:::info
+:::info See also
 
-See also [_Pod Scaler_ reference](/reference/configuration/spec.md#pod-scaler)
+[_Pod Scaler_ reference](/reference/configuration/spec.md#pod-scaler)
 
 :::
 
@@ -144,15 +145,15 @@ underlying resources based on the value of the signal. To complete the feedback
 loop, the component emits output signals for the number of configured replicas
 and the actual number of replicas deployed.
 
-A _Pod Scaler_ component is not required if you are using the high-level _Auto
-Scaler_ component. It defines multiple scale in, scale out controllers and takes
-care of instantiating the _Pod Scaler_ component.
+A _Pod Scaler_ component can be used standalone, but is not required to be
+defined explicitly if the high-level [_Auto Scaler_](#auto-scaler) component is
+used. _Auto Scaler_ component allows multiple scale in, scale out controllers
+and takes care of instantiating the _Pod Scaler_ component internally.
 
 ## Kubernetes Object Selector
 
-:::info
+:::info See also
 
-See also
 [_Kubernetes Object Selector_ reference](/reference/configuration/spec.md#kubernetes-object-selector)
 
 :::
@@ -164,7 +165,7 @@ Object Selector identifies a resource in the Kubernetes cluster.
 
 A _Kubernetes Object Selector_ consists of:
 
-- _Agent Group_: The Agent Group identifies Aperture Agents where the component
+- _Agent Group_: The agent group identifies Aperture agents where the component
   gets applied.
 - API Version: The Kubernetes API version of the resource.
 - Kind: The Kind of the Kubernetes resource, such as Deployment, ReplicaSet,
@@ -172,11 +173,41 @@ A _Kubernetes Object Selector_ consists of:
 - Name: The name of the Kubernetes resource.
 - Namespace: The Kubernetes namespace of the resource.
 
-:::info Control Points Discovery
+## Live Preview of Kubernetes Control Points
 
 The Kubernetes resources identified by a _Kubernetes Object Selector_ are called
 _Kubernetes Control Points_. These are a subset of resources in a Kubernetes
-cluster resource that can be scaled in or out. Aperture Agents performs
-automated discovery of Kubernetes Control Points in a cluster.
+cluster resource that can be scaled in or out. Aperture agents perform automated
+discovery of Kubernetes Control Points in a cluster.
 
-:::
+Use the
+[`aperturectl auto-scale control-points`](../reference/aperturectl/auto-scale/control-points/)
+CLI command to list active control points.
+
+For example:
+
+```sh
+aperturectl auto-scale control-points --kube
+```
+
+Returns:
+
+```json
+AGENT GROUP   NAME                                                NAMESPACE             KIND
+default       coredns                                             kube-system           Deployment
+default       coredns-5d78c9869d                                  kube-system           ReplicaSet
+default       gateway                                             istio-system          Deployment
+default       gateway-868c757988                                  istio-system          ReplicaSet
+default       istiod                                              istio-system          Deployment
+default       istiod-6d9df7fb7                                    istio-system          ReplicaSet
+default       local-path-provisioner                              local-path-storage    Deployment
+default       local-path-provisioner-6bc4bddd6b                   local-path-storage    ReplicaSet
+default       service1-demo-app                                   demoapp               Deployment
+default       service1-demo-app-7b4bc9bdcd                        demoapp               ReplicaSet
+default       service2-demo-app                                   demoapp               Deployment
+default       service2-demo-app-677bb57574                        demoapp               ReplicaSet
+default       service3-demo-app                                   demoapp               Deployment
+default       service3-demo-app-58656dcf95                        demoapp               ReplicaSet
+default       wavepool-generator                                  demoapp               Deployment
+default       wavepool-generator-5b4578bdd9                       demoapp               ReplicaSet
+```

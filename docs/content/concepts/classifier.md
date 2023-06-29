@@ -1,18 +1,31 @@
 ---
 title: Classifier
-sidebar_position: 5
+sidebar_position: 7
 ---
 
-The _Classifier_ is a component that allows you to create additional [_Flow
-Labels_][label] based on request metadata without requiring any changes to your
-service, If the existing flow labels aren't sufficient.
+:::info See also
+
+[_Classifier_ reference][reference].
+
+:::
+
+A _Classifier_ can be used to create additional [flow labels][label] based on
+request attributes, if the existing flow labels aren't sufficient. _Classifiers_
+are defined using [rules](#rules) based on the [Rego][rego] query language.
+
+_Classifiers_ are available only at _HTTP_ [control points][control-point]. For
+feature-based control points, developers can provide arbitrary flow labels by
+setting baggage or directly as arguments to the `startFlow()` call.
 
 ## Defining a Classifier
 
-To define a Classifier, it needs to be added as a resource in a
-[policy][policies]. It specifies a set of rules to create new flow labels based
-on request metadata. Envoy's [External Authorization][ext-authz] definition is
-used by Aperture to describe the request metadata, specifically the
+To define a _Classifier_, it needs to be added as a resource in a
+[policy][policies]. Like any other flow control component, a _Classifier_ is
+applied only to the flows matching the specified [selectors][selector]
+
+A _Classifier_ defines a set of rules to create new flow labels based on request
+attributes. Envoy's [External Authorization][ext-authz] definition is used by
+Aperture to describe the request attributes, specifically the
 [`AttributeContext`][attr-context].
 
 An example of how the request attributes might look can be seen in the [INPUT
@@ -36,59 +49,35 @@ policy:
                 from: request.http.headers.user-type # HTTP header
 ```
 
-:::note
-
-At _Feature_ [_Control Points_][control-point], developers can already provide
-arbitrary flow labels by setting baggage or directly as arguments to the
-`Check()` call. As flow labels can be effortlessly provided at _Feature_ control
-points by the developers, _Classifiers_ are available only at _HTTP_ control
-points.
-
-:::
-
-Any _Flow Labels_ created through the _Classifier_ are immediately available for
-use in other components at the same [_Control Point_][control-point].
-Additionally, the _Flow Label_ is injected as baggage, so it will be available
-on every subsequent control point too (assuming you have [baggage
-propagation][baggage] configured in your system). If you're a [FluxNinja ARC
-extension][arc] user, such flow label will also be available for analytics.
-
-:::note
-
-Both these behaviors (baggage propagation and inclusion in telemetry) can be
-[disabled][rule].
-
-:::
-
 :::caution
 
-Although Classifier is defined as a resource in a [_Policy_][policies], _Flow
-Labels_ aren't isolated in any way and are shared across policies.
+Although Classifier is defined as a resource in a [policy][policies], flow
+labels aren't isolated in any way and are shared across policies.
 
 :::
 
-## Defining Classifier's Scope {#selectors}
+Any _Flow Labels_ created through the _Classifier_ become available in
+subsequent stages of [flow processing](./flow-lifecycle.md). Additionally, the
+_Flow Label_ is injected as baggage, so it will be available as a flow label in
+downstream flows too (assuming you have [baggage propagation][baggage]
+configured in your system). If [FluxNinja ARC extension][arc] plugin is enabled,
+all flow labels including the ones created through classifier are available in
+traffic analytics.
 
-Each _Classifier_ needs to specify which control point it will be run at. For
-instance, the following selector is for the "ingress" control point at a
-service:
+:::note
 
-```yaml
-selectors:
-  - service: checkout.default.svc.cluster.local
-    control_point: ingress
-```
+The extracted label's baggage propagation and inclusion in traffic analytics can
+be [disabled][rule] in the classifier configuration.
 
-You can be more precise by adding a [_Label Matcher_][label-matcher] and, for
-example, gate the Classifier to particular paths.
+:::
 
 ## Live Previewing Requests Attributes {#live-previewing-requests}
 
 Live previewing of request attributes is a feature that allows real-time
 examination of attributes flowing through services and control points. This can
 be done using the [`aperturectl`][aperturectl] tool, aiding in setting up or
-debugging your Classifier. It provides insights into the data your Classifier
-will handle, enabling the creation of more effective classification rules.
+debugging a Classifier. It provides insights into the data a Classifier will
+handle, enabling the creation of more effective classification rules.
 
 For example:
 
@@ -159,9 +148,9 @@ Returns:
 }
 ```
 
-Alternatively, you can use the
+Alternatively, use the
 [Introspection API](/reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
-directly on a `aperture-agent` local to the service instances (pods):
+directly on an Aperture agent:
 
 Example:
 
@@ -177,13 +166,12 @@ Rules ([reference][rule])
 
 :::
 
-In addition to the selectors, a Classifier needs to specify classification
-rules. Each classification rule consists of two main components:
+Each classification rule consists of two main components:
 
 - **Flow Label Key**: This is the identifier for the flow label. It is used to
   reference the flow label in other parts of the system.
 - **Extraction Rule**: A rule how to extract the flow label value based on
-  request metadata.
+  request attributes.
 
 There are two ways to specify a classification rule:
 
@@ -194,16 +182,15 @@ There are two ways to specify a classification rule:
 
 The possibility of extracting values from the request body depends on how
 [External Authorization in Envoy][ext-authz-extension] was configured. The
-Sample [Istio Configuration][install-istio] provided by FluxNinja does not
-enable request body buffering by default, as it _might_ break some streaming
-APIs.
+default [Istio Configuration][install-istio] does not enable request body
+buffering, as it _might_ break some streaming APIs.
 
 :::
 
 ### Declarative Extractors {#extractors}
 
 Extractors provide a high-level way to specify how to extract a flow label value
-given HTTP request metadata, eliminating the need to write Rego code. Provided
+given HTTP request attributes, eliminating the need to write Rego code. Provided
 extractors include:
 
 - [Extracting values from headers][extractor]
@@ -297,12 +284,6 @@ rego:
     }
 ```
 
-:::info
-
-For more details and examples, refer to the [Classifier reference][reference].
-
-:::
-
 [ext-authz-extension]:
   https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#config-http-filters-ext-authz
 [ext-authz]:
@@ -318,7 +299,7 @@ For more details and examples, refer to the [Classifier reference][reference].
 [extractor]: /reference/configuration/spec.md#extractor
 [rego-rule]: /reference/configuration/spec.md#rule-rego
 [arc]: /arc/extension.md
-[label-matcher]: ./selector.md#label-matcher
+[selector]: ./selector.md
 [policies]: /concepts/advanced/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:

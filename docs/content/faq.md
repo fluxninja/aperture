@@ -35,9 +35,8 @@ are still benefits of using Aperture:
   – [mesh of Agents is providing distributed counters](/concepts/rate-limiter.md#distributed-counters).
 - Rate-limiting decisions can be made locally on the agent if lazy sync is
   enabled.
-- In addition to Rate Limiter, Aperture also offers
-  [Load Scheduler](/concepts/scheduler.md), which Envoy doesn't have an
-  equivalent of.
+- In addition to Rate Limiter, Aperture also offers [Load
+  Scheduler][Load Scheduler], which Envoy doesn't have an equivalent of.
 
 ### Does Aperture reject requests immediately?
 
@@ -96,7 +95,7 @@ The installation steps are available
 [here](/get-started/installation/agent/bare_metal.md).
 
 [Rate Limiter]: /concepts/rate-limiter.md
-[Load Scheduler]: /concepts/scheduler.md
+[Load Scheduler]: /concepts/scheduler/load-scheduler.md
 [Classifier]: /concepts/classifier.md
 [Flow Label]: /concepts/flow-label.md
 [Aperture Controller]: /get-started/installation/controller/controller.md

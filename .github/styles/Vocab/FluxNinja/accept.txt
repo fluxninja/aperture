@@ -52,13 +52,9 @@ Pub/Sub
 [Aa]uto-scalers?\b
 [Rr]ollouts?\b
 LinkedIn
-Nutanix
-Netsil
 SLAs
 rpm
 performant
-Zalando
-Hotstar
 Linkerd
 [Mm]ultithreaded
 AIMD

@@ -1,11 +1,11 @@
 ---
 title: Circuit
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-:::info
+:::info See also
 
-See also [_Circuit_ reference][circuit-reference]
+[_Circuit_ reference][circuit-reference]
 
 :::
 
@@ -96,19 +96,19 @@ Examples of built-in components include:
     components work in tandem to make the circuit adapt based on conditions.
 - **Controllers**: Controllers are an essential part of a closed loop control
   system. A controller takes as input a signal, a setpoint and emits the
-  suggested value of the Control Variable as output. The aim of the controller
+  suggested value of the control variable as output. The aim of the controller
   is to make the signal achieve the setpoint.
   - [Gradient Controller](/reference/configuration/spec.md#gradient-controller):
     This controller acts on the ratio of setpoint and signal.
 - **Actuators**: Actuators are components which act on signals and interface
   with external systems to perform actions such as throttling and queuing
   traffic, changing rate limits or auto-scaling.
-  - [Concurrency Limiter](/reference/configuration/spec.md#concurrency-limiter):
-    Takes load multiplier as a signal which determines the proportion of Flow
-    concurrency to accept.
-  - [Rate Limiter](/reference/configuration/spec.md#rate-limiter): Take rate
-    limit as a signal which determines the rate of flows handled by that rate
-    limiter.
+  - [Load Scheduler](/reference/configuration/spec.md#load-scheduler): Takes
+    load multiplier as a signal which determines the proportion of tokens to
+    accept relative to past window.
+  - [Rate Limiter](/reference/configuration/spec.md#rate-limiter): Take fill
+    rate and bucket capacity as signals which determines the API rate limit for
+    each user or label value.
 
 [control-system]: https://en.wikipedia.org/wiki/Control_system
 [tick]: #runtime

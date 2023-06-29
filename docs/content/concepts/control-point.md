@@ -1,7 +1,7 @@
 ---
 title: Control Point
 sidebar_label: Control Point
-sidebar_position: 1
+sidebar_position: 2
 keywords:
   - flows
   - services
@@ -15,56 +15,51 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Control Points are key components of Aperture policies, function similarly to
-feature flags but with a broader scope. Specifically, Control Points identify
-critical junctures in your code or data plane—including web servers, service
-meshes, and API gateways—where flow control decisions are made.
-
-Developers have the option to define these Control Points in their code using
-Aperture SDKs, providing precise control over the system's request flow.
-Alternatively, during the integration process with API Gateways or Service
-Meshes, Control Points are automatically established.
+Control points are similar to feature flags. They identify the location in the
+code or data plane (web servers, service meshes, API gateways, and so on) where
+flow control decisions are applied. They're defined by developers using the SDKs
+or configured when integrating with API Gateways or Service Meshes.
 
 ## How to Integrate Control Points
 
-To empower Aperture to act at any of the Control Points, integrations need to be
+To empower Aperture to act at any of the control points, integrations need to be
 installed to be able to interact with the Aperture Agent. Here are the two
-primary types of Control Points: HTTP/gRPC Control Points and Feature Control
+primary types of control points: HTTP/gRPC control points and Feature Control
 Points.
 
 ### HTTP/gRPC Control Points
 
-HTTP Control Points use web framework and service-mesh-based integrations to
-establish Control Points in the traffic path of a service.
+HTTP control points use web framework and service-mesh-based integrations to
+establish control points in the traffic path of a service.
 
 In principle, any web proxy or web framework can be integrated with Aperture
-using this method. There are ready integrations available for many popular web
+using this method. There are integrations available for many popular web
 frameworks.
 
 The integration with Envoy uses the External Authorization API. In such a setup,
-the Control Point can be labeled to identify a specific filter chain in Envoy.
-If insertion is achieved using the
+the control point can be used to identify a specific filter chain in Envoy. If
+insertion is achieved using the
 [Istio integration](/integrations/istio/istio.md), the default filter
-configuration designates `ingress` and `egress` Control Points as identified by
+configuration designates `ingress` and `egress` control points as identified by
 [PatchContext](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext)
 of Istio's EnvoyFilter CRD.
 
 ### Feature Control Points
 
-Feature Control Points are facilitated by the
+Feature control points are facilitated by the
 [Aperture SDKs](/integrations/sdk/sdk.md), which are available for a variety of
 popular programming languages. These SDKs allow any function call or code
-snippet within the service code to be wrapped as a _Feature Control Point_. In
+snippet within the service code to be wrapped as a feature control point. In
 Aperture's context, every execution of the feature is seen as a flow.
 
 The SDK offers an API to initiate a flow, which corresponds to a
 [`flowcontrol.v1.Check`][flowcontrol-proto] call into the Agent. The response
-from this call comprises a decision on whether to authorize or decline the flow.
-The execution of a feature might be gated based on this decision. There is also
-an API to end a flow, which dispatches an OpenTelemetry span representing the
-flow to the Agent as telemetry data.
+from this call comprises a decision on whether to accept or reject the flow. The
+execution of a feature might be gated based on this decision. There is also an
+API to end a flow, which creates an OpenTelemetry span representing the flow and
+dispatches it to the Agent.
 
-## Understanding and Implementing Control Points
+## Understanding Control Points
 
 <Zoom>
 
@@ -102,19 +97,34 @@ code.
 
 :::note
 
-The _Control Point_ definition does not care about which particular entity (like
-a pod) is handling a particular flow. A single _Control Point_ covers _all_ the
+The control point definition does not care about which particular entity (like a
+pod) is handling a particular flow. A single control point covers _all_ the
 entities belonging to the same service.
 
 :::
 
-:::tip
+## Live Preview of Control Points
 
-Use the [`aperturectl flow-control control-points`][aperturectl] CLI command to
-list active control points.
+Use the
+[`aperturectl flow-control control-points`](../reference/aperturectl/discovery/entities/)
+CLI command to list active control points.
 
-:::
+For example:
+
+```sh
+aperturectl flow-control control-points --kube
+```
+
+Returns:
+
+```json
+AGENT GROUP   SERVICE                                       NAME      TYPE
+default       service1-demo-app.demoapp.svc.cluster.local   egress    http
+default       service1-demo-app.demoapp.svc.cluster.local   ingress   http
+default       service2-demo-app.demoapp.svc.cluster.local   egress    http
+default       service2-demo-app.demoapp.svc.cluster.local   ingress   http
+default       service3-demo-app.demoapp.svc.cluster.local   ingress   http
+```
 
 [flowcontrol-proto]:
   https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.check.v1
-[aperturectl]: /get-started/installation/aperture-cli/aperture-cli.md

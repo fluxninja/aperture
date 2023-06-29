@@ -1,7 +1,7 @@
 ---
 title: Selector
 sidebar_label: Selector
-sidebar_position: 3
+sidebar_position: 6
 keywords:
   - flows
   - services
@@ -15,71 +15,61 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-A Selector is a part of flow control components which helps determine where a
-flow control and observability component, such as a [Classifier][classifier],
-[Flux Meter][flux-meter], or [Load Scheduler][load-scheduler], should be
-applied. It does this based on a combination of factors including the control
-point, flow labels, agent group, and the service. Basically, scoping rules that
-determine how these components should select flows for their operations.
-
-:::note See also
+:::info See also
 
 [_Selector_ configuration specification.](/reference/configuration/spec.md#selector)
 
 :::
 
-A Selector consists of the following fields:
+_Selectors_ are used by flow control and observability components instantiated
+by Aperture Agents like [_Classifiers_][classifier], [_Flux Meters_][flux-meter]
+and [_Load Scheduler_][load-scheduler]. _Selectors_ define scoping rules that
+decide how these components should select flows for their operations.
 
-- **Control Point (required)**: The control point identifies the location within
-  the services where policies can act on flows. It could represent a specific
-  feature, execution block, or ingress/egress calls within a service.
-- **Label Matcher (optional)**: It narrows down the selected flows based on
-  conditions defined on labels. It allows for precise filtering of flows based
-  on specific criteria.
-- **Agent Group (optional)**: An Agent Group is a flexible label that defines a
-  collection of agents operating as peers.
-- **Service (optional)**: The service represents a collection of entities
-  delivering a common functionality, such as checkout or billing in an ecommerce
-  example.
+A Selector consists of the following parameters:
+
+- [_Control Point_](#control-point) (required)
+- [_Label Matcher_](#label-matcher) (optional)
+- [_Agent Group_](#agent-group) (optional)
+- [_Service_](#service) (optional)
 
 **Example:**
 
 ```yaml
-selectors:
-  service: checkout.myns.svc.cluster.local # Service
-  control_point: ingress # Control Point
-  agent_group: default # Agent Group
-  label_matcher: # Label Matcher
-    match_labels:
-      user_tier: premium
-      http.method: GET
-    match_expressions:
-      - key: query
-        operator: In
-        values:
-          - insert
-          - delete
-    expression: # Using Label Matcher with expression
-      label_matches:
-        - label: user_agent
-          regex: ^(?!.*Chrome).*Safari
+service: checkout.myns.svc.cluster.local # Service
+control_point: ingress # Control Point
+agent_group: default # Agent Group
+label_matcher: # Label Matcher
+match_labels:
+  user_tier: premium
+  http.method: GET
+match_expressions:
+  - key: query
+    operator: In
+    values:
+      - insert
+      - delete
+expression: # Using Label Matcher with expression
+  label_matches:
+    - label: user_agent
+      regex: ^(?!.*Chrome).*Safari
 ```
 
 ## Control Point {#control-point}
 
-Control Points serve as the "where" of flow control. They specify where in the
-system a policy should be applied. This could be at the ingress or egress of a
-service (for HTTP/gRPC Control Points) or at specific features within the
-service code (for Feature Control Points).
+Control point is the only required parameter in the selector that identifies
+either a feature in the code or an interception point within a proxy or
+middleware. For more details, refer to the
+[control points concept](control-point.md).
 
 ## Label Matcher {#label-matcher}
 
-The "Label Matcher" is optional in selector fields, but it is helpful to narrow
-down the selected flow using conditions defined on [Labels][label]. It allows
-for precise filtering of flows based on specific criteria.
+The label matcher is used to narrow down the selected flows using conditions
+defined on [Labels][label]. It allows for precise filtering of flows based on
+specific criteria.
 
-There are multiple ways to define a label matcher, and they can be used in
-combination with each other.
+There are multiple ways to define a label matcher. If multiple match criteria
+are defined simultaneously, then they all must match for a flow to be selected.
 
 - **Exact Match**: It is the simplest way to match a label. It matches the label
   value exactly.
@@ -119,49 +109,13 @@ these matching methods.
 
 ## Agent Group {#agent-group}
 
-_Agent Group_ is a flexible label that defines a collection of agents that
-operate as peers. For example, an Agent Group can be a Kubernetes cluster name
-in the case of DaemonSet deployment of Agent, or it can be a service name for
-sidecar deployments of Agent.
+The agent group parameter identifies the agents where the selector gets applied.
+For more details, refer to the [agent group concept](agent-group.md).
 
-When employing sidecar mode, it's advisable to name the Agent Group based on the
-respective application, therefore fostering a unified Agent Group for all pods
-within an application. For instance, all pods within the 'Checkouts' application
-should be under the same Agent Group.
-
-In DaemonSet mode, the Kubernetes cluster name typically becomes the Agent Group
-name, which applies to all agents deployed on each node. This ensures all Agents
-spanning the entire cluster comes under the same Agent Group.
-
-<!-- vale off -->
-
-### Where does Agent Group help?
-
-<!-- vale on -->
-
-- **Complex Environments**: It helps manage multiple agents efficiently within
-  intricate environments, like Kubernetes or multi-cluster installations.
-  Basically, helping scale Aperture configuration.
-
-- **State Synchronization**: _Agent Group_ defines the scope of agent-to-agent
-  synchronization, with agents within the group forming a peer-to-peer network
-  to synchronize fine-grained state per-label global counters that are used for
-  rate-limiting purposes. Additionally, all agents within an _Agent Group_
-  instantiate the same set of flow control components as published by the
-  controller.
-
-:::note In standalone Aperture Agent deployments
-
-Where Aperture Agent is not co-located with any service, the _Control Points_
-alone can be used to match flows to policies and that deployment can be used as
-a feature flag decision service serving remote flow control requests.
-
-:::
-
-Example:
+In the example below, the agent group is `prod-cluster`.
 
 ```yaml
-agent_group: default # Agent Group
+agent_group: prod-cluster # Agent Group
 control_point: ingress
 label_matcher:
   match_labels:
@@ -170,34 +124,8 @@ label_matcher:
 
 ## Service {#service}
 
-In Aperture, a service represents a collection of entities that deliver a common
-functionality, such as checkout or billing in an ecommerce example, or provide a
-specific service, such as a database or a search service. It is similar to the
-concept of services tracked in platforms like Kubernetes or Consul. Services in
-Aperture are typically referred to by their fully qualified domain names (FQDN).
-
-<!-- vale off -->
-
-### How does it work?
-
-<!-- vale on -->
-
-Aperture maintains a mapping of entity IP addresses to service names. Upon
-receiving a flow control decision request from an entity, Aperture uses this
-mapping to identify the service name and determines which flow control
-components to execute.
-
-:::note An entity (Kubernetes pod, VM) might belong to multiple services.
-
-:::
-
-### Service Discovery
-
-Aperture agents in environments like Kubernetes automatically discover services
-and entities. They actively monitor and observe changes in services and
-entities. This service discovery ensures that the mapping between entity IP
-addresses and service names remains up to date. It allows for accurate and
-reliable identification of services during flow control decision-making.
+The service parameter limits the selector to flows that belong to the specified
+service. For more details, refer to the [service concept](service.md).
 
 :::tip Special Service Names
 
@@ -216,83 +144,84 @@ label_matcher:
     user_tier: gold
 ```
 
-### Scoping and Configuration
+## Selectors for different scenarios
 
-Services in Aperture are scoped within _Agent Groups_, creating two level
-hierarchies. The combination of the Agent Group name and the service name
-determines the specific service to which flows are assigned and policies are
-applied. This scoping mechanism ensures that policies are targeted and applied
-to the relevant services within the system.
+### Features defined through SDK
 
-In this example, there are two independent `db.mynamespace.svc.cluster.local`
-services.
+Control point alone is sufficient to identify flows belonging to a unique
+feature.
 
-<Zoom>
+An example flow:
 
-```mermaid
-graph TB
-    subgraph group2
-        s3[search.mynamespace.svc.cluster.local]
-        s4[db.mynamespace.svc.cluster.local]
-    end
-    subgraph group1
-        s1[frontend.mynamespace.svc.cluster.local]
-        s2[db.mynamespace.svc.cluster.local]
-    end
-```
+| Agent Group | Control Point                | Service                                 | Flow Labels     |
+| ----------- | ---------------------------- | --------------------------------------- | --------------- |
+| default     | smart-recommendation-feature | checkout-service.prod.svc.cluster.local | user_type:guest |
 
-</Zoom>
+### DaemonSet deployment of Aperture agents
 
-For single-cluster deployments, a single `default` _Agent Group_ can be used:
+In this installation mode, control points alone might not be sufficient to
+identify flows. For instance, in the case of Envoy interception, the default
+Envoy Filter assigns `ingress` and `egress` as the control points to all
+listener chains, depending on whether they are for ingress or egress traffic. In
+this case, the service parameter can be used to distinguish among flows
+belonging to different services.
 
-<Zoom>
+An example flow:
 
-```mermaid
-graph TB
-    subgraph default
-        s1[frontend.mynamespace.svc.cluster.local]
-        s3[search.mynamespace.svc.cluster.local]
-        s2[db.mynamespace.svc.cluster.local]
-    end
-```
+<!-- vale off -->
 
-</Zoom>
+| Agent Group | Control Point | Service                                 | Flow Labels                                                |
+| ----------- | ------------- | --------------------------------------- | ---------------------------------------------------------- |
+| default     | ingress       | checkout-service.prod.svc.cluster.local | http.request.header.user_type:guest, http.target:/checkout |
 
-as another extreme, if _Agent Groups_ already group entities into logical
-services, the _Agent Group_ can be treated as a service to match flows to
-policies (useful when installing as a sidecar):
+<!-- vale on -->
 
-<Zoom>
+### Aperture agent as a sidecar container
 
-```mermaid
-graph TB
-    subgraph frontend
-        s1[*]
-    end
-    subgraph search
-        s2[*]
-    end
-    subgraph db
-        s3[*]
-    end
-```
+In this installation mode, Kubernetes service discovery is disabled by default.
+It is recommended to configure each service's deployment with a unique Aperture
+agent group. Therefore, the selector in this scenario can identify the flows for
+a service based on the agent group and control point.
 
-</Zoom>
+Example flows:
 
-_Agent Group_ name together with _Service_ name determine the
-[service](#service) to select flows from.
+<!-- vale off -->
+
+| Agent Group      | Control Point                | Service | Flow Labels                                                |
+| ---------------- | ---------------------------- | ------- | ---------------------------------------------------------- |
+| checkout-service | ingress                      |         | http.request.header.user_type:guest, http.target:/checkout |
+| checkout-service | smart-recommendation-feature |         | user_type:guest                                            |
+
+<!-- vale on -->
+
+### Standalone deployment of Aperture agents
+
+In this installation mode, Aperture agents are installed as a standalone load
+management service. Clients call into this service to get load management
+functionality. The selectors in this scenario rely on control points as the
+distinguishing factor to identify unique features and services.
+
+An example flow:
+
+<!-- vale off -->
+
+| Agent Group | Control Point                | Service | Flow Labels     |
+| ----------- | ---------------------------- | ------- | --------------- |
+| default     | smart-recommendation-feature |         | user_type:guest |
+
+<!-- vale on -->
 
 ### Gateways Integration {#gateways-integration}
 
-Aperture can be integrated with [Gateways][gateway] to control traffic before
-that is routed to the upstream service. Gateways should be configured to send
-flow control requests to Aperture for every incoming request.
+Aperture can be integrated with [Gateways][gateway] to control traffic before it
+is routed to the upstream service. Gateways are configured to send flow control
+requests to Aperture for every incoming request.
 
-As the requests to Aperture are sent from the Gateway, the service selector has
-to be configured to match the Gateway's service. For example, if the Gateway
+As the requests to Aperture are sent from the Gateway, the selector has to be
+configured to match the Gateway's service. For example, if the Gateway
 controller is running with service name `nginx-server` in namespace `nginx`, for
-upstream service having location/route as `/service1`, the selector should be
-configured as follows:
+upstream service having location or route as `/search-service`, the selector
+should be configured as follows:
 
 ```yaml
 service: nginx-server.nginx.svc.cluster.local
@@ -303,27 +232,49 @@ label_matcher:
     http.target: "/search-service"
 ```
 
-Also, if the control point is configured uniquely for each location/route, the
-`control_point` field alone can be used to match the upstream service and the
-rest of the fields can be omitted:
+An example flow:
+
+<!-- vale off -->
+
+| Agent Group | Control Point  | Service                              | Flow Labels                 |
+| ----------- | -------------- | ------------------------------------ | --------------------------- |
+| default     | search-service | nginx-server.nginx.svc.cluster.local | http.target:/search-service |
+
+<!-- vale on -->
+
+Also, if the control point is configured uniquely for each location or route,
+the `control_point` alone can be used to match the upstream service and the rest
+of the parameters can be omitted:
 
 ```yaml
 agent_group: default
 control_point: search-service
 ```
 
-### Filtering out liveness/health probes, and metrics endpoints
+An example flow:
+
+<!-- vale off -->
+
+| Agent Group | Control Point  | Service                              | Flow Labels                 |
+| ----------- | -------------- | ------------------------------------ | --------------------------- |
+| default     | search-service | nginx-server.nginx.svc.cluster.local | http.target:/search-service |
+
+<!-- vale on -->
+
+## Filtering out health and metrics endpoints
 
 Liveness and health probes are essential for checking the health of the
 application, and metrics endpoints are necessary for monitoring its performance.
-However, these endpoints do not contribute to the overall latency of the
-service, and if included in latency calculations, they might cause requests to
-be rejected, leading to unnecessary pod restarts.
+However, these endpoints do not usually represent the intended workload in an
+Aperture policy. If included in a _Flux Meter_, they can reduce the accuracy of
+latency calculations. If included in an actuation component like _Load
+Scheduler_, they might cause these requests to be rejected under load, leading
+to unnecessary pod restarts.
 
 To prevent these issues, traffic to these endpoints can be filtered out by
 matching expressions. In the example below, flows with `http.target` starting
-with /health, /live, or /ready, and User Agent starting with `kube-probe/1.23`
-are filtered out.
+with `/health`, `/live`, or `/ready`, and User Agent starting with
+`kube-probe/1.23` are filtered out.
 
 ```yaml
 service: checkout.myns.svc.cluster.local
@@ -344,26 +295,9 @@ label_matcher:
         - kube-probe/1.23
 ```
 
-Filtering out traffic to these endpoints can prevent unnecessary pod restarts
-and ensure that the application is available to handle real user traffic
-
-Other flows can be filtered out by matching on different keys and operators,
-such as `http.method` with `NotIn` operator and `GET` value. For more
-information on how to configure the Label Matcher, see the [Label Matcher
-reference][label-matcher].
-
-:::info
-
-Remember that while these endpoints might have a low latency, they should not be
-included in the overall latency of the service. Filtering them out can help
-improve the accuracy of latency calculations and prevent requests from being
-rejected.
-
-:::
-
 [label]: ./flow-label.md
 [flux-meter]: ./flux-meter.md
-[load-scheduler]: ./scheduler.md
+[load-scheduler]: ./scheduler/load-scheduler.md
 [classifier]: ./classifier.md
 [label-matcher]: /reference/configuration/spec.md#label-matcher
 [gateway]: /integrations/gateway/gateway.md

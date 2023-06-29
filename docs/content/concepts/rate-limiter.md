@@ -1,11 +1,11 @@
 ---
 title: Rate Limiter
-sidebar_position: 8
+sidebar_position: 10
 ---
 
-:::info
+:::info See also
 
-See also [_Rate Limiter_ reference][reference]
+[_Rate Limiter_ reference][reference]
 
 :::
 
@@ -16,35 +16,37 @@ incoming flows based on per-label limits, which are configured using the
 
 The _Rate Limiter_ is a component of Aperture's [policy][policies] system, and
 it can be configured to work with different labels and limits depending on the
-needs of your application.
+needs of an application.
 
-Example:
+The following example creates a _Rate Limiter_ at the `ingress` control point
+for service `checkout.default.svc.cluster.local`. A rate limit of `2` requests
+per second with a burst capacity of `40` is applied per unique value of
+`http.request.header.user_id` flow label:
 
 ```yaml
-rate_limiter:
-  bucket_capacity: 40
-  fill_amount: 2
-  selectors:
-    - agent_group: default
-      service: checkout.default.svc.cluster.local
-      control_point: ingress
-  # Parameters.
-  # Type: aperture.spec.v1.RateLimiterParameters
-  parameters:
-    # Flow label to use for rate limiting.
-    # Type: string
-    # Required: True
-    label_key: user_id
-    lazy_sync:
-      enabled: true
-      num_sync: 5
-    interval: 1s
+circuit:
+components:
+  - flow_control:
+      rate_limiter:
+        in_ports:
+          bucket_capacity:
+            constant_signal:
+              value: 40
+          fill_amount:
+            constant_signal:
+              value: 2
+        parameters:
+          interval: 1s
+          label_key: http.request.header.user_id
+        selectors:
+          - control_point: ingress
+            service: checkout.default.svc.cluster.local
 ```
 
 ## Distributed Counters {#distributed-counters}
 
 For each configured [_Rate Limiter Component_][reference], every matching
-Aperture Agent instantiates a copy of the _Rate Limiter_. Although each Agent
+Aperture agent instantiates a copy of the _Rate Limiter_. Although each agent
 has its own copy of the component, they all share counters through a distributed
 cache. This means that they work together as a single _Rate Limiter_, providing
 seamless coordination and control across agents. The agents within an [agent
@@ -55,7 +57,7 @@ protocol.
 
 This algorithm allows users to execute a substantial number of requests in
 bursts, and then continue at a steady rate. Here are the key points to
-understand about the token bucket metaphor:
+understand about the token bucket algorithm:
 
 - Each user (or any flow label) has access to a bucket, which can hold, say, 60
   "tokens".
@@ -68,14 +70,12 @@ understand about the token bucket metaphor:
 This model ensures that apps that handle API calls judiciously will always have
 a supply of tokens for a burst of requests when necessary. For example, if users
 average 20 requests ("tokens") per second but suddenly need to make 30 requests
-at once, users can do so if they have accumulated enough tokens. The basic
-principles of the token bucket algorithm apply to all our rate limits,
-regardless of the specific methods used to implement them.
+at once, users can do so if they have accumulated enough tokens.
 
 ### Lazy Syncing {#lazy-syncing}
 
 When lazy syncing is enabled, rate-limiting counters are stored in-memory and
-are only synchronized between Aperture Agent instances on-demand. This allows
+are only synchronized between Aperture agent instances on-demand. This allows
 for fast and low-latency rate-limiting decisions, at the cost of slight
 inaccuracy within a (small) time window (sync interval).
 
@@ -84,22 +84,15 @@ inaccuracy within a (small) time window (sync interval).
 The _Rate Limiter_ component accepts or rejects incoming flows based on
 per-label limits, configured as the maximum number of requests per a given
 period of time. The rate-limiting label is chosen from the
-[flow-label][flow-label] with a specific key, enabling you to configure separate
-limits for different users or flows.
+[flow-label][flow-label] with a specific key, enabling distinct limits per user
+as identified by unique values of the label.
 
 :::tip
 
-The limit value is treated as a signal within the circuit and can be dynamically
-modified or disabled at runtime.
+The limit value is provided as a signal within the circuit. It can be set
+dynamically based on the circuit's logic.
 
 :::
-
-### Overrides {#overrides}
-
-The override mechanism allows for increasing the limit for a particular value of
-a label. For instance, you might want to increase the limit for the admin user.
-Please refer to the [reference][reference] for more details on how to use this
-feature.
 
 [reference]: /reference/configuration/spec.md#rate-limiter
 [agent-group]: /concepts/selector.md#agent-group
