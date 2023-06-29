@@ -22,7 +22,7 @@ keywords:
   - workload prioritization
   - rate limiting
   - observability
-  - feature rollout
+  - load ramp
   - feature flag
 ---
 

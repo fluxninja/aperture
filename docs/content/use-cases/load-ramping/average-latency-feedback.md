@@ -2,7 +2,7 @@
 title: Average Latency Feedback
 keywords:
   - policies
-  - rollout
+  - load ramping
   - latency
   - feature-flags
 sidebar_position: 1
@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 :::note
 
 The following policy is based on the
-[Feature Rollout with Average Latency Feedback](/reference/blueprints/load-ramping/base.md)
+[Load Ramping with Average Latency Feedback](/reference/blueprints/load-ramping/base.md)
 blueprint.
 
 :::
@@ -27,26 +27,26 @@ blueprint.
 API response time is a critical performance indicator and directly impacts user
 experience. As new features are released, it's crucial to maintain service
 latency within a defined threshold. This policy monitors the average latency of
-an API, using it as a feedback mechanism for controlled feature rollout.
+an API, using it as a feedback mechanism for controlled load ramp.
 
 ## Configuration
 
 The service is instrumented with the Aperture SDK. A new feature,
 `awesome-feature`, is encapsulated within a control point in the code.
 
-The **`load_ramp`** section details the rollout procedure:
+The **`load_ramp`** section details the ramping procedure:
 
-- **`awesome_feature`** is the target for the rollout process.
-- The rollout begins with 1% of traffic directed to the new feature, gradually
+- **`awesome_feature`** is the target for the ramping process.
+- The ramping begins with 1% of traffic directed to the new feature, gradually
   increasing to 100% over a period of 300 seconds.
 
-The feature rollout is manually initiated by applying the dynamic configuration
-for this policy, as specified in the dynamic-values tab below.
+The load ramp is manually initiated by applying the dynamic configuration for
+this policy, as specified in the dynamic-values tab below.
 
-During the rollout, the average latency of the **`/checkout`** API on the
+During the ramping, the average latency of the **`/checkout`** API on the
 **`checkout.prod.svc.cluster.local`** service gets monitored. If the API
-endpoint latency remains below 75ms, the awesome-feature rollout proceeds. If
-the average latency surpasses 75ms, the policy automatically reverts the rollout
+endpoint latency remains below 75ms, the awesome-feature ramp proceeds. If the
+average latency surpasses 75ms, the policy automatically reverts the ramping
 back to the initial 1% threshold.
 
 ```mdx-code-block
@@ -87,9 +87,9 @@ back to the initial 1% threshold.
 ## Policy in Action
 
 In this scenario, the new `awesome-feature` causes a performance regression in
-the service, leading to increased response times. As the rollout percentage
+the service, leading to increased response times. As the ramping percentage
 increases, the latency threshold of 75ms is exceeded, prompting the policy to
-automatically revert the rollout back to the initial 1% threshold. This action
+automatically revert the ramping back to the initial 1% threshold. This action
 results in the return of the latency to normal levels.
 
 :::info
@@ -101,6 +101,6 @@ policy.
 
 <Zoom>
 
-![Feature Rollout with Average Latency Feedback](./assets/average-latency-feedback/dashboard.png)
+![Load Ramping with Average Latency Feedback](./assets/average-latency-feedback/dashboard.png)
 
 </Zoom>

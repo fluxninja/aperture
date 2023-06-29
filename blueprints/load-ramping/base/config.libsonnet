@@ -63,14 +63,14 @@ local promql_driver_defaults = {
 };
 
 
-local rollout_policy_base_defaults = {
+local ramp_policy_base_defaults = {
   /**
   * @param (policy.policy_name: string) Name of the policy.
-  * @param (policy.load_ramp: aperture.spec.v1.LoadRampParameters) Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
+  * @param (policy.load_ramp: aperture.spec.v1.LoadRampParameters) Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   * @param (policy.resources: aperture.spec.v1.Resources) List of additional resources.
   * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
-  * @param (policy.rollout: bool) Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
+  * @param (policy.start: bool) Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.
   */
   policy_name: '__REQUIRED_FIELD__',
   load_ramp: {
@@ -92,7 +92,7 @@ local rollout_policy_base_defaults = {
     percentile_latency_drivers: [],
   },
 
-  rollout: false,
+  start: false,
 
   components: [],
 
@@ -106,7 +106,7 @@ local rollout_policy_base_defaults = {
 };
 
 {
-  policy: rollout_policy_base_defaults,
+  policy: ramp_policy_base_defaults,
 
   /**
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
@@ -120,7 +120,7 @@ local rollout_policy_base_defaults = {
     time_from: 'now-15m',
     time_to: 'now',
     extra_filters: {},
-    title: 'Aperture Feature Rollout',
+    title: 'Aperture Load Ramp',
     /**
     * @param (dashboard.datasource.name: string) Datasource name.
     * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
