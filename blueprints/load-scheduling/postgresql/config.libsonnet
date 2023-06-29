@@ -1,6 +1,5 @@
 local promqlDefaults = import '../promql/config.libsonnet';
 
-
 promqlDefaults {
   policy+: {
     /**
@@ -42,6 +41,10 @@ promqlDefaults {
         threshold: null,
         operator: 'gte',
       },
+    },
+
+    kubeletstats_infra_meter+: {
+      enabled: true,
     },
   },
 

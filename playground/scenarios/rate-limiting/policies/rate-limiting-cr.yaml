@@ -26,3 +26,9 @@ spec:
   resources:
     flow_control:
       classifiers: []
+    infra_meters:
+      aerospike:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          aerospike: {}

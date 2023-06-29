@@ -1,7 +1,4 @@
-local selectors_defaults = [{
-  service: '__REQUIRED_FIELD__',
-  control_point: '__REQUIRED_FIELD__',
-}];
+local commonConfig = import '../../common/config-defaults.libsonnet';
 
 /**
 * @param (policy.drivers.average_latency_drivers: []average_latency_driver) List of drivers that compare average latency against forward, backward and reset thresholds.
@@ -11,7 +8,7 @@ local selectors_defaults = [{
 * @schema (average_latency_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
 */
 local average_latency_driver_defaults = {
-  selectors: selectors_defaults,
+  selectors: commonConfig.selectors_defaults,
   criteria: {
     forward: {
       threshold: '__REQUIRED_FIELD__',
@@ -29,7 +26,7 @@ local average_latency_driver_defaults = {
 */
 local percentile_latency_driver_defaults = {
   flux_meter: {
-    selector: selectors_defaults,
+    selector: commonConfig.selectors_defaults,
     static_buckets: {
       buckets: [5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0],
     },
@@ -65,17 +62,14 @@ local promql_driver_defaults = {
 
 local ramp_policy_base_defaults = {
   /**
-  * @param (policy.policy_name: string) Name of the policy.
   * @param (policy.load_ramp: aperture.spec.v1.LoadRampParameters) Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.
-  * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
-  * @param (policy.resources: aperture.spec.v1.Resources) List of additional resources.
   * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
   * @param (policy.start: bool) Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.
   */
-  policy_name: '__REQUIRED_FIELD__',
+  evaluation_interval: '10s',
   load_ramp: {
     sampler: {
-      selectors: selectors_defaults,
+      selectors: commonConfig.selectors_defaults,
       label_key: '',
     },
     steps: [
@@ -94,41 +88,13 @@ local ramp_policy_base_defaults = {
 
   start: false,
 
-  components: [],
-
-  resources: {
-    flow_control: {
-      classifiers: [],
-    },
-  },
-
-  evaluation_interval: '10s',
 };
 
-{
-  policy: ramp_policy_base_defaults,
+commonConfig {
+  policy+: ramp_policy_base_defaults,
 
-  /**
-  * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
-  * @param (dashboard.time_from: string) From time of dashboard.
-  * @param (dashboard.time_to: string) To time of dashboard.
-  * @param (dashboard.extra_filters: map[string]string) Additional filters to pass to each query to Grafana datasource.
-  * @param (dashboard.title: string) Name of the main dashboard.
-  */
-  dashboard: {
-    refresh_interval: '5s',
-    time_from: 'now-15m',
-    time_to: 'now',
-    extra_filters: {},
+  dashboard+: {
     title: 'Aperture Load Ramp',
-    /**
-    * @param (dashboard.datasource.name: string) Datasource name.
-    * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
-    */
-    datasource: {
-      name: '$datasource',
-      filter_regex: '',
-    },
   },
 
   // defaults for the schemas

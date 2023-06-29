@@ -77,20 +77,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-policy-name"></a>
 
 <ParameterDescription
@@ -113,6 +99,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Object (aperture.spec.v1.Resources)'
     reference='../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-evaluation-interval"></a>
+
+<ParameterDescription
+    name='policy.evaluation_interval'
+    description='The interval between successive evaluations of the Circuit.'
+    type='string'
+    reference=''
+    value='"10s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-kubeletstats-infra-meter"></a>
+
+<ParameterDescription
+    name='policy.kubeletstats_infra_meter'
+    description='Infra meter for scraping Kubelet metrics.'
+    type='Object (kubeletstats_infra_meter)'
+    reference='#kubeletstats-infra-meter'
+    value='{"agent_group": "default", "enabled": true, "filter": {}}'
 />
 
 <!-- vale on -->
@@ -297,7 +311,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='dashboard.time_from'
-    description='Time from of dashboard.'
+    description='From time of dashboard.'
     type='string'
     reference=''
     value='"now-15m"'
@@ -311,7 +325,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='dashboard.time_to'
-    description='Time to of dashboard.'
+    description='To time of dashboard.'
     type='string'
     reference=''
     value='"now"'
@@ -370,6 +384,184 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 ---
 
 ### Schemas
+
+<!-- vale off -->
+
+#### kubeletstats_infra_meter {#kubeletstats-infra-meter}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-agent-group"></a>
+
+<ParameterDescription
+    name='agent_group'
+    description='Agent group to be used for the infra_meter.'
+    type='string'
+    reference=''
+    value='"default"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Adds infra_meter for scraping Kubelet metrics.'
+    type='Boolean'
+    reference=''
+    value='false'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-filter"></a>
+
+<ParameterDescription
+    name='filter'
+    description='Filter to be applied to the infra_meter.'
+    type='Object (kubeletstats_infra_meter_filter)'
+    reference='#kubeletstats-infra-meter-filter'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubeletstats_infra_meter_filter {#kubeletstats-infra-meter-filter}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-filter-fields"></a>
+
+<ParameterDescription
+    name='fields'
+    description='Fields allows to filter pods by generic k8s fields. Supported operations are: equals, not-equals.'
+    type='Array of Object (kubeletstats_infra_meter_label_filter)'
+    reference='#kubeletstats-infra-meter-label-filter'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-filter-labels"></a>
+
+<ParameterDescription
+    name='labels'
+    description='Labels allows to filter pods by generic k8s pod labels.'
+    type='Array of Object (kubeletstats_infra_meter_label_filter)'
+    reference='#kubeletstats-infra-meter-label-filter'
+    value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-filter-namespace"></a>
+
+<ParameterDescription
+    name='namespace'
+    description='Namespace filters all pods by the provided namespace. All other pods are ignored.'
+    type='string'
+    reference=''
+    value='""'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-filter-node"></a>
+
+<ParameterDescription
+    name='node'
+    description='Node represents a k8s node or host. If specified, any pods not running on the specified node will be ignored by the tagger.'
+    type='string'
+    reference=''
+    value='""'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-filter-node-from-env-var"></a>
+
+<ParameterDescription
+    name='node_from_env_var'
+    description='odeFromEnv can be used to extract the node name from an environment variable. For example: `NODE_NAME`.'
+    type='string'
+    reference=''
+    value='""'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubeletstats_infra_meter_label_filter {#kubeletstats-infra-meter-label-filter}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-label-filter-key"></a>
+
+<ParameterDescription
+    name='key'
+    description='Key represents the key or name of the field or labels that a filter can apply on.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-label-filter-op"></a>
+
+<ParameterDescription
+    name='op'
+    description='Op represents the filter operation to apply on the given Key: Value pair. The supported operations are: equals, not-equals, exists, does-not-exist.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubeletstats-infra-meter-label-filter-value"></a>
+
+<ParameterDescription
+    name='value'
+    description='Value represents the value associated with the key that a filter operation specified by the `Op` field applies on.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
 
 <!-- vale off -->
 

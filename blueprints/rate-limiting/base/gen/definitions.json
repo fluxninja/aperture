@@ -95,7 +95,17 @@
         },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "10s",
+          "default": "15s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "From time of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "To time of dashboard.",
+          "default": "now",
           "type": "string"
         },
         "title": {
