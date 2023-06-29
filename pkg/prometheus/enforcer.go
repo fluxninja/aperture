@@ -31,9 +31,21 @@ func (e *PrometheusEnforcer) EnforceLabels(query string) (string, error) {
 		return "", err
 	}
 
+	if e == nil {
+		log.Error().Msg("e is not initialized?")
+		return query, nil
+	}
+
+	if e.enforcer == nil {
+		log.Error().Msg("e.enforcer is not initialized?")
+		return query, nil
+	}
+
 	if err := e.enforcer.EnforceNode(expr); err != nil {
 		return "", err
 	}
+
+	log.Debug().Str("query", expr.String()).Msg("Enforcing additional PromQL labels")
 
 	return expr.String(), nil
 }
@@ -55,6 +67,8 @@ func providePrometheusEnforcer(in EnforcerIn) (*PrometheusEnforcer, error) {
 	}
 
 	enforcer := plp.NewEnforcer(false, labels...)
+
+	log.Info().Msg("Initializing prometheus labels exporter")
 
 	return &PrometheusEnforcer{enforcer: enforcer}, nil
 }
