@@ -116,7 +116,6 @@ function(cfg, params={}, metadata={}) {
       labels: {
         'fluxninja.com/validate': 'true',
       },
-      annotations: {},
     },
     spec: policyDef,
   },

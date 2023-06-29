@@ -42,7 +42,6 @@ function(cfg, metadata={}) {
       labels: {
         'fluxninja.com/validate': 'true',
       },
-      annotations: {},
     },
     spec: policyDef,
   },

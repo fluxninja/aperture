@@ -1,7 +1,6 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
-  annotations: {}
   labels:
     fluxninja.com/validate: "true"
   name: weighted-service-protection
