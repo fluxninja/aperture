@@ -20,7 +20,7 @@ type EnforcerIn struct {
 // PrometheusEnforcer is responsible for enforcing extra set of labels that
 // should be present in every PromQL query executed.
 type PrometheusEnforcer struct {
-	enforcer *plp.Enforcer
+	labels []*promlabels.Matcher
 }
 
 // EnforceLabels transforms given query, making sure that all the required
@@ -36,16 +36,13 @@ func (e *PrometheusEnforcer) EnforceLabels(query string) (string, error) {
 		return query, nil
 	}
 
-	if e.enforcer == nil {
-		log.Error().Msg("e.enforcer is not initialized?")
-		return query, nil
-	}
+	enforcer := plp.NewEnforcer(false, e.labels...)
 
-	if err := e.enforcer.EnforceNode(expr); err != nil {
+	if err := enforcer.EnforceNode(expr); err != nil {
 		return "", err
 	}
 
-	log.Debug().Str("query", expr.String()).Msg("Enforcing additional PromQL labels")
+	log.Warn().Str("query", expr.String()).Msg("Enforcing additional PromQL labels")
 
 	return expr.String(), nil
 }
@@ -66,9 +63,7 @@ func providePrometheusEnforcer(in EnforcerIn) (*PrometheusEnforcer, error) {
 		})
 	}
 
-	enforcer := plp.NewEnforcer(false, labels...)
-
 	log.Info().Msg("Initializing prometheus labels exporter")
 
-	return &PrometheusEnforcer{enforcer: enforcer}, nil
+	return &PrometheusEnforcer{labels: labels}, nil
 }
