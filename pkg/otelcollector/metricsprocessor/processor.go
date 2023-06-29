@@ -57,7 +57,8 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		attributes := logRecord.Attributes()
 
 		// CheckResponse
-		checkResponse := &flowcontrolv1.CheckResponse{}
+		checkResponse := flowcontrolv1.CheckResponseFromVTPool()
+		defer checkResponse.ReturnToVTPool()
 
 		ensureCapacity := func() {
 			capacity := attributes.Len() +

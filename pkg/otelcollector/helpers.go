@@ -115,6 +115,10 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map)) {
 	}
 }
 
+type vtprotoMessage interface {
+	UnmarshalVT([]byte) error
+}
+
 // GetStruct is a helper for decoding complex structs encoded into an attribute
 // as string.
 //
@@ -157,6 +161,16 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 			log.Sample(failedBase64Sampler).
 				Warn().Err(err).Str("label", label).Msg("Failed to unmarshal as base64")
 		}
+
+		if vtmsg, isVt := msg.(vtprotoMessage); isVt {
+			err = vtmsg.UnmarshalVT(wireMsg)
+			if err != nil {
+				log.Sample(failedProtoSampler).
+					Warn().Err(err).Str("label", label).Msg("Failed to unmarshal as vtprotobuf")
+			}
+			return true
+		}
+
 		err = proto.Unmarshal(wireMsg, msg)
 		if err != nil {
 			log.Sample(failedProtoSampler).
