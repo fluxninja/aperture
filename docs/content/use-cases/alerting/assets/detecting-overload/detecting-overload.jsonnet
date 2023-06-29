@@ -16,7 +16,6 @@ local combinator = aperture.spec.v1.ArithmeticCombinator;
 local decider = aperture.spec.v1.Decider;
 local alerter = aperture.spec.v1.Alerter;
 local alerterParameters = aperture.spec.v1.AlerterParameters;
-local constantSignal = aperture.spec.v1.ConstantSignal;
 
 local svcSelectors = [
   selector.new()

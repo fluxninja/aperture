@@ -2,7 +2,6 @@ package controlplane
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"path"
 
@@ -100,16 +99,11 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		return nil, err
 	}
 
-	metadataBytes, err := json.Marshal(req.PolicyMetadata)
-	if err != nil {
-		return nil, err
-	}
 	txn := s.etcdClient.Client.Txn(s.etcdClient.Client.Ctx())
 	_, err = txn.If(
 		clientv3.Compare(clientv3.Version(path.Join(paths.PoliciesAPIConfigPath, req.PolicyName)), ">", -1),
 	).Then(
 		clientv3.OpPut(path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(policyBytes)),
-		clientv3.OpPut(path.Join(paths.PoliciesMetadataAPIConfigPath, req.PolicyName), string(metadataBytes)),
 	).Commit()
 	if err != nil {
 		return nil, err
@@ -140,7 +134,6 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 // DeletePolicy deletes a policy from the system.
 func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIConfigPath, policy.Name))
-	s.etcdWriter.Delete(path.Join(paths.PoliciesMetadataAPIConfigPath, policy.Name))
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
 	return &emptypb.Empty{}, nil
 }

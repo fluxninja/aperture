@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/rate-limiting/base/gen/definitions.json
-# Generated values file for policies/rate-limiting/base blueprint
+# yaml-language-server: $schema=../../../../blueprints/rate-limiting/base/gen/definitions.json
+# Generated values file for rate-limiting/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/rate-limiting
 

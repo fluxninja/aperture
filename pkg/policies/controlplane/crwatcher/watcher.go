@@ -219,14 +219,8 @@ func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.
 		return unmarshalErr
 	}
 
-	annotations := instance.GetObjectMeta().GetAnnotations()
 	policyMessage := &iface.PolicyMessage{
 		Policy: policySpec,
-		PolicyMetadata: &languagev1.PolicyMetadata{
-			Values:        annotations["fluxninja.com/values"],
-			BlueprintsUri: annotations["fluxninja.com/blueprints-uri"],
-			BlueprintName: annotations["fluxninja.com/blueprint-name"],
-		},
 	}
 	bytes, err := json.Marshal(policyMessage)
 	if err != nil {

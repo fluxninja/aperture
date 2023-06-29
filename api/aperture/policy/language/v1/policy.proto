@@ -84,7 +84,6 @@ message UpsertPolicyRequest {
   Policy policy = 2 [(validate.rules).message.required = true];
   // The paths to update.
   google.protobuf.FieldMask update_mask = 3;
-  PolicyMetadata policy_metadata = 4;
 }
 
 // PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
@@ -206,6 +205,7 @@ message Resources {
   //
   // :::
   map<string, InfraMeter> infra_meters = 2;
+
   // FlowControlResources are resources that are provided by flow control integration.
   FlowControlResources flow_control = 101;
 }
@@ -331,10 +331,4 @@ message NestedCircuit {
   string name = 4;
   // Short description of the nested circuit component. This description is displayed by graph visualization tools.
   string short_description = 5;
-}
-
-message PolicyMetadata {
-  string blueprints_uri = 1;
-  string blueprint_name = 2;
-  string values = 3;
 }

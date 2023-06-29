@@ -2947,15 +2947,6 @@ definitions:
                 $ref: '#/definitions/Resources'
                 description: Resources (such as Flux Meters, Classifiers) to setup.
         type: object
-    PolicyMetadata:
-        properties:
-            blueprint_name:
-                type: string
-            blueprints_uri:
-                type: string
-            values:
-                type: string
-        type: object
     PolicyWrapper:
         properties:
             common_attributes:
@@ -2964,9 +2955,6 @@ definitions:
             policy:
                 $ref: '#/definitions/Policy'
                 title: Policy
-            policy_metadata:
-                $ref: '#/definitions/PolicyMetadata'
-                title: Policy Metadata
         type: object
     PolicyWrappers:
         properties:
@@ -4883,8 +4871,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string
@@ -4917,8 +4903,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string

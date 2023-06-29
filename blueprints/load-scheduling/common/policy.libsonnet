@@ -116,11 +116,6 @@ function(cfg, params={}, metadata={}) {
       labels: {
         'fluxninja.com/validate': 'true',
       },
-      annotations: {
-        [if std.objectHas(metadata, 'values') then 'fluxninja.com/values']: metadata.values,
-        [if std.objectHas(metadata, 'blueprints_uri') then 'fluxninja.com/blueprints-uri']: metadata.blueprints_uri,
-        [if std.objectHas(metadata, 'blueprint_name') then 'fluxninja.com/blueprint-name']: metadata.blueprint_name,
-      },
     },
     spec: policyDef,
   },

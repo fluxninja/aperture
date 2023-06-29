@@ -1,33 +1,6 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
-  annotations:
-    fluxninja.com/blueprint-name: load-scheduling/average-latency
-    fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"components": [{"decider": {"in_ports": {"lhs":
-      {"signal_name": "DESIRED_LOAD_MULTIPLIER"}, "rhs": {"constant_signal": {"value":
-      1}}}, "operator": "lt", "out_ports": {"output": {"signal_name": "IS_CRAWLER_ESCALATION"}},
-      "true_for": "30s"}}, {"switcher": {"in_ports": {"off_signal": {"constant_signal":
-      {"value": 10}}, "on_signal": {"constant_signal": {"value": 0}}, "switch": {"signal_name":
-      "IS_CRAWLER_ESCALATION"}}, "out_ports": {"output": {"signal_name": "RATE_LIMIT"}}}},
-      {"flow_control": {"rate_limiter": {"in_ports": {"bucket_capacity": {"signal_name":
-      "RATE_LIMIT"}, "fill_amount": {"signal_name": "RATE_LIMIT"}}, "parameters":
-      {"interval": "1s", "label_key": "http.request.header.user_id"}, "selectors":
-      [{"control_point": "service1-demo-app", "label_matcher": {"match_labels": {"http.request.header.user_type":
-      "crawler"}}}]}}}], "latency_baseliner": {"flux_meter": {"selectors": [{"control_point":
-      "service3-demo-app", "label_matcher": {"match_labels": {"http.target": "/service3"}},
-      "service": "nginx-server.demoapp.svc.cluster.local"}]}, "latency_tolerance_multiplier":
-      1.1000000000000001}, "policy_name": "service1-demo-app", "resources": {"flow_control":
-      {"classifiers": [{"rules": {"user_type": {"extractor": {"from": "request.http.headers.user-type"}}},
-      "selectors": [{"control_point": "service1-demo-app", "label_matcher": {"match_labels":
-      {"http.target": "/service1"}}, "service": "nginx-server.demoapp.svc.cluster.local"}]}]}},
-      "service_protection_core": {"adaptive_load_scheduler": {"load_multiplier_linear_increment":
-      0.025000000000000001, "load_scheduler": {"scheduler": {"workloads": [{"label_matcher":
-      {"match_labels": {"user_type": "guest"}}, "name": "guest", "parameters": {"priority":
-      "50"}}, {"label_matcher": {"match_labels": {"http.request.header.user_type":
-      "subscriber"}}, "name": "subscriber", "parameters": {"priority": "200"}}]},
-      "selectors": [{"control_point": "service1-demo-app", "label_matcher": {"match_labels":
-      {"http.target": "/service1"}}, "service": "nginx-server.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: service1-demo-app

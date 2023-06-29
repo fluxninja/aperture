@@ -1,14 +1,6 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
-  annotations:
-    fluxninja.com/blueprint-name: load-scheduling/average-latency
-    fluxninja.com/blueprints-uri: local
-    fluxninja.com/values: '{"policy": {"latency_baseliner": {"flux_meter": {"selectors":
-      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]},
-      "latency_tolerance_multiplier": 1.1000000000000001}, "policy_name": "basic-service-protection",
-      "service_protection_core": {"adaptive_load_scheduler": {"load_scheduler": {"selectors":
-      [{"control_point": "ingress", "service": "service1-demo-app.demoapp.svc.cluster.local"}]}}}}}'
   labels:
     fluxninja.com/validate: "true"
   name: basic-service-protection
