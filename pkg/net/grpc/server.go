@@ -127,7 +127,7 @@ func (constructor ServerConstructor) provideServer(
 		validatorUnaryInterceptor(),
 	}
 	unaryServerInterceptors = append(unaryServerInterceptors, constructor.UnaryServerInterceptors...)
-	unaryServerInterceptors = append(unaryServerInterceptors, unaryServerInterceptors...)
+	unaryServerInterceptors = append(unaryServerInterceptors, additionalUnaryInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
@@ -135,7 +135,7 @@ func (constructor ServerConstructor) provideServer(
 		otelgrpc.StreamServerInterceptor(),
 	}
 	streamServerInterceptors = append(streamServerInterceptors, constructor.StreamServerInterceptors...)
-	streamServerInterceptors = append(streamServerInterceptors, streamServerInterceptors...)
+	streamServerInterceptors = append(streamServerInterceptors, additionalStreamInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
 
 	// add additionalOptions
