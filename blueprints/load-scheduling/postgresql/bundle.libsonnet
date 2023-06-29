@@ -1,4 +1,4 @@
-local creator = import '../../grafana/creator.libsonnet';
+local creator = import '../../grafana/dashboard_group.libsonnet';
 local blueprint = import './postgresql.libsonnet';
 
 local policy = blueprint.policy;
@@ -111,6 +111,7 @@ function(params, metadata={}) {
     [std.format('%s.yaml', c.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
   },
   dashboards: {
-    [std.format('%s.json', c.policy.policy_name)]: d.dashboard,
+    [std.format('%s.json', c.policy.policy_name)]: d.mainDashboard,
+    [std.format('signals-%s.json', c.policy.policy_name)]: d.signalsDashboard,
   },
 }
