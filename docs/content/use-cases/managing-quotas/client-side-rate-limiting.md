@@ -88,6 +88,6 @@ policy.
 
 <Zoom>
 
-![Client Side Rate Limiting](./assets/client-side-rate-limiting/dashboard.png)
+![Client-Side Rate Limiting](./assets/client-side-rate-limiting/dashboard.png)
 
 </Zoom>

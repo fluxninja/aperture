@@ -1,17 +1,17 @@
 ---
-title: Load Scheduling
+title: Adaptive Service Protection
 keywords:
   - tutorial
 sidebar_position: 1
-sidebar_label: Load Scheduling
+sidebar_label: Adaptive Service Protection
 ---
 
 ## Overview
 
-Load scheduling is a strategy implemented by Aperture that leverages closed-loop
-feedback of service health telemetry to dynamically adjust the rate of requests
-processed by a service. This adjustment is managed by Aperture agents, which
-provide a virtual request queue at the service's entry point.
+Adaptive service protection leverages closed-loop feedback of service health
+telemetry to dynamically adjust the rate of requests processed by a service.
+This adjustment is managed by Aperture agents, which provide a virtual request
+queue at the service's entry point.
 
 The queue adjusts the rate of requests in real-time based on the service's
 health, effectively mitigating potential service disruptions and maintaining
@@ -31,7 +31,7 @@ safeguard, ensuring that your system maintains optimal performance and uptime.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/service-protection.mmd}
+{@include: ./assets/adaptive-service-protection/adaptive-service-protection.mmd}
 ```
 
 </Zoom>
@@ -45,8 +45,8 @@ multiplier applied to the recent rate of requests.
 :::note
 
 Aperture facilitates the observation of health signals from various services.
-For instance, load scheduling can also be implemented based on the health
-observation of an upstream service in relation to a downstream service.
+For instance, adaptive service protection can also be implemented based on the
+health observation of an upstream service in relation to a downstream service.
 
 :::
 

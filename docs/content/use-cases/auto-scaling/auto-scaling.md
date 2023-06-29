@@ -25,7 +25,7 @@ changing traffic patterns.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/auto-scaling.mmd}
+{@include: ./assets/auto-scaling/auto-scaling.mmd}
 ```
 
 </Zoom>

@@ -24,7 +24,7 @@ within this blueprint.
 :::info
 
 See the tutorial on
-[Load Ramping with Average Latency Feedback](/use-cases/load-ramping/average-latency-feedback.md)
+[Percentage Rollout with Average Latency Feedback](/use-cases/percentage-rollouts/average-latency-feedback.md)
 to see this blueprint in use.
 
 :::

@@ -1,5 +1,5 @@
 ---
-title: Quota Scheduling
+title: Managing Quotas
 keywords:
   - tutorial
   - quota-scheduler
@@ -9,16 +9,16 @@ keywords:
   - external-api
   - prioritization
 sidebar_position: 2
-sidebar_label: Quota Scheduling
+sidebar_label: Managing Quotas
 ---
 
 ## Overview
 
 Quota scheduling is a sophisticated technique that enables effective management
-of external request quotas. This technique empowers services to enforce rate
-limits for outbound or external API. This helps ensure that services stay within
-allocated rate limits, therefore avoiding penalties, ensuring smooth and
-uninterrupted operation.
+of request quotas. This technique empowers services to enforce rate limits for
+outbound or external API. This helps ensure that services stay within allocated
+rate limits, therefore avoiding penalties, ensuring smooth and uninterrupted
+operation.
 
 Moreover, quota scheduling optimizes the utilization of request quotas by
 prioritizing access based on business-critical workloads. This strategic
@@ -29,7 +29,7 @@ cost overages.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/quota-scheduler.mmd}
+{@include: ./assets/managing-quotas/managing-quotas.mmd}
 ```
 
 </Zoom>

@@ -1,5 +1,5 @@
 ---
-title: Prioritization
+title: Workload Prioritization
 keywords:
   - policies
   - scheduler
@@ -29,9 +29,9 @@ scenarios.
 This policy defines service protection on
 **`cart-service.prod.svc.cluster.local`** using a load scheduler and overload
 detection is based on average latency similar to the
-[protection policy](protection.md). In addition, workload prioritization is
-specified in the load scheduler based on user types accessing the service. User
-types are identified based on the value of a header label
+[protection policy](average-latency-feedback.md). In addition, workload
+prioritization is specified in the load scheduler based on user types accessing
+the service. User types are identified based on the value of a header label
 `http.request.header.user_type`. Requests matching label value **`guest`** are
 assigned a priority of 50, whereas those matching **`subscriber`** are given a
 priority of 200.
@@ -42,7 +42,7 @@ priority of 200.
 ```
 
 ```yaml
-{@include: ./assets/prioritization/values.yaml}
+{@include: ./assets/workload-prioritization/values.yaml}
 ```
 
 ```mdx-code-block
@@ -54,7 +54,7 @@ priority of 200.
 <p>
 
 ```yaml
-{@include: ./assets/prioritization/policy.yaml}
+{@include: ./assets/workload-prioritization/policy.yaml}
 ```
 
 </p>
@@ -62,7 +62,8 @@ priority of 200.
 
 :::info
 
-[Circuit Diagram](./assets/prioritization/graph.mmd.svg) for this policy.
+[Circuit Diagram](./assets/workload-prioritization/graph.mmd.svg) for this
+policy.
 
 :::
 
@@ -77,7 +78,7 @@ The below dashboard shows that, during overload periods, requests from
 
 <Zoom>
 
-![Workload Prioritization](./assets/prioritization/dashboard.png)
+![Workload Prioritization](./assets/workload-prioritization/dashboard.png)
 
 </Zoom>
 

@@ -1350,8 +1350,8 @@ AutoScale components are used to scale the service.
 
 <!-- vale on -->
 
-BoolVariable emits a constant Boolean signal which can be changed at runtime via
-dynamic configuration.
+BoolVariable emits a constant Boolean signal which can be changed at runtime
+through dynamic configuration.
 
 </dd>
 <dt>decider</dt>
@@ -1637,7 +1637,7 @@ Takes an input signal and emits the square root of the input signal.
 
 <!-- vale on -->
 
-Emits a variable signal which can be changed at runtime via dynamic
+Emits a variable signal which can be changed at runtime through dynamic
 configuration.
 
 </dd>

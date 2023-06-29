@@ -48,9 +48,10 @@ component that is used within this blueprint.
 :::info
 
 See tutorials on
-[Basic Load Scheduling](/use-cases/load-scheduling/protection.md) and
-[Workload Prioritization](/use-cases/load-scheduling/prioritization.md) to see
-this blueprint in use.
+[Adaptive Service Protection with Average Latency Feedback](/use-cases/adaptive-service-protection/average-latency-feedback.md)
+and
+[Workload Prioritization](/use-cases/adaptive-service-protection/workload-prioritization.md)
+to see this blueprint in use.
 
 :::
 

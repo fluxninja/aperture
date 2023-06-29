@@ -548,7 +548,7 @@
         },
         "bool_variable": {
           "$ref": "#/definitions/BoolVariable",
-          "description": "BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration."
+          "description": "BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration."
         },
         "decider": {
           "$ref": "#/definitions/Decider",
@@ -640,7 +640,7 @@
         },
         "variable": {
           "$ref": "#/definitions/Variable",
-          "description": "Emits a variable signal which can be changed at runtime via dynamic configuration."
+          "description": "Emits a variable signal which can be changed at runtime through dynamic configuration."
         }
       },
       "title": "Computational block that forms the circuit",
