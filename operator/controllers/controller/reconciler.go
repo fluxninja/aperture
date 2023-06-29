@@ -138,7 +138,9 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if instance.GetDeletionTimestamp() != nil {
 		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
 		if controllerutil.ContainsFinalizer(instance, controllers.FinalizerName) {
-			r.deleteResources(ctx, logger, instance.DeepCopy())
+			if !r.MultipleControllers {
+				r.deleteResources(ctx, logger, instance.DeepCopy())
+			}
 
 			controllerutil.RemoveFinalizer(instance, controllers.FinalizerName)
 			if err = r.updateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
