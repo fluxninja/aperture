@@ -65,7 +65,7 @@ type ServerConstructor struct {
 	ServerOptions []grpc.ServerOption
 	// UnaryServerInterceptors add after all built-in unary interceptors
 	UnaryServerInterceptors []grpc.UnaryServerInterceptor
-	// StreamServerInterceptors add after all built-in unary interceptors
+	// StreamServerInterceptors add after all built-in stream interceptors
 	StreamServerInterceptors []grpc.StreamServerInterceptor
 	// Default Server Config
 	DefaultConfig GRPCServerConfig
