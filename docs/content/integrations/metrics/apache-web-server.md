@@ -32,13 +32,12 @@ Apache Web Server as part of [Policy resources][policy-resources] while
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          apache:
-            per_agent_group: true
-            receivers:
-              apache: [apachereceiver configuration here]
+    infra_meters:
+      apache:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          apache: [apachereceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

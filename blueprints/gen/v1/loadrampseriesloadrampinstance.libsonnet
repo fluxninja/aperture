@@ -1,8 +1,8 @@
-local loadrampseriesloadrampinstanceouts = import './loadrampseriesloadrampinstanceouts.libsonnet';
+local loadrampouts = import './loadrampouts.libsonnet';
 {
   new():: {
   },
-  outPorts:: loadrampseriesloadrampinstanceouts,
+  outPorts:: loadrampouts,
   withLoadRamp(load_ramp):: {
     load_ramp: load_ramp,
   },

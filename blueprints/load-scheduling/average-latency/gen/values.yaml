@@ -1,0 +1,84 @@
+# Generated values file for load-scheduling/average-latency blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
+
+policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # The interval between successive evaluations of the Circuit.
+  # Type: string
+  evaluation_interval: "10s"
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
+  service_protection_core:
+    # Parameters for Adaptive Load Scheduler.
+    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Required: True
+    adaptive_load_scheduler:
+      alerter:
+        alert_name: "Load Throttling Event"
+      gradient:
+        max_gradient: 1
+        min_gradient: 0.1
+        slope: -1
+      load_multiplier_linear_increment: 0.025
+      load_scheduler:
+        selectors:
+          - control_point: __REQUIRED_FIELD__
+            service: __REQUIRED_FIELD__
+      max_load_multiplier: 2
+    # Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
+    # Type: bool
+    dry_run: false
+    # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
+    # Type: []overload_confirmation
+    overload_confirmations: []
+  latency_baseliner:
+    # Flux Meter defines the scope of latency measurements.
+    # Type: aperture.spec.v1.FluxMeter
+    # Required: True
+    flux_meter:
+      selectors:
+        - control_point: __REQUIRED_FIELD__
+          service: __REQUIRED_FIELD__
+    # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.
+    # Type: float64
+    latency_tolerance_multiplier: 1.25
+    # Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.
+    # Type: string
+    long_term_query_interval: "1800s"
+    # Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.
+    # Type: string
+    long_term_query_periodic_interval: "30s"
+
+dashboard:
+  # Additional filters to pass to each query to Grafana datasource.
+  # Type: map[string]string
+  extra_filters: {}
+  # Refresh interval for dashboard panels.
+  # Type: string
+  refresh_interval: "15s"
+  # Time from of dashboard.
+  # Type: string
+  time_from: "now-15m"
+  # Time to of dashboard.
+  # Type: string
+  time_to: "now"
+  # Name of the main dashboard.
+  # Type: string
+  title: "Aperture Service Protection"
+  datasource:
+    # Datasource filter regex.
+    # Type: string
+    filter_regex: ""
+    # Datasource name.
+    # Type: string
+    name: "$datasource"

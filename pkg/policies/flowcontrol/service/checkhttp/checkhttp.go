@@ -12,7 +12,6 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -75,10 +74,13 @@ type Handler struct {
 // CheckHTTP is the Check method of Flow Control service returns the allow/deny decisions of
 // whether to accept the traffic after running the algorithms.
 func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTTPRequest) (*flowcontrolhttpv1.CheckHTTPResponse, error) {
+	// Put inner fields back into pool.
+	// Note: Not pooling the whole CheckHTTPRequest, as we don't control the object creation.
+	defer req.ResetVT()
 	// record the start time of the request
 	start := time.Now()
 	createResponse := func(checkResponse *flowcontrolv1.CheckResponse) *flowcontrolhttpv1.CheckHTTPResponse {
-		marshalledCheckResponse, err := proto.Marshal(checkResponse)
+		marshalledCheckResponse, err := checkResponse.MarshalVT()
 		if err != nil {
 			log.Bug().Err(err).Msg("bug: Failed to marshal check response")
 			return nil

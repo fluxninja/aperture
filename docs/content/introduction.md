@@ -56,20 +56,20 @@ sections inside applications.
 Aperture provides a variety of advanced load management features:
 
 - 🛡️
-  [**Adaptive Service Protection**](./use-cases/service-protection/protection.md):
+  [**Adaptive Service Protection**](./use-cases/load-scheduling/protection.md):
   Enhance resource utilization and safeguard against abrupt service overloads
   with an intelligent queue at the entry point of services. This queue
   dynamically adjusts the rate of requests based on live service health, thereby
   mitigating potential service disruptions and ensuring optimal performance
   under all load conditions.
 - 📊
-  [**Intelligent Quota Management**](./use-cases/quota-scheduler/quota-scheduler.md):
+  [**Intelligent Quota Management**](./use-cases/quota-scheduling/quota-scheduling.md):
   Maintain compliance with external API quotas with a global token bucket and
   smart request queuing. This feature regulates requests aimed at external
   services, ensuring that the usage remains within prescribed rate limits and
   avoids penalties or additional costs.
 - 🎯
-  [**Workload Prioritization**](./use-cases/service-protection/prioritization.md):
+  [**Workload Prioritization**](./use-cases/load-scheduling/prioritization.md):
   Safeguard crucial user experience pathways and ensure prioritized access to
   external APIs even during high-load conditions by strategically prioritizing
   workloads. This is achieved through the use of declarative policies that label
@@ -77,20 +77,19 @@ Aperture provides a variety of advanced load management features:
   [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
   for scheduling, Aperture ensures a fair distribution of resources that aligns
   with the business value and urgency of requests.
-- 🔀 [**Load-based Auto Scaling**](./use-cases/auto-scale/auto-scale.md):
-  Eliminate the need for costly over-provisioning and enhance efficiency with
-  Aperture's load-based auto-scaling. Aperture's policies are expressed as
-  circuit graphs that continuously track deviations from service-level
-  objectives and calculate recovery or escalation actions. Auto-scaling can be
-  implemented as an escalation that triggers based on load throttling signal.
+- 🔀 **Load-based Auto Scaling**: Eliminate the need for costly
+  over-provisioning and enhance efficiency with Aperture's load-based
+  auto-scaling. Aperture's policies are expressed as circuit graphs that
+  continuously track deviations from service-level objectives and calculate
+  recovery or escalation actions. Auto-scaling can be implemented as an
+  escalation that triggers based on load throttling signal.
 - ⏱️
   [**Distributed Rate-Limiting**](./use-cases/rate-limiting/rate-limiting.md):
   Safeguard APIs from potential abuse with Aperture's high-performance,
   distributed rate limiter. This feature enforces per-key limits based on
   fine-grained labels, ensuring precise control and prevention of excessive
   usage.
-- 🚀
-  [**Automated Load Ramping**](./use-cases/feature-rollout/feature-rollout.md):
+- 🚀 [**Automated Load Ramping**](./use-cases/load-ramping/load-ramping.md):
   Aperture enables teams to gradually release new features to a subset of users,
   without impacting the rest of the system, using dark launch.
 

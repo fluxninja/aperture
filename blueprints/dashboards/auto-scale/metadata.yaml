@@ -1,3 +1,0 @@
-blueprint: Auto-scale
-sources:
-  dashboard: dashboards/auto-scale/dashboard.libsonnet

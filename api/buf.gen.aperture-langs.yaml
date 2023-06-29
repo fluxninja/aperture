@@ -24,6 +24,24 @@ plugins:
     out: gen/proto/go
     opt:
       - paths=source_relative
+  - plugin: buf.build/community/planetscale-vtprotobuf:v0.4.0
+    out: gen/proto/go
+    opt:
+      - paths=source_relative
+      - features=marshal+unmarshal+size+pool
+      # Nicer way (instead of poolable) would be to use mempool attribute,
+      # like here, but that package is not on buf registry.
+      # https://github.com/planetscale/vtprotobuf/blob/96ede25e29a0325741fd05d6e9e48364d65ea137/testproto/pool/pool.proto#L7
+      # Note: Pooling is enabled only for top-level messages, or messages which
+      # get automatically used in unmarshalling. The rest of messages don't use
+      # the pool.
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.CheckResponse
+      # Doesn't compile, hit some bug in vtproto.
+      # - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision_SchedulerInfo
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest_HttpRequest
+      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.SocketAddress
   - plugin: buf.build/grpc/go
     out: gen/proto/go
     opt:

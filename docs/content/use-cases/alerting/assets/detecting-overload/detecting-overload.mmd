@@ -1,11 +1,11 @@
 flowchart LR
-subgraph root.0[<center>PromQL<br/>every 1s</center>]
+subgraph root.0[<center>PromQL<br/>every 10s</center>]
 subgraph root.0_outports[ ]
 style root.0_outports fill:none,stroke:none
 root.0output[output]
 end
 end
-subgraph root.1[<center>EMA<br/>win: 3000</center>]
+subgraph root.1[<center>EMA<br/>win: 150</center>]
 subgraph root.1_inports[ ]
 style root.1_inports fill:none,stroke:none
 root.1input[input]

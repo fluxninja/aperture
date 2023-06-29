@@ -20,24 +20,14 @@ func AddInfraMeters(
 	config *otelconfig.Config,
 	infraMeters map[string]*policysyncv1.InfraMeterWrapper,
 ) error {
-	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
-		"attributes": []map[string]interface{}{
-			{
-				"key":    "service.name",
-				"action": "upsert",
-				"value":  "aperture-infra-meter",
-			},
-		},
-	})
 	if infraMeters == nil {
 		infraMeters = map[string]*policysyncv1.InfraMeterWrapper{}
 	}
-	for prefix, infraMeterWrapper := range infraMeters {
-		for key, infraMeter := range infraMeterWrapper.GetInfraMeter() {
-			if err := addInfraMeter(
-				config, infraMeterWrapper.GetPolicyName(), infraMeterWrapper.GetTelemetryCollectorId(), prefix, key, infraMeter); err != nil {
-				return fmt.Errorf("failed to add infra metric pipeline %s: %w", fmt.Sprintf("%s/%s", prefix, key), err)
-			}
+	for pipelineName, infraMeterWrapper := range infraMeters {
+		infraMeter := infraMeterWrapper.GetInfraMeter()
+		if err := addInfraMeter(
+			config, infraMeterWrapper.GetPolicyName(), pipelineName, infraMeterWrapper.GetInfraMeterName(), infraMeter); err != nil {
+			return fmt.Errorf("failed to add infra metric pipeline %s: %w", pipelineName, err)
 		}
 	}
 	return nil
@@ -46,14 +36,18 @@ func AddInfraMeters(
 func addInfraMeter(
 	config *otelconfig.Config,
 	policyName string,
-	telemetryCollectorID int64,
-	telemetryCollectorName string,
+	pipelineName string,
 	infraMeterName string,
 	infraMeter *policylangv1.InfraMeter,
 ) error {
-	processorName := fmt.Sprintf("%s-%s-%s-%d", otelconsts.ProcessorTelemetryCollector, policyName, infraMeterName, telemetryCollectorID)
+	processorName := fmt.Sprintf("%s-%s-%s", otelconsts.ProcessorInfraMeter, policyName, infraMeterName)
 	config.AddProcessor(processorName, map[string]any{
 		"attributes": []map[string]interface{}{
+			{
+				"key":    "service.name",
+				"action": "upsert",
+				"value":  "aperture-infra-meter",
+			},
 			{
 				"key":    "aperture_infra_meter_name",
 				"action": "upsert",
@@ -64,14 +58,9 @@ func addInfraMeter(
 				"action": "upsert",
 				"value":  policyName,
 			},
-			{
-				"key":    "aperture_telemetry_collector_id",
-				"action": "upsert",
-				"value":  telemetryCollectorID,
-			},
 		},
 	})
-	pipelineName := strings.TrimPrefix(fmt.Sprintf("%s/%s", telemetryCollectorName, infraMeterName), "metrics/")
+	pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
 
 	receiverIDs := map[string]string{}
 	processorIDs := map[string]string{}
@@ -126,7 +115,6 @@ func addInfraMeter(
 		Receivers: mapSlice(receiverIDs, infraMeter.Pipeline.Receivers),
 		Processors: append(
 			mapSlice(processorIDs, infraMeter.Pipeline.Processors),
-			otelconsts.ProcessorInfraMeter,
 			processorName,
 			otelconsts.ProcessorAgentResourceLabels,
 		),

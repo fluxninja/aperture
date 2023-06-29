@@ -16,7 +16,6 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -94,7 +93,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		// Additional base64 encoding step is used, as there's no way to push
 		// binary data through dynamic metadata and envoy's access log
 		// formatter. Overhead of this base64 encoding is small though.
-		marshalledCheckResponse, err := proto.Marshal(checkResponse)
+		marshalledCheckResponse, err := checkResponse.MarshalVT()
 		if err != nil {
 			log.Bug().Err(err).Msg("bug: Failed to marshal check response")
 			return nil
