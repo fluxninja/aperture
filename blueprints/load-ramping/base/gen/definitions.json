@@ -58,7 +58,7 @@
           "type": "string"
         },
         "load_ramp": {
-          "description": "Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.",
+          "description": "Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.",
           "default": {
             "sampler": {
               "label_key": "",
@@ -94,8 +94,8 @@
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
-        "rollout": {
-          "description": "Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.",
+        "start": {
+          "description": "Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.",
           "default": false,
           "type": "boolean"
         }
@@ -128,7 +128,7 @@
         },
         "title": {
           "description": "Name of the main dashboard.",
-          "default": "Aperture Feature Rollout",
+          "default": "Aperture Load Ramp",
           "type": "string"
         },
         "datasource": {

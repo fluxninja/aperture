@@ -974,7 +974,7 @@ type Component_Sma struct {
 }
 
 type Component_Variable struct {
-	// Emits a variable signal which can be changed at runtime via dynamic configuration.
+	// Emits a variable signal which can be changed at runtime through dynamic configuration.
 	Variable *Variable `protobuf:"bytes,9,opt,name=variable,proto3,oneof"`
 }
 
@@ -1064,7 +1064,7 @@ type Component_SignalGenerator struct {
 }
 
 type Component_BoolVariable struct {
-	// BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
+	// BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
 	BoolVariable *BoolVariable `protobuf:"bytes,28,opt,name=bool_variable,json=boolVariable,proto3,oneof"`
 }
 

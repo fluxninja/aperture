@@ -7,9 +7,9 @@ sidebar_label: Base Load Ramping Policy
 
 ## Introduction
 
-This policy rolls out new features based on closed loop feedback. The rollout
+This policy rolls out new features based on closed loop feedback. The ramping
 criteria are defined by drivers that determine conditions for advancing,
-reversing, or resetting the rollout to its initial state. The rollout process
+reversing, or resetting the ramping to its initial state. The ramping process
 consists of a series of steps that progress if the feature is considered
 healthy.
 
@@ -24,7 +24,7 @@ within this blueprint.
 :::info
 
 See the tutorial on
-[Load Ramping with Average Latency Feedback](/use-cases/load-ramping/average-latency-feedback.md)
+[Percentage Rollout with Average Latency Feedback](/use-cases/percentage-rollouts/average-latency-feedback.md)
 to see this blueprint in use.
 
 :::
@@ -87,7 +87,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <ParameterDescription
     name='policy.load_ramp'
-    description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.'
+    description='Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.'
     type='Object (aperture.spec.v1.LoadRampParameters)'
     reference='../../spec#load-ramp-parameters'
     value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
@@ -125,11 +125,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale off -->
 
-<a id="policy-rollout"></a>
+<a id="policy-start"></a>
 
 <ParameterDescription
-    name='policy.rollout'
-    description='Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.'
+    name='policy.start'
+    description='Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.'
     type='Boolean'
     reference=''
     value='false'
@@ -258,7 +258,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Name of the main dashboard.'
     type='string'
     reference=''
-    value='"Aperture Feature Rollout"'
+    value='"Aperture Load Ramp"'
 />
 
 <!-- vale on -->
@@ -655,7 +655,7 @@ at runtime, without reloading the policy.
 
 <ParameterDescription
     name='reset'
-    description='Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.'
+    description='Reset load ramp to the first step. This setting can be updated at the runtime without shutting down the policy.'
     type='Boolean'
     reference=''
     value='false'
@@ -667,11 +667,11 @@ at runtime, without reloading the policy.
 
 <!-- vale off -->
 
-<a id="rollout"></a>
+<a id="start"></a>
 
 <ParameterDescription
-    name='rollout'
-    description='Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.'
+    name='start'
+    description='Start load ramp. This setting can be updated at runtime without shutting down the policy. The load ramp gets paused if this flag is set to false in the middle of a load ramp.'
     type='Boolean'
     reference=''
     value='false'

@@ -3,11 +3,11 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/load-ramping/base
 
-# Start feature rollout. This setting can be updated at runtime without shutting down the policy. The feature rollout gets paused if this flag is set to false in the middle of a feature rollout.
+# Start load ramp. This setting can be updated at runtime without shutting down the policy. The load ramp gets paused if this flag is set to false in the middle of a load ramp.
 # Type: bool
-rollout: true
+start: true
 
-# Reset feature rollout to the first step. This setting can be updated at the runtime without shutting down the policy.
+# Reset load ramp to the first step. This setting can be updated at the runtime without shutting down the policy.
 # Type: bool
 reset: false
 

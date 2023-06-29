@@ -30,7 +30,7 @@ performance and resource allocation.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/rate-limiting.mmd}
+{@include: ./assets/rate-limiting/rate-limiting.mmd}
 ```
 
 </Zoom>

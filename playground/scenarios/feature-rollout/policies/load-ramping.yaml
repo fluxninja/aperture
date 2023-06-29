@@ -1,16 +1,16 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/feature-rollout/base/gen/definitions.json
-# Generated values file for policies/feature-rollout/base blueprint
+# yaml-language-server: $schema=../../../../blueprints/load-ramping/base/gen/definitions.json
+# Generated values file for load-ramping/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/feature-rollout/base
+# https://docs.fluxninja.com/reference/blueprints/load-ramping/base
 
-# Parameters for the Feature Rollout policy.
-# Type: policies/feature-rollout/base:schema:rollout_policy
+# Parameters for the load ramp policy.
+# Type: load-ramping/base:schema:rollout_policy
 # Required: True
 policy:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "feature-rollout"
+  policy_name: "load-ramping"
   components: []
   drivers:
     average_latency_drivers:
@@ -22,7 +22,7 @@ policy:
             threshold: 75
           reset:
             threshold: 75
-  rollout: true
+  start: true
   evaluation_interval: "10s"
   load_ramp:
     sampler:

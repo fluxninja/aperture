@@ -70,7 +70,7 @@ low load.
 ```
 
 ```yaml
-{@include: ./assets/values.yaml}
+{@include: ./assets/load-based-auto-scaling/values.yaml}
 ```
 
 ```mdx-code-block
@@ -82,7 +82,7 @@ low load.
 <p>
 
 ```yaml
-{@include: ./assets/policy.yaml}
+{@include: ./assets/load-based-auto-scaling/policy.yaml}
 ```
 
 </p>
@@ -90,7 +90,8 @@ low load.
 
 :::info
 
-[Circuit Diagram](./assets/graph.mmd.svg) for this policy.
+[Circuit Diagram](./assets/load-based-auto-scaling/graph.mmd.svg) for this
+policy.
 
 :::
 
@@ -111,6 +112,6 @@ triggered, which reduces the number of replicas in response to decreased load.
 
 <Zoom>
 
-![Auto Scale](./assets/dashboard.png)
+![Auto Scale](./assets/load-based-auto-scaling/dashboard.png)
 
 </Zoom>
