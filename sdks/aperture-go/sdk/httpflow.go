@@ -58,10 +58,7 @@ func (f *httpflow) Decision() FlowDecision {
 // By default, fail-open behavior is enabled. Use DisableFailOpen to disable it.
 func (f *httpflow) ShouldRun() bool {
 	decision := f.Decision()
-	if decision == Accepted || (f.failOpen && decision == Unreachable) {
-		return true
-	}
-	return false
+	return decision == Accepted || (f.failOpen && decision == Unreachable)
 }
 
 // DisableFailOpen disables fail-open behavior for the flow.
