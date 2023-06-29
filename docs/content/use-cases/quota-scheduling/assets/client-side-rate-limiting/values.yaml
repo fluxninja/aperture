@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=../../../../../../blueprints/policies/quota-scheduling/gen/definitions.json
-# Generated values file for quota-scheduling blueprint
+# yaml-language-server: $schema=../../../../../../blueprints/quota-scheduling/base/gen/definitions.json
+# Generated values file for quota-scheduling/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/quota-scheduling
 policy:
@@ -21,9 +21,9 @@ policy:
             match_labels:
               call_type: background
           parameters:
-            priority: 50
+            priority: "50"
         - label_matcher:
             match_labels:
               call_type: interactive
           parameters:
-            priority: 200
+            priority: "200"
