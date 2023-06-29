@@ -10,15 +10,16 @@ import (
 	"strconv"
 	"strings"
 
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
-	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+
+	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
+	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
-// splits address into host and port
+// splits address into host and port.
 func splitAddress(logger logr.Logger, address string) (string, uint32) {
 	host, port, err := net.SplitHostPort(address)
 	if err != nil {
@@ -35,7 +36,7 @@ func splitAddress(logger logr.Logger, address string) (string, uint32) {
 	return host, uint32(portUint)
 }
 
-// reads body from request, replacing it with a clone to allow further reads
+// reads body from request, replacing it with a clone to allow further reads.
 func readClonedBody(r *http.Request) ([]byte, error) {
 	body := r.Body
 	defer body.Close()
@@ -47,7 +48,7 @@ func readClonedBody(r *http.Request) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-// try to figure out the local ip address
+// try to figure out the local ip address.
 func getLocalIP(logger logr.Logger) string {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
