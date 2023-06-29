@@ -1,3 +1,0 @@
-blueprint: Service Protection Policy for PostgreSQL.
-sources:
-  policy: policies/service-protection/postgresql/policy.libsonnet

@@ -7,7 +7,7 @@ aperturectl="$git_root"/cmd/aperturectl/aperturectl
 
 "$aperturectl" blueprints generate \
 	--uri "$git_root"/blueprints \
-	--name policies/rate-limiting \
+	--name policies/rate-limiting/base \
 	--values-file values.yaml \
 	--output-dir "tmp" \
 	--skip-pull \
@@ -16,4 +16,4 @@ aperturectl="$git_root"/cmd/aperturectl/aperturectl
 rm -rf tmp
 
 # copy over raw values.yaml as well
-cp "$git_root"/blueprints/policies/rate-limiting/gen/values.yaml raw_values.yaml
+cp "$git_root"/blueprints/policies/rate-limiting/base/gen/values.yaml raw_values.yaml

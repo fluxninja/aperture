@@ -16,8 +16,8 @@ import Zoom from 'react-medium-image-zoom';
 ## Overview
 
 This policy is an example of how to implement
-[rate limiting](../../reference/blueprints/policies/rate-limiting.md) for
-GraphQL queries using the [_Classifier_][rego-rules].
+[rate limiting](/reference/blueprints/rate-limiting/base.md) for GraphQL queries
+using the [_Classifier_][rego-rules].
 
 ## Configuration
 

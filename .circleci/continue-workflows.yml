@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.4
+      - image: cimg/go:1.20.5
         user: root
   python-cimg-executor:
     docker:
@@ -313,7 +313,7 @@ jobs:
       - restore_cache:
           name: Restore daily cache
           keys:
-            - aperture-v7-daily-cache-{{ checksum "~/day" }}
+            - aperture-v8-daily-cache-{{ checksum "~/day" }}
       - run: &install_opsninja
           name: Install opsninja and its dependencies
           command: |
@@ -394,7 +394,7 @@ jobs:
             fi
       - save_cache:
           name: Save daily cache
-          key: aperture-v7-daily-cache-{{ checksum "~/day" }}
+          key: aperture-v8-daily-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/go-build
             - ../.cache/golangci-lint
@@ -1444,10 +1444,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Copy tool-versions in HOME dir
@@ -1469,7 +1469,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v9-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:

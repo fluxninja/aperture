@@ -2,7 +2,7 @@ apiVersion: fluxninja.com/v1alpha1
 kind: Policy
 metadata:
   annotations:
-    fluxninja.com/blueprint-name: policies/rate-limiting
+    fluxninja.com/blueprint-name: rate-limiting/base
     fluxninja.com/blueprints-uri: local
     fluxninja.com/values: '{"policy": {"policy_name": "graphql-rate-limiting", "rate_limiter":
       {"bucket_capacity": 40, "fill_amount": 2, "parameters": {"interval": "1s", "label_key":
