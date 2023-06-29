@@ -189,6 +189,10 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	}
 	r.resourcesDeleted = false
 
+	if err := r.deleteSingletonResources(ctx, logger, req, instance); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	if err := r.manageResources(ctx, logger, instance); err != nil {
 		return ctrl.Result{}, err
 	}
@@ -259,6 +263,55 @@ func (r *ControllerReconciler) updateStatus(ctx context.Context, instance *contr
 			return err
 		}
 	}
+	return nil
+}
+
+func (r *ControllerReconciler) deleteSingletonResources(ctx context.Context, log logr.Logger, req ctrl.Request, instance *controllerv1alpha1.Controller) error {
+	// If we created controller with name "controller" its full name will match singleton name.
+	instanceFullName := fmt.Sprintf("%s-%s", controllers.AppName, instance.GetName())
+	if instanceFullName == controllers.ControllerServiceName {
+		return nil
+	}
+
+	singletonInstance := instance.DeepCopy()
+	singletonInstance.Name = controllers.ControllerServiceName
+
+	deployment, err := deploymentForController(singletonInstance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
+	if err != nil {
+		return nil
+	}
+
+	if err = r.Delete(ctx, deployment); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old singleton Deployment")
+	}
+
+	configMap, err := configMapForControllerConfig(singletonInstance.DeepCopy(), r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old singleton ConfigMap")
+	}
+
+	serviceAccount, err := serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old singleton ServiceAccount")
+	}
+
+	secret, err := secretForControllerAPIKey(singletonInstance.DeepCopy(), r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	if err = r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old singleton Secret")
+	}
+
 	return nil
 }
 
@@ -494,18 +547,19 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	return nil
 }
 
+func (r *ControllerReconciler) tlsEnabled() bool {
+	// FIXME: Manage per-controller tls certificates with cert-manager
+	if r.MultipleControllers {
+		return false
+	} else {
+		return true
+	}
+}
+
 // reconcileDeployment prepares the desired states for Controller Deployment and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	// FIXME: Manage per-controller tls certificates with cert-manager
-	var tlsEnabled bool
-	if r.MultipleControllers {
-		tlsEnabled = false
-	} else {
-		tlsEnabled = true
-	}
-
-	dep, err := deploymentForController(instance.DeepCopy(), tlsEnabled, log, r.Scheme)
+	dep, err := deploymentForController(instance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
 	if err != nil {
 		return err
 	}
