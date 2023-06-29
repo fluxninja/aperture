@@ -19,20 +19,35 @@
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
         },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
         "dry_run": {
           "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
           "default": false,
           "type": "boolean"
         },
-        "evaluation_interval": {
-          "description": "The interval between successive evaluations of the Circuit.",
-          "default": "10s",
-          "type": "string"
-        },
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
+        "kubeletstats_infra_meter": {
+          "description": "Infra meter for scraping Kubelet metrics.",
+          "default": {
+            "agent_group": "default",
+            "enabled": true,
+            "filter": {}
+          },
+          "type": "object",
+          "$ref": "#/$defs/kubeletstats_infra_meter"
         },
         "promql_scale_in_controllers": {
           "description": "List of scale in controllers.",
@@ -51,16 +66,6 @@
             "type": "object",
             "$ref": "#/$defs/promql_scale_out_controller"
           }
-        },
-        "resources": {
-          "description": "List of additional resources.",
-          "default": {
-            "flow_control": {
-              "classifiers": []
-            }
-          },
-          "type": "object",
-          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
         "scaling_backend": {
           "description": "Scaling backend for the policy.",
@@ -97,16 +102,16 @@
         },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "5s",
+          "default": "15s",
           "type": "string"
         },
         "time_from": {
-          "description": "Time from of dashboard.",
+          "description": "From time of dashboard.",
           "default": "now-15m",
           "type": "string"
         },
         "time_to": {
-          "description": "Time to of dashboard.",
+          "description": "To time of dashboard.",
           "default": "now",
           "type": "string"
         },
@@ -135,6 +140,89 @@
     }
   },
   "$defs": {
+    "kubeletstats_infra_meter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agent_group": {
+          "description": "Agent group to be used for the infra_meter.",
+          "default": "default",
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Adds infra_meter for scraping Kubelet metrics.",
+          "default": true,
+          "type": "boolean"
+        },
+        "filter": {
+          "description": "Filter to be applied to the infra_meter.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/kubeletstats_infra_meter_filter"
+        }
+      }
+    },
+    "kubeletstats_infra_meter_filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "description": "Fields allows to filter pods by generic k8s fields. Supported operations are: equals, not-equals.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/$defs/kubeletstats_infra_meter_label_filter"
+          }
+        },
+        "labels": {
+          "description": "Labels allows to filter pods by generic k8s pod labels.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/$defs/kubeletstats_infra_meter_label_filter"
+          }
+        },
+        "namespace": {
+          "description": "Namespace filters all pods by the provided namespace. All other pods are ignored.",
+          "default": "",
+          "type": "string"
+        },
+        "node": {
+          "description": "Node represents a k8s node or host. If specified, any pods not running on the specified node will be ignored by the tagger.",
+          "default": "",
+          "type": "string"
+        },
+        "node_from_env_var": {
+          "description": "odeFromEnv can be used to extract the node name from an environment variable. For example: `NODE_NAME`.",
+          "default": "",
+          "type": "string"
+        }
+      }
+    },
+    "kubeletstats_infra_meter_label_filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "op", "value"],
+      "properties": {
+        "key": {
+          "description": "Key represents the key or name of the field or labels that a filter can apply on.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "op": {
+          "description": "Op represents the filter operation to apply on the given Key: Value pair. The supported operations are: equals, not-equals, exists, does-not-exist.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "value": {
+          "description": "Value represents the value associated with the key that a filter operation specified by the `Op` field applies on.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        }
+      }
+    },
     "promql_scale_in_controller": {
       "type": "object",
       "additionalProperties": false,

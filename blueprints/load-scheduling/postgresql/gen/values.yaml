@@ -6,9 +6,6 @@ policy:
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []
-  # The interval between successive evaluations of the Circuit.
-  # Type: string
-  evaluation_interval: "10s"
   # Name of the policy.
   # Type: string
   # Required: True
@@ -18,6 +15,15 @@ policy:
   resources:
     flow_control:
       classifiers: []
+  # The interval between successive evaluations of the Circuit.
+  # Type: string
+  evaluation_interval: "10s"
+  # Infra meter for scraping Kubelet metrics.
+  # Type: kubeletstats_infra_meter
+  kubeletstats_infra_meter:
+    agent_group: "default"
+    enabled: true
+    filter: {}
   service_protection_core:
     # Parameters for Adaptive Load Scheduler.
     # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
@@ -75,10 +81,10 @@ dashboard:
   # Refresh interval for dashboard panels.
   # Type: string
   refresh_interval: "15s"
-  # Time from of dashboard.
+  # From time of dashboard.
   # Type: string
   time_from: "now-15m"
-  # Time to of dashboard.
+  # To time of dashboard.
   # Type: string
   time_to: "now"
   # Name of the main dashboard.

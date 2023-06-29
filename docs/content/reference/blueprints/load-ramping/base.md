@@ -69,6 +69,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale off -->
 
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-resources"></a>
+
+<ParameterDescription
+    name='policy.resources'
+    description='Additional resources.'
+    type='Object (aperture.spec.v1.Resources)'
+    reference='../../spec#resources'
+    value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-evaluation-interval"></a>
 
 <ParameterDescription
@@ -91,34 +119,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     type='Object (aperture.spec.v1.LoadRampParameters)'
     reference='../../spec#load-ramp-parameters'
     value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-policy-name"></a>
-
-<ParameterDescription
-    name='policy.policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-resources"></a>
-
-<ParameterDescription
-    name='policy.resources'
-    description='List of additional resources.'
-    type='Object (aperture.spec.v1.Resources)'
-    reference='../../spec#resources'
-    value='{"flow_control": {"classifiers": []}}'
 />
 
 <!-- vale on -->
@@ -216,7 +216,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Refresh interval for dashboard panels.'
     type='string'
     reference=''
-    value='"5s"'
+    value='"15s"'
 />
 
 <!-- vale on -->
