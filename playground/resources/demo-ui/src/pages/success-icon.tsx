@@ -1,7 +1,6 @@
 import { SvgIcon, SvgIconProps } from '@mui/material'
 import React, { FC, PropsWithRef } from 'react'
 
-// eslint-disable-next-line react/display-name
 export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
   (props, ref) => (
     <SvgIcon width="100" height="100" viewBox="0 0 49 44" {...props} ref={ref}>
@@ -36,3 +35,5 @@ export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
     </SvgIcon>
   )
 )
+
+SuccessIcon.displayName = 'SuccessIcon'
