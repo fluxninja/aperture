@@ -8,7 +8,7 @@ import (
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
-// HTTPMiddleware is the interface for the HTTP middleware
+// HTTPMiddleware is the interface for the HTTP middleware.
 type HTTPMiddleware interface {
 	Handle(http.Handler) http.Handler
 }
@@ -19,7 +19,7 @@ type httpMiddleware struct {
 	ignoredPaths *[]regexp.Regexp
 }
 
-// NewHTTPMiddleware creates a new HTTPMiddleware struct
+// NewHTTPMiddleware creates a new HTTPMiddleware struct.
 func NewHTTPMiddleware(client aperture.Client, controlPoint string, ignoredPaths *[]regexp.Regexp) HTTPMiddleware {
 	return &httpMiddleware{
 		client:       client,
@@ -28,7 +28,7 @@ func NewHTTPMiddleware(client aperture.Client, controlPoint string, ignoredPaths
 	}
 }
 
-// Handle takes a http.Handler and returns a new http.Handler with the middleware applied
+// Handle takes a http.Handler and returns a new http.Handler with the middleware applied.
 func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// If the path is ignored, skip the middleware
