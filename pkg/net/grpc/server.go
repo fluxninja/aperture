@@ -84,6 +84,8 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 				fx.ParamTags(
 					config.NameTag(constructor.ListenerName),
 					config.GroupTag(constructor.Name)+` optional:"true"`,
+					config.GroupTag(constructor.Name)+` optional:"true"`,
+					config.GroupTag(constructor.Name)+` optional:"true"`,
 				),
 				fx.ResultTags(
 					config.NameTag(constructor.Name),
@@ -97,6 +99,8 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 func (constructor ServerConstructor) provideServer(
 	listener *listener.Listener,
 	additionalOptions []grpc.ServerOption,
+	additionalUnaryInterceptors []grpc.UnaryServerInterceptor,
+	additionalStreamInterceptors []grpc.StreamServerInterceptor,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 	shutdowner fx.Shutdowner,
@@ -123,6 +127,7 @@ func (constructor ServerConstructor) provideServer(
 		validatorUnaryInterceptor(),
 	}
 	unaryServerInterceptors = append(unaryServerInterceptors, constructor.UnaryServerInterceptors...)
+	unaryServerInterceptors = append(unaryServerInterceptors, unaryServerInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
@@ -130,6 +135,7 @@ func (constructor ServerConstructor) provideServer(
 		otelgrpc.StreamServerInterceptor(),
 	}
 	streamServerInterceptors = append(streamServerInterceptors, constructor.StreamServerInterceptors...)
+	streamServerInterceptors = append(streamServerInterceptors, streamServerInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
 
 	// add additionalOptions
