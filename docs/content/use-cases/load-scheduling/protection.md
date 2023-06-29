@@ -4,7 +4,7 @@ keywords:
   - policies
   - concurrency
   - service-protection
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 ```mdx-code-block
