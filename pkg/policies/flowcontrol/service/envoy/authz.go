@@ -165,7 +165,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
 	svcs := h.serviceGetter.ServicesFromContext(ctx)
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels, input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -184,19 +184,18 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	// Make the freshly created flow labels available to flowcontrol.
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
-	flowLabels := mergedFlowLabels.ToPlainMap()
 
 	// Ask flow control service for Ok/Deny
 	checkResponse := h.fcHandler.CheckRequest(ctx,
 		iface.RequestContext{
-			FlowLabels:   flowLabels,
+			FlowLabels:   mergedFlowLabels,
 			ControlPoint: ctrlPt,
 			Services:     svcs,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
-	checkResponse.TelemetryFlowLabels = flowLabels
+	checkResponse.TelemetryFlowLabels = mergedFlowLabels.TelemetryLabels()
 	// add control point type
 	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 
