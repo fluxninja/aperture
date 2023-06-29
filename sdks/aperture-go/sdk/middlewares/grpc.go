@@ -6,12 +6,13 @@ import (
 	"net"
 	"net/http"
 
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
-	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
+	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
 // socketAddressFromNetAddr takes a net.Addr and returns a flowcontrolhttp.SocketAddress.
