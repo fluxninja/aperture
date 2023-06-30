@@ -50,6 +50,10 @@ type Image struct {
 	//+kubebuilder:validation:Optional
 	Tag string `json:"tag" default:"latest"`
 
+	// The digest (version) of the image
+	//+kubebuilder:validation:Optional
+	Digest string `json:"digest,omitempty"`
+
 	// The ImagePullPolicy of the image
 	//+kubebuilder:validation:Optional
 	PullPolicy string `json:"pullPolicy" default:"IfNotPresent" validate:"oneof=Never Always IfNotPresent"`
