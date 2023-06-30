@@ -86,7 +86,7 @@ function(cfg) {
 
   local policyDef =
     spec.v1.Policy.new()
-    + spec.v1.Policy.withResources(utils.resources(params.policy.resources { infra_meters: utils.add_kubeletstats_infra_meter(params) }).updatedResources)
+    + spec.v1.Policy.withResources(utils.resources(params.policy.resources).updatedResources)
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
       + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)

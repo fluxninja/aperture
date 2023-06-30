@@ -3,20 +3,6 @@ local selectors_defaults = [{
   control_point: '__REQUIRED_FIELD__',
 }];
 
-local kubeletstats_infra_meter_label_filter = {
-  key: '__REQUIRED_FIELD__',
-  value: '__REQUIRED_FIELD__',
-  op: '__REQUIRED_FIELD__',
-};
-
-local kubeletstats_infra_meter_filter = {
-  node: '',
-  node_from_env_var: '',
-  namespace: '',
-  fields: [],
-  labels: [],
-};
-
 {
   /**
   * @param (policy.policy_name: string) Name of the policy.
@@ -59,6 +45,4 @@ local kubeletstats_infra_meter_filter = {
 
   // defaults for the schemas
   selectors_defaults: selectors_defaults,
-  kubeletstats_infra_meter_label_filter: kubeletstats_infra_meter_label_filter,
-  kubeletstats_infra_meter_filter: kubeletstats_infra_meter_filter,
 }

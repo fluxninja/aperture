@@ -145,4 +145,3 @@ spec:
               match_labels:
                 http.target: /service3
             service: kong-server.demoapp.svc.cluster.local
-    infra_meters: {}

@@ -18,12 +18,6 @@ policy:
   # Dry run mode ensures that no scaling is invoked by this auto scaler.
   # Type: bool
   dry_run: false
-  # Infra meter for scraping Kubelet metrics.
-  # Type: kubeletstats_infra_meter
-  kubeletstats_infra_meter:
-    agent_group: "default"
-    enabled: true
-    filter: {}
   # List of scale in controllers.
   # Type: []promql_scale_in_controller
   promql_scale_in_controllers: []
@@ -42,6 +36,12 @@ policy:
       alert_name: "Auto-scaler is scaling in"
     scale_out_alerter:
       alert_name: "Auto-scaler is scaling out"
+  # Driver to do scaling of the resource based on the CPU usage.
+  # Type: scaling_threshold
+  pod_cpu: {}
+  # Driver to do scaling of the resource based on the Memory usage.
+  # Type: scaling_threshold
+  pod_memory: {}
 
 dashboard:
   # Additional filters to pass to each query to Grafana datasource.

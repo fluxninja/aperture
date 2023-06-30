@@ -98,20 +98,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 
 <!-- vale off -->
 
-<a id="policy-kubeletstats-infra-meter"></a>
-
-<ParameterDescription
-    name='policy.kubeletstats_infra_meter'
-    description='Infra meter for scraping Kubelet metrics.'
-    type='Object (kubeletstats_infra_meter)'
-    reference='#kubeletstats-infra-meter'
-    value='{"agent_group": "default", "enabled": true, "filter": {}}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-promql-scale-in-controllers"></a>
 
 <ParameterDescription
@@ -162,6 +148,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
     reference='../../spec#auto-scaler-scaling-parameters'
     value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-pod-cpu"></a>
+
+<ParameterDescription
+    name='policy.pod_cpu'
+    description='Driver to do scaling of the resource based on the CPU usage.'
+    type='Object (scaling_threshold)'
+    reference='#scaling-threshold'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-pod-memory"></a>
+
+<ParameterDescription
+    name='policy.pod_memory'
+    description='Driver to do scaling of the resource based on the Memory usage.'
+    type='Object (scaling_threshold)'
+    reference='#scaling-threshold'
+    value='{}'
 />
 
 <!-- vale on -->
@@ -281,184 +295,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 ---
 
 ### Schemas
-
-<!-- vale off -->
-
-#### kubeletstats_infra_meter {#kubeletstats-infra-meter}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-agent-group"></a>
-
-<ParameterDescription
-    name='agent_group'
-    description='Agent group to be used for the infra_meter.'
-    type='string'
-    reference=''
-    value='"default"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-enabled"></a>
-
-<ParameterDescription
-    name='enabled'
-    description='Adds infra_meter for scraping Kubelet metrics.'
-    type='Boolean'
-    reference=''
-    value='true'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-filter"></a>
-
-<ParameterDescription
-    name='filter'
-    description='Filter to be applied to the infra_meter.'
-    type='Object (kubeletstats_infra_meter_filter)'
-    reference='#kubeletstats-infra-meter-filter'
-    value='{}'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### kubeletstats_infra_meter_filter {#kubeletstats-infra-meter-filter}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-filter-fields"></a>
-
-<ParameterDescription
-    name='fields'
-    description='Fields allows to filter pods by generic k8s fields. Supported operations are: equals, not-equals.'
-    type='Array of Object (kubeletstats_infra_meter_label_filter)'
-    reference='#kubeletstats-infra-meter-label-filter'
-    value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-filter-labels"></a>
-
-<ParameterDescription
-    name='labels'
-    description='Labels allows to filter pods by generic k8s pod labels.'
-    type='Array of Object (kubeletstats_infra_meter_label_filter)'
-    reference='#kubeletstats-infra-meter-label-filter'
-    value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-filter-namespace"></a>
-
-<ParameterDescription
-    name='namespace'
-    description='Namespace filters all pods by the provided namespace. All other pods are ignored.'
-    type='string'
-    reference=''
-    value='""'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-filter-node"></a>
-
-<ParameterDescription
-    name='node'
-    description='Node represents a k8s node or host. If specified, any pods not running on the specified node will be ignored by the tagger.'
-    type='string'
-    reference=''
-    value='""'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-filter-node-from-env-var"></a>
-
-<ParameterDescription
-    name='node_from_env_var'
-    description='odeFromEnv can be used to extract the node name from an environment variable. For example: `NODE_NAME`.'
-    type='string'
-    reference=''
-    value='""'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### kubeletstats_infra_meter_label_filter {#kubeletstats-infra-meter-label-filter}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-label-filter-key"></a>
-
-<ParameterDescription
-    name='key'
-    description='Key represents the key or name of the field or labels that a filter can apply on.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-label-filter-op"></a>
-
-<ParameterDescription
-    name='op'
-    description='Op represents the filter operation to apply on the given Key: Value pair. The supported operations are: equals, not-equals, exists, does-not-exist.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="kubeletstats-infra-meter-label-filter-value"></a>
-
-<ParameterDescription
-    name='value'
-    description='Value represents the value associated with the key that a filter operation specified by the `Op` field applies on.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
----
 
 <!-- vale off -->
 
@@ -582,6 +418,82 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### scaling_driver {#scaling-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### scale_in {#scaling-driver-scale-in}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-driver-scale-in-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the Driver to do scale in of the resource.'
+    type='Boolean'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-driver-scale-in-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### scale_out {#scaling-driver-scale-out}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-driver-scale-out-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver to do scale out of the resource.'
+    type='Boolean'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-driver-scale-out-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='null'
 />
 
 <!-- vale on -->
