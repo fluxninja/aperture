@@ -8,6 +8,7 @@ import (
 	promapi "github.com/prometheus/client_golang/api"
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"go.uber.org/fx"
+	"golang.org/x/oauth2"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -47,6 +48,7 @@ func Module() fx.Option {
 type ClientIn struct {
 	fx.In
 	HTTPClient   *http.Client `name:"prometheus.http-client"`
+	TokenSource  *oauth2.TokenSource
 	Unmarshaller config.Unmarshaller
 }
 
@@ -61,6 +63,15 @@ func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, err
 		log.Error().Err(err).Msg("")
 		return nil, nil, err
 	}
+
+	if in.TokenSource != nil {
+		oauth2Transport := &oauth2.Transport{
+			Source: *in.TokenSource,
+			Base:   in.HTTPClient.Transport,
+		}
+		in.HTTPClient.Transport = oauth2Transport
+	}
+
 	client, err := promapi.NewClient(promapi.Config{
 		Address:      config.Address,
 		RoundTripper: in.HTTPClient.Transport,
