@@ -27,7 +27,7 @@ const (
 // ServerModule is an fx module that provides annotated gRPC Server using the default listener and registers its metrics with the prometheus registry.
 func ServerModule() fx.Option {
 	return fx.Options(
-		ServerConstructor{}.Annotate(),
+		ServerConstructor{Name: "main"}.Annotate(),
 		fx.Invoke(RegisterGRPCServerMetrics),
 	)
 }
@@ -36,7 +36,7 @@ func ServerModule() fx.Option {
 func GMuxServerModule() fx.Option {
 	return fx.Options(
 		listener.GMuxConstructor{ListenerName: defaultGMuxListener}.Annotate(),
-		ServerConstructor{ListenerName: defaultGMuxListener}.Annotate(),
+		ServerConstructor{Name: "main", ListenerName: defaultGMuxListener}.Annotate(),
 		fx.Invoke(RegisterGRPCServerMetrics),
 	)
 }
