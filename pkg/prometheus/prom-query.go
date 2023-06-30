@@ -60,7 +60,7 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 
 		query, innerErr := pq.enforcer.EnforceLabels(pq.query)
 		if innerErr != nil {
-			return err
+			return innerErr
 		}
 
 		result, warnings, err = pq.promAPI.Query(ctx, query, pq.endTimestamp)
@@ -69,13 +69,13 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 			return backoff.Permanent(jobCtxt.Err())
 		}
 		if err != nil {
-			log.Error().Err(err).Str("query", pq.query).Msg("Encountered error while executing promQL query")
+			log.Error().Err(err).Str("query", query).Msg("Encountered error while executing promQL query")
 			return err
 		}
 		for _, warning := range warnings {
-			log.Warn().Str("query", pq.query).Str("warning", warning).Msg("Encountered warning while executing promQL query")
+			log.Warn().Str("query", query).Str("warning", warning).Msg("Encountered warning while executing promQL query")
 		}
-		log.Trace().Str("query", pq.query).Time("end timestamp", pq.endTimestamp).Interface("result", result).Msg("Running prometheus query")
+		log.Trace().Str("query", query).Time("end timestamp", pq.endTimestamp).Interface("result", result).Msg("Running prometheus query")
 		return nil
 	}
 

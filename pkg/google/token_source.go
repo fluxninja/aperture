@@ -28,19 +28,26 @@ func Module() fx.Option {
 const tokenSourceConfigKey = "token_source"
 
 func provideGoogleTokenSource(in SourceIn) (*oauth2.TokenSource, error) {
+	log.Info().Msg("Initializing Google Token Source")
 	var config tokenconfig.Config
 	if err := in.Unmarshaller.UnmarshalKey(tokenSourceConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to unmarshal configuration")
 	}
 
 	if !config.Enabled {
+		log.Info().Msg("Google Token Source disabled. Will return nil.")
 		return nil, nil
 	}
 
+	log.Info().Msg("Google Token Source enabled. Will create and return it.")
+
 	tokenSource, err := google.DefaultTokenSource(context.Background(), config.Scopes...)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to create Google Token Source")
 		return nil, err
 	}
+
+	log.Info().Any("source", tokenSource).Msg("Created Token Source for GCP")
 
 	return &tokenSource, nil
 }

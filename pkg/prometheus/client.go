@@ -64,12 +64,16 @@ func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, err
 		return nil, nil, err
 	}
 
+	log.Info().Msg("Checking if TokenSource is available")
 	if in.TokenSource != nil {
+		log.Info().Msg("Using TokenSource for prometheus")
 		oauth2Transport := &oauth2.Transport{
 			Source: *in.TokenSource,
 			Base:   in.HTTPClient.Transport,
 		}
 		in.HTTPClient.Transport = oauth2Transport
+	} else {
+		log.Info().Msg("No TokenSource available.")
 	}
 
 	client, err := promapi.NewClient(promapi.Config{
