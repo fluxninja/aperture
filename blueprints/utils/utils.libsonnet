@@ -28,7 +28,7 @@ local kubeletstats_infra_meter(agent_group, filters) = {
             'k8s.container.name',
           ],
         },
-        filter: filters,
+        selector: filters,
         pod_association: [
           {
             sources: [
@@ -76,16 +76,11 @@ local updateResources(resources) = {
     } else resources,
 };
 
-local add_kubeletstats_infra_meter(params) =
-  (if std.objectHas(params.policy.resources, 'infra_meters') then params.policy.resources.infra_meters else {}) +
-  if params.policy.kubeletstats_infra_meter.enabled then
-    merge(
-      params.policy.resources.infra_meters,
-      kubeletstats_infra_meter(
-        params.policy.kubeletstats_infra_meter.agent_group, params.policy.kubeletstats_infra_meter.filter
-      )
-    )
-  else {};
+local add_kubeletstats_infra_meter(infra_meters, agent_group='default', selector={}) =
+  merge(
+    infra_meters,
+    kubeletstats_infra_meter(agent_group, selector)
+  );
 
 {
   resources: updateResources,
