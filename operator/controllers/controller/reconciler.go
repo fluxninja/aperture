@@ -296,13 +296,15 @@ func (r *ControllerReconciler) deleteSingletonResources(ctx context.Context, log
 		log.Error(err, "Failed to delete old singleton ConfigMap")
 	}
 
-	serviceAccount, err := serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
-	if err != nil {
-		return err
-	}
+	if singletonInstance.Spec.ServiceAccountSpec.Create {
+		serviceAccount, err := serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
+		if err != nil {
+			return err
+		}
 
-	if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "Failed to delete old singleton ServiceAccount")
+		if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "Failed to delete singleton ServiceAccount")
+		}
 	}
 
 	secret, err := secretForControllerAPIKey(singletonInstance.DeepCopy(), r.Scheme)
