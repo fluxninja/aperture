@@ -453,6 +453,10 @@ func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance 
 		return err
 	}
 
+	if err := ctrl.SetControllerReference(instance, configMap, r.Scheme); err != nil {
+		return err
+	}
+
 	if _, err = createConfigMapForController(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 		return err
 	}
@@ -550,6 +554,11 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	if err != nil {
 		return err
 	}
+
+	if err := ctrl.SetControllerReference(instance, sa, r.Scheme); err != nil {
+		return err
+	}
+
 	if err = r.createServiceAccount(sa, ctx, instance); err != nil {
 		return err
 	}
@@ -571,6 +580,10 @@ func (r *ControllerReconciler) tlsEnabled() bool {
 func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
 	dep, err := deploymentForController(instance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
 	if err != nil {
+		return err
+	}
+
+	if err := ctrl.SetControllerReference(instance, dep, r.Scheme); err != nil {
 		return err
 	}
 
