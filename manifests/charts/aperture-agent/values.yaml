@@ -2,15 +2,15 @@
 ##
 global:
   azure:
-  images:
-    operator:
-      registry: docker.io
-      image: fluxninja/aperture-operator
-      digest: sha256:156c72d8b5761d4eef890d8ffe56bbeb7758a6492bf9998339adfd264a7e78c4
-    agent:
-      registry: docker.io
-      image: fluxninja/aperture-agent
-      digest: sha256:ed5e099ed896056ffc8189b772e740b504d84550de5600ccba03f3c7846fba44
+    images:
+      operator:
+        registry: docker.io
+        image: fluxninja/aperture-operator
+        digest: sha256:156c72d8b5761d4eef890d8ffe56bbeb7758a6492bf9998339adfd264a7e78c4
+      agent:
+        registry: docker.io
+        image: fluxninja/aperture-agent
+        digest: sha256:ed5e099ed896056ffc8189b772e740b504d84550de5600ccba03f3c7846fba44
   ## @param global.imageRegistry Global Docker image registry
   ##
   imageRegistry: ~

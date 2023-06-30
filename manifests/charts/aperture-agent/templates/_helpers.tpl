@@ -50,10 +50,16 @@ Create the endpoint of the etcd for Aperture Agent
 {{- define "agent.etcd.endpoints" -}}
 {{- $endpoints := list -}}
 {{ $endpoints = without .etcd.endpoints "" }}
-{{- if empty $endpoints -}}
-    {{- fail "Value for etcd endpoints of Agent cannot be empty." -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- if not (empty $globalAzure) -}}
+    {{ $endpoints = append $endpoints "http://etcd:2379" }}
+    {{ print $endpoints | indent 4 }}
+{{- else -}}
+    {{- if empty $endpoints -}}
+        {{- fail "Value for etcd endpoints of Agent cannot be empty." -}}
+    {{- end -}}
+    {{ print $endpoints }}
 {{- end -}}
-{{ print $endpoints }}
 {{- end -}}
 
 {{/*
@@ -61,10 +67,16 @@ Create the address of the Prometheus for Aperture Agent
 {{ include "agent.prometheus.address" ( dict "prometheus" .Values.path.to.the.prometheus "context" $.context $) }}
 */}}
 {{- define "agent.prometheus.address" -}}
-{{- if .prometheus.address -}}
-    {{ print .prometheus.address }}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- if not (empty $globalAzure) -}}
+    {{- $address := ( printf "%s" "http://prometheus-server:80") -}}
+    {{ print $address }}
 {{- else -}}
-    {{- fail "Value for prometheus address of Agent cannot be empty." -}}
+    {{- if .prometheus.address -}}
+        {{ print .prometheus.address }}
+    {{- else -}}
+        {{- fail "Value for prometheus address of Agent cannot be empty." -}}
+    {{- end -}}
 {{- end -}}
 {{- end -}}
 

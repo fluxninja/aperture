@@ -19,7 +19,7 @@ spec:
   image:
     registry: {{ .Values.global.azure.images.controller.registry }}
     repository: {{ .Values.global.azure.images.controller.image }}
-    tag: {{ .Values.global.azure.images.controller.digest }}
+    digest: {{ .Values.global.azure.images.controller.digest }}
   {{- else }}
   image: {{ omit .Values.controller.image "tag" | toYaml | nindent 4 }}
     tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.controller.image.tag | quote }}
