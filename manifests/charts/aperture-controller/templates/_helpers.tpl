@@ -48,10 +48,13 @@ Check of etcd at global level.
 {{ include "etcd.initContainer.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
 */}}
 {{- define "etcd.initContainer.image" -}}
-{{- $globalAzure := get .context.Values.global.azure.images "etcd" -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
 {{- if not (empty $globalAzure) -}}
-    {{- $azureImage := (printf "%s/%s@%s" .context.Values.global.azure.images.etcd.registry  .context.Values.global.azure.images.etcd.image .context.Values.global.azure.images.etcd.digest) -}}
-    {{ print $azureImage }}
+    {{- $etcdAzure := get .context.Values.global.azure.images "etcd" -}}
+    {{- if not (empty $etcdAzure) -}}
+        {{- $azureImage := (printf "%s/%s@%s" .context.Values.global.azure.images.etcd.registry  .context.Values.global.azure.images.etcd.image .context.Values.global.azure.images.etcd.digest) -}}
+        {{ print $azureImage }}
+    {{- end -}}
 {{- else -}}
     {{- $newImage := .image -}}
     {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
@@ -63,10 +66,13 @@ Check of prometheus at global level.
 {{ include "etcd.initContainer.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
 */}}
 {{- define "prometheus.initContainer.image" -}}
-{{- $globalAzure := get .context.Values.global.azure.images "prometheus" -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
 {{- if not (empty $globalAzure) -}}
-    {{- $azureImage := (printf "%s/%s@%s" .context.Values.global.azure.images.prometheus.registry  .context.Values.global.azure.images.prometheus.image .context.Values.global.azure.images.prometheus.digest) -}}
-    {{ print $azureImage }}
+    {{- $prometheusAzure := get .context.Values.global.azure.images "prometheus" -}}
+    {{- if not (empty $globalAzure) -}}
+        {{- $prometheusImage := (printf "%s/%s@%s" .context.Values.global.azure.images.prometheus.registry  .context.Values.global.azure.images.prometheus.image .context.Values.global.azure.images.prometheus.digest) -}}
+        {{ print $prometheusImage }}
+    {{- end -}}
 {{- else -}}
     {{- $newImage := .image -}}
     {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
