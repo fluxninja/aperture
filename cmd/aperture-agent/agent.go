@@ -59,12 +59,15 @@ func main() {
 		otelcollector.Module(),
 	)
 
+	defer log.WaitFlush()
+
 	if err := app.Err(); err != nil {
 		visualize, viserr := fx.VisualizeError(err)
 		if viserr != nil {
-			log.Panic().Err(viserr).Msgf("Failed to visualize fx error: %s", viserr)
+			log.Error().Err(viserr).Msgf("Failed to visualize fx error: %s", viserr)
 		}
-		log.Panic().Err(err).Msg("fx.New failed: " + visualize)
+		log.Error().Err(err).Msg("fx.New failed: " + visualize)
+		return
 	}
 
 	log.Info().Msg("aperture-agent app created")
