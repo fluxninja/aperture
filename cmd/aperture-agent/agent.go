@@ -62,11 +62,12 @@ func main() {
 	defer log.WaitFlush()
 
 	if err := app.Err(); err != nil {
-		visualize, viserr := fx.VisualizeError(err)
-		if viserr != nil {
-			log.Error().Err(viserr).Msgf("Failed to visualize fx error: %s", viserr)
+		v, verr := fx.VisualizeError(err)
+		if verr != nil {
+			log.Error().Err(verr).Msg("Failed to visualize fx error")
+			return
 		}
-		log.Error().Err(err).Msg("fx.New failed: " + visualize)
+		log.Error().Err(err).Str("visualize", v).Msg("Failed to run create an initialize platform")
 		return
 	}
 
