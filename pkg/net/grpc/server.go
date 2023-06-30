@@ -126,6 +126,7 @@ func (constructor ServerConstructor) provideServer(
 		otelgrpc.UnaryServerInterceptor(),
 		validatorUnaryInterceptor(),
 	}
+	log.Warn().Int("no", len(additionalUnaryInterceptors)).Msg("TEST")
 	unaryServerInterceptors = append(unaryServerInterceptors, constructor.UnaryServerInterceptors...)
 	unaryServerInterceptors = append(unaryServerInterceptors, additionalUnaryInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
