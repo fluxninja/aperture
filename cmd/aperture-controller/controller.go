@@ -49,8 +49,9 @@ func main() {
 		v, verr := fx.VisualizeError(err)
 		if verr != nil {
 			log.Error().Err(verr).Msg("Failed to visualize fx error")
+			return
 		}
-		log.Error().Err(err).Str("visualize", v).Msg("fx.New failed")
+		log.Error().Err(err).Str("visualize", v).Msg("Failed to run create an initialize platform")
 		return
 	}
 
