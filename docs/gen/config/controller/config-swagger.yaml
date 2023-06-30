@@ -208,6 +208,23 @@ definitions:
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
+    Config:
+        properties:
+            enabled:
+                default: false
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "false"
+                x-go-tag-json: enabled
+            scopes:
+                items:
+                    type: string
+                type: array
+                x-go-name: Scopes
+                x-go-tag-json: scopes,omitempty
+        title: Config stores configuration for the Google Token Source.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/google/config
     ControllerOTelConfig:
         properties:
             batch_alerts:

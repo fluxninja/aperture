@@ -14,7 +14,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
-	tokensource "github.com/fluxninja/aperture/v2/pkg/google"
+	googletoken "github.com/fluxninja/aperture/v2/pkg/google"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -53,7 +53,7 @@ func policyFactoryModule() fx.Option {
 			),
 		),
 		prom.Module(),
-		tokensource.Module(),
+		googletoken.Module(),
 		policyModule(),
 	)
 }

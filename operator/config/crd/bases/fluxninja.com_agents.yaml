@@ -1822,6 +1822,16 @@ spec:
                     - kubernetes
                     - static
                     type: object
+                  token_source:
+                    description: Google Token Source configuration
+                    properties:
+                      enabled:
+                        type: boolean
+                      scopes:
+                        items:
+                          type: string
+                        type: array
+                    type: object
                   watchdog:
                     description: Watchdog configuration.
                     properties:

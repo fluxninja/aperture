@@ -118,6 +118,7 @@ func (in *CommonConfigSpec) DeepCopyInto(out *CommonConfigSpec) {
 	out.Metrics = in.Metrics
 	out.Profilers = in.Profilers
 	in.Prometheus.DeepCopyInto(&out.Prometheus)
+	in.TokenSource.DeepCopyInto(&out.TokenSource)
 	in.Server.DeepCopyInto(&out.Server)
 	in.Watchdog.DeepCopyInto(&out.Watchdog)
 	in.Alertmanagers.DeepCopyInto(&out.Alertmanagers)
