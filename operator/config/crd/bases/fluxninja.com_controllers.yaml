@@ -1309,6 +1309,9 @@ spec:
                           * "grpc_server_msg_received_total.*" * "grpc_server_msg_sent_total.*"
                           * "grpc_server_started_total.*"'
                         type: boolean
+                      enable_local_metrics_pipeline:
+                        description: Whether to enable local OTel collector pipeline
+                        type: boolean
                       ports:
                         description: Ports configures debug, health and extension
                           ports values.

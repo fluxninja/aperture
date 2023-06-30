@@ -29,4 +29,7 @@ type ControllerOTelConfig struct {
 	//   * "grpc_server_msg_sent_total.*"
 	//   * "grpc_server_started_total.*"
 	EnableHighCardinalityPlatformMetrics bool `json:"enable_high_cardinality_platform_metrics" default:"false"`
+
+	// Whether to enable local OTel collector pipeline
+	EnableLocalMetricsPipeline bool `json:"enable_local_metrics_pipeline" default:"true"`
 }
