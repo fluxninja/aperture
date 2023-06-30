@@ -42,10 +42,6 @@ promqlDefaults {
         operator: 'gte',
       },
     },
-
-    kubeletstats_infra_meter+: {
-      enabled: true,
-    },
   },
 
   dashboard+: {
