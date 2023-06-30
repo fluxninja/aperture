@@ -4,7 +4,9 @@ import {
   MonitorRequestProps,
   RequestRecord,
 } from '../components/monitor-request'
-import { Box, Typography, styled, Tabs, Tab, RadioGroup, FormControlLabel, Radio } from '@mui/material'
+import { Box, Typography, styled, Tabs, Tab, Backdrop, Fade } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
+
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
   GracefulError,
@@ -15,18 +17,21 @@ import { api, RequestSpec } from '../api'
 import { SuccessIcon } from './success-icon'
 
 export const HomePage: FC = () => {
+
   const [value, setValue] = useState('1')
-
   const [userType, setUserType] = useState<'guest' | 'subscriber'>('guest')
-
-  const handleUserTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUserType((event.target as HTMLInputElement).value as 'guest' | 'subscriber');
-  };
+  const [open, setOpen] = useState(false);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue)
+    if(newValue === '2') setOpen(true);
   }
 
+  const handleDialogClose = (value: 'guest' | 'subscriber') => {
+    setUserType(value);
+    setOpen(false);
+  };
+  
   // Request Spec for rate-limit endpoint with Executive user to retrieve fluxninja founders info
   const reqSpec: RequestSpec = {
     method: 'GET',
@@ -85,10 +90,32 @@ export const HomePage: FC = () => {
         />
       </TabPanel>
       <TabPanel value="2">
-        <RadioGroup aria-label="userType" name="userType" value={userType} onChange={handleUserTypeChange}>
-          <FormControlLabel value="guest" control={<Radio />} label="Guest" />
-          <FormControlLabel value="subscriber" control={<Radio />} label="Subscriber" />
-        </RadioGroup>
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={open}
+        />
+          <Dialog
+            open={open}
+            TransitionComponent={Fade}
+            onClose={() => setOpen(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+          <DialogTitle id="alert-dialog-title">{"User Type"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Please select the user type.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => handleDialogClose('guest')} color="primary">
+              Guest
+            </Button>
+            <Button onClick={() => handleDialogClose('subscriber')} color="primary" autoFocus>
+              Subscriber
+            </Button>
+          </DialogActions>
+        </Dialog>
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: userRequestRecord,
@@ -156,7 +183,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
     const intervalId = setInterval(() => {
       setRequestCount((prevCount) => prevCount + 1)
       refetch()
-    }, 400)
+    }, 100)
 
     setIntervalId(intervalId)
 
