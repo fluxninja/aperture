@@ -87,9 +87,9 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 				constructor.provideServer,
 				fx.ParamTags(
 					config.NameTag(constructor.ListenerName),
-					config.GroupTag(constructor.Name)+` optional:"true"`,
-					config.GroupTag(constructor.Name)+` optional:"true"`,
-					config.GroupTag(constructor.Name)+` optional:"true"`,
+					config.GroupTag(constructor.Name),
+					config.GroupTag(constructor.Name),
+					config.GroupTag(constructor.Name),
 				),
 				fx.ResultTags(
 					config.NameTag(constructor.Name),
