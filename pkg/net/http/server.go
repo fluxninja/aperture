@@ -22,6 +22,7 @@ import (
 
 const (
 	defaultServerKey   = "server.http"
+	defaultServerName  = "main"
 	defaultHandlerName = "default"
 )
 
@@ -59,7 +60,7 @@ type HTTPServerConfig struct {
 
 // ServerConstructor holds fields to create an annotated HTTP Server.
 type ServerConstructor struct {
-	// Name of http server instance -- empty for main server
+	// Name of http server instance
 	Name string
 	// Name of listener instance
 	ListenerName string
@@ -73,6 +74,9 @@ type ServerConstructor struct {
 
 // Annotate creates an annotated instance of HTTP Server.
 func (constructor ServerConstructor) Annotate() fx.Option {
+	if constructor.Name == "" {
+		constructor.Name = defaultServerName
+	}
 	if constructor.ConfigKey == "" {
 		constructor.ConfigKey = defaultServerKey
 	}
