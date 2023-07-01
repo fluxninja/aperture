@@ -10,31 +10,40 @@ import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
   GracefulError,
   GracefulErrorProps,
+  useGraceful,
   useGracefulRequest,
 } from '@fluxninja-tools/graceful-js'
-import { api, req, RequestSpec } from '../api'
+import { api, RequestSpec } from '../api'
 import { SuccessIcon } from './success-icon'
 import { useTabChange } from '../hooks'
 
 const RATE_LIMIT_REQUEST: RequestSpec = {
   method: 'GET',
-  endpoint: '/rate-limit',
-  userType: 'user',
-  userId: 'DemoUI',
+  url: '/api/rate-limit',
+  headers: {
+    'User-Id': 'DemoUI',
+    'User-Type': 'user',
+  },
 }
 
-const WORKLOAD_PRIORITIZATION_USER_REQUEST: RequestSpec = {
+const WORKLOAD_PRIORITIZATION_SUBSCRIBER_REQUEST: RequestSpec = {
+  url: '/request',
   method: 'POST',
-  endpoint: '',
-  userType: 'subscriber',
-  userId: 'DemoUI',
+  data: {},
+  headers: {
+    'User-Id': 'DemoUI',
+    'User-Type': 'subscriber',
+  },
 }
 
 const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
+  url: '/request',
   method: 'POST',
-  endpoint: '',
-  userType: 'guest',
-  userId: 'DemoUI',
+  data: {},
+  headers: {
+    'User-Id': 'DemoUI',
+    'User-Type': 'guest',
+  },
 }
 
 export const HomePage: FC = () => {
@@ -55,7 +64,7 @@ export const HomePage: FC = () => {
     isError: isErrorUser,
     requestRecord: userRequestRecord,
     isLoading: isLoadingUser,
-  } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_USER_REQUEST)
+  } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_SUBSCRIBER_REQUEST)
 
   const {
     refetch: refetchGuest,
@@ -84,8 +93,7 @@ export const HomePage: FC = () => {
           isErrored={isError}
           isLoading={isLoadingRequest}
           errorComponentProps={{
-            url: `/api${RATE_LIMIT_REQUEST.endpoint}`,
-            requestBody: {},
+            url: '/aperture/api/rate-limit',
           }}
         />
       </TabPanel>
@@ -99,7 +107,7 @@ export const HomePage: FC = () => {
           isErrored={isErrorUser}
           isLoading={isLoadingUser}
           errorComponentProps={{
-            url: `/request`,
+            url: '/aperture/request',
             requestBody: {},
           }}
         />
@@ -112,7 +120,7 @@ export const HomePage: FC = () => {
           isErrored={isErrorGuest}
           isLoading={isLoadingGuest}
           errorComponentProps={{
-            url: `/request`,
+            url: '/aperture/request',
             requestBody: {},
           }}
         />
@@ -129,28 +137,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   const { isError, refetch, error, data, isRetry, isLoading } =
     useGracefulRequest<'Axios'>({
       typeOfRequest: 'Axios',
-      requestFnc: () => {
-        if (reqSpec.method === 'POST') {
-          // if request method is POST, use req.post for workload prioritization
-          return req.post(
-            reqSpec.endpoint,
-            {},
-            {
-              headers: {
-                'User-Id': reqSpec.userId,
-                'User-Type': reqSpec.userType,
-              },
-            }
-          )
-        }
-        // if request method is GET, use api.get for rate limit
-        return api.get(reqSpec.endpoint, {
-          headers: {
-            'User-Id': reqSpec.userId,
-            'User-Type': reqSpec.userType,
-          },
-        })
-      },
+      requestFnc: () => api(reqSpec),
       options: {
         disabled: true,
       },
@@ -172,7 +159,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
     const intervalId = setInterval(() => {
       setRequestCount((prevCount) => prevCount + 1)
       refetch()
-    }, 400)
+    }, 800)
 
     setIntervalId(intervalId)
 
@@ -195,7 +182,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       clearInterval(intervalId)
       return
     }
-  }, [requestCount, intervalId, isError, reqSpec.userType])
+  }, [requestCount, intervalId, isError])
 
   return { isError, refetch: startFetch, requestRecord, isLoading, data }
 }
@@ -213,47 +200,37 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   isLoading,
   errorComponentProps,
 }) => {
-  if (isLoading) {
-    return (
-      <Box
-        {...{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: 500,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    )
-  }
-
+  const { errorInfo } = useGraceful()
   return (
     <HomePageWrapper>
       <HomePageColumnBox>
         <MonitorRequest {...monitorRequestProps} />
       </HomePageColumnBox>
       <HomePageColumnBox>
-        {isErrored && !isLoading ? (
-          <GracefulError {...errorComponentProps} />
+        {isLoading ? (
+          <FlexBox>
+            <CircularProgress />
+          </FlexBox>
+        ) : isErrored && !isLoading ? (
+          errorInfo.get(JSON.stringify(errorComponentProps))
+            ?.errorComponent || <GracefulError {...errorComponentProps} /> // TODO: Fix error component in graceful-js
         ) : (
-          <Box
-            sx={(theme) => ({
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: theme.palette.grey[400],
-            })}
-          >
+          <FlexBox>
             <SuccessIcon style={{ width: '15rem', height: '15rem' }} />
-          </Box>
+          </FlexBox>
         )}
       </HomePageColumnBox>
     </HomePageWrapper>
   )
 }
+
+const FlexBox = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  minHeight: 500,
+}))
 
 export const HomePageWrapper = styled(Box)(({ theme }) => ({
   display: 'grid',

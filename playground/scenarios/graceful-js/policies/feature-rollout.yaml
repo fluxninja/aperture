@@ -25,7 +25,7 @@ policy:
             threshold: 75
           reset:
             threshold: 75
-  rollout: true
+  # rollout: true
   evaluation_interval: "10s"
   load_ramp:
     sampler:
@@ -37,9 +37,9 @@ policy:
               http.path: /api/feature-rollout
       label_key: ""
     steps:
-      - duration: 0s
+      - duration: "0s"
         target_accept_percentage: 1.0
-      - duration: 300s
+      - duration: "300s"
         target_accept_percentage: 100.0
   resources:
     flow_control:

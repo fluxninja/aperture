@@ -42,15 +42,11 @@ module.exports = {
     hot: true,
     open: true,
     proxy: {
-      '/api': {
+      '/aperture': {
         target: 'http://localhost:3010',
         router: () => 'http://service1-demo-app.demoapp.svc.cluster.local',
         logLevel: 'debug',
-      },
-      '/request': {
-        target: 'http://localhost:3010',
-        router: () => 'http://service2-demo-app.demoapp.svc.cluster.local',
-        logLevel: 'debug',
+        pathRewrite: { '^/aperture': '' },
       },
     },
   },
