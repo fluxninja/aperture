@@ -20,6 +20,5 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --link --from=builder /src/public /public
 COPY --link --from=builder /demo-app /demo-app
 ENTRYPOINT ["/demo-app"]

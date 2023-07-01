@@ -178,10 +178,7 @@ func (ss SimpleService) Run() error {
 		http.HandleFunc("/prometheus", prometheusHandler)
 	}
 
-	// server ui build pack from public folder
-	fs := http.FileServer(http.Dir("./public"))
 
-	http.Handle("/ui/", http.StripPrefix("/ui/", fs))
 	http.HandleFunc("/api/rate-limit", apiEndpointHandler)
 	http.HandleFunc("/api/feature-rollout", apiEndpointHandler)
 	http.HandleFunc("/api/prioritization", apiEndpointHandler)
