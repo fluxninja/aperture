@@ -11,6 +11,28 @@ global:
         registry: docker.io
         image: fluxninja/aperture-controller
         digest: sha256:2c401906bca77e500d37dca2606e8fb65f728301de816192eda87072c637c1a8
+      etcd:
+        registry: docker.io
+        image: bitnami/etcd
+        digest: sha256:5ccdef05ca72d8a29795a99169cdd4e2e342cd099457ee39978d8c9e67a5784b
+      prometheus:
+        registry: quay.io
+        image: prometheus/prometheus
+        digest: sha256:bcd30cf1f5d0cc92786f663d25452bc484303ea29f3431e6f3096dc8e4b56118
+      configmap-reload:
+        registry: docker.io
+        image: jimmidyson/configmap-reload
+        digest: sha256:91467ba755a0c41199a63fe80a2c321c06edc4d3affb4f0ab6b3d20a49ed88d1
+      kubectl:
+        registry: docker.io
+        image: bitnami/kubectl
+        digest: sha256:9d85d17983c84e2d82159b6372b3af30cd81445e65af58db87a192d687ece7a6
+      yq:
+        registry: docker.io
+        image: linuxserver/yq
+        digest: sha256:f34ae399bab8720d952d3f97313f9c768ad40b129208a21f2cee8934c6afef7f
+
+
   ## @param global.imageRegistry Global Docker image registry
   ##
   imageRegistry: ~

@@ -14,8 +14,16 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
+  {{- $globalAzure := get .Values.global "azure" }}
+  {{- if not (empty $globalAzure) }}
+  image:
+    registry: {{ .Values.global.azure.images.agent.registry }}
+    repository: {{ .Values.global.azure.images.agent.image }}
+    digest: {{ .Values.global.azure.images.agent.digest }}
+  {{- else }}
   image: {{ omit .Values.agent.image "tag" | toYaml | nindent 4 }}
     tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.agent.image.tag | quote }}
+  {{- end }}
   {{- if .Values.agent.service.annotations }}
   service:
     annotations: {{ .Values.agent.service.annotations | toYaml | nindent 6 }}

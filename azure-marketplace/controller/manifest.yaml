@@ -1,7 +1,7 @@
 applicationName: com.fluxninja.controller
 publisher: "fluxninja"
 description: "FluxNinja Controller on AKS"
-version: 1.0.2 #Must be in the format of #.#.#
+version: 1.0.3 #Must be in the format of #.#.#
 helmChart: "../../manifests/charts/aperture-controller/"
 clusterArmTemplate: "./mainTemplate.json"
 uiDefinition: "./createUIDefinition.json"
