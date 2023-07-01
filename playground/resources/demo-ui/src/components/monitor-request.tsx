@@ -19,7 +19,7 @@ export declare type RequestRecord = {
 
 export interface MonitorRequestProps {
   requestRecord: RequestRecord[]
-  userType: 'Subscriber' | 'Guest' | 'Crawler' | 'User'
+  userType: 'Subscriber' | 'Guest' | 'Crawler' | 'User' | 'Rate Limit'
   refetch: () => void
 }
 

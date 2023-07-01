@@ -87,7 +87,7 @@ export const HomePage: FC = () => {
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: requestRecord,
-            userType: 'User',
+            userType: 'Rate Limit',
             refetch,
           }}
           isErrored={isError}
