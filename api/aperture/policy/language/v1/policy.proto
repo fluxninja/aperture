@@ -250,7 +250,7 @@ message Component {
     // Simple Moving Average filter.
     SMA sma = 6;
 
-    // Emits a variable signal which can be changed at runtime via dynamic configuration.
+    // Emits a variable signal which can be changed at runtime through dynamic configuration.
     Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
@@ -304,7 +304,7 @@ message Component {
     // Generates the specified signal.
     SignalGenerator signal_generator = 27;
 
-    // BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
+    // BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
     BoolVariable bool_variable = 28;
 
     // Query components that are query databases such as Prometheus.

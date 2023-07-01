@@ -3,18 +3,17 @@ package flowcontrol
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strconv"
 	"sync"
 	"time"
 
 	"go.uber.org/multierr"
-	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	multimatcher "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/consts"
@@ -86,8 +85,7 @@ func (e *Engine) ProcessRequest(
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
-	labelKeys := maps.Keys(flowLabels)
-	sort.Strings(labelKeys)
+	labelKeys := flowLabels.SortedKeys()
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: labelKeys,
@@ -100,9 +98,11 @@ func (e *Engine) ProcessRequest(
 		return
 	}
 
-	labelPreviews := mmr.labelPreviews
-	for labelPreview := range labelPreviews {
-		labelPreview.AddLabelPreview(flowLabels)
+	if len(mmr.labelPreviews) > 0 {
+		plainLabels := flowLabels.Copy()
+		for labelPreview := range mmr.labelPreviews {
+			labelPreview.AddLabelPreview(plainLabels)
+		}
 	}
 
 	fluxMeters := mmr.fluxMeters
@@ -157,7 +157,7 @@ func (e *Engine) ProcessRequest(
 func runLimiters(
 	ctx context.Context,
 	limiters map[iface.Limiter]struct{},
-	labels map[string]string,
+	labels labels.Labels,
 ) (
 	map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
@@ -217,16 +217,12 @@ func runLimiters(
 
 func revertRemaining(
 	ctx context.Context,
-	labels map[string]string,
+	labels labels.Labels,
 	limiterDecisions map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 ) {
-	labelsCopy := make(map[string]string, len(labels))
-	for k, v := range labels {
-		labelsCopy[k] = v
-	}
 	for l, d := range limiterDecisions {
 		if !d.Dropped && d.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
-			go l.Revert(context.TODO(), labelsCopy, d)
+			go l.Revert(context.TODO(), labels.Copy(), d)
 		}
 	}
 }
@@ -400,7 +396,7 @@ func (e *Engine) GetSampler(limiterID iface.LimiterID) iface.Limiter {
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.
-func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map[string]string) *multiMatchResult {
+func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels labels.Labels) *multiMatchResult {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
 

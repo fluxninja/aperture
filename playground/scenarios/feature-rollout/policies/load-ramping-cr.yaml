@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: feature-rollout
+  name: load-ramping
 spec:
   circuit:
     components:
@@ -13,9 +13,9 @@ spec:
           out_ports:
             output:
               signal_name: AVERAGE_LATENCY_0
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="feature-rollout/average_latency/0",
-            policy_name="feature-rollout"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="feature-rollout/average_latency/0", policy_name="feature-rollout"}[30s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="load-ramping/average_latency/0",
+            policy_name="load-ramping"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="load-ramping/average_latency/0", policy_name="load-ramping"}[30s]))
     - decider:
         in_ports:
           lhs:
@@ -39,11 +39,11 @@ spec:
           output:
             signal_name: RESET_0
     - bool_variable:
-        config_key: rollout
-        constant_output: false
+        config_key: start
+        constant_output: true
         out_ports:
           output:
-            signal_name: USER_ROLLOUT_CONTROL
+            signal_name: USER_START_CONTROL
     - bool_variable:
         config_key: reset
         constant_output: false
@@ -108,7 +108,7 @@ spec:
           inputs:
           - signal_name: NOT_BACKWARD
           - signal_name: NOT_RESET
-          - signal_name: USER_ROLLOUT_CONTROL
+          - signal_name: USER_START_CONTROL
           - signal_name: FORWARD_INTENT
         out_ports:
           output:
@@ -134,8 +134,8 @@ spec:
             sampler:
               label_key: ""
               selectors:
-              - control_point: awesome-feature
-                service: checkout-service.prod.svc.cluster.local
+              - control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
             steps:
             - duration: 0s
               target_accept_percentage: 1
@@ -147,10 +147,7 @@ spec:
     flow_control:
       classifiers: []
       flux_meters:
-        feature-rollout/average_latency/0:
+        load-ramping/average_latency/0:
           selectors:
           - control_point: ingress
-            label_matcher:
-              match_labels:
-                http.path: /checkout
-            service: checkout-service.prod.svc.cluster.local
+            service: service1-demo-app.demoapp.svc.cluster.local

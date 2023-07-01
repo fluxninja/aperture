@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../../../blueprints/policies/load-ramping/base/gen/definitions.json
+# yaml-language-server: $schema=../../../../../../blueprints/load-ramping/base/gen/definitions.json
 # Generated values file for load-ramping/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-ramping/base
@@ -23,7 +23,7 @@ policy:
   # The interval between successive evaluations of the Circuit.
   # Type: string
   evaluation_interval: "10s"
-  # Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.
+  # Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.
   # Type: aperture.spec.v1.LoadRampParameters
   # Required: True
   load_ramp:
@@ -40,12 +40,12 @@ policy:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "feature-rollout"
+  policy_name: "load-ramping"
   # List of additional resources.
   # Type: aperture.spec.v1.Resources
   resources:
     flow_control:
       classifiers: []
-  # Whether to start the rollout. This setting may be overridden at runtime via dynamic configuration.
+  # Whether to start the ramping. This setting may be overridden at runtime via dynamic configuration.
   # Type: bool
-  rollout: false
+  start: false
