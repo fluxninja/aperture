@@ -15,9 +15,6 @@ policy:
         - selectors:
             - service: service1-demo-app.demoapp.svc.cluster.local
               control_point: ingress
-              label_matcher:
-                match_labels:
-                  http.path: /api/workload-prioritization
           rules:
             user_type:
               extractor:
@@ -35,15 +32,13 @@ policy:
           workloads:
             - label_matcher:
                 match_labels:
-                  http.request.header.user_type: "guest"
-                  http.path: /api/workload-prioritization
+                  user_type: "guest"
               parameters:
                 priority: "50"
               name: "guest"
             - label_matcher:
                 match_labels:
                   http.request.header.user_type: "subscriber"
-                  http.path: /api/workload-prioritization
               parameters:
                 priority: "200"
               name: "subscriber"
@@ -56,6 +51,3 @@ policy:
       selectors:
         - control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
-          label_matcher:
-            match_labels:
-              http.path: /api/workload-prioritization

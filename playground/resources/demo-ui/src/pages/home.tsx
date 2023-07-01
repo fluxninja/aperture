@@ -4,8 +4,7 @@ import {
   MonitorRequestProps,
   RequestRecord,
 } from '../components/monitor-request'
-import { Box, Typography, styled, Tabs, Tab, Backdrop, Fade } from '@mui/material'
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
+import { Box, Typography, styled, Tabs, Tab } from '@mui/material'
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
@@ -13,56 +12,60 @@ import {
   GracefulErrorProps,
   useGracefulRequest,
 } from '@fluxninja-tools/graceful-js'
-import { api, RequestSpec } from '../api'
+import { api, req, RequestSpec } from '../api'
 import { SuccessIcon } from './success-icon'
 
 export const HomePage: FC = () => {
-
   const [value, setValue] = useState('1')
-  const [userType, setUserType] = useState<'guest' | 'subscriber'>('guest')
-  const [open, setOpen] = useState(false);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue)
-    if(newValue === '2') setOpen(true);
   }
 
-  const handleDialogClose = (value: 'guest' | 'subscriber') => {
-    setUserType(value);
-    setOpen(false);
-  };
-  
-  // Request Spec for rate-limit endpoint with Executive user to retrieve fluxninja founders info
   const reqSpec: RequestSpec = {
     method: 'GET',
     endpoint: '/rate-limit',
     userType: 'user',
     userId: 'DemoUI',
   }
-  // Request to rate-limit endpoint with Guest user
+
   const {
     refetch,
     isError,
-    requestRecord: requestRecord,
+    requestRecord,
     isLoading: isLoadingRequest,
     data: requestResponse,
   } = useRequestToEndpoint(reqSpec)
 
-  // Request to workload-prioritization endpoint with Guest user and Subscriber user
-  const reqSpec2: RequestSpec = {
-    method: 'GET',
-    endpoint: '/workload-prioritization',
+  const reqSpecUser: RequestSpec = {
+    method: 'POST',
+    endpoint: '',
     userType: 'subscriber',
     userId: 'DemoUI',
   }
+
   const {
     refetch: refetchUser,
     isError: isErrorUser,
     requestRecord: userRequestRecord,
     isLoading: isLoadingUser,
     data: userRequestResponse,
-  } = useRequestToEndpoint(reqSpec2)
+  } = useRequestToEndpoint(reqSpecUser)
 
+  const reqSpecGuest: RequestSpec = {
+    method: 'POST',
+    endpoint: '',
+    userType: 'guest',
+    userId: 'DemoUI',
+  }
+
+  const {
+    refetch: refetchGuest,
+    isError: isErrorGuest,
+    requestRecord: guestRequestRecord,
+    isLoading: isLoadingGuest,
+    data: guestRequestResponse,
+  } = useRequestToEndpoint(reqSpecGuest)
   return (
     <TabContext value={value}>
       <TabList
@@ -90,45 +93,33 @@ export const HomePage: FC = () => {
         />
       </TabPanel>
       <TabPanel value="2">
-        <Backdrop
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={open}
-        />
-          <Dialog
-            open={open}
-            TransitionComponent={Fade}
-            onClose={() => setOpen(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-          <DialogTitle id="alert-dialog-title">{"User Type"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Please select the user type.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => handleDialogClose('guest')} color="primary">
-              Guest
-            </Button>
-            <Button onClick={() => handleDialogClose('subscriber')} color="primary" autoFocus>
-              Subscriber
-            </Button>
-          </DialogActions>
-        </Dialog>
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: userRequestRecord,
             refetch: refetchUser,
-            userType: userType === 'subscriber' ? 'Subscriber' : 'Guest',
+            userType: 'Subscriber',
           }}
           isErrored={isErrorUser}
           isLoading={isLoadingUser}
           errorComponentProps={{
-            url: `/api${reqSpec2.endpoint}`,
+            url: `/request${reqSpecUser.endpoint}`,
             requestBody: {},
           }}
           responseData={userRequestResponse}
+        />
+        <RequestMonitorPanel
+          monitorRequestProps={{
+            requestRecord: guestRequestRecord,
+            refetch: refetchGuest,
+            userType: 'Guest',
+          }}
+          isErrored={isErrorGuest}
+          isLoading={isLoadingGuest}
+          errorComponentProps={{
+            url: `/request${reqSpecGuest.endpoint}`,
+            requestBody: {},
+          }}
+          responseData={guestRequestResponse}
         />
       </TabPanel>
     </TabContext>
@@ -145,7 +136,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       typeOfRequest: 'Axios',
       requestFnc: () => {
         if (reqSpec.method === 'POST') {
-          return api.post(reqSpec.endpoint, reqSpec.body, {
+          return req.post(reqSpec.endpoint, {
             headers: {
               'User-Id': reqSpec.userId,
               'User-Type': reqSpec.userType,
@@ -183,7 +174,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
     const intervalId = setInterval(() => {
       setRequestCount((prevCount) => prevCount + 1)
       refetch()
-    }, 100)
+    }, 400)
 
     setIntervalId(intervalId)
 
@@ -191,7 +182,6 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       clearInterval(intervalId)
     }
   }, [refetch])
-
 
   // stop making request if isError is true or requestCount is greater than 50
   useEffect(() => {
@@ -231,7 +221,6 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
     <HomePageColumnBox>
       <MonitorRequest {...monitorRequestProps} />
     </HomePageColumnBox>
-    <SuccessIcon />
     <HomePageColumnBox>
       {isErrored && !isLoading ? (
         <GracefulError {...errorComponentProps} />
@@ -245,8 +234,19 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
             color: theme.palette.grey[400],
           })}
         >
-          <Typography variant="h5">{responseData?.data?.message}</Typography>
-          {responseData?.status === 200 && <SuccessIcon />}
+          <Typography
+            variant="h5"
+            style={{
+              color: responseData?.status === 429 ? '#F8773D' : '#56AE89',
+            }}
+          >
+            {responseData?.status === 429
+              ? 'Request rate limited'
+              : responseData?.data?.message}
+          </Typography>
+          {responseData?.status === 200 && (
+            <SuccessIcon style={{ width: '15rem', height: '15rem' }} />
+          )}
         </Box>
       )}
     </HomePageColumnBox>
@@ -267,6 +267,7 @@ export const HomePageWrapper = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     width: '100%',
+    height: '100%',
   },
 }))
 

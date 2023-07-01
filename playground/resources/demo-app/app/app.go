@@ -184,7 +184,7 @@ func (ss SimpleService) Run() error {
 	http.Handle("/ui/", http.StripPrefix("/ui/", fs))
 	http.HandleFunc("/api/rate-limit", apiEndpointHandler)
 	http.HandleFunc("/api/feature-rollout", apiEndpointHandler)
-	http.HandleFunc("/api/workload-prioritization", apiEndpointHandler)
+	http.HandleFunc("/api/prioritization", apiEndpointHandler)
 	http.Handle("/request", handlerFunc(handler))
 
 	address := fmt.Sprintf(":%d", ss.port)
@@ -195,7 +195,6 @@ func (ss SimpleService) Run() error {
 }
 
 func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
-
 	// Extract baggage and trace context from headers
 	ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
 	// Start a new span (not needed if we want "just passthrough")
@@ -212,7 +211,7 @@ func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
 		span.SetStatus(codes.Error, "rejected")
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusForbidden)
 	}
 
 	span.SetStatus(codes.Ok, "accepted")

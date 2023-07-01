@@ -135,6 +135,9 @@ spec:
               label_key: ""
               selectors:
               - control_point: ingress
+                label_matcher:
+                  match_labels:
+                    http.path: /api/feature-rollout
                 service: service1-demo-app.demoapp.svc.cluster.local
             steps:
             - duration: 0s
@@ -150,4 +153,7 @@ spec:
         feature-rollout/average_latency/0:
           selectors:
           - control_point: ingress
+            label_matcher:
+              match_labels:
+                http.path: /api/feature-rollout
             service: service1-demo-app.demoapp.svc.cluster.local

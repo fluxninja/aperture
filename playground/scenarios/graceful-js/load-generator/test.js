@@ -1,13 +1,17 @@
-import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
+import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.4.0/index.js";
 import { check, sleep } from "k6";
 import { vu } from "k6/execution";
 import http from "k6/http";
 
 export let vuStages = [
+  { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
+  { duration: "1m", target: 50 },
+  { duration: "2m", target: 50 },
+  { duration: "1m", target: 100 },
+  { duration: "2m", target: 100 },
+  { duration: "10s", target: 5 },
   { duration: "2m", target: 5 },
-  { duration: "1m", target: 5 },
-  { duration: "1m", target: 5 },
 ];
 
 export let options = {
@@ -29,8 +33,7 @@ export let options = {
 export default function () {
   let userType = __ENV.USER_TYPE;
   let userId = vu.idInTest;
-  const url =
-    "http://service1-demo-app.demoapp.svc.cluster.local/api/workload-prioritization";
+  const url = "http://service1-demo-app.demoapp.svc.cluster.local/request";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
@@ -42,16 +45,13 @@ export default function () {
     request: [
       [
         {
-          destination:
-            "service1-demo-app.demoapp.svc.cluster.local/workload-prioritization",
+          destination: "service1-demo-app.demoapp.svc.cluster.local/request",
         },
         {
-          destination:
-            "service2-demo-app.demoapp.svc.cluster.local/workload-prioritization",
+          destination: "service2-demo-app.demoapp.svc.cluster.local/request",
         },
         {
-          destination:
-            "service3-demo-app.demoapp.svc.cluster.local/workload-prioritization",
+          destination: "service3-demo-app.demoapp.svc.cluster.local/request",
         },
       ],
     ],
