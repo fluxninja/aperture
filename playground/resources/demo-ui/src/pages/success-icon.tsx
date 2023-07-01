@@ -32,7 +32,7 @@ export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
         x2="23.7691"
         y2="40.7336"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <line
         x1="24.645"
@@ -40,12 +40,12 @@ export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
         x2="25.3515"
         y2="42.1433"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <path
         d="M22.2094 42.6433H22.9159"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <line
         x1="23.9159"
@@ -53,7 +53,7 @@ export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
         x2="24.6224"
         y2="44.228"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <line
         x1="55.0286"
@@ -61,7 +61,7 @@ export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
         x2="55.7351"
         y2="40.7336"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <line
         x1="56.6109"
@@ -69,12 +69,12 @@ export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
         x2="57.3174"
         y2="42.1433"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <path
         d="M54.1753 42.6433H54.8818"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <line
         x1="55.8818"
@@ -82,27 +82,27 @@ export const SuccessIcon: FC<PropsWithRef<SvgIconProps>> = React.forwardRef(
         x2="56.5883"
         y2="44.228"
         stroke="#F8773D"
-        stroke-linecap="round"
+        strokeLinecap="round"
       />
       <path
         d="M27.3738 37.4519L31.5374 33.2882L35.7011 37.4519"
         stroke="#56AE89"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M44.3257 37.4519L48.4893 33.2882L52.6529 37.4519"
         stroke="#56AE89"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M29.0877 44.3665C30.9419 48.1108 35.1362 50.7232 40.0134 50.7232C44.8905 50.7232 49.0848 48.1108 50.9391 44.3665"
         stroke="#56AE89"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
     </SvgIcon>
   )

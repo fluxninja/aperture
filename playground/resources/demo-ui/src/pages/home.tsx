@@ -4,7 +4,7 @@ import {
   MonitorRequestProps,
   RequestRecord,
 } from '../components/monitor-request'
-import { Box, Typography, styled, Tabs, Tab } from '@mui/material'
+import { Box, styled, Tabs, Tab, CircularProgress } from '@mui/material'
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
@@ -14,58 +14,56 @@ import {
 } from '@fluxninja-tools/graceful-js'
 import { api, req, RequestSpec } from '../api'
 import { SuccessIcon } from './success-icon'
+import { useTabChange } from '../hooks'
+
+const RATE_LIMIT_REQUEST: RequestSpec = {
+  method: 'GET',
+  endpoint: '/rate-limit',
+  userType: 'user',
+  userId: 'DemoUI',
+}
+
+const WORKLOAD_PRIORITIZATION_USER_REQUEST: RequestSpec = {
+  method: 'POST',
+  endpoint: '',
+  userType: 'subscriber',
+  userId: 'DemoUI',
+}
+
+const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
+  method: 'POST',
+  endpoint: '',
+  userType: 'guest',
+  userId: 'DemoUI',
+}
 
 export const HomePage: FC = () => {
-  const [value, setValue] = useState('1')
-
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue)
-  }
-
-  const reqSpec: RequestSpec = {
-    method: 'GET',
-    endpoint: '/rate-limit',
-    userType: 'user',
-    userId: 'DemoUI',
-  }
+  const { handleChange, value } = useTabChange([
+    'Rate Limit',
+    'Workload Prioritization',
+  ])
 
   const {
     refetch,
     isError,
     requestRecord,
     isLoading: isLoadingRequest,
-    data: requestResponse,
-  } = useRequestToEndpoint(reqSpec)
-
-  const reqSpecUser: RequestSpec = {
-    method: 'POST',
-    endpoint: '',
-    userType: 'subscriber',
-    userId: 'DemoUI',
-  }
+  } = useRequestToEndpoint(RATE_LIMIT_REQUEST)
 
   const {
     refetch: refetchUser,
     isError: isErrorUser,
     requestRecord: userRequestRecord,
     isLoading: isLoadingUser,
-    data: userRequestResponse,
-  } = useRequestToEndpoint(reqSpecUser)
-
-  const reqSpecGuest: RequestSpec = {
-    method: 'POST',
-    endpoint: '',
-    userType: 'guest',
-    userId: 'DemoUI',
-  }
+  } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_USER_REQUEST)
 
   const {
     refetch: refetchGuest,
     isError: isErrorGuest,
     requestRecord: guestRequestRecord,
     isLoading: isLoadingGuest,
-    data: guestRequestResponse,
-  } = useRequestToEndpoint(reqSpecGuest)
+  } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_GUEST_REQUEST)
+
   return (
     <TabContext value={value}>
       <TabList
@@ -73,10 +71,10 @@ export const HomePage: FC = () => {
         aria-label="FluxNinja Scenarios"
         variant="fullWidth"
       >
-        <Tab label="Rate Limit" value="1" />
-        <Tab label="Workload Prioritization" value="2" />
+        <Tab label="Rate Limit" value="0" />
+        <Tab label="Workload Prioritization" value="1" />
       </TabList>
-      <TabPanel value="1">
+      <TabPanel value="0">
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: requestRecord,
@@ -86,13 +84,12 @@ export const HomePage: FC = () => {
           isErrored={isError}
           isLoading={isLoadingRequest}
           errorComponentProps={{
-            url: `/api${reqSpec.endpoint}`,
+            url: `/api${RATE_LIMIT_REQUEST.endpoint}`,
             requestBody: {},
           }}
-          responseData={requestResponse}
         />
       </TabPanel>
-      <TabPanel value="2">
+      <TabPanel value="1">
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: userRequestRecord,
@@ -102,10 +99,9 @@ export const HomePage: FC = () => {
           isErrored={isErrorUser}
           isLoading={isLoadingUser}
           errorComponentProps={{
-            url: `/request${reqSpecUser.endpoint}`,
+            url: `/request`,
             requestBody: {},
           }}
-          responseData={userRequestResponse}
         />
         <RequestMonitorPanel
           monitorRequestProps={{
@@ -116,10 +112,9 @@ export const HomePage: FC = () => {
           isErrored={isErrorGuest}
           isLoading={isLoadingGuest}
           errorComponentProps={{
-            url: `/request${reqSpecGuest.endpoint}`,
+            url: `/request`,
             requestBody: {},
           }}
-          responseData={guestRequestResponse}
         />
       </TabPanel>
     </TabContext>
@@ -136,22 +131,25 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       typeOfRequest: 'Axios',
       requestFnc: () => {
         if (reqSpec.method === 'POST') {
-          return req.post(reqSpec.endpoint, {
-            headers: {
-              'User-Id': reqSpec.userId,
-              'User-Type': reqSpec.userType,
-            },
-          })
-        } else if (reqSpec.method === 'GET') {
-          return api.get(reqSpec.endpoint, {
-            headers: {
-              'User-Id': reqSpec.userId,
-              'User-Type': reqSpec.userType,
-            },
-          })
-        } else {
-          throw new Error(`Invalid method: ${reqSpec.method}`)
+          // if request method is POST, use req.post for workload prioritization
+          return req.post(
+            reqSpec.endpoint,
+            {},
+            {
+              headers: {
+                'User-Id': reqSpec.userId,
+                'User-Type': reqSpec.userType,
+              },
+            }
+          )
         }
+        // if request method is GET, use api.get for rate limit
+        return api.get(reqSpec.endpoint, {
+          headers: {
+            'User-Id': reqSpec.userId,
+            'User-Type': reqSpec.userType,
+          },
+        })
       },
       options: {
         disabled: true,
@@ -207,7 +205,6 @@ export interface RequestMonitorPanelProps {
   isErrored: boolean
   isLoading: boolean
   errorComponentProps: GracefulErrorProps
-  responseData: any
 }
 
 export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
@@ -215,43 +212,48 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   isErrored,
   isLoading,
   errorComponentProps,
-  responseData,
-}) => (
-  <HomePageWrapper>
-    <HomePageColumnBox>
-      <MonitorRequest {...monitorRequestProps} />
-    </HomePageColumnBox>
-    <HomePageColumnBox>
-      {isErrored && !isLoading ? (
-        <GracefulError {...errorComponentProps} />
-      ) : (
-        <Box
-          sx={(theme) => ({
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            color: theme.palette.grey[400],
-          })}
-        >
-          <Typography
-            variant="h5"
-            style={{
-              color: responseData?.status === 429 ? '#F8773D' : '#56AE89',
-            }}
+}) => {
+  if (isLoading) {
+    return (
+      <Box
+        {...{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 500,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  return (
+    <HomePageWrapper>
+      <HomePageColumnBox>
+        <MonitorRequest {...monitorRequestProps} />
+      </HomePageColumnBox>
+      <HomePageColumnBox>
+        {isErrored && !isLoading ? (
+          <GracefulError {...errorComponentProps} />
+        ) : (
+          <Box
+            sx={(theme) => ({
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: theme.palette.grey[400],
+            })}
           >
-            {responseData?.status === 429
-              ? 'Request rate limited'
-              : responseData?.data?.message}
-          </Typography>
-          {responseData?.status === 200 && (
             <SuccessIcon style={{ width: '15rem', height: '15rem' }} />
-          )}
-        </Box>
-      )}
-    </HomePageColumnBox>
-  </HomePageWrapper>
-)
+          </Box>
+        )}
+      </HomePageColumnBox>
+    </HomePageWrapper>
+  )
+}
 
 export const HomePageWrapper = styled(Box)(({ theme }) => ({
   display: 'grid',

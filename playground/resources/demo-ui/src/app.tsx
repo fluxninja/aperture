@@ -5,6 +5,7 @@ import {
   GracefulProvider,
   Config as GracefulJsConfig,
 } from '@fluxninja-tools/graceful-js'
+import { BrowserRouter } from 'react-router-dom'
 import { api } from './api'
 
 const gracefulJsConfig: GracefulJsConfig = {
@@ -16,7 +17,9 @@ export const App: FC = () => {
   return (
     <DemoAppThemeProvider>
       <GracefulProvider config={gracefulJsConfig}>
-        <HomePage />
+        <BrowserRouter>
+          <HomePage />
+        </BrowserRouter>
       </GracefulProvider>
     </DemoAppThemeProvider>
   )

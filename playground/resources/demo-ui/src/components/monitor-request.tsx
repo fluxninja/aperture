@@ -188,4 +188,3 @@ export const MonitorRequestItem = styled(Box, {
     : theme.palette.success.main,
   borderRadius: theme.spacing(1),
 }))
-
