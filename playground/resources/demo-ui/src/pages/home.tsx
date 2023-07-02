@@ -1,21 +1,19 @@
-import React, { FC, useCallback, useEffect, useState } from 'react'
+import React, { FC } from 'react'
 import {
   MonitorRequest,
   MonitorRequestProps,
-  RequestRecord,
 } from '../components/monitor-request'
-import { Box, styled, Tabs, Tab, CircularProgress } from '@mui/material'
+import { Box, styled, Tab, CircularProgress } from '@mui/material'
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
-  GracefulError,
-  GracefulErrorProps,
-  useGraceful,
-  useGracefulRequest,
+  GracefulErrorByStatus,
+  RateLimitInfo,
 } from '@fluxninja-tools/graceful-js'
-import { api, RequestSpec } from '../api'
+import { RequestSpec } from '../api'
 import { SuccessIcon } from './success-icon'
-import { useTabChange } from '../hooks'
+import { useRequestToEndpoint, useTabChange } from '../hooks'
+import { AxiosError } from 'axios'
 
 const RATE_LIMIT_REQUEST: RequestSpec = {
   method: 'GET',
@@ -57,6 +55,7 @@ export const HomePage: FC = () => {
     isError,
     requestRecord,
     isLoading: isLoadingRequest,
+    error: rateLimitRequestError,
   } = useRequestToEndpoint(RATE_LIMIT_REQUEST)
 
   const {
@@ -64,6 +63,7 @@ export const HomePage: FC = () => {
     isError: isErrorUser,
     requestRecord: userRequestRecord,
     isLoading: isLoadingUser,
+    error: workloadPrioritySubscriberError,
   } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_SUBSCRIBER_REQUEST)
 
   const {
@@ -71,6 +71,7 @@ export const HomePage: FC = () => {
     isError: isErrorGuest,
     requestRecord: guestRequestRecord,
     isLoading: isLoadingGuest,
+    error: workloadPriorityGuestError,
   } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_GUEST_REQUEST)
 
   return (
@@ -92,9 +93,7 @@ export const HomePage: FC = () => {
           }}
           isErrored={isError}
           isLoading={isLoadingRequest}
-          errorComponentProps={{
-            url: '/aperture/api/rate-limit',
-          }}
+          error={rateLimitRequestError}
         />
       </TabPanel>
       <TabPanel value="1">
@@ -106,10 +105,7 @@ export const HomePage: FC = () => {
           }}
           isErrored={isErrorUser}
           isLoading={isLoadingUser}
-          errorComponentProps={{
-            url: '/aperture/request',
-            requestBody: {},
-          }}
+          error={workloadPrioritySubscriberError}
         />
         <RequestMonitorPanel
           monitorRequestProps={{
@@ -119,88 +115,28 @@ export const HomePage: FC = () => {
           }}
           isErrored={isErrorGuest}
           isLoading={isLoadingGuest}
-          errorComponentProps={{
-            url: '/aperture/request',
-            requestBody: {},
-          }}
+          error={workloadPriorityGuestError}
         />
       </TabPanel>
     </TabContext>
   )
 }
 
-export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
-  const [requestRecord, setRequestRecord] = useState<RequestRecord[]>([]) // record state for each request
-  const [requestCount, setRequestCount] = useState(0) // number of request count state
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null) // interval id state, used to clear interval
-
-  const { isError, refetch, error, data, isRetry, isLoading } =
-    useGracefulRequest<'Axios'>({
-      typeOfRequest: 'Axios',
-      requestFnc: () => api(reqSpec),
-      options: {
-        disabled: true,
-      },
-    })
-
-  // update record state if request counter is not 0
-  const updateRecord = useCallback(() => {
-    if (!requestCount) {
-      return
-    }
-    setRequestRecord((prevErrors) => [
-      ...prevErrors,
-      { isError, rateLimitInfo: error?.rateLimitInfo || null, isRetry },
-    ])
-  }, [isError, requestCount, error?.rateLimitInfo, isRetry])
-
-  // start making request after 800ms
-  const startFetch = useCallback(() => {
-    const intervalId = setInterval(() => {
-      setRequestCount((prevCount) => prevCount + 1)
-      refetch()
-    }, 800)
-
-    setIntervalId(intervalId)
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [refetch])
-
-  // stop making request if isError is true or requestCount is greater than 50
-  useEffect(() => {
-    updateRecord()
-    if (!intervalId) {
-      return
-    }
-    if (isError) {
-      clearInterval(intervalId)
-      return
-    }
-    if (requestCount >= 60) {
-      clearInterval(intervalId)
-      return
-    }
-  }, [requestCount, intervalId, isError])
-
-  return { isError, refetch: startFetch, requestRecord, isLoading, data }
-}
-
 export interface RequestMonitorPanelProps {
   monitorRequestProps: MonitorRequestProps
   isErrored: boolean
   isLoading: boolean
-  errorComponentProps: GracefulErrorProps
+  error: AxiosError<unknown, unknown> & {
+    rateLimitInfo?: RateLimitInfo
+  }
 }
 
 export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   monitorRequestProps,
   isErrored,
   isLoading,
-  errorComponentProps,
+  error,
 }) => {
-  const { errorInfo } = useGraceful()
   return (
     <HomePageWrapper>
       <HomePageColumnBox>
@@ -212,8 +148,7 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
             <CircularProgress />
           </FlexBox>
         ) : isErrored && !isLoading ? (
-          errorInfo.get(JSON.stringify(errorComponentProps))
-            ?.errorComponent || <GracefulError {...errorComponentProps} /> // TODO: Fix error component in graceful-js
+          <GracefulErrorByStatus status={error.response?.status} />
         ) : (
           <FlexBox>
             <SuccessIcon style={{ width: '15rem', height: '15rem' }} />
@@ -256,14 +191,4 @@ export const HomePageColumnBox = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   gap: theme.spacing(2),
   minHeight: 500,
-}))
-
-export const HomePageTabs = styled(Tabs)(({ theme }) => ({
-  width: '100%',
-  minHeight: 500,
-  display: 'flex',
-  alignItems: 'center',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  gap: theme.spacing(2),
 }))
