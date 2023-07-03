@@ -124,7 +124,7 @@ func getDecisions(etcdClient *clientv3.Client, decisionType string) (map[string]
 			continue
 		}
 
-		if decisionType == "" {
+		if all {
 			decisionType = strings.Split(decisionName, "/")[0]
 		}
 
