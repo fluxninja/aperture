@@ -242,7 +242,7 @@ repos:
         args:
           - "-L inport,atleast,iteraction"
           - "--ignore-words=./.github/styles/Vocab/FluxNinja/accept.txt"
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.*/go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|playground/resources/nginx/.*|\.github/.*|.*\.libsonnet)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.*/go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|playground/resources/nginx/.*|\.github/.*|.*\.libsonnet|playground/resources/demo-ui/package-lock\.json)$
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.7.1
     hooks:

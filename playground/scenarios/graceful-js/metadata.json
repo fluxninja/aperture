@@ -10,15 +10,15 @@
       "dashboard_mixin_dir": "dashboards/"
     },
     {
-      "blueprint_name": "load-ramping/base",
-      "policy_name": "feature-rollout",
-      "values_file": "policies/feature-rollout.yaml",
-      "dashboard_mixin_dir": "dashboards/"
-    },
-    {
       "blueprint_name": "load-scheduling/average-latency",
       "policy_name": "workload-prioritization",
       "values_file": "policies/workload-prioritization.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    },
+    {
+      "blueprint_name": "load-ramping/base",
+      "policy_name": "load-ramping",
+      "values_file": "policies/load-ramping.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

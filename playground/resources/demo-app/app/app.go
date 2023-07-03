@@ -178,10 +178,8 @@ func (ss SimpleService) Run() error {
 		http.HandleFunc("/prometheus", prometheusHandler)
 	}
 
-
 	http.HandleFunc("/api/rate-limit", apiEndpointHandler)
-	http.HandleFunc("/api/feature-rollout", apiEndpointHandler)
-	http.HandleFunc("/api/prioritization", apiEndpointHandler)
+	http.HandleFunc("/api/load-ramp", apiEndpointHandler)
 	http.Handle("/request", handlerFunc(handler))
 
 	address := fmt.Sprintf(":%d", ss.port)
@@ -195,7 +193,7 @@ func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract baggage and trace context from headers
 	ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
 	// Start a new span (not needed if we want "just passthrough")
-	ctx, span := otel.Tracer(libraryName).Start(ctx, "ServeHTTP")
+	ctx, span := otel.Tracer(libraryName).Start(ctx, "apiEndpointHandler")
 	defer span.End()
 
 	responseBody := ResponseBody{
@@ -210,6 +208,9 @@ func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 	}
+
+	r = r.WithContext(ctx)
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(r.Header))
 
 	span.SetStatus(codes.Ok, "accepted")
 
