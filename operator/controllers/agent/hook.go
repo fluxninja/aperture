@@ -43,8 +43,8 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	if newAgent.Spec.Image.Digest == "" && newAgent.Spec.Image.Tag == "" {
-		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided")
+	if (newAgent.Spec.Image.Digest == "" && newAgent.Spec.Image.Tag == "") || (newAgent.Spec.Image.Digest != "" && newAgent.Spec.Image.Tag != "") {
+		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided , but not both")
 	}
 
 	if newAgent.Spec.Secrets.FluxNinjaExtension.Create && newAgent.Spec.Secrets.FluxNinjaExtension.Value == "" {
