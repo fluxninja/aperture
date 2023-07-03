@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/autoscale"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/blueprints"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/build"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/decisions"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/flowcontrol"
@@ -38,6 +39,7 @@ func init() {
 	RootCmd.AddCommand(build.BuildCmd)
 	RootCmd.AddCommand(agentsCmd)
 	RootCmd.AddCommand(delete.DeleteCmd)
+	RootCmd.AddCommand(decisions.DecisionsCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true
