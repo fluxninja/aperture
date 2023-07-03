@@ -1,0 +1,58 @@
+replicaCount: 1
+
+extraLabels: {}
+
+reactApp:
+  cpuLoadPercentage: 0
+  hostname: ~
+  image:
+    repository: fluxninja/demo-ui
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+nginx:
+  enabled: true
+  resources: {}
+  replicaCount: 1
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "demoui"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  demo-ui:
+    enabled: true
+    matchExpressions:
+      - { key: "app", operator: "In", values: ["demo-ui"] }

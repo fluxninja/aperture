@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "demoui"
+  labels:
+    app: "demoui"
+    chart: "demo-ui.chart"
+  annotations:
+    tilt.dev/enable-sync: "true" # Enable live updates with Tilt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "demoui"
+  template:
+    metadata:
+      labels:
+        app: "demoui"
+    spec:
+      containers:
+        - name: "demoui"
+          image:
+            "fluxninja/demo-ui"
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - name: http
+              containerPort: 3010
+          env:
+          # Add any necessary environment variables for your React app
+          # Add any other container configuration required by your React app

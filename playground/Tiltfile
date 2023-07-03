@@ -40,6 +40,7 @@ APERTURE_JS_EXAMPLE_NS = "aperture-js-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_PYTHON_EXAMPLE_NS = "aperture-python-example"
 APERTURE_DEMOAPP_NS = "demoapp"
+APERTURE_DEMO_UI_NS = "demoui"
 APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ISTIO_NS = "istio-system"
 DEFAULT_TEST_SCENARIO = "scenarios/java-service-protection"
@@ -385,6 +386,25 @@ DEP_TREE = {
             ]
         },
     },
+    APERTURE_DEMO_UI_NS: {
+        "demo-ui": {
+            "labels": ["TestScenarioApplication"],
+            "tkenv": TANKA_ROOT + "/apps/demo-ui",
+            "images": [
+                {
+                    "ref": "demo-ui",
+                    "context": GIT_ROOT + "/playground/resources/demo-ui",
+                }
+            ],
+            "child_resources": [
+                {
+                    "workload": "demoui",
+                    "new_name": "Demo UI",
+                    "resource_deps": ["agent"],
+                }
+            ]
+        }
+    }
 }
 
 NS_CONFIG = {}
@@ -877,6 +897,7 @@ def process_aperture_scenario(scenario_path):
             ]
         }
         DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-policies"] = policies
+        DEP_TREE[APERTURE_DEMO_UI_NS]["scenario-policies"] = policies
 
         for policy_name, dashboard in render_dashboards(aperture_policies).items():
             ds = {
@@ -1093,6 +1114,21 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
             service="aperture-grafana",
             local_port=3000,
             remote_port=3000,
+            extra_env={
+                "PERIOD": "1",
+                "INITIAL_DELAY": "1",
+            },
+        )
+
+    if "demo-ui" in resources:
+        forward_port_delayed(
+            workload="demo-ui-forward",
+            namespace=APERTURE_DEMO_UI_NS,
+            labels=["TestScenarioApplication"],
+            resource_deps=["Demo UI"],
+            service="demoui",
+            local_port=8099,
+            remote_port=80,
             extra_env={
                 "PERIOD": "1",
                 "INITIAL_DELAY": "1",
