@@ -26,6 +26,10 @@ type PrometheusEnforcer struct {
 // EnforceLabels transforms given query, making sure that all the required
 // labels are in place.
 func (e *PrometheusEnforcer) EnforceLabels(query string) (string, error) {
+	if len(e.labels) == 0 {
+		return query, nil
+	}
+
 	expr, err := parser.ParseExpr(query)
 	if err != nil {
 		return "", err
@@ -62,8 +66,6 @@ func providePrometheusEnforcer(in EnforcerIn) (*PrometheusEnforcer, error) {
 			Value: label.Value,
 		})
 	}
-
-	log.Info().Msg("Initializing prometheus labels exporter")
 
 	return &PrometheusEnforcer{labels: labels}, nil
 }
