@@ -82,13 +82,13 @@
           "description": "Driver to do scaling of the resource based on the CPU usage.",
           "default": {},
           "type": "object",
-          "$ref": "#/$defs/scaling_threshold"
+          "$ref": "#/$defs/scaling_driver"
         },
         "pod_memory": {
           "description": "Driver to do scaling of the resource based on the Memory usage.",
           "default": {},
           "type": "object",
-          "$ref": "#/$defs/scaling_threshold"
+          "$ref": "#/$defs/scaling_driver"
         }
       }
     },
@@ -205,17 +205,21 @@
     "scaling_driver": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["scale_in", "scale_out"],
       "properties": {
         "scale_in": {
           "type": "object",
           "additionalProperties": false,
+          "required": ["enabled", "threshold"],
           "properties": {
             "enabled": {
               "description": "Enables the Driver to do scale in of the resource.",
+              "default": "__REQUIRED_FIELD__",
               "type": "boolean"
             },
             "threshold": {
               "description": "Threshold for the driver.",
+              "default": "__REQUIRED_FIELD__",
               "type": "number",
               "format": "double"
             }
@@ -224,13 +228,16 @@
         "scale_out": {
           "type": "object",
           "additionalProperties": false,
+          "required": ["enabled", "threshold"],
           "properties": {
             "enabled": {
               "description": "Enables the driver to do scale out of the resource.",
+              "default": "__REQUIRED_FIELD__",
               "type": "boolean"
             },
             "threshold": {
               "description": "Threshold for the driver.",
+              "default": "__REQUIRED_FIELD__",
               "type": "number",
               "format": "double"
             }

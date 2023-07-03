@@ -159,8 +159,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 <ParameterDescription
     name='policy.pod_cpu'
     description='Driver to do scaling of the resource based on the CPU usage.'
-    type='Object (scaling_threshold)'
-    reference='#scaling-threshold'
+    type='Object (scaling_driver)'
+    reference='#scaling-driver'
     value='{}'
 />
 
@@ -173,8 +173,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 <ParameterDescription
     name='policy.pod_memory'
     description='Driver to do scaling of the resource based on the Memory usage.'
-    type='Object (scaling_threshold)'
-    reference='#scaling-threshold'
+    type='Object (scaling_driver)'
+    reference='#scaling-driver'
     value='{}'
 />
 
@@ -445,7 +445,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     description='Enables the Driver to do scale in of the resource.'
     type='Boolean'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -459,7 +459,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     description='Threshold for the driver.'
     type='Number (double)'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -479,7 +479,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     description='Enables the driver to do scale out of the resource.'
     type='Boolean'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -493,7 +493,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     description='Threshold for the driver.'
     type='Number (double)'
     reference=''
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
