@@ -46,10 +46,10 @@ var _ = Describe("Static service discovery", func() {
 			someService := "svc1"
 
 			cfg := &sdconfig.StaticDiscoveryConfig{
-				Entities: []entitiesv1.Entity{
+				Entities: []sdconfig.Entity{
 					{
-						IpAddress: someIPAddress,
-						Uid:       someUID,
+						IPAddress: someIPAddress,
+						UID:       someUID,
 						Services:  []string{someService},
 						Name:      someName,
 					},
@@ -118,10 +118,10 @@ var _ = Describe("Static service discovery", func() {
 			someOtherService := "svc2"
 
 			cfg := &sdconfig.StaticDiscoveryConfig{
-				Entities: []entitiesv1.Entity{
+				Entities: []sdconfig.Entity{
 					{
-						IpAddress: someIPAddress,
-						Uid:       someUID,
+						IPAddress: someIPAddress,
+						UID:       someUID,
 						Services:  []string{someService, someOtherService},
 						Name:      someName,
 					},

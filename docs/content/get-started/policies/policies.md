@@ -55,18 +55,13 @@ The following command can be used to list available blueprints:
 Which will output the following:
 
 ```bash
-dashboards/signals
-policies/auto-scaling/pod-auto-scaler
-policies/feature-rollout/average-latency
-policies/feature-rollout/base
-policies/feature-rollout/ema-latency
-policies/feature-rollout/percentile-latency
-policies/feature-rollout/promql
-policies/service-protection/average-latency
-policies/service-protection/promql
-policies/service-protection-with-load-based-pod-auto-scaler/average-latency
-policies/service-protection-with-load-based-pod-auto-scaler/promql
-policies/rate-limiting
+auto-scaling/pod-auto-scaler
+load-ramping/base
+load-scheduling/average-latency
+load-scheduling/postgresql
+load-scheduling/promql
+quota-scheduling/base
+rate-limiting/base
 ```
 
 ## Customizing Blueprints

@@ -33,8 +33,9 @@ class ExitException(RuntimeError):
 
 ANNOTATION_RE = re.compile(r".*@param.*|.*@schema.*")
 ANNOTATION_DETAILED_RE = re.compile(
-    r".*(?P<annotation_type>@schema|@param) \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]/:-]+) ?(?P<param_required>\w+)?\) ?(?P<param_description>.+)?"
+    r".*(?P<annotation_type>@schema|@param) \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]/:-]+)\) ?(?P<param_description>.+)?"
 )
+JSONNET_IMPORT_RE = re.compile(r".*import ['\"](?P<import_path>.+)['\"].*")
 
 
 @dataclasses.dataclass
@@ -61,10 +62,6 @@ class ParameterNode:
 class Blueprint:
     # nested dictionary of parameters
     nested_parameters: ParameterNode = dataclasses.field(default_factory=ParameterNode)
-    # nested dictionary of required parameters
-    nested_required_parameters: ParameterNode = dataclasses.field(
-        default_factory=ParameterNode
-    )
     # deprecated is a string
     deprecation_message: Optional[str] = None
 
@@ -135,10 +132,11 @@ class Blueprint:
         cls,
         blueprints_root_relative_path: str,
         policies_relative_path: str,
+        rendered_config: Dict,
         comment: List[str],
     ) -> Blueprint:
         nested_parameters = ParameterNode()
-        nested_required_parameters = ParameterNode()
+        comment.sort()
         for line in comment:
             if ANNOTATION_RE.match(line.strip()):
                 inner = ANNOTATION_DETAILED_RE.match(line.strip())
@@ -158,15 +156,65 @@ class Blueprint:
                 )
 
                 annotation_type = groups["annotation_type"]
-                param_required = groups.get("param_required", "") == "required"
                 param_description = groups.get("param_description", "")
                 # tokenize param_name and create nested_parameters
                 parts = param_name.split(".")
-                parent = nested_parameters.children
-                parent_required = nested_required_parameters.children
+
+                # read default value from rendered config
+                config = rendered_config
+                param_default = None
+                for idx, part in enumerate(parts):
+                    if idx == len(parts) - 1:
+                        try:
+                            param_default = config[part]
+                        except KeyError:
+                            if annotation_type == "@param":
+                                # fatal
+                                logger.error(
+                                    f"Unable to find param {param_name} in rendered config"
+                                )
+                                raise typer.Exit(1)
+                            else:
+                                # non-fatal
+                                param_default = None
+                    else:
+                        try:
+                            config = config[part]
+                        except KeyError:
+                            # the param is not present in the config, so we return None
+                            # Also, when specific param is a map (map[string]type) and there is no default
+                            # then we return None here, which will be converted into an empty map later.
+                            param_default = None
+                            break
+
+                # dive into param_default and check if any field contains __REQUIRED_FIELD__
+                def has_required_field(value):
+                    if isinstance(value, dict):
+                        for _, v in value.items():
+                            if has_required_field(v):
+                                return True
+                    elif isinstance(value, list):
+                        for v in value:
+                            if has_required_field(v):
+                                return True
+                    elif value == "__REQUIRED_FIELD__":
+                        return True
+                    return False
+
+                param_required = has_required_field(param_default)
+
                 if param_required and annotation_type == "@param":
                     nested_parameters.required_children.add(parts[0])
-                    nested_required_parameters.required_children.add(parts[0])
+
+                if param_default and json_schema_link:
+                    if param_type.startswith("["):
+                        # Add with the first element of the array
+                        rendered_config[param_type.split("]")[1]] = param_default[0]
+                    else:
+                        rendered_config[param_type] = param_default
+
+                parent = nested_parameters.children
+
                 for idx, part in enumerate(parts):
                     if idx == len(parts) - 1:
                         node = ParameterNode(
@@ -179,11 +227,10 @@ class Blueprint:
                                 docs_link,
                                 param_description,
                                 param_required,
+                                param_default,
                             )
                         )
                         parent[part] = node
-                        if param_required:
-                            parent_required[part] = node
                     else:
                         next_part = parts[idx + 1]
                         node = ParameterNode(Parameter(annotation_type, part))
@@ -192,19 +239,13 @@ class Blueprint:
                         if param_required:
                             parent[part].required_children.add(next_part)
                         parent = parent[part].children
-                        if param_required:
-                            if part not in parent_required:
-                                parent_required[part] = node
-                            parent_required[part].required_children.add(next_part)
-                            parent_required = parent_required[part].children
 
-        if not nested_parameters or not nested_required_parameters:
+        if not nested_parameters:
             logger.error("Unable to find parameters in comments")
             raise ValueError()
 
         return cls(
             nested_parameters,
-            nested_required_parameters,
         )
 
 
@@ -216,87 +257,6 @@ def command_with_exit_code(func):
             sys.exit(ex.ret_code)
 
     return wrapper
-
-
-def update_param_defaults(
-    repository_root: Path,
-    config_path: Path,
-    parameters: Blueprint,
-    jsonnet_path: Path = Path(),
-):
-    jsonnet_data = f"local config = import '{config_path}';\n"
-    if jsonnet_path != Path():
-        jsonnet_data += f"local fn = import '{jsonnet_path}';\n"
-
-    if jsonnet_path != Path():
-        jsonnet_data += f"fn(config)\n"
-    jsonnet_data += "{_config::: config}\n"
-
-    rendered_config = None
-    with tempfile.NamedTemporaryFile(suffix=".libsonnet") as tmp:
-        tmppath = Path(tmp.name)
-        tmppath.write_text(jsonnet_data)
-
-        jsonnet_jpaths = [
-            "-J",
-            repository_root / "blueprints",
-            "-J",
-            repository_root / "blueprints" / "vendor",
-        ]
-
-        try:
-            result = subprocess.run(
-                ["jsonnet", *jsonnet_jpaths, str(tmppath)],
-                capture_output=True,
-                check=True,
-            )
-        except subprocess.CalledProcessError as ex:
-            logger.error(f"Error while rendering jsonnet: {ex.stderr}")
-            # log file for debugging
-            logger.error(f"Jsonnet file: {jsonnet_data}")
-            raise typer.Exit(1)
-
-        rendered_config = json.loads(result.stdout)
-
-    def get_param_default_from_rendered_config(root: Dict, name: str) -> Any:
-        parts = name.split(".")
-        config = root
-        for idx, part in enumerate(parts):
-            if idx == len(parts) - 1:
-                try:
-                    return config[part]
-                except KeyError:
-                    # fatal exit
-                    logger.error(f"Unable to find param {name} in rendered config")
-                    raise typer.Exit(1)
-            else:
-                try:
-                    config = config[part]
-                except KeyError:
-                    # the param is not present in the config, so we return None
-                    # Also, when specific param is a map (map[string]type) and there is no default
-                    # then we return None here, which will be converted into an empty map later.
-                    return None
-
-    logger.trace(rendered_config)
-    # walk nested_parameters and update defaults
-
-    def update_nested_param_defaults(node, prefix=""):
-        if node.parameter.param_type != "intermediate_node":
-            default = get_param_default_from_rendered_config(
-                rendered_config["_config"], prefix
-            )
-            if default is not None:
-                node.parameter.default = default
-        for key, child in node.children.items():
-            if prefix != "":
-                keyPrefix = f"{prefix}.{key}"
-            else:
-                keyPrefix = key
-            update_nested_param_defaults(child, keyPrefix)
-
-    update_nested_param_defaults(parameters.nested_parameters)
-    update_nested_param_defaults(parameters.nested_required_parameters)
 
 
 MARKDOWN_DOC_TPL = """
@@ -510,7 +470,9 @@ type: "{{ param_type }}"
 {% else %}
 {{ node.parameter.param_name }}:
   description: "{{ node.parameter.description }}"
+  {% if node.parameter.default != None %}
   default: {{ node.parameter.default | quote_value }}
+  {% endif %}
   {{ render_type(node.parameter.param_type, node.parameter.json_schema_link,
                  node.parameter.is_complex_type) | indent(2, true) }}
 {% endif %}
@@ -542,7 +504,7 @@ JSON_SCHEMA_DEFINITIONS_TPL = """
 YAML_TPL = """
 # Generated values file for {{ blueprint_name }} blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/ {{ blueprint_name }}
+# https://docs.fluxninja.com/reference/blueprints/{{ blueprint_name }}
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
 {%- if not value.items() %}
@@ -660,6 +622,7 @@ def update_readme_markdown(
         readme_copied += template.render(
             {"nested_parameters": dynamic_config_parameters.nested_parameters}
         )
+        readme_copied += "\n"
     readme_path.write_text(readme_copied)
 
 
@@ -738,15 +701,10 @@ def update_docs_markdown(
 def render_sample_config_yaml(
     blueprint_name: Path,
     sample_config_path: Path,
-    only_required: bool,
     parameters: Blueprint,
 ):
     """Render sample config YAML file from blocks"""
-    sample_config_data = ParameterNode()
-    if only_required is False:
-        sample_config_data = parameters.nested_parameters
-    else:
-        sample_config_data = parameters.nested_required_parameters
+    sample_config_data = parameters.nested_parameters
 
     env = get_jinja2_environment()
     template = env.get_template("values.yaml.j2")
@@ -773,17 +731,94 @@ def render_json_schema(
     json_schema_path.write_text(rendered)
 
 
-def parse_annotations(
-    blueprints_root_relative_path: str, policies_relative_path: str, jsonnet_data: str
+def parse_root_config(
+    repository_root: Path,
+    blueprints_root_relative_path: str,
+    policies_relative_path: str,
+    config_path: Path,
+    metadata: dict = dict(),
 ) -> Blueprint:
+    # first, load all default values
+    jsonnet_data = f"local config = import '{config_path}';\n"
+    sources = metadata.get("sources", {}).keys()
+    for source in sources:
+        jsonnet_path = metadata["sources"][source]
+        jsonnet_data += f"local fn_{source} = import '{jsonnet_path}';\n"
+    for source in sources:
+        jsonnet_data += f"local res_{source} = fn_{source}(config);\n"
+    jsonnet_data += "{_config::: config}\n"
+
+    rendered_config = None
+    with tempfile.NamedTemporaryFile(suffix=".libsonnet") as tmp:
+        tmppath = Path(tmp.name)
+        tmppath.write_text(jsonnet_data)
+
+        jsonnet_jpaths = [
+            "-J",
+            repository_root / "blueprints",
+            "-J",
+            repository_root / "blueprints" / "vendor",
+        ]
+
+        try:
+            result = subprocess.run(
+                ["jsonnet", *jsonnet_jpaths, str(tmppath)],
+                capture_output=True,
+                check=True,
+            )
+        except subprocess.CalledProcessError as ex:
+            logger.error(f"Error while rendering jsonnet: {ex.stderr}")
+            # log file for debugging
+            logger.error(f"Jsonnet file: {jsonnet_data}")
+            raise typer.Exit(1)
+
+        rendered_config = json.loads(result.stdout)["_config"]
+
+    logger.trace(rendered_config)
+
+    blueprint = parse_config_file(
+        repository_root,
+        blueprints_root_relative_path,
+        policies_relative_path,
+        config_path,
+        rendered_config,
+    )
+    blueprint.deprecation_message = metadata.get("deprecation_message", None)
+    return blueprint
+
+
+def parse_config_file(
+    repository_root: Path,
+    blueprints_root_relative_path: str,
+    policies_relative_path: str,
+    config_path: Path,
+    rendered_config: dict = dict(),
+) -> Blueprint:
+    config_data = config_path.read_text()
     docblock_start_re = r".*\/\*\*$"
     docblock_end_re = r".*\*\/$"
 
     docblocks = []
     inside_docblock = False
     docblock_data = []
-    for line in jsonnet_data.split("\n"):
-        if re.match(docblock_start_re, line):
+    for line in config_data.split("\n"):
+        if JSONNET_IMPORT_RE.match(line):
+            import_matches = JSONNET_IMPORT_RE.match(line.strip())
+            if not import_matches:
+                logger.error(f"Error while parsing import: {line}")
+                raise typer.Exit(1)
+            import_groupdict = import_matches.groupdict()
+            import_path = import_groupdict["import_path"]
+            docblocks.append(
+                parse_config_file(
+                    repository_root,
+                    blueprints_root_relative_path,
+                    policies_relative_path,
+                    config_path.parent / import_path,
+                    rendered_config,
+                )
+            )
+        elif re.match(docblock_start_re, line):
             assert not inside_docblock
             inside_docblock = True
         elif re.match(docblock_end_re, line):
@@ -791,7 +826,10 @@ def parse_annotations(
             inside_docblock = False
             docblocks.append(
                 Blueprint.from_comment(
-                    blueprints_root_relative_path, policies_relative_path, docblock_data
+                    blueprints_root_relative_path,
+                    policies_relative_path,
+                    rendered_config,
+                    docblock_data,
                 )
             )
             docblock_data = []
@@ -806,11 +844,6 @@ def parse_annotations(
         merge_parameternodes(
             merged_parameters.nested_parameters, block.nested_parameters
         )
-        merge_parameternodes(
-            merged_parameters.nested_required_parameters,
-            block.nested_required_parameters,
-        )
-
     return merged_parameters
 
 
@@ -859,13 +892,7 @@ def main(
         blueprint_name, blueprint_gen_path / "definitions.json", config_parameters
     )
     render_sample_config_yaml(
-        blueprint_name, blueprint_gen_path / "values.yaml", False, config_parameters
-    )
-    render_sample_config_yaml(
-        blueprint_name,
-        blueprint_gen_path / "values-required.yaml",
-        True,
-        config_parameters,
+        blueprint_name, blueprint_gen_path / "values.yaml", config_parameters
     )
 
     dynamic_config_parameters = parse_dynamic_config_docblocks(
@@ -882,13 +909,6 @@ def main(
     render_sample_config_yaml(
         blueprint_name,
         blueprint_gen_path / "dynamic-config-values.yaml",
-        False,
-        dynamic_config_parameters,
-    )
-    render_sample_config_yaml(
-        blueprint_name,
-        blueprint_gen_path / "dynamic-config-values-required.yaml",
-        True,
         dynamic_config_parameters,
     )
 
@@ -931,17 +951,13 @@ def parse_config_parameters(
 
     metadata = yaml.safe_load(metadata_path.read_text())
 
-    parameters = parse_annotations(
-        blueprints_root_relative_path, policies_relative_path, config_path.read_text()
+    parameters = parse_root_config(
+        repository_root,
+        blueprints_root_relative_path,
+        policies_relative_path,
+        config_path,
+        metadata,
     )
-
-    # read deprecated property (string) from metadata
-    parameters.deprecation_message = metadata.get("deprecated", None)
-
-    # set defaults for nested parameters
-    for source in metadata["sources"].keys():
-        jsonnet_path = metadata["sources"][source]
-        update_param_defaults(repository_root, config_path, parameters, jsonnet_path)
 
     return parameters
 
@@ -956,11 +972,13 @@ def parse_dynamic_config_docblocks(
     if not config_path.exists():
         return Blueprint()
 
-    dynamic_config_parameters = parse_annotations(
-        blueprints_root_relative_path, policies_relative_path, config_path.read_text()
+    dynamic_config_parameters = parse_root_config(
+        repository_root,
+        blueprints_root_relative_path,
+        policies_relative_path,
+        config_path,
     )
 
-    update_param_defaults(repository_root, config_path, dynamic_config_parameters)
     return dynamic_config_parameters
 
 
@@ -973,6 +991,7 @@ def merge_parameternodes(params1: ParameterNode, params2: ParameterNode):
     for key, value in params2.children.items():
         if key in params1.children:
             merge_parameternodes(params1.children[key], value)
+            params1.children[key].parameter = value.parameter
         else:
             params1.children[key] = value
 

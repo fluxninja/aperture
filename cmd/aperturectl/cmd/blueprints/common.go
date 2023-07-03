@@ -13,15 +13,9 @@ import (
 
 func createValuesFile(blueprintName string, valuesFile string, dynamicConfig bool) error {
 	valFileName := valuesFileName
-	if onlyRequired {
-		valFileName = requiredValuesFileName
-	}
 
 	if dynamicConfig {
 		valFileName = dynamicConfigValuesFileName
-		if onlyRequired {
-			valFileName = requiredDynamicConfigValuesFileName
-		}
 	}
 
 	blueprintDir := filepath.Join(blueprintsDir, blueprintName)

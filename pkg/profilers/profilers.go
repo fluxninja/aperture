@@ -90,6 +90,7 @@ func (constructor Constructor) setupProfilers(unmarshaller config.Unmarshaller,
 		router.HandleFunc(path.Join(httpPathPrefix, "cmdline"), httppprof.Cmdline)
 		router.HandleFunc(path.Join(httpPathPrefix, "profile"), httppprof.Profile)
 		router.HandleFunc(path.Join(httpPathPrefix, "symbol"), httppprof.Symbol)
+		router.Handle(path.Join(httpPathPrefix, "heap"), httppprof.Handler("heap"))
 	}
 
 	lc.Append(fx.Hook{

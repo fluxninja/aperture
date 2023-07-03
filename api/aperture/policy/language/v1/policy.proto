@@ -84,7 +84,6 @@ message UpsertPolicyRequest {
   Policy policy = 2 [(validate.rules).message.required = true];
   // The paths to update.
   google.protobuf.FieldMask update_mask = 3;
-  PolicyMetadata policy_metadata = 4;
 }
 
 // PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
@@ -154,7 +153,7 @@ message Policy {
 message Circuit {
   // Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
   // This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"0.5s"
+  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"10s"
 
   // Defines a signal processing graph as a list of components.
   repeated Component components = 2; // @gotags: validate:"dive"
@@ -169,7 +168,44 @@ message Circuit {
 // :::
 message Resources {
   // TelemetryCollector configures OpenTelemetry collector integration.
+  // Deprecated: v2.8.0. Use `infra_meters` instead.
   repeated TelemetryCollector telemetry_collectors = 1;
+
+  // _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
+  // receive and process telemetry at the agents and send metrics to the configured Prometheus.
+  // Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
+  // is optional, as all the components and pipeline names would be normalized.
+  //
+  // Example:
+  //
+  // ```yaml
+  // infra_meters:
+  //   rabbitmq:
+  //     agent_group: default
+  //     per_agent_group: true
+  //     processors:
+  //	     batch:
+  //	       send_batch_size: 10
+  //	       timeout: 10s
+  //	   receivers:
+  //	     rabbitmq:
+  //	       collection_interval: 10s
+  //         endpoint: http://<rabbitmq-svc-fqdn>:15672
+  //         password: secretpassword
+  //         username: admin
+  //
+  // ```
+  //
+  // :::caution
+  //
+  // Validate the OTel configuration before applying it to the
+  // production cluster.
+  // Incorrect configuration will get rejected at the agents and might cause
+  // shutdown of the agent(s).
+  //
+  // :::
+  map<string, InfraMeter> infra_meters = 2;
+
   // FlowControlResources are resources that are provided by flow control integration.
   FlowControlResources flow_control = 101;
 }
@@ -214,7 +250,7 @@ message Component {
     // Simple Moving Average filter.
     SMA sma = 6;
 
-    // Emits a variable signal which can be changed at runtime via dynamic configuration.
+    // Emits a variable signal which can be changed at runtime through dynamic configuration.
     Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
@@ -268,7 +304,7 @@ message Component {
     // Generates the specified signal.
     SignalGenerator signal_generator = 27;
 
-    // BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
+    // BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
     BoolVariable bool_variable = 28;
 
     // Query components that are query databases such as Prometheus.
@@ -295,10 +331,4 @@ message NestedCircuit {
   string name = 4;
   // Short description of the nested circuit component. This description is displayed by graph visualization tools.
   string short_description = 5;
-}
-
-message PolicyMetadata {
-  string blueprints_uri = 1;
-  string blueprint_name = 2;
-  string values = 3;
 }

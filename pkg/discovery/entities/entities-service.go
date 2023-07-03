@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
@@ -45,12 +47,20 @@ func (c *EntitiesService) GetEntities(ctx context.Context, _ *emptypb.Empty) (*e
 
 // GetEntityByIPAddress returns an entity by IP address.
 func (c *EntitiesService) GetEntityByIPAddress(ctx context.Context, req *entitiesv1.GetEntityByIPAddressRequest) (*entitiesv1.Entity, error) {
-	return c.entityCache.GetByIP(req.GetIpAddress())
+	e, err := c.entityCache.GetByIP(req.GetIpAddress())
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+	return e.Clone(), nil
 }
 
 // GetEntityByName returns an entity by name.
 func (c *EntitiesService) GetEntityByName(ctx context.Context, req *entitiesv1.GetEntityByNameRequest) (*entitiesv1.Entity, error) {
-	return c.entityCache.GetByName(req.GetName())
+	e, err := c.entityCache.GetByName(req.GetName())
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+	return e.Clone(), nil
 }
 
 // ListDiscoveryEntities lists currently discovered entities by IP address.
@@ -71,7 +81,7 @@ func (c *EntitiesService) ListDiscoveryEntity(ctx context.Context, req *cmdv1.Li
 			return nil, err
 		}
 		return &cmdv1.ListDiscoveryEntityAgentResponse{
-			Entity: entity,
+			Entity: entity.Clone(),
 		}, nil
 	case *cmdv1.ListDiscoveryEntityRequest_Name:
 		entity, err := c.entityCache.GetByName(req.GetName())
@@ -79,7 +89,7 @@ func (c *EntitiesService) ListDiscoveryEntity(ctx context.Context, req *cmdv1.Li
 			return nil, err
 		}
 		return &cmdv1.ListDiscoveryEntityAgentResponse{
-			Entity: entity,
+			Entity: entity.Clone(),
 		}, nil
 	default:
 		return nil, nil

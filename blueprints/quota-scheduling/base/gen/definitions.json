@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "quota-scheduling/base blueprint",
+  "additionalProperties": false,
+  "required": ["policy"],
+  "properties": {
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name", "quota_scheduler"],
+      "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "quota_scheduler": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "bucket_capacity",
+            "fill_amount",
+            "rate_limiter",
+            "selectors"
+          ],
+          "properties": {
+            "bucket_capacity": {
+              "description": "Bucket capacity.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "fill_amount": {
+              "description": "Fill amount.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "rate_limiter": {
+              "description": "Rate Limiter Parameters.",
+              "default": {
+                "interval": "__REQUIRED_FIELD__",
+                "label_key": ""
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+            },
+            "scheduler": {
+              "description": "Scheduler configuration.",
+              "default": {},
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
+            },
+            "selectors": {
+              "description": "Flow selectors to match requests against",
+              "default": [
+                {
+                  "control_point": "__REQUIRED_FIELD__",
+                  "service": "__REQUIRED_FIELD__"
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+              }
+            }
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "10s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "Time from of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "Time to of dashboard.",
+          "default": "now",
+          "type": "string"
+        },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Quota Scheduler",
+          "type": "string"
+        },
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "default": "",
+              "type": "string"
+            },
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": null
+}

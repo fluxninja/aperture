@@ -395,7 +395,7 @@ type BundledExtensionsSpec struct {
 	Sentry sentry.SentryConfig `json:"sentry"`
 }
 
-// ServiceDiscoverySpec defines configuration for Service discoveru.
+// ServiceDiscoverySpec defines configuration for Service discovery.
 type ServiceDiscoverySpec struct {
 	// KubernetesDiscoveryConfig for Kubernetes service discovery.
 	KubernetesDiscoveryConfig kubernetes.KubernetesDiscoveryConfig `json:"kubernetes"`

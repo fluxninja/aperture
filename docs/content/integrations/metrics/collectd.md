@@ -1,6 +1,6 @@
 ---
-title: CollectD write_http plugin JSON
-description: Integrating CollectD write_http plugin JSON Metrics
+title: CollectD `write_http` plugin JSON
+description: Integrating CollectD `write_http` plugin JSON Metrics
 keywords:
   - collectd
   - otel
@@ -26,19 +26,18 @@ you're [building][build] your own Aperture Agent, add
 :::
 
 You can configure the [OpenTelemetry Collector][opentelemetry-collector] for
-CollectD write_http plugin JSON as part of [Policy resources][policy-resources]
-while [applying the policy][applying-policy]:
+CollectD `write_http` plugin JSON as part of [Policy
+resources][policy-resources] while [applying the policy][applying-policy]:
 
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          collectd:
-            per_agent_group: true
-            receivers:
-              collectd: [collectdreceiver configuration here]
+    infra_meters:
+      collectd:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          collectd: [collectdreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

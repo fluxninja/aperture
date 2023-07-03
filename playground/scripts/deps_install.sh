@@ -49,7 +49,7 @@ for path in "${CHARTS_DIR}"/*; do
 	fi
 	pushd "$path" >/dev/null
 	echo "Processing $path"
-	if helm dependency list | grep -q missing$; then
+	if helm dependency list | grep -q -e missing -e 'wrong version'$; then
 		helm dependency update
 	fi
 	popd >/dev/null

@@ -23,5 +23,4 @@ Aperture performs auto-scaling based on
 - [Kubernetes](./kubernetes/kubernetes.md): Auto-scaling any scalable resource
   in a Kubernetes cluster can be achieved using Aperture. To achieve this, you
   must first ensure that an Aperture Agent is installed on the cluster, and then
-  configure [auto-scaling policies](/use-cases/auto-scale/auto-scale.md) at the
-  Aperture Controller.
+  configure auto-scaling policies at the Aperture Controller.

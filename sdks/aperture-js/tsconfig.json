@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node 16",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "es2022",
+    "target": "es2015",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "outDir": "./lib",
+    "declarationDir": "./@types"
+  },
+  "include": ["sdk", "example"],
+  "exclude": ["node_modules", "proto", "@types", "lib"]
+}

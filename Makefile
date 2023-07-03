@@ -164,6 +164,9 @@ operator-help: ## Display this help.
 operator-manifests: ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd:ignoreUnexportedFields=true,allowDangerousTypes=true webhook paths="./operator/..." output:crd:artifacts:config=operator/config/crd/bases output:rbac:artifacts:config=operator/config/rbac output:webhook:artifacts:config=operator/config/webhook
 	./operator/hack/create_policy_sample.sh
+	cp ./operator/config/crd/bases/fluxninja.com_agents.yaml ./manifests/charts/aperture-agent/crds/fluxninja.com_agents.yaml
+	cp ./operator/config/crd/bases/fluxninja.com_controllers.yaml ./manifests/charts/aperture-controller/crds/fluxninja.com_controllers.yaml
+	cp ./operator/config/crd/bases/fluxninja.com_policies.yaml ./manifests/charts/aperture-controller/crds/fluxninja.com_policies.yaml
 
 .PHONY: operator-generate
 operator-generate: ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.

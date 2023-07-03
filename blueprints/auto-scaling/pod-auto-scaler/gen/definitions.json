@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "auto-scaling/pod-auto-scaler blueprint",
+  "additionalProperties": false,
+  "required": ["policy"],
+  "properties": {
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name", "scaling_backend"],
+      "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "dry_run": {
+          "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
+          "default": false,
+          "type": "boolean"
+        },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "10s",
+          "type": "string"
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "promql_scale_in_controllers": {
+          "description": "List of scale in controllers.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/$defs/promql_scale_in_controller"
+          }
+        },
+        "promql_scale_out_controllers": {
+          "description": "List of scale out controllers.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/$defs/promql_scale_out_controller"
+          }
+        },
+        "resources": {
+          "description": "List of additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "scaling_backend": {
+          "description": "Scaling backend for the policy.",
+          "default": {
+            "kubernetes_replicas": "__REQUIRED_FIELD__"
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingBackend"
+        },
+        "scaling_parameters": {
+          "description": "Parameters that define the scaling behavior.",
+          "default": {
+            "scale_in_alerter": {
+              "alert_name": "Auto-scaler is scaling in"
+            },
+            "scale_out_alerter": {
+              "alert_name": "Auto-scaler is scaling out"
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "5s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "Time from of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "Time to of dashboard.",
+          "default": "now",
+          "type": "string"
+        },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Auto-scale",
+          "type": "string"
+        },
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "default": "",
+              "type": "string"
+            },
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "promql_scale_in_controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alerter", "gradient", "query_string", "setpoint"],
+      "properties": {
+        "alerter": {
+          "description": "Alerter parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+        },
+        "gradient": {
+          "description": "Gradient parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
+        },
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "setpoint": {
+          "description": "Setpoint for the controller.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "promql_scale_out_controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alerter", "gradient", "query_string", "setpoint"],
+      "properties": {
+        "alerter": {
+          "description": "Alerter parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+        },
+        "gradient": {
+          "description": "Gradient parameters for the controller.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
+        },
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "setpoint": {
+          "description": "Setpoint for the controller.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    }
+  }
+}

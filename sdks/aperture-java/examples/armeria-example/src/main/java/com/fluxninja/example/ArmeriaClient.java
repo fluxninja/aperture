@@ -2,10 +2,10 @@ package com.fluxninja.example;
 
 import com.fluxninja.aperture.armeria.ApertureHTTPClient;
 import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.linecorp.armeria.client.Clients;
 import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.HttpResponse;
+import java.io.IOException;
 import java.time.Duration;
 
 public class ArmeriaClient {
@@ -58,7 +58,7 @@ public class ArmeriaClient {
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
-        } catch (ApertureSDKException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return;
         }

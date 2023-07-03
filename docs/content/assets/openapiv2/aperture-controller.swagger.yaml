@@ -498,13 +498,13 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
-                default: 0.5s
+                default: 10s
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
                 type: string
-                x-go-tag-default: 0.5s
+                x-go-tag-default: 10s
         type: object
     Classifier:
         description: |-
@@ -597,7 +597,7 @@ definitions:
                 description: AutoScale components are used to scale the service.
             bool_variable:
                 $ref: '#/definitions/BoolVariable'
-                description: BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
+                description: BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
             decider:
                 $ref: '#/definitions/Decider'
                 description: Decider emits the binary result of comparison operator on two operands.
@@ -668,7 +668,7 @@ definitions:
                 description: Takes an input signal and emits the square root of the input signal.
             variable:
                 $ref: '#/definitions/Variable'
-                description: Emits a variable signal which can be changed at runtime via dynamic configuration.
+                description: Emits a variable signal which can be changed at runtime through dynamic configuration.
         title: Computational block that forms the circuit
         type: object
     ConstantSignal:
@@ -1550,6 +1550,13 @@ definitions:
 
             :::
         properties:
+            agent_group:
+                default: default
+                description: |+
+                    AgentGroup is the agent group to sync this InfraMeter with.
+
+                type: string
+                x-go-tag-default: default
             per_agent_group:
                 default: false
                 description: |+
@@ -1561,7 +1568,7 @@ definitions:
                 x-go-tag-default: "false"
             pipeline:
                 $ref: '#/definitions/InfraMeterMetricsPipeline'
-                description: |+
+                description: |-
                     Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
                     and processors defined above. Exporter would be added automatically.
 
@@ -1570,8 +1577,6 @@ definitions:
                     automatically use all given receivers and the defined processor (if
                     any).  However, if there are more than one processor, the pipeline must
                     be defined explicitly.
-
-                x-go-tag-validate: required
             processors:
                 additionalProperties:
                     type: object
@@ -2433,15 +2438,6 @@ definitions:
                 $ref: '#/definitions/Resources'
                 description: Resources (such as Flux Meters, Classifiers) to setup.
         type: object
-    PolicyMetadata:
-        properties:
-            blueprint_name:
-                type: string
-            blueprints_uri:
-                type: string
-            values:
-                type: string
-        type: object
     ProcessInfo:
         properties:
             extensions:
@@ -2772,8 +2768,48 @@ definitions:
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
+            infra_meters:
+                additionalProperties:
+                    $ref: '#/definitions/InfraMeter'
+                description: |-
+                    _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
+                    receive and process telemetry at the agents and send metrics to the configured Prometheus.
+                    Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
+                    is optional, as all the components and pipeline names would be normalized.
+
+                    Example:
+
+                    ```yaml
+                    infra_meters:
+                      rabbitmq:
+                        agent_group: default
+                        per_agent_group: true
+                        processors:
+                    	     batch:
+                    	       send_batch_size: 10
+                    	       timeout: 10s
+                    	   receivers:
+                    	     rabbitmq:
+                    	       collection_interval: 10s
+                            endpoint: http://<rabbitmq-svc-fqdn>:15672
+                            password: secretpassword
+                            username: admin
+
+                    ```
+
+                    :::caution
+
+                    Validate the OTel configuration before applying it to the
+                    production cluster.
+                    Incorrect configuration will get rejected at the agents and might cause
+                    shutdown of the agent(s).
+
+                    :::
+                type: object
             telemetry_collectors:
-                description: TelemetryCollector configures OpenTelemetry collector integration.
+                description: |-
+                    TelemetryCollector configures OpenTelemetry collector integration.
+                    Deprecated: v2.8.0. Use `infra_meters` instead.
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
@@ -3342,6 +3378,7 @@ definitions:
                 type: object
         title: |-
             TelemetryCollector defines the telemetry configuration to be synced with the agents.
+            Deprecated: v2.8.0. Use `InfraMeter` instead.
             It consists of two parts:
             - Agent Group: Agent group to sync telemetry configuration with
             - Infra Meters: OTel compatible metrics pipelines
@@ -3799,8 +3836,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string
@@ -3832,8 +3867,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string

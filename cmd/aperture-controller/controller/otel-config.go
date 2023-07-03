@@ -72,7 +72,7 @@ func addPrometheusReceiver(
 	config.AddReceiver(otelconsts.ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval":     "1s",
+				"scrape_interval":     "10s",
 				"scrape_timeout":      "1s",
 				"evaluation_interval": "1m",
 			},

@@ -218,13 +218,13 @@ def portsImports(definition: JsonnetDefinition) -> str:
 
     in_ports = definition.properties.get("in_ports")
     if in_ports:
-        ports_name = f"{definition.jsonnet_name.lower()}ins"
+        ports_name = f"{in_ports.definition.jsonnet_name.lower()}"
         ports_fname = f"{ports_name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
     out_ports = definition.properties.get("out_ports")
     if out_ports:
-        ports_name = f"{definition.jsonnet_name.lower()}outs"
+        ports_name = f"{out_ports.definition.jsonnet_name.lower()}"
         ports_fname = f"{ports_name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
@@ -238,12 +238,12 @@ def portsBlock(definition: JsonnetDefinition) -> str:
 
     in_ports = definition.properties.get("in_ports")
     if in_ports:
-        ports_name = f"{definition.jsonnet_name.lower()}ins"
+        ports_name = f"{in_ports.definition.jsonnet_name.lower()}"
         block += f"inPorts:: {ports_name},\n"
 
     out_ports = definition.properties.get("out_ports")
     if out_ports:
-        ports_name = f"{definition.jsonnet_name.lower()}outs"
+        ports_name = f"{out_ports.definition.jsonnet_name.lower()}"
         block += f"outPorts:: {ports_name},\n"
 
     return block.removesuffix("\n")
