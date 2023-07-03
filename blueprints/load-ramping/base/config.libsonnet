@@ -59,6 +59,21 @@ local promql_driver_defaults = {
   },
 };
 
+/**
+* @schema (kubelet_metrics_criteria.pod_cpu.forward.threshold: float64) The threshold of CPU usage for the forward criteria.
+* @schema (kubelet_metrics_criteria.pod_cpu.backward.threshold: float64) The threshold of CPU usage for the backward criteria.
+* @schema (kubelet_metrics_criteria.pod_cpu.reset.threshold: float64) The threshold of CPU usage for the reset criteria.
+* @schema (kubelet_metrics_criteria.pod_memory.forward.threshold: float64) The threshold of Memory usage for the forward criteria.
+* @schema (kubelet_metrics_criteria.pod_memory.backward.threshold: float64) The threshold of Memory usage for the backward criteria.
+* @schema (kubelet_metrics_criteria.pod_memory.reset.threshold: float64) The threshold of Memory usage for the reset criteria.
+* @param (policy.kubelet_metrics: kubelet_metrics) Kubelet metrics configuration.
+* @schema (kubelet_metrics.infra_context: aperture.spec.v1.KubernetesObjectSelector) Kubernetes selector for scraping metrics.
+* @schema (kubelet_metrics.criteria: kubelet_metrics_criteria) Criteria.
+*/
+local kubelet_metrics_defaults = {
+  infra_context: '__REQUIRED_FIELD__',
+  criteria: {},
+};
 
 local ramp_policy_base_defaults = {
   /**
@@ -88,6 +103,7 @@ local ramp_policy_base_defaults = {
 
   start: false,
 
+  kubelet_metrics: {},
 };
 
 commonConfig {
@@ -101,4 +117,5 @@ commonConfig {
   promql_driver: promql_driver_defaults,
   average_latency_driver: average_latency_driver_defaults,
   percentile_latency_driver: percentile_latency_driver_defaults,
+  kubelet_metrics_criteria: kubelet_metrics_defaults,
 }
