@@ -27,10 +27,7 @@ func provideController(
 	otelCfg.SetDebugPort(&controllerCfg.CommonOTelConfig)
 	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTelConfig)
 
-	addPrometheusReceiver(otelCfg, &controllerCfg, tlsConfig, lis)
-	if controllerCfg.EnableLocalMetricsPipeline {
-		addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
-	}
+	addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
 	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
 	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTelConfig)
 
@@ -45,6 +42,7 @@ func addMetricsPipeline(
 	lis *listener.Listener,
 	promClient promapi.Client,
 ) {
+	addPrometheusReceiver(config, controllerConfig, tlsConfig, lis)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
 	processors := []string{}
 	if !controllerConfig.EnableHighCardinalityPlatformMetrics {

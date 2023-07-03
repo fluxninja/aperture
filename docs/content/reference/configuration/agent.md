@@ -1517,6 +1517,18 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 API Key for this agent. If this key is not set, the extension won't be enabled.
 
 </dd>
+<dt>disable_local_otel_pipeline</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Whether to configure local prometheus OTel pipeline for metrics
+
+</dd>
 <dt>endpoint</dt>
 <dd>
 

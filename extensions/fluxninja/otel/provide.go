@@ -83,6 +83,9 @@ func injectOtelConfig(
 			}
 			if _, exists := config.Service.Pipeline("metrics/controller-fast"); exists {
 				addMetricsControllerSlowPipeline(config)
+				if extensionConfig.DisableLocalOTelPipeline {
+					deleteLocalMetricsPipelineAndReceiver(config)
+				}
 			}
 			for pipelineName, customMetricsPipeline := range config.Service.Pipelines {
 				if !strings.HasPrefix(pipelineName, "metrics/user-defined-") {
@@ -181,6 +184,12 @@ func addFluxNinjaPrometheusReceiver(config *otelconfig.Config) {
 		log.Fatal().Err(err).Msg("failed to merge configs")
 	}
 	config.AddReceiver(receiverPrometheus, duplicatedReceiverConfig)
+}
+
+func deleteLocalMetricsPipelineAndReceiver(config *otelconfig.Config) {
+	log.Info().Msg("Cleaning up local prometheus pipeline and receiver")
+	delete(config.Receivers, otelconsts.ReceiverPrometheus)
+	config.Service.DeletePipeline("metrics/controller")
 }
 
 func duplicateMap(in map[string]any) (map[string]any, error) {
