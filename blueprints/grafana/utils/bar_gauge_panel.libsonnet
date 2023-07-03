@@ -16,8 +16,8 @@ function(title, dsName, query, strFilters, h=6, w=12) {
     + g.panel.barGauge.options.withDisplayMode('gradient')
     + g.panel.barGauge.options.withOrientation('horizontal')
     + g.panel.barGauge.standardOptions.color.withMode('thresholds')
-    + g.panel.barGauge.standardOptions.tresholds.withMode('absolute')
-    + g.panel.barGauge.standardOptions.tresholds.withSteps([{ color: 'green', value: null }])
+    + g.panel.barGauge.standardOptions.thresholds.withMode('absolute')
+    + g.panel.barGauge.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
     + g.panel.barGauge.gridPos.withH(h)
     + g.panel.barGauge.gridPos.withW(w),
 
