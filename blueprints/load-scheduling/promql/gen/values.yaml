@@ -38,6 +38,9 @@ policy:
     # Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
     # Type: bool
     dry_run: false
+    # Overload confirmation signals from kubelet.
+    # Type: kubelet_overload_confirmations
+    kubelet_overload_confirmations: {}
     # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
     # Type: []overload_confirmation
     overload_confirmations: []

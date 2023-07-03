@@ -195,6 +195,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-service-protection-core-kubelet-overload-confirmations"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.kubelet_overload_confirmations'
+    description='Overload confirmation signals from kubelet.'
+    type='Object (kubelet_overload_confirmations)'
+    reference='#kubelet-overload-confirmations'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-service-protection-core-overload-confirmations"></a>
 
 <ParameterDescription
@@ -203,54 +217,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
     value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### policy.service_protection_core.cpu_overload_confirmation {#policy-service-protection-core-cpu-overload-confirmation}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-cpu-overload-confirmation-operator"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation.operator'
-    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.'
-    type='string'
-    reference=''
-    value='"gte"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-cpu-overload-confirmation-query-string"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation.query_string'
-    description='The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.'
-    type='string'
-    reference=''
-    value='"avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name=\"__REQUIRED_FIELD__\"})"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-cpu-overload-confirmation-threshold"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation.threshold'
-    description='Threshold value for CPU utilizatio if it has to be used as overload confirmation.'
-    type='Number (double)'
-    reference=''
-    value='null'
 />
 
 <!-- vale on -->
@@ -370,6 +336,118 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 ---
 
 ### Schemas
+
+<!-- vale off -->
+
+#### overload_confirmation_driver {#overload-confirmation-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### pod_cpu {#overload-confirmation-driver-pod-cpu}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-cpu-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver for using CPU usage as overload confirmation.'
+    type='Boolean'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-cpu-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### pod_memory {#overload-confirmation-driver-pod-memory}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-memory-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver for using Memory usage as overload confirmation.'
+    type='Boolean'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-memory-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubelet_overload_confirmations {#kubelet-overload-confirmations}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-overload-confirmations-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='Criteria for overload confirmation.'
+    type='Object (overload_confirmation_driver)'
+    reference='#overload-confirmation-driver'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-overload-confirmations-infra-context"></a>
+
+<ParameterDescription
+    name='infra_context'
+    description='Kubernetes selector for scraping metrics.'
+    type='Object (aperture.spec.v1.KubernetesObjectSelector)'
+    reference='../../spec#kubernetes-object-selector'
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
 
 <!-- vale off -->
 

@@ -103,3 +103,4 @@ spec:
           selectors:
           - control_point: ingress
             service: service3-demo-app.demoapp.svc.cluster.local
+    infra_meters: {}

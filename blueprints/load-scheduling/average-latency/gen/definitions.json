@@ -78,6 +78,12 @@
               "default": false,
               "type": "boolean"
             },
+            "kubelet_overload_confirmations": {
+              "description": "Overload confirmation signals from kubelet.",
+              "default": {},
+              "type": "object",
+              "$ref": "#/$defs/kubelet_overload_confirmations"
+            },
             "overload_confirmations": {
               "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
               "default": [],
@@ -177,6 +183,61 @@
     }
   },
   "$defs": {
+    "overload_confirmation_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pod_cpu": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "description": "Enables the driver for using CPU usage as overload confirmation.",
+              "type": "boolean"
+            },
+            "threshold": {
+              "description": "Threshold for the driver.",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "pod_memory": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "description": "Enables the driver for using Memory usage as overload confirmation.",
+              "type": "boolean"
+            },
+            "threshold": {
+              "description": "Threshold for the driver.",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        }
+      }
+    },
+    "kubelet_overload_confirmations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["infra_context"],
+      "properties": {
+        "criteria": {
+          "description": "Criteria for overload confirmation.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/overload_confirmation_driver"
+        },
+        "infra_context": {
+          "description": "Kubernetes selector for scraping metrics.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
+        }
+      }
+    },
     "overload_confirmation": {
       "type": "object",
       "additionalProperties": false,

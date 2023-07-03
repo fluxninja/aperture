@@ -87,3 +87,4 @@ spec:
           selectors:
           - control_point: ingress
             service: cart-service.prod.svc.cluster.local
+    infra_meters: {}
