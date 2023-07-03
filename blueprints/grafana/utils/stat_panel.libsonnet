@@ -12,8 +12,8 @@ function(title, dsName, query, strFilters, h=6, w=6) {
       + g.query.prometheus.withRange(true),
     ])
     + g.panel.stat.standardOptions.color.withMode('thresholds')
-    + g.panel.stat.standardOptions.tresholds.withMode('absolute')
-    + g.panel.stat.standardOptions.tresholds.withSteps([{ color: 'green', value: null }])
+    + g.panel.stat.standardOptions.thresholds.withMode('absolute')
+    + g.panel.stat.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
     + g.panel.stat.options.withColorMode('value')
     + g.panel.stat.options.withGraphMode('none')
     + g.panel.stat.options.withJustifyMode('center')
