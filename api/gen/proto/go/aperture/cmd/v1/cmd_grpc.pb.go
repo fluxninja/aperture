@@ -34,6 +34,7 @@ const (
 	Controller_UpsertPolicy_FullMethodName               = "/aperture.cmd.v1.Controller/UpsertPolicy"
 	Controller_PostDynamicConfig_FullMethodName          = "/aperture.cmd.v1.Controller/PostDynamicConfig"
 	Controller_DeletePolicy_FullMethodName               = "/aperture.cmd.v1.Controller/DeletePolicy"
+	Controller_GetDecisions_FullMethodName               = "/aperture.cmd.v1.Controller/GetDecisions"
 )
 
 // ControllerClient is the client API for Controller service.
@@ -52,6 +53,7 @@ type ControllerClient interface {
 	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
 }
 
 type controllerClient struct {
@@ -161,6 +163,15 @@ func (c *controllerClient) DeletePolicy(ctx context.Context, in *v1.DeletePolicy
 	return out, nil
 }
 
+func (c *controllerClient) GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error) {
+	out := new(v1.GetDecisionsResponse)
+	err := c.cc.Invoke(ctx, Controller_GetDecisions_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 // All implementations should embed UnimplementedControllerServer
 // for forward compatibility
@@ -177,6 +188,7 @@ type ControllerServer interface {
 	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error)
 	PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
+	GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error)
 }
 
 // UnimplementedControllerServer should be embedded to have forward compatible implementations.
@@ -215,6 +227,9 @@ func (UnimplementedControllerServer) PostDynamicConfig(context.Context, *v1.Post
 }
 func (UnimplementedControllerServer) DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (UnimplementedControllerServer) GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDecisions not implemented")
 }
 
 // UnsafeControllerServer may be embedded to opt out of forward compatibility for this service.
@@ -426,6 +441,24 @@ func _Controller_DeletePolicy_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_GetDecisions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.GetDecisionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).GetDecisions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_GetDecisions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).GetDecisions(ctx, req.(*v1.GetDecisionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Controller_ServiceDesc is the grpc.ServiceDesc for Controller service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -476,6 +509,10 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePolicy",
 			Handler:    _Controller_DeletePolicy_Handler,
+		},
+		{
+			MethodName: "GetDecisions",
+			Handler:    _Controller_GetDecisions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

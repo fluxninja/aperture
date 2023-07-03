@@ -24,18 +24,22 @@ aperturectl decisions [flags]
 
 ```
 
-	aperturectl decisions --etcd-host="127.0.0.1" --etcd-port="2379" --all
-	aperturectl decisions --etcd-host="127.0.0.1" --etcd-port="2379" --decision-type="load_scheduler"
+	aperturectl decisions --all
+	aperturectl decisions --decision-type="load_scheduler"
 ```
 
 ### Options
 
 ```
       --all                    Get all decisions
+      --controller string      Address of Aperture controller
+      --controller-ns string   Namespace in which the Aperture Controller is running
       --decision-type string   Type of the decision to get (load_scheduler, rate_limiter, quota_scheduler, pod_scaler, sampler)
-      --etcd-host string       Etcd host (default "localhost")
-      --etcd-port string       Etcd port (default "2379")
   -h, --help                   help for decisions
+      --insecure               Allow connection to controller running without TLS
+      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
+      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --skip-verify            Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO
