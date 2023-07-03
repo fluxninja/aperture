@@ -4,15 +4,20 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
@@ -151,4 +156,58 @@ func (s *PolicyService) getPolicyBytes(name string, policy *policylangv1.Policy)
 	}
 
 	return jsonPolicy, nil
+}
+
+// GetDecisions returns the decisions.
+func (s *PolicyService) GetDecisions(ctx context.Context, req *policylangv1.GetDecisionsRequest) (*policylangv1.GetDecisionsResponse, error) {
+	decisionsPathPrefix := paths.DecisionsPrefix + "/"
+	decisionType := ""
+	all := true
+	if req != nil {
+		if req.DecisionType != "" {
+			all = false
+			decisionType = req.DecisionType
+			decisionsPathPrefix += decisionType + "/"
+		}
+	}
+
+	resp, err := s.etcdClient.Client.KV.Get(ctx, decisionsPathPrefix, clientv3.WithPrefix())
+	if err != nil {
+		return nil, err
+	}
+
+	decisions := map[string]string{}
+	for _, kv := range resp.Kvs {
+		decisionName, ok := strings.CutPrefix(string(kv.Key), decisionsPathPrefix)
+		if !ok {
+			continue
+		}
+
+		if all {
+			decisionType = strings.Split(decisionName, "/")[0]
+		}
+
+		var m protoreflect.ProtoMessage
+		switch decisionType {
+		case "load_scheduler":
+			m = &policysyncv1.LoadDecisionWrapper{}
+		case "rate_limiter", "quota_scheduler":
+			m = &policysyncv1.RateLimiterDecisionWrapper{}
+		case "pod_scaler":
+			m = &policysyncv1.ScaleDecisionWrapper{}
+		case "sampler":
+			m = &policysyncv1.SamplerDecisionWrapper{}
+		}
+
+		err := proto.Unmarshal(kv.Value, m)
+		if err != nil {
+			return nil, err
+		}
+		mjson := protojson.Format(m)
+		decisions[decisionName] = mjson
+	}
+
+	return &policylangv1.GetDecisionsResponse{
+		Decisions: decisions,
+	}, nil
 }

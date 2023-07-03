@@ -66,6 +66,13 @@ service PolicyService {
       tags: ["aperture-controller"];
     };
   }
+
+  rpc GetDecisions(GetDecisionsRequest) returns (GetDecisionsResponse) {
+    option (google.api.http) = {get: "/v1/decisions/{decision_type}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
 }
 
 // GetPolicyRequest is a request to get a policy with given name.
@@ -95,6 +102,16 @@ message PostDynamicConfigRequest {
 // DeletePolicyRequest is a request to delete a policy with given name.
 message DeletePolicyRequest {
   string name = 1;
+}
+
+// GetDecisionsRequest is a request to get decisions for a given decision type.
+message GetDecisionsRequest {
+  string decision_type = 1;
+}
+
+// GetDecisionsResponse is a response containing decisions for a given decision type.
+message GetDecisionsResponse {
+  map<string, string> decisions = 1;
 }
 
 // GetPoliciesResponse is a response containing all Policies.
