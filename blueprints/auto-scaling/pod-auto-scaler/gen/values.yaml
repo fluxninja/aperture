@@ -37,10 +37,10 @@ policy:
     scale_out_alerter:
       alert_name: "Auto-scaler is scaling out"
   # Driver to do scaling of the resource based on the CPU usage.
-  # Type: scaling_threshold
+  # Type: scaling_driver
   pod_cpu: {}
   # Driver to do scaling of the resource based on the Memory usage.
-  # Type: scaling_threshold
+  # Type: scaling_driver
   pod_memory: {}
 
 dashboard:
