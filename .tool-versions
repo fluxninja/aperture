@@ -18,5 +18,5 @@ jb 0.5.1
 tanka 0.24.0
 tilt 0.32.3
 go-jsonnet 0.20.0
-circleci 0.1.26343
+circleci 0.1.27054
 java corretto-19.0.2.7.1
