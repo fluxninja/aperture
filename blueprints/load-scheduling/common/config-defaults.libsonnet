@@ -1,5 +1,25 @@
 local commonConfig = import '../../common/config-defaults.libsonnet';
 
+/**
+* @schema (overload_confirmation_driver.pod_cpu.enabled: bool) Enables the driver for using CPU usage as overload confirmation.
+* @schema (overload_confirmation_driver.pod_cpu.threshold: float64) Threshold for the driver.
+* @schema (overload_confirmation_driver.pod_memory.enabled: bool) Enables the driver for using Memory usage as overload confirmation.
+* @schema (overload_confirmation_driver.pod_memory.threshold: float64) Threshold for the driver.
+*/
+local overload_confirmation_driver_defaults = {
+  pod_cpu: {},
+  pod_memory: {},
+};
+
+/**
+* @schema (kubelet_overload_confirmations.infra_context: aperture.spec.v1.KubernetesObjectSelector) Kubernetes selector for scraping metrics.
+* @schema (kubelet_overload_confirmations.criteria: overload_confirmation_driver) Criteria for overload confirmation.
+*/
+local kubelet_overload_confirmations_defaults = {
+  infra_context: '__REQUIRED_FIELD__',
+  criteria: {},
+};
+
 local service_protection_core_defaults = {
   overload_confirmations: [],
 
@@ -20,6 +40,8 @@ local service_protection_core_defaults = {
   },
 
   dry_run: false,
+
+  kubelet_overload_confirmations: {},
 };
 
 commonConfig {
@@ -31,6 +53,7 @@ commonConfig {
   * @schema (overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`
   * @param (policy.service_protection_core.adaptive_load_scheduler: aperture.spec.v1.AdaptiveLoadSchedulerParameters) Parameters for Adaptive Load Scheduler.
   * @param (policy.service_protection_core.dry_run: bool) Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
+  * @param (policy.service_protection_core.kubelet_overload_confirmations: kubelet_overload_confirmations) Overload confirmation signals from kubelet.
   */
   policy+: {
     evaluation_interval: '10s',
@@ -42,4 +65,6 @@ commonConfig {
     variant_name: 'Service Protection',
   },
 
+  kubelet_overload_confirmations: kubelet_overload_confirmations_defaults,
+  overload_confirmation_driver: overload_confirmation_driver_defaults,
 }

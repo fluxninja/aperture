@@ -79,6 +79,12 @@
               "default": false,
               "type": "boolean"
             },
+            "kubelet_overload_confirmations": {
+              "description": "Overload confirmation signals from kubelet.",
+              "default": {},
+              "type": "object",
+              "$ref": "#/$defs/kubelet_overload_confirmations"
+            },
             "overload_confirmations": {
               "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
               "default": [],
@@ -86,27 +92,6 @@
               "items": {
                 "type": "object",
                 "$ref": "#/$defs/overload_confirmation"
-              }
-            },
-            "cpu_overload_confirmation": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "operator": {
-                  "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.",
-                  "default": "gte",
-                  "type": "string"
-                },
-                "query_string": {
-                  "description": "The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.",
-                  "default": "avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name=\"__REQUIRED_FIELD__\"})",
-                  "type": "string"
-                },
-                "threshold": {
-                  "description": "Threshold value for CPU utilizatio if it has to be used as overload confirmation.",
-                  "type": "number",
-                  "format": "double"
-                }
               }
             }
           }
@@ -185,6 +170,61 @@
     }
   },
   "$defs": {
+    "overload_confirmation_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pod_cpu": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "description": "Enables the driver for using CPU usage as overload confirmation.",
+              "type": "boolean"
+            },
+            "threshold": {
+              "description": "Threshold for the driver.",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "pod_memory": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "description": "Enables the driver for using Memory usage as overload confirmation.",
+              "type": "boolean"
+            },
+            "threshold": {
+              "description": "Threshold for the driver.",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        }
+      }
+    },
+    "kubelet_overload_confirmations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["infra_context"],
+      "properties": {
+        "criteria": {
+          "description": "Criteria for overload confirmation.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/overload_confirmation_driver"
+        },
+        "infra_context": {
+          "description": "Kubernetes selector for scraping metrics.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
+        }
+      }
+    },
     "overload_confirmation": {
       "type": "object",
       "additionalProperties": false,
