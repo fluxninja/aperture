@@ -67,6 +67,12 @@
             }
           }
         },
+        "kubelet_metrics": {
+          "description": "Kubelet metrics configuration.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/kubelet_metrics"
+        },
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
           "default": "10s",
@@ -349,6 +355,106 @@
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
+        }
+      }
+    },
+    "kubelet_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "criteria": {
+          "description": "Criteria.",
+          "type": "object",
+          "$ref": "#/$defs/kubelet_metrics_criteria"
+        },
+        "infra_context": {
+          "description": "Kubernetes selector for scraping metrics.",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
+        }
+      }
+    },
+    "kubelet_metrics_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pod_cpu": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "backward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold of CPU usage for the backward criteria.",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "forward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold of CPU usage for the forward criteria.",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "reset": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold of CPU usage for the reset criteria.",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            }
+          }
+        },
+        "pod_memory": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "backward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold of Memory usage for the backward criteria.",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "forward": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold of Memory usage for the forward criteria.",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            },
+            "reset": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The threshold of Memory usage for the reset criteria.",
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            }
+          }
         }
       }
     }

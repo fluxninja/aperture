@@ -3,7 +3,7 @@ local utils = import '../../utils/utils.libsonnet';
 local add_kubelet_overload_confirmations(c) = {
   local prepare_signal = function(metrics_name, threshold) {
     controller: {
-      query_string: std.format('avg(%s{"k8s_%s_name=%s,k8s_namespace_name=%s"})', [
+      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s"})', [
         metrics_name,
         std.asciiLower(c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.kind),
         c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.name,
@@ -35,9 +35,14 @@ local add_kubelet_overload_confirmations(c) = {
   local updated_cfg = c {
     policy+: {
       service_protection_core+: {
-        overload_confirmations+: c.policy.service_protection_core.overload_confirmations +
-                                 if std.objectHas(pod_cpu_overload_confirmation, 'query_string') then [pod_cpu_overload_confirmation] else [] +
-                                                                                                                                           if std.objectHas(pod_memory_overload_confirmation, 'query_string') then [pod_memory_overload_confirmation] else [],
+        local overloadConfirmations = if std.objectHas(c.policy.service_protection_core, 'overload_confirmations') then
+          c.policy.service_protection_core.overload_confirmations
+        else [],
+        overload_confirmations+: overloadConfirmations +
+                                 (if std.objectHas(pod_cpu_overload_confirmation, 'query_string') then
+                                    [pod_cpu_overload_confirmation]
+                                  else []) +
+                                 (if std.objectHas(pod_memory_overload_confirmation, 'query_string') then [pod_memory_overload_confirmation] else []),
       },
       resources+: {
         infra_meters:

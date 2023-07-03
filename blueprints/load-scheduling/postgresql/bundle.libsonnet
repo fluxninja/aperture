@@ -15,7 +15,7 @@ function(params, metadata={}) {
 
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg,
 
-  local p = policy(updated_cfg, params, metadataWrapper),
+  local p = policy(updated_cfg, metadataWrapper),
   local d = creator(p.policyResource, updated_cfg),
 
   policies: {

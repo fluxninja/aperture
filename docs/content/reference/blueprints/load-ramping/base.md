@@ -97,6 +97,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale off -->
 
+<a id="policy-kubelet-metrics"></a>
+
+<ParameterDescription
+    name='policy.kubelet_metrics'
+    description='Kubelet metrics configuration.'
+    type='Object (kubelet_metrics)'
+    reference='#kubelet-metrics'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-evaluation-interval"></a>
 
 <ParameterDescription
@@ -612,6 +626,182 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 <ParameterDescription
     name='threshold'
     description='The threshold for the reset criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubelet_metrics {#kubelet-metrics}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='Criteria.'
+    type='Object (kubelet_metrics_criteria)'
+    reference='#kubelet-metrics-criteria'
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-infra-context"></a>
+
+<ParameterDescription
+    name='infra_context'
+    description='Kubernetes selector for scraping metrics.'
+    type='Object (aperture.spec.v1.KubernetesObjectSelector)'
+    reference='../../spec#kubernetes-object-selector'
+    value='null'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubelet_metrics_criteria {#kubelet-metrics-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### pod_cpu {#kubelet-metrics-criteria-pod-cpu}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### backward {#kubelet-metrics-criteria-pod-cpu-backward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-cpu-backward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold of CPU usage for the backward criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### forward {#kubelet-metrics-criteria-pod-cpu-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-cpu-forward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold of CPU usage for the forward criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### reset {#kubelet-metrics-criteria-pod-cpu-reset}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-cpu-reset-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold of CPU usage for the reset criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### pod_memory {#kubelet-metrics-criteria-pod-memory}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### backward {#kubelet-metrics-criteria-pod-memory-backward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-memory-backward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold of Memory usage for the backward criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### forward {#kubelet-metrics-criteria-pod-memory-forward}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-memory-forward-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold of Memory usage for the forward criteria.'
+    type='Number (double)'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+###### reset {#kubelet-metrics-criteria-pod-memory-reset}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-memory-reset-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold of Memory usage for the reset criteria.'
     type='Number (double)'
     reference=''
     value='null'

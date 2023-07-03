@@ -25,6 +25,9 @@ policy:
     # List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.
     # Type: []promql_driver
     promql_drivers: []
+  # Kubelet metrics configuration.
+  # Type: kubelet_metrics
+  kubelet_metrics: {}
   # The interval between successive evaluations of the Circuit.
   # Type: string
   evaluation_interval: "10s"

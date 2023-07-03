@@ -15,9 +15,9 @@ function(params, metadata={}) {
 
   local prepare_controller = function(metrics_name, gradient_slope, alert_name) {
     controller: {
-      query_string: std.format('avg(%s{"k8s_%s_name=%s,k8s_namespace_name=%s"})', [
+      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s"})', [
         metrics_name,
-        c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.kind,
+        std.asciiLower(c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.kind),
         c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.name,
         c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.namespace,
       ]),
@@ -77,9 +77,9 @@ function(params, metadata={}) {
         infra_meters:
           local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {};
           if std.objectHas(pod_cpu_scale_in_controllers, 'query_string') ||
-             std.std.objectHas(pod_cpu_scale_out_controllers, 'query_string') ||
-             std.std.objectHas(pod_memory_scale_in_controllers, 'query_string') ||
-             std.std.objectHas(pod_memory_scale_out_controllers, 'query_string') then
+             std.objectHas(pod_cpu_scale_out_controllers, 'query_string') ||
+             std.objectHas(pod_memory_scale_in_controllers, 'query_string') ||
+             std.objectHas(pod_memory_scale_out_controllers, 'query_string') then
             utils.add_kubeletstats_infra_meter(
               infraMeters,
               c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.agent_group,
