@@ -297,7 +297,8 @@ func (r *ControllerReconciler) deleteSingletonResources(ctx context.Context, log
 	}
 
 	if singletonInstance.Spec.ServiceAccountSpec.Create {
-		serviceAccount, err := serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
+		var serviceAccount *corev1.ServiceAccount
+		serviceAccount, err = serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
 		}
@@ -455,7 +456,7 @@ func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance 
 		return err
 	}
 
-	if err := ctrl.SetControllerReference(instance, configMap, r.Scheme); err != nil {
+	if err = ctrl.SetControllerReference(instance, configMap, r.Scheme); err != nil {
 		return err
 	}
 
@@ -557,7 +558,7 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 		return err
 	}
 
-	if err := ctrl.SetControllerReference(instance, sa, r.Scheme); err != nil {
+	if err = ctrl.SetControllerReference(instance, sa, r.Scheme); err != nil {
 		return err
 	}
 
@@ -585,7 +586,7 @@ func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr
 		return err
 	}
 
-	if err := ctrl.SetControllerReference(instance, dep, r.Scheme); err != nil {
+	if err = ctrl.SetControllerReference(instance, dep, r.Scheme); err != nil {
 		return err
 	}
 
