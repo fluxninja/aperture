@@ -475,6 +475,11 @@ func ServiceAccountName(instance *controllerv1alpha1.Controller) string {
 	return instance.Spec.ServiceAccountSpec.Name
 }
 
+// ServiceName generates a name for the service used to connect to the controller.
+func ServiceName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
+}
+
 // SecretDataKey fetches Key for ApiKey secret from config or generates the Key if not present in config.
 func SecretDataKey(spec *common.SecretKeyRef) string {
 	key := spec.Key

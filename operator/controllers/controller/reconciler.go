@@ -412,10 +412,6 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 
 	if !r.MultipleControllers {
 		instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
-		if err := r.reconcileService(ctx, log, instance); err != nil {
-			return err
-		}
-
 		if err := r.reconcileClusterRole(ctx, instance); err != nil {
 			return err
 		}
@@ -427,6 +423,10 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 		if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
 			return err
 		}
+	}
+
+	if err := r.reconcileService(ctx, log, instance); err != nil {
+		return err
 	}
 
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
