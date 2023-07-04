@@ -180,7 +180,7 @@ repos:
         name: "Generate Blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"
         language: script
-        files: ^(blueprints|docs/content/reference/)|\.proto$|^requirements.txt$
+        files: ^(blueprints|docs/content/reference/blueprints)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
       - id: generate-playground-policies
