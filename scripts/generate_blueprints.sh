@@ -36,7 +36,7 @@ function generate_readme() {
 	python "${blueprints_root}"/blueprint-assets-generator.py "$dir"
 
 	gen_dir="$dir"/gen
-	gen_files=("$gen_dir"/values.yaml "$gen_dir"/values-required.yaml "$gen_dir"/dynamic-config-values.yaml "$gen_dir"/dynamic-config-values-required.yaml "$gen_dir"/definitions.json "$gen_dir"/dynamic-config-definitions.json)
+	gen_files=("$gen_dir"/values.yaml "$gen_dir"/dynamic-config-values.yaml "$gen_dir"/definitions.json "$gen_dir"/dynamic-config-definitions.json)
 	for gen_file in "${gen_files[@]}"; do
 		if [ -f "$gen_file" ]; then
 			prettier --write "$gen_file"
@@ -46,17 +46,13 @@ function generate_readme() {
 
 export -f generate_readme
 
-
-while IFS= read -r -d '' file
-do
-   limit_jobs 8 generate_readme "$file"
+while IFS= read -r -d '' file; do
+	limit_jobs 8 generate_readme "$file"
 done < <($FIND "$blueprints_root" -type f -name 'config.libsonnet' -print0)
 
-wait  # Wait for all background jobs to complete
-
+wait # Wait for all background jobs to complete
 
 # run prettier on generated readme docs
-while IFS= read -r -d '' file
-do
-    prettier --write "$file"
-done < <($FIND  "$git_root"/docs/content/reference/blueprints -type f -name '*.md' -print0)
+while IFS= read -r -d '' file; do
+	prettier --write "$file"
+done < <($FIND "$git_root"/docs/content/reference/blueprints -type f -name '*.md' -print0)

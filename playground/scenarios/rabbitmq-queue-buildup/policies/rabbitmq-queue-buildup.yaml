@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/promql/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/promql/gen/definitions.json
 policy:
   policy_name: "service1-demoapp-rabbitmq-queue-buildup"
   promql_query: 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})'
@@ -9,9 +9,9 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-        - agent_group: default
-          control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
   setpoint: 1000
   resources:
     infra_meters:

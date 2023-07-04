@@ -29,8 +29,8 @@ This example applies a rate limiter to the **`ingress`** control point on the
 service **`catalog-service.prod.svc.cluster.local`**. Unique users are
 identified based on the **`user_id`** header in the HTTP traffic. This header is
 provided by the Envoy proxy and is available under the label key
-**`http.request.header.user_id`** (see
-[Flow Labels](/concepts/flow-control/flow-label.md) for more information).
+**`http.request.header.user_id`** (see [Flow Labels](/concepts/flow-label.md)
+for more information).
 
 Each user is allowed **`2`** requests every **`1s`** (1 second) period. A burst
 of up to **`40`** requests is allowed. This means that the user can send up to

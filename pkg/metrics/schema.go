@@ -98,10 +98,12 @@ const (
 	DistCacheMemberIDLabel = "distcache_member_id"
 	// DistCacheMemberNameLabel - label specifying name of the node in the olric cluster.
 	DistCacheMemberNameLabel = "distcache_member_name"
-	// PolicyNameLabel - label used in prometheus.
+	// PolicyNameLabel - policy name label.
 	PolicyNameLabel = "policy_name"
-	// PolicyHashLabel - label used in prometheus.
+	// PolicyHashLabel - policy hash label.
 	PolicyHashLabel = "policy_hash"
+	// InfraMeterNameLabel - Label for name of infra meter in resources.
+	InfraMeterNameLabel = "infra_meter_name"
 	// ComponentIDLabel - index of component in circuit label.
 	ComponentIDLabel = "component_id"
 	// DecisionTypeLabel - label for decision type rejected or accepted.

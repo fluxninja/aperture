@@ -25,6 +25,7 @@ const (
 	PolicyService_UpsertPolicy_FullMethodName      = "/aperture.policy.language.v1.PolicyService/UpsertPolicy"
 	PolicyService_PostDynamicConfig_FullMethodName = "/aperture.policy.language.v1.PolicyService/PostDynamicConfig"
 	PolicyService_DeletePolicy_FullMethodName      = "/aperture.policy.language.v1.PolicyService/DeletePolicy"
+	PolicyService_GetDecisions_FullMethodName      = "/aperture.policy.language.v1.PolicyService/GetDecisions"
 )
 
 // PolicyServiceClient is the client API for PolicyService service.
@@ -41,6 +42,7 @@ type PolicyServiceClient interface {
 	PostDynamicConfig(ctx context.Context, in *PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetDecisions(ctx context.Context, in *GetDecisionsRequest, opts ...grpc.CallOption) (*GetDecisionsResponse, error)
 }
 
 type policyServiceClient struct {
@@ -96,6 +98,15 @@ func (c *policyServiceClient) DeletePolicy(ctx context.Context, in *DeletePolicy
 	return out, nil
 }
 
+func (c *policyServiceClient) GetDecisions(ctx context.Context, in *GetDecisionsRequest, opts ...grpc.CallOption) (*GetDecisionsResponse, error) {
+	out := new(GetDecisionsResponse)
+	err := c.cc.Invoke(ctx, PolicyService_GetDecisions_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PolicyServiceServer is the server API for PolicyService service.
 // All implementations should embed UnimplementedPolicyServiceServer
 // for forward compatibility
@@ -110,6 +121,7 @@ type PolicyServiceServer interface {
 	PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error)
+	GetDecisions(context.Context, *GetDecisionsRequest) (*GetDecisionsResponse, error)
 }
 
 // UnimplementedPolicyServiceServer should be embedded to have forward compatible implementations.
@@ -130,6 +142,9 @@ func (UnimplementedPolicyServiceServer) PostDynamicConfig(context.Context, *Post
 }
 func (UnimplementedPolicyServiceServer) DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (UnimplementedPolicyServiceServer) GetDecisions(context.Context, *GetDecisionsRequest) (*GetDecisionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDecisions not implemented")
 }
 
 // UnsafePolicyServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -233,6 +248,24 @@ func _PolicyService_DeletePolicy_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PolicyService_GetDecisions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDecisionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PolicyServiceServer).GetDecisions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PolicyService_GetDecisions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PolicyServiceServer).GetDecisions(ctx, req.(*GetDecisionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PolicyService_ServiceDesc is the grpc.ServiceDesc for PolicyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -259,6 +292,10 @@ var PolicyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePolicy",
 			Handler:    _PolicyService_DeletePolicy_Handler,
+		},
+		{
+			MethodName: "GetDecisions",
+			Handler:    _PolicyService_GetDecisions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

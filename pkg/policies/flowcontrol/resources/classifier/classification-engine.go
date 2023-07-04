@@ -12,6 +12,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	multimatcher "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
@@ -87,7 +88,7 @@ var (
 func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	flowLabels flowlabel.FlowLabels,
 	mm *multimatcher.MultiMatcher[int, multiMatcherResult],
-	labelsForMatching map[string]string,
+	labelsForMatching labels.Labels,
 	input Input,
 ) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
 	logger := c.registry.GetLogger()
@@ -164,7 +165,7 @@ func (c *ClassificationEngine) Classify(
 	ctx context.Context,
 	svcs []string,
 	ctrlPt string,
-	labelsForMatching map[string]string,
+	labelsForMatching labels.Labels,
 	input Input,
 ) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {
 	flowLabels := make(flowlabel.FlowLabels)

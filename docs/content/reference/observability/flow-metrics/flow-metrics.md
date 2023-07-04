@@ -106,4 +106,4 @@ and behavior. The stream can be stored and visualized in
 
 [quantilesdoublesketch]:
   https://druid.apache.org/docs/latest/development/extensions-core/datasketches-quantiles.html
-[classifier]: /concepts/flow-control/resources/classifier.md
+[classifier]: /concepts/classifier.md

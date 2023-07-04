@@ -77,7 +77,12 @@ OpenTelemetry
 EnvoyFilter
 [Gg]oodput
 [Ll]aunch
-write_http
 Kubelet
 colocating
 [Oo]perator
+[Ss]caler
+[Mm]ulti-tenant
+Hasura
+SemaphoreCI
+reactively
+ALS

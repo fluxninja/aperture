@@ -60,6 +60,11 @@ type SimpleService struct {
 	cpuLoadPercentage int           // Percentage of CPU to be loaded
 }
 
+// ResponseBody is a response body for returning a response to all requests made on api endpoints
+type ResponseBody struct {
+	Message string `json:"message"`
+}
+
 // NewSimpleService creates a SimpleService instance.
 func NewSimpleService(
 	hostname string,
@@ -173,6 +178,8 @@ func (ss SimpleService) Run() error {
 		http.HandleFunc("/prometheus", prometheusHandler)
 	}
 
+	http.HandleFunc("/api/rate-limit", apiEndpointHandler)
+	http.HandleFunc("/api/load-ramp", apiEndpointHandler)
 	http.Handle("/request", handlerFunc(handler))
 
 	address := fmt.Sprintf(":%d", ss.port)
@@ -180,6 +187,35 @@ func (ss SimpleService) Run() error {
 	server := &http.Server{Addr: address}
 
 	return server.ListenAndServe()
+}
+
+func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract baggage and trace context from headers
+	ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
+	// Start a new span (not needed if we want "just passthrough")
+	ctx, span := otel.Tracer(libraryName).Start(ctx, "apiEndpointHandler")
+	defer span.End()
+
+	responseBody := ResponseBody{
+		Message: "Request accepted",
+	}
+
+	err := json.NewEncoder(w).Encode(responseBody)
+	if err != nil {
+		log.Autosample().Error().Err(err).Msg("Error encoding JSON")
+		span.SetStatus(codes.Error, "rejected")
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusForbidden)
+	}
+
+	r = r.WithContext(ctx)
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(r.Header))
+
+	span.SetStatus(codes.Ok, "accepted")
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
 
 func getOrCreateCounter(userID, userType string) *Counter {

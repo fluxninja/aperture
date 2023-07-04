@@ -13,7 +13,7 @@ function(cfg, title, withVariables, signalName='') {
   local signalAvg = timeSeriesPanel(title,
                                     cfg.dashboard.datasource.name,
                                     'increase(signal_reading_sum{%(filters)s}[$__rate_interval]) / increase(signal_reading_count{%(filters)s}[$__rate_interval])',
-                                    signalFilters),
+                                    stringFilters),
 
   panel: signalAvg.panel,
 }

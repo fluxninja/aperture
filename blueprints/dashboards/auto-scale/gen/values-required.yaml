@@ -1,9 +1,0 @@
-# Generated values file for dashboards/auto-scale blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/dashboards/auto-scale
-
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: __REQUIRED_FIELD__

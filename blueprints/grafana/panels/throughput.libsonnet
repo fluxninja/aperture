@@ -6,7 +6,7 @@ function(cfg) {
 
   local throughput = timeSeriesPanel('Throughput - Accept/Reject',
                                      cfg.dashboard.datasource.name,
-                                     'rate(sampler_counter_total{%(filters)s}[$__rate_interval])',
+                                     'sum(rate(sampler_counter_total{%(filters)s}[$__rate_interval]))',
                                      stringFilters),
 
   panel: throughput.panel,

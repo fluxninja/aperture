@@ -77,7 +77,10 @@ install_helm_plugins() {
 install_plugins() {
 	check_asdf
 	if [ "${#@}" = 0 ]; then
-		asdf install
+		readarray -t intended_plugins < <(cut -d" " -f1 "${version_file}")
+		for plugin in "${intended_plugins[@]}"; do
+			asdf install "${plugin}"
+		done
 	else
 		local plug
 		for plug in "${@}"; do

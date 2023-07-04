@@ -3,7 +3,6 @@ package controlplane
 import (
 	"context"
 	"encoding/json"
-	"path"
 
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -132,21 +131,7 @@ func setupPoliciesNotifier(
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
 			}
-			if policyMessage.PolicyMetadata == nil {
-				resp, err := etcdClient.KV.Get(context.Background(), path.Join(paths.PoliciesMetadataAPIConfigPath, key.String()))
-				if err != nil {
-					log.Warn().Err(err).Msg("Failed to get policy metadata from etcd")
-				} else if len(resp.Kvs) > 0 {
-					policyMessage.PolicyMetadata = &languagev1.PolicyMetadata{}
-					err = json.Unmarshal(resp.Kvs[0].Value, policyMessage.PolicyMetadata)
-					if err != nil {
-						log.Warn().Err(err).Msg("Failed to unmarshal policy metadata")
-					}
-				} else {
-					log.Warn().Msgf("no policy %s metadata in response", key.String())
-				}
-			}
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.Policy, string(key), policyMessage.PolicyMetadata)
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.Policy, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr

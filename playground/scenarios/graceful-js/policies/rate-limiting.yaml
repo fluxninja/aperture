@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../../blueprints/rate-limiting/base/gen/definitions.json
+# Generated values file for rate-limiting/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/rate-limiting
+policy:
+  policy_name: rate-limiting
+  rate_limiter:
+    bucket_capacity: 30
+    fill_amount: 2
+    selectors:
+      - service: service1-demo-app.demoapp.svc.cluster.local
+        control_point: ingress
+        label_matcher:
+          match_labels:
+            http.path: /api/rate-limit
+    parameters:
+      label_key: http.request.header.user_id
+      interval: 60s

@@ -22,6 +22,6 @@ function(cfg, title, withVariables, signalName='') {
     + g.query.prometheus.withLegendFormat('Invalid'),
   ],
 
-  local signalFrequency = timeSeriesPanel(title, cfg.dashboard.datasource.name, '', signalFilters, targets=targets),
+  local signalFrequency = timeSeriesPanel(title, cfg.dashboard.datasource.name, '', stringFilters, targets=targets),
   panel: signalFrequency.panel,
 }

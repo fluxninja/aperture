@@ -5,11 +5,13 @@ local panelLibrary = import 'panel_library.libsonnet';
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(policyFile, cfg, add_signals=false) {
+function(policyFile, cfg) {
   local config = defaultConfig + cfg,
   local dashboard = base(config),
-  local rateLimiterPanel = panelLibrary.rate_limiter(config),
-  local policyJSON = std.parseYaml(policyFile),
+  local policyJSON =
+    if std.isObject(policyFile)
+    then policyFile
+    else std.parseYaml(policyFile),
 
   // Flow Control Panels
   local flowControlComponents = std.flattenArrays(std.filter(function(x) x != null, [
@@ -36,14 +38,7 @@ function(policyFile, cfg, add_signals=false) {
     for componentName in std.objectFields(component)
   ])),
 
-  // Add signals panels if requested
-  local signals =
-    if add_signals
-    then
-      otherPanels + unwrap(std.toString('signals'), {}, config).panel
-    else [],
-
-  local panels = flowControlPanels + otherPanels + signals,
+  local panels = flowControlPanels + otherPanels,
   local final = dashboard.baseDashboard
                 + g.dashboard.withPanels(panels),
   dashboard: final,

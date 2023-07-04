@@ -26,6 +26,7 @@ service Controller {
   rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (google.protobuf.Empty);
   rpc PostDynamicConfig(aperture.policy.language.v1.PostDynamicConfigRequest) returns (google.protobuf.Empty);
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
+  rpc GetDecisions(aperture.policy.language.v1.GetDecisionsRequest) returns (aperture.policy.language.v1.GetDecisionsResponse);
 }
 
 message ListServicesRequest {}

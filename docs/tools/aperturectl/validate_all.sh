@@ -23,7 +23,9 @@ dirs=$($FIND "$git_root" -name validate.sh -exec dirname {} \;)
 
 # Use the limit_jobs function
 for dir in $dirs; do
-  limit_jobs 8 bash -c "cd $dir && ./validate.sh"
+  cd "$dir" || exit
+  limit_jobs 8 bash -c ./validate.sh
+  cd - || exit
 done
 
 wait  # Wait for all background jobs to complete
