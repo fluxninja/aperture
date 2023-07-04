@@ -1,0 +1,5 @@
+apiVersion: v2
+name: demo-ui
+description: An example ui app for demo purposes
+type: application
+version: 0.1.0

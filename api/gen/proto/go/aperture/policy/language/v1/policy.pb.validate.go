@@ -707,6 +707,214 @@ var _ interface {
 	ErrorName() string
 } = DeletePolicyRequestValidationError{}
 
+// Validate checks the field values on GetDecisionsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDecisionsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDecisionsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDecisionsRequestMultiError, or nil if none found.
+func (m *GetDecisionsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDecisionsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for DecisionType
+
+	if len(errors) > 0 {
+		return GetDecisionsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDecisionsRequestMultiError is an error wrapping multiple validation
+// errors returned by GetDecisionsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetDecisionsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDecisionsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDecisionsRequestMultiError) AllErrors() []error { return m }
+
+// GetDecisionsRequestValidationError is the validation error returned by
+// GetDecisionsRequest.Validate if the designated constraints aren't met.
+type GetDecisionsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDecisionsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDecisionsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDecisionsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDecisionsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDecisionsRequestValidationError) ErrorName() string {
+	return "GetDecisionsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDecisionsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDecisionsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDecisionsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDecisionsRequestValidationError{}
+
+// Validate checks the field values on GetDecisionsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDecisionsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDecisionsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDecisionsResponseMultiError, or nil if none found.
+func (m *GetDecisionsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDecisionsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Decisions
+
+	if len(errors) > 0 {
+		return GetDecisionsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDecisionsResponseMultiError is an error wrapping multiple validation
+// errors returned by GetDecisionsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetDecisionsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDecisionsResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDecisionsResponseMultiError) AllErrors() []error { return m }
+
+// GetDecisionsResponseValidationError is the validation error returned by
+// GetDecisionsResponse.Validate if the designated constraints aren't met.
+type GetDecisionsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDecisionsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDecisionsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDecisionsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDecisionsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDecisionsResponseValidationError) ErrorName() string {
+	return "GetDecisionsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDecisionsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDecisionsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDecisionsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDecisionsResponseValidationError{}
+
 // Validate checks the field values on GetPoliciesResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

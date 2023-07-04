@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "demoui"
+  labels:
+    app: "demo-ui"
+    chart: "demo-ui.chart"
+spec:
+  selector:
+    app: "demoui"
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

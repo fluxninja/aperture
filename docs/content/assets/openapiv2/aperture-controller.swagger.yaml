@@ -1275,6 +1275,14 @@ definitions:
                 type: array
                 x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
         type: object
+    GetDecisionsResponse:
+        description: GetDecisionsResponse is a response containing decisions for a given decision type.
+        properties:
+            decisions:
+                additionalProperties:
+                    type: string
+                type: object
+        type: object
     GetPoliciesResponse:
         description: GetPoliciesResponse is a response containing all Policies.
         properties:
@@ -3692,6 +3700,25 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
+    /v1/decisions/{decision_type}:
+        get:
+            operationId: PolicyService_GetDecisions
+            parameters:
+                - in: path
+                  name: decision_type
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetDecisionsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-controller
     /v1/dynamic-configs/{policy_name}:
         post:
             operationId: PolicyService_PostDynamicConfig

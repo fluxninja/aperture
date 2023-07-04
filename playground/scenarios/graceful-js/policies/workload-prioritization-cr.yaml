@@ -1,0 +1,98 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: workload-prioritization
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          dry_run: false
+          dry_run_config_key: dry_run
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.025
+            load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    match_labels:
+                      user_type: guest
+                  name: guest
+                  parameters:
+                    priority: "5"
+                - label_matcher:
+                    match_labels:
+                      http.request.header.user_type: subscriber
+                  name: subscriber
+                  parameters:
+                    priority: "250"
+              selectors:
+              - control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - query:
+        promql:
+          evaluation_interval: 10s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization",
+            policy_name="workload-prioritization"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="workload-prioritization", policy_name="workload-prioritization"}[30s]))
+    - query:
+        promql:
+          evaluation_interval: 30s
+          out_ports:
+            output:
+              signal_name: SIGNAL_LONG_TERM
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization",
+            policy_name="workload-prioritization"}[1800s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="workload-prioritization", policy_name="workload-prioritization"}[1800s]))
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_LONG_TERM
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 10s
+  resources:
+    flow_control:
+      classifiers:
+      - rules:
+          user_type:
+            extractor:
+              from: request.http.headers.user-type
+        selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local
+      flux_meters:
+        workload-prioritization:
+          selectors:
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
