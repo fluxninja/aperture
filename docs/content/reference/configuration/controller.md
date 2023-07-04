@@ -806,18 +806,6 @@ platform metrics from being published to Prometheus. Filtered out metrics are:
 "grpc_server_msg_sent_total._" "grpc_server_started_total._"
 
 </dd>
-<dt>enable_local_metrics_pipeline</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool, default: `true`)
-
-<!-- vale on -->
-
-Whether to enable local OTel collector pipeline
-
-</dd>
 <dt>batch_alerts</dt>
 <dd>
 

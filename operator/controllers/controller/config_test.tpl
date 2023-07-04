@@ -94,7 +94,6 @@ otel:
     pprof_port: 1777
     zpages_port: 55679
   enable_high_cardinality_platform_metrics: false
-  enable_local_metrics_pipeline: true
 policies:
   cr_watcher:
     enabled: false
