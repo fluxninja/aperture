@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/Henry-Sarabia/sliceconv v1.0.2
-	github.com/Masterminds/semver/v3 v3.2.0
+	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/buger/jsonparser v1.1.1
 	github.com/buraksezer/olric v0.0.0-00010101000000-000000000000
