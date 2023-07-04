@@ -6,6 +6,7 @@ etcd:
   endpoints:
   - http://agent-etcd:2379
   lease_ttl: 60s
+  namespace: aperture
   password: ""
   tls:
     ca_file: ""
@@ -56,6 +57,7 @@ fluxninja:
       tls_handshake_timeout: 10s
       use_proxy: false
       write_buffer_size: 0
+  disable_local_otel_pipeline: false
   endpoint: ""
   heartbeat_interval: 5s
   installation_mode: LINUX_BARE_METAL
@@ -92,6 +94,7 @@ otel:
     pprof_port: 1777
     zpages_port: 55679
   enable_high_cardinality_platform_metrics: false
+  enable_local_metrics_pipeline: true
 policies:
   cr_watcher:
     enabled: false
@@ -155,6 +158,8 @@ server:
     client_ca_file: ""
     enabled: true
     key_file: /etc/aperture/aperture-controller/certs/key.pem
+token_source:
+  enabled: false
 watchdog:
   cgroup:
     adaptive_policy:
