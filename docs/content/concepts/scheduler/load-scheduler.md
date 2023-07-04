@@ -54,7 +54,7 @@ Adaptive Load Scheduler
 :::
 
 _Adaptive Load Scheduler_ is a high-level [circuit](../advanced/circuit.md)
-component that uses the [_Load Scheduler_](#load-scheduler) internally. In
+component that uses the _Load Scheduler_ internally. In
 addition, it employs a
 [_Gradient Controller_](../../reference/configuration/spec.md#gradient-controller)
 and an [Integrator](../../reference/configuration/spec.md#integrator) for
