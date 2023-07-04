@@ -999,7 +999,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				},
 			}
 
-			result := ControllerVolumes(instance.DeepCopy())
+			result := ControllerVolumes(true, instance.DeepCopy())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1054,7 +1054,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				},
 			}
 
-			result := ControllerVolumes(instance.DeepCopy())
+			result := ControllerVolumes(true, instance.DeepCopy())
 			Expect(result).To(Equal(expected))
 		})
 	})
