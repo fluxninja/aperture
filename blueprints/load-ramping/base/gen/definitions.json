@@ -361,14 +361,17 @@
     "kubelet_metrics": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["infra_context"],
       "properties": {
         "criteria": {
           "description": "Criteria.",
+          "default": {},
           "type": "object",
           "$ref": "#/$defs/kubelet_metrics_criteria"
         },
         "infra_context": {
           "description": "Kubernetes selector for scraping metrics.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
         }

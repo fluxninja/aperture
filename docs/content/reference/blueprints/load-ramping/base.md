@@ -650,7 +650,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Criteria.'
     type='Object (kubelet_metrics_criteria)'
     reference='#kubelet-metrics-criteria'
-    value='null'
+    value='{}'
 />
 
 <!-- vale on -->
@@ -664,7 +664,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Kubernetes selector for scraping metrics.'
     type='Object (aperture.spec.v1.KubernetesObjectSelector)'
     reference='../../spec#kubernetes-object-selector'
-    value='null'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

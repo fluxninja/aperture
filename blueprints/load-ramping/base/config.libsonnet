@@ -117,5 +117,5 @@ commonConfig {
   promql_driver: promql_driver_defaults,
   average_latency_driver: average_latency_driver_defaults,
   percentile_latency_driver: percentile_latency_driver_defaults,
-  kubelet_metrics_criteria: kubelet_metrics_defaults,
+  kubelet_metrics: kubelet_metrics_defaults,
 }
