@@ -5421,8 +5421,12 @@ spec:
                   create:
                     description: Specifies whether a ServiceAccount should be created
                     type: boolean
+                  name:
+                    description: Existing ServiceAccount name to be used
+                    type: string
                 required:
                 - create
+                - name
                 type: object
               sidecars:
                 description: Add additional sidecar containers
