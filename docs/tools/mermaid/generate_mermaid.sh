@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Example
-# FORMAT=png ./docs/tools/mermaid/generate_mermaid.sh ./docs/content/applying-policies/service-protection/assets/workload-prioritization/graph.mmd
+# FORMAT=png ./docs/tools/mermaid/generate_mermaid.sh ./docs/content/applying-policies/load-scheduling/assets/workload-prioritization/graph.mmd
 
 gitroot=$(git rev-parse --show-toplevel)
 docsdir=$gitroot/docs

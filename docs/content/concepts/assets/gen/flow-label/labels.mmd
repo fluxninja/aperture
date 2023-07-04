@@ -1,0 +1,25 @@
+graph TB
+
+    subgraph Backend Services
+        Gateway[Gateway Service]
+        UserService[User Service]
+        CatalogService[Catalog Service]
+        CartService[Cart Service]
+        OrderService[Order Service]
+        PaymentService[Payment Service]
+        DeliveryService[Delivery Service]
+    end
+
+    subgraph External Systems
+        PaymentGateway[Payment Gateway]
+        DeliveryProvider[Delivery Provider]
+    end
+
+    Gateway -->|User Login-> user_type:registered| UserService
+    Gateway -->|Browse Catalog-> product_category:electronics| CatalogService
+    Gateway -->|Add to Cart-> product_id:12345| CartService
+    Gateway -->|Checkout-> cart_id:67890, user_type:registered| OrderService
+    OrderService -->|Get User Info-> user_type:registered| UserService
+    OrderService -->|Get Cart Info-> cart_id:67890| CartService
+    OrderService -->|Process Payment-> payment_method:credit_card| PaymentService --> PaymentGateway
+    OrderService -->|Arrange Delivery-> delivery_method:express| DeliveryService --> DeliveryProvider

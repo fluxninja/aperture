@@ -25,6 +25,7 @@ import (
 	kubernetes "github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config"
 	static "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
+	googletoken "github.com/fluxninja/aperture/v2/pkg/google/config"
 	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
@@ -325,6 +326,10 @@ type CommonConfigSpec struct {
 	// Prometheus configuration.
 	//+kubebuilder:validation:Required
 	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
+
+	// Google Token Source configuration
+	//+kubebuilder:validation:Optional
+	TokenSource googletoken.Config `json:"token_source"`
 
 	// Server configuration.
 	//+kubebuilder:validation:Optional

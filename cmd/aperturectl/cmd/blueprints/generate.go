@@ -35,7 +35,6 @@ func init() {
 
 type metadata struct {
 	BlueprintsURI string `json:"blueprints_uri"`
-	BlueprintName string `json:"blueprint_name"`
 }
 
 var generateCmd = &cobra.Command{
@@ -133,7 +132,6 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 		}
 		metadata, err := json.Marshal(metadata{
 			BlueprintsURI: blueprintsURIMetadata,
-			BlueprintName: blueprintName,
 		})
 		if err != nil {
 			return err

@@ -12,6 +12,6 @@ sidebar_label: Policy Specification
 
 <!-- vale on -->
 
-Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
+Reference for all objects used in [the Policy language](/concepts/advanced/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).

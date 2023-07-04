@@ -32,7 +32,6 @@ const (
 	//   schema:
 	//     $ref: "#/definitions/EtcdConfig"
 	defaultClientConfigKey = "etcd"
-	namespace              = "aperture"
 )
 
 // ClientIn holds parameters for ProvideClient.
@@ -101,11 +100,11 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			etcdClient.Client = cli
 
 			// namespace the client
-			cli.Lease = namespacev3.NewLease(cli.Lease, namespace)
+			cli.Lease = namespacev3.NewLease(cli.Lease, config.Namespace)
 			etcdClient.Lease = cli.Lease
-			cli.KV = namespacev3.NewKV(cli.KV, namespace)
+			cli.KV = namespacev3.NewKV(cli.KV, config.Namespace)
 			etcdClient.KV = cli.KV
-			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, namespace)
+			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, config.Namespace)
 			etcdClient.Watcher = cli.Watcher
 
 			// Create a new Session

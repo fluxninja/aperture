@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"strings"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
@@ -33,8 +32,8 @@ import (
 // * dynamic flow labels.
 func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
 	// Aperture Processing Duration
-	startTime := checkResponse.GetStart().AsTime()
-	endTime := checkResponse.GetEnd().AsTime()
+	startTime := checkResponse.Start.AsTime()
+	endTime := checkResponse.End.AsTime()
 	if !startTime.IsZero() && !endTime.IsZero() {
 		attributes.PutDouble(otelconsts.ApertureProcessingDurationLabel, float64(endTime.Sub(startTime).Milliseconds()))
 	} else {
@@ -42,139 +41,140 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 			Warn().Msgf("Aperture processing duration not found in %s access logs", sourceStr)
 	}
 	// Services
-	servicesValue := pcommon.NewValueSlice()
-	for _, service := range checkResponse.Services {
-		servicesValue.Slice().AppendEmpty().SetStr(service)
-	}
-	servicesValue.CopyTo(attributes.PutEmpty(otelconsts.ApertureServicesLabel))
+	putStrSlice(attributes, otelconsts.ApertureServicesLabel, checkResponse.Services)
 
 	// Control Point
-	attributes.PutStr(otelconsts.ApertureControlPointLabel, checkResponse.GetControlPoint())
+	attributes.PutStr(otelconsts.ApertureControlPointLabel, checkResponse.ControlPoint)
 
-	labels := map[string]pcommon.Value{
-		otelconsts.ApertureRateLimitersLabel:            pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingRateLimitersLabel:    pcommon.NewValueSlice(),
-		otelconsts.ApertureLoadSchedulersLabel:          pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingLoadSchedulersLabel:  pcommon.NewValueSlice(),
-		otelconsts.ApertureQuotaSchedulersLabel:         pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingQuotaSchedulersLabel: pcommon.NewValueSlice(),
-		otelconsts.ApertureWorkloadsLabel:               pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingWorkloadsLabel:       pcommon.NewValueSlice(),
-		otelconsts.ApertureSamplersLabel:                pcommon.NewValueSlice(),
-		otelconsts.ApertureDroppingSamplersLabel:        pcommon.NewValueSlice(),
-		otelconsts.ApertureFluxMetersLabel:              pcommon.NewValueSlice(),
-		otelconsts.ApertureFlowLabelKeysLabel:           pcommon.NewValueSlice(),
-		otelconsts.ApertureClassifiersLabel:             pcommon.NewValueSlice(),
-		otelconsts.ApertureClassifierErrorsLabel:        pcommon.NewValueSlice(),
-		otelconsts.ApertureDecisionTypeLabel:            pcommon.NewValueStr(checkResponse.DecisionType.String()),
-		otelconsts.ApertureRejectReasonLabel:            pcommon.NewValueStr(checkResponse.GetRejectReason().String()),
-	}
+	// Decision type
+	attributes.PutStr(
+		otelconsts.ApertureDecisionTypeLabel,
+		flowcontrolv1.CheckResponse_DecisionType_name[int32(checkResponse.DecisionType)],
+	)
+
+	// Reason
+	attributes.PutStr(
+		otelconsts.ApertureRejectReasonLabel,
+		flowcontrolv1.CheckResponse_RejectReason_name[int32(checkResponse.RejectReason)],
+	)
+
+	// Note: Sorted alphabetically to help sorting attributes in rollupprocessor.key at least a bit.
+	droppingLoadSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingLoadSchedulersLabel)
+	droppingQuotaSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingQuotaSchedulersLabel)
+	droppingRateLimitersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingRateLimitersLabel)
+	droppingSamplersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingSamplersLabel)
+	droppingWorkloadsSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingWorkloadsLabel)
+	loadSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureLoadSchedulersLabel)
+	quotaSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureQuotaSchedulersLabel)
+	rateLimitersSlice := attributes.PutEmptySlice(otelconsts.ApertureRateLimitersLabel)
+	samplersSlice := attributes.PutEmptySlice(otelconsts.ApertureSamplersLabel)
+	workloadsSlice := attributes.PutEmptySlice(otelconsts.ApertureWorkloadsLabel)
+
 	for _, decision := range checkResponse.LimiterDecisions {
 		if decision.GetRateLimiterInfo() != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
-			labels[otelconsts.ApertureRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			rateLimitersSlice.AppendEmpty().SetStr(value)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingRateLimitersLabel].Slice().AppendEmpty().SetStr(value)
+				droppingRateLimitersSlice.AppendEmpty().SetStr(value)
 			}
 		}
 		if cl := decision.GetLoadSchedulerInfo(); cl != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
-			labels[otelconsts.ApertureLoadSchedulersLabel].Slice().AppendEmpty().SetStr(value)
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			loadSchedulersSlice.AppendEmpty().SetStr(value)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingLoadSchedulersLabel].Slice().AppendEmpty().SetStr(value)
+				droppingLoadSchedulersSlice.AppendEmpty().SetStr(value)
 			}
 
-			workloadsRawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value = strings.Join(workloadsRawValue, ",")
-			labels[otelconsts.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+			workloadsValue := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.WorkloadIndexLabel, cl.GetWorkloadIndex(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			workloadsSlice.AppendEmpty().SetStr(workloadsValue)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+				droppingWorkloadsSlice.AppendEmpty().SetStr(workloadsValue)
 			}
 		}
 		if decision.GetSamplerInfo() != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
-			labels[otelconsts.ApertureSamplersLabel].Slice().AppendEmpty().SetStr(value)
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			samplersSlice.AppendEmpty().SetStr(value)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingSamplersLabel].Slice().AppendEmpty().SetStr(value)
+				droppingSamplersSlice.AppendEmpty().SetStr(value)
 			}
 		}
 		if cl := decision.GetQuotaSchedulerInfo(); cl != nil {
-			rawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value := strings.Join(rawValue, ",")
-			labels[otelconsts.ApertureQuotaSchedulersLabel].Slice().AppendEmpty().SetStr(value)
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			quotaSchedulersSlice.AppendEmpty().SetStr(value)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingQuotaSchedulersLabel].Slice().AppendEmpty().SetStr(value)
+				droppingQuotaSchedulersSlice.AppendEmpty().SetStr(value)
 			}
 
-			workloadsRawValue := []string{
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
-				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.SchedulerInfo.GetWorkloadIndex()),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
-			}
-			value = strings.Join(workloadsRawValue, ",")
-			labels[otelconsts.ApertureWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+			workloadsValue := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.WorkloadIndexLabel, cl.SchedulerInfo.GetWorkloadIndex(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			workloadsSlice.AppendEmpty().SetStr(workloadsValue)
 			if decision.Dropped {
-				labels[otelconsts.ApertureDroppingWorkloadsLabel].Slice().AppendEmpty().SetStr(value)
+				droppingWorkloadsSlice.AppendEmpty().SetStr(workloadsValue)
 			}
 		}
 	}
+
+	fluxMetersSlice := attributes.PutEmptySlice(otelconsts.ApertureFluxMetersLabel)
+	fluxMetersSlice.EnsureCapacity(len(checkResponse.FluxMeterInfos))
 	for _, fluxMeter := range checkResponse.FluxMeterInfos {
-		value := fluxMeter.GetFluxMeterName()
-		labels[otelconsts.ApertureFluxMetersLabel].Slice().AppendEmpty().SetStr(value)
+		fluxMetersSlice.AppendEmpty().SetStr(fluxMeter.GetFluxMeterName())
 	}
 
-	for _, flowLabelKey := range checkResponse.GetFlowLabelKeys() {
-		labels[otelconsts.ApertureFlowLabelKeysLabel].Slice().AppendEmpty().SetStr(flowLabelKey)
-	}
+	putStrSlice(attributes, otelconsts.ApertureFlowLabelKeysLabel, checkResponse.FlowLabelKeys)
 
+	classifiersSlice := attributes.PutEmptySlice(otelconsts.ApertureClassifiersLabel)
+	classifiersSlice.EnsureCapacity(len(checkResponse.ClassifierInfos))
+	classifierErrorsSlice := attributes.PutEmptySlice(otelconsts.ApertureClassifierErrorsLabel)
 	for _, classifier := range checkResponse.ClassifierInfos {
-		rawValue := []string{
-			fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
-			fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
-		}
-		value := strings.Join(rawValue, ",")
-		labels[otelconsts.ApertureClassifiersLabel].Slice().AppendEmpty().SetStr(value)
+		value := fmt.Sprintf(
+			"%s:%v,%s:%v",
+			metrics.PolicyNameLabel, classifier.PolicyName,
+			metrics.ClassifierIndexLabel, classifier.ClassifierIndex,
+		)
+		classifiersSlice.AppendEmpty().SetStr(value)
 
 		// add errors as attributes as well
 		if classifier.Error != flowcontrolv1.ClassifierInfo_ERROR_NONE {
-			errorsValue := []string{
+			errorsValue := fmt.Sprintf(
+				"%s,%s:%v,%s:%v,%s:%v",
 				classifier.Error.String(),
-				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, classifier.PolicyName),
-				fmt.Sprintf("%s:%v", metrics.ClassifierIndexLabel, classifier.ClassifierIndex),
-				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, classifier.PolicyHash),
-			}
-			joinedValue := strings.Join(errorsValue, ",")
-			labels[otelconsts.ApertureClassifierErrorsLabel].Slice().AppendEmpty().SetStr(joinedValue)
+				metrics.PolicyNameLabel, classifier.PolicyName,
+				metrics.ClassifierIndexLabel, classifier.ClassifierIndex,
+				metrics.PolicyHashLabel, classifier.PolicyHash,
+			)
+			classifierErrorsSlice.AppendEmpty().SetStr(errorsValue)
 		}
-	}
-
-	for key, value := range labels {
-		value.CopyTo(attributes.PutEmpty(key))
 	}
 }
 
@@ -184,5 +184,13 @@ var noDurationSampler = log.NewRatelimitingSampler()
 func AddFlowLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse) {
 	for key, value := range checkResponse.GetTelemetryFlowLabels() {
 		pcommon.NewValueStr(value).CopyTo(attributes.PutEmpty(key))
+	}
+}
+
+func putStrSlice(m pcommon.Map, key string, strs []string) {
+	slice := m.PutEmptySlice(key)
+	slice.EnsureCapacity(len(strs))
+	for _, str := range strs {
+		slice.AppendEmpty().SetStr(str)
 	}
 }

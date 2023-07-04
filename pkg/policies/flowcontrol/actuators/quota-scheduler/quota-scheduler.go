@@ -21,6 +21,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -342,13 +343,13 @@ func (qs *quotaScheduler) GetSelectors() []*policylangv1.Selector {
 	return qs.proto.GetSelectors()
 }
 
-func (qs *quotaScheduler) getLabelKey(labels map[string]string) (string, bool) {
+func (qs *quotaScheduler) getLabelKey(labels labels.Labels) (string, bool) {
 	labelKey := qs.proto.RateLimiter.GetLabelKey()
 	var label string
 	if labelKey == "" {
 		label = "default"
 	} else {
-		labelValue, found := labels[labelKey]
+		labelValue, found := labels.Get(labelKey)
 		if !found {
 			return "", false
 		}
@@ -358,7 +359,7 @@ func (qs *quotaScheduler) getLabelKey(labels map[string]string) (string, bool) {
 }
 
 // Decide runs the limiter.
-func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
+func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) iface.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 	dropped := false
 	label := ""
@@ -426,7 +427,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels map[string]string) 
 }
 
 // Revert returns the tokens to the limiter.
-func (qs *quotaScheduler) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (qs *quotaScheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	// return to the underlying rate limiter
 	if qsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_); ok {
 		tokens := qsDecision.QuotaSchedulerInfo.SchedulerInfo.TokensConsumed

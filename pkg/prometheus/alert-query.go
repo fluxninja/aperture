@@ -40,6 +40,7 @@ func NewAlertQueryJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer *PrometheusEnforcer,
 	timeout time.Duration,
 	forDuration time.Duration,
 	alertActiveCallback,
@@ -48,7 +49,7 @@ func NewAlertQueryJob(
 	cbArgs ...interface{},
 ) jobs.JobCallback {
 	aq := &alertQuery{forDuration: forDuration, alertActiveCallback: alertActiveCallback, alertInactiveCallback: alertInactiveCallback}
-	return NewPromQueryJob(query, endTimestamp, promAPI, timeout, aq.execute, errorCallback, cbArgs...)
+	return NewPromQueryJob(query, endTimestamp, promAPI, enforcer, timeout, aq.execute, errorCallback, cbArgs...)
 }
 
 func (aq *alertQuery) execute(jobCtxt context.Context, value prometheusmodel.Value, cbArgs ...interface{}) (proto.Message, error) {

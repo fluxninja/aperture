@@ -34,7 +34,7 @@ first.
 Advanced users can learn about designing new policies by following the example
 circuit created in
 
-[Detecting overload](../../use-cases/alerting/detecting-overload.md) tutorial.
+[Detecting overload](../../use-cases/alerting/detecting-overload.md) use-case.
 
 <Zoom>
 
@@ -55,18 +55,13 @@ The following command can be used to list available blueprints:
 Which will output the following:
 
 ```bash
-dashboards/signals
-policies/auto-scaling/pod-auto-scaler
-policies/feature-rollout/average-latency
-policies/feature-rollout/base
-policies/feature-rollout/ema-latency
-policies/feature-rollout/percentile-latency
-policies/feature-rollout/promql
-policies/service-protection/average-latency
-policies/service-protection/promql
-policies/service-protection-with-load-based-pod-auto-scaler/average-latency
-policies/service-protection-with-load-based-pod-auto-scaler/promql
-policies/rate-limiting
+auto-scaling/pod-auto-scaler
+load-ramping/base
+load-scheduling/average-latency
+load-scheduling/postgresql
+load-scheduling/promql
+quota-scheduling/base
+rate-limiting/base
 ```
 
 ## Customizing Blueprints
@@ -162,7 +157,7 @@ The policy YAML generated (Kubernetes Custom Resource) using the above example
 can also be applied using `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/policies/rate-limiting-cr.yaml -n aperture-controller
+kubectl apply -f policy-gen/configuration/rate-limiting-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
@@ -192,5 +187,5 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 [controller-metrics]: /reference/observability/prometheus-metrics/controller.md
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
 [blueprints]: /reference/blueprints/blueprints.md
-[policies]: /concepts/policy/policy.md
+[policies]: /concepts/advanced/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/

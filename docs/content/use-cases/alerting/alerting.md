@@ -26,7 +26,7 @@ channels, ensuring prompt response to any potential issues.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/alerting.mmd}
+{@include: ./assets/alerting/alerting.mmd}
 ```
 
 The diagram depicts agents collecting metrics into Prometheus (the metrics can

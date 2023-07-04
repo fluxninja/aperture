@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/stdr"
 	"github.com/gorilla/mux"
@@ -28,6 +26,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
+	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -217,9 +218,9 @@ func (c *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]s
 			} else {
 				// TODO use HTTP Check and pull proper status
 				w.WriteHeader(http.StatusServiceUnavailable)
-				_, err := fmt.Fprint(w, flow.CheckResponse().GetRejectReason().String())
-				if err != nil {
-					c.log.Info("Aperture flow control end got error.", "error", err)
+				_, perr := fmt.Fprint(w, flow.CheckResponse().GetRejectReason().String())
+				if perr != nil {
+					c.log.Info("Aperture flow control end got error.", "error", perr)
 				}
 			}
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.

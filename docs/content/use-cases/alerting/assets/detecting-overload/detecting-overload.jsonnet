@@ -16,7 +16,6 @@ local combinator = aperture.spec.v1.ArithmeticCombinator;
 local decider = aperture.spec.v1.Decider;
 local alerter = aperture.spec.v1.Alerter;
 local alerterParameters = aperture.spec.v1.AlerterParameters;
-local constantSignal = aperture.spec.v1.ConstantSignal;
 
 local svcSelectors = [
   selector.new()
@@ -36,15 +35,15 @@ local policyDef =
   )
   + policy.withCircuit(
     circuit.new()
-    + circuit.withEvaluationInterval('0.5s')
+    + circuit.withEvaluationInterval('10s')
     + circuit.withComponents([
       component.withQuery(
         query.new()
         + query.withPromql(
-          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))';
+          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[30s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[30s]))';
           promQL.new()
           + promQL.withQueryString(q)
-          + promQL.withEvaluationInterval('1s')
+          + promQL.withEvaluationInterval('10s')
           + promQL.withOutPorts({ output: port.withSignalName('LATENCY') }),
         ),
       ),
