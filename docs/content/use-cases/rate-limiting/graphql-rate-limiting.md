@@ -82,7 +82,7 @@ mutation createTodo {
 ```
 
 Without diving deep into how Rego works, the source section mentioned in this
-tutorial does the following:
+use-case does the following:
 
 1. Parse the query
 2. Check if the mutation query is `createTodo`
@@ -94,9 +94,9 @@ tutorial does the following:
 From there on, the Classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
-[`Rate Limiter`](/concepts/flow-control/components/rate-limiter.md) component in
-the policy to limit the `createTodo` mutation query to `2` requests per second
-with a burst capacity of `40` requests for each `userID`.
+[`Rate Limiter`](/concepts/rate-limiter.md) component in the policy to limit the
+`createTodo` mutation query to `2` requests per second with a burst capacity of
+`40` requests for each `userID`.
 
 ## Policy in Action
 

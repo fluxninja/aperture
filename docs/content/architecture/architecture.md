@@ -22,6 +22,11 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+Aperture, an observability-driven load management platform, is architected on a
+distributed structure, which delivers a cohesive platform for observability and
+control for cloud-native applications. The design of the architecture aims to
+provide high availability, scalability, and reliability
+
 Aperture is built on a distributed architecture that provides a unified
 observability and controllability platform for cloud-native applications. The
 architecture is designed to ensure high availability, scalability, and

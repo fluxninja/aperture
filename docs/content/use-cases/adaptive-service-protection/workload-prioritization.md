@@ -19,7 +19,7 @@ to prioritize key user experiences and business-critical features over less
 crucial tasks or background workloads. For instance, in an e-commerce platform,
 the checkout process must take precedence over functionalities like personalized
 recommendations, especially during resource shortage or high traffic. Aperture's
-[Weighted Fair Queuing Scheduler (WFQ)](/concepts/flow-control/components/load-scheduler.md#scheduler)
+[Weighted Fair Queuing Scheduler (WFQ)](/concepts/scheduler/scheduler.md)
 enables such prioritization of flows over others based on their labels, ensuring
 user experience or revenue is maximized during overloads or other failure
 scenarios.

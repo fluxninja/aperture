@@ -47,7 +47,7 @@ component that is used within this blueprint.
 
 :::info
 
-See tutorials on
+See the use-cases
 [Adaptive Service Protection with Average Latency Feedback](/use-cases/adaptive-service-protection/average-latency-feedback.md)
 and
 [Workload Prioritization](/use-cases/adaptive-service-protection/workload-prioritization.md)

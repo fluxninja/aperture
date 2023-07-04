@@ -1,6 +1,6 @@
 ---
 title: Auto Scale
-sidebar_position: 12
+sidebar_position: 13
 keywords:
   - auto-scaling
   - Autoscaling
@@ -22,7 +22,7 @@ state for informed scaling decisions. For instance, during sudden traffic
 spikes, if a load scheduler on a service sheds traffic, auto-scaler can
 automatically add more instances to the service to handle the increased load.
 
-With the auto-scaler capability in Aperture, service operators can configure
+With the auto-scale capability in Aperture, service operators can configure
 auto-scaling policies based on different service overload signals, such as load
 shedding, in addition to resource utilization based on CPU, memory usage,
 network I/O, and so on. This flexibility enables service operators to fine-tune
@@ -60,8 +60,6 @@ auto-scaling decisions.
 </Zoom>
 
 ## Auto Scaler
-
-Components involved in the auto-scaling process:
 
 :::info See also
 

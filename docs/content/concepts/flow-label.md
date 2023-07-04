@@ -3,14 +3,16 @@ title: Flow Label
 sidebar_position: 4
 ---
 
-In the context of an Aperture Agent, a 'flow' represents a basic unit of work,
-which could be an API call, a feature, or a database query. This is akin to an
-[OpenTelemetry span][span]. Each flow is tagged with a set of 'Flow Labels',
-which are key-value pairs. For instance, if a flow is tagged with
-`user_tier:gold`, `user_tier` is the label key and `gold` is the label value.
-`user_tier` is a flow label.
+A flow is the fundamental unit of work from the perspective of an Aperture
+agent. It could be an API call, a feature, or even a database query. A flow in
+Aperture is similar to [OpenTelemetry span][span]. Each flow is annotated with a
+set of **Flow Labels**, which are key-value pairs. For instance, if a flow is
+tagged with `user_tier:gold`, then `user_tier` is the label key and `gold` is
+the label value.
 
-_Example:_
+The following visualization depicts flows belonging to different
+[control points](./control-point.md) across a distributed application, along
+with their associated flow labels.
 
 <Zoom>
 

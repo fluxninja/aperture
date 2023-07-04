@@ -12,9 +12,10 @@ keywords:
 
 :::
 
-The Flux Meter component provides a way to translate a flux of flows, matching a
-[Selector][flow-selectors], into a Prometheus [histogram][histogram-metric]. The
-histogram created by Flux Meter measures the workload latency by default.
+The _Flux Meter_ is a type of policy resource that provides a way to translate a
+flux of flows, matching a [Selector][flow-selectors], into a Prometheus
+[histogram][histogram-metric]. The histogram created by _Flux Meter_ measures
+the workload latency by default.
 
 Example:
 
@@ -31,9 +32,9 @@ flux_meters:
 
 ## Naming Convention
 
-Each Flux Meter is identified by its unique name. The generated histogram gets
+Each _Flux Meter_ is identified by its unique name. The generated histogram gets
 labeled with this name. It is therefore recommended to assign globally unique
-names to Flux Meters.
+names to _Flux Meters_.
 
 ## The Journey of a Request
 

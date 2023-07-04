@@ -49,7 +49,7 @@ func addInfraMeter(
 				"value":  "aperture-infra-meter",
 			},
 			{
-				"key":    "aperture_infra_meter_name",
+				"key":    metrics.InfraMeterNameLabel,
 				"action": "upsert",
 				"value":  infraMeterName,
 			},

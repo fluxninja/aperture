@@ -711,7 +711,7 @@ func (x *AdaptiveLoadScheduler) GetDryRunConfigKey() string {
 //
 // :::info
 //
-// See also [_Sampler_ overview](/concepts/sampler.md).
+// See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
 //
 // :::
 type Sampler struct {

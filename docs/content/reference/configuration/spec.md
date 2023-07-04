@@ -6696,7 +6696,7 @@ specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [_Sampler_ overview](/concepts/sampler.md).
+See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
 
 :::
 

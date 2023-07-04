@@ -9,9 +9,7 @@ sidebar_position: 1
 
 :::info See Also
 
-Load Scheduler [Reference](/reference/configuration/spec.md#load-scheduler) and
-Adaptive Load Scheduler
-[Reference](/reference/configuration/spec.md#adaptive-load-scheduler)
+Load Scheduler [Reference](/reference/configuration/spec.md#load-scheduler)
 
 :::
 
@@ -29,11 +27,12 @@ This diagram illustrates the working of a load scheduler.
 ![Scheduler](./assets/img/load-scheduler-light.svg#gh-light-mode-only)
 ![Scheduler](./assets/img/load-scheduler-dark.svg#gh-dark-mode-only)
 
-There is a `load_multiplier` port on the _Load Scheduler_ component. The policy
-circuit controls the token refill rate by adjusting the signal at the load
-multiplier port. At each agent, the adjusted token rate is determined by
-multiplying the past token rate with the load multiplier. The past 30 seconds of
-data is used for finding the past token rate.
+The _Load Scheduler_'s throttling behavior is controlled by the signal at its
+`load_multiplier` input port. As the policy circuit adjusts the signal at the
+load multiplier port, it gets translated to the token refill rate at the agents.
+At each agent, the adjusted token rate is determined by multiplying the past
+token rate with the load multiplier. The past 30 seconds of data is used for
+finding the past token rate.
 
 $$
 adjusted\_token\_rate = past\_token\_rate * load\_multiplier
@@ -45,10 +44,18 @@ an order determined by the scheduler based on the weighted fair queuing
 algorithm. Any request that fails to be scheduled within its designated timeout
 is rejected.
 
-### Adaptive Load Scheduler {#adaptive-load-scheduler}
+## Adaptive Load Scheduler {#adaptive-load-scheduler}
+
+:::info See Also
+
+Adaptive Load Scheduler
+[Reference](/reference/configuration/spec.md#adaptive-load-scheduler)
+
+:::
 
 _Adaptive Load Scheduler_ is a high-level [circuit](../advanced/circuit.md)
-component that uses the _Load Scheduler_ internally. In addition, it employs a
+component that uses the [_Load Scheduler_](#load-scheduler) internally. In
+addition, it employs a
 [_Gradient Controller_](reference/configuration/spec#gradient-controller) and an
 [Integrator](../../reference/configuration/spec#integrator) for computing the
 load multiplier. From the Agents' perspective, the _Load Scheduler_ and
