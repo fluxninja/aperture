@@ -427,6 +427,10 @@ workflows:
           name: aperture-publish-lua-module
           tag: << pipeline.git.tag >>
 
+      - publish_aperture_on_azure_marketplace:
+          filters: *release-filters
+          tag: << pipeline.git.tag >>
+
 commands:
   asdf_install:
     description: "Install tools using ASDF"

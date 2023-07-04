@@ -83,7 +83,7 @@ Check of prometheus at global level.
 {{- $globalAzure := get .context.Values.global "azure" -}}
 {{- if not (empty $globalAzure) -}}
     {{- $prometheusAzure := get .context.Values.global.azure.images "yq" -}}
-    {{- if not (empty $globalAzure) -}}
+    {{- if not (empty $prometheusAzure) -}}
         {{- $prometheusImage := (printf "%s/%s@%s" .context.Values.global.azure.images.yq.registry  .context.Values.global.azure.images.yq.image .context.Values.global.azure.images.yq.digest) -}}
         {{ print $prometheusImage }}
     {{- end -}}
