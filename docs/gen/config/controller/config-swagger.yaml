@@ -208,6 +208,23 @@ definitions:
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
+    Config:
+        properties:
+            enabled:
+                default: false
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "false"
+                x-go-tag-json: enabled
+            scopes:
+                items:
+                    type: string
+                type: array
+                x-go-name: Scopes
+                x-go-tag-json: scopes,omitempty
+        title: Config stores configuration for the Google Token Source.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/google/config
     ControllerOTelConfig:
         properties:
             batch_alerts:
@@ -263,6 +280,13 @@ definitions:
                 x-go-tag-default: 60s
                 x-go-tag-json: lease_ttl
                 x-go-tag-validate: gte=1s
+            namespace:
+                default: aperture
+                description: etcd namespace
+                type: string
+                x-go-name: Namespace
+                x-go-tag-default: aperture
+                x-go-tag-json: namespace
             password:
                 type: string
                 x-go-name: Password
@@ -1018,9 +1042,31 @@ definitions:
                 x-go-tag-json: address
                 x-go-tag-validate: required,hostname_port|url|fqdn
                 x-pattern-rules: hostname_port | url | fqdn
+            labels:
+                description: A list of labels to be attached to every query
+                items:
+                    $ref: '#/definitions/PrometheusLabel'
+                type: array
+                x-go-name: Labels
+                x-go-tag-json: labels,omitempty
         required:
             - address
         title: PrometheusConfig holds configuration for Prometheus Server.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/prometheus/config
+    PrometheusLabel:
+        description: |-
+            PrometheusLabel holds Name->Value mapping for the label that will
+            be attached to every PromQL query executed by the controller.
+        properties:
+            name:
+                type: string
+                x-go-name: Name
+                x-go-tag-json: name
+            value:
+                type: string
+                x-go-name: Value
+                x-go-tag-json: value
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/prometheus/config
     ProxyConfig:

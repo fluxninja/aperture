@@ -185,6 +185,11 @@ func (o *Service) AddPipeline(name string, pipeline Pipeline) {
 	o.Pipelines[name] = pipeline
 }
 
+// DeletePipeline deletes pipeline from the OTel Service.
+func (o *Service) DeletePipeline(name string) {
+	delete(o.Pipelines, name)
+}
+
 // Pipeline gets pipeline with given name from OTel Service together with `exists` bool.
 func (o *Service) Pipeline(name string) (Pipeline, bool) {
 	pipeline, exists := o.Pipelines[name]

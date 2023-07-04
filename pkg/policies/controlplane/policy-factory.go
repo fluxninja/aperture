@@ -14,6 +14,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	googletoken "github.com/fluxninja/aperture/v2/pkg/google"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -52,6 +53,7 @@ func policyFactoryModule() fx.Option {
 			),
 		),
 		prom.Module(),
+		googletoken.Module(),
 		policyModule(),
 	)
 }
@@ -61,6 +63,7 @@ type PolicyFactory struct {
 	lock                             sync.RWMutex
 	circuitJobGroup                  *jobs.JobGroup
 	etcdClient                       *etcdclient.Client
+	prometheusEnforcer               *prom.PrometheusEnforcer
 	alerterIface                     alerts.Alerter
 	registry                         status.Registry
 	policiesDynamicConfigEtcdWatcher notifiers.Watcher
@@ -74,6 +77,7 @@ func providePolicyFactory(
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
+	enforcer *prom.PrometheusEnforcer,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
 	prometheusRegistry *prometheus.Registry,
@@ -91,6 +95,7 @@ func providePolicyFactory(
 		registry:                         policiesStatusRegistry,
 		circuitJobGroup:                  circuitJobGroup,
 		etcdClient:                       etcdClient,
+		prometheusEnforcer:               enforcer,
 		alerterIface:                     alerterIface,
 		policiesDynamicConfigEtcdWatcher: policiesDynamicConfigEtcdWatcher,
 		policyTracker:                    make(map[string]*policysyncv1.PolicyWrapper),
@@ -164,6 +169,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 			),
 			factory.circuitJobGroup,
 			factory.etcdClient,
+			factory.prometheusEnforcer,
 			factory.alerterIface,
 			&wrapperMessage,
 		),

@@ -28,6 +28,8 @@ type FluxNinjaExtensionConfig struct {
 	ClientConfig ClientConfig `json:"client"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
+	// Whether to configure local Prometheus OTel pipeline for metrics
+	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
 }
 
 // ClientConfig is the client configuration.

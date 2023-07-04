@@ -23,6 +23,7 @@ type PromErrorCallback func(error, ...interface{}) (proto.Message, error)
 type promQuery struct {
 	endTimestamp   time.Time
 	promAPI        prometheusv1.API
+	enforcer       *PrometheusEnforcer
 	resultCallback PromResultCallback
 	errorCallback  PromErrorCallback
 	query          string
@@ -38,12 +39,13 @@ func NewPromQueryJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer *PrometheusEnforcer,
 	timeout time.Duration,
 	resultCallback PromResultCallback,
 	errorCallback PromErrorCallback,
 	cbArgs ...interface{},
 ) jobs.JobCallback {
-	pQuery := &promQuery{query: query, promAPI: promAPI, timeout: timeout, endTimestamp: endTimestamp, resultCallback: resultCallback, errorCallback: errorCallback, cbArgs: cbArgs}
+	pQuery := &promQuery{query: query, promAPI: promAPI, enforcer: enforcer, timeout: timeout, endTimestamp: endTimestamp, resultCallback: resultCallback, errorCallback: errorCallback, cbArgs: cbArgs}
 	return pQuery.execute
 }
 
@@ -56,19 +58,24 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 		ctx, cancel := context.WithTimeout(jobCtxt, pq.timeout)
 		defer cancel()
 
-		result, warnings, err = pq.promAPI.Query(ctx, pq.query, pq.endTimestamp)
+		query, innerErr := pq.enforcer.EnforceLabels(pq.query)
+		if innerErr != nil {
+			return innerErr
+		}
+
+		result, warnings, err = pq.promAPI.Query(ctx, query, pq.endTimestamp)
 		// if jobCtxt is closed, return PermanentError
 		if jobCtxt.Err() != nil {
 			return backoff.Permanent(jobCtxt.Err())
 		}
 		if err != nil {
-			log.Error().Err(err).Str("query", pq.query).Msg("Encountered error while executing promQL query")
+			log.Error().Err(err).Str("query", query).Msg("Encountered error while executing promQL query")
 			return err
 		}
 		for _, warning := range warnings {
-			log.Warn().Str("query", pq.query).Str("warning", warning).Msg("Encountered warning while executing promQL query")
+			log.Warn().Str("query", query).Str("warning", warning).Msg("Encountered warning while executing promQL query")
 		}
-		log.Trace().Str("query", pq.query).Time("end timestamp", pq.endTimestamp).Interface("result", result).Msg("Running prometheus query")
+		log.Trace().Str("query", query).Time("end timestamp", pq.endTimestamp).Interface("result", result).Msg("Running prometheus query")
 		return nil
 	}
 

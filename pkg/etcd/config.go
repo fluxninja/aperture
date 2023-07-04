@@ -10,6 +10,8 @@ import (
 // swagger:model
 // +kubebuilder:object:generate=true
 type EtcdConfig struct {
+	// etcd namespace
+	Namespace string `json:"namespace" default:"aperture"`
 	// Lease time-to-live
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
 	// Authentication
