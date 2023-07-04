@@ -36,7 +36,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/memberlist v0.5.0
 	github.com/integralist/go-findroot v0.0.0-20160518114804-ac90681525dc
-	github.com/jonboulle/clockwork v0.3.0
+	github.com/jonboulle/clockwork v0.4.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jsonnet-bundler/jsonnet-bundler v0.5.1
 	github.com/knadh/koanf v1.5.0
