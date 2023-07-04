@@ -149,7 +149,7 @@ require (
 	github.com/prometheus/alertmanager v0.25.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/prometheus/common v0.44.0
-	github.com/reugn/go-quartz v0.6.0
+	github.com/reugn/go-quartz v0.7.0
 	github.com/rs/zerolog v1.29.1
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cast v1.5.1
