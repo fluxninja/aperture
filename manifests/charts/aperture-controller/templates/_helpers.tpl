@@ -19,12 +19,9 @@ Compile all warnings into a single message.
 {{- end -}}
 
 {{/*
-Get image tag for operator.
-{{ include "controller-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
+   Azure Controller helper template
 */}}
-{{- define "controller-operator.image" -}}
-{{- $globalAzure := get .context.Values.global "azure" -}}
-{{- if not (empty $globalAzure) -}}
+{{- define "azure.image.helper" -}}
     {{- $azureImage := "" -}}
     {{- if  .operator -}}
         {{- $azureImage = (printf "%s/%s@%s" .context.Values.global.azure.images.operator.registry  .context.Values.global.azure.images.operator.image .context.Values.global.azure.images.operator.digest) -}}
@@ -32,7 +29,12 @@ Get image tag for operator.
         {{- $azureImage = (printf "%s/%s@%s" .context.Values.global.azure.images.controller.registry  .context.Values.global.azure.images.controller.image .context.Values.global.azure.images.controller.digest) -}}
     {{- end -}}
     {{ print $azureImage }}
-{{- else -}}
+{{- end -}}
+
+{{/*
+   Controller helper template
+*/}}
+{{- define "controller.image.helper" -}}
     {{- $tag := get .image "tag" -}}
     {{- $newImage := .image -}}
     {{- if (not $tag) -}}
@@ -40,6 +42,18 @@ Get image tag for operator.
     {{- end -}}
     {{- $_ := set $newImage "tag" $tag -}}
     {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
+{{- end -}}
+
+{{/*
+Get image tag for operator.
+{{ include "controller-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $ ) }}
+*/}}
+{{- define "controller-operator.image" -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- if not (empty $globalAzure) -}}
+    {{ print (include "azure.image.helper" (dict "operator" .operator "context"  .context) ) }}
+{{- else -}}
+    {{ print (include "controller.image.helper" (dict "image" .image "context"  .context)) }}
 {{- end -}}
 {{- end -}}
 

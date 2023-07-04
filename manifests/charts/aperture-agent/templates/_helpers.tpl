@@ -18,21 +18,24 @@ Compile all warnings into a single message.
 {{- end -}}
 {{- end -}}
 
+
 {{/*
-Get image tag for operator.
-{{ include "agent-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $) }}
+  Azure Agent helper template
 */}}
-{{- define "agent-operator.image" -}}
-{{- $globalAzure := get .context.Values.global "azure" -}}
-{{- if not (empty $globalAzure) -}}
-    {{- $out := "" -}}
-    {{- if  .operator -}}
-        {{- $out = (printf "%s/%s@%s" .context.Values.global.azure.images.operator.registry  .context.Values.global.azure.images.operator.image .context.Values.global.azure.images.operator.digest) -}}
-    {{- else -}}
-        {{- $out = (printf "%s/%s@%s" .context.Values.global.azure.images.agent.registry  .context.Values.global.azure.images.agent.image .context.Values.global.azure.images.agent.digest) -}}
-    {{- end -}}
-    {{ print $out }}
+{{- define "azure.image.helper" -}}
+{{- $azureImage := "" -}}
+{{- if  .operator -}}
+    {{- $azureImage = (printf "%s/%s@%s" .context.Values.global.azure.images.operator.registry  .context.Values.global.azure.images.operator.image .context.Values.global.azure.images.operator.digest) -}}
 {{- else -}}
+    {{- $azureImage = (printf "%s/%s@%s" .context.Values.global.azure.images.agent.registry  .context.Values.global.azure.images.agent.image .context.Values.global.azure.images.agent.digest) -}}
+{{- end -}}
+{{ print $azureImage }}
+{{- end -}}
+
+{{/*
+   Agent helper template
+*/}}
+{{- define "agent.image.helper" -}}
     {{- $tag := get .image "tag" -}}
     {{- $newImage := .image -}}
     {{- if (not $tag) -}}
@@ -41,8 +44,20 @@ Get image tag for operator.
     {{- $_ := set $newImage "tag" $tag -}}
     {{ print (include "common.images.image" (dict "imageRoot" $newImage "global" .context.Values.global)) }}
 {{- end -}}
-{{- end -}}
 
+
+{{/*
+Get image tag for operator.
+{{ include "agent-operator.image" ( dict "image" .Values.path.to.the.image "context" $.context $) }}
+*/}}
+{{- define "agent-operator.image" -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- if not (empty $globalAzure) -}}
+    {{ print (include "azure.image.helper" (dict "operator" .operator "context"  .context)) }}
+{{- else -}}
+    {{ print (include "agent.image.helper" (dict "image" .image "context"  .context)) }}
+{{- end -}}
+{{- end -}}
 {{/*
 Create the endpoint of the etcd for Aperture Agent
 {{ include "agent.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
