@@ -214,7 +214,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [classifier]: ./classifier.md
 [workload]: ./scheduler/scheduler.md#workload
 [ratelimiter]: ./rate-limiter.md
-[scheduler]: ./scheduler/scheduler.md#scheduler
+[scheduler]: ./scheduler/scheduler.md
 [flux-meter]: ./flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:

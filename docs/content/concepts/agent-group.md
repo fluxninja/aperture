@@ -26,7 +26,7 @@ spanning the entire cluster comes under the same agent group.
 :::note
 
 Agent group can be configured at the agent during installation, refer to
-[agent config](../reference/configuration/agent#agent-info-config)
+[agent config](../reference/configuration/agent.md#agent-info-config)
 
 :::
 
