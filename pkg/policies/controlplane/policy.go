@@ -22,7 +22,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/classifier"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/fluxmeter"
-	telemetrycollectors "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/telemetry-collectors"
+	inframeters "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/infra-meters"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
@@ -75,7 +75,7 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
 func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (*circuitfactory.Circuit, error) {
-	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter", nil)
+	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
 	if err != nil {
 		return nil, err
 	}
@@ -127,9 +127,27 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 				resourceOptions = append(resourceOptions, classifierOption)
 			}
 		}
+
+		infraMeters := resources.GetInfraMeters()
+
+		// Deprecated: v2.8.0.
 		telemetryCollectors := resources.GetTelemetryCollectors()
-		if telemetryCollectors != nil {
-			tcOption, err := telemetrycollectors.NewTelemetryCollectorsOptions(telemetryCollectors, policy)
+		for _, tc := range telemetryCollectors {
+			if infraMeters == nil {
+				infraMeters = make(map[string]*policylangv1.InfraMeter)
+			}
+			for name, infraMeter := range tc.GetInfraMeters() {
+				if _, exists := infraMeters[name]; !exists {
+					infraMeter.AgentGroup = tc.GetAgentGroup()
+					infraMeters[name] = infraMeter
+				} else {
+					return nil, nil, nil, fmt.Errorf("duplicate infra meter name '%s' found in telemetry_collectors and infra_meters", name)
+				}
+			}
+		}
+
+		if infraMeters != nil {
+			tcOption, err := inframeters.NewInfraMetersOptions(infraMeters, policy)
 			if err != nil {
 				return nil, nil, nil, err
 			}
@@ -255,7 +273,7 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 }
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string, metadata *policylangv1.PolicyMetadata) (*policysyncv1.PolicyWrapper, error) {
+func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
 	jsonDat, marshalErr := json.Marshal(policyMessage)
 	if marshalErr != nil {
 		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
@@ -281,6 +299,5 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string, me
 			PolicyName: policyName,
 			PolicyHash: hash,
 		},
-		PolicyMetadata: metadata,
 	}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -68,7 +69,7 @@ func LabelMatchesRegex(key string, pattern string) (Expr, error) {
 }
 
 // Labels is a map from label to value.
-type Labels map[string]string
+type Labels = labels.Labels
 
 // MultiMatcher is a database of items (entries) and their corresponding LabelSelector.
 // Provides APIs to Add/Remove entries, Match against labels.
@@ -225,7 +226,7 @@ type existsNode struct {
 
 // Evaluate checks if the label exists in the labels.
 func (en existsNode) Evaluate(l Labels) bool {
-	_, ok := l[en.label]
+	_, ok := l.Get(en.label)
 	return ok
 }
 
@@ -236,7 +237,7 @@ type exactMatchNode struct {
 
 // Evaluate checks if the label exists in the labels and if so, checks whether the label is exactly equal to the value.
 func (em exactMatchNode) Evaluate(l Labels) bool {
-	value, ok := l[em.label]
+	value, ok := l.Get(em.label)
 	if ok {
 		if value == em.value {
 			return true
@@ -252,7 +253,7 @@ type regexMatchNode struct {
 
 // Evaluate checks if the label exists in the labels and if so, checks whether the label contains any match of the regex.
 func (rm regexMatchNode) Evaluate(l Labels) bool {
-	value, ok := l[rm.label]
+	value, ok := l.Get(rm.label)
 	if ok {
 		return rm.regex.MatchString(value)
 	}

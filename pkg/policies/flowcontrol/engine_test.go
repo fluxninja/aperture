@@ -9,6 +9,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/mocks"
@@ -165,7 +166,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			controlPoint := "ingress"
 			svcs := []string{"testService2.testNamespace2.svc.cluster.local"}
-			labels := map[string]string{"service": "whatever"}
+			labels := labels.PlainMap{"service": "whatever"}
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).To(BeEmpty())
@@ -178,7 +179,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			controlPoint := "ingress"
 			svcs := []string{"testService.testNamespace.svc.cluster.local"}
-			labels := map[string]string{"service": "testService.testNamespace.svc.cluster.local"}
+			labels := labels.PlainMap{"service": "testService.testNamespace.svc.cluster.local"}
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).NotTo(BeEmpty())

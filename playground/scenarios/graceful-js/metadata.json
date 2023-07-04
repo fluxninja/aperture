@@ -1,0 +1,49 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/demo-app",
+  "needs": ["istio"],
+  "aperture_policies": [
+    {
+      "blueprint_name": "rate-limiting/base",
+      "policy_name": "rate-limiting",
+      "values_file": "policies/rate-limiting.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    },
+    {
+      "blueprint_name": "load-scheduling/average-latency",
+      "policy_name": "workload-prioritization",
+      "values_file": "policies/workload-prioritization.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    },
+    {
+      "blueprint_name": "load-ramping/base",
+      "policy_name": "load-ramping",
+      "values_file": "policies/load-ramping.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service2-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service2-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service3-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service3-demo-app:serviceaccount"]
+    }
+  ]
+}

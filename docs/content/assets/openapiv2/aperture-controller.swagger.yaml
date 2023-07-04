@@ -464,7 +464,7 @@ definitions:
 
             :::info
 
-            See also [Circuit overview](/concepts/policy/circuit.md).
+            See also [Circuit overview](/concepts/advanced/circuit.md).
 
             :::
 
@@ -498,19 +498,19 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
-                default: 0.5s
+                default: 10s
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
                 type: string
-                x-go-tag-default: 0.5s
+                x-go-tag-default: 10s
         type: object
     Classifier:
         description: |-
             :::info
 
-            See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+            See also [Classifier overview](/concepts/classifier.md).
 
             :::
             Example
@@ -544,7 +544,7 @@ definitions:
                     $ref: '#/definitions/Rule'
                 description: |+
                     A map of {key, value} pairs mapping from
-                    [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+                    [flow label](/concepts/flow-label.md) keys to rules that define
                     how to extract and propagate flow labels with that key.
 
                 type: object
@@ -567,7 +567,7 @@ definitions:
         description: |-
             :::info
 
-            See also [Components overview](/concepts/policy/circuit.md#components).
+            See also [Components overview](/concepts/advanced/circuit.md#components).
 
             :::
 
@@ -597,7 +597,7 @@ definitions:
                 description: AutoScale components are used to scale the service.
             bool_variable:
                 $ref: '#/definitions/BoolVariable'
-                description: BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
+                description: BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
             decider:
                 $ref: '#/definitions/Decider'
                 description: Decider emits the binary result of comparison operator on two operands.
@@ -668,7 +668,7 @@ definitions:
                 description: Takes an input signal and emits the square root of the input signal.
             variable:
                 $ref: '#/definitions/Variable'
-                description: Emits a variable signal which can be changed at runtime via dynamic configuration.
+                description: Emits a variable signal which can be changed at runtime through dynamic configuration.
         title: Computational block that forms the circuit
         type: object
     ConstantSignal:
@@ -1122,7 +1122,7 @@ definitions:
 
             :::info
 
-            See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+            See also [Flux Meter overview](/concepts/flux-meter.md).
 
             :::
             Example:
@@ -1274,6 +1274,14 @@ definitions:
                     type: number
                 type: array
                 x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+        type: object
+    GetDecisionsResponse:
+        description: GetDecisionsResponse is a response containing decisions for a given decision type.
+        properties:
+            decisions:
+                additionalProperties:
+                    type: string
+                type: object
         type: object
     GetPoliciesResponse:
         description: GetPoliciesResponse is a response containing all Policies.
@@ -1550,6 +1558,13 @@ definitions:
 
             :::
         properties:
+            agent_group:
+                default: default
+                description: |+
+                    AgentGroup is the agent group to sync this InfraMeter with.
+
+                type: string
+                x-go-tag-default: default
             per_agent_group:
                 default: false
                 description: |+
@@ -1561,7 +1576,7 @@ definitions:
                 x-go-tag-default: "false"
             pipeline:
                 $ref: '#/definitions/InfraMeterMetricsPipeline'
-                description: |+
+                description: |-
                     Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
                     and processors defined above. Exporter would be added automatically.
 
@@ -1570,8 +1585,6 @@ definitions:
                     automatically use all given receivers and the defined processor (if
                     any).  However, if there are more than one processor, the pipeline must
                     be defined explicitly.
-
-                x-go-tag-validate: required
             processors:
                 additionalProperties:
                     type: object
@@ -1768,7 +1781,7 @@ definitions:
             agent_group:
                 default: default
                 description: |+
-                    Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
+                    Which [agent-group](/concepts/selector.md#agent-group) this
                     selector applies to.
 
                 type: string
@@ -1834,7 +1847,7 @@ definitions:
                 type: object
         title: |-
             Allows to define rules whether a map of
-            [labels](/concepts/flow-control/flow-label.md)
+            [labels](/concepts/flow-label.md)
             should be considered a match or not
         type: object
     LoadRamp:
@@ -1983,7 +1996,7 @@ definitions:
         description: |-
             :::info
 
-            See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+            See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
 
             :::
 
@@ -2420,7 +2433,7 @@ definitions:
 
             :::info
 
-            See also [Policy overview](/concepts/policy/policy.md).
+            See also [Policy overview](/concepts/advanced/policy.md).
 
             :::
 
@@ -2432,15 +2445,6 @@ definitions:
             resources:
                 $ref: '#/definitions/Resources'
                 description: Resources (such as Flux Meters, Classifiers) to setup.
-        type: object
-    PolicyMetadata:
-        properties:
-            blueprint_name:
-                type: string
-            blueprints_uri:
-                type: string
-            values:
-                type: string
         type: object
     ProcessInfo:
         properties:
@@ -2478,7 +2482,7 @@ definitions:
 
                     :::info Usage with Flux Meter
 
-                    [Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+                    [Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
                     Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
                     The particular Flux Meter can be identified with the `flux_meter_name` label.
                     There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
@@ -2559,7 +2563,7 @@ definitions:
         description: |-
             :::info
 
-            See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+            See also [_Rate Limiter_ overview](/concepts/rate-limiter.md).
 
             :::
 
@@ -2628,7 +2632,7 @@ definitions:
                     Specifies which label the rate limiter should be keyed by.
 
                     Rate limiting is done independently for each value of the
-                    [label](/concepts/flow-control/flow-label.md) with given key.
+                    [label](/concepts/flow-label.md) with given key.
                     For example, to give each user a separate limit, assuming you
                     have a _user_ flow
                     label set up, set `label_key: "user"`.
@@ -2685,7 +2689,7 @@ definitions:
 
             :::info
 
-            You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+            You can use the [live-preview](/concepts/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 
             :::
 
@@ -2713,7 +2717,7 @@ definitions:
                     $ref: '#/definitions/RegoLabelProperties'
                 description: |+
                     A map of {key, value} pairs mapping from
-                    [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
+                    [flow label](/concepts/flow-label.md) keys to queries that define
                     how to extract and propagate flow labels with that key.
                     The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
 
@@ -2757,7 +2761,7 @@ definitions:
 
                 title: |-
                     Decides if the created flow label should be available as an attribute in OLAP telemetry and
-                    propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+                    propagated in [baggage](/concepts/flow-label.md#baggage)
                 type: boolean
                 x-go-tag-default: "true"
         type: object
@@ -2765,15 +2769,55 @@ definitions:
         description: |-
             :::info
 
-            See also [Resources overview](/concepts/policy/resources.md).
+            See also [Resources overview](/concepts/advanced/policy.md).
 
             :::
         properties:
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
+            infra_meters:
+                additionalProperties:
+                    $ref: '#/definitions/InfraMeter'
+                description: |-
+                    _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
+                    receive and process telemetry at the agents and send metrics to the configured Prometheus.
+                    Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
+                    is optional, as all the components and pipeline names would be normalized.
+
+                    Example:
+
+                    ```yaml
+                    infra_meters:
+                      rabbitmq:
+                        agent_group: default
+                        per_agent_group: true
+                        processors:
+                    	     batch:
+                    	       send_batch_size: 10
+                    	       timeout: 10s
+                    	   receivers:
+                    	     rabbitmq:
+                    	       collection_interval: 10s
+                            endpoint: http://<rabbitmq-svc-fqdn>:15672
+                            password: secretpassword
+                            username: admin
+
+                    ```
+
+                    :::caution
+
+                    Validate the OTel configuration before applying it to the
+                    production cluster.
+                    Incorrect configuration will get rejected at the agents and might cause
+                    shutdown of the agent(s).
+
+                    :::
+                type: object
             telemetry_collectors:
-                description: TelemetryCollector configures OpenTelemetry collector integration.
+                description: |-
+                    TelemetryCollector configures OpenTelemetry collector integration.
+                    Deprecated: v2.8.0. Use `infra_meters` instead.
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
@@ -2812,7 +2856,7 @@ definitions:
 
                 title: |-
                     Decides if the created flow label should be available as an attribute in OLAP telemetry and
-                    propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+                    propagated in [baggage](/concepts/flow-label.md#baggage)
                 type: boolean
                 x-go-tag-default: "true"
         title: Rule describes a single classification Rule
@@ -2866,12 +2910,12 @@ definitions:
     Sampler:
         description: |-
             _Sampler_ is a component that regulates the load at a
-            [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
+            [_Control Point_](/concepts/selector.md/#control-point) by allowing only a specified percentage of
             flows at random or by sticky sessions.
 
             :::info
 
-            See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
+            See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
 
             :::
         properties:
@@ -3001,7 +3045,7 @@ definitions:
                 description: |+
                     List of workloads to be used in scheduler.
 
-                    Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+                    Categorizing flows into workloads
                     allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
                     There are two aspects of this "intelligence":
                     * Scheduler can more precisely calculate concurrency if it understands
@@ -3017,7 +3061,7 @@ definitions:
                     :::info
 
                     See also [workload definition in the concepts
-                    section](/concepts/flow-control/components/load-scheduler.md#workload).
+                    section](/concepts/scheduler/scheduler.md#workload).
 
                     :::
 
@@ -3035,7 +3079,7 @@ definitions:
                 $ref: '#/definitions/LabelMatcher'
                 description: |+
                     Label Matcher to select a Workload based on
-                    [flow labels](/concepts/flow-control/flow-label.md).
+                    [flow labels](/concepts/flow-label.md).
 
                 x-go-tag-validate: required
             name:
@@ -3083,12 +3127,12 @@ definitions:
     Selector:
         description: |-
             Selects flows based on control point, flow labels, agent group and the service
-            that the [flow control component](/concepts/flow-control/flow-control.md#components)
+            that the flow control component
             will operate on.
 
             :::info
 
-            See also [Selector overview](/concepts/flow-control/selector.md).
+            See also [Selector overview](/concepts/selector.md).
 
             :::
 
@@ -3113,7 +3157,7 @@ definitions:
             agent_group:
                 default: default
                 description: |+
-                    [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
+                    [_Agent Group_](/concepts/selector.md#agent-group) this
                     selector applies to.
 
                     :::info
@@ -3128,7 +3172,7 @@ definitions:
                 x-go-tag-default: default
             control_point:
                 description: |+
-                    [Control Point](/concepts/flow-control/selector.md#control-point)
+                    [Control Point](/concepts/control-point.md)
                     identifies location within services where policies can act on flows.
                     For an SDK based insertion,
                     a _Control Point_ can represent a particular feature or execution
@@ -3141,13 +3185,13 @@ definitions:
             label_matcher:
                 $ref: '#/definitions/LabelMatcher'
                 description: |-
-                    [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
+                    [Label Matcher](/concepts/selector.md#label-matcher)
                     can be used to match flows based on flow labels.
             service:
                 default: any
                 description: |+
                     The Fully Qualified Domain Name of the
-                    [service](/concepts/flow-control/selector.md) to select.
+                    [service](/concepts/selector.md) to select.
 
                     In Kubernetes, this is the FQDN of the Service object.
 
@@ -3342,6 +3386,7 @@ definitions:
                 type: object
         title: |-
             TelemetryCollector defines the telemetry configuration to be synced with the agents.
+            Deprecated: v2.8.0. Use `InfraMeter` instead.
             It consists of two parts:
             - Agent Group: Agent group to sync telemetry configuration with
             - Infra Meters: OTel compatible metrics pipelines
@@ -3655,6 +3700,25 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
+    /v1/decisions/{decision_type}:
+        get:
+            operationId: PolicyService_GetDecisions
+            parameters:
+                - in: path
+                  name: decision_type
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetDecisionsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-controller
     /v1/dynamic-configs/{policy_name}:
         post:
             operationId: PolicyService_PostDynamicConfig
@@ -3799,8 +3863,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string
@@ -3832,8 +3894,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string

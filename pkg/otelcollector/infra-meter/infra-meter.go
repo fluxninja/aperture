@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
@@ -16,22 +18,15 @@ import (
 // AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
 func AddInfraMeters(
 	config *otelconfig.Config,
-	infraMeters map[string]*policylangv1.InfraMeter,
+	infraMeters map[string]*policysyncv1.InfraMeterWrapper,
 ) error {
-	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
-		"attributes": []map[string]interface{}{
-			{
-				"key":    "service.name",
-				"action": "upsert",
-				"value":  "aperture-infra-meter",
-			},
-		},
-	})
 	if infraMeters == nil {
-		infraMeters = map[string]*policylangv1.InfraMeter{}
+		infraMeters = map[string]*policysyncv1.InfraMeterWrapper{}
 	}
-	for pipelineName, metricConfig := range infraMeters {
-		if err := addInfraMeter(config, pipelineName, metricConfig); err != nil {
+	for pipelineName, infraMeterWrapper := range infraMeters {
+		infraMeter := infraMeterWrapper.GetInfraMeter()
+		if err := addInfraMeter(
+			config, infraMeterWrapper.GetPolicyName(), pipelineName, infraMeterWrapper.GetInfraMeterName(), infraMeter); err != nil {
 			return fmt.Errorf("failed to add infra metric pipeline %s: %w", pipelineName, err)
 		}
 	}
@@ -40,9 +35,31 @@ func AddInfraMeters(
 
 func addInfraMeter(
 	config *otelconfig.Config,
+	policyName string,
 	pipelineName string,
+	infraMeterName string,
 	infraMeter *policylangv1.InfraMeter,
 ) error {
+	processorName := fmt.Sprintf("%s-%s-%s", otelconsts.ProcessorInfraMeter, policyName, infraMeterName)
+	config.AddProcessor(processorName, map[string]any{
+		"attributes": []map[string]interface{}{
+			{
+				"key":    "service.name",
+				"action": "upsert",
+				"value":  "aperture-infra-meter",
+			},
+			{
+				"key":    metrics.InfraMeterNameLabel,
+				"action": "upsert",
+				"value":  infraMeterName,
+			},
+			{
+				"key":    metrics.PolicyNameLabel,
+				"action": "upsert",
+				"value":  policyName,
+			},
+		},
+	})
 	pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
 
 	receiverIDs := map[string]string{}
@@ -98,7 +115,7 @@ func addInfraMeter(
 		Receivers: mapSlice(receiverIDs, infraMeter.Pipeline.Receivers),
 		Processors: append(
 			mapSlice(processorIDs, infraMeter.Pipeline.Processors),
-			otelconsts.ProcessorInfraMeter,
+			processorName,
 			otelconsts.ProcessorAgentResourceLabels,
 		),
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},

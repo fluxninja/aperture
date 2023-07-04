@@ -370,35 +370,6 @@ func (m *UpsertPolicyRequest) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetPolicyMetadata()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertPolicyRequestValidationError{
-					field:  "PolicyMetadata",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertPolicyRequestValidationError{
-					field:  "PolicyMetadata",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetPolicyMetadata()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return UpsertPolicyRequestValidationError{
-				field:  "PolicyMetadata",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
 		return UpsertPolicyRequestMultiError(errors)
 	}
@@ -735,6 +706,214 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeletePolicyRequestValidationError{}
+
+// Validate checks the field values on GetDecisionsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDecisionsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDecisionsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDecisionsRequestMultiError, or nil if none found.
+func (m *GetDecisionsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDecisionsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for DecisionType
+
+	if len(errors) > 0 {
+		return GetDecisionsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDecisionsRequestMultiError is an error wrapping multiple validation
+// errors returned by GetDecisionsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetDecisionsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDecisionsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDecisionsRequestMultiError) AllErrors() []error { return m }
+
+// GetDecisionsRequestValidationError is the validation error returned by
+// GetDecisionsRequest.Validate if the designated constraints aren't met.
+type GetDecisionsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDecisionsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDecisionsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDecisionsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDecisionsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDecisionsRequestValidationError) ErrorName() string {
+	return "GetDecisionsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDecisionsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDecisionsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDecisionsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDecisionsRequestValidationError{}
+
+// Validate checks the field values on GetDecisionsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDecisionsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDecisionsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDecisionsResponseMultiError, or nil if none found.
+func (m *GetDecisionsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDecisionsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Decisions
+
+	if len(errors) > 0 {
+		return GetDecisionsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDecisionsResponseMultiError is an error wrapping multiple validation
+// errors returned by GetDecisionsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetDecisionsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDecisionsResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDecisionsResponseMultiError) AllErrors() []error { return m }
+
+// GetDecisionsResponseValidationError is the validation error returned by
+// GetDecisionsResponse.Validate if the designated constraints aren't met.
+type GetDecisionsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDecisionsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDecisionsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDecisionsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDecisionsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDecisionsResponseValidationError) ErrorName() string {
+	return "GetDecisionsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDecisionsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDecisionsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDecisionsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDecisionsResponseValidationError{}
 
 // Validate checks the field values on GetPoliciesResponse with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1383,6 +1562,52 @@ func (m *Resources) validate(all bool) error {
 			}
 		}
 
+	}
+
+	{
+		sorted_keys := make([]string, len(m.GetInfraMeters()))
+		i := 0
+		for key := range m.GetInfraMeters() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetInfraMeters()[key]
+			_ = val
+
+			// no validation rules for InfraMeters[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, ResourcesValidationError{
+							field:  fmt.Sprintf("InfraMeters[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, ResourcesValidationError{
+							field:  fmt.Sprintf("InfraMeters[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return ResourcesValidationError{
+						field:  fmt.Sprintf("InfraMeters[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
 	}
 
 	if all {
@@ -2972,109 +3197,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = NestedCircuitValidationError{}
-
-// Validate checks the field values on PolicyMetadata with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *PolicyMetadata) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on PolicyMetadata with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in PolicyMetadataMultiError,
-// or nil if none found.
-func (m *PolicyMetadata) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *PolicyMetadata) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for BlueprintsUri
-
-	// no validation rules for BlueprintName
-
-	// no validation rules for Values
-
-	if len(errors) > 0 {
-		return PolicyMetadataMultiError(errors)
-	}
-
-	return nil
-}
-
-// PolicyMetadataMultiError is an error wrapping multiple validation errors
-// returned by PolicyMetadata.ValidateAll() if the designated constraints
-// aren't met.
-type PolicyMetadataMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m PolicyMetadataMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m PolicyMetadataMultiError) AllErrors() []error { return m }
-
-// PolicyMetadataValidationError is the validation error returned by
-// PolicyMetadata.Validate if the designated constraints aren't met.
-type PolicyMetadataValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PolicyMetadataValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PolicyMetadataValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PolicyMetadataValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PolicyMetadataValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PolicyMetadataValidationError) ErrorName() string { return "PolicyMetadataValidationError" }
-
-// Error satisfies the builtin error interface
-func (e PolicyMetadataValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPolicyMetadata.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PolicyMetadataValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PolicyMetadataValidationError{}

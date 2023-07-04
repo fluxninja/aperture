@@ -14,7 +14,7 @@ sidebar_label: Policy Specification
 <!-- vale on -->
 
 Reference for all objects used in
-[the Policy language](/concepts/policy/policy.md).
+[the Policy language](/concepts/advanced/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).
 
@@ -1128,7 +1128,7 @@ Circuit is graph of inter-connected signal processing components.
 
 :::info
 
-See also [Circuit overview](/concepts/policy/circuit.md).
+See also [Circuit overview](/concepts/advanced/circuit.md).
 
 :::
 
@@ -1170,7 +1170,7 @@ Defines a signal processing graph as a list of components.
 
 <!-- vale off -->
 
-(string, default: `"0.5s"`)
+(string, default: `"10s"`)
 
 <!-- vale on -->
 
@@ -1193,7 +1193,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+See also [Classifier overview](/concepts/classifier.md).
 
 ::: Example
 
@@ -1243,9 +1243,9 @@ extractors are recommended.
 
 <!-- vale on -->
 
-A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to rules that define how
-to extract and propagate flow labels with that key.
+A map of {key, value} pairs mapping from [flow label](/concepts/flow-label.md)
+keys to rules that define how to extract and propagate flow labels with that
+key.
 
 </dd>
 <dt>selectors</dt>
@@ -1274,7 +1274,7 @@ Computational block that forms the circuit
 
 :::info
 
-See also [Components overview](/concepts/policy/circuit.md#components).
+See also [Components overview](/concepts/advanced/circuit.md#components).
 
 :::
 
@@ -1350,8 +1350,8 @@ AutoScale components are used to scale the service.
 
 <!-- vale on -->
 
-BoolVariable emits a constant Boolean signal which can be changed at runtime via
-dynamic configuration.
+BoolVariable emits a constant Boolean signal which can be changed at runtime
+through dynamic configuration.
 
 </dd>
 <dt>decider</dt>
@@ -1637,7 +1637,7 @@ Takes an input signal and emits the square root of the input signal.
 
 <!-- vale on -->
 
-Emits a variable signal which can be changed at runtime via dynamic
+Emits a variable signal which can be changed at runtime through dynamic
 configuration.
 
 </dd>
@@ -2788,7 +2788,7 @@ histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+See also [Flux Meter overview](/concepts/flux-meter.md).
 
 ::: Example:
 
@@ -3650,6 +3650,18 @@ See also
 :::
 
 <dl>
+<dt>agent_group</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+AgentGroup is the agent group to sync this InfraMeter with.
+
+</dd>
 <dt>per_agent_group</dt>
 <dd>
 
@@ -4147,8 +4159,7 @@ Describes which pods a control or observability component should apply to.
 
 <!-- vale on -->
 
-Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
-selector applies to.
+Which [agent-group](/concepts/selector.md#agent-group) this selector applies to.
 
 </dd>
 <dt>api_version</dt>
@@ -4209,9 +4220,8 @@ Kubernetes namespace that the resource belongs to.
 
 <!-- vale on -->
 
-Allows to define rules whether a map of
-[labels](/concepts/flow-control/flow-label.md) should be considered a match or
-not
+Allows to define rules whether a map of [labels](/concepts/flow-label.md) should
+be considered a match or not
 
 It provides three ways to define requirements:
 
@@ -4672,8 +4682,7 @@ active service protection
 
 :::info
 
-See also
-[_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
 
 :::
 
@@ -5756,7 +5765,7 @@ Policy expresses observability-driven control logic.
 
 :::info
 
-See also [Policy overview](/concepts/policy/policy.md).
+See also [Policy overview](/concepts/advanced/policy.md).
 
 :::
 
@@ -5848,12 +5857,12 @@ single element.
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be
-queries using PromQL. Flux Meter defines histogram type of metrics in
-Prometheus. Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and
-`flux_meter_bucket`. The particular Flux Meter can be identified with the
-`flux_meter_name` label. There are additional labels available on a Flux Meter
-such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+[Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux
+Meter defines histogram type of metrics in Prometheus. Therefore, one can refer
+to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`. The particular
+Flux Meter can be identified with the `flux_meter_name` label. There are
+additional labels available on a Flux Meter such as `valid`, `flow_status`,
+`http_status_code` and `decision_type`.
 
 :::
 
@@ -6054,8 +6063,7 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also
-[_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/rate-limiter.md).
 
 :::
 
@@ -6197,10 +6205,10 @@ specified by `fill_amount` signal.
 Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/flow-label.md) with given key. For example, to
-give each user a separate limit, assuming you have a _user_ flow label set up,
-set `label_key: "user"`. If no label key is specified, then all requests
-matching the selectors will be rate limited based on the global bucket.
+[label](/concepts/flow-label.md) with given key. For example, to give each user
+a separate limit, assuming you have a _user_ flow label set up, set
+`label_key: "user"`. If no label key is specified, then all requests matching
+the selectors will be rate limited based on the global bucket.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -6291,8 +6299,7 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 
 :::info
 
-You can use the
-[live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
+You can use the [live-preview](/concepts/classifier.md#live-previewing-requests)
 feature to first preview the input to the classifier before writing the labeling
 logic.
 
@@ -6328,11 +6335,10 @@ rego:
 
 <!-- vale on -->
 
-A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to queries that define
-how to extract and propagate flow labels with that key. The name of the label
-maps to a variable in the Rego module. It maps to `data.<package>.<label>`
-variable.
+A map of {key, value} pairs mapping from [flow label](/concepts/flow-label.md)
+keys to queries that define how to extract and propagate flow labels with that
+key. The name of the label maps to a variable in the Rego module. It maps to
+`data.<package>.<label>` variable.
 
 </dd>
 <dt>module</dt>
@@ -6374,8 +6380,7 @@ Must include a "package" declaration.
 <!-- vale on -->
 
 Decides if the created flow label should be available as an attribute in OLAP
-telemetry and propagated in
-[baggage](/concepts/flow-control/flow-label.md#baggage)
+telemetry and propagated in [baggage](/concepts/flow-label.md#baggage)
 
 :::note
 
@@ -6407,7 +6412,7 @@ Resources that need to be setup for the policy to function
 
 :::info
 
-See also [Resources overview](/concepts/policy/resources.md).
+See also [Resources overview](/concepts/advanced/policy.md).
 
 :::
 
@@ -6425,6 +6430,50 @@ FlowControlResources are resources that are provided by flow control
 integration.
 
 </dd>
+<dt>infra_meters</dt>
+<dd>
+
+<!-- vale off -->
+
+(map of [InfraMeter](#infra-meter))
+
+<!-- vale on -->
+
+_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which
+will receive and process telemetry at the agents and send metrics to the
+configured Prometheus. Key in this map refers to OTel pipeline name. Prefixing
+pipeline name with `metrics/` is optional, as all the components and pipeline
+names would be normalized.
+
+Example:
+
+```yaml
+infra_meters:
+  rabbitmq:
+    agent_group: default
+    per_agent_group: true
+    processors:
+	     batch:
+	       send_batch_size: 10
+	       timeout: 10s
+	   receivers:
+	     rabbitmq:
+	       collection_interval: 10s
+        endpoint: http://<rabbitmq-svc-fqdn>:15672
+        password: secretpassword
+        username: admin
+
+```
+
+:::caution
+
+Validate the OTel configuration before applying it to the production cluster.
+Incorrect configuration will get rejected at the agents and might cause shutdown
+of the agent(s).
+
+:::
+
+</dd>
 <dt>telemetry_collectors</dt>
 <dd>
 
@@ -6434,7 +6483,8 @@ integration.
 
 <!-- vale on -->
 
-TelemetryCollector configures OpenTelemetry collector integration.
+TelemetryCollector configures OpenTelemetry collector integration. Deprecated:
+v2.8.0. Use `infra_meters` instead.
 
 </dd>
 </dl>
@@ -6481,8 +6531,7 @@ High-level declarative extractor.
 <!-- vale on -->
 
 Decides if the created flow label should be available as an attribute in OLAP
-telemetry and propagated in
-[baggage](/concepts/flow-control/flow-label.md#baggage)
+telemetry and propagated in [baggage](/concepts/flow-label.md#baggage)
 
 :::note
 
@@ -6642,12 +6691,12 @@ Whether the output is valid during the warm-up stage.
 <!-- vale on -->
 
 _Sampler_ is a component that regulates the load at a
-[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing
-only a specified percentage of flows at random or by sticky sessions.
+[_Control Point_](/concepts/selector.md/#control-point) by allowing only a
+specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
+See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
 
 :::
 
@@ -6968,9 +7017,9 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-allows for load throttling to be "intelligent" instead of queueing flows in an
-arbitrary order. There are two aspects of this "intelligence":
+Categorizing flows into workloads allows for load throttling to be "intelligent"
+instead of queueing flows in an arbitrary order. There are two aspects of this
+"intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands that
   flows belonging to different classes have different weights (for example,
@@ -6986,7 +7035,7 @@ workloads, the first matching one will be used. If none of workloads match,
 :::info
 
 See also
-[workload definition in the concepts section](/concepts/flow-control/components/load-scheduler.md#workload).
+[workload definition in the concepts section](/concepts/scheduler/scheduler.md#workload).
 
 :::
 
@@ -7015,7 +7064,7 @@ as response latency and desired priority.
 <!-- vale on -->
 
 Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/flow-label.md).
+[flow labels](/concepts/flow-label.md).
 
 </dd>
 <dt>name</dt>
@@ -7106,13 +7155,11 @@ only if tokens for the flow aren't specified in the flow labels.
 <!-- vale on -->
 
 Selects flows based on control point, flow labels, agent group and the service
-that the
-[flow control component](/concepts/flow-control/flow-control.md#components) will
-operate on.
+that the flow control component will operate on.
 
 :::info
 
-See also [Selector overview](/concepts/flow-control/selector.md).
+See also [Selector overview](/concepts/selector.md).
 
 :::
 
@@ -7145,8 +7192,7 @@ label_matcher:
 
 <!-- vale on -->
 
-[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this selector
-applies to.
+[_Agent Group_](/concepts/selector.md#agent-group) this selector applies to.
 
 :::info
 
@@ -7166,12 +7212,11 @@ configuration and form a peer to peer cluster to constantly share state.
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/selector.md#control-point) identifies
-location within services where policies can act on flows. For an SDK based
-insertion, a _Control Point_ can represent a particular feature or execution
-block within a service. In case of service mesh or middleware insertion, a
-_Control Point_ can identify ingress or egress calls or distinct listeners or
-filter chains.
+[Control Point](/concepts/control-point.md) identifies location within services
+where policies can act on flows. For an SDK based insertion, a _Control Point_
+can represent a particular feature or execution block within a service. In case
+of service mesh or middleware insertion, a _Control Point_ can identify ingress
+or egress calls or distinct listeners or filter chains.
 
 </dd>
 <dt>label_matcher</dt>
@@ -7183,8 +7228,8 @@ filter chains.
 
 <!-- vale on -->
 
-[Label Matcher](/concepts/flow-control/selector.md#label-matcher) can be used to
-match flows based on flow labels.
+[Label Matcher](/concepts/selector.md#label-matcher) can be used to match flows
+based on flow labels.
 
 </dd>
 <dt>service</dt>
@@ -7196,8 +7241,8 @@ match flows based on flow labels.
 
 <!-- vale on -->
 
-The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/selector.md) to select.
+The Fully Qualified Domain Name of the [service](/concepts/selector.md) to
+select.
 
 In Kubernetes, this is the FQDN of the Service object.
 
@@ -7554,7 +7599,7 @@ Selected signal (`on_signal` or `off_signal`).
 <!-- vale on -->
 
 TelemetryCollector defines the telemetry configuration to be synced with the
-agents. It consists of two parts:
+agents. Deprecated: v2.8.0. Use `InfraMeter` instead. It consists of two parts:
 
 - Agent Group: Agent group to sync telemetry configuration with
 - Infra Meters: OTel compatible metrics pipelines

@@ -32,13 +32,12 @@ Simple Prometheus as part of [Policy resources][policy-resources] while
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          prometheus_simple:
-            per_agent_group: true
-            receivers:
-              prometheus_simple: [simpleprometheusreceiver configuration here]
+    infra_meters:
+      prometheus_simple:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          prometheus_simple: [simpleprometheusreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

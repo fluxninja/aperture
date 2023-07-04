@@ -103,6 +103,7 @@ type FluxMeter struct {
 	fluxMeterName         string
 	attributeKey          string
 	buckets               []float64
+	policyName            string
 }
 
 type fluxMeterFactory struct {
@@ -154,6 +155,7 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 		fluxMeterProto: fluxMeterProto,
 		buckets:        buckets,
 		registry:       reg,
+		policyName:     wrapperMessage.PolicyName,
 	}
 
 	return fx.Options(
@@ -166,6 +168,7 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 	logger := fluxMeter.registry.GetLogger()
 	metricLabels := make(map[string]string)
 	metricLabels[metrics.FluxMeterNameLabel] = fluxMeter.GetFluxMeterName()
+	metricLabels[metrics.PolicyNameLabel] = fluxMeter.GetPolicyName()
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -173,11 +176,11 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 			fluxMeter.histMetricVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 				Name:        metrics.FluxMeterMetricName,
 				Buckets:     fluxMeter.buckets,
-				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
+				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.GetFluxMeterName(), metrics.PolicyNameLabel: fluxMeter.GetPolicyName()},
 			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})
 			fluxMeter.invalidFluxMeterTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 				Name:        metrics.InvalidFluxMeterTotalMetricName,
-				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.fluxMeterName},
+				ConstLabels: prometheus.Labels{metrics.FluxMeterNameLabel: fluxMeter.GetFluxMeterName(), metrics.PolicyNameLabel: fluxMeter.GetPolicyName()},
 				Help:        "The number of invalid readings from a Flux Meter",
 			}, []string{metrics.DecisionTypeLabel, metrics.StatusCodeLabel, metrics.FlowStatusLabel})
 			// Register metric with Prometheus
@@ -229,6 +232,11 @@ func (fluxMeter *FluxMeter) GetSelectors() []*policylangv1.Selector {
 // GetFluxMeterName returns the metric name.
 func (fluxMeter *FluxMeter) GetFluxMeterName() string {
 	return fluxMeter.fluxMeterName
+}
+
+// GetPolicyName returns the policy name.
+func (fluxMeter *FluxMeter) GetPolicyName() string {
+	return fluxMeter.policyName
 }
 
 // GetAttributeKey returns the attribute key.

@@ -26,11 +26,10 @@ var _ = Describe("Cache", func() {
 			Expect(actual).To(Equal(entity))
 		})
 
-		It("returns nil when no entity found", func() {
+		It("returns err when no entity found", func() {
 			ip := "1.2.3.4"
-			actual, err := ec.GetByIP(ip)
-			Expect(err).To(Not(BeNil()))
-			Expect(actual).To(BeNil())
+			_, err := ec.GetByIP(ip)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("removes an entity properly", func() {
@@ -42,9 +41,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
-			found, err := ec.GetByIP(ip)
-			Expect(err).To(Not(BeNil()))
-			Expect(found).To(BeNil())
+			_, err := ec.GetByIP(ip)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns false if trying to remove a nonexistent entity", func() {
@@ -76,11 +74,10 @@ var _ = Describe("Cache", func() {
 			Expect(actual).To(Equal(entity))
 		})
 
-		It("returns nil when no entity found", func() {
+		It("returns err when no entity found", func() {
 			name := "some_name"
-			actual, err := ec.GetByName(name)
-			Expect(err).To(Not(BeNil()))
-			Expect(actual).To(BeNil())
+			_, err := ec.GetByName(name)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("removes an entity properly", func() {
@@ -92,9 +89,8 @@ var _ = Describe("Cache", func() {
 			removed := ec.Remove(entity)
 			Expect(removed).To(BeTrue())
 
-			found, err := ec.GetByName(name)
-			Expect(err).To(Not(BeNil()))
-			Expect(found).To(BeNil())
+			_, err := ec.GetByName(name)
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns false if trying to remove a nonexistent entity", func() {
@@ -120,17 +116,16 @@ var _ = Describe("Cache", func() {
 		entity := testEntity("foo", "", "some_name", nil)
 		ec.Put(entity)
 		ec.Clear()
-		found, err := ec.GetByIP(ip)
-		Expect(err).To(Not(BeNil()))
-		Expect(found).To(BeNil())
+		_, err := ec.GetByIP(ip)
+		Expect(err).To(HaveOccurred())
 	})
 })
 
-func testEntity(uid, ipAddress, name string, services []string) *entitiesv1.Entity {
-	return &entitiesv1.Entity{
+func testEntity(uid, ipAddress, name string, services []string) entities.Entity {
+	return entities.NewEntity(&entitiesv1.Entity{
 		Uid:       uid,
 		IpAddress: ipAddress,
 		Name:      name,
 		Services:  services,
-	}
+	})
 }

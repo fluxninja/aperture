@@ -1,0 +1,31 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: rate-limiting
+spec:
+  circuit:
+    components:
+    - flow_control:
+        rate_limiter:
+          in_ports:
+            bucket_capacity:
+              constant_signal:
+                value: 30
+            fill_amount:
+              constant_signal:
+                value: 2
+          parameters:
+            interval: 60s
+            label_key: http.request.header.user_id
+          selectors:
+          - control_point: ingress
+            label_matcher:
+              match_labels:
+                http.path: /api/rate-limit
+            service: service1-demo-app.demoapp.svc.cluster.local
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []

@@ -5,6 +5,7 @@ package aperture.policy.language.v1;
 import "google/protobuf/struct.proto";
 
 // TelemetryCollector defines the telemetry configuration to be synced with the agents.
+// Deprecated: v2.8.0. Use `InfraMeter` instead.
 // It consists of two parts:
 // - Agent Group: Agent group to sync telemetry configuration with
 // - Infra Meters: OTel compatible metrics pipelines
@@ -80,9 +81,13 @@ message InfraMeter {
   // automatically use all given receivers and the defined processor (if
   // any).  However, if there are more than one processor, the pipeline must
   // be defined explicitly.
-  MetricsPipeline pipeline = 3; // @gotags: validate:"required"
+  MetricsPipeline pipeline = 3;
+
   // PerAgentGroup marks the pipeline to be instantiated only once per agent
   // group. This is helpful for receivers that scrape for example, some cluster-wide
   // metrics. When not set, pipeline will be instantiated on every Agent.
   bool per_agent_group = 4; // @gotags: default:"false"
+
+  // AgentGroup is the agent group to sync this InfraMeter with.
+  string agent_group = 5; // @gotags: default:"default"
 }

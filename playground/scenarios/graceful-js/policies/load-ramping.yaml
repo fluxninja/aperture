@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../../../blueprints/load-ramping/base/gen/definitions.json
+# Generated values file for load-ramping/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/load-ramping/base
+
+# Parameters for the load ramp policy.
+# Type: load-ramping/base:schema:rollout_policy
+# Required: True
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "load-ramping"
+  components: []
+  drivers:
+    average_latency_drivers:
+      - selectors:
+          - control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+            label_matcher:
+              match_labels:
+                http.path: /api/load-ramp
+        criteria:
+          forward:
+            threshold: 75
+          reset:
+            threshold: 75
+  start: true
+  evaluation_interval: "10s"
+  load_ramp:
+    sampler:
+      selectors:
+        - control_point: ingress
+          service: service1-demo-app.demoapp.svc.cluster.local
+          label_matcher:
+            match_labels:
+              http.path: /api/load-ramp
+      label_key: ""
+    steps:
+      - duration: 0s
+        target_accept_percentage: 1.0
+      - duration: 300s
+        target_accept_percentage: 100.0
+  resources:
+    flow_control:
+      classifiers: []
+
+# Configuration for the Grafana dashboard accompanying this policy.
+# Type: policies/feature-rollout/base:param:dashboard
+dashboard:
+  datasource:
+    filter_regex: ""
+    name: "$datasource"
+  refresh_interval: "5s"
+  time_from: "now-15m"
+  time_to: "now"

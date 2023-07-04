@@ -32,13 +32,12 @@ Kinesis Data Firehose as part of [Policy resources][policy-resources] while
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          awsfirehose:
-            per_agent_group: true
-            receivers:
-              awsfirehose: [awsfirehosereceiver configuration here]
+    infra_meters:
+      awsfirehose:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          awsfirehose: [awsfirehosereceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

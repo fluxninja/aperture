@@ -21,6 +21,7 @@ import (
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -293,7 +294,7 @@ func (fr *sampler) GetSelectors() []*policylangv1.Selector {
 
 // Decide runs the limiter.
 func (fr *sampler) Decide(ctx context.Context,
-	labels map[string]string,
+	labels labels.Labels,
 ) iface.LimiterDecision {
 	var (
 		labelValue  string
@@ -301,7 +302,7 @@ func (fr *sampler) Decide(ctx context.Context,
 	)
 	labelKey := fr.proto.GetParameters().GetLabelKey()
 	if labelKey != "" {
-		labelValue, hasLabelKey = labels[fr.proto.GetParameters().GetLabelKey()]
+		labelValue, hasLabelKey = labels.Get(fr.proto.GetParameters().GetLabelKey())
 	}
 
 	// Initialize LimiterDecision
@@ -358,7 +359,7 @@ func (fr *sampler) Decide(ctx context.Context,
 }
 
 // Revert implements the Revert method of the flowcontrolv1.Sampler interface.
-func (fr *sampler) Revert(_ context.Context, _ map[string]string, _ *flowcontrolv1.LimiterDecision) {
+func (fr *sampler) Revert(_ context.Context, _ labels.Labels, _ *flowcontrolv1.LimiterDecision) {
 	// No-op
 }
 

@@ -25,10 +25,8 @@ go mod download
 tools=$(grep _ tools.go | awk -F'"' '{print $2}')
 
 echo "$tools" | while IFS= read -r tool; do
-    go install "$tool" &
+    go install "$tool"
 done
-
-wait  # Wait for all background jobs to complete
 
 
 popd >/dev/null

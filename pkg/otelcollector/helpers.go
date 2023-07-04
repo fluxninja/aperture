@@ -115,6 +115,10 @@ func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map)) {
 	}
 }
 
+type vtprotoMessage interface {
+	UnmarshalVT([]byte) error
+}
+
 // GetStruct is a helper for decoding complex structs encoded into an attribute
 // as string.
 //
@@ -157,6 +161,16 @@ func GetStruct(attributes pcommon.Map, label string, output interface{}, treatAs
 			log.Sample(failedBase64Sampler).
 				Warn().Err(err).Str("label", label).Msg("Failed to unmarshal as base64")
 		}
+
+		if vtmsg, isVt := msg.(vtprotoMessage); isVt {
+			err = vtmsg.UnmarshalVT(wireMsg)
+			if err != nil {
+				log.Sample(failedProtoSampler).
+					Warn().Err(err).Str("label", label).Msg("Failed to unmarshal as vtprotobuf")
+			}
+			return true
+		}
+
 		err = proto.Unmarshal(wireMsg, msg)
 		if err != nil {
 			log.Sample(failedProtoSampler).
@@ -232,44 +246,16 @@ func Min(a, b float64) float64 {
 	return a
 }
 
-// FormIncludeList returns a map of all the keys in the given list with a value of true.
-func FormIncludeList(attributes []string) map[string]bool {
-	return utils.SliceToMap(attributes)
-}
-
-// FormExcludeList returns a map of all the keys in the given list with a value of false.
-func FormExcludeList(attributes []string) map[string]bool {
-	return utils.SliceToMap(attributes)
-}
-
-type enforceCriteria uint8
-
-const (
-	include enforceCriteria = iota
-	exclude
-)
-
 // EnforceIncludeList enforces the given include list on the given attributes.
-func EnforceIncludeList(attributes pcommon.Map, includeList map[string]bool) {
-	enforceList(attributes, includeList, include)
+func EnforceIncludeList(attributes pcommon.Map, includeList utils.Set[string]) {
+	attributes.RemoveIf(func(key string, _ pcommon.Value) bool {
+		return !includeList.Contains(key)
+	})
 }
 
 // EnforceExcludeList enforces the given exclude list on the given attributes.
-func EnforceExcludeList(attributes pcommon.Map, excludeList map[string]bool) {
-	enforceList(attributes, excludeList, exclude)
-}
-
-func enforceList(attributes pcommon.Map, list map[string]bool, enforceCriteria enforceCriteria) {
-	keysToRemove := make([]string, 0)
-	attributes.Range(func(key string, _ pcommon.Value) bool {
-		if enforceCriteria == include && !list[key] {
-			keysToRemove = append(keysToRemove, key)
-		} else if enforceCriteria == exclude && list[key] {
-			keysToRemove = append(keysToRemove, key)
-		}
-		return true
+func EnforceExcludeList(attributes pcommon.Map, excludeList utils.Set[string]) {
+	attributes.RemoveIf(func(key string, _ pcommon.Value) bool {
+		return excludeList.Contains(key)
 	})
-	for _, key := range keysToRemove {
-		attributes.Remove(key)
-	}
 }

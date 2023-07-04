@@ -76,7 +76,6 @@ var _ = DescribeTable("FN Extension OTel", func(
 
 	err = app.Stop(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
-
 },
 	Entry(
 		"add FN processors and exporters",
@@ -150,7 +149,7 @@ func baseOTelConfig() configBuilder {
 	cfg.AddReceiver("prometheus", map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval": "1s",
+				"scrape_interval": "10s",
 			},
 			// Put some scrape configs to be sure they are not overwritten.
 			"scrape_configs": []string{"foo", "bar"},

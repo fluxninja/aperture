@@ -1,8 +1,8 @@
-local quotaschedulerins = import './quotaschedulerins.libsonnet';
+local ratelimiterins = import './ratelimiterins.libsonnet';
 {
   new():: {
   },
-  inPorts:: quotaschedulerins,
+  inPorts:: ratelimiterins,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          oracledb:
-            per_agent_group: true
-            receivers:
-              oracledb: [oracledbreceiver configuration here]
+    infra_meters:
+      oracledb:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          oracledb: [oracledbreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

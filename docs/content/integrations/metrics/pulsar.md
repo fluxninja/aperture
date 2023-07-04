@@ -32,13 +32,12 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          pulsar:
-            per_agent_group: true
-            receivers:
-              pulsar: [pulsarreceiver configuration here]
+    infra_meters:
+      pulsar:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          pulsar: [pulsarreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

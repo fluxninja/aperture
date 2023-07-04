@@ -32,14 +32,12 @@ Google Cloud Spanner as part of [Policy resources][policy-resources] while
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          googlecloudspanner:
-            per_agent_group: true
-            receivers:
-              googlecloudspanner:
-                [googlecloudspannerreceiver configuration here]
+    infra_meters:
+      googlecloudspanner:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          googlecloudspanner: [googlecloudspannerreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

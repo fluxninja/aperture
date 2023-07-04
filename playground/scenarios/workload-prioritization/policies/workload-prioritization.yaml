@@ -1,7 +1,7 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
-# Generated values file for policies/service-protection/average-latency blueprint
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/average-latency/gen/definitions.json
+# Generated values file for load-scheduling/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/policies/service-protection/average-latency
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
 policy:
   # Name of the policy.
   # Type: string
@@ -43,6 +43,7 @@ policy:
                 priority: "200"
               name: "subscriber"
   latency_baseliner:
+    latency_tolerance_multiplier: 1.1
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter
     # Required: True

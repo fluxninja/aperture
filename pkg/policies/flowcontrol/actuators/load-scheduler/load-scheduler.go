@@ -323,7 +323,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// Initialize the token bucket (non continuous tracking mode)
-			ls.tokenBucket = scheduler.NewLoadMultiplierTokenBucket(ls.clock, 10, time.Second, tbLMGauge, tbMetrics)
+			ls.tokenBucket = scheduler.NewLoadMultiplierTokenBucket(ls.clock, 30, time.Second, tbLMGauge, tbMetrics)
 
 			ls.schedulerMetrics, err = wsFactory.NewSchedulerMetrics(metricLabels)
 			if err != nil {
