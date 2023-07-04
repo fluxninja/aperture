@@ -1430,7 +1430,7 @@ Lease time-to-live
 
 <!-- vale on -->
 
-Etcd namespace
+etcd namespace
 
 </dd>
 <dt>password</dt>
@@ -1526,7 +1526,7 @@ API Key for this agent. If this key is not set, the extension won't be enabled.
 
 <!-- vale on -->
 
-Whether to configure local prometheus OTel pipeline for metrics
+Whether to configure local Prometheus OTel pipeline for metrics
 
 </dd>
 <dt>endpoint</dt>

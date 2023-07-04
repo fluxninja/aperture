@@ -282,7 +282,7 @@ definitions:
                 x-go-tag-validate: gte=1s
             namespace:
                 default: aperture
-                description: Etcd namespace
+                description: etcd namespace
                 type: string
                 x-go-name: Namespace
                 x-go-tag-default: aperture

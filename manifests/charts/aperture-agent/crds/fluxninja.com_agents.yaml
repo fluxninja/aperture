@@ -1124,7 +1124,7 @@ spec:
                         description: Lease time-to-live
                         type: string
                       namespace:
-                        description: Etcd namespace
+                        description: etcd namespace
                         type: string
                       password:
                         type: string
@@ -1292,7 +1292,7 @@ spec:
                             type: object
                         type: object
                       disable_local_otel_pipeline:
-                        description: Whether to configure local prometheus OTel pipeline
+                        description: Whether to configure local Prometheus OTel pipeline
                           for metrics
                         type: boolean
                       endpoint:

@@ -100,7 +100,7 @@ definitions:
                 x-go-tag-json: client
             disable_local_otel_pipeline:
                 default: false
-                description: Whether to configure local prometheus OTel pipeline for metrics
+                description: Whether to configure local Prometheus OTel pipeline for metrics
                 type: boolean
                 x-go-name: DisableLocalOTelPipeline
                 x-go-tag-default: "false"
