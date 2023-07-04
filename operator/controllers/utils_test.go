@@ -1155,7 +1155,7 @@ var _ = Describe("Tests for secretName", func() {
 				},
 			}
 
-			expected := fmt.Sprintf("%s-agent-apikey", AppName)
+			expected := fmt.Sprintf("%s-aperture-agent-apikey", AppName)
 
 			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(expected))
@@ -1180,7 +1180,7 @@ var _ = Describe("Tests for secretName", func() {
 				},
 			}
 
-			expected := fmt.Sprintf("%s-controller-apikey", AppName)
+			expected := fmt.Sprintf("%s-aperture-controller-apikey", AppName)
 
 			result := SecretName(AppName, "controller", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(expected))
