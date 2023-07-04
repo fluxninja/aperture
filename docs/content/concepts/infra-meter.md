@@ -26,9 +26,9 @@ telemetry collected from the infrastructure.
 
 The Aperture agent process has a built-in
 [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector),
-which allows defining collection pipelines to gather metrics from
-[various sources](integration). The _Infra Meter_ is a type of policy resource
-that facilitates the setup of OpenTelemetry pipelines at Aperture agents. It
+which allows defining collection pipelines to gather metrics from [various
+sources][integration]. The _Infra Meter_ is a type of policy resource that
+facilitates the setup of OpenTelemetry pipelines at Aperture agents. It
 primarily defines receivers, processors, and a single metrics pipeline. The
 metrics pipeline data is exported to the Prometheus instance configured in
 Aperture controller.
@@ -74,8 +74,8 @@ of these receivers should follow the OpenTelemetry (OTel) format.
 :::info
 
 For examples of configuration and instructions on how to template using
-environment variables and ConfigMap, refer to the
-[Metrics integration documentation](/integrations/metrics/metrics.md).
+environment variables and ConfigMap, refer to the [Metrics integration
+documentation][integration].
 
 :::
 

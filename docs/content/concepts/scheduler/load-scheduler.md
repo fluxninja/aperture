@@ -9,7 +9,7 @@ sidebar_position: 1
 
 :::info See Also
 
-Load Scheduler [Reference](/reference/configuration/spec.md#load-scheduler)
+Load Scheduler [Reference](../../reference/configuration/spec.md#load-scheduler)
 
 :::
 
@@ -49,17 +49,17 @@ is rejected.
 :::info See Also
 
 Adaptive Load Scheduler
-[Reference](/reference/configuration/spec.md#adaptive-load-scheduler)
+[Reference](../../reference/configuration/spec.md#adaptive-load-scheduler)
 
 :::
 
 _Adaptive Load Scheduler_ is a high-level [circuit](../advanced/circuit.md)
 component that uses the [_Load Scheduler_](#load-scheduler) internally. In
 addition, it employs a
-[_Gradient Controller_](reference/configuration/spec#gradient-controller) and an
-[Integrator](../../reference/configuration/spec#integrator) for computing the
-load multiplier. From the Agents' perspective, the _Load Scheduler_ and
-_Adaptive Load Scheduler_ are identical.
+[_Gradient Controller_](../../reference/configuration/spec.md#gradient-controller)
+and an [Integrator](../../reference/configuration/spec.md#integrator) for
+computing the load multiplier. From the Agents' perspective, the _Load
+Scheduler_ and _Adaptive Load Scheduler_ are identical.
 
 Offering a more high-level interface, this component has `signal`, `setpoint`,
 and `overload_confirmation` ports. The core function of the _Adaptive Load
