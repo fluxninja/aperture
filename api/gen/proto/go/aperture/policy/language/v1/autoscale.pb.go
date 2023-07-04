@@ -29,7 +29,7 @@ type KubernetesObjectSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
+	// Which [agent-group](/concepts/selector.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// Kubernetes namespace that the resource belongs to.

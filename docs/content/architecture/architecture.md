@@ -2,8 +2,8 @@
 title: Architecture
 sidebar_position: 5
 description:
-  Discover the core components of Aperture Architecture and learn how they work
-  together to provide powerful and efficient reliability automation.
+  Discover the core components of Aperture architecture and learn how they work
+  together to provide powerful and efficient load management.
 image: ../assets/img/aperture_logo.png
 keywords:
   - reliability
@@ -35,56 +35,53 @@ reliability.
 
 </Zoom>
 
-### Aperture Controller
+## Aperture Controller
 
-The Aperture Controller is the central component of the platform. The controller
-monitors the system using an in-built telemetry system and collects metrics on
-service performance and workloads, including information on customer tiers,
-request types, and other relevant attributes.
+The Aperture controller is a centralized control system, equipped with a
+comprehensive global perspective. It is programmed using declarative policies
+that are stored in a policy database that can be managed using the Kubernetes
+Custom Resource Definition (CRD) API, allowing users to configure and modify
+policies as needed.
 
-The controller uses declarative policies, expressed as a control circuit, to
-analyze the collected metrics and make decisions on load throttling, workload
-prioritization, and auto-scaling to ensure that the application operates within
-the specified SLOs. The controller's policies are based on the principles of
-Observability-driven closed-loop automation, which continuously track deviations
-from service-level objectives (SLOs) and calculate recovery or escalation
-actions.
+A policy represents a closed-loop control circuit that is executed periodically.
+The control circuit draws input signals from metrics aggregated across Aperture
+agents, providing the controller with a holistic view of the application's
+health and performance. Service-level objectives (SLOs) are defined against
+these health and performance signals. The policies continuously track deviations
+from SLOs and calculate recovery or escalation actions that are translated as
+adjustments to the agents.
 
-The controller's policies are stored in a policy database and are managed using
-the Kubernetes Custom Resource Definition (CRD) API, allowing users to configure
-and modify policies as needed. The controller interacts with Aperture Agents to
-enforce the policies and ensure the reliable operation of cloud-native
-applications.
+After computing the adjustments, the Aperture controller synchronizes them with
+the relevant Aperture agents. These adjustments encompass load throttling,
+workload prioritization, and auto-scaling actions, among others. By
+disseminating the calculated adjustments to the agents, the controller ensures
+that the agents take localized actions in line with the global state of the
+system.
 
 ### Aperture Agents
 
-Aperture Agents are the workhorses of the platform, providing powerful flow
+Aperture agents are the workhorses of the platform, providing powerful flow
 control components such as a weighted fair queuing scheduler for workload
-prioritization and a distributed rate-limiter for abuse prevention.
-
-A flow is the fundamental unit of work from the perspective of an Aperture
-Agent. It could be an API call, a feature, or even a database query.
+prioritization and a distributed rate-limiter for abuse prevention. Agents
+integrate with service meshes, gateways and HTTP middlewares. Alternately,
+developers can use SDKs to get flow control around specific features or code
+sections inside services.
 
 The agents monitor service and infrastructure health signals using an in-built
 telemetry system. In addition, a programmable, high-fidelity flow classifier is
 used to label requests based on attributes such as customer tier or request
-type. These metrics are then analyzed by the Aperture Controller.
+type. These metrics are then analyzed by the Aperture controller.
 
-Aperture Agents schedule workloads based on their priorities, helping maximize
-user experience or revenue even during overload scenarios. Similar to boarding
-an aircraft, first class passengers get priority over other passengers; every
-application has workloads with varying priorities. For example, a video
-streaming service might prioritize a request to play a movie by a customer over
-running an internal machine learning workload. A SaaS product might prioritize
-features used by paid users over those being used by free users. Graceful
-degradation of services is achieved by prioritizing critical application
-features over background workloads.
+Aperture agents schedule workloads based on their priorities, helping prioritize
+critical features over less important workloads during overload scenarios. For
+example, a video streaming service might prioritize a request to play a movie by
+a customer over a recommended movies API. A SaaS product might prioritize
+features used by paid users over those being used by free users.
 
-Aperture Agents can be installed on a variety of infrastructure such as
-Kubernetes, VMs, or bare-metal. They integrate with Service Meshes or can be
-used with SDKs to provide [flow control](/concepts/flow-control/flow-control.md)
-capabilities. Additionally, agents work with auto-scaling APIs for platforms
-such as Kubernetes, to help scale infrastructure when needed.
+Aperture agents can be installed on a variety of infrastructure such as
+Kubernetes, VMs, or bare-metal. In addition to flow control capabilities, agents
+work with auto-scaling APIs for platforms such as Kubernetes, to help scale
+infrastructure when needed.
 
 ### Aperture Databases
 
@@ -92,11 +89,11 @@ Aperture uses two databases to store configuration, telemetry, and flow control
 information: [Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
 Prometheus enables Aperture to monitor the system and detect deviations from the
 service-level objectives (SLOs) defined in the declarative policies. Aperture
-Controller uses etcd (distributed key-value store) to persist the declarative
+controller uses etcd (distributed key-value store) to persist the declarative
 policies that define the control circuits and their components, as well as the
-current system state.
+adjustments synchronized between the controller and agents.
 
-Users can optionally reuse their existing etcd or
+Users can optionally reuse their existing etcd and
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)
 installations to minimize operational overhead and use their existing monitoring
 infrastructure.

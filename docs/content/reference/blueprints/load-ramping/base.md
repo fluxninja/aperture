@@ -23,7 +23,7 @@ within this blueprint.
 
 :::info
 
-See the tutorial on
+See the use-case
 [Percentage Rollout with Average Latency Feedback](/use-cases/percentage-rollouts/average-latency-feedback.md)
 to see this blueprint in use.
 

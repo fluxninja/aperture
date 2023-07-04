@@ -34,19 +34,19 @@ This policy employs two key strategies: service protection and auto-scaling.
 
 1. Service Protection: Based on the trend of observed latency, the service gets
    protected from sudden traffic spikes using a
-   [_Load Scheduler_](/concepts/flow-control/components/load-scheduler.md)
-   component. Load on the service is throttled when the observed latency exceeds
-   the long-term trend by a certain percentage threshold. This ensures the
-   service stays responsive even under high load.
+   [_Load Scheduler_](/concepts/scheduler/load-scheduler.md) component. Load on
+   the service is throttled when the observed latency exceeds the long-term
+   trend by a certain percentage threshold. This ensures the service stays
+   responsive even under high load.
 2. Auto-Scaling: The auto-scaling strategy is based on the throttling behavior
    of the service protection policy. An
-   [_Auto Scaler_](/concepts/auto-scale/components/auto-scaler.md) component is
-   used to dynamically adjust the number of service instances in response to
-   changes in load. This load-based auto-scaling is enacted by a scale-out
-   Controller that reads Load Scheduler signals. The service replicas are scaled
-   out when the load is being throttled, effectively scaling resources to match
-   the demand. During periods of low load, the policy attempts to scale in after
-   periodic intervals to reduce excess replicas.
+   [_Auto Scaler_](/concepts/auto-scale.md#auto-scaler) component is used to
+   dynamically adjust the number of service instances in response to changes in
+   load. This load-based auto-scaling is enacted by a scale-out Controller that
+   reads Load Scheduler signals. The service replicas are scaled out when the
+   load is being throttled, effectively scaling resources to match the demand.
+   During periods of low load, the policy attempts to scale in after periodic
+   intervals to reduce excess replicas.
 
 By combining service protection with auto-scaling, this policy ensures that the
 number of service replicas is adjusted to match persistent changes in demand,

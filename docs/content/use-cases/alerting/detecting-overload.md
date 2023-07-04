@@ -18,14 +18,14 @@ import Zoom from 'react-medium-image-zoom';
 Monitoring the health of a service is a critical aspect of ensuring reliable
 operations. This policy provides a mechanism for detecting an overload state of
 a service and sending alerts using Aperture's declarative policy language. The
-policy creates a [circuit](/concepts/policy/circuit.md) that models the typical
-latency behavior of the service using an exponential moving average (EMA). This
-automated learning of the normal latency threshold for each service reduces the
-need for manual tuning of alert policies.
+policy creates a [circuit](/concepts/advanced/circuit.md) that models the
+typical latency behavior of the service using an exponential moving average
+(EMA). This automated learning of the normal latency threshold for each service
+reduces the need for manual tuning of alert policies.
 
 One reliable metric for detecting overload is the latency of service requests.
 In Aperture, latency can be reported using a
-[_Flux Meter_](/concepts/flow-control/resources/flux-meter.md).
+[_Flux Meter_](/concepts/flux-meter.md).
 
 :::tip
 
@@ -33,8 +33,8 @@ To prevent the mixing of latency measurements across different workloads, it's
 recommended to apply the Flux Meter to a single type of workload. For instance,
 if a service has both Select and Insert API calls, it is advised to measure the
 latency of only one of these workloads using a Flux Meter. Refer to the
-[_Selector_](/concepts/flow-control/selector.md) documentation for guidance on
-applying the Flux Meter to a subset of API calls for a service.
+[_Selector_](/concepts/selector.md) documentation for guidance on applying the
+Flux Meter to a subset of API calls for a service.
 
 :::
 

@@ -128,7 +128,7 @@ message Policies {
 //
 // :::info
 //
-// See also [Policy overview](/concepts/policy/policy.md).
+// See also [Policy overview](/concepts/advanced/policy.md).
 //
 // :::
 //
@@ -144,7 +144,7 @@ message Policy {
 //
 // :::info
 //
-// See also [Circuit overview](/concepts/policy/circuit.md).
+// See also [Circuit overview](/concepts/advanced/circuit.md).
 //
 // :::
 //
@@ -180,7 +180,7 @@ message Circuit {
 //
 // :::info
 //
-// See also [Resources overview](/concepts/policy/resources.md).
+// See also [Resources overview](/concepts/advanced/policy.md).
 //
 // :::
 message Resources {
@@ -231,7 +231,7 @@ message Resources {
 //
 // :::info
 //
-// See also [Components overview](/concepts/policy/circuit.md#components).
+// See also [Components overview](/concepts/advanced/circuit.md#components).
 //
 // :::
 //

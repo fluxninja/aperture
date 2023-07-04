@@ -14,9 +14,9 @@ overloaded.
 At a high level, this policy works as follows:
 
 - Latency EMA-based overload detection: A Flux Meter is used to gather latency
-  metrics from a [service control point](/concepts/flow-control/selector.md).
-  The latency signal gets fed into an Exponential Moving Average (EMA) component
-  to establish a long-term trend that can be compared to the current latency to
+  metrics from a [service control point](/concepts/selector.md). The latency
+  signal gets fed into an Exponential Moving Average (EMA) component to
+  establish a long-term trend that can be compared to the current latency to
   detect overloads.
 - Gradient Controller: Set point latency and current latency signals are fed to
   the gradient controller that calculates the proportional response to adjust
@@ -30,12 +30,12 @@ At a high level, this policy works as follows:
   incoming concurrency.
 - Load Scheduler and Actuator: The Accepted Concurrency at the service is
   throttled by a
-  [weighted-fair queuing scheduler](/concepts/flow-control/components/load-scheduler.md).
-  The output of the adjustments to accepted concurrency made by gradient
-  controller and optimizer logic are translated to a load multiplier that is
-  synchronized with Aperture Agents through etcd. The load multiplier adjusts
-  (increases or decreases) the token bucket fill rates based on the incoming
-  concurrency observed at each agent.
+  [weighted-fair queuing scheduler](/concepts/scheduler/scheduler.md). The
+  output of the adjustments to accepted concurrency made by gradient controller
+  and optimizer logic are translated to a load multiplier that is synchronized
+  with Aperture Agents through etcd. The load multiplier adjusts (increases or
+  decreases) the token bucket fill rates based on the incoming concurrency
+  observed at each agent.
 
 :::info
 
@@ -47,7 +47,7 @@ component that is used within this blueprint.
 
 :::info
 
-See tutorials on
+See the use-cases
 [Adaptive Service Protection with Average Latency Feedback](/use-cases/adaptive-service-protection/average-latency-feedback.md)
 and
 [Workload Prioritization](/use-cases/adaptive-service-protection/workload-prioritization.md)

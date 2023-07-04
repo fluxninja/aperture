@@ -32,11 +32,11 @@ are still benefits of using Aperture:
   parameters through signals from Policy.
 - The ability to configure global rate limiting without configuring any external
   components
-  – [mesh of Agents is providing distributed counters](/concepts/flow-control/components/rate-limiter.md#distributed-counters).
+  – [mesh of Agents is providing distributed counters](/concepts/rate-limiter.md#distributed-counters).
 - Rate-limiting decisions can be made locally on the agent if lazy sync is
   enabled.
-- In addition to Rate Limiter, Aperture also offers Load Scheduler, which Envoy
-  doesn't have an equivalent of.
+- In addition to Rate Limiter, Aperture also offers [Load
+  Scheduler][Load Scheduler], which Envoy doesn't have an equivalent of.
 
 ### Does Aperture reject requests immediately?
 
@@ -83,8 +83,8 @@ existing services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
 
-No, as for now, we only support deploying [Aperture Controller][] on a
-Kubernetes cluster.
+No, as for now, we only support deploying [Aperture
+Controller][Aperture Controller] on a Kubernetes cluster.
 
 ### Can the Aperture Agent run in a non-containerized environment?
 
@@ -94,8 +94,8 @@ Aperture Agent is a binary that can be run on the
 The installation steps are available
 [here](/get-started/installation/agent/bare_metal.md).
 
-[Rate Limiter]: /concepts/flow-control/components/rate-limiter.md
-[Load Scheduler]: /concepts/flow-control/components/load-scheduler.md
-[Classifier]: /concepts/flow-control/resources/classifier.md
-[Flow Label]: /concepts/flow-control/flow-label.md
+[Rate Limiter]: /concepts/rate-limiter.md
+[Load Scheduler]: /concepts/scheduler/load-scheduler.md
+[Classifier]: /concepts/classifier.md
+[Flow Label]: /concepts/flow-label.md
 [Aperture Controller]: /get-started/installation/controller/controller.md

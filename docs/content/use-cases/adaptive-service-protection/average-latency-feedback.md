@@ -79,7 +79,7 @@ policy.
 
 :::
 
-## Policy is Action
+## Policy in Action
 
 To see the policy in action, the traffic is generated such that it starts within
 the service's capacity and then goes beyond the capacity after some time. Such a

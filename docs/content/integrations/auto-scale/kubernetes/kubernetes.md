@@ -26,7 +26,7 @@ The discovered control points can be viewed in the [FluxNinja ARC](/arc/arc.md)
 UI. Navigate to the **Control Points** page and select the **Kubernetes** tab.
 You should see a list of discovered control points. Alternatively, you can use
 the
-[introspection API](/reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
+[introspection API](/reference/api/agent/auto-scale-kubernetes-control-points-service-get-control-points.api.mdx)
 or
 [aperturectl](/reference/aperturectl/auto-scale/control-points/control-points.md)
 to view this information.
