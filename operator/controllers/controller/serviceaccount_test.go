@@ -57,16 +57,6 @@ var _ = Describe("ServiceAccount for Controller", func() {
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},
-					Annotations: nil,
-					OwnerReferences: []metav1.OwnerReference{
-						{
-							APIVersion:         "fluxninja.com/v1alpha1",
-							Name:               instance.GetName(),
-							Kind:               "Controller",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
-						},
-					},
 				},
 				AutomountServiceAccountToken: pointer.Bool(true),
 			}
@@ -112,15 +102,6 @@ var _ = Describe("ServiceAccount for Controller", func() {
 					Annotations: map[string]string{
 						Test:    Test,
 						TestTwo: TestTwo,
-					},
-					OwnerReferences: []metav1.OwnerReference{
-						{
-							APIVersion:         "fluxninja.com/v1alpha1",
-							Name:               instance.GetName(),
-							Kind:               "Controller",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
-						},
 					},
 				},
 				AutomountServiceAccountToken: pointer.Bool(false),

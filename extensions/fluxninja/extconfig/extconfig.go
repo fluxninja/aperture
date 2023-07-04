@@ -30,6 +30,8 @@ type FluxNinjaExtensionConfig struct {
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
 	// Whether to configure local Prometheus OTel pipeline for metrics
 	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
+	// Controller ID.
+	ControllerID string `json:"controller_id,omitempty"`
 }
 
 // ClientConfig is the client configuration.

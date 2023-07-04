@@ -98,6 +98,11 @@ definitions:
                 $ref: '#/definitions/ClientConfig'
                 description: Client configuration.
                 x-go-tag-json: client
+            controller_id:
+                description: Controller ID.
+                type: string
+                x-go-name: ControllerID
+                x-go-tag-json: controller_id,omitempty
             disable_local_otel_pipeline:
                 default: false
                 description: Whether to configure local Prometheus OTel pipeline for metrics
