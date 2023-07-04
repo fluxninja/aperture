@@ -31,6 +31,7 @@ spec:
         {{- end }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: aperture-controller
+        azure-extensions-usage-release-identifier: {{ .Release.Name }}
         {{- if .Values.controller.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.controller.podLabels "context" . $ ) | nindent 8 }}
         {{- end }}

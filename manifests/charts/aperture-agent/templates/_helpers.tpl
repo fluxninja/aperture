@@ -155,3 +155,20 @@ Fetch the Distcache port of the Aperture Agent
     {{ print .defaultPort }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Add the pod labels when global azure field is set
+*/}}
+{{- define "agent.podlabels" -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- $podLabels := "" -}}
+{{- if not (empty $globalAzure) -}}
+    {{- $podLabels = (printf "%s: %s" "azure-extensions-usage-release-identifier" .context.Release.Name ) -}}
+    {{ print $podLabels | toYaml | nindent 4 | replace "'" ""}}
+{{- else -}}
+  {{- if not (empty .podlabels) -}}
+    {{- $podLabels = .podlabels | toYaml | nindent 4 -}}
+    {{ print $podLabels }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}

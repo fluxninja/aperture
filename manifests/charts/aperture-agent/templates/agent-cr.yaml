@@ -6,6 +6,7 @@ metadata:
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: aperture-agent-manager
+    azure-extensions-usage-release-identifier: {{ .Release.Name }}
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
@@ -91,8 +92,8 @@ spec:
   {{- if .Values.agent.args }}
   args: {{ .Values.agent.args | toYaml | nindent 4 }}
   {{- end }}
-  {{- if .Values.agent.podLabels }}
-  podLabels: {{ .Values.agent.podLabels | toYaml | nindent 4 }}
+  {{- if or .Values.agent.podLabels .Values.global.azure }}
+  podLabels: {{ include "agent.podlabels" (dict "podlabels" .Values.agent.podLabels "context" . $) }}
   {{- end }}
   {{- if .Values.agent.podAnnotations }}
   podAnnotations: {{ .Values.agent.podAnnotations | toYaml | nindent 4 }}

@@ -187,3 +187,20 @@ Prepare the Host for configuring in the Ingress
     {{- fail "Value of .Values.ingress.domain_name cannot be empty when .Values.ingress.enabled is set to true." -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Add the pod labels when global azure field is set
+*/}}
+{{- define "controller.podlabels" -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+{{- $podLabels := "" -}}
+{{- if not (empty $globalAzure) -}}
+    {{- $podLabels = (printf "%s: %s" "azure-extensions-usage-release-identifier" .context.Release.Name ) -}}
+    {{ print $podLabels | toYaml | nindent 4 | replace "'" ""}}
+{{- else -}}
+  {{- if not (empty .podlabels) -}}
+    {{- $podLabels = .podlabels | toYaml | nindent 4 -}}
+    {{ print $podLabels }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}
