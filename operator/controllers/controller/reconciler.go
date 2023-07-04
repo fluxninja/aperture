@@ -191,8 +191,10 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	}
 	r.resourcesDeleted = false
 
-	if err := r.deleteSingletonResources(ctx, logger, req, instance); err != nil {
-		return ctrl.Result{}, err
+	if r.MultipleControllers {
+		if err := r.deleteSingletonResources(ctx, logger, req, instance); err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	if err := r.manageResources(ctx, logger, instance); err != nil {
