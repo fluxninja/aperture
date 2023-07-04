@@ -27,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
@@ -48,16 +47,12 @@ func serviceAccountForController(instance *controllerv1alpha1.Controller, scheme
 
 	sa := &corev1.ServiceAccount{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerServiceName,
+			Name:        controllers.ServiceAccountName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: annotations,
 		},
 		AutomountServiceAccountToken: &saSpec.AutomountServiceAccountToken,
-	}
-
-	if err := ctrl.SetControllerReference(instance, sa, scheme); err != nil {
-		return nil, err
 	}
 
 	return sa, nil

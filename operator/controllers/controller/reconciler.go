@@ -51,11 +51,12 @@ import (
 // ControllerReconciler reconciles a Controller object.
 type ControllerReconciler struct {
 	client.Client
-	DynamicClient    dynamic.Interface
-	Scheme           *runtime.Scheme
-	Recorder         record.EventRecorder
-	resourcesDeleted bool
-	defaultsExecuted bool
+	DynamicClient       dynamic.Interface
+	Scheme              *runtime.Scheme
+	Recorder            record.EventRecorder
+	MultipleControllers bool
+	resourcesDeleted    bool
+	defaultsExecuted    bool
 }
 
 var (
@@ -63,6 +64,29 @@ var (
 	controllerKey        *bytes.Buffer
 	controllerClientCert *bytes.Buffer
 )
+
+func (r *ControllerReconciler) verifySingletonControllerExists(ctx context.Context, instance *controllerv1alpha1.Controller, instances *controllerv1alpha1.ControllerList) (bool, error) {
+	// Check if this is an update request. If not, skip the resource creation as only single Controller is required in a cluster.
+	if instances.Items != nil && len(instances.Items) != 0 {
+		for _, ins := range instances.Items {
+			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
+				continue
+			}
+			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
+				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
+					"The required resources are already deployed. Skipping resource creation as currently, the Controller does not support multiple replicas.")
+
+				instance.Status.Resources = "skipped"
+				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+					return false, err
+				}
+
+				return false, nil
+			}
+		}
+	}
+	return true, nil
+}
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=validatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
@@ -114,7 +138,9 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if instance.GetDeletionTimestamp() != nil {
 		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
 		if controllerutil.ContainsFinalizer(instance, controllers.FinalizerName) {
-			r.deleteResources(ctx, logger, instance.DeepCopy())
+			if !r.MultipleControllers {
+				r.deleteResources(ctx, logger, instance.DeepCopy())
+			}
 
 			controllerutil.RemoveFinalizer(instance, controllers.FinalizerName)
 			if err = r.updateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
@@ -133,23 +159,13 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	// Check if this is an update request. If not, skip the resource creation as only single Controller is required in a cluster.
-	if instances.Items != nil && len(instances.Items) != 0 {
-		for _, ins := range instances.Items {
-			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
-				continue
-			}
-			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
-				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
-					"The required resources are already deployed. Skipping resource creation as currently, the Controller does not support multiple replicas.")
-
-				instance.Status.Resources = "skipped"
-				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
-					return ctrl.Result{}, err
-				}
-
-				return ctrl.Result{}, nil
-			}
+	if !r.MultipleControllers {
+		passed, innerErr := r.verifySingletonControllerExists(ctx, instance, instances)
+		if innerErr != nil {
+			return ctrl.Result{}, innerErr
+		}
+		if !passed {
+			return ctrl.Result{}, nil
 		}
 	}
 
@@ -174,6 +190,12 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 	r.resourcesDeleted = false
+
+	if r.MultipleControllers {
+		if err := r.deleteSingletonResources(ctx, logger, req, instance); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
 
 	if err := r.manageResources(ctx, logger, instance); err != nil {
 		return ctrl.Result{}, err
@@ -245,6 +267,58 @@ func (r *ControllerReconciler) updateStatus(ctx context.Context, instance *contr
 			return err
 		}
 	}
+	return nil
+}
+
+func (r *ControllerReconciler) deleteSingletonResources(ctx context.Context, log logr.Logger, req ctrl.Request, instance *controllerv1alpha1.Controller) error {
+	// If we created controller with name "controller" its full name will match singleton name.
+	instanceFullName := fmt.Sprintf("%s-%s", controllers.AppName, instance.GetName())
+	if instanceFullName == controllers.ControllerServiceName {
+		return nil
+	}
+
+	singletonInstance := instance.DeepCopy()
+	singletonInstance.Name = controllers.ControllerServiceName
+
+	deployment, err := deploymentForController(singletonInstance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
+	if err != nil {
+		return nil
+	}
+
+	if err = r.Delete(ctx, deployment); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old singleton Deployment")
+	}
+
+	configMap, err := configMapForControllerConfig(singletonInstance.DeepCopy(), r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old singleton ConfigMap")
+	}
+
+	if singletonInstance.Spec.ServiceAccountSpec.Create {
+		var serviceAccount *corev1.ServiceAccount
+		serviceAccount, err = serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
+		if err != nil {
+			return err
+		}
+
+		if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "Failed to delete singleton ServiceAccount")
+		}
+	}
+
+	secret, err := secretForControllerAPIKey(singletonInstance.DeepCopy(), r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	if err = r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old singleton Secret")
+	}
+
 	return nil
 }
 
@@ -323,35 +397,45 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *cont
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	// Always enable TLS on the controller
-	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-		CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
-		KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
-		Enabled:  true,
+	if r.tlsEnabled() {
+		// When controller TLS is enabled, force the TLS configuration
+		instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+			CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
+			KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
+			Enabled:  true,
+		}
+	} else {
+		instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+			CertFile: "",
+			KeyFile:  "",
+			Enabled:  false,
+		}
 	}
 
-	instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
-	if err := r.reconcileConfigMap(ctx, instance); err != nil {
-		return err
+	if !r.MultipleControllers {
+		instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
+		if err := r.reconcileClusterRole(ctx, instance); err != nil {
+			return err
+		}
+
+		if err := r.reconcileClusterRoleBinding(ctx, instance); err != nil {
+			return err
+		}
+
+		if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
+			return err
+		}
 	}
 
 	if err := r.reconcileService(ctx, log, instance); err != nil {
 		return err
 	}
 
-	if err := r.reconcileClusterRole(ctx, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileClusterRoleBinding(ctx, instance); err != nil {
+	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
 
 	if err := r.reconcileServiceAccount(ctx, log, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
 		return err
 	}
 
@@ -371,6 +455,10 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance *controllerv1alpha1.Controller) error {
 	configMap, err := configMapForControllerConfig(instance.DeepCopy(), r.Scheme)
 	if err != nil {
+		return err
+	}
+
+	if err = ctrl.SetControllerReference(instance, configMap, r.Scheme); err != nil {
 		return err
 	}
 
@@ -466,10 +554,16 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	if !instance.Spec.ServiceAccountSpec.Create {
 		return nil
 	}
+
 	sa, err := serviceAccountForController(instance.DeepCopy(), r.Scheme)
 	if err != nil {
 		return err
 	}
+
+	if err = ctrl.SetControllerReference(instance, sa, r.Scheme); err != nil {
+		return err
+	}
+
 	if err = r.createServiceAccount(sa, ctx, instance); err != nil {
 		return err
 	}
@@ -477,11 +571,24 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	return nil
 }
 
+func (r *ControllerReconciler) tlsEnabled() bool {
+	// FIXME: Manage per-controller tls certificates with cert-manager
+	if r.MultipleControllers {
+		return false
+	} else {
+		return true
+	}
+}
+
 // reconcileDeployment prepares the desired states for Controller Deployment and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	dep, err := deploymentForController(instance.DeepCopy(), log, r.Scheme)
+	dep, err := deploymentForController(instance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
 	if err != nil {
+		return err
+	}
+
+	if err = ctrl.SetControllerReference(instance, dep, r.Scheme); err != nil {
 		return err
 	}
 

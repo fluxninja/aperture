@@ -29,14 +29,13 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/utils/pointer"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
 
 // deploymentForAPIService prepares the Deployment object for the Controller.
-func deploymentForController(instance *controllerv1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+func deploymentForController(instance *controllerv1alpha1.Controller, tlsEnabled bool, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	spec := instance.Spec
 
 	podLabels := controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName)
@@ -66,7 +65,7 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerServiceName,
+			Name:        controllers.DeploymentName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: spec.Annotations,
@@ -85,7 +84,7 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
-					ServiceAccountName:            controllers.ControllerServiceName,
+					ServiceAccountName:            controllers.ServiceAccountName(instance),
 					HostAliases:                   spec.HostAliases,
 					ImagePullSecrets:              controllers.ImagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
@@ -137,10 +136,10 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 							LivenessProbe:            livenessProbe,
 							ReadinessProbe:           readinessProbe,
 							Lifecycle:                spec.LifecycleHooks,
-							VolumeMounts:             controllers.ControllerVolumeMounts(spec.CommonSpec),
+							VolumeMounts:             controllers.ControllerVolumeMounts(tlsEnabled, spec.CommonSpec),
 						},
 					},
-					Volumes: controllers.ControllerVolumes(instance),
+					Volumes: controllers.ControllerVolumes(tlsEnabled, instance),
 				},
 			},
 		},
@@ -150,9 +149,6 @@ func deploymentForController(instance *controllerv1alpha1.Controller, log logr.L
 		dep.Spec.Template.Spec.Containers = append(dep.Spec.Template.Spec.Containers, spec.Sidecars...)
 	}
 
-	if err := ctrl.SetControllerReference(instance, dep, scheme); err != nil {
-		return nil, err
-	}
 	return dep, nil
 }
 

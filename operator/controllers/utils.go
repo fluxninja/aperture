@@ -343,24 +343,27 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 }
 
 // ControllerVolumeMounts prepares volumeMounts for Controllers' container.
-func ControllerVolumeMounts(controllerSpec common.CommonSpec) []corev1.VolumeMount {
+func ControllerVolumeMounts(tlsEnabled bool, controllerSpec common.CommonSpec) []corev1.VolumeMount {
 	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "aperture-controller-config",
 			MountPath: "/etc/aperture/aperture-controller/config",
 		},
-		{
+	}
+
+	if tlsEnabled {
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
 			Name:      "server-cert",
 			MountPath: "/etc/aperture/aperture-controller/certs",
 			ReadOnly:  true,
-		},
+		})
 	}
 
 	return MergeVolumeMounts(volumeMounts, controllerSpec.ExtraVolumeMounts)
 }
 
 // ControllerVolumes prepares volumes for Controller.
-func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume {
+func ControllerVolumes(tlsEnabled bool, instance *controllerv1alpha1.Controller) []corev1.Volume {
 	volumes := []corev1.Volume{
 		{
 			Name: "aperture-controller-config",
@@ -368,12 +371,15 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 					DefaultMode: pointer.Int32(420),
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: ControllerServiceName,
+						Name: ConfigMapName(instance),
 					},
 				},
 			},
 		},
-		{
+	}
+
+	if tlsEnabled {
+		volumes = append(volumes, corev1.Volume{
 			Name: "server-cert",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
@@ -381,7 +387,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 					SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 				},
 			},
-		},
+		})
 	}
 
 	return MergeVolumes(volumes, instance.Spec.ExtraVolumes)
@@ -448,7 +454,30 @@ func SecretName(instance, component string, spec *common.APIKeySecret) string {
 		return name
 	}
 
-	return fmt.Sprintf("%s-%s-apikey", instance, component)
+	return fmt.Sprintf("%s-%s-%s-apikey", AppName, instance, component)
+}
+
+// DeploymentName generates a name for the controller deployment.
+func DeploymentName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
+}
+
+// ConfigMapName generates a name for the controller config map.
+func ConfigMapName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
+}
+
+// ServiceAccountName generate a name for the controller service account.
+func ServiceAccountName(instance *controllerv1alpha1.Controller) string {
+	if instance.Spec.ServiceAccountSpec.Create {
+		return fmt.Sprintf("%s-%s", AppName, instance.GetName())
+	}
+	return instance.Spec.ServiceAccountSpec.Name
+}
+
+// ServiceName generates a name for the service used to connect to the controller.
+func ServiceName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
 }
 
 // SecretDataKey fetches Key for ApiKey secret from config or generates the Key if not present in config.
