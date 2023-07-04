@@ -27,7 +27,7 @@ func Module() fx.Option {
 
 const tokenSourceConfigKey = "token_source"
 
-func provideGoogleTokenSource(in SourceIn) (*oauth2.TokenSource, error) {
+func provideGoogleTokenSource(in SourceIn) (oauth2.TokenSource, error) {
 	log.Info().Msg("Initializing Google Token Source")
 	var config tokenconfig.Config
 	if err := in.Unmarshaller.UnmarshalKey(tokenSourceConfigKey, &config); err != nil {
@@ -45,5 +45,5 @@ func provideGoogleTokenSource(in SourceIn) (*oauth2.TokenSource, error) {
 		return nil, err
 	}
 
-	return &tokenSource, nil
+	return tokenSource, nil
 }

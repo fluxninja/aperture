@@ -48,7 +48,7 @@ func Module() fx.Option {
 type ClientIn struct {
 	fx.In
 	HTTPClient   *http.Client `name:"prometheus.http-client"`
-	TokenSource  *oauth2.TokenSource
+	TokenSource  oauth2.TokenSource
 	Unmarshaller config.Unmarshaller
 }
 
@@ -68,7 +68,7 @@ func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, err
 	if in.TokenSource != nil {
 		log.Info().Msg("Using Google TokenSource for prometheus API queries")
 		oauth2Transport := &oauth2.Transport{
-			Source: *in.TokenSource,
+			Source: in.TokenSource,
 			Base:   in.HTTPClient.Transport,
 		}
 		in.HTTPClient.Transport = oauth2Transport

@@ -35,18 +35,11 @@ func (e *PrometheusEnforcer) EnforceLabels(query string) (string, error) {
 		return "", err
 	}
 
-	if e == nil {
-		log.Error().Msg("e is not initialized?")
-		return query, nil
-	}
-
 	enforcer := plp.NewEnforcer(false, e.labels...)
 
 	if err := enforcer.EnforceNode(expr); err != nil {
 		return "", err
 	}
-
-	log.Warn().Str("query", expr.String()).Msg("Enforcing additional PromQL labels")
 
 	return expr.String(), nil
 }
