@@ -14,7 +14,7 @@ Quota Scheduler [Reference](/reference/configuration/spec.md#quota-scheduler)
 
 :::
 
-_Quota Scheduler_ is used to schedule requests based on importance while
+The _Quota Scheduler_ is used to schedule requests based on importance while
 ensuring that the application adheres to third-party API rate limits or
 inter-service API quotas.
 

@@ -48,7 +48,7 @@ In addition to the _Flux Meters_ shown in the diagram, the request might get
 processed by other matching flow control components before a decision is
 returned to the service. The service executes its logic based on the decision,
 and an OpenTelemetry span representing the flow gets generated and forwarded to
-the agent. The OTEL pipeline in the agent processes the span(s) and reports the
+the agent. The OTel pipeline in the agent processes the span(s) and reports the
 generated metrics to Prometheus.
 
 ## Metric
