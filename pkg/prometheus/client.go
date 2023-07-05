@@ -47,8 +47,8 @@ func Module() fx.Option {
 // ClientIn holds fields, parameters, to provide Prometheus Client.
 type ClientIn struct {
 	fx.In
-	HTTPClient   *http.Client `name:"prometheus.http-client"`
-	TokenSource  oauth2.TokenSource
+	HTTPClient   *http.Client       `name:"prometheus.http-client"`
+	TokenSource  oauth2.TokenSource `optional:"true"`
 	Unmarshaller config.Unmarshaller
 }
 
