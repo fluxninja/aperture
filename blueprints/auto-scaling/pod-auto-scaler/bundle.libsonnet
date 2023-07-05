@@ -14,7 +14,7 @@ function(params, metadata={}) {
   local metadataWrapper = metadata { values: std.toString(params) },
 
   local prepare_controller = function(metrics_name, gradient_slope, threshold, alert_name) {
-    controller: {
+    controller: [{
       query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s"})', [
         metrics_name,
         std.asciiLower(c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.kind),
@@ -28,7 +28,7 @@ function(params, metadata={}) {
       alerter: {
         alert_name: alert_name,
       },
-    },
+    }],
   },
 
   local pod_cpu_scale_in_controllers =
@@ -36,50 +36,50 @@ function(params, metadata={}) {
        std.objectHas(c.policy.pod_cpu, 'scale_in') &&
        std.objectHas(c.policy.pod_cpu.scale_in, 'enabled') &&
        c.policy.pod_cpu.scale_in.enabled then
-      prepare_controller('k8s_pod_cpu_utilization_ratio', 1, c.policy.pod_cpu.scale_in.threshold, 'Pod CPU based scale in intended').controller
-    else {},
+      prepare_controller('k8s_pod_cpu_utilization_ratio', -1, c.policy.pod_cpu.scale_in.threshold, 'Pod CPU based scale in intended').controller
+    else [],
 
   local pod_cpu_scale_out_controllers =
     if std.objectHas(c.policy, 'pod_cpu') &&
        std.objectHas(c.policy.pod_cpu, 'scale_out') &&
        std.objectHas(c.policy.pod_cpu.scale_out, 'enabled') &&
        c.policy.pod_cpu.scale_out.enabled then
-      prepare_controller('k8s_pod_cpu_utilization_ratio', -1, c.policy.pod_cpu.scale_out.threshold, 'Pod CPU based scale out intended').controller
-    else {},
+      prepare_controller('k8s_pod_cpu_utilization_ratio', 1, c.policy.pod_cpu.scale_out.threshold, 'Pod CPU based scale out intended').controller
+    else [],
 
   local pod_memory_scale_in_controllers =
     if std.objectHas(c.policy, 'pod_memory') &&
        std.objectHas(c.policy.pod_memory, 'scale_in') &&
        std.objectHas(c.policy.pod_memory.scale_in, 'enabled') &&
        c.policy.pod_memory.scale_in.enabled then
-      prepare_controller('k8s_pod_memory_usage_bytes', 1, c.policy.pod_memory.scale_in.threshold, 'Pod Memory based scale in intended').controller
-    else {},
+      prepare_controller('k8s_pod_memory_usage_bytes', -1, c.policy.pod_memory.scale_in.threshold, 'Pod Memory based scale in intended').controller
+    else [],
 
   local pod_memory_scale_out_controllers =
     if std.objectHas(c.policy, 'pod_memory') &&
        std.objectHas(c.policy.pod_memory, 'scale_out') &&
        std.objectHas(c.policy.pod_memory.scale_out, 'enabled') &&
        c.policy.pod_memory.scale_out.enabled then
-      prepare_controller('k8s_pod_memory_usage_bytes', -1, c.policy.pod_memory.scale_out.threshold, 'Pod Memory based scale out intended').controller
-    else {},
+      prepare_controller('k8s_pod_memory_usage_bytes', 1, c.policy.pod_memory.scale_out.threshold, 'Pod Memory based scale out intended').controller
+    else [],
 
   local updated_cfg = c {
     policy+: {
-      promql_scale_out_controllers+: [
-        pod_cpu_scale_out_controllers,
-        pod_memory_scale_out_controllers,
-      ],
-      promql_scale_in_controllers+: [
-        pod_cpu_scale_in_controllers,
-        pod_memory_scale_in_controllers,
-      ],
+      local promqlScaleOutControllers = if std.objectHas(c.policy, 'promql_scale_out_controllers') then c.policy.promql_scale_out_controllers else [],
+      promql_scale_out_controllers: promqlScaleOutControllers +
+                                    (if std.length(pod_cpu_scale_out_controllers) > 0 then pod_cpu_scale_out_controllers else []) +
+                                    (if std.length(pod_memory_scale_out_controllers) > 0 then pod_memory_scale_out_controllers else []),
+      local promqlScaleInControllers = if std.objectHas(c.policy, 'promql_scale_in_controllers') then c.policy.promql_scale_in_controllers else [],
+      promql_scale_in_controllers+: promqlScaleInControllers +
+                                    (if std.length(pod_cpu_scale_in_controllers) > 0 then pod_cpu_scale_in_controllers else []) +
+                                    (if std.length(pod_memory_scale_in_controllers) > 0 then pod_memory_scale_in_controllers else []),
       resources+: {
         infra_meters:
           local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {};
-          if std.objectHas(pod_cpu_scale_in_controllers, 'query_string') ||
-             std.objectHas(pod_cpu_scale_out_controllers, 'query_string') ||
-             std.objectHas(pod_memory_scale_in_controllers, 'query_string') ||
-             std.objectHas(pod_memory_scale_out_controllers, 'query_string') then
+          if std.length(pod_cpu_scale_in_controllers) > 0 ||
+             std.length(pod_cpu_scale_out_controllers) > 0 ||
+             std.length(pod_memory_scale_in_controllers) > 0 ||
+             std.length(pod_memory_scale_out_controllers) > 0 then
             utils.add_kubeletstats_infra_meter(
               infraMeters,
               c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.agent_group,

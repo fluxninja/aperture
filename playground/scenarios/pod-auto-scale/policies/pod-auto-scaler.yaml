@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=file:/home/hardik/Work/fluxninja/aperture/blueprints/auto-scaling/pod-auto-scaler/gen/definitions.json
 # Generated values file for auto-scaling/pod-auto-scaler blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/auto-scaling/pod-auto-scaler
@@ -9,7 +10,7 @@ policy:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: __REQUIRED_FIELD__
+  policy_name: pod-auto-scaler
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:
@@ -18,20 +19,19 @@ policy:
   # Dry run mode ensures that no scaling is invoked by this auto scaler.
   # Type: bool
   dry_run: false
-  # The interval between successive evaluations of the Circuit.
-  # Type: string
-  evaluation_interval: "10s"
-  # List of scale in controllers.
-  # Type: []promql_scale_in_controller
-  promql_scale_in_controllers: []
-  # List of scale out controllers.
-  # Type: []promql_scale_out_controller
-  promql_scale_out_controllers: []
   # Scaling backend for the policy.
   # Type: aperture.spec.v1.AutoScalerScalingBackend
   # Required: True
   scaling_backend:
-    kubernetes_replicas: __REQUIRED_FIELD__
+    kubernetes_replicas:
+      max_replicas: "10"
+      min_replicas: "1"
+      kubernetes_object_selector:
+        agent_group: default
+        api_version: apps/v1
+        kind: Deployment
+        name: service1-demo-app
+        namespace: demoapp
   # Parameters that define the scaling behavior.
   # Type: aperture.spec.v1.AutoScalerScalingParameters
   scaling_parameters:
@@ -41,10 +41,13 @@ policy:
       alert_name: "Auto-scaler is scaling out"
   # Driver to do scaling of the resource based on the CPU usage.
   # Type: scaling_driver
-  pod_cpu: {}
-  # Driver to do scaling of the resource based on the Memory usage.
-  # Type: scaling_driver
-  pod_memory: {}
+  pod_cpu:
+    scale_in:
+      enabled: true
+      threshold: 0.1
+    scale_out:
+      enabled: true
+      threshold: 0.4
 
 dashboard:
   # Additional filters to pass to each query to Grafana datasource.

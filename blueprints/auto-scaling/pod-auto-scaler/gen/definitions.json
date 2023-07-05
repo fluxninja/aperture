@@ -39,6 +39,11 @@
           "default": false,
           "type": "boolean"
         },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "10s",
+          "type": "string"
+        },
         "promql_scale_in_controllers": {
           "description": "List of scale in controllers.",
           "default": [],
