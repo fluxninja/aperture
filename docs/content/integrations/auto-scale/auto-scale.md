@@ -7,6 +7,12 @@ keywords:
   - Kubernetes
 ---
 
+:::info See also
+
+[Auto-scaling use-case](../../use-cases/auto-scaling/auto-scaling.md)
+
+:::
+
 Auto-scaling is a powerful method for automatically adjusting the number of
 instances or resources allocated to a service based on fluctuating workload
 demands. Aperture's closed-loop control policies provide an ideal solution for
