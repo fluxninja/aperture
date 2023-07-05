@@ -38,7 +38,7 @@ var _ = Describe("Service for Controller", func() {
 		It("returns correct Service", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -61,7 +61,7 @@ var _ = Describe("Service for Controller", func() {
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},
@@ -87,7 +87,7 @@ var _ = Describe("Service for Controller", func() {
 					},
 					Selector: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},
@@ -105,7 +105,7 @@ var _ = Describe("Service for Controller", func() {
 		It("returns correct Service", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -135,7 +135,7 @@ var _ = Describe("Service for Controller", func() {
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 						Test:                           Test,
@@ -165,7 +165,7 @@ var _ = Describe("Service for Controller", func() {
 					},
 					Selector: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},

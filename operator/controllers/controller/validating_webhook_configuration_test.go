@@ -40,7 +40,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 					APIVersion: "fluxninja.com/v1alpha1",
 				},
 				ObjectMeta: v1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -61,13 +61,13 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 					Name: ControllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},
 					Annotations: map[string]string{
 						"fluxninja.com/primary-resource-type": "Controller.fluxninja.com",
-						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, AppName),
+						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, ControllerName),
 					},
 				},
 				Webhooks: []admissionregistrationv1.ValidatingWebhook{
@@ -119,7 +119,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 					APIVersion: "fluxninja.com/v1alpha1",
 				},
 				ObjectMeta: v1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -144,14 +144,14 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 					Name: ControllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 						Test:                           Test,
 					},
 					Annotations: map[string]string{
 						"fluxninja.com/primary-resource-type": "Controller.fluxninja.com",
-						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, AppName),
+						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, ControllerName),
 						Test:                                  Test,
 						TestTwo:                               TestTwo,
 					},

@@ -41,8 +41,10 @@ const (
 	AppName = "aperture"
 	// OperatorName defines operator name.
 	OperatorName = AppName + "-operator"
+	// ControllerName defines controller name.
+	ControllerName = "controller"
 	// ControllerServiceName defines controller service name.
-	ControllerServiceName = AppName + "-aperture"
+	ControllerServiceName = AppName + "-controller"
 	// AgentServiceName defines agent service name.
 	AgentServiceName = AppName + "-agent"
 	// PodMutatingWebhookName defines agent service name.
