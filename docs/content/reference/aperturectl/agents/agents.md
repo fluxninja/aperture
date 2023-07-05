@@ -23,6 +23,7 @@ aperturectl agents [flags]
 ### Options
 
 ```
+      --api-key string         FluxNinja ARC API Key to be used when using Cloud Controller
       --controller string      Address of Aperture controller
       --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for agents
