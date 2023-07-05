@@ -171,7 +171,35 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     description='Refresh interval for dashboard panels.'
     type='string'
     reference=''
-    value='"10s"'
+    value='"15s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-from"></a>
+
+<ParameterDescription
+    name='dashboard.time_from'
+    description='From time of dashboard.'
+    type='string'
+    reference=''
+    value='"now-15m"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="dashboard-time-to"></a>
+
+<ParameterDescription
+    name='dashboard.time_to'
+    description='To time of dashboard.'
+    type='string'
+    reference=''
+    value='"now"'
 />
 
 <!-- vale on -->

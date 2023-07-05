@@ -46,20 +46,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-policy-name"></a>
 
 <ParameterDescription
@@ -82,6 +68,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Object (aperture.spec.v1.Resources)'
     reference='../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-evaluation-interval"></a>
+
+<ParameterDescription
+    name='policy.evaluation_interval'
+    description='The interval between successive evaluations of the Circuit.'
+    type='string'
+    reference=''
+    value='"10s"'
 />
 
 <!-- vale on -->
@@ -150,6 +150,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-service-protection-core-kubelet-overload-confirmations"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.kubelet_overload_confirmations'
+    description='Overload confirmation signals from kubelet.'
+    type='Object (kubelet_overload_confirmations)'
+    reference='#kubelet-overload-confirmations'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-service-protection-core-overload-confirmations"></a>
 
 <ParameterDescription
@@ -204,7 +218,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='dashboard.time_from'
-    description='Time from of dashboard.'
+    description='From time of dashboard.'
     type='string'
     reference=''
     value='"now-15m"'
@@ -218,7 +232,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='dashboard.time_to'
-    description='Time to of dashboard.'
+    description='To time of dashboard.'
     type='string'
     reference=''
     value='"now"'
@@ -277,6 +291,114 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 ---
 
 ### Schemas
+
+<!-- vale off -->
+
+#### driver_criteria {#driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver.'
+    type='Boolean'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### overload_confirmation_driver {#overload-confirmation-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-cpu"></a>
+
+<ParameterDescription
+    name='pod_cpu'
+    description='The driver for using CPU usage as overload confirmation.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-memory"></a>
+
+<ParameterDescription
+    name='pod_memory'
+    description='The driver for using CPU usage as overload confirmation.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubelet_overload_confirmations {#kubelet-overload-confirmations}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-overload-confirmations-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='Criteria for overload confirmation.'
+    type='Object (overload_confirmation_driver)'
+    reference='#overload-confirmation-driver'
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-overload-confirmations-infra-context"></a>
+
+<ParameterDescription
+    name='infra_context'
+    description='Kubernetes selector for scraping metrics.'
+    type='Object (aperture.spec.v1.KubernetesObjectSelector)'
+    reference='../../spec#kubernetes-object-selector'
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
 
 <!-- vale off -->
 

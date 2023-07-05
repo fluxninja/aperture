@@ -69,6 +69,48 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale off -->
 
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-resources"></a>
+
+<ParameterDescription
+    name='policy.resources'
+    description='Additional resources.'
+    type='Object (aperture.spec.v1.Resources)'
+    reference='../../spec#resources'
+    value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-kubelet-metrics"></a>
+
+<ParameterDescription
+    name='policy.kubelet_metrics'
+    description='Kubelet metrics configuration.'
+    type='Object (kubelet_metrics)'
+    reference='#kubelet-metrics'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-evaluation-interval"></a>
 
 <ParameterDescription
@@ -91,34 +133,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     type='Object (aperture.spec.v1.LoadRampParameters)'
     reference='../../spec#load-ramp-parameters'
     value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-policy-name"></a>
-
-<ParameterDescription
-    name='policy.policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-resources"></a>
-
-<ParameterDescription
-    name='policy.resources'
-    description='List of additional resources.'
-    type='Object (aperture.spec.v1.Resources)'
-    reference='../../spec#resources'
-    value='{"flow_control": {"classifiers": []}}'
 />
 
 <!-- vale on -->
@@ -216,7 +230,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Refresh interval for dashboard panels.'
     type='string'
     reference=''
-    value='"5s"'
+    value='"15s"'
 />
 
 <!-- vale on -->
@@ -303,7 +317,215 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale off -->
 
+#### criteria {#criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="criteria-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the criteria.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### promql_criteria {#promql-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-criteria-operator"></a>
+
+<ParameterDescription
+    name='operator'
+    description='The operator for the criteria. oneof: `gt | lt | gte | lte | eq | neq`.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-criteria-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='The threshold for the criteria.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### driver_criteria {#driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-backward"></a>
+
+<ParameterDescription
+    name='backward'
+    description='The backward criteria.'
+    type='Object (criteria)'
+    reference='#criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-forward"></a>
+
+<ParameterDescription
+    name='forward'
+    description='The forward criteria.'
+    type='Object (criteria)'
+    reference='#criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-reset"></a>
+
+<ParameterDescription
+    name='reset'
+    description='The reset criteria.'
+    type='Object (criteria)'
+    reference='#criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### promql_driver_criteria {#promql-driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-backward"></a>
+
+<ParameterDescription
+    name='backward'
+    description='The backward criteria.'
+    type='Object (promql_criteria)'
+    reference='#promql-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-forward"></a>
+
+<ParameterDescription
+    name='forward'
+    description='The forward criteria.'
+    type='Object (promql_criteria)'
+    reference='#promql-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria-reset"></a>
+
+<ParameterDescription
+    name='reset'
+    description='The reset criteria.'
+    type='Object (promql_criteria)'
+    reference='#promql-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubelet_metrics_criteria {#kubelet-metrics-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-cpu"></a>
+
+<ParameterDescription
+    name='pod_cpu'
+    description='The criteria of the pod cpu usage driver.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-metrics-criteria-pod-memory"></a>
+
+<ParameterDescription
+    name='pod_memory'
+    description='The criteria of the pod memory usage driver.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
 #### average_latency_driver {#average-latency-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="average-latency-driver-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='The criteria of the driver.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='"__REQUIRED_FIELD__"'
+/>
 
 <!-- vale on -->
 
@@ -321,77 +543,25 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale on -->
 
-<!-- vale off -->
-
-##### criteria {#average-latency-driver-criteria}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### backward {#average-latency-driver-criteria-backward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="average-latency-driver-criteria-backward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the backward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### forward {#average-latency-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="average-latency-driver-criteria-forward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### reset {#average-latency-driver-criteria-reset}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="average-latency-driver-criteria-reset-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the reset criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
 ---
 
 <!-- vale off -->
 
 #### percentile_latency_driver {#percentile-latency-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="percentile-latency-driver-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='The criteria of the driver.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='"__REQUIRED_FIELD__"'
+/>
 
 <!-- vale on -->
 
@@ -423,77 +593,25 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale on -->
 
-<!-- vale off -->
-
-##### criteria {#percentile-latency-driver-criteria}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### backward {#percentile-latency-driver-criteria-backward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria-backward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the backward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### forward {#percentile-latency-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria-forward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### reset {#percentile-latency-driver-criteria-reset}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="percentile-latency-driver-criteria-reset-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the reset criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
 ---
 
 <!-- vale off -->
 
 #### promql_driver {#promql-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="promql-driver-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='The criteria of the driver.'
+    type='Object (promql_driver_criteria)'
+    reference='#promql-driver-criteria'
+    value='"__REQUIRED_FIELD__"'
+/>
 
 <!-- vale on -->
 
@@ -511,61 +629,23 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale on -->
 
+---
+
 <!-- vale off -->
 
-##### criteria {#promql-driver-criteria}
+#### kubelet_metrics {#kubelet-metrics}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-###### backward {#promql-driver-criteria-backward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-backward-operator"></a>
+<a id="kubelet-metrics-criteria"></a>
 
 <ParameterDescription
-    name='operator'
-    description='The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-backward-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the backward criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### forward {#promql-driver-criteria-forward}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-forward-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
+    name='criteria'
+    description='Criteria.'
+    type='Object (kubelet_metrics_criteria)'
+    reference='#kubelet-metrics-criteria'
     value='"__REQUIRED_FIELD__"'
 />
 
@@ -573,48 +653,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
 
 <!-- vale off -->
 
-<a id="promql-driver-criteria-forward-threshold"></a>
+<a id="kubelet-metrics-infra-context"></a>
 
 <ParameterDescription
-    name='threshold'
-    description='The threshold for the forward criteria.'
-    type='Number (double)'
-    reference=''
+    name='infra_context'
+    description='Kubernetes selector for scraping metrics.'
+    type='Object (aperture.spec.v1.KubernetesObjectSelector)'
+    reference='../../spec#kubernetes-object-selector'
     value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### reset {#promql-driver-criteria-reset}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-reset-operator"></a>
-
-<ParameterDescription
-    name='operator'
-    description='The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="promql-driver-criteria-reset-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='The threshold for the reset criteria.'
-    type='Number (double)'
-    reference=''
-    value='null'
 />
 
 <!-- vale on -->

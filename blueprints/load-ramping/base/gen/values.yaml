@@ -3,6 +3,18 @@
 # https://docs.fluxninja.com/reference/blueprints/load-ramping/base
 
 policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   drivers:
     # List of drivers that compare average latency against forward, backward and reset thresholds.
     # Type: []average_latency_driver
@@ -13,9 +25,9 @@ policy:
     # List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.
     # Type: []promql_driver
     promql_drivers: []
-  # List of additional circuit components.
-  # Type: []aperture.spec.v1.Component
-  components: []
+  # Kubelet metrics configuration.
+  # Type: kubelet_metrics
+  kubelet_metrics: {}
   # The interval between successive evaluations of the Circuit.
   # Type: string
   evaluation_interval: "10s"
@@ -31,15 +43,6 @@ policy:
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: __REQUIRED_FIELD__
-  # List of additional resources.
-  # Type: aperture.spec.v1.Resources
-  resources:
-    flow_control:
-      classifiers: []
   # Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.
   # Type: bool
   start: false
@@ -50,7 +53,7 @@ dashboard:
   extra_filters: {}
   # Refresh interval for dashboard panels.
   # Type: string
-  refresh_interval: "5s"
+  refresh_interval: "15s"
   # From time of dashboard.
   # Type: string
   time_from: "now-15m"

@@ -24,11 +24,6 @@
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
         },
-        "evaluation_interval": {
-          "description": "The interval between successive evaluations of the Circuit.",
-          "default": "10s",
-          "type": "string"
-        },
         "policy_name": {
           "description": "Name of the policy.",
           "default": "__REQUIRED_FIELD__",
@@ -43,6 +38,11 @@
           },
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "evaluation_interval": {
+          "description": "The interval between successive evaluations of the Circuit.",
+          "default": "10s",
+          "type": "string"
         },
         "service_protection_core": {
           "type": "object",
@@ -78,6 +78,12 @@
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
               "default": false,
               "type": "boolean"
+            },
+            "kubelet_overload_confirmations": {
+              "description": "Overload confirmation signals from kubelet.",
+              "default": {},
+              "type": "object",
+              "$ref": "#/$defs/kubelet_overload_confirmations"
             },
             "overload_confirmations": {
               "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
@@ -119,12 +125,12 @@
           "type": "string"
         },
         "time_from": {
-          "description": "Time from of dashboard.",
+          "description": "From time of dashboard.",
           "default": "now-15m",
           "type": "string"
         },
         "time_to": {
-          "description": "Time to of dashboard.",
+          "description": "To time of dashboard.",
           "default": "now",
           "type": "string"
         },
@@ -153,6 +159,61 @@
     }
   },
   "$defs": {
+    "driver_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "threshold"],
+      "properties": {
+        "enabled": {
+          "description": "Enables the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "boolean"
+        },
+        "threshold": {
+          "description": "Threshold for the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "overload_confirmation_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pod_cpu": {
+          "description": "The driver for using CPU usage as overload confirmation.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        },
+        "pod_memory": {
+          "description": "The driver for using CPU usage as overload confirmation.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        }
+      }
+    },
+    "kubelet_overload_confirmations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criteria", "infra_context"],
+      "properties": {
+        "criteria": {
+          "description": "Criteria for overload confirmation.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "#/$defs/overload_confirmation_driver"
+        },
+        "infra_context": {
+          "description": "Kubernetes selector for scraping metrics.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
+        }
+      }
+    },
     "overload_confirmation": {
       "type": "object",
       "additionalProperties": false,

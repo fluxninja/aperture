@@ -148,7 +148,6 @@ spec:
     evaluation_interval: 10s
   resources:
     flow_control:
-      classifiers: []
       flux_meters:
         load-ramping/average_latency/0:
           selectors:
@@ -157,3 +156,4 @@ spec:
               match_labels:
                 http.path: /api/load-ramp
             service: service1-demo-app.demoapp.svc.cluster.local
+    infra_meters: {}

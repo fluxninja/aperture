@@ -115,3 +115,4 @@ spec:
           selectors:
           - control_point: ingress
             service: search-service.prod.svc.cluster.local
+    infra_meters: {}

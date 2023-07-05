@@ -8,8 +8,32 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["load_ramp", "policy_name"],
+      "required": ["policy_name", "load_ramp"],
       "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
         "drivers": {
           "type": "object",
           "additionalProperties": false,
@@ -43,14 +67,11 @@
             }
           }
         },
-        "components": {
-          "description": "List of additional circuit components.",
-          "default": [],
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
-          }
+        "kubelet_metrics": {
+          "description": "Kubelet metrics configuration.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/kubelet_metrics"
         },
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
@@ -79,21 +100,6 @@
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadRampParameters"
         },
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
-        "resources": {
-          "description": "List of additional resources.",
-          "default": {
-            "flow_control": {
-              "classifiers": []
-            }
-          },
-          "type": "object",
-          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
-        },
         "start": {
           "description": "Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.",
           "default": false,
@@ -113,7 +119,7 @@
         },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "5s",
+          "default": "15s",
           "type": "string"
         },
         "time_from": {
@@ -151,52 +157,113 @@
     }
   },
   "$defs": {
+    "criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["threshold"],
+      "properties": {
+        "threshold": {
+          "description": "The threshold for the criteria.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "promql_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operator", "threshold"],
+      "properties": {
+        "operator": {
+          "description": "The operator for the criteria. oneof: `gt | lt | gte | lte | eq | neq`.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "threshold": {
+          "description": "The threshold for the criteria.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "driver_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backward": {
+          "description": "The backward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/criteria"
+        },
+        "forward": {
+          "description": "The forward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/criteria"
+        },
+        "reset": {
+          "description": "The reset criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/criteria"
+        }
+      }
+    },
+    "promql_driver_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backward": {
+          "description": "The backward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/promql_criteria"
+        },
+        "forward": {
+          "description": "The forward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/promql_criteria"
+        },
+        "reset": {
+          "description": "The reset criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/promql_criteria"
+        }
+      }
+    },
+    "kubelet_metrics_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pod_cpu": {
+          "description": "The criteria of the pod cpu usage driver.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        },
+        "pod_memory": {
+          "description": "The criteria of the pod memory usage driver.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        }
+      }
+    },
     "average_latency_driver": {
       "type": "object",
       "additionalProperties": false,
       "required": ["criteria", "selectors"],
       "properties": {
         "criteria": {
+          "description": "The criteria of the driver.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
-          "additionalProperties": false,
-          "required": ["forward"],
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["threshold"],
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the forward criteria.",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
+          "$ref": "#/$defs/driver_criteria"
         },
         "selectors": {
           "description": "Identify the service and flows whose latency needs to be measured.",
@@ -220,46 +287,10 @@
       "required": ["criteria", "flux_meter"],
       "properties": {
         "criteria": {
+          "description": "The criteria of the driver.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
-          "additionalProperties": false,
-          "required": ["forward"],
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["threshold"],
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the forward criteria.",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
+          "$ref": "#/$defs/driver_criteria"
         },
         "flux_meter": {
           "description": "FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.",
@@ -291,64 +322,34 @@
       "required": ["criteria", "query_string"],
       "properties": {
         "criteria": {
+          "description": "The criteria of the driver.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
-          "additionalProperties": false,
-          "required": ["forward"],
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "operator": {
-                  "description": "The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-                  "type": "string"
-                },
-                "threshold": {
-                  "description": "The threshold for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["operator", "threshold"],
-              "properties": {
-                "operator": {
-                  "description": "The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "string"
-                },
-                "threshold": {
-                  "description": "The threshold for the forward criteria.",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "operator": {
-                  "description": "The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-                  "type": "string"
-                },
-                "threshold": {
-                  "description": "The threshold for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
+          "$ref": "#/$defs/promql_driver_criteria"
         },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
           "default": "__REQUIRED_FIELD__",
           "type": "string"
+        }
+      }
+    },
+    "kubelet_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criteria", "infra_context"],
+      "properties": {
+        "criteria": {
+          "description": "Criteria.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "#/$defs/kubelet_metrics_criteria"
+        },
+        "infra_context": {
+          "description": "Kubernetes selector for scraping metrics.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
         }
       }
     }
