@@ -552,6 +552,7 @@ type Scheduler struct {
 	// Fail-open logic is use for flow control APIs, so if the gRPC deadline
 	// reaches, the flow will end up being unconditionally allowed while
 	// it is still waiting on the scheduler.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	DecisionDeadlineMargin *durationpb.Duration `protobuf:"bytes,6,opt,name=decision_deadline_margin,json=decisionDeadlineMargin,proto3" json:"decision_deadline_margin,omitempty" default:"0.01s"` // @gotags: default:"0.01s"
 	// * Key for a flow label that can be used to override the default number of tokens for this flow.
 	// * The value associated with this key must be a valid uint64 number.
@@ -1974,12 +1975,14 @@ type RateLimiter_Parameters struct {
 	TokensLabelKey string `protobuf:"bytes,2,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty" default:"tokens"` // @gotags: default:"tokens"
 	// Interval defines the time interval in which the token bucket
 	// will fill tokens specified by `fill_amount` signal.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	Interval *durationpb.Duration `protobuf:"bytes,3,opt,name=interval,proto3" json:"interval,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Continuous fill determines whether the token bucket should be filled
 	// continuously or only on discrete intervals.
 	ContinuousFill bool `protobuf:"varint,4,opt,name=continuous_fill,json=continuousFill,proto3" json:"continuous_fill,omitempty" default:"true"` // @gotags: default:"true"
 	// Max idle time before token bucket state for a label is removed.
 	// If set to 0, the state is never removed.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	MaxIdleTime *durationpb.Duration `protobuf:"bytes,5,opt,name=max_idle_time,json=maxIdleTime,proto3" json:"max_idle_time,omitempty" default:"7200s"` // @gotags: default:"7200s"
 	// Configuration of lazy-syncing behavior of rate limiter
 	LazySync *RateLimiter_Parameters_LazySync `protobuf:"bytes,6,opt,name=lazy_sync,json=lazySync,proto3" json:"lazy_sync,omitempty"`
@@ -3035,6 +3038,7 @@ type LoadRamp_Parameters_Step struct {
 	// The value of the step.
 	TargetAcceptPercentage float64 `protobuf:"fixed64,1,opt,name=target_accept_percentage,json=targetAcceptPercentage,proto3" json:"target_accept_percentage,omitempty" validate:"gte=0,lte=100"` // @gotags: validate:"gte=0,lte=100"
 	// Duration for which the step is active.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	Duration *durationpb.Duration `protobuf:"bytes,2,opt,name=duration,proto3" json:"duration,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 

@@ -174,6 +174,7 @@ definitions:
                 default: 5s
                 description: |+
                     Duration of alert resolver.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -422,6 +423,7 @@ definitions:
                 default: 120s
                 description: |+
                     The amount of time to wait after a scale-in operation for another scale-in operation.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 120s
@@ -435,6 +437,7 @@ definitions:
                 default: 30s
                 description: |+
                     The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 30s
@@ -503,6 +506,7 @@ definitions:
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 10s
@@ -706,6 +710,7 @@ definitions:
                 description: |+
                     Duration of time to wait before changing to false state.
                     If the duration is zero, the change will happen instantaneously.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 0s
@@ -731,9 +736,11 @@ definitions:
                 description: Output ports for the Decider component.
             true_for:
                 default: 0s
-                title: |-
+                description: |+
                     Duration of time to wait before changing to true state.
                     If the duration is zero, the change will happen instantaneously.```
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+
                 type: string
                 x-go-tag-default: 0s
         title: Type of Combinator that computes the comparison operation on LHS and RHS signals
@@ -807,6 +814,7 @@ definitions:
                 default: 5s
                 description: |+
                     The window of time over which differentiator operates.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -922,6 +930,7 @@ definitions:
             ema_window:
                 description: |+
                     Duration of EMA sampling window.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -937,6 +946,7 @@ definitions:
                     Duration of EMA warming up window.
 
                     The initial value of the EMA is the average of signal readings received during the warm up window.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -1031,6 +1041,7 @@ definitions:
             max_extrapolation_interval:
                 description: |+
                     Maximum time interval to repeat the last valid value of input signal.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -1429,6 +1440,7 @@ definitions:
                 default: 5s
                 description: |+
                     Holding the last valid signal value for the `hold_for` duration.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -1889,6 +1901,7 @@ definitions:
             duration:
                 description: |+
                     Duration for which the step is active.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -2076,7 +2089,6 @@ definitions:
             not:
                 $ref: '#/definitions/MatchExpression'
                 description: The expression negates the result of sub expression.
-        title: Defines a `[map<string, string> → bool]` expression to be evaluated on labels
         type: object
     MatchExpressionList:
         description: 'for example, `{any: {of: [expr1, expr2]}}`.'
@@ -2321,6 +2333,7 @@ definitions:
             period:
                 description: |+
                     The period of the timer.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -2404,6 +2417,7 @@ definitions:
                 default: 10s
                 description: |+
                     Describes the interval between successive evaluations of the Prometheus query.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 10s
@@ -2451,6 +2465,7 @@ definitions:
                 default: 5s
                 description: |+
                     Emitting 0 for the `false_for` duration.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -2461,6 +2476,7 @@ definitions:
                 default: 5s
                 description: |+
                     Emitting 1 for the `true_for` duration.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -2564,6 +2580,7 @@ definitions:
                 description: |+
                     Interval defines the time interval in which the token bucket
                     will fill tokens specified by `fill_amount` signal.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -2587,6 +2604,7 @@ definitions:
                 description: |+
                     Max idle time before token bucket state for a label is removed.
                     If set to 0, the state is never removed.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 7200s
@@ -2834,6 +2852,7 @@ definitions:
             sma_window:
                 description: |+
                     Window of time over which the moving average is computed.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -2966,6 +2985,7 @@ definitions:
                     Fail-open logic is use for flow control APIs, so if the gRPC deadline
                     reaches, the flow will end up being unconditionally allowed while
                     it is still waiting on the scheduler.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 0.01s
@@ -3220,6 +3240,7 @@ definitions:
             duration:
                 description: |+
                     Duration for which the step is active.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required

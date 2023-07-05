@@ -170,7 +170,7 @@
         },
         "resolve_timeout": {
           "default": "5s",
-          "description": "Duration of alert resolver.\n\n",
+          "description": "Duration of alert resolver.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "5s"
         },
@@ -424,7 +424,7 @@
         },
         "scale_in_cooldown": {
           "default": "120s",
-          "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
+          "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "120s"
         },
@@ -435,7 +435,7 @@
         },
         "scale_out_cooldown": {
           "default": "30s",
-          "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
+          "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "30s"
         }
@@ -487,7 +487,7 @@
         },
         "evaluation_interval": {
           "default": "10s",
-          "description": "Evaluation interval (tick) is the time between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\n\n",
+          "description": "Evaluation interval (tick) is the time between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "10s"
         }
@@ -671,7 +671,7 @@
       "properties": {
         "false_for": {
           "default": "0s",
-          "description": "Duration of time to wait before changing to false state.\nIf the duration is zero, the change will happen instantaneously.\n\n",
+          "description": "Duration of time to wait before changing to false state.\nIf the duration is zero, the change will happen instantaneously.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "0s"
         },
@@ -692,7 +692,7 @@
         },
         "true_for": {
           "default": "0s",
-          "title": "Duration of time to wait before changing to true state.\nIf the duration is zero, the change will happen instantaneously.```",
+          "description": "Duration of time to wait before changing to true state.\nIf the duration is zero, the change will happen instantaneously.```\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "0s"
         }
@@ -790,7 +790,7 @@
         },
         "window": {
           "default": "5s",
-          "description": "The window of time over which differentiator operates.\n\n",
+          "description": "The window of time over which differentiator operates.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "5s"
         }
@@ -890,7 +890,7 @@
           "x-go-tag-validate": "gte=1.0"
         },
         "ema_window": {
-          "description": "Duration of EMA sampling window.\n\n",
+          "description": "Duration of EMA sampling window.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },
@@ -901,7 +901,7 @@
           "x-go-tag-default": "false"
         },
         "warmup_window": {
-          "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm up window.\n\n",
+          "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm up window.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         }
@@ -1003,7 +1003,7 @@
       "description": "Parameters for the Extrapolator component.",
       "properties": {
         "max_extrapolation_interval": {
-          "description": "Maximum time interval to repeat the last valid value of input signal.\n\n",
+          "description": "Maximum time interval to repeat the last valid value of input signal.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         }
@@ -1340,7 +1340,7 @@
       "properties": {
         "hold_for": {
           "default": "5s",
-          "description": "Holding the last valid signal value for the `hold_for` duration.\n\n",
+          "description": "Holding the last valid signal value for the `hold_for` duration.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "5s"
         },
@@ -1810,7 +1810,7 @@
     "LoadRampParametersStep": {
       "properties": {
         "duration": {
-          "description": "Duration for which the step is active.\n\n",
+          "description": "Duration for which the step is active.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },
@@ -1998,7 +1998,6 @@
           "description": "The expression negates the result of sub expression."
         }
       },
-      "title": "Defines a `[map<string, string> \u2192\u00a0bool]` expression to be evaluated on labels",
       "type": "object",
       "additionalProperties": false
     },
@@ -2285,7 +2284,7 @@
       "description": "PeriodicDecrease defines a controller for scaling in based on a periodic timer.",
       "properties": {
         "period": {
-          "description": "The period of the timer.\n\n",
+          "description": "The period of the timer.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },
@@ -2375,7 +2374,7 @@
       "properties": {
         "evaluation_interval": {
           "default": "10s",
-          "description": "Describes the interval between successive evaluations of the Prometheus query.\n\n",
+          "description": "Describes the interval between successive evaluations of the Prometheus query.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "10s"
         },
@@ -2408,7 +2407,7 @@
       "properties": {
         "false_for": {
           "default": "5s",
-          "description": "Emitting 0 for the `false_for` duration.\n\n",
+          "description": "Emitting 0 for the `false_for` duration.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "5s"
         },
@@ -2418,7 +2417,7 @@
         },
         "true_for": {
           "default": "5s",
-          "description": "Emitting 1 for the `true_for` duration.\n\n",
+          "description": "Emitting 1 for the `true_for` duration.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "5s"
         }
@@ -2534,7 +2533,7 @@
           "x-go-tag-default": "true"
         },
         "interval": {
-          "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\n\n",
+          "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },
@@ -2548,7 +2547,7 @@
         },
         "max_idle_time": {
           "default": "7200s",
-          "description": "Max idle time before token bucket state for a label is removed.\nIf set to 0, the state is never removed.\n\n",
+          "description": "Max idle time before token bucket state for a label is removed.\nIf set to 0, the state is never removed.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "7200s"
         },
@@ -2708,7 +2707,7 @@
     "SMAParameters": {
       "properties": {
         "sma_window": {
-          "description": "Window of time over which the moving average is computed.\n\n",
+          "description": "Window of time over which the moving average is computed.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },
@@ -2838,7 +2837,7 @@
       "properties": {
         "decision_deadline_margin": {
           "default": "0.01s",
-          "description": "Decision deadline margin is the amount of time that the scheduler will\nsubtract from the request deadline to determine the deadline for the\ndecision. This is to ensure that the scheduler has enough time to\nmake a decision before the request deadline happens, accounting for\nprocessing delays.\nThe request deadline is based on the\n[gRPC deadline](https://grpc.io/blog/deadlines) or the\n[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).\n\nFail-open logic is use for flow control APIs, so if the gRPC deadline\nreaches, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\n",
+          "description": "Decision deadline margin is the amount of time that the scheduler will\nsubtract from the request deadline to determine the deadline for the\ndecision. This is to ensure that the scheduler has enough time to\nmake a decision before the request deadline happens, accounting for\nprocessing delays.\nThe request deadline is based on the\n[gRPC deadline](https://grpc.io/blog/deadlines) or the\n[`grpc-timeout` HTTP header](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).\n\nFail-open logic is use for flow control APIs, so if the gRPC deadline\nreaches, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "0.01s"
         },
@@ -3013,7 +3012,7 @@
     "SignalGeneratorParametersStep": {
       "properties": {
         "duration": {
-          "description": "Duration for which the step is active.\n\n",
+          "description": "Duration for which the step is active.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },

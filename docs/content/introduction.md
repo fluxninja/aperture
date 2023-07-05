@@ -91,7 +91,7 @@ Aperture provides a variety of advanced load management features:
   fine-grained labels, ensuring precise control and prevention of excessive
   usage.
 - 🚀
-  [**Percentage rollouts**](./use-cases/percentage-rollouts/percentage-rollouts.md):
+  [**Percentage Rollouts**](./use-cases/percentage-rollouts/percentage-rollouts.md):
   Aperture enables teams to gradually release new features to a subset of users,
   without impacting the rest of the system, using dark launch.
 

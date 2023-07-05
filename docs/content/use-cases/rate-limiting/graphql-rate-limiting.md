@@ -13,6 +13,13 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+The following policy is based on the
+[Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint.
+
+:::
+
 ## Overview
 
 This policy is an example of how to implement

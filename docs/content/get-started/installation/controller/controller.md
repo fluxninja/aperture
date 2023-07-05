@@ -17,11 +17,11 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion
 
 ## Overview
 
-The Aperture Controller functions as the brain of the Aperture system.
-Leveraging an advanced control loop, the Controller routinely analyzes polled
+The Aperture controller functions as the brain of the Aperture system.
+Leveraging an advanced control loop, the controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
 set policies. Once determined, these decisions are then exported to all Aperture
-Agents to effectively handle workloads.
+agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (process variables) and compares them against
@@ -32,23 +32,25 @@ process variables and maintain their values within the optimal range.
 
 ## Installation
 
-The Aperture Controller can be installed using the below options:
+The Aperture controller can be installed using the below options:
 
 1. [**Kubernetes**](kubernetes/kubernetes.md)
 
-   The Aperture Controller can be installed on Kubernetes using the Kubernetes
+   The Aperture controller can be installed on Kubernetes using the Kubernetes
    Operator available for it, or using namespace-scoped resources.
 
 2. [**Docker**](docker.md)
 
-   The Aperture Controller can also be installed on Docker as containers.
+   The Aperture controller can also be installed on Docker as containers.
 
 ## Applying Policies
 
-The process of creating policies for Aperture can be done either after the
-installation of the controller or after the installation of the agent, depending
-on your preference.
-[Generating and applying policies](/get-started/policies/policies.md) guide
-includes step-by-step instructions on how to create policies for Aperture in a
-Kubernetes cluster, which you can follow to create policies according to your
-needs.
+Once the
+[application is set up](/get-started/setting-up-application/setting-up-application.md)
+and both the Aperture Controller and Agents are installed, the next crucial step
+is to create and apply policies.
+
+[Your first policy](/get-started/policies/policies.md) section provides
+step-by-step instructions on customizing, creating, and applying policies within
+Aperture. Additionally, the [use-cases](/use-cases/use-cases.md) section serves
+as a valuable resource for tailoring policies to meet specific requirements.

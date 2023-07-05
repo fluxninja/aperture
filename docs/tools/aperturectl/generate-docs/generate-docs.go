@@ -117,6 +117,12 @@ keywords:
 ---
 <!-- markdownlint-disable -->
 
+:::info
+
+For installation instructions see [installing aperturectl](/get-started/installation/aperture-cli/aperture-cli.md).
+
+:::
+
 `, sidebarLabel, name)
 }
 

@@ -98,6 +98,7 @@ message RateLimiter {
 
     // Interval defines the time interval in which the token bucket
     // will fill tokens specified by `fill_amount` signal.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration interval = 3; // @gotags: validate:"required"
 
     // Continuous fill determines whether the token bucket should be filled
@@ -106,6 +107,7 @@ message RateLimiter {
 
     // Max idle time before token bucket state for a label is removed.
     // If set to 0, the state is never removed.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration max_idle_time = 5; // @gotags: default:"7200s"
 
     // Configuration of lazy-syncing behavior of rate limiter
@@ -286,6 +288,7 @@ message Scheduler {
   // Fail-open logic is use for flow control APIs, so if the gRPC deadline
   // reaches, the flow will end up being unconditionally allowed while
   // it is still waiting on the scheduler.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration decision_deadline_margin = 6; // @gotags: default:"0.01s"
 
   // * Key for a flow label that can be used to override the default number of tokens for this flow.
@@ -417,6 +420,7 @@ message LoadRamp {
       // The value of the step.
       double target_accept_percentage = 1; // @gotags: validate:"gte=0,lte=100"
       // Duration for which the step is active.
+      // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
 

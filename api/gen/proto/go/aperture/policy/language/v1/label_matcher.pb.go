@@ -172,8 +172,6 @@ func (x *K8SLabelMatcherRequirement) GetValues() []string {
 	return nil
 }
 
-// Defines a `[map<string, string> → bool]` expression to be evaluated on labels
-//
 // MatchExpression has multiple variants, exactly one should be set.
 //
 // Example:

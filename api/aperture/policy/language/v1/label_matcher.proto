@@ -44,8 +44,6 @@ message K8sLabelMatcherRequirement {
   repeated string values = 3;
 }
 
-// Defines a `[map<string, string> → bool]` expression to be evaluated on labels
-//
 // MatchExpression has multiple variants, exactly one should be set.
 //
 // Example:
