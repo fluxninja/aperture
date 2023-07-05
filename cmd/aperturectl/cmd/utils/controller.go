@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -40,6 +41,7 @@ type ControllerConn struct {
 	skipVerify     bool
 	kubeConfigPath string
 	kubeConfig     *rest.Config
+	apiKey         string
 
 	forwarderStopChan chan struct{}
 	conn              *grpc.ClientConn
@@ -82,6 +84,12 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"controller-ns",
 		"",
 		"Namespace in which the Aperture Controller is running",
+	)
+	flags.StringVar(
+		&c.apiKey,
+		"api-key",
+		"",
+		"FluxNinja ARC API Key to be used when using Cloud Controller",
 	)
 }
 
@@ -165,7 +173,7 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 	}
 
 	var err error
-	c.conn, err = grpc.Dial(addr, grpc.WithTransportCredentials(cred))
+	c.conn, err = grpc.Dial(addr, grpc.WithTransportCredentials(cred), grpc.WithUnaryInterceptor(c.cloudControllerInterceptor))
 	if err != nil {
 		return nil, err
 	}
@@ -284,4 +292,21 @@ func (c *ControllerConn) GetKubeRestConfig() *rest.Config {
 // GetControllerNs returns namespace in which the Aperture Controller is running.
 func GetControllerNs() string {
 	return controllerNs
+}
+
+func (c *ControllerConn) cloudControllerInterceptor(
+	ctx context.Context,
+	method string,
+	req interface{},
+	reply interface{},
+	cc *grpc.ClientConn,
+	invoker grpc.UnaryInvoker,
+	opts ...grpc.CallOption,
+) error {
+	if c.apiKey == "" {
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}
+	md := metadata.Pairs("apikey", c.apiKey)
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	return invoker(ctx, method, req, reply, cc, opts...)
 }
