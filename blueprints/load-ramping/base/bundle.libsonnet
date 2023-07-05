@@ -15,11 +15,13 @@ function(params, metadata={}) {
 
   local prepare_driver = function(metrics_name, criteria_name) {
     driver: {
-      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s"})', [
+      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s",policy_name="%s",infra_meter_name="%s"})', [
         metrics_name,
         std.asciiLower(c.policy.kubelet_metrics.infra_context.kind),
         c.policy.kubelet_metrics.infra_context.name,
         c.policy.kubelet_metrics.infra_context.namespace,
+        c.policy.policy_name,
+        'kubeletstats',
       ]),
       criteria: {
         ['%s' % criteria]: {
@@ -58,6 +60,7 @@ function(params, metadata={}) {
           local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {};
           if std.objectHas(pod_cpu_kubelet_driver, 'query_string') ||
              std.objectHas(pod_memory_kubelet_driver, 'query_string') then
+            assert !std.objectHas(infraMeters, 'kubeletstats') : 'An infra meter with name kubeletstats already exists. Please choose a different name.';
             utils.add_kubeletstats_infra_meter(
               infraMeters,
               if std.objectHas(c.policy.kubelet_metrics.infra_context, 'agent_group') then c.policy.kubelet_metrics.infra_context.agent_group else 'default',

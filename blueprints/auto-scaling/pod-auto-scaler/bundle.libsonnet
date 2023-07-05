@@ -15,11 +15,13 @@ function(params, metadata={}) {
 
   local prepare_controller = function(metrics_name, gradient_slope, threshold, alert_name) {
     controller: [{
-      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s"})', [
+      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s",policy_name="%s",infra_meter_name="%s"})', [
         metrics_name,
         std.asciiLower(c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.kind),
         c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.name,
         c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.namespace,
+        c.policy.policy_name,
+        'kubeletstats',
       ]),
       setpoint: threshold,
       gradient: {
@@ -80,6 +82,7 @@ function(params, metadata={}) {
              std.length(pod_cpu_scale_out_controllers) > 0 ||
              std.length(pod_memory_scale_in_controllers) > 0 ||
              std.length(pod_memory_scale_out_controllers) > 0 then
+            assert !std.objectHas(infraMeters, 'kubeletstats') : 'An infra meter with name kubeletstats already exists. Please choose a different name.';
             utils.add_kubeletstats_infra_meter(
               infraMeters,
               c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.agent_group,

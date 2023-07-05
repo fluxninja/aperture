@@ -3,11 +3,13 @@ local utils = import '../../utils/utils.libsonnet';
 local add_kubelet_overload_confirmations(c) = {
   local prepare_signal = function(metrics_name, threshold) {
     controller: {
-      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s"})', [
+      query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s",policy_name="%s",infra_meter_name="%s"})', [
         metrics_name,
         std.asciiLower(c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.kind),
         c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.name,
         c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.namespace,
+        c.policy.policy_name,
+        'kubeletstats',
       ]),
       threshold: threshold,
       operator: 'gt',
@@ -51,6 +53,7 @@ local add_kubelet_overload_confirmations(c) = {
           local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {};
           if std.objectHas(pod_cpu_overload_confirmation, 'query_string') ||
              std.objectHas(pod_memory_overload_confirmation, 'query_string') then
+            assert !std.objectHas(infraMeters, 'kubeletstats') : 'An infra meter with name kubeletstats already exists. Please choose a different name.';
             utils.add_kubeletstats_infra_meter(
               infraMeters,
               if std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations.infra_context, 'agent_group') then
