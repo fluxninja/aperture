@@ -157,52 +157,113 @@
     }
   },
   "$defs": {
+    "criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["threshold"],
+      "properties": {
+        "threshold": {
+          "description": "The threshold for the criteria.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "promql_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operator", "threshold"],
+      "properties": {
+        "operator": {
+          "description": "The operator for the criteria. oneof: `gt | lt | gte | lte | eq | neq`.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "threshold": {
+          "description": "The threshold for the criteria.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "driver_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backward": {
+          "description": "The backward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/criteria"
+        },
+        "forward": {
+          "description": "The forward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/criteria"
+        },
+        "reset": {
+          "description": "The reset criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/criteria"
+        }
+      }
+    },
+    "promql_driver_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backward": {
+          "description": "The backward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/promql_criteria"
+        },
+        "forward": {
+          "description": "The forward criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/promql_criteria"
+        },
+        "reset": {
+          "description": "The reset criteria.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/promql_criteria"
+        }
+      }
+    },
+    "kubelet_metrics_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pod_cpu": {
+          "description": "The criteria of the pod cpu usage driver.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        },
+        "pod_memory": {
+          "description": "The criteria of the pod memory usage driver.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        }
+      }
+    },
     "average_latency_driver": {
       "type": "object",
       "additionalProperties": false,
       "required": ["criteria", "selectors"],
       "properties": {
         "criteria": {
+          "description": "The criteria of the driver.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
-          "additionalProperties": false,
-          "required": ["forward"],
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["threshold"],
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the forward criteria.",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
+          "$ref": "#/$defs/driver_criteria"
         },
         "selectors": {
           "description": "Identify the service and flows whose latency needs to be measured.",
@@ -226,46 +287,10 @@
       "required": ["criteria", "flux_meter"],
       "properties": {
         "criteria": {
+          "description": "The criteria of the driver.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
-          "additionalProperties": false,
-          "required": ["forward"],
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["threshold"],
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the forward criteria.",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
+          "$ref": "#/$defs/driver_criteria"
         },
         "flux_meter": {
           "description": "FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.",
@@ -297,59 +322,10 @@
       "required": ["criteria", "query_string"],
       "properties": {
         "criteria": {
+          "description": "The criteria of the driver.",
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
-          "additionalProperties": false,
-          "required": ["forward"],
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "operator": {
-                  "description": "The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-                  "type": "string"
-                },
-                "threshold": {
-                  "description": "The threshold for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["operator", "threshold"],
-              "properties": {
-                "operator": {
-                  "description": "The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "string"
-                },
-                "threshold": {
-                  "description": "The threshold for the forward criteria.",
-                  "default": "__REQUIRED_FIELD__",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "operator": {
-                  "description": "The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-                  "type": "string"
-                },
-                "threshold": {
-                  "description": "The threshold for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
+          "$ref": "#/$defs/promql_driver_criteria"
         },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
@@ -361,11 +337,11 @@
     "kubelet_metrics": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["infra_context"],
+      "required": ["criteria", "infra_context"],
       "properties": {
         "criteria": {
           "description": "Criteria.",
-          "default": {},
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "#/$defs/kubelet_metrics_criteria"
         },
@@ -374,90 +350,6 @@
           "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
-        }
-      }
-    },
-    "kubelet_metrics_criteria": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "pod_cpu": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold of CPU usage for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold of CPU usage for the forward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold of CPU usage for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
-        },
-        "pod_memory": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "backward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold of Memory usage for the backward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "forward": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold of Memory usage for the forward criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            },
-            "reset": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "threshold": {
-                  "description": "The threshold of Memory usage for the reset criteria.",
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
         }
       }
     }

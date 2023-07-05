@@ -1,28 +1,58 @@
 local commonConfig = import '../../common/config-defaults.libsonnet';
 
 /**
+* @schema (criteria.threshold: float64) The threshold for the criteria.
+*/
+local criteria_defaults = {
+  threshold: '__REQUIRED_FIELD__',
+};
+
+/**
+* @schema (promql_criteria.threshold: float64) The threshold for the criteria.
+* @schema (promql_criteria.operator: string) The operator for the criteria. oneof: `gt | lt | gte | lte | eq | neq`.
+*/
+local promql_criteria_defaults = criteria_defaults {
+  operator: '__REQUIRED_FIELD__',
+};
+
+/**
+* @schema (driver_criteria.forward: criteria) The forward criteria.
+* @schema (driver_criteria.backward: criteria) The backward criteria.
+* @schema (driver_criteria.reset: criteria) The reset criteria.
+* @schema (promql_driver_criteria.forward: promql_criteria) The forward criteria.
+* @schema (promql_driver_criteria.backward: promql_criteria) The backward criteria.
+* @schema (promql_driver_criteria.reset: promql_criteria) The reset criteria.
+*/
+local driver_criteria_defaults = {
+  forward: {},
+  backward: {},
+  reset: {},
+};
+
+/**
+* @schema (kubelet_metrics_criteria.pod_cpu: driver_criteria) The criteria of the pod cpu usage driver.
+* @schema (kubelet_metrics_criteria.pod_memory: driver_criteria) The criteria of the pod memory usage driver.
+*/
+local kubelet_metrics_criteria_defaults = {
+  pod_cpu: {},
+  pod_memory: {},
+};
+
+/**
 * @param (policy.drivers.average_latency_drivers: []average_latency_driver) List of drivers that compare average latency against forward, backward and reset thresholds.
 * @schema (average_latency_driver.selectors: []aperture.spec.v1.Selector) Identify the service and flows whose latency needs to be measured.
-* @schema (average_latency_driver.criteria.forward.threshold: float64) The threshold for the forward criteria.
-* @schema (average_latency_driver.criteria.backward.threshold: float64) The threshold for the backward criteria.
-* @schema (average_latency_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
+* @schema (average_latency_driver.criteria: driver_criteria) The criteria of the driver.
 */
 local average_latency_driver_defaults = {
   selectors: commonConfig.selectors_defaults,
-  criteria: {
-    forward: {
-      threshold: '__REQUIRED_FIELD__',
-    },
-  },
+  criteria: '__REQUIRED_FIELD__',
 };
 
 /**
 * @param (policy.drivers.percentile_latency_drivers: []percentile_latency_driver) List of drivers that compare percentile latency against forward, backward and reset thresholds.
 * @schema (percentile_latency_driver.flux_meter: aperture.spec.v1.FluxMeter) FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.
 * @schema (percentile_latency_driver.percentile: float64) The percentile to be used for latency measurement.
-* @schema (percentile_latency_driver.criteria.forward.threshold: float64) The threshold for the forward criteria.
-* @schema (percentile_latency_driver.criteria.backward.threshold: float64) The threshold for the backward criteria.
-* @schema (percentile_latency_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
+* @schema (percentile_latency_driver.criteria: driver_criteria) The criteria of the driver.
 */
 local percentile_latency_driver_defaults = {
   flux_meter: {
@@ -32,47 +62,27 @@ local percentile_latency_driver_defaults = {
     },
   },
   percentile: 95,
-  criteria: {
-    forward: {
-      threshold: '__REQUIRED_FIELD__',
-    },
-  },
+  criteria: '__REQUIRED_FIELD__',
 };
 
 /**
 * @param (policy.drivers.promql_drivers: []promql_driver) List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.
 * @schema (promql_driver.query_string: string) The Prometheus query to be run. Must return a scalar or a vector with a single element.
-* @schema (promql_driver.criteria.forward.threshold: float64) The threshold for the forward criteria.
-* @schema (promql_driver.criteria.forward.operator: string) The operator for the forward criteria. oneof: `gt | lt | gte | lte | eq | neq`
-* @schema (promql_driver.criteria.backward.threshold: float64) The threshold for the backward criteria.
-* @schema (promql_driver.criteria.backward.operator: string) The operator for the backward criteria. oneof: `gt | lt | gte | lte | eq | neq`
-* @schema (promql_driver.criteria.reset.threshold: float64) The threshold for the reset criteria.
-* @schema (promql_driver.criteria.reset.operator: string) The operator for the reset criteria. oneof: `gt | lt | gte | lte | eq | neq`
+* @schema (promql_driver.criteria: promql_driver_criteria) The criteria of the driver.
 */
 local promql_driver_defaults = {
   query_string: '__REQUIRED_FIELD__',
-  criteria: {
-    forward: {
-      threshold: '__REQUIRED_FIELD__',
-      operator: '__REQUIRED_FIELD__',
-    },
-  },
+  criteria: '__REQUIRED_FIELD__',
 };
 
 /**
-* @schema (kubelet_metrics_criteria.pod_cpu.forward.threshold: float64) The threshold of CPU usage for the forward criteria.
-* @schema (kubelet_metrics_criteria.pod_cpu.backward.threshold: float64) The threshold of CPU usage for the backward criteria.
-* @schema (kubelet_metrics_criteria.pod_cpu.reset.threshold: float64) The threshold of CPU usage for the reset criteria.
-* @schema (kubelet_metrics_criteria.pod_memory.forward.threshold: float64) The threshold of Memory usage for the forward criteria.
-* @schema (kubelet_metrics_criteria.pod_memory.backward.threshold: float64) The threshold of Memory usage for the backward criteria.
-* @schema (kubelet_metrics_criteria.pod_memory.reset.threshold: float64) The threshold of Memory usage for the reset criteria.
 * @param (policy.kubelet_metrics: kubelet_metrics) Kubelet metrics configuration.
 * @schema (kubelet_metrics.infra_context: aperture.spec.v1.KubernetesObjectSelector) Kubernetes selector for scraping metrics.
 * @schema (kubelet_metrics.criteria: kubelet_metrics_criteria) Criteria.
 */
 local kubelet_metrics_defaults = {
   infra_context: '__REQUIRED_FIELD__',
-  criteria: {},
+  criteria: '__REQUIRED_FIELD__',
 };
 
 local ramp_policy_base_defaults = {
@@ -118,4 +128,9 @@ commonConfig {
   average_latency_driver: average_latency_driver_defaults,
   percentile_latency_driver: percentile_latency_driver_defaults,
   kubelet_metrics: kubelet_metrics_defaults,
+  criteria: criteria_defaults,
+  promql_criteria: promql_criteria_defaults,
+  driver_criteria: driver_criteria_defaults,
+  promql_driver_criteria: driver_criteria_defaults,
+  kubelet_metrics_criteria: kubelet_metrics_criteria_defaults,
 }

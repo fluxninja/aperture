@@ -10,7 +10,7 @@ local add_kubelet_overload_confirmations(c) = {
         c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.namespace,
       ]),
       threshold: threshold,
-      operator: 'gte',
+      operator: 'gt',
     },
   },
 
@@ -19,6 +19,7 @@ local add_kubelet_overload_confirmations(c) = {
        std.objectHas(c.policy.service_protection_core, 'kubelet_overload_confirmations') &&
        std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations, 'criteria') &&
        std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations.criteria, 'pod_cpu') &&
+       std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations.criteria.pod_cpu, 'enabled') &&
        c.policy.service_protection_core.kubelet_overload_confirmations.criteria.pod_cpu.enabled then
       prepare_signal('k8s_pod_cpu_utilization_ratio', c.policy.service_protection_core.kubelet_overload_confirmations.criteria.pod_cpu.threshold).controller
     else {},
@@ -28,6 +29,7 @@ local add_kubelet_overload_confirmations(c) = {
        std.objectHas(c.policy.service_protection_core, 'kubelet_overload_confirmations') &&
        std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations, 'criteria') &&
        std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations.criteria, 'pod_memory') &&
+       std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations.criteria.pod_memory, 'enabled') &&
        c.policy.service_protection_core.kubelet_overload_confirmations.criteria.pod_memory.enabled then
       prepare_signal('k8s_pod_memory_usage_bytes', c.policy.service_protection_core.kubelet_overload_confirmations.criteria.pod_memory.threshold).controller
     else {},
@@ -51,7 +53,8 @@ local add_kubelet_overload_confirmations(c) = {
              std.objectHas(pod_memory_overload_confirmation, 'query_string') then
             utils.add_kubeletstats_infra_meter(
               infraMeters,
-              c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.agent_group,
+              if std.objectHas(c.policy.service_protection_core.kubelet_overload_confirmations.infra_context, 'agent_group') then
+                c.policy.service_protection_core.kubelet_overload_confirmations.infra_context.agent_group else 'default',
               c.policy.service_protection_core.kubelet_overload_confirmations.infra_context { agent_group:: '' },
             )
           else infraMeters,

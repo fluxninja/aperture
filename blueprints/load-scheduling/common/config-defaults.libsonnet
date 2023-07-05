@@ -1,10 +1,17 @@
 local commonConfig = import '../../common/config-defaults.libsonnet';
 
 /**
-* @schema (overload_confirmation_driver.pod_cpu.enabled: bool) Enables the driver for using CPU usage as overload confirmation.
-* @schema (overload_confirmation_driver.pod_cpu.threshold: float64) Threshold for the driver.
-* @schema (overload_confirmation_driver.pod_memory.enabled: bool) Enables the driver for using Memory usage as overload confirmation.
-* @schema (overload_confirmation_driver.pod_memory.threshold: float64) Threshold for the driver.
+* @schema (driver_criteria.enabled: bool) Enables the driver.
+* @schema (driver_criteria.threshold: float64) Threshold for the driver.
+*/
+local driver_criteria_defaults = {
+  enabled: '__REQUIRED_FIELD__',
+  threshold: '__REQUIRED_FIELD__',
+};
+
+/**
+* @schema (overload_confirmation_driver.pod_cpu: driver_criteria) The driver for using CPU usage as overload confirmation.
+* @schema (overload_confirmation_driver.pod_memory: driver_criteria) The driver for using CPU usage as overload confirmation.
 */
 local overload_confirmation_driver_defaults = {
   pod_cpu: {},
@@ -17,7 +24,7 @@ local overload_confirmation_driver_defaults = {
 */
 local kubelet_overload_confirmations_defaults = {
   infra_context: '__REQUIRED_FIELD__',
-  criteria: {},
+  criteria: '__REQUIRED_FIELD__',
 };
 
 local service_protection_core_defaults = {
@@ -67,4 +74,5 @@ commonConfig {
 
   kubelet_overload_confirmations: kubelet_overload_confirmations_defaults,
   overload_confirmation_driver: overload_confirmation_driver_defaults,
+  driver_criteria: driver_criteria_defaults,
 }

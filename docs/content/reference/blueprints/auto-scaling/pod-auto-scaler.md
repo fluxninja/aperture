@@ -426,74 +426,70 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 
 <!-- vale off -->
 
+#### scaling_criteria {#scaling-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-criteria-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver to do scale in or out of the resource.'
+    type='Boolean'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-criteria-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
 #### scaling_driver {#scaling-driver}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-##### scale_in {#scaling-driver-scale-in}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="scaling-driver-scale-in-enabled"></a>
+<a id="scaling-driver-scale-in"></a>
 
 <ParameterDescription
-    name='enabled'
-    description='Enables the Driver to do scale in of the resource.'
-    type='Boolean'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
+    name='scale_in'
+    description='The scale in criteria for the driver.'
+    type='Object (scaling_criteria)'
+    reference='#scaling-criteria'
+    value='{}'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="scaling-driver-scale-in-threshold"></a>
+<a id="scaling-driver-scale-out"></a>
 
 <ParameterDescription
-    name='threshold'
-    description='Threshold for the driver.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### scale_out {#scaling-driver-scale-out}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="scaling-driver-scale-out-enabled"></a>
-
-<ParameterDescription
-    name='enabled'
-    description='Enables the driver to do scale out of the resource.'
-    type='Boolean'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="scaling-driver-scale-out-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='Threshold for the driver.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
+    name='scale_out'
+    description='The scale out criteria for the driver.'
+    type='Object (scaling_criteria)'
+    reference='#scaling-criteria'
+    value='{}'
 />
 
 <!-- vale on -->

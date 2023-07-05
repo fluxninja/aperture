@@ -339,74 +339,70 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+#### driver_criteria {#driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver.'
+    type='Boolean'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
 #### overload_confirmation_driver {#overload-confirmation-driver}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-##### pod_cpu {#overload-confirmation-driver-pod-cpu}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="overload-confirmation-driver-pod-cpu-enabled"></a>
+<a id="overload-confirmation-driver-pod-cpu"></a>
 
 <ParameterDescription
-    name='enabled'
-    description='Enables the driver for using CPU usage as overload confirmation.'
-    type='Boolean'
-    reference=''
-    value='null'
+    name='pod_cpu'
+    description='The driver for using CPU usage as overload confirmation.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="overload-confirmation-driver-pod-cpu-threshold"></a>
+<a id="overload-confirmation-driver-pod-memory"></a>
 
 <ParameterDescription
-    name='threshold'
-    description='Threshold for the driver.'
-    type='Number (double)'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### pod_memory {#overload-confirmation-driver-pod-memory}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="overload-confirmation-driver-pod-memory-enabled"></a>
-
-<ParameterDescription
-    name='enabled'
-    description='Enables the driver for using Memory usage as overload confirmation.'
-    type='Boolean'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="overload-confirmation-driver-pod-memory-threshold"></a>
-
-<ParameterDescription
-    name='threshold'
-    description='Threshold for the driver.'
-    type='Number (double)'
-    reference=''
-    value='null'
+    name='pod_memory'
+    description='The driver for using CPU usage as overload confirmation.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
 />
 
 <!-- vale on -->
@@ -428,7 +424,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Criteria for overload confirmation.'
     type='Object (overload_confirmation_driver)'
     reference='#overload-confirmation-driver'
-    value='{}'
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

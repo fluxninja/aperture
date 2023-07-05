@@ -202,46 +202,39 @@
         }
       }
     },
+    "scaling_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "threshold"],
+      "properties": {
+        "enabled": {
+          "description": "Enables the driver to do scale in or out of the resource.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "boolean"
+        },
+        "threshold": {
+          "description": "Threshold for the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
     "scaling_driver": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["scale_in", "scale_out"],
       "properties": {
         "scale_in": {
+          "description": "The scale in criteria for the driver.",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
-          "required": ["enabled", "threshold"],
-          "properties": {
-            "enabled": {
-              "description": "Enables the Driver to do scale in of the resource.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "boolean"
-            },
-            "threshold": {
-              "description": "Threshold for the driver.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            }
-          }
+          "$ref": "#/$defs/scaling_criteria"
         },
         "scale_out": {
+          "description": "The scale out criteria for the driver.",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
-          "required": ["enabled", "threshold"],
-          "properties": {
-            "enabled": {
-              "description": "Enables the driver to do scale out of the resource.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "boolean"
-            },
-            "threshold": {
-              "description": "Threshold for the driver.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
-            }
-          }
+          "$ref": "#/$defs/scaling_criteria"
         }
       }
     }

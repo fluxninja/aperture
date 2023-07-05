@@ -170,50 +170,50 @@
     }
   },
   "$defs": {
+    "driver_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "threshold"],
+      "properties": {
+        "enabled": {
+          "description": "Enables the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "boolean"
+        },
+        "threshold": {
+          "description": "Threshold for the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
     "overload_confirmation_driver": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "pod_cpu": {
+          "description": "The driver for using CPU usage as overload confirmation.",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "enabled": {
-              "description": "Enables the driver for using CPU usage as overload confirmation.",
-              "type": "boolean"
-            },
-            "threshold": {
-              "description": "Threshold for the driver.",
-              "type": "number",
-              "format": "double"
-            }
-          }
+          "$ref": "#/$defs/driver_criteria"
         },
         "pod_memory": {
+          "description": "The driver for using CPU usage as overload confirmation.",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "enabled": {
-              "description": "Enables the driver for using Memory usage as overload confirmation.",
-              "type": "boolean"
-            },
-            "threshold": {
-              "description": "Threshold for the driver.",
-              "type": "number",
-              "format": "double"
-            }
-          }
+          "$ref": "#/$defs/driver_criteria"
         }
       }
     },
     "kubelet_overload_confirmations": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["infra_context"],
+      "required": ["criteria", "infra_context"],
       "properties": {
         "criteria": {
           "description": "Criteria for overload confirmation.",
-          "default": {},
+          "default": "__REQUIRED_FIELD__",
           "type": "object",
           "$ref": "#/$defs/overload_confirmation_driver"
         },

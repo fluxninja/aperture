@@ -13,7 +13,7 @@ function(params, metadata={}) {
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
 
-  local prepare_controller = function(metrics_name, gradient_slope, alert_name) {
+  local prepare_controller = function(metrics_name, gradient_slope, threshold, alert_name) {
     controller: {
       query_string: std.format('avg(%s{k8s_%s_name="%s",k8s_namespace_name="%s"})', [
         metrics_name,
@@ -21,7 +21,7 @@ function(params, metadata={}) {
         c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.name,
         c.policy.scaling_backend.kubernetes_replicas.kubernetes_object_selector.namespace,
       ]),
-      setpoint: params.policy.pod_cpu.scale_in.threshold,
+      setpoint: threshold,
       gradient: {
         slope: gradient_slope,
       },
@@ -36,7 +36,7 @@ function(params, metadata={}) {
        std.objectHas(c.policy.pod_cpu, 'scale_in') &&
        std.objectHas(c.policy.pod_cpu.scale_in, 'enabled') &&
        c.policy.pod_cpu.scale_in.enabled then
-      prepare_controller('k8s_pod_cpu_utilization_ratio', 1, 'Pod CPU based scale in intended').controller
+      prepare_controller('k8s_pod_cpu_utilization_ratio', 1, c.policy.pod_cpu.scale_in.threshold, 'Pod CPU based scale in intended').controller
     else {},
 
   local pod_cpu_scale_out_controllers =
@@ -44,7 +44,7 @@ function(params, metadata={}) {
        std.objectHas(c.policy.pod_cpu, 'scale_out') &&
        std.objectHas(c.policy.pod_cpu.scale_out, 'enabled') &&
        c.policy.pod_cpu.scale_out.enabled then
-      prepare_controller('k8s_pod_cpu_utilization_ratio', -1, 'Pod CPU based scale out intended').controller
+      prepare_controller('k8s_pod_cpu_utilization_ratio', -1, c.policy.pod_cpu.scale_out.threshold, 'Pod CPU based scale out intended').controller
     else {},
 
   local pod_memory_scale_in_controllers =
@@ -52,7 +52,7 @@ function(params, metadata={}) {
        std.objectHas(c.policy.pod_memory, 'scale_in') &&
        std.objectHas(c.policy.pod_memory.scale_in, 'enabled') &&
        c.policy.pod_memory.scale_in.enabled then
-      prepare_controller('k8s_pod_memory_usage_bytes', 1, 'Pod Memory based scale in intended').controller
+      prepare_controller('k8s_pod_memory_usage_bytes', 1, c.policy.pod_memory.scale_in.threshold, 'Pod Memory based scale in intended').controller
     else {},
 
   local pod_memory_scale_out_controllers =
@@ -60,7 +60,7 @@ function(params, metadata={}) {
        std.objectHas(c.policy.pod_memory, 'scale_out') &&
        std.objectHas(c.policy.pod_memory.scale_out, 'enabled') &&
        c.policy.pod_memory.scale_out.enabled then
-      prepare_controller('k8s_pod_memory_usage_bytes', -1, 'Pod Memory based scale out intended').controller
+      prepare_controller('k8s_pod_memory_usage_bytes', -1, c.policy.pod_memory.scale_out.threshold, 'Pod Memory based scale out intended').controller
     else {},
 
   local updated_cfg = c {
