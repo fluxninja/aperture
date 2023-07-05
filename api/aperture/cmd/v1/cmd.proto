@@ -18,6 +18,7 @@ service Controller {
   rpc ListAutoScaleControlPoints(ListAutoScaleControlPointsRequest) returns (ListAutoScaleControlPointsControllerResponse);
   rpc ListDiscoveryEntities(ListDiscoveryEntitiesRequest) returns (ListDiscoveryEntitiesControllerResponse);
   rpc ListDiscoveryEntity(ListDiscoveryEntityRequest) returns (ListDiscoveryEntityAgentResponse);
+  rpc ListPolicies(google.protobuf.Empty) returns (aperture.policy.language.v1.GetPoliciesResponse);
 
   // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);

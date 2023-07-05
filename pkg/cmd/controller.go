@@ -370,3 +370,8 @@ func (h *Handler) DeletePolicy(ctx context.Context, req *policylangv1.DeletePoli
 func (h *Handler) GetDecisions(ctx context.Context, req *policylangv1.GetDecisionsRequest) (*policylangv1.GetDecisionsResponse, error) {
 	return h.policyService.GetDecisions(ctx, req)
 }
+
+// ListPolicies returns all applied policies.
+func (h *Handler) ListPolicies(ctx context.Context, _ *emptypb.Empty) (*policylangv1.GetPoliciesResponse, error) {
+	return h.policyService.GetPolicies(ctx, nil)
+}
