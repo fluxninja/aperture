@@ -52,7 +52,7 @@ type Image struct {
 
 	// The digest (version) of the image
 	//+kubebuilder:validation:Optional
-	Digest string `json:"digest,omitempty"`
+	Digest string `json:"digest"`
 
 	// The ImagePullPolicy of the image
 	//+kubebuilder:validation:Optional

@@ -43,7 +43,7 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 	}
 
 	if (controller.Spec.Image.Digest == "" && controller.Spec.Image.Tag == "") || (controller.Spec.Image.Digest != "" && controller.Spec.Image.Tag != "") {
-		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided,but not both")
+		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
 	}
 
 	if controller.Spec.Secrets.FluxNinjaExtension.Create && controller.Spec.Secrets.FluxNinjaExtension.Value == "" {

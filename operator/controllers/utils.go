@@ -84,8 +84,12 @@ func PodSecurityContext(podSecurityContext common.PodSecurityContext) *corev1.Po
 // ImageString prepares image string from the provided Image struct.
 func ImageString(image common.Image, repository string) string {
 	var imageStr string
-	if image.Digest != "" && image.Registry != "" {
-		imageStr = fmt.Sprintf("%s/%s@%s", image.Registry, repository, image.Digest)
+	if image.Digest != "" {
+		if image.Registry != "" {
+			imageStr = fmt.Sprintf("%s/%s@%s", image.Registry, repository, image.Digest)
+			return imageStr
+		}
+		imageStr = fmt.Sprintf("%s@%s", repository, image.Digest)
 		return imageStr
 	}
 	if image.Registry != "" {

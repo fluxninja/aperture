@@ -160,6 +160,51 @@ var _ = Describe("Tests for imageString", func() {
 		})
 	})
 
+	Context("When image digest is given with registry", func() {
+		It("returns correct image string", func() {
+			instance := &agentv1alpha1.Agent{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      AppName,
+					Namespace: AppName,
+				},
+				Spec: agentv1alpha1.AgentSpec{
+					Image: common.AgentImage{
+						Image: common.Image{
+							Registry: Test,
+							Digest:   TestDigest,
+						},
+						Repository: Test,
+					},
+				},
+			}
+
+			result := ImageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
+			Expect(result).To(Equal("test/test@sha256:1234567890"))
+		})
+	})
+
+	Context("When image digest is given without registry", func() {
+		It("returns correct image string", func() {
+			instance := &agentv1alpha1.Agent{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      AppName,
+					Namespace: AppName,
+				},
+				Spec: agentv1alpha1.AgentSpec{
+					Image: common.AgentImage{
+						Image: common.Image{
+							Digest: TestDigest,
+						},
+						Repository: Test,
+					},
+				},
+			}
+
+			result := ImageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
+			Expect(result).To(Equal("test@sha256:1234567890"))
+		})
+	})
+
 	Context("When any image registry is not provided", func() {
 		It("returns correct image string", func() {
 			instance := &agentv1alpha1.Agent{
