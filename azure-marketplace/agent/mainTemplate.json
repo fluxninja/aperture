@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "autoUpgradeMinorVersion": {
+      "defaultValue": false,
+      "type": "Bool",
+      "metadata": {
+        "description": "Allow auto upgrade of minor version for the extension."
+      }
+    },
     "extensionResourceName": {
       "type": "string",
       "metadata": {
@@ -125,11 +132,11 @@
     }
   },
   "variables": {
-    "plan-name": "DONOTMODIFY",
-    "plan-publisher": "DONOTMODIFY",
-    "plan-offerID": "DONOTMODIFY",
-    "releaseTrain": "DONOTMODIFY",
-    "clusterExtensionTypeName": "DONOTMODIFY",
+    "plan-name": "main",
+    "plan-publisher": "fluxninja",
+    "plan-offerID": "agents-cnab",
+    "releaseTrain": "stable",
+    "clusterExtensionTypeName": "Fluxninja.AgentMain",
 
     "copy": [
       {
@@ -219,7 +226,7 @@
       "name": "[parameters('extensionResourceName')]",
       "properties": {
         "extensionType": "[variables('clusterExtensionTypeName')]",
-        "autoUpgradeMinorVersion": true,
+        "autoUpgradeMinorVersion": "[parameters('autoUpgradeMinorVersion')]",
         "releaseTrain": "[variables('releaseTrain')]",
         "configurationSettings": "[variables('configurationSettings')]",
         "configurationProtectedSettings": {}
