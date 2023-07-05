@@ -1,4 +1,4 @@
-applicationName: com.fluxninja.agnets
+applicationName: com.fluxninja.agents
 publisher: "fluxninja"
 description: "FluxNinja Agent on AKS"
 version: 1.0.1 #Must be in the format of #.#.#
