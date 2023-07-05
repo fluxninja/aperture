@@ -21,9 +21,9 @@ import Zoom from 'react-medium-image-zoom';
 
 To simplify the process of creating policies in Aperture, the built-in blueprint
 system can be utilized. The Aperture repository contains several
-[blueprints][blueprints] that can generate [policies][policies] and [Grafana
+[blueprints][blueprints] that can generate [policies][policies], and [Grafana
 dashboards][grafana]. These blueprints serve as starting points for creating new
-policies or can be used as-is by providing the required parameters or
+policies, or can be used as-is by providing the required parameters or
 customizations. The [use-cases](/use-cases/use-cases.md) section showcases
 practical examples of blueprints in action.
 
@@ -32,7 +32,7 @@ To manage blueprints and generate policies, use the
 
 For advanced users interested in designing new policies, explore the example
 circuit created in the
-[Detecting overload](../../use-cases/alerting/detecting-overload.md) use-case.
+[detecting overload](../../use-cases/alerting/detecting-overload.md) use-case.
 This example serves as a valuable reference for understanding the process of
 creating custom policies in Aperture.
 
