@@ -800,7 +800,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 		It("returns correct EnvVarSource", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -855,7 +855,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 		It("returns correct EnvVarSource", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -901,7 +901,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 		It("returns correct VolumeMount", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{},
@@ -928,7 +928,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 		It("returns correct VolumeMount", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -970,7 +970,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 		It("returns correct Volume", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{},
@@ -1008,7 +1008,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 		It("returns correct Volume", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -1065,7 +1065,7 @@ var _ = Describe("Tests for commonLabels", func() {
 		It("returns correct labels", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{},
@@ -1087,7 +1087,7 @@ var _ = Describe("Tests for commonLabels", func() {
 		It("returns correct labels", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{

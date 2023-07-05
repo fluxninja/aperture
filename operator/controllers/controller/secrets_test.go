@@ -37,7 +37,7 @@ var _ = Describe("Secret for Controller", func() {
 		It("returns correct Secret", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -53,11 +53,11 @@ var _ = Describe("Secret for Controller", func() {
 
 			expected := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("%s-aperture-controller-apikey", AppName),
+					Name:      fmt.Sprintf("%s-%s-controller-apikey", AppName, ControllerName),
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},
@@ -88,7 +88,7 @@ var _ = Describe("Secret for Controller", func() {
 		It("returns correct Secret", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -113,7 +113,7 @@ var _ = Describe("Secret for Controller", func() {
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},
@@ -146,7 +146,7 @@ var _ = Describe("Secret for Controller Cert", func() {
 		It("returns correct Secret", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{},
@@ -154,11 +154,11 @@ var _ = Describe("Secret for Controller Cert", func() {
 
 			expected := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("%s-controller-cert", AppName),
+					Name:      fmt.Sprintf("%s-controller-cert", ControllerName),
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  AppName,
 					},
@@ -181,7 +181,7 @@ var _ = Describe("Secret for Controller Cert", func() {
 		It("returns correct Secret", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -193,11 +193,11 @@ var _ = Describe("Secret for Controller Cert", func() {
 
 			expected := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("%s-controller-cert", AppName),
+					Name:      fmt.Sprintf("%s-controller-cert", ControllerName),
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  AppName,
 					},
