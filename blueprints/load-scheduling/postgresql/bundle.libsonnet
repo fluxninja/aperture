@@ -15,15 +15,33 @@ function(params, metadata={}) {
 
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg,
 
-  local p = policy(updated_cfg, metadataWrapper),
-  local d = creator(p.policyResource, updated_cfg),
+  local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {},
+  assert !std.objectHas(infraMeters, 'postgresql') : 'An infra meter with name postgresql already exists. Please choose a different name.',
+  local config_with_postgresql_infra_meter = updated_cfg {
+    policy+: {
+      resources+: {
+        infra_meters+: {
+          postgresql: {
+            agent_group: if std.objectHas(updated_cfg.policy.postgresql, 'agent_group') then updated_cfg.policy.postgresql.agent_group else 'default',
+            per_agent_group: true,
+            receivers: {
+              postgresql: std.prune(updated_cfg.policy.postgresql { agent_group: null }),
+            },
+          },
+        },
+      },
+    },
+  },
+
+  local p = policy(config_with_postgresql_infra_meter, metadataWrapper),
+  local d = creator(p.policyResource, config_with_postgresql_infra_meter),
 
   policies: {
-    [std.format('%s-cr.yaml', updated_cfg.policy.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
+    [std.format('%s-cr.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyResource,
+    [std.format('%s.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
   },
   dashboards: {
-    [std.format('%s.json', updated_cfg.policy.policy_name)]: d.mainDashboard,
-    [std.format('signals-%s.json', updated_cfg.policy.policy_name)]: d.signalsDashboard,
+    [std.format('%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.mainDashboard,
+    [std.format('signals-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.signalsDashboard,
   },
 }
