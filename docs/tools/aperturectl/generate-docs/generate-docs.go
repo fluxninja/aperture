@@ -108,7 +108,7 @@ func filePrepender(filename string) string {
 	sidebarLabel := tokens[len(tokens)-1]
 	sidebarLabel = cases.Title(language.English).String(sidebarLabel)
 
-	return fmt.Sprintf(`---
+	template := `---
 sidebar_label: %s
 hide_title: true
 keywords:
@@ -116,14 +116,18 @@ keywords:
 - %s
 ---
 <!-- markdownlint-disable -->
+`
+	log.Println(filename)
+	// filename ends with aperturectl.md then add a note about installation
+	if strings.HasSuffix(filename, "aperturectl.md") {
+		template += `:::info
 
-:::info
+For installation instructions, see [installing aperturectl](/get-started/installation/aperture-cli/aperture-cli.md).
 
-For installation instructions see [installing aperturectl](/get-started/installation/aperture-cli/aperture-cli.md).
+:::`
+	}
 
-:::
-
-`, sidebarLabel, name)
+	return fmt.Sprintf(template, sidebarLabel, name)
 }
 
 func linkHandler(name string) string {

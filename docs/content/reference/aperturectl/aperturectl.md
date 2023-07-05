@@ -8,7 +8,11 @@ keywords:
 
 <!-- markdownlint-disable -->
 
-## aperturectl
+:::info
+
+For installation instructions, see [installing aperturectl](/get-started/installation/aperture-cli/aperture-cli.md).
+
+:::## aperturectl
 
 aperturectl - CLI tool to interact with Aperture
 
