@@ -25,43 +25,35 @@ import (
 	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
 
-var (
-	rules = []rbacv1.PolicyRule{
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
-			APIGroups: []string{""},
-			Resources: []string{"events"},
-			Verbs:     []string{"create", "patch"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies/finalizers"},
-			Verbs:     []string{"update"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies/status"},
-			Verbs:     []string{"get", "patch", "update"},
-		},
-	}
-
-	roleRef = rbacv1.RoleRef{
-		APIGroup: "rbac.authorization.k8s.io",
-		Kind:     "ClusterRole",
-		Name:     controllers.ControllerServiceName,
-	}
-)
+var rules = []rbacv1.PolicyRule{
+	{
+		APIGroups: []string{"fluxninja.com"},
+		Resources: []string{"policies"},
+		Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
+	},
+	{
+		APIGroups: []string{""},
+		Resources: []string{"events"},
+		Verbs:     []string{"create", "patch"},
+	},
+	{
+		APIGroups: []string{"fluxninja.com"},
+		Resources: []string{"policies/finalizers"},
+		Verbs:     []string{"update"},
+	},
+	{
+		APIGroups: []string{"fluxninja.com"},
+		Resources: []string{"policies/status"},
+		Verbs:     []string{"get", "patch", "update"},
+	},
+}
 
 // clusterRoleForController prepares the ClusterRole object for the Controller based on the provided parameter.
 func clusterRoleForController(instance *controllerv1alpha1.Controller) *rbacv1.ClusterRole {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerServiceName,
-			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.OperatorName),
+			Name:        controllers.ControllerResourcesName(instance),
+			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: controllers.ControllerAnnotationsWithOwnerRef(instance),
 		},
 		Rules: rules,
@@ -74,15 +66,19 @@ func clusterRoleForController(instance *controllerv1alpha1.Controller) *rbacv1.C
 func clusterRoleBindingForController(instance *controllerv1alpha1.Controller) *rbacv1.ClusterRoleBinding {
 	clusterRoleBinding := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerServiceName,
+			Name:        controllers.ControllerResourcesName(instance),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: controllers.ControllerAnnotationsWithOwnerRef(instance),
 		},
-		RoleRef: roleRef,
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     controllers.ControllerResourcesName(instance),
+		},
 		Subjects: []rbacv1.Subject{
 			{
 				Kind:      "ServiceAccount",
-				Name:      controllers.ControllerServiceName,
+				Name:      controllers.ServiceAccountName(instance),
 				Namespace: instance.GetNamespace(),
 			},
 		},

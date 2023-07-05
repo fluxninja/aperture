@@ -29,6 +29,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/utils/pointer"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
@@ -65,7 +66,7 @@ func deploymentForController(instance *controllerv1alpha1.Controller, tlsEnabled
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.DeploymentName(instance),
+			Name:        controllers.ControllerResourcesName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: spec.Annotations,
@@ -147,6 +148,10 @@ func deploymentForController(instance *controllerv1alpha1.Controller, tlsEnabled
 
 	if spec.Sidecars != nil {
 		dep.Spec.Template.Spec.Containers = append(dep.Spec.Template.Spec.Containers, spec.Sidecars...)
+	}
+
+	if err := ctrl.SetControllerReference(instance, dep, scheme); err != nil {
+		return nil, err
 	}
 
 	return dep, nil

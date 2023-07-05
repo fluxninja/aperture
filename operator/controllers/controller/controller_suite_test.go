@@ -152,6 +152,8 @@ var _ = BeforeSuite(func() {
 		},
 	}
 
+	MinimumKubernetesVersionBool = true
+
 	err = config.UnmarshalYAML([]byte{}, &DefaultControllerInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())
 })
