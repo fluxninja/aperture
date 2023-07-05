@@ -1998,7 +1998,6 @@
           "description": "The expression negates the result of sub expression."
         }
       },
-      "title": "Defines a `[map<string, string> \u2192\u00a0bool]` expression to be evaluated on labels",
       "type": "object",
       "additionalProperties": false
     },

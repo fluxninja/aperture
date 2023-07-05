@@ -326,7 +326,6 @@ definitions:
             not:
                 $ref: '#/definitions/MatchExpression'
                 description: The expression negates the result of sub expression.
-        title: Defines a `[map<string, string> → bool]` expression to be evaluated on labels
         type: object
     MatchExpressionList:
         description: 'for example, `{any: {of: [expr1, expr2]}}`.'
