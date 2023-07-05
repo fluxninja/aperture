@@ -450,11 +450,10 @@ Additional labels to add to alert.
 
 Duration of alert resolver. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>severity</dt>
@@ -1016,7 +1015,12 @@ Configuration for scale-in Alerter.
 <!-- vale on -->
 
 The amount of time to wait after a scale-in operation for another scale-in
-operation.
+operation. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>scale_out_alerter</dt>
@@ -1041,7 +1045,12 @@ Configuration for scale-out Alerter.
 <!-- vale on -->
 
 The amount of time to wait after a scale-out operation for another scale-out or
-scale-in operation.
+scale-in operation. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1184,11 +1193,10 @@ Evaluation interval (tick) is the time between consecutive runs of the policy
 circuit. This interval is typically aligned with how often the corrective action
 (actuation) needs to be taken. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1724,11 +1732,10 @@ zero then the transitions are instantaneous.
 Duration of time to wait before changing to false state. If the duration is
 zero, the change will happen instantaneously. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>in_ports</dt>
@@ -1779,11 +1786,10 @@ Output ports for the Decider component.
 Duration of time to wait before changing to true state. If the duration is zero,
 the change will happen instantaneously.``` This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2010,11 +2016,10 @@ Output ports for the Differentiator component.
 
 The window of time over which differentiator operates. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2279,11 +2284,10 @@ envelope.
 
 Duration of EMA sampling window. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -2312,11 +2316,10 @@ Duration of EMA warming up window.
 The initial value of the EMA is the average of signal readings received during
 the warm up window. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2579,11 +2582,10 @@ Parameters for the Extrapolator component.
 Maximum time interval to repeat the last valid value of input signal. This field
 employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -3438,11 +3440,10 @@ and invalid new signals until the `hold_for` duration is finished.
 Holding the last valid signal value for the `hold_for` duration. This field
 employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>in_ports</dt>
@@ -4569,11 +4570,10 @@ Parameters for the _Sampler_.
 
 Duration for which the step is active. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>target_accept_percentage</dt>
@@ -5660,7 +5660,12 @@ PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 
 <!-- vale on -->
 
-The period of the timer.
+The period of the timer. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>scale_in_percentage</dt>
@@ -5885,11 +5890,10 @@ output signal
 Describes the interval between successive evaluations of the Prometheus query.
 This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>out_ports</dt>
@@ -5992,11 +5996,10 @@ Generates 0 and 1 in turns.
 
 Emitting 0 for the `false_for` duration. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>out_ports</dt>
@@ -6022,11 +6025,10 @@ Output ports for the PulseGenerator component.
 
 Emitting 1 for the `true_for` duration. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -6273,11 +6275,10 @@ continuously or only on discrete intervals.
 Interval defines the time interval in which the token bucket will fill tokens
 specified by `fill_amount` signal. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>label_key</dt>
@@ -6322,11 +6323,10 @@ Configuration of lazy-syncing behavior of rate limiter
 Max idle time before token bucket state for a label is removed. If set to 0, the
 state is never removed. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -6760,11 +6760,10 @@ Computed moving average.
 
 Window of time over which the moving average is computed. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -7076,11 +7075,10 @@ Fail-open logic is use for flow control APIs, so if the gRPC deadline reaches,
 the flow will end up being unconditionally allowed while it is still waiting on
 the scheduler. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -7565,11 +7563,10 @@ Parameters for the _Signal Generator_ component.
 
 Duration for which the step is active. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers (protobuf). The format accommodates
-fractional seconds up to nine digits after the decimal point, offering
-nanosecond precision. Every duration value must be suffixed with an "s" to
-indicate 'seconds.' For example, a value of "10s" would signify a duration of 10
-seconds.
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>target_output</dt>

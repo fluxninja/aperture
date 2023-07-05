@@ -424,6 +424,7 @@ type PeriodicDecrease struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The period of the timer.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	Period *durationpb.Duration `protobuf:"bytes,1,opt,name=period,proto3" json:"period,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The percentage of scale to reduce.
 	ScaleInPercentage float64 `protobuf:"fixed64,2,opt,name=scale_in_percentage,json=scaleInPercentage,proto3" json:"scale_in_percentage,omitempty" validate:"required,gte=0,lte=100"` // @gotags: validate:"required,gte=0,lte=100"
@@ -1177,8 +1178,10 @@ type AutoScaler_ScalingParameters struct {
 	// The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 	MaxScaleInPercentage float64 `protobuf:"fixed64,2,opt,name=max_scale_in_percentage,json=maxScaleInPercentage,proto3" json:"max_scale_in_percentage,omitempty" default:"1"` // @gotags: default:"1"
 	// The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	ScaleOutCooldown *durationpb.Duration `protobuf:"bytes,3,opt,name=scale_out_cooldown,json=scaleOutCooldown,proto3" json:"scale_out_cooldown,omitempty" default:"30s"` // @gotags: default:"30s"
 	// The amount of time to wait after a scale-in operation for another scale-in operation.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	ScaleInCooldown *durationpb.Duration `protobuf:"bytes,4,opt,name=scale_in_cooldown,json=scaleInCooldown,proto3" json:"scale_in_cooldown,omitempty" default:"120s"` // @gotags: default:"120s"
 	// Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
 	// For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the

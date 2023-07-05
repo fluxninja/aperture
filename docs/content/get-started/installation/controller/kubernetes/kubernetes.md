@@ -161,13 +161,3 @@ of the Kubernetes cluster based on your infrastructure.
 8. Once the `ADDRESS` matches the External IP, the etcd will be accessible on
    `http://etcd.YOUR_DOMAIN_HERE:80` and the Prometheus will be accessible on
    `http://prometheus.YOUR_DOMAIN_HERE:80`.
-
-## Applying Policies
-
-The process of creating policies for Aperture can be done either after the
-installation of the controller or after the installation of the agent, depending
-on your preference.
-[Generating and applying policies](/get-started/policies/policies.md) guide
-includes step-by-step instructions on how to create policies for Aperture in a
-Kubernetes cluster, which you can follow to create policies according to your
-needs.

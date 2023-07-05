@@ -50,8 +50,7 @@ Once the
 and both the Aperture Controller and Agents are installed, the next crucial step
 is to create and apply policies.
 
-The [Generating and applying policies](/get-started/policies/policies.md)
-section provides comprehensive, step-by-step instructions on customizing,
-creating, and applying policies within Aperture. Additionally, the
-[use-cases](/use-cases/use-cases.md) section serves as a valuable resource about
-tailoring policies to meet specific requirements.
+[Your first policy](/get-started/policies/policies.md) section provides
+step-by-step instructions on customizing, creating, and applying policies within
+Aperture. Additionally, the [use-cases](/use-cases/use-cases.md) section serves
+as a valuable resource for tailoring policies to meet specific requirements.
