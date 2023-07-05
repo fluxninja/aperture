@@ -29,6 +29,7 @@ const (
 	Controller_ListAutoScaleControlPoints_FullMethodName = "/aperture.cmd.v1.Controller/ListAutoScaleControlPoints"
 	Controller_ListDiscoveryEntities_FullMethodName      = "/aperture.cmd.v1.Controller/ListDiscoveryEntities"
 	Controller_ListDiscoveryEntity_FullMethodName        = "/aperture.cmd.v1.Controller/ListDiscoveryEntity"
+	Controller_ListPolicies_FullMethodName               = "/aperture.cmd.v1.Controller/ListPolicies"
 	Controller_PreviewFlowLabels_FullMethodName          = "/aperture.cmd.v1.Controller/PreviewFlowLabels"
 	Controller_PreviewHTTPRequests_FullMethodName        = "/aperture.cmd.v1.Controller/PreviewHTTPRequests"
 	Controller_UpsertPolicy_FullMethodName               = "/aperture.cmd.v1.Controller/UpsertPolicy"
@@ -47,6 +48,7 @@ type ControllerClient interface {
 	ListAutoScaleControlPoints(ctx context.Context, in *ListAutoScaleControlPointsRequest, opts ...grpc.CallOption) (*ListAutoScaleControlPointsControllerResponse, error)
 	ListDiscoveryEntities(ctx context.Context, in *ListDiscoveryEntitiesRequest, opts ...grpc.CallOption) (*ListDiscoveryEntitiesControllerResponse, error)
 	ListDiscoveryEntity(ctx context.Context, in *ListDiscoveryEntityRequest, opts ...grpc.CallOption) (*ListDiscoveryEntityAgentResponse, error)
+	ListPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.GetPoliciesResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
@@ -118,6 +120,15 @@ func (c *controllerClient) ListDiscoveryEntity(ctx context.Context, in *ListDisc
 	return out, nil
 }
 
+func (c *controllerClient) ListPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.GetPoliciesResponse, error) {
+	out := new(v1.GetPoliciesResponse)
+	err := c.cc.Invoke(ctx, Controller_ListPolicies_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *controllerClient) PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error) {
 	out := new(PreviewFlowLabelsControllerResponse)
 	err := c.cc.Invoke(ctx, Controller_PreviewFlowLabels_FullMethodName, in, out, opts...)
@@ -182,6 +193,7 @@ type ControllerServer interface {
 	ListAutoScaleControlPoints(context.Context, *ListAutoScaleControlPointsRequest) (*ListAutoScaleControlPointsControllerResponse, error)
 	ListDiscoveryEntities(context.Context, *ListDiscoveryEntitiesRequest) (*ListDiscoveryEntitiesControllerResponse, error)
 	ListDiscoveryEntity(context.Context, *ListDiscoveryEntityRequest) (*ListDiscoveryEntityAgentResponse, error)
+	ListPolicies(context.Context, *emptypb.Empty) (*v1.GetPoliciesResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
@@ -212,6 +224,9 @@ func (UnimplementedControllerServer) ListDiscoveryEntities(context.Context, *Lis
 }
 func (UnimplementedControllerServer) ListDiscoveryEntity(context.Context, *ListDiscoveryEntityRequest) (*ListDiscoveryEntityAgentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListDiscoveryEntity not implemented")
+}
+func (UnimplementedControllerServer) ListPolicies(context.Context, *emptypb.Empty) (*v1.GetPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicies not implemented")
 }
 func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewFlowLabels not implemented")
@@ -347,6 +362,24 @@ func _Controller_ListDiscoveryEntity_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ControllerServer).ListDiscoveryEntity(ctx, req.(*ListDiscoveryEntityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_ListPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).ListPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_ListPolicies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).ListPolicies(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -489,6 +522,10 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListDiscoveryEntity",
 			Handler:    _Controller_ListDiscoveryEntity_Handler,
+		},
+		{
+			MethodName: "ListPolicies",
+			Handler:    _Controller_ListPolicies_Handler,
 		},
 		{
 			MethodName: "PreviewFlowLabels",
