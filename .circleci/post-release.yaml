@@ -342,8 +342,8 @@ jobs:
           command: |
             docker pull mcr.microsoft.com/container-package-app:latest
             cd ..
-            docker run -e APP_ID=${APP_ID} -e AZURE_PASSWORD=${AZURE_PASSWORD} -e TENANT=${TENANT} -d --name interactive_shell -v /var/run/docker.sock:/var/run/docker.sock -v project:/data mcr.microsoft.com/container-package-app:latest tail -f /dev/null
-            docker exec -it interactive_shell /bin/bash -c '
+            docker run -e APP_ID=${APP_ID} -e AZURE_PASSWORD=${AZURE_PASSWORD} -e TENANT=${TENANT} -d --name microsoft_container -v /var/run/docker.sock:/var/run/docker.sock -v project:/data mcr.microsoft.com/container-package-app:latest tail -f /dev/null
+            docker exec microsoft_container /bin/bash -xc '
               export REGISTRY_NAME="fluxninja.azurecr.io"
               az login --service-principal -u ${APP_ID} --password ${AZURE_PASSWORD} --tenant ${TENANT}
               az acr login -n $REGISTRY_NAME
