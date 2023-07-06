@@ -123,8 +123,8 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	instance := &controllerv1alpha1.Controller{}
 	err := r.Get(ctx, req.NamespacedName, instance)
 	if err != nil && errors.IsNotFound(err) {
-		defer r.mutex.RUnlock()
 		r.mutex.RLock()
+		defer r.mutex.RUnlock()
 		if deleted, ok := r.ResourcesDeleted[req.NamespacedName.String()]; !ok || !deleted {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
@@ -161,8 +161,8 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 		}
 
-		defer r.mutex.Unlock()
 		r.mutex.Lock()
+		defer r.mutex.Unlock()
 		r.ResourcesDeleted[req.NamespacedName.String()] = true
 		return ctrl.Result{}, nil
 	}
@@ -199,9 +199,9 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.defaultsExecuted = true
 	}
 
-	defer r.mutex.Unlock()
 	r.mutex.Lock()
 	r.ResourcesDeleted[req.NamespacedName.String()] = false
+	r.mutex.Unlock()
 	if err = r.manageResources(ctx, logger, instance); err != nil {
 		return ctrl.Result{}, err
 	}
