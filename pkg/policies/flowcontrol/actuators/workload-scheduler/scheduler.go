@@ -417,7 +417,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 	reqCtx := ctx
 
 	clientDeadline, hasDeadline := ctx.Deadline()
-	if hasDeadline && matchedWorkloadTimeout > 0 {
+	if hasDeadline || matchedWorkloadTimeout > 0 {
 		// The clientDeadline is calculated based on client's timeout, passed
 		// as grpc-timeout. Our goal is for the response to be received by the
 		// client before its deadline passes (otherwise we risk fail-open on
