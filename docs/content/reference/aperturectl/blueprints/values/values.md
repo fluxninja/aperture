@@ -23,7 +23,7 @@ aperturectl blueprints values [flags]
 ### Examples
 
 ```
-aperturectl blueprints values --name=policies/rate-limiting --output-file=values.yaml
+aperturectl blueprints values --name=rate-limiting/base --output-file=values.yaml
 ```
 
 ### Options
