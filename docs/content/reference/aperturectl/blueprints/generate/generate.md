@@ -33,7 +33,7 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 ```
       --api-key string         FluxNinja ARC API Key to be used when using Cloud Controller
       --apply                  Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
-      --controller string      Address of Aperture controller
+      --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --graph-depth int        Max depth of the graph when generating DOT and Mermaid files (default 1)
   -h, --help                   help for generate

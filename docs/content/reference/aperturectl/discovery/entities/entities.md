@@ -41,7 +41,7 @@ aperturectl discovery entities --find-by=“ip=10.244.1.24”
 
 ```
       --api-key string         FluxNinja ARC API Key to be used when using Cloud Controller
-      --controller string      Address of Aperture controller
+      --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --insecure               Allow connection to controller running without TLS
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly

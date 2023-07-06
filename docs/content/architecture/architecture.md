@@ -37,7 +37,7 @@ reliability.
 
 ## Aperture Controller
 
-The Aperture controller is a centralized control system, equipped with a
+The Aperture Controller is a centralized control system, equipped with a
 comprehensive global perspective. It is programmed using declarative policies
 that are stored in a policy database that can be managed using the Kubernetes
 Custom Resource Definition (CRD) API, allowing users to configure and modify
@@ -51,8 +51,8 @@ these health and performance signals. The policies continuously track deviations
 from SLOs and calculate recovery or escalation actions that are translated as
 adjustments to the agents.
 
-After computing the adjustments, the Aperture controller synchronizes them with
-the relevant Aperture agents. These adjustments encompass load throttling,
+After computing the adjustments, the Aperture Controller synchronizes them with
+the relevant Aperture Agents. These adjustments encompass load throttling,
 workload prioritization, and auto-scaling actions, among others. By
 disseminating the calculated adjustments to the agents, the controller ensures
 that the agents take localized actions in line with the global state of the
@@ -60,7 +60,7 @@ system.
 
 ### Aperture Agents
 
-Aperture agents are the workhorses of the platform, providing powerful flow
+Aperture Agents are the workhorses of the platform, providing powerful flow
 control components such as a weighted fair queuing scheduler for workload
 prioritization and a distributed rate-limiter for abuse prevention. Agents
 integrate with service meshes, gateways and HTTP middlewares. Alternately,
@@ -70,15 +70,15 @@ sections inside services.
 The agents monitor service and infrastructure health signals using an in-built
 telemetry system. In addition, a programmable, high-fidelity flow classifier is
 used to label requests based on attributes such as customer tier or request
-type. These metrics are then analyzed by the Aperture controller.
+type. These metrics are then analyzed by the Aperture Controller.
 
-Aperture agents schedule workloads based on their priorities, helping prioritize
+Aperture Agents schedule workloads based on their priorities, helping prioritize
 critical features over less important workloads during overload scenarios. For
 example, a video streaming service might prioritize a request to play a movie by
 a customer over a recommended movies API. A SaaS product might prioritize
 features used by paid users over those being used by free users.
 
-Aperture agents can be installed on a variety of infrastructure such as
+Aperture Agents can be installed on a variety of infrastructure such as
 Kubernetes, VMs, or bare-metal. In addition to flow control capabilities, agents
 work with auto-scaling APIs for platforms such as Kubernetes, to help scale
 infrastructure when needed.

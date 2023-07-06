@@ -17,7 +17,7 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion
 
 ## Overview
 
-The Aperture controller functions as the brain of the Aperture system.
+The Aperture Controller functions as the brain of the Aperture system.
 Leveraging an advanced control loop, the controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
 set policies. Once determined, these decisions are then exported to all Aperture
@@ -32,16 +32,16 @@ process variables and maintain their values within the optimal range.
 
 ## Installation
 
-The Aperture controller can be installed using the below options:
+The Aperture Controller can be installed using the below options:
 
 1. [**Kubernetes**](kubernetes/kubernetes.md)
 
-   The Aperture controller can be installed on Kubernetes using the Kubernetes
+   The Aperture Controller can be installed on Kubernetes using the Kubernetes
    Operator available for it, or using namespace-scoped resources.
 
 2. [**Docker**](docker.md)
 
-   The Aperture controller can also be installed on Docker as containers.
+   The Aperture Controller can also be installed on Docker as containers.
 
 ## Applying Policies
 

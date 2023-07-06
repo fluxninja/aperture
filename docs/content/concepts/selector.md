@@ -157,7 +157,7 @@ An example flow:
 | ----------- | ---------------------------- | --------------------------------------- | --------------- |
 | default     | smart-recommendation-feature | checkout-service.prod.svc.cluster.local | user_type:guest |
 
-### DaemonSet deployment of Aperture agents
+### DaemonSet deployment of Aperture Agents
 
 In this installation mode, control points alone might not be sufficient to
 identify flows. For instance, in the case of Envoy interception, the default
@@ -176,7 +176,7 @@ An example flow:
 
 <!-- vale on -->
 
-### Aperture agent as a sidecar container
+### Aperture Agent as a sidecar container
 
 In this installation mode, Kubernetes service discovery is disabled by default.
 It is recommended to configure each service's deployment with a unique Aperture
@@ -194,9 +194,9 @@ Example flows:
 
 <!-- vale on -->
 
-### Standalone deployment of Aperture agents
+### Standalone deployment of Aperture Agents
 
-In this installation mode, Aperture agents are installed as a standalone load
+In this installation mode, Aperture Agents are installed as a standalone load
 management service. Clients call into this service to get load management
 functionality. The selectors in this scenario rely on control points as the
 distinguishing factor to identify unique features and services.

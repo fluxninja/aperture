@@ -12,7 +12,7 @@ keywords:
 ## Flow Lifecycle
 
 The lifecycle of a flow begins when a service initiates it, requesting a
-decision from the Aperture agent. As the flow enters the Aperture agent, it
+decision from the Aperture Agent. As the flow enters the Aperture Agent, it
 embarks on a journey through multiple stages before a final decision is made.
 The following diagram illustrates these stages and the sequence they follow.
 

@@ -150,7 +150,7 @@ Returns:
 
 Alternatively, use the
 [Introspection API](/reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
-directly on an Aperture agent:
+directly on an Aperture Agent:
 
 Example:
 
