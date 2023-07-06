@@ -45,7 +45,7 @@ policies as needed.
 
 A policy represents a closed-loop control circuit that is executed periodically.
 The control circuit draws input signals from metrics aggregated across Aperture
-agents, providing the controller with a holistic view of the application's
+Agents, providing the controller with a holistic view of the application's
 health and performance. Service-level objectives (SLOs) are defined against
 these health and performance signals. The policies continuously track deviations
 from SLOs and calculate recovery or escalation actions that are translated as
@@ -58,7 +58,7 @@ disseminating the calculated adjustments to the agents, the controller ensures
 that the agents take localized actions in line with the global state of the
 system.
 
-### Aperture Agents
+## Aperture Agents
 
 Aperture Agents are the workhorses of the platform, providing powerful flow
 control components such as a weighted fair queuing scheduler for workload
@@ -83,7 +83,7 @@ Kubernetes, VMs, or bare-metal. In addition to flow control capabilities, agents
 work with auto-scaling APIs for platforms such as Kubernetes, to help scale
 infrastructure when needed.
 
-### Aperture Databases
+## Aperture Databases
 
 Aperture uses two databases to store configuration, telemetry, and flow control
 information: [Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
