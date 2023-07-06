@@ -7229,6 +7229,24 @@ virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\ri
 $$
 
 </dd>
+<dt>queue_timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Timeout for the flow in the workload. If timeout is provided on the Check call
+as well, we pick the minimum of the two. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
 <dt>tokens</dt>
 <dd>
 
