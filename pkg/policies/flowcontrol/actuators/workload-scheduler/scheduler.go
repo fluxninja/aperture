@@ -405,6 +405,10 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 	if matchedWorkloadParametersProto.QueueTimeout != nil {
 		matchedWorkloadTimeout = matchedWorkloadParametersProto.QueueTimeout.AsDuration()
 	}
+	hasWorkloadTimeout := false
+	if matchedWorkloadTimeout > 0 {
+		hasWorkloadTimeout = true
+	}
 
 	if s.proto.TokensLabelKey != "" {
 		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
@@ -417,7 +421,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 	reqCtx := ctx
 
 	clientDeadline, hasDeadline := ctx.Deadline()
-	if hasDeadline || matchedWorkloadTimeout > 0 {
+	if hasDeadline || hasWorkloadTimeout {
 		// The clientDeadline is calculated based on client's timeout, passed
 		// as grpc-timeout. Our goal is for the response to be received by the
 		// client before its deadline passes (otherwise we risk fail-open on
@@ -432,14 +436,9 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 			timeout = 0
 		}
 
-		matchedWorkloadTimeoutWithoutMargin := matchedWorkloadTimeout - s.proto.DecisionDeadlineMargin.AsDuration()
-		if matchedWorkloadTimeoutWithoutMargin < 0 {
-			matchedWorkloadTimeoutWithoutMargin = 0
-		}
-
 		// find the minimum of matchedWorkloadTimeout and client's timeout
-		if matchedWorkloadTimeoutWithoutMargin < timeout {
-			timeout = matchedWorkloadTimeoutWithoutMargin
+		if hasWorkloadTimeout && matchedWorkloadTimeout < timeout {
+			timeout = matchedWorkloadTimeout
 		}
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
