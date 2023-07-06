@@ -73,7 +73,7 @@ For example, to generate a `policies/rate-limiting` policy, you can first
 generate a `values.yaml` file using the following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=policies/rate-limiting --version={apertureVersion} --output-file=values.yaml</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints values --name=rate-limiting/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
 ```
 
 You can then edit the `values.yaml` to provide the required fields
@@ -104,7 +104,7 @@ Once the `values.yaml` file is ready, you can generate the blueprint using the
 following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=policies/rate-limiting
+<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
 --values-file=values.yaml --output-dir=policy-gen --version={apertureVersion}</CodeBlock>
 ```
 
@@ -136,7 +136,7 @@ generated policies on a Kubernetes cluster in the namespace where the Aperture
 Controller is installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=policies/rate-limiting
+<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
 --values-file=values.yaml --apply --version={apertureVersion}</CodeBlock>
 ```
 
@@ -144,7 +144,7 @@ It uses the default configuration for Kubernetes cluster under `~/.kube/config`.
 You can pass the `--kube-config` flag to pass any other path.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=policies/rate-limiting
+<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
 --values-file=values.yaml --kube-config=/path/to/config --apply --version={apertureVersion}</CodeBlock>
 ```
 
