@@ -23,9 +23,9 @@ aperturectl blueprints generate [flags]
 ### Examples
 
 ```
-aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml
+aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml --apply
+aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml --apply
 ```
 
 ### Options
