@@ -16,8 +16,18 @@
           "subdir": "crdsonnet"
         }
       },
-      "version": "af14e3b8e958e1e4155d67689bd9d38cb7169698",
-      "sum": "HH+GjMwZCo65Q4SBG2M2Ezz+RekZmc783vZsXvVyPOA="
+      "version": "522d9546e44721fa8f1331d075295fc2feef966a",
+      "sum": "abzN6XHVHqSSjrrsQGpx/zBFaQn/fwbpH3XEzfct2Mw="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/crdsonnet/validate-libsonnet.git",
+          "subdir": ""
+        }
+      },
+      "version": "a78ca15fbfece3110c4807d1f059132ece01d97b",
+      "sum": "qYLH56MqvmgxE4YMNeTbuJ1XSsCpl1sumHN5x8IQv2I="
     },
     {
       "source": {
@@ -36,8 +46,8 @@
           "subdir": "gen/grafonnet-v9.4.0"
         }
       },
-      "version": "bf8e76582d494f3c68e99a26a4a80c519896de8a",
-      "sum": "ZpLDXjPjdY1BXZqNrFZ6sApXKALmN3m9j6pp/2xxkxY="
+      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2",
+      "sum": "Ju+Q5MP6YAQvK4pNOGRjHWgP4eLCxzLtjUOCqXyCbf4="
     },
     {
       "source": {
@@ -46,8 +56,8 @@
           "subdir": "grafonnet-base"
         }
       },
-      "version": "bf8e76582d494f3c68e99a26a4a80c519896de8a",
-      "sum": "0GrcZOf33zjkbaOe7V58008KuciSHamOSjGQ/7LsYz4="
+      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2",
+      "sum": "5zmj5Vn/cKhKrD+jA5BfLliR4t74upkM4PfnuJC5t4M="
     },
     {
       "source": {
@@ -66,8 +76,8 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "2f10b97239412c22a84d580d5c1499b8b6f564ef",
-      "sum": "wp/L/9smcsHIiy24DH5WWMv2fcSckN2Lw/m7qDszaWU="
+      "version": "8464fb13bbacf6764a39a0f90076aa2b0fcb70c8",
+      "sum": "RJjFQa1n8CDbB6m1fBQQzPye7jhOhGTUbma27Gil81I="
     },
     {
       "source": {
@@ -76,7 +86,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "2f10b97239412c22a84d580d5c1499b8b6f564ef",
+      "version": "8464fb13bbacf6764a39a0f90076aa2b0fcb70c8",
       "sum": "0y3AFX9LQSpfWTxWKSwoLgbt0Wc9nnCwhMH2szKzHv0="
     },
     {
@@ -86,7 +96,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "2f10b97239412c22a84d580d5c1499b8b6f564ef",
+      "version": "8464fb13bbacf6764a39a0f90076aa2b0fcb70c8",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -96,8 +106,8 @@
           "subdir": "doc-util"
         }
       },
-      "version": "ff76f6d8edde6366c6dcf81a356481b0e344566b",
-      "sum": "OxjkWDF0oHmwV52hhyoFW3bwtwgke8s/EOPNRiICPTI="
+      "version": "7c865ec0606f2b68c0f6b2721f101e6a99cd2593",
+      "sum": "zjjufxN4yAIevldYEERiZEp27vK0BJKj1VvZcVtWiOo="
     },
     {
       "source": {
