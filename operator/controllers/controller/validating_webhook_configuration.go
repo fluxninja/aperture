@@ -31,7 +31,7 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 
 	validatingWebhookConfiguration := &admissionregistrationv1.ValidatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerServiceName,
+			Name:        controllers.ControllerResourcesName(instance),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: controllers.ControllerAnnotationsWithOwnerRef(instance),
 		},
@@ -40,7 +40,7 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 				Name: controllers.PolicyValidatingWebhookName,
 				ClientConfig: admissionregistrationv1.WebhookClientConfig{
 					Service: &admissionregistrationv1.ServiceReference{
-						Name:      controllers.ControllerServiceName,
+						Name:      controllers.ControllerResourcesName(instance),
 						Namespace: instance.GetNamespace(),
 						Path:      pointer.String(controllers.PolicyValidatingWebhookURI),
 						Port:      pointer.Int32(serverPort),

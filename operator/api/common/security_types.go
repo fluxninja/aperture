@@ -22,6 +22,7 @@ type ServiceAccountSpec struct {
 	Create bool `json:"create" default:"true"`
 
 	// Existing ServiceAccount name to be used
+	//+kubebuilder:validation:Optional
 	Name string `json:"name" default:""`
 
 	// Additional Service Account annotations

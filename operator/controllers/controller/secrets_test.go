@@ -53,7 +53,7 @@ var _ = Describe("Secret for Controller", func() {
 
 			expected := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("%s-%s-controller-apikey", AppName, ControllerName),
+					Name:      fmt.Sprintf("%s-controller-apikey", ControllerName),
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,

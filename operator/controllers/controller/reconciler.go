@@ -23,6 +23,7 @@ import (
 	"path"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/fluxninja/aperture/v2/operator/controllers"
 
@@ -55,8 +56,9 @@ type ControllerReconciler struct {
 	Scheme              *runtime.Scheme
 	Recorder            record.EventRecorder
 	MultipleControllers bool
-	resourcesDeleted    bool
+	ResourcesDeleted    map[string]bool
 	defaultsExecuted    bool
+	mutex               sync.RWMutex
 }
 
 var (
@@ -121,7 +123,9 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	instance := &controllerv1alpha1.Controller{}
 	err := r.Get(ctx, req.NamespacedName, instance)
 	if err != nil && errors.IsNotFound(err) {
-		if !r.resourcesDeleted {
+		r.mutex.RLock()
+		defer r.mutex.RUnlock()
+		if deleted, ok := r.ResourcesDeleted[req.NamespacedName.String()]; !ok || !deleted {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and do not requeue
@@ -131,6 +135,15 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	} else if err != nil {
 		// Error reading the object - requeue the request.
 		logger.Error(err, "failed to get Controller")
+		return ctrl.Result{}, err
+	}
+
+	// Checking if the Minimum kubernetes version condition is satisfied.
+	if len(instance.Status.Resources) == 0 && !controllers.MinimumKubernetesVersionBool {
+		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
+			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
+		instance.Status.Resources = "failed"
+		err = r.updateStatus(ctx, instance.DeepCopy())
 		return ctrl.Result{}, err
 	}
 
@@ -148,7 +161,9 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 		}
 
-		r.resourcesDeleted = true
+		r.mutex.Lock()
+		defer r.mutex.Unlock()
+		r.ResourcesDeleted[req.NamespacedName.String()] = true
 		return ctrl.Result{}, nil
 	}
 
@@ -169,6 +184,11 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 	}
 
+	instance.Status.Resources = "creating"
+	if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	if instance.Annotations == nil || instance.Annotations[controllers.DefaulterAnnotationKey] != "true" || !r.defaultsExecuted {
 		err = r.checkDefaults(ctx, instance)
 		if err != nil {
@@ -179,25 +199,10 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.defaultsExecuted = true
 	}
 
-	// Checking if the Minimum kubernetes version condition is satisfied.
-	if len(instance.Status.Resources) == 0 && !controllers.MinimumKubernetesVersionBool {
-		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
-			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
-	}
-
-	instance.Status.Resources = "creating"
-	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
-		return ctrl.Result{}, err
-	}
-	r.resourcesDeleted = false
-
-	if r.MultipleControllers {
-		if err := r.deleteSingletonResources(ctx, logger, req, instance); err != nil {
-			return ctrl.Result{}, err
-		}
-	}
-
-	if err := r.manageResources(ctx, logger, instance); err != nil {
+	r.mutex.Lock()
+	r.ResourcesDeleted[req.NamespacedName.String()] = false
+	r.mutex.Unlock()
+	if err = r.manageResources(ctx, logger, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -205,10 +210,34 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		controllerutil.AddFinalizer(instance, controllers.FinalizerName)
 	}
 
+	if !instance.Status.IsMigrationCompleted || instance.GetName() != controllers.ControllerName {
+		// Reloading instances for the case when the migration is completed by another controller.
+		err = r.List(ctx, instances)
+		if err != nil {
+			logger.Error(err, "failed to list Controller")
+			return ctrl.Result{}, err
+		}
+
+		doMigration := true
+		for _, ins := range instances.Items {
+			if ins.Status.IsMigrationCompleted || ins.GetName() == controllers.ControllerName {
+				doMigration = false
+				break
+			}
+		}
+
+		if doMigration {
+			if err := r.deleteOlderInstances(ctx, logger, instance); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	}
+
 	if err := r.updateController(ctx, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
+	instance.Status.IsMigrationCompleted = true
 	instance.Status.Resources = "created"
 	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 		return ctrl.Result{}, err
@@ -270,53 +299,59 @@ func (r *ControllerReconciler) updateStatus(ctx context.Context, instance *contr
 	return nil
 }
 
-func (r *ControllerReconciler) deleteSingletonResources(ctx context.Context, log logr.Logger, req ctrl.Request, instance *controllerv1alpha1.Controller) error {
-	// If we created controller with name "controller" its full name will match singleton name.
-	instanceFullName := fmt.Sprintf("%s-%s", controllers.AppName, instance.GetName())
-	if instanceFullName == controllers.ControllerServiceName {
-		return nil
-	}
-
+func (r *ControllerReconciler) deleteOlderInstances(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
 	singletonInstance := instance.DeepCopy()
-	singletonInstance.Name = controllers.ControllerServiceName
+	singletonInstance.Name = controllers.ControllerName
 
 	deployment, err := deploymentForController(singletonInstance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
-	if err != nil {
-		return nil
-	}
-
-	if err = r.Delete(ctx, deployment); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "Failed to delete old singleton Deployment")
-	}
-
-	configMap, err := configMapForControllerConfig(singletonInstance.DeepCopy(), r.Scheme)
-	if err != nil {
-		return err
-	}
-
-	if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "Failed to delete old singleton ConfigMap")
+	if err != nil || deployment == nil {
+		log.Error(err, "Failed to create object for old Deployment during Migration")
+	} else {
+		if err = r.Delete(ctx, deployment); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "Failed to delete old Deployment during Migration")
+		}
 	}
 
 	if singletonInstance.Spec.ServiceAccountSpec.Create {
 		var serviceAccount *corev1.ServiceAccount
 		serviceAccount, err = serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
-		if err != nil {
-			return err
-		}
-
-		if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
-			log.Error(err, "Failed to delete singleton ServiceAccount")
+		if err != nil || serviceAccount == nil {
+			log.Error(err, "Failed to create object for old ServiceAccount during Migration")
+		} else {
+			if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete old ServiceAccount during Migration")
+			}
 		}
 	}
 
-	secret, err := secretForControllerAPIKey(singletonInstance.DeepCopy(), r.Scheme)
-	if err != nil {
-		return err
+	configMap, err := configMapForControllerConfig(singletonInstance.DeepCopy(), r.Scheme)
+	if err != nil || configMap == nil {
+		log.Error(err, "Failed to create object for old ConfigMap during Migration")
+	} else {
+		if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "Failed to delete old ConfigMap during Migration")
+		}
 	}
 
-	if err = r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "Failed to delete old singleton Secret")
+	service, err := serviceForController(singletonInstance.DeepCopy(), log, r.Scheme)
+	if err != nil || service == nil {
+		log.Error(err, "Failed to create object for old Service during Migration")
+	} else {
+		if err = r.Delete(ctx, service); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "Failed to delete old Service during Migration")
+		}
+	}
+
+	if err = r.Delete(ctx, validatingWebhookConfiguration(singletonInstance.DeepCopy(), controllerClientCert.Bytes())); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old ValidatingWebhookConfiguration during Migration")
+	}
+
+	if err = r.Delete(ctx, clusterRoleBindingForController(singletonInstance.DeepCopy())); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old ClusterRoleBinding during Migration")
+	}
+
+	if err = r.Delete(ctx, clusterRoleForController(singletonInstance.DeepCopy())); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old ClusterRole during Migration")
 	}
 
 	return nil
@@ -324,13 +359,6 @@ func (r *ControllerReconciler) deleteSingletonResources(ctx context.Context, log
 
 // deleteResources deletes cluster-scoped resources for which owner-reference is not added.
 func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) {
-	// Deleting old ClusterRole
-	cr := clusterRoleForController(instance)
-	cr.Name = controllers.AppName
-	if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "failed to delete object of ClusterRole")
-	}
-
 	if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil {
 		log.Error(err, "failed to delete object of ClusterRole")
 	}

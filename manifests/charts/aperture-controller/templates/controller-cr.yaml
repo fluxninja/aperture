@@ -139,6 +139,8 @@ spec:
             echo "Waiting for Etcd to be Healthy";
           done;
           echo "Etcd is healthy."
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
       volumeMounts:
         - mountPath: /etc/aperture/aperture-controller/config
           name: aperture-controller-config
@@ -155,6 +157,8 @@ spec:
             echo "Waiting for Prometheus to be Ready"; sleep 2;
           done;
           echo "Prometheus is ready."
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
       volumeMounts:
         - mountPath: /etc/aperture/aperture-controller/config
           name: aperture-controller-config

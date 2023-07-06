@@ -5432,7 +5432,6 @@ spec:
                     type: string
                 required:
                 - create
-                - name
                 type: object
               sidecars:
                 description: Add additional sidecar containers
@@ -6751,6 +6750,8 @@ spec:
           status:
             description: ControllerStatus defines the observed state of Controller.
             properties:
+              isMigrationCompleted:
+                type: boolean
               resources:
                 type: string
             type: object
