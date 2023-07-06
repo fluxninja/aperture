@@ -4013,7 +4013,7 @@ spec:
                 description: Image configuration
                 properties:
                   digest:
-                    description: The digest (version) of the image
+                    description: The digest (sha) of the image
                     type: string
                   pullPolicy:
                     description: The ImagePullPolicy of the image

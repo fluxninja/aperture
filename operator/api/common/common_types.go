@@ -50,7 +50,7 @@ type Image struct {
 	//+kubebuilder:validation:Optional
 	Tag string `json:"tag"`
 
-	// The digest (version) of the image
+	// The digest (sha) of the image
 	//+kubebuilder:validation:Optional
 	Digest string `json:"digest"`
 

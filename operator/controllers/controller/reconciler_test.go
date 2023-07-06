@@ -83,6 +83,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -154,6 +155,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			instance.Namespace = namespace
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -226,6 +228,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -274,6 +277,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls6.crt")
