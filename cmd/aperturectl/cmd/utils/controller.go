@@ -53,7 +53,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&c.controllerAddr,
 		"controller",
 		"",
-		"Address of Aperture controller",
+		"Address of Aperture Controller",
 	)
 	flags.BoolVar(
 		&c.allowInsecure,

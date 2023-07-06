@@ -46,7 +46,7 @@ components:
 ## Distributed Counters {#distributed-counters}
 
 For each configured [_Rate Limiter Component_][reference], every matching
-Aperture agent instantiates a copy of the _Rate Limiter_. Although each agent
+Aperture Agent instantiates a copy of the _Rate Limiter_. Although each agent
 has its own copy of the component, they all share counters through a distributed
 cache. This means that they work together as a single _Rate Limiter_, providing
 seamless coordination and control across agents. The agents within an [agent
@@ -75,7 +75,7 @@ at once, users can do so if they have accumulated enough tokens.
 ### Lazy Syncing {#lazy-syncing}
 
 When lazy syncing is enabled, rate-limiting counters are stored in-memory and
-are only synchronized between Aperture agent instances on-demand. This allows
+are only synchronized between Aperture Agent instances on-demand. This allows
 for fast and low-latency rate-limiting decisions, at the cost of slight
 inaccuracy within a (small) time window (sync interval).
 

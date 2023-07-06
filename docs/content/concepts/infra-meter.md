@@ -24,14 +24,14 @@ infrastructure. Several policies such as auto-scale, service protection and
 feature rollout can provide more accurate control using health and saturation
 telemetry collected from the infrastructure.
 
-The Aperture agent process has a built-in
+The Aperture Agent process has a built-in
 [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector),
 which allows defining collection pipelines to gather metrics from [various
 sources][integration]. The _Infra Meter_ is a type of policy resource that
-facilitates the setup of OpenTelemetry pipelines at Aperture agents. It
+facilitates the setup of OpenTelemetry pipelines at Aperture Agents. It
 primarily defines receivers, processors, and a single metrics pipeline. The
 metrics pipeline data is exported to the Prometheus instance configured in
-Aperture controller.
+Aperture Controller.
 
 ## Configuration
 

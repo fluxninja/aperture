@@ -39,7 +39,7 @@ ensuring optimal performance while minimizing infrastructure costs.
 
 ## Insertion
 
-Aperture agents interface with cloud infrastructure APIs, such as Kubernetes
+Aperture Agents interface with cloud infrastructure APIs, such as Kubernetes
 API, to discover, monitor, and scale infrastructure resources. The Aperture
 Controller uses the information from the agents to make informed auto-scaling
 decisions that are then acted on by the agents.
@@ -163,7 +163,7 @@ Object Selector identifies a resource in the Kubernetes cluster.
 
 A _Kubernetes Object Selector_ consists of:
 
-- _Agent Group_: The agent group identifies Aperture agents where the component
+- _Agent Group_: The agent group identifies Aperture Agents where the component
   gets applied.
 - API Version: The Kubernetes API version of the resource.
 - Kind: The Kind of the Kubernetes resource, such as Deployment, ReplicaSet,
@@ -175,7 +175,7 @@ A _Kubernetes Object Selector_ consists of:
 
 The Kubernetes resources identified by a _Kubernetes Object Selector_ are called
 _Kubernetes Control Points_. These are a subset of resources in a Kubernetes
-cluster resource that can be scaled in or out. Aperture agents perform automated
+cluster resource that can be scaled in or out. Aperture Agents perform automated
 discovery of Kubernetes Control Points in a cluster.
 
 Use the

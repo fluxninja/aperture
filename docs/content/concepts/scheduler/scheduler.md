@@ -47,7 +47,7 @@ or inter-service API quotas.
 
 Workloads are groups of requests based on common
 [_Flow Labels_](../flow-label.md). Workloads are expressed by [label
-matcher][label-matcher] rules in the _Scheduler_ definition. Aperture agents
+matcher][label-matcher] rules in the _Scheduler_ definition. Aperture Agents
 schedule workloads based on their [priorities](#priority) and [tokens](#tokens).
 
 ### Priority {#priority}

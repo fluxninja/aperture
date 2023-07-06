@@ -20,7 +20,7 @@ Use this command to query information about active Discovery integrations
 
 ```
       --api-key string         FluxNinja ARC API Key to be used when using Cloud Controller
-      --controller string      Address of Aperture controller
+      --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for discovery
       --insecure               Allow connection to controller running without TLS
