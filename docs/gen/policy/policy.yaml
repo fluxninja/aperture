@@ -3073,6 +3073,11 @@ definitions:
                 type: string
                 x-go-tag-default: "1"
                 x-go-tag-validate: gt=0
+            queue_timeout:
+                description: |-
+                    Timeout for the flow in the workload.
+                    If timeout is provided on the Check call as well, we pick the minimum of the two.
+                type: string
             tokens:
                 description: |-
                     Tokens determines the cost of admitting a single flow in the workload,

@@ -2898,6 +2898,10 @@
           "x-go-tag-default": "1",
           "x-go-tag-validate": "gt=0"
         },
+        "queue_timeout": {
+          "description": "Timeout for the flow in the workload.\nIf timeout is provided on the Check call as well, we pick the minimum of the two.",
+          "type": "string"
+        },
         "tokens": {
           "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.",
           "format": "uint64",

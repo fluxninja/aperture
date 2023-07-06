@@ -7229,6 +7229,19 @@ virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\ri
 $$
 
 </dd>
+<dt>queue_timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Timeout for the flow in the workload. If timeout is provided on the Check call
+as well, we pick the minimum of the two.
+
+</dd>
 <dt>tokens</dt>
 <dd>
 
