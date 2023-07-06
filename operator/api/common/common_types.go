@@ -48,7 +48,11 @@ type Image struct {
 
 	// The tag (version) of the image
 	//+kubebuilder:validation:Optional
-	Tag string `json:"tag" default:"latest"`
+	Tag string `json:"tag"`
+
+	// The digest (sha) of the image
+	//+kubebuilder:validation:Optional
+	Digest string `json:"digest"`
 
 	// The ImagePullPolicy of the image
 	//+kubebuilder:validation:Optional

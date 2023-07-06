@@ -130,6 +130,8 @@ var (
 	Test = "test"
 	// TestTwo string.
 	TestTwo = "test2"
+	// TestDigest string.
+	TestDigest = "sha256:1234567890"
 	// TestArray array.
 	TestArray = []string{Test}
 	// TestArrayTwo array.
