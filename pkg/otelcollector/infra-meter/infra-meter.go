@@ -1,6 +1,7 @@
 package inframeter
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"sort"
 	"strings"
@@ -70,7 +71,19 @@ func addInfraMeter(
 		if err := id.UnmarshalText([]byte(origName)); err != nil {
 			return fmt.Errorf("invalid id %q: %w", origName, err)
 		}
-		id = component.NewIDWithName(id.Type(), normalizeComponentName(pipelineName, id.Name()))
+
+		configSHA := sha256.New()
+		_, err := configSHA.Write([]byte(receiverConfig.String()))
+		if err != nil {
+			return fmt.Errorf("failed to prepare sha256 for receiver '%s' in infra_meter: '%s' of Policy: '%s': %w", origName, infraMeterName, policyName, err)
+		}
+		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", configSHA.Sum(nil)))
+
+		// If receiver is already present with given id, skip adding it again.
+		if _, ok := config.Receivers[id.String()]; ok && !infraMeter.PerAgentGroup {
+			receiverIDs[origName] = id.String()
+			continue
+		}
 		var cfg any
 		cfg = receiverConfig.AsMap()
 		id, cfg = leaderonlyreceiver.WrapConfigIf(infraMeter.PerAgentGroup, id, cfg)
@@ -120,7 +133,6 @@ func addInfraMeter(
 		),
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
 	})
-
 	return nil
 }
 
