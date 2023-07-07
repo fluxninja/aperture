@@ -2,12 +2,15 @@ package checkhttp_test
 
 import (
 	"context"
+	"time"
 
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
@@ -18,10 +21,10 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	classification "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
+	"github.com/fluxninja/aperture/v2/pkg/policies/mocks"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
@@ -42,20 +45,24 @@ var _ = AfterEach(func() {
 	}
 })
 
-type AcceptingHandler struct{}
-
-func (s *AcceptingHandler) CheckRequest(
-	context.Context,
-	iface.RequestContext,
-) *flowcontrolv1.CheckResponse {
-	resp := &flowcontrolv1.CheckResponse{
+func acceptedResponse() *flowcontrolv1.CheckResponse {
+	return &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 	}
-	return resp
+}
+
+func rejectedResponse() *flowcontrolv1.CheckResponse {
+	return &flowcontrolv1.CheckResponse{
+		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
+	}
 }
 
 var _ = Describe("CheckHTTP handler", func() {
-	var handler *checkhttp.Handler
+	var (
+		ctrl         *gomock.Controller
+		checkHandler *mocks.MockHandlerWithValues
+		handler      *checkhttp.Handler
+	)
 
 	When("it is queried with a request", func() {
 		BeforeEach(func() {
@@ -71,11 +78,16 @@ var _ = Describe("CheckHTTP handler", func() {
 				IpAddress: "1.2.3.4",
 				Services:  []string{service1Selector.Service},
 			})
+			ctrl = gomock.NewController(GinkgoT())
+			checkHandler = mocks.NewMockHandlerWithValues(ctrl)
 			handler = checkhttp.NewHandler(
 				classifier,
 				servicegetter.FromEntities(entities),
-				&AcceptingHandler{},
+				checkHandler,
 			)
+		})
+		AfterEach(func() {
+			ctrl.Finish()
 		})
 		It("returns ok response", func() {
 			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("1.2.3.4"))
@@ -84,6 +96,7 @@ var _ = Describe("CheckHTTP handler", func() {
 				ctxWithIp,
 				metadata.Pairs(),
 			)
+			checkHandler.EXPECT().CheckRequest(gomock.Any(), gomock.Any()).Return(acceptedResponse())
 			resp, err := handler.CheckHTTP(ctxWithIp, &flowcontrolhttpv1.CheckHTTPRequest{ControlPoint: "ingress"})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
@@ -94,9 +107,24 @@ var _ = Describe("CheckHTTP handler", func() {
 				ctxWithIp,
 				metadata.Pairs(),
 			)
+			checkHandler.EXPECT().CheckRequest(gomock.Any(), gomock.Any()).Return(acceptedResponse())
 			resp, err := handler.CheckHTTP(ctxWithIp, &flowcontrolhttpv1.CheckHTTPRequest{ControlPoint: "ingress"})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp.GetDynamicMetadata()).NotTo(BeNil())
+		})
+		It("sets retry-after header", func() {
+			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("1.2.3.4"))
+			ctxWithIp = metadata.NewIncomingContext(
+				ctxWithIp,
+				metadata.Pairs(),
+			)
+			response := rejectedResponse()
+			response.WaitTime = durationpb.New(10 * time.Second)
+			checkHandler.EXPECT().CheckRequest(gomock.Any(), gomock.Any()).Return(response)
+			resp, err := handler.CheckHTTP(ctxWithIp, &flowcontrolhttpv1.CheckHTTPRequest{ControlPoint: "ingress"})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp.GetDynamicMetadata()).NotTo(BeNil())
+			Expect(resp.GetDeniedResponse().Headers).To(HaveKeyWithValue("retry-after", "10"))
 		})
 	})
 })

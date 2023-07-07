@@ -46,7 +46,7 @@ var _ = Describe("clusterRoleForController", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: ControllerServiceName,
+					Name: controllerName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   ControllerName,
@@ -108,7 +108,7 @@ var _ = Describe("clusterRoleForController", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: ControllerServiceName,
+					Name: controllerName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   ControllerName,
@@ -173,7 +173,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 
 		expected := &rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: ControllerServiceName,
+				Name: controllerName,
 				Labels: map[string]string{
 					"app.kubernetes.io/name":       AppName,
 					"app.kubernetes.io/instance":   ControllerName,
@@ -190,7 +190,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 			RoleRef: rbacv1.RoleRef{
 				APIGroup: "rbac.authorization.k8s.io",
 				Kind:     "ClusterRole",
-				Name:     ControllerServiceName,
+				Name:     controllerName,
 			},
 			Subjects: []rbacv1.Subject{
 				{
@@ -228,7 +228,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 
 		expected := &rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: ControllerServiceName,
+				Name: controllerName,
 				Labels: map[string]string{
 					"app.kubernetes.io/name":       AppName,
 					"app.kubernetes.io/instance":   ControllerName,
@@ -245,7 +245,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 			RoleRef: rbacv1.RoleRef{
 				APIGroup: "rbac.authorization.k8s.io",
 				Kind:     "ClusterRole",
-				Name:     ControllerServiceName,
+				Name:     controllerName,
 			},
 			Subjects: []rbacv1.Subject{
 				{
@@ -284,7 +284,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 
 		expected := &rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: ControllerServiceName,
+				Name: controllerName,
 				Labels: map[string]string{
 					"app.kubernetes.io/name":       AppName,
 					"app.kubernetes.io/instance":   ControllerName,
@@ -301,7 +301,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 			RoleRef: rbacv1.RoleRef{
 				APIGroup: "rbac.authorization.k8s.io",
 				Kind:     "ClusterRole",
-				Name:     ControllerServiceName,
+				Name:     controllerName,
 			},
 			Subjects: []rbacv1.Subject{
 				{

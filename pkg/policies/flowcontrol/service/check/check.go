@@ -13,6 +13,8 @@ import (
 	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 )
 
+//go:generate mockgen -source=check.go -destination=../../../mocks/mock_check.go -package=mocks
+
 // Handler implements the flowcontrol.v1 Service
 //
 // It also accepts a pointer to an EntityCache for services lookup.

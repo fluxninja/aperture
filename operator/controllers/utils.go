@@ -471,6 +471,11 @@ func ControllerResourcesName(instance *controllerv1alpha1.Controller) string {
 	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
 }
 
+// ControllerResourcesNamespacedName generates a name for the controller related resources.
+func ControllerResourcesNamespacedName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s-%s", AppName, instance.GetName(), instance.GetNamespace())
+}
+
 // ServiceAccountName generate a name for the controller service account.
 func ServiceAccountName(instance *controllerv1alpha1.Controller) string {
 	if instance.Spec.ServiceAccountSpec.Create && instance.Spec.ServiceAccountSpec.Name == "" {
@@ -757,7 +762,7 @@ func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1
 	}
 
 	// regenerate certificate if it is expired
-	if time.Now().After(cert.NotAfter) || reflect.DeepEqual(cert.DNSNames, GetCertificateDNSNames(ControllerResourcesName(instance), instance.GetNamespace())) {
+	if time.Now().After(cert.NotAfter) || !reflect.DeepEqual(cert.DNSNames, GetCertificateDNSNames(ControllerResourcesName(instance), instance.GetNamespace())) {
 		return generateCert()
 	}
 
