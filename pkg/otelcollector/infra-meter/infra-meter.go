@@ -79,14 +79,29 @@ func addInfraMeter(
 		}
 		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", configSHA.Sum(nil)))
 
-		// If receiver is already present with given id, skip adding it again.
-		if _, ok := config.Receivers[id.String()]; ok && !infraMeter.PerAgentGroup {
+		// If receiver is already present with given id and per-agent-group = false, skip adding receiver with per-agent-group = true.
+		if _, ok := config.Receivers[id.String()]; ok && infraMeter.PerAgentGroup {
 			receiverIDs[origName] = id.String()
 			continue
 		}
+
 		var cfg any
 		cfg = receiverConfig.AsMap()
 		id, cfg = leaderonlyreceiver.WrapConfigIf(infraMeter.PerAgentGroup, id, cfg)
+
+		// Remove receiver for per-agent-group infra-meter if a receiver with the same config already exists without per-agent-group.
+		if !infraMeter.PerAgentGroup {
+			updatedID, _ := leaderonlyreceiver.WrapConfigIf(true, id, cfg)
+			if _, ok := config.Receivers[updatedID.String()]; ok {
+				delete(config.Receivers, updatedID.String())
+				for key, value := range receiverIDs {
+					if value == updatedID.String() {
+						receiverIDs[key] = id.String()
+					}
+				}
+				continue
+			}
+		}
 		receiverIDs[origName] = id.String()
 		config.AddReceiver(id.String(), cfg)
 	}
