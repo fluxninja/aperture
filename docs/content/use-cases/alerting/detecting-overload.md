@@ -8,6 +8,8 @@ sidebar_position: 2
 ---
 
 ```mdx-code-block
+import {apertureVersion} from '../../apertureVersion.js';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
@@ -48,6 +50,12 @@ The EMA of latency is then multiplied by a tolerance factor to calculate the
 setpoint latency, which serves as a threshold for detecting an overloaded
 state - if the real-time latency of the service exceeds this setpoint (which is
 based on the long-term EMA), the service is considered overloaded.
+
+The below `policy.yaml` file can be applied using the `aperturectl` CLI tool.
+
+```mdx-code-block
+<CodeBlock language="bash"> aperturectl blueprints generate --values-file=policy.yaml --apply --version=main  </CodeBlock>
+```
 
 ```mdx-code-block
 <Tabs>

@@ -30,9 +30,9 @@ magnitude of momentary surge allowed in request rates.
 This policy is based on the
 [Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint. It
 applies a rate limiter to the **`ingress`** control point on the service
-**`catalog-service.prod.svc.cluster.local`**. Unique users are identified based
-on the **`user_id`** header in the HTTP traffic. This header is provided by the
-Envoy proxy and is available under the label key
+**`catalog-service.prod.svc.cluster.local`** and identifies unique users by
+referencing the **`user_id`** header present in the HTTP traffic. Provided by
+the Envoy proxy, this header can be located under the label key
 **`http.request.header.user_id`** (see [Flow Labels](/concepts/flow-label.md)
 for more information).
 

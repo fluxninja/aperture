@@ -29,7 +29,7 @@ API, ensuring essential workloads receive a fair share of the API quota.
 
 This policy is based on the
 [Quota Scheduler](/reference/blueprints/quota-scheduling/base.md#policy-quota-scheduler)
-blueprint. It utilizes a quota scheduler to regulate the control point
+blueprint. It uses a quota scheduler to regulate the control point
 **`some-external-api`**, which represents all outgoing requests made to an
 external API from services within a distributed application. The rate limit is
 applied per **`api_key`** label. The rate limiter interval is set to **`1`**
