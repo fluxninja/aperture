@@ -428,7 +428,11 @@ workflows:
           tag: << pipeline.git.tag >>
 
       - publish_aperture_on_azure_marketplace:
-          filters: *release-filters
+          filters:
+            <<: *release-filters
+            tags:
+              only: /^v.*/
+              ignore: /^.*-rc.*/
           tag: << pipeline.git.tag >>
 
 commands:
