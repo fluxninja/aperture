@@ -445,6 +445,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		defer cancel()
 		reqCtx = timeoutCtx
 	} else if hasWorkloadTimeout {
+		// If there is no client deadline but there is a workload timeout, we create a new context with the workload timeout.
 		timeoutCtx, cancel := context.WithTimeout(ctx, matchedWorkloadTimeout)
 		defer cancel()
 		reqCtx = timeoutCtx
