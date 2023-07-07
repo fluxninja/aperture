@@ -89,14 +89,14 @@ Generate a values file specific to the policy. This can be achieved using the
 command provided below.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=load-ramping --version={apertureVersion} --output-file=values.yaml</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints values --name=load-ramping/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
 ```
 
 Adjust the values to match the application requirements. Use the following
 command to generate the policy.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=load-ramping
+<CodeBlock language="bash">aperturectl blueprints generate --name=load-ramping/base
 --values-file=values.yaml --output-dir=policy-gen --version={apertureVersion}</CodeBlock>
 ```
 
@@ -112,7 +112,7 @@ policies on a Kubernetes cluster in the namespace where the Aperture Controller
 is installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=load-ramping
+<CodeBlock language="bash">aperturectl blueprints generate --name=load-ramping/base
 --values-file=values.yaml --apply --version={apertureVersion}</CodeBlock>
 ```
 
@@ -120,7 +120,7 @@ Use the default configuration for the Kubernetes cluster under `~/.kube/config`,
 or opt for the `--kube-config` flag to indicate a different path.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=load-ramping
+<CodeBlock language="bash">aperturectl blueprints generate --name=load-ramping/base
 --values-file=values.yaml --kube-config=/path/to/config --apply --version={apertureVersion}</CodeBlock>
 ```
 

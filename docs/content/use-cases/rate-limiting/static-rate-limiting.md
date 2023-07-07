@@ -82,14 +82,14 @@ Generate a values file specific to the policy. This can be achieved using the
 command provided below.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=policies/rate-limiting/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints values --name=rate-limiting/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
 ```
 
 Adjust the values to match the application requirements. Use the following
 command to generate the policy.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=policies/rate-limiting/base
+<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
 --values-file=values.yaml --output-dir=policy-gen --version={apertureVersion}</CodeBlock>
 ```
 
