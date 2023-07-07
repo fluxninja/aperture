@@ -59,6 +59,7 @@ func rejectedResponse() *flowcontrolv1.CheckResponse {
 
 var _ = Describe("CheckHTTP handler", func() {
 	var (
+		ctrl         *gomock.Controller
 		checkHandler *mocks.MockHandlerWithValues
 		handler      *checkhttp.Handler
 	)
@@ -77,12 +78,16 @@ var _ = Describe("CheckHTTP handler", func() {
 				IpAddress: "1.2.3.4",
 				Services:  []string{service1Selector.Service},
 			})
-			checkHandler = mocks.NewMockHandlerWithValues(gomock.NewController(GinkgoT()))
+			ctrl = gomock.NewController(GinkgoT())
+			checkHandler = mocks.NewMockHandlerWithValues(ctrl)
 			handler = checkhttp.NewHandler(
 				classifier,
 				servicegetter.FromEntities(entities),
 				checkHandler,
 			)
+		})
+		AfterEach(func() {
+			ctrl.Finish()
 		})
 		It("returns ok response", func() {
 			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("1.2.3.4"))
