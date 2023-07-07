@@ -213,6 +213,9 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 			Status: statusCode,
 		}
 		if checkResponse.WaitTime != nil {
+			if deniedHTTPResponse.Headers == nil {
+				deniedHTTPResponse.Headers = map[string]string{}
+			}
 			deniedHTTPResponse.Headers["retry-after"] = waitTimeToRetryAfter(checkResponse.WaitTime)
 			// Clear to avoid redundancy, as we're translating it into header.
 			// Logs processor doesn't read it and clients aren't supposed to
