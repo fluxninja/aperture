@@ -4879,6 +4879,35 @@ func (m *Scheduler_Workload_Parameters) validate(all bool) error {
 
 	// no validation rules for Tokens
 
+	if all {
+		switch v := interface{}(m.GetQueueTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Scheduler_Workload_ParametersValidationError{
+					field:  "QueueTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Scheduler_Workload_ParametersValidationError{
+					field:  "QueueTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetQueueTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Scheduler_Workload_ParametersValidationError{
+				field:  "QueueTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return Scheduler_Workload_ParametersMultiError(errors)
 	}

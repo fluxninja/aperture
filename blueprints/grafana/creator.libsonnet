@@ -11,6 +11,8 @@ function(policyFile, cfg) {
   local policyJSON =
     if std.isObject(policyFile)
     then policyFile
+    else if std.startsWith(policyFile, '{')
+    then std.parseJson(policyFile)
     else std.parseYaml(policyFile),
   local componentsJSON =
     if std.objectHas(policyJSON, 'spec')
