@@ -7239,7 +7239,10 @@ $$
 <!-- vale on -->
 
 Timeout for the flow in the workload. If timeout is provided on the Check call
-as well, we pick the minimum of the two. This field employs the
+as well, we pick the minimum of the two. If this override is not provided, the
+timeout provided in the check call is used. 0 timeout value implies that the
+request will not wait in the queue and will be accepted/dropped immediately.
+This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
 representation from Protocol Buffers. The format accommodates fractional seconds
 up to nine digits after the decimal point, offering nanosecond precision. Every
