@@ -52,7 +52,7 @@ var rules = []rbacv1.PolicyRule{
 func clusterRoleForController(instance *controllerv1alpha1.Controller) *rbacv1.ClusterRole {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerResourcesName(instance),
+			Name:        controllers.ControllerResourcesNamespacedName(instance),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: controllers.ControllerAnnotationsWithOwnerRef(instance),
 		},
@@ -66,14 +66,14 @@ func clusterRoleForController(instance *controllerv1alpha1.Controller) *rbacv1.C
 func clusterRoleBindingForController(instance *controllerv1alpha1.Controller) *rbacv1.ClusterRoleBinding {
 	clusterRoleBinding := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerResourcesName(instance),
+			Name:        controllers.ControllerResourcesNamespacedName(instance),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: controllers.ControllerAnnotationsWithOwnerRef(instance),
 		},
 		RoleRef: rbacv1.RoleRef{
 			APIGroup: "rbac.authorization.k8s.io",
 			Kind:     "ClusterRole",
-			Name:     controllers.ControllerResourcesName(instance),
+			Name:     controllers.ControllerResourcesNamespacedName(instance),
 		},
 		Subjects: []rbacv1.Subject{
 			{

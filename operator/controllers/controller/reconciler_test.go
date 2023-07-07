@@ -100,10 +100,10 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerServiceKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance)}
+			clusterRoleKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
-			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance)}
+			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerServiceAccount := &corev1.ServiceAccount{}
 			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ServiceAccountName(instance), Namespace: namespace}
@@ -112,7 +112,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerDeploymentKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance)}
+			vwcKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerSecret := &corev1.Secret{}
 			controllerSecretKey := types.NamespacedName{Name: Test, Namespace: namespace}
@@ -173,10 +173,10 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerServiceKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance)}
+			clusterRoleKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
-			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance)}
+			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerServiceAccount := &corev1.ServiceAccount{}
 			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ServiceAccountName(instance), Namespace: namespace}
@@ -185,7 +185,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerDeploymentKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance)}
+			vwcKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerSecret := &corev1.Secret{}
 			controllerSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-apikey", instance.GetName()), Namespace: namespace}
@@ -276,6 +276,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 
 			instance.Namespace = namespace
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
+			instance.Spec.CommonSpec.ServiceAccountSpec.Name = Test
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
 			instance.Spec.Image.Digest = TestDigest
@@ -306,7 +307,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
-			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance)}
+			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			Eventually(func() bool {
 				return K8sClient.Get(Ctx, clusterRoleBindingKey, createdClusterRoleBinding) == nil
