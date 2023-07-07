@@ -56,6 +56,8 @@ var (
 	cancel  context.CancelFunc
 )
 
+var controllerName = "aperture-controller-aperture"
+
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 

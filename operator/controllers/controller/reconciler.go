@@ -210,7 +210,7 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		controllerutil.AddFinalizer(instance, controllers.FinalizerName)
 	}
 
-	if !instance.Status.IsMigrationCompleted || instance.GetName() != controllers.ControllerName {
+	if !instance.Status.IsMigrationCompleted {
 		// Reloading instances for the case when the migration is completed by another controller.
 		err = r.List(ctx, instances)
 		if err != nil {
@@ -219,15 +219,24 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 
 		doMigration := true
+		isCRNamedControllerPresent := false
 		for _, ins := range instances.Items {
-			if ins.Status.IsMigrationCompleted || ins.GetName() == controllers.ControllerName {
+			if ins.GetName() == controllers.ControllerName {
+				isCRNamedControllerPresent = true
+			}
+
+			if ins.GetUID() == instance.GetUID() {
+				continue
+			}
+
+			if ins.Status.IsMigrationCompleted {
 				doMigration = false
 				break
 			}
 		}
 
 		if doMigration {
-			if err := r.deleteOlderInstances(ctx, logger, instance); err != nil {
+			if err := r.deleteOlderInstances(ctx, logger, instance, isCRNamedControllerPresent); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
@@ -299,58 +308,66 @@ func (r *ControllerReconciler) updateStatus(ctx context.Context, instance *contr
 	return nil
 }
 
-func (r *ControllerReconciler) deleteOlderInstances(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
+func (r *ControllerReconciler) deleteOlderInstances(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller, isCRNamedControllerPresent bool) error {
 	singletonInstance := instance.DeepCopy()
 	singletonInstance.Name = controllers.ControllerName
 
-	deployment, err := deploymentForController(singletonInstance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
-	if err != nil || deployment == nil {
-		log.Error(err, "Failed to create object for old Deployment during Migration")
-	} else {
-		if err = r.Delete(ctx, deployment); err != nil && !errors.IsNotFound(err) {
-			log.Error(err, "Failed to delete old Deployment during Migration")
-		}
-	}
-
-	if singletonInstance.Spec.ServiceAccountSpec.Create {
-		var serviceAccount *corev1.ServiceAccount
-		serviceAccount, err = serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
-		if err != nil || serviceAccount == nil {
-			log.Error(err, "Failed to create object for old ServiceAccount during Migration")
+	if !isCRNamedControllerPresent {
+		deployment, err := deploymentForController(singletonInstance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
+		if err != nil || deployment == nil {
+			log.Error(err, "Failed to create object for old Deployment during Migration")
 		} else {
-			if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
-				log.Error(err, "Failed to delete old ServiceAccount during Migration")
+			if err = r.Delete(ctx, deployment); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete old Deployment during Migration")
+			}
+		}
+
+		if singletonInstance.Spec.ServiceAccountSpec.Create {
+			var serviceAccount *corev1.ServiceAccount
+			serviceAccount, err = serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
+			if err != nil || serviceAccount == nil {
+				log.Error(err, "Failed to create object for old ServiceAccount during Migration")
+			} else {
+				if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
+					log.Error(err, "Failed to delete old ServiceAccount during Migration")
+				}
+			}
+		}
+
+		configMap, err := configMapForControllerConfig(singletonInstance.DeepCopy(), r.Scheme)
+		if err != nil || configMap == nil {
+			log.Error(err, "Failed to create object for old ConfigMap during Migration")
+		} else {
+			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete old ConfigMap during Migration")
+			}
+		}
+
+		service, err := serviceForController(singletonInstance.DeepCopy(), log, r.Scheme)
+		if err != nil || service == nil {
+			log.Error(err, "Failed to create object for old Service during Migration")
+		} else {
+			if err = r.Delete(ctx, service); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete old Service during Migration")
 			}
 		}
 	}
 
-	configMap, err := configMapForControllerConfig(singletonInstance.DeepCopy(), r.Scheme)
-	if err != nil || configMap == nil {
-		log.Error(err, "Failed to create object for old ConfigMap during Migration")
-	} else {
-		if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
-			log.Error(err, "Failed to delete old ConfigMap during Migration")
-		}
-	}
-
-	service, err := serviceForController(singletonInstance.DeepCopy(), log, r.Scheme)
-	if err != nil || service == nil {
-		log.Error(err, "Failed to create object for old Service during Migration")
-	} else {
-		if err = r.Delete(ctx, service); err != nil && !errors.IsNotFound(err) {
-			log.Error(err, "Failed to delete old Service during Migration")
-		}
-	}
-
-	if err = r.Delete(ctx, validatingWebhookConfiguration(singletonInstance.DeepCopy(), controllerClientCert.Bytes())); err != nil && !errors.IsNotFound(err) {
+	vwc := validatingWebhookConfiguration(singletonInstance.DeepCopy(), controllerClientCert.Bytes())
+	vwc.Name = controllers.ControllerServiceName
+	if err := r.Delete(ctx, vwc); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "Failed to delete old ValidatingWebhookConfiguration during Migration")
 	}
 
-	if err = r.Delete(ctx, clusterRoleBindingForController(singletonInstance.DeepCopy())); err != nil && !errors.IsNotFound(err) {
+	crb := clusterRoleBindingForController(singletonInstance.DeepCopy())
+	crb.Name = controllers.ControllerServiceName
+	if err := r.Delete(ctx, crb); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "Failed to delete old ClusterRoleBinding during Migration")
 	}
 
-	if err = r.Delete(ctx, clusterRoleForController(singletonInstance.DeepCopy())); err != nil && !errors.IsNotFound(err) {
+	cr := clusterRoleForController(singletonInstance.DeepCopy())
+	cr.Name = controllers.ControllerServiceName
+	if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "Failed to delete old ClusterRole during Migration")
 	}
 

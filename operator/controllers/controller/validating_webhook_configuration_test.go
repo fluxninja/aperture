@@ -58,7 +58,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 
 			expected := &admissionregistrationv1.ValidatingWebhookConfiguration{
 				ObjectMeta: v1.ObjectMeta{
-					Name: ControllerServiceName,
+					Name: controllerName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   ControllerName,
@@ -141,7 +141,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 
 			expected := &admissionregistrationv1.ValidatingWebhookConfiguration{
 				ObjectMeta: v1.ObjectMeta{
-					Name: ControllerServiceName,
+					Name: controllerName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   ControllerName,
