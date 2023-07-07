@@ -402,11 +402,9 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 	}
 
 	var matchedWorkloadTimeout time.Duration
+	hasWorkloadTimeout := false
 	if matchedWorkloadParametersProto.QueueTimeout != nil {
 		matchedWorkloadTimeout = matchedWorkloadParametersProto.QueueTimeout.AsDuration()
-	}
-	hasWorkloadTimeout := false
-	if matchedWorkloadTimeout > 0 {
 		hasWorkloadTimeout = true
 	}
 
