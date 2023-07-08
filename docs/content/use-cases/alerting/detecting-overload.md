@@ -51,12 +51,6 @@ setpoint latency, which serves as a threshold for detecting an overloaded
 state - if the real-time latency of the service exceeds this setpoint (which is
 based on the long-term EMA), the service is considered overloaded.
 
-The below `policy.yaml` file can be applied using the `aperturectl` CLI tool.
-
-```mdx-code-block
-<CodeBlock language="bash"> aperturectl blueprints generate --values-file=policy.yaml --apply --version=main  </CodeBlock>
-```
-
 ```mdx-code-block
 <Tabs>
 <TabItem value="YAML">
@@ -89,6 +83,14 @@ The below `policy.yaml` file can be applied using the `aperturectl` CLI tool.
 ```
 
 </Zoom>
+
+## Install
+
+Apply this custom policy to the `aperture-controller` namespace.
+
+```mdx-code-block
+<CodeBlock language="bash"> kubectl apply -f policy.yaml -n aperture-controller  </CodeBlock>
+```
 
 ## Policy in Action
 
