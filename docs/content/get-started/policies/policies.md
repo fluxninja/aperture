@@ -86,8 +86,6 @@ You can then edit the `values.yaml` to provide the required fields
 {@include: ./assets/values.yaml}
 ```
 
-You can then run the following command to generate the blueprint:
-
 </TabItem>
 <TabItem value="Placeholder Values">
 

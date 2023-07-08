@@ -1087,9 +1087,6 @@ definitions:
             load_ramp:
                 $ref: '#/definitions/LoadRamp'
                 description: _Load Ramp_ smoothly regulates the flow of requests over specified steps.
-            load_ramp_series:
-                $ref: '#/definitions/LoadRampSeries'
-                description: _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
             load_scheduler:
                 $ref: '#/definitions/LoadScheduler'
                 description: _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
@@ -1916,54 +1913,6 @@ definitions:
                 x-go-tag-validate: gte=0,lte=100
         required:
             - duration
-        type: object
-    LoadRampSeries:
-        description: _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
-        properties:
-            in_ports:
-                $ref: '#/definitions/LoadRampSeriesIns'
-            parameters:
-                $ref: '#/definitions/LoadRampSeriesParameters'
-                x-go-tag-validate: required
-        type: object
-    LoadRampSeriesIns:
-        description: Inputs for the _LoadRampSeries_ component.
-        properties:
-            backward:
-                $ref: '#/definitions/InPort'
-                description: Whether to progress the load ramp series towards the previous step.
-            forward:
-                $ref: '#/definitions/InPort'
-                description: Whether to progress the load ramp series towards the next step.
-            reset:
-                $ref: '#/definitions/InPort'
-                description: Whether to reset the load ramp series to the first step.
-        type: object
-    LoadRampSeriesLoadRampInstance:
-        properties:
-            load_ramp:
-                $ref: '#/definitions/LoadRampParameters'
-                description: |+
-                    The load ramp.
-
-                x-go-tag-validate: required
-            out_ports:
-                $ref: '#/definitions/LoadRampOuts'
-        type: object
-    LoadRampSeriesParameters:
-        description: Parameters for the _LoadRampSeries_ component.
-        properties:
-            load_ramps:
-                description: |+
-                    An ordered list of load ramps that get applied in order.
-
-                items:
-                    $ref: '#/definitions/LoadRampSeriesLoadRampInstance'
-                    type: object
-                type: array
-                x-go-tag-validate: required,dive
-        required:
-            - load_ramps
         type: object
     LoadScheduler:
         description: |-
