@@ -23,7 +23,7 @@ import Zoom from 'react-medium-image-zoom';
 
 _Selectors_ are used by flow control and observability components instantiated
 by Aperture Agents like [_Classifiers_][classifier], [_Flux Meters_][flux-meter]
-and [_Load Scheduler_][load-scheduler]. _Selectors_ define scoping rules that
+and [_Load Schedulers_][load-scheduler]. _Selectors_ define scoping rules that
 decide how these components should select flows for their operations.
 
 A Selector consists of the following parameters:

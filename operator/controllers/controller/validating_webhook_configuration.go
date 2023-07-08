@@ -31,7 +31,7 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 
 	validatingWebhookConfiguration := &admissionregistrationv1.ValidatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ControllerResourcesName(instance),
+			Name:        controllers.ControllerResourcesNamespacedName(instance),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: controllers.ControllerAnnotationsWithOwnerRef(instance),
 		},
