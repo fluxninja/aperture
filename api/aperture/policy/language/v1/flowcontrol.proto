@@ -40,9 +40,6 @@ message FlowControl {
     // _Load Ramp_ smoothly regulates the flow of requests over specified steps.
     LoadRamp load_ramp = 10;
 
-    // _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
-    LoadRampSeries load_ramp_series = 11;
-
     // Extends flow control with private components.
     google.protobuf.Any private = 1000;
   }
@@ -466,34 +463,6 @@ message LoadRamp {
 
   // Configuration key for setting pass through label values through dynamic configuration.
   string pass_through_label_values_config_key = 5;
-}
-
-// _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
-message LoadRampSeries {
-  message LoadRampInstance {
-    // The load ramp.
-    LoadRamp.Parameters load_ramp = 1; // @gotags: validate:"required"
-    LoadRamp.Outs out_ports = 2;
-  }
-  // Parameters for the _LoadRampSeries_ component.
-  message Parameters {
-    // An ordered list of load ramps that get applied in order.
-    repeated LoadRampInstance load_ramps = 1; // @gotags: validate:"required,dive"
-  }
-
-  // Inputs for the _LoadRampSeries_ component.
-  message Ins {
-    // Whether to progress the load ramp series towards the next step.
-    InPort forward = 1;
-    // Whether to progress the load ramp series towards the previous step.
-    InPort backward = 2;
-    // Whether to reset the load ramp series to the first step.
-    InPort reset = 3;
-  }
-
-  Ins in_ports = 1;
-
-  Parameters parameters = 2; // @gotags: validate:"required"
 }
 
 // Flux Meter gathers metrics for the traffic that matches its selector.
