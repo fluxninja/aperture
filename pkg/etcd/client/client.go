@@ -65,15 +65,15 @@ type Client struct {
 
 // ProvideClient creates a new Etcd Client and provides it via Fx.
 func ProvideClient(in ClientIn) (*Client, error) {
-	var etcdConf etcd.EtcdConfig
+	var config etcd.EtcdConfig
 
 	if in.ConfigOverride != nil {
 		log.Error().Msg("Skipping etcd config deserialization, etcd config already provided")
-		etcdConf.Namespace = in.ConfigOverride.Namespace
-		etcdConf.Endpoints = in.ConfigOverride.Endpoints
-		etcdConf.LeaseTTL = in.ConfigOverride.LeaseTTL
+		config.Namespace = in.ConfigOverride.Namespace
+		config.Endpoints = in.ConfigOverride.Endpoints
+		config.LeaseTTL = in.ConfigOverride.LeaseTTL
 	} else {
-		if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &etcdConf); err != nil {
+		if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
 			log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
 			return nil, err
 		}
@@ -85,7 +85,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			tlsConfig, tlsErr := etcdConf.ClientTLSConfig.GetTLSConfig()
+			tlsConfig, tlsErr := config.ClientTLSConfig.GetTLSConfig()
 			if tlsErr != nil {
 				log.Error().Err(tlsErr).Msg("Failed to get TLS config")
 				cancel()
@@ -103,11 +103,11 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 			log.Info().Msg("Initializing etcd client")
 			cli, err := clientv3.New(clientv3.Config{
-				Endpoints:   etcdConf.Endpoints,
+				Endpoints:   config.Endpoints,
 				Context:     ctx,
 				TLS:         tlsConfig,
-				Username:    etcdConf.Username,
-				Password:    etcdConf.Password,
+				Username:    config.Username,
+				Password:    config.Password,
 				Logger:      zap.New(log.NewZapAdapter(in.Logger, "etcd-client"), zap.IncreaseLevel(zap.WarnLevel)),
 				DialOptions: dialOptions,
 			})
@@ -127,15 +127,15 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			etcdClient.Client = cli
 
 			// namespace the client
-			cli.Lease = namespacev3.NewLease(cli.Lease, etcdConf.Namespace)
+			cli.Lease = namespacev3.NewLease(cli.Lease, config.Namespace)
 			etcdClient.Lease = cli.Lease
-			cli.KV = namespacev3.NewKV(cli.KV, etcdConf.Namespace)
+			cli.KV = namespacev3.NewKV(cli.KV, config.Namespace)
 			etcdClient.KV = cli.KV
-			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, etcdConf.Namespace)
+			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, config.Namespace)
 			etcdClient.Watcher = cli.Watcher
 
 			// Create a new Session
-			session, err := concurrencyv3.NewSession(etcdClient.Client, concurrencyv3.WithTTL((int)(etcdConf.LeaseTTL.AsDuration().Seconds())))
+			session, err := concurrencyv3.NewSession(etcdClient.Client, concurrencyv3.WithTTL((int)(config.LeaseTTL.AsDuration().Seconds())))
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to create a new session")
 				cancel()
