@@ -84,12 +84,35 @@ based on the long-term EMA), the service is considered overloaded.
 
 </Zoom>
 
-## Install
+## Installation
 
-Apply this custom policy to the `aperture-controller` namespace.
+Apply this custom policy to the `aperture-controller` namespace using
+`aperturectl` or `kubectl`. For more information and examples on how to apply
+[policies](/reference/aperturectl/apply/policy/policy.md) and
+[dynamic configurations](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+using `aperturectl`, please consult the relevant sections.
 
 ```mdx-code-block
-<CodeBlock language="bash"> kubectl apply -f policy.yaml -n aperture-controller  </CodeBlock>
+<Tabs>
+<TabItem value="aperturectl" label="aperturectl">
+```
+
+```bash
+aperturectl apply policy --file=policy.yaml
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="kubectl" label="kubectl">
+```
+
+```bash
+ kubectl apply -f policy.yaml -n aperture-controller
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 ## Policy in Action

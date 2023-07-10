@@ -32,11 +32,11 @@ This policy is based on the
 blueprint. It uses a quota scheduler to regulate the control point
 **`some-external-api`**, which represents all outgoing requests made to an
 external API from services within a distributed application. The rate limit is
-applied per **`api_key`** label. The rate limiter interval is set to **`1`**
-second, meaning that the token bucket is replenished with **`25`** tokens every
-second, up to a maximum of **`500`** tokens. Lazy sync is enabled on the rate
-limiter, which allows the rate limit counters on each Agent to sync four times
-every interval (1 second).
+applied per **`api_key`** label, with an interval set to **`1`** second, meaning
+that the token bucket is replenished with **`25`** tokens every second, up to a
+maximum of **`500`** tokens. Lazy sync is enabled on the rate limiter, which
+allows the rate limit counters on each Agent to sync four times every interval
+(1 second).
 
 The WFQ Scheduler prioritizes interactive and background requests with
 respective priorities of **`200`** and **`50`**, ensuring that interactive calls
