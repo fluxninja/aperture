@@ -46,12 +46,12 @@ var _ = Describe("clusterRoleForController", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: ControllerServiceName,
+					Name: controllerName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
-						"app.kubernetes.io/component":  OperatorName,
+						"app.kubernetes.io/component":  ControllerServiceName,
 					},
 					Annotations: map[string]string{
 						"fluxninja.com/primary-resource-type": "Controller.fluxninja.com",
@@ -108,12 +108,12 @@ var _ = Describe("clusterRoleForController", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: ControllerServiceName,
+					Name: controllerName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
-						"app.kubernetes.io/component":  OperatorName,
+						"app.kubernetes.io/component":  ControllerServiceName,
 						Test:                           Test,
 					},
 					Annotations: map[string]string{
@@ -153,7 +153,7 @@ var _ = Describe("clusterRoleForController", func() {
 })
 
 var _ = Describe("clusterRoleBindingForController", func() {
-	It("returns correct ClusterRoleBinding", func() {
+	It("returns correct ClusterRoleBinding when spec.ServiceAccountSpec.Create is false", func() {
 		instance := &controllerv1alpha1.Controller{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Controller",
@@ -173,7 +173,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 
 		expected := &rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: ControllerServiceName,
+				Name: controllerName,
 				Labels: map[string]string{
 					"app.kubernetes.io/name":       AppName,
 					"app.kubernetes.io/instance":   ControllerName,
@@ -190,12 +190,123 @@ var _ = Describe("clusterRoleBindingForController", func() {
 			RoleRef: rbacv1.RoleRef{
 				APIGroup: "rbac.authorization.k8s.io",
 				Kind:     "ClusterRole",
-				Name:     ControllerServiceName,
+				Name:     controllerName,
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      "ServiceAccount",
+					Name:      "",
+					Namespace: instance.GetNamespace(),
+				},
+			},
+		}
+
+		result := clusterRoleBindingForController(instance.DeepCopy())
+		Expect(result).To(Equal(expected))
+	})
+
+	It("returns correct ClusterRoleBinding when spec.ServiceAccountSpec.Create is true and spec.ServiceAccountSpec.Name is not provided", func() {
+		instance := &controllerv1alpha1.Controller{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Controller",
+				APIVersion: "fluxninja.com/v1alpha1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      ControllerName,
+				Namespace: AppName,
+			},
+			Spec: controllerv1alpha1.ControllerSpec{
+				CommonSpec: common.CommonSpec{
+					Labels:      TestMap,
+					Annotations: TestMap,
+					ServiceAccountSpec: common.ServiceAccountSpec{
+						Create: true,
+					},
+				},
+			},
+		}
+
+		expected := &rbacv1.ClusterRoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: controllerName,
+				Labels: map[string]string{
+					"app.kubernetes.io/name":       AppName,
+					"app.kubernetes.io/instance":   ControllerName,
+					"app.kubernetes.io/managed-by": OperatorName,
+					"app.kubernetes.io/component":  ControllerServiceName,
+					Test:                           Test,
+				},
+				Annotations: map[string]string{
+					"fluxninja.com/primary-resource-type": "Controller.fluxninja.com",
+					"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, ControllerName),
+					Test:                                  Test,
+				},
+			},
+			RoleRef: rbacv1.RoleRef{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "ClusterRole",
+				Name:     controllerName,
 			},
 			Subjects: []rbacv1.Subject{
 				{
 					Kind:      "ServiceAccount",
 					Name:      ControllerServiceName,
+					Namespace: instance.GetNamespace(),
+				},
+			},
+		}
+
+		result := clusterRoleBindingForController(instance.DeepCopy())
+		Expect(result).To(Equal(expected))
+	})
+
+	It("returns correct ClusterRoleBinding when spec.ServiceAccountSpec.Create is true and spec.ServiceAccountSpec.Name is provided", func() {
+		instance := &controllerv1alpha1.Controller{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Controller",
+				APIVersion: "fluxninja.com/v1alpha1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      ControllerName,
+				Namespace: AppName,
+			},
+			Spec: controllerv1alpha1.ControllerSpec{
+				CommonSpec: common.CommonSpec{
+					Labels:      TestMap,
+					Annotations: TestMap,
+					ServiceAccountSpec: common.ServiceAccountSpec{
+						Create: true,
+						Name:   Test,
+					},
+				},
+			},
+		}
+
+		expected := &rbacv1.ClusterRoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: controllerName,
+				Labels: map[string]string{
+					"app.kubernetes.io/name":       AppName,
+					"app.kubernetes.io/instance":   ControllerName,
+					"app.kubernetes.io/managed-by": OperatorName,
+					"app.kubernetes.io/component":  ControllerServiceName,
+					Test:                           Test,
+				},
+				Annotations: map[string]string{
+					"fluxninja.com/primary-resource-type": "Controller.fluxninja.com",
+					"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, ControllerName),
+					Test:                                  Test,
+				},
+			},
+			RoleRef: rbacv1.RoleRef{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "ClusterRole",
+				Name:     controllerName,
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      "ServiceAccount",
+					Name:      Test,
 					Namespace: instance.GetNamespace(),
 				},
 			},

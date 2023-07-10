@@ -203,6 +203,7 @@ func main() {
 			Scheme:              mgr.GetScheme(),
 			Recorder:            mgr.GetEventRecorderFor("aperture-controller"),
 			MultipleControllers: multipleControllersEnabled,
+			ResourcesDeleted:    map[string]bool{},
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Controller")
 			os.Exit(1)

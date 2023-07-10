@@ -5695,7 +5695,6 @@ spec:
                     type: string
                 required:
                 - create
-                - name
                 type: object
               sidecar:
                 description: Sidecar defines the desired state of Sidecar setup for

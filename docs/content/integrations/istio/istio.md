@@ -16,6 +16,10 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 ```
 
+![Istio](./assets/istio-light.svg#gh-light-mode-only)
+
+![Istio](./assets/istio-dark.svg#gh-dark-mode-only)
+
 ## Supported Versions
 
 Aperture supports the following version of Istio:

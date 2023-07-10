@@ -81,12 +81,14 @@ policy:
         scheduler:
           workloads:
             - parameters:
+                queue_timeout: 1s
                 priority: "50"
               label_matcher:
                 match_labels:
                   user_type: guest
               name: guest
             - parameters:
+                queue_timeout: 2s
                 priority: "200"
               label_matcher:
                 match_labels:

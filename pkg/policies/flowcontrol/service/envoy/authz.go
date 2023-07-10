@@ -186,7 +186,8 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
 
 	// Ask flow control service for Ok/Deny
-	checkResponse := h.fcHandler.CheckRequest(ctx,
+	checkResponse := h.fcHandler.CheckRequest(
+		ctx,
 		iface.RequestContext{
 			FlowLabels:   mergedFlowLabels,
 			ControlPoint: ctrlPt,

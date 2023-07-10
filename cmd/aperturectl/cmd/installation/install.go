@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes/scheme"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"

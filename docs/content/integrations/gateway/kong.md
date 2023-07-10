@@ -16,6 +16,10 @@ import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js
 
 Integrating Aperture with Kong using Custom plugins.
 
+![Kong](./assets/kong-dark.svg#gh-dark-mode-only)
+
+![Kong](./assets/kong-light.svg#gh-light-mode-only)
+
 ## Introduction
 
 Custom plugins are Lua scripts that can be executed within Kong to extend its
