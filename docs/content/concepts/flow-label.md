@@ -24,15 +24,18 @@ with their associated flow labels.
 
 ## Usage of Flow Labels
 
-Flow labels serve various purposes within Aperture:
+Flow labels play a significant role in Aperture and serve various purposes:
 
-- The [_Selector_][selectors] can select flows based on flow labels, to narrow
-  the scope of [_Classifiers_][classifier], [_Flux Meters_][flux-meter] and so
-  on.
-- They assist in mapping a flow to a [Workload][workload].
-- It is used to form the basis for fairness within [Scheduler][scheduler] and
-  [Rate Limiter][ratelimiter]. _Flow Labels_ are used in different ways in
-  Aperture:
+- The [_Selector_][selectors] can use flow labels to select specific flows,
+  narrowing down the scope of [_Classifiers_][classifier], [_Flux
+  Meters_][flux-meter], and other components.
+- Flow labels help map a flow to a specific [Workload][workload], providing
+  context and aiding in workload identification.
+- Flow labels are instrumental in mapping flows to unique users or entities,
+  allowing for the allocation of rate limit quotas per label key. This
+  allocation is utilized by the [Rate Limiter][ratelimiter] and [Quota
+  Scheduler][quota-scheduler] components, enabling effective management of
+  traffic and resource allocation based on these labels.
 
 ## Flow Label Sources
 
@@ -214,7 +217,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [classifier]: ./classifier.md
 [workload]: ./scheduler/scheduler.md#workload
 [ratelimiter]: ./rate-limiter.md
-[scheduler]: ./scheduler/scheduler.md
+[quota-scheduler]: ./scheduler/quota-scheduler.md
 [flux-meter]: ./flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:

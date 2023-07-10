@@ -20,6 +20,10 @@ defining auto-scaling criteria. Aperture Agents interface with infrastructure
 APIs to perform auto-scaling. For example, Aperture Agents can invoke Kubernetes
 APIs to perform auto-scaling of any scalable resource in a Kubernetes cluster.
 
+![Auto Scaling](./assets/autoscale-dark.svg#gh-dark-mode-only)
+
+![Auto Scaling](./assets/autoscale-light.svg#gh-light-mode-only)
+
 ## Setup
 
 Aperture performs auto-scaling based on
