@@ -5924,7 +5924,7 @@ func (m *Scheduler_Workload_Parameters) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Priority |= uint64(b&0x7F) << shift
+				m.Priority |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -5943,7 +5943,7 @@ func (m *Scheduler_Workload_Parameters) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Tokens |= uint64(b&0x7F) << shift
+				m.Tokens |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
