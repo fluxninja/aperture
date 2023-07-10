@@ -77,20 +77,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-policy-name"></a>
 
 <ParameterDescription
@@ -113,6 +99,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Object (aperture.spec.v1.Resources)'
     reference='../../spec#resources'
     value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-evaluation-interval"></a>
+
+<ParameterDescription
+    name='policy.evaluation_interval'
+    description='The interval between successive evaluations of the Circuit.'
+    type='string'
+    reference=''
+    value='"10s"'
 />
 
 <!-- vale on -->
@@ -195,6 +195,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-service-protection-core-kubelet-overload-confirmations"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.kubelet_overload_confirmations'
+    description='Overload confirmation signals from kubelet.'
+    type='Object (kubelet_overload_confirmations)'
+    reference='#kubelet-overload-confirmations'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-service-protection-core-overload-confirmations"></a>
 
 <ParameterDescription
@@ -203,54 +217,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
     value='[]'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-###### policy.service_protection_core.cpu_overload_confirmation {#policy-service-protection-core-cpu-overload-confirmation}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-cpu-overload-confirmation-operator"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation.operator'
-    description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.'
-    type='string'
-    reference=''
-    value='"gte"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-cpu-overload-confirmation-query-string"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation.query_string'
-    description='The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.'
-    type='string'
-    reference=''
-    value='"avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name=\"__REQUIRED_FIELD__\"})"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-cpu-overload-confirmation-threshold"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.cpu_overload_confirmation.threshold'
-    description='Threshold value for CPU utilizatio if it has to be used as overload confirmation.'
-    type='Number (double)'
-    reference=''
-    value='null'
 />
 
 <!-- vale on -->
@@ -297,7 +263,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='dashboard.time_from'
-    description='Time from of dashboard.'
+    description='From time of dashboard.'
     type='string'
     reference=''
     value='"now-15m"'
@@ -311,7 +277,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='dashboard.time_to'
-    description='Time to of dashboard.'
+    description='To time of dashboard.'
     type='string'
     reference=''
     value='"now"'
@@ -370,6 +336,114 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 ---
 
 ### Schemas
+
+<!-- vale off -->
+
+#### driver_criteria {#driver-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver.'
+    type='Boolean'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="driver-criteria-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### overload_confirmation_driver {#overload-confirmation-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-cpu"></a>
+
+<ParameterDescription
+    name='pod_cpu'
+    description='The driver for using CPU usage as overload confirmation.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="overload-confirmation-driver-pod-memory"></a>
+
+<ParameterDescription
+    name='pod_memory'
+    description='The driver for using CPU usage as overload confirmation.'
+    type='Object (driver_criteria)'
+    reference='#driver-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### kubelet_overload_confirmations {#kubelet-overload-confirmations}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-overload-confirmations-criteria"></a>
+
+<ParameterDescription
+    name='criteria'
+    description='Criteria for overload confirmation.'
+    type='Object (overload_confirmation_driver)'
+    reference='#overload-confirmation-driver'
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="kubelet-overload-confirmations-infra-context"></a>
+
+<ParameterDescription
+    name='infra_context'
+    description='Kubernetes selector for scraping metrics.'
+    type='Object (aperture.spec.v1.KubernetesObjectSelector)'
+    reference='../../spec#kubernetes-object-selector'
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
 
 <!-- vale off -->
 

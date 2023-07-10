@@ -2,7 +2,9 @@ package heartbeats
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -24,6 +26,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/status"
+	guuid "github.com/google/uuid"
+	"github.com/technosophos/moniker"
 )
 
 // Module returns the module for heartbeats.
@@ -86,7 +90,7 @@ func provide(in ConstructorIn) (*Heartbeats, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient)
+			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient, getControllerID(in.ExtensionConfig))
 			if err != nil {
 				log.Error().Err(err).Msg("Could not read/create controller id in heartbeats")
 				return err
@@ -107,4 +111,14 @@ func provide(in ConstructorIn) (*Heartbeats, error) {
 	})
 
 	return heartbeats, nil
+}
+
+func getControllerID(extensionConfig *extconfig.FluxNinjaExtensionConfig) string {
+	if extensionConfig.ControllerID != "" {
+		return extensionConfig.ControllerID
+	}
+	newID := guuid.NewString()
+	parts := strings.Split(newID, "-")
+	moniker := strings.Replace(moniker.New().Name(), " ", "-", 1)
+	return fmt.Sprintf("%s-%s", moniker, parts[0])
 }

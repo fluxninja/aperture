@@ -449,6 +449,16 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 		return nil
 	}
 
+	if (instance.Spec.Image.Digest == "" && instance.Spec.Image.Tag == "") || (instance.Spec.Image.Digest != "" && instance.Spec.Image.Tag != "") {
+		instance.Status.Resources = controllers.FailedStatus
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
+		errUpdate := r.updateStatus(ctx, instance)
+		if errUpdate != nil {
+			return errUpdate
+		}
+		return nil
+	}
+
 	if instance.Status.Resources == controllers.FailedStatus {
 		instance.Status.Resources = ""
 	}

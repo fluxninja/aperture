@@ -43,7 +43,13 @@ dashboard:
   extra_filters: {}
   # Refresh interval for dashboard panels.
   # Type: string
-  refresh_interval: "10s"
+  refresh_interval: "15s"
+  # From time of dashboard.
+  # Type: string
+  time_from: "now-15m"
+  # To time of dashboard.
+  # Type: string
+  time_to: "now"
   # Name of the main dashboard.
   # Type: string
   title: "Aperture Rate Limiter"

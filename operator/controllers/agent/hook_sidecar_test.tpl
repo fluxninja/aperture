@@ -5,6 +5,9 @@
     "name": "agent-sample"
   },
   "spec": {
+    "image":{
+      "digest": "sha:432234"
+    },
     "sidecar": {
       "enabled": true
     },

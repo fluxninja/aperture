@@ -75,7 +75,8 @@ type PoliciesConfig struct {
 
 // ControllerStatus defines the observed state of Controller.
 type ControllerStatus struct {
-	Resources string `json:"resources,omitempty"`
+	Resources            string `json:"resources,omitempty"`
+	IsMigrationCompleted bool   `json:"isMigrationCompleted,omitempty"`
 }
 
 //+kubebuilder:object:root=true

@@ -56,7 +56,7 @@ func serviceForController(instance *controllerv1alpha1.Controller, log logr.Logg
 
 	svc := &corev1.Service{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ServiceName(instance),
+			Name:        controllers.ControllerResourcesName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: spec.Annotations,

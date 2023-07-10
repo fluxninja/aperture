@@ -32,7 +32,8 @@ aperturectl decisions [flags]
 
 ```
       --all                    Get all decisions
-      --controller string      Address of Aperture controller
+      --api-key string         FluxNinja ARC API Key to be used when using Cloud Controller
+      --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --decision-type string   Type of the decision to get (load_scheduler, rate_limiter, quota_scheduler, pod_scaler, sampler)
   -h, --help                   help for decisions

@@ -19,6 +19,21 @@
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
         },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
         "dry_run": {
           "description": "Dry run mode ensures that no scaling is invoked by this auto scaler.",
           "default": false,
@@ -27,11 +42,6 @@
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
           "default": "10s",
-          "type": "string"
-        },
-        "policy_name": {
-          "description": "Name of the policy.",
-          "default": "__REQUIRED_FIELD__",
           "type": "string"
         },
         "promql_scale_in_controllers": {
@@ -51,16 +61,6 @@
             "type": "object",
             "$ref": "#/$defs/promql_scale_out_controller"
           }
-        },
-        "resources": {
-          "description": "List of additional resources.",
-          "default": {
-            "flow_control": {
-              "classifiers": []
-            }
-          },
-          "type": "object",
-          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
         "scaling_backend": {
           "description": "Scaling backend for the policy.",
@@ -82,6 +82,18 @@
           },
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AutoScalerScalingParameters"
+        },
+        "pod_cpu": {
+          "description": "Driver to do scaling of the resource based on the CPU usage.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/scaling_driver"
+        },
+        "pod_memory": {
+          "description": "Driver to do scaling of the resource based on the Memory usage.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/scaling_driver"
         }
       }
     },
@@ -97,16 +109,16 @@
         },
         "refresh_interval": {
           "description": "Refresh interval for dashboard panels.",
-          "default": "5s",
+          "default": "15s",
           "type": "string"
         },
         "time_from": {
-          "description": "Time from of dashboard.",
+          "description": "From time of dashboard.",
           "default": "now-15m",
           "type": "string"
         },
         "time_to": {
-          "description": "Time to of dashboard.",
+          "description": "To time of dashboard.",
           "default": "now",
           "type": "string"
         },
@@ -192,6 +204,42 @@
           "default": "__REQUIRED_FIELD__",
           "type": "number",
           "format": "double"
+        }
+      }
+    },
+    "scaling_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "threshold"],
+      "properties": {
+        "enabled": {
+          "description": "Enables the driver to do scale in or out of the resource.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "boolean"
+        },
+        "threshold": {
+          "description": "Threshold for the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "scaling_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scale_in": {
+          "description": "The scale in criteria for the driver.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/scaling_criteria"
+        },
+        "scale_out": {
+          "description": "The scale out criteria for the driver.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/scaling_criteria"
         }
       }
     }

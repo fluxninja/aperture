@@ -122,6 +122,7 @@ type PromQL struct {
 	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`
 	// Describes the interval between successive evaluations of the Prometheus query.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	EvaluationInterval *durationpb.Duration `protobuf:"bytes,3,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"10s"` // @gotags: default:"10s"
 }
 

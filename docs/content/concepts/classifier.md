@@ -71,7 +71,7 @@ be [disabled][rule] in the classifier configuration.
 
 :::
 
-## Live Previewing Requests Attributes {#live-previewing-requests}
+## Live Previewing Request Attributes {#live-previewing-requests}
 
 Live previewing of request attributes is a feature that allows real-time
 examination of attributes flowing through services and control points. This can
@@ -150,7 +150,7 @@ Returns:
 
 Alternatively, use the
 [Introspection API](/reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
-directly on an Aperture agent:
+directly on an Aperture Agent:
 
 Example:
 

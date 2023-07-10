@@ -56,6 +56,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 
 <!-- vale off -->
 
+<a id="policy-policy-name"></a>
+
+<ParameterDescription
+    name='policy.policy_name'
+    description='Name of the policy.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-resources"></a>
+
+<ParameterDescription
+    name='policy.resources'
+    description='Additional resources.'
+    type='Object (aperture.spec.v1.Resources)'
+    reference='../../spec#resources'
+    value='{"flow_control": {"classifiers": []}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-dry-run"></a>
 
 <ParameterDescription
@@ -78,20 +106,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     type='string'
     reference=''
     value='"10s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-policy-name"></a>
-
-<ParameterDescription
-    name='policy.policy_name'
-    description='Name of the policy.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -126,20 +140,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 
 <!-- vale off -->
 
-<a id="policy-resources"></a>
-
-<ParameterDescription
-    name='policy.resources'
-    description='List of additional resources.'
-    type='Object (aperture.spec.v1.Resources)'
-    reference='../../spec#resources'
-    value='{"flow_control": {"classifiers": []}}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-scaling-backend"></a>
 
 <ParameterDescription
@@ -162,6 +162,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
     reference='../../spec#auto-scaler-scaling-parameters'
     value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-pod-cpu"></a>
+
+<ParameterDescription
+    name='policy.pod_cpu'
+    description='Driver to do scaling of the resource based on the CPU usage.'
+    type='Object (scaling_driver)'
+    reference='#scaling-driver'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-pod-memory"></a>
+
+<ParameterDescription
+    name='policy.pod_memory'
+    description='Driver to do scaling of the resource based on the Memory usage.'
+    type='Object (scaling_driver)'
+    reference='#scaling-driver'
+    value='{}'
 />
 
 <!-- vale on -->
@@ -197,7 +225,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     description='Refresh interval for dashboard panels.'
     type='string'
     reference=''
-    value='"5s"'
+    value='"15s"'
 />
 
 <!-- vale on -->
@@ -208,7 +236,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 
 <ParameterDescription
     name='dashboard.time_from'
-    description='Time from of dashboard.'
+    description='From time of dashboard.'
     type='string'
     reference=''
     value='"now-15m"'
@@ -222,7 +250,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 
 <ParameterDescription
     name='dashboard.time_to'
-    description='Time to of dashboard.'
+    description='To time of dashboard.'
     type='string'
     reference=''
     value='"now"'
@@ -404,6 +432,78 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### scaling_criteria {#scaling-criteria}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-criteria-enabled"></a>
+
+<ParameterDescription
+    name='enabled'
+    description='Enables the driver to do scale in or out of the resource.'
+    type='Boolean'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-criteria-threshold"></a>
+
+<ParameterDescription
+    name='threshold'
+    description='Threshold for the driver.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### scaling_driver {#scaling-driver}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-driver-scale-in"></a>
+
+<ParameterDescription
+    name='scale_in'
+    description='The scale in criteria for the driver.'
+    type='Object (scaling_criteria)'
+    reference='#scaling-criteria'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="scaling-driver-scale-out"></a>
+
+<ParameterDescription
+    name='scale_out'
+    description='The scale out criteria for the driver.'
+    type='Object (scaling_criteria)'
+    reference='#scaling-criteria'
+    value='{}'
 />
 
 <!-- vale on -->

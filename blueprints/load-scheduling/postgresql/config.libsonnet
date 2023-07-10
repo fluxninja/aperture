@@ -1,6 +1,5 @@
 local promqlDefaults = import '../promql/config.libsonnet';
 
-
 promqlDefaults {
   policy+: {
     /**
@@ -29,19 +28,6 @@ promqlDefaults {
       password: '__REQUIRED_FIELD__',
       endpoint: '__REQUIRED_FIELD__',
       agent_group: 'default',
-    },
-
-    /**
-    * @param (policy.service_protection_core.cpu_overload_confirmation.query_string: string) The Prometheus query to be run to get the PostgreSQL CPU utilization. Must return a scalar or a vector with a single element.
-    * @param (policy.service_protection_core.cpu_overload_confirmation.threshold: float64) Threshold value for CPU utilizatio if it has to be used as overload confirmation.
-    * @param (policy.service_protection_core.cpu_overload_confirmation.operator: string) The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`.
-    */
-    service_protection_core+: {
-      cpu_overload_confirmation+: {
-        query_string: 'avg(k8s_pod_cpu_utilization_ratio{k8s_statefulset_name="__REQUIRED_FIELD__"})',
-        threshold: null,
-        operator: 'gte',
-      },
     },
   },
 

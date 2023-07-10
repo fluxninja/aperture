@@ -9,12 +9,17 @@ sidebar_position: 10
 
 :::
 
-_Load Ramp_ is a high-level [circuit](./advanced/circuit.md) that can be used to
-ramp up traffic in a controlled manner. The rollout is specified as steps that
-take a time duration and target percentage. And the target percentage
-transitions linearly from one step to the next. The load ramp is driven through
-signals at input ports `forward`, `backward` and `reset`. Internally, the _Load
-Ramp_ uses a [_Sampler_](#sampler) component and provides it with an
+The _Load Ramp_ is a high-level component in the policy
+[circuit](./advanced/circuit.md). It is specifically designed to facilitate
+controlled traffic ramp-up scenarios. This component allows for gradual
+increases in traffic by specifying rollout steps, each defined by a time
+duration and target percentage. The target percentage transitions linearly from
+one step to the next.
+
+To achieve this functionality, the _Load Ramp_ utilizes input ports named
+`forward`, `backward`, and `reset` to control its behavior. These input signals
+drive the internal logic of the component. Additionally, the _Load Ramp_
+internally leverages the [_Sampler_](#sampler) component, providing it with an
 `accept_percentage` signal.
 
 ## Sampler

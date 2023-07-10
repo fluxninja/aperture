@@ -185,7 +185,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
     description='Refresh interval for dashboard panels.'
     type='string'
     reference=''
-    value='"10s"'
+    value='"15s"'
 />
 
 <!-- vale on -->
@@ -196,7 +196,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 
 <ParameterDescription
     name='dashboard.time_from'
-    description='Time from of dashboard.'
+    description='From time of dashboard.'
     type='string'
     reference=''
     value='"now-15m"'
@@ -210,7 +210,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 
 <ParameterDescription
     name='dashboard.time_to'
-    description='Time to of dashboard.'
+    description='To time of dashboard.'
     type='string'
     reference=''
     value='"now"'

@@ -85,15 +85,18 @@ func injectOtelConfig(
 			if alertsPipeline, exists := config.Service.Pipeline("logs/alerts"); exists {
 				addFNToPipeline("logs/alerts", config, alertsPipeline)
 			}
+
+			disableLocalPipelines := extensionConfig.EnableCloudController || extensionConfig.DisableLocalOTelPipeline
+
 			if _, exists := config.Service.Pipeline("metrics/fast"); exists {
 				addMetricsSlowPipeline(config)
-				if extensionConfig.DisableLocalOTelPipeline {
+				if disableLocalPipelines {
 					deleteLocalMetricsPipeline(config, "metrics/fast")
 				}
 			}
 			if _, exists := config.Service.Pipeline("metrics/controller-fast"); exists {
 				addMetricsControllerSlowPipeline(config)
-				if extensionConfig.DisableLocalOTelPipeline {
+				if disableLocalPipelines {
 					deleteLocalMetricsPipeline(config, "metrics/controller-fast")
 				}
 			}
@@ -102,7 +105,7 @@ func injectOtelConfig(
 					continue
 				}
 				addFNToPipeline(pipelineName, config, customMetricsPipeline)
-				if extensionConfig.DisableLocalOTelPipeline {
+				if disableLocalPipelines {
 					deleteLocalMetricsPipeline(config, pipelineName)
 				}
 			}

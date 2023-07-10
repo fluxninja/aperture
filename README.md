@@ -112,7 +112,7 @@ To install the Aperture system, please follow the
 - [Use Cases](https://docs.fluxninja.com/use-cases) section in Aperture
   documentation.
 
-### Slide decks
+### 🖥️ Slide Decks
 
 - [Observability-driven Load Management](https://docs.google.com/presentation/d/1Funig5u63w96G91ZjHV7ftgLOl1c5z5yDeuoVRH1QSs/edit?usp=sharing)
   deck covers the overview and use-cases of Aperture.

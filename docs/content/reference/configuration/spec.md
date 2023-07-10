@@ -448,7 +448,12 @@ Additional labels to add to alert.
 
 <!-- vale on -->
 
-Duration of alert resolver.
+Duration of alert resolver. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>severity</dt>
@@ -1010,7 +1015,12 @@ Configuration for scale-in Alerter.
 <!-- vale on -->
 
 The amount of time to wait after a scale-in operation for another scale-in
-operation.
+operation. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>scale_out_alerter</dt>
@@ -1035,7 +1045,12 @@ Configuration for scale-out Alerter.
 <!-- vale on -->
 
 The amount of time to wait after a scale-out operation for another scale-out or
-scale-in operation.
+scale-in operation. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1176,7 +1191,12 @@ Defines a signal processing graph as a list of components.
 
 Evaluation interval (tick) is the time between consecutive runs of the policy
 circuit. This interval is typically aligned with how often the corrective action
-(actuation) needs to be taken.
+(actuation) needs to be taken. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1710,7 +1730,12 @@ zero then the transitions are instantaneous.
 <!-- vale on -->
 
 Duration of time to wait before changing to false state. If the duration is
-zero, the change will happen instantaneously.
+zero, the change will happen instantaneously. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>in_ports</dt>
@@ -1759,7 +1784,12 @@ Output ports for the Decider component.
 <!-- vale on -->
 
 Duration of time to wait before changing to true state. If the duration is zero,
-the change will happen instantaneously.```
+the change will happen instantaneously.``` This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1984,7 +2014,12 @@ Output ports for the Differentiator component.
 
 <!-- vale on -->
 
-The window of time over which differentiator operates.
+The window of time over which differentiator operates. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2247,7 +2282,12 @@ envelope.
 
 <!-- vale on -->
 
-Duration of EMA sampling window.
+Duration of EMA sampling window. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -2274,7 +2314,12 @@ Whether the output is valid during the warm-up stage.
 Duration of EMA warming up window.
 
 The initial value of the EMA is the average of signal readings received during
-the warm up window.
+the warm up window. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2534,7 +2579,13 @@ Parameters for the Extrapolator component.
 
 <!-- vale on -->
 
-Maximum time interval to repeat the last valid value of input signal.
+Maximum time interval to repeat the last valid value of input signal. This field
+employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2664,19 +2715,6 @@ deviation of the signal from setpoint.
 <!-- vale on -->
 
 _Load Ramp_ smoothly regulates the flow of requests over specified steps.
-
-</dd>
-<dt>load_ramp_series</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampSeries](#load-ramp-series))
-
-<!-- vale on -->
-
-_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one
-after another at same or different _Control Points_.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -3386,7 +3424,13 @@ and invalid new signals until the `hold_for` duration is finished.
 
 <!-- vale on -->
 
-Holding the last valid signal value for the `hold_for` duration.
+Holding the last valid signal value for the `hold_for` duration. This field
+employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>in_ports</dt>
@@ -4511,7 +4555,12 @@ Parameters for the _Sampler_.
 
 <!-- vale on -->
 
-Duration for which the step is active.
+Duration for which the step is active. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>target_accept_percentage</dt>
@@ -4524,147 +4573,6 @@ Duration for which the step is active.
 <!-- vale on -->
 
 The value of the step.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRampSeries {#load-ramp-series}
-
-<!-- vale on -->
-
-_LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampSeriesIns](#load-ramp-series-ins))
-
-<!-- vale on -->
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampSeriesParameters](#load-ramp-series-parameters))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRampSeriesIns {#load-ramp-series-ins}
-
-<!-- vale on -->
-
-Inputs for the _LoadRampSeries_ component.
-
-<dl>
-<dt>backward</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Whether to progress the load ramp series towards the previous step.
-
-</dd>
-<dt>forward</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Whether to progress the load ramp series towards the next step.
-
-</dd>
-<dt>reset</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Whether to reset the load ramp series to the first step.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRampSeriesLoadRampInstance {#load-ramp-series-load-ramp-instance}
-
-<!-- vale on -->
-
-<dl>
-<dt>load_ramp</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampParameters](#load-ramp-parameters))
-
-<!-- vale on -->
-
-The load ramp.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampOuts](#load-ramp-outs))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRampSeriesParameters {#load-ramp-series-parameters}
-
-<!-- vale on -->
-
-Parameters for the _LoadRampSeries_ component.
-
-<dl>
-<dt>load_ramps</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]LoadRampSeriesLoadRampInstance](#load-ramp-series-load-ramp-instance),
-**required**)
-
-<!-- vale on -->
-
-An ordered list of load ramps that get applied in order.
 
 </dd>
 </dl>
@@ -4877,8 +4785,6 @@ in the flow labels.
 ### MatchExpression {#match-expression}
 
 <!-- vale on -->
-
-Defines a `[map<string, string> → bool]` expression to be evaluated on labels
 
 MatchExpression has multiple variants, exactly one should be set.
 
@@ -5598,7 +5504,12 @@ PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 
 <!-- vale on -->
 
-The period of the timer.
+The period of the timer. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>scale_in_percentage</dt>
@@ -5821,6 +5732,12 @@ output signal
 <!-- vale on -->
 
 Describes the interval between successive evaluations of the Prometheus query.
+This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>out_ports</dt>
@@ -5921,7 +5838,12 @@ Generates 0 and 1 in turns.
 
 <!-- vale on -->
 
-Emitting 0 for the `false_for` duration.
+Emitting 0 for the `false_for` duration. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>out_ports</dt>
@@ -5945,7 +5867,12 @@ Output ports for the PulseGenerator component.
 
 <!-- vale on -->
 
-Emitting 1 for the `true_for` duration.
+Emitting 1 for the `true_for` duration. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -6190,7 +6117,12 @@ continuously or only on discrete intervals.
 <!-- vale on -->
 
 Interval defines the time interval in which the token bucket will fill tokens
-specified by `fill_amount` signal.
+specified by `fill_amount` signal. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>label_key</dt>
@@ -6233,7 +6165,12 @@ Configuration of lazy-syncing behavior of rate limiter
 <!-- vale on -->
 
 Max idle time before token bucket state for a label is removed. If set to 0, the
-state is never removed.
+state is never removed. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -6665,7 +6602,12 @@ Computed moving average.
 
 <!-- vale on -->
 
-Window of time over which the moving average is computed.
+Window of time over which the moving average is computed. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -6975,7 +6917,12 @@ based on the [gRPC deadline](https://grpc.io/blog/deadlines) or the
 
 Fail-open logic is use for flow control APIs, so if the gRPC deadline reaches,
 the flow will end up being unconditionally allowed while it is still waiting on
-the scheduler.
+the scheduler. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -7126,6 +7073,27 @@ $$
 $$
 virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
 $$
+
+</dd>
+<dt>queue_timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Timeout for the flow in the workload. If timeout is provided on the Check call
+as well, we pick the minimum of the two. If this override is not provided, the
+timeout provided in the check call is used. 0 timeout value implies that the
+request will not wait in the queue and will be accepted/dropped immediately.
+This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>tokens</dt>
@@ -7458,7 +7426,12 @@ Parameters for the _Signal Generator_ component.
 
 <!-- vale on -->
 
-Duration for which the step is active.
+Duration for which the step is active. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>target_output</dt>

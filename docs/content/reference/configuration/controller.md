@@ -938,6 +938,18 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 API Key for this agent. If this key is not set, the extension won't be enabled.
 
 </dd>
+<dt>controller_id</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Controller ID.
+
+</dd>
 <dt>disable_local_otel_pipeline</dt>
 <dd>
 
@@ -947,7 +959,20 @@ API Key for this agent. If this key is not set, the extension won't be enabled.
 
 <!-- vale on -->
 
-Whether to configure local Prometheus OTel pipeline for metrics
+Whether to configure local Prometheus OTel pipeline for metrics. Implied to be
+true by EnableCloudController.
+
+</dd>
+<dt>enable_cloud_controller</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Whether to enable cloud controller. Overrides etcd and TLS configurations.
 
 </dd>
 <dt>endpoint</dt>

@@ -6,27 +6,27 @@ policy:
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   # Dry run mode ensures that no scaling is invoked by this auto scaler.
   # Type: bool
   dry_run: false
   # The interval between successive evaluations of the Circuit.
   # Type: string
   evaluation_interval: "10s"
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: __REQUIRED_FIELD__
   # List of scale in controllers.
   # Type: []promql_scale_in_controller
   promql_scale_in_controllers: []
   # List of scale out controllers.
   # Type: []promql_scale_out_controller
   promql_scale_out_controllers: []
-  # List of additional resources.
-  # Type: aperture.spec.v1.Resources
-  resources:
-    flow_control:
-      classifiers: []
   # Scaling backend for the policy.
   # Type: aperture.spec.v1.AutoScalerScalingBackend
   # Required: True
@@ -39,6 +39,12 @@ policy:
       alert_name: "Auto-scaler is scaling in"
     scale_out_alerter:
       alert_name: "Auto-scaler is scaling out"
+  # Driver to do scaling of the resource based on the CPU usage.
+  # Type: scaling_driver
+  pod_cpu: {}
+  # Driver to do scaling of the resource based on the Memory usage.
+  # Type: scaling_driver
+  pod_memory: {}
 
 dashboard:
   # Additional filters to pass to each query to Grafana datasource.
@@ -46,11 +52,11 @@ dashboard:
   extra_filters: {}
   # Refresh interval for dashboard panels.
   # Type: string
-  refresh_interval: "5s"
-  # Time from of dashboard.
+  refresh_interval: "15s"
+  # From time of dashboard.
   # Type: string
   time_from: "now-15m"
-  # Time to of dashboard.
+  # To time of dashboard.
   # Type: string
   time_to: "now"
   # Name of the main dashboard.

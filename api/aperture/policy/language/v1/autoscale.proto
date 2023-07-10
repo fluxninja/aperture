@@ -132,6 +132,7 @@ message DecreasingGradient {
 // PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 message PeriodicDecrease {
   // The period of the timer.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration period = 1; // @gotags: validate:"required"
   // The percentage of scale to reduce.
   double scale_in_percentage = 2; // @gotags: validate:"required,gte=0,lte=100"
@@ -175,8 +176,10 @@ message AutoScaler {
     double max_scale_in_percentage = 2; // @gotags: default:"1"
 
     // The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration scale_out_cooldown = 3; // @gotags: default:"30s"
     // The amount of time to wait after a scale-in operation for another scale-in operation.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration scale_in_cooldown = 4; // @gotags: default:"120s"
 
     // Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.

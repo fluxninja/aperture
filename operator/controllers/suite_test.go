@@ -111,7 +111,7 @@ var _ = BeforeSuite(func() {
 
 	DefaultControllerInstance = &controllerv1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      AppName,
+			Name:      ControllerName,
 			Namespace: AppName,
 		},
 		Spec: controllerv1alpha1.ControllerSpec{

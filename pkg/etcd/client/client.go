@@ -8,6 +8,8 @@ import (
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
@@ -21,6 +23,12 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(ProvideClient),
 	)
+}
+
+// ConfigOverride can be provided by an extension to provide etcd client config directly.
+type ConfigOverride struct {
+	etcd.EtcdConfig
+	PerRPCCredentials credentials.PerRPCCredentials // optional
 }
 
 const (
@@ -38,10 +46,11 @@ const (
 type ClientIn struct {
 	fx.In
 
-	Unmarshaller config.Unmarshaller
-	Lifecycle    fx.Lifecycle
-	Shutdowner   fx.Shutdowner
-	Logger       *log.Logger
+	Unmarshaller   config.Unmarshaller
+	Lifecycle      fx.Lifecycle
+	Shutdowner     fx.Shutdowner
+	Logger         *log.Logger
+	ConfigOverride *ConfigOverride `optional:"true"`
 }
 
 // Client is a wrapper around etcd client v3. It provides interfaces rooted by a namespace in etcd.
@@ -58,9 +67,16 @@ type Client struct {
 func ProvideClient(in ClientIn) (*Client, error) {
 	var config etcd.EtcdConfig
 
-	if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
-		log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
-		return nil, err
+	if in.ConfigOverride != nil {
+		log.Info().Msg("Skipping etcd config deserialization, etcd config already provided")
+		config.Namespace = in.ConfigOverride.Namespace
+		config.Endpoints = in.ConfigOverride.Endpoints
+		config.LeaseTTL = in.ConfigOverride.LeaseTTL
+	} else {
+		if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
+			log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
+			return nil, err
+		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -75,14 +91,25 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				cancel()
 				return tlsErr
 			}
+
+			var dialOptions []grpc.DialOption
+
+			if in.ConfigOverride != nil && in.ConfigOverride.PerRPCCredentials != nil {
+				dialOptions = append(
+					dialOptions,
+					grpc.WithPerRPCCredentials(in.ConfigOverride.PerRPCCredentials),
+				)
+			}
+
 			log.Info().Msg("Initializing etcd client")
 			cli, err := clientv3.New(clientv3.Config{
-				Endpoints: config.Endpoints,
-				Context:   ctx,
-				TLS:       tlsConfig,
-				Username:  config.Username,
-				Password:  config.Password,
-				Logger:    zap.New(log.NewZapAdapter(in.Logger, "etcd-client"), zap.IncreaseLevel(zap.WarnLevel)),
+				Endpoints:   config.Endpoints,
+				Context:     ctx,
+				TLS:         tlsConfig,
+				Username:    config.Username,
+				Password:    config.Password,
+				Logger:      zap.New(log.NewZapAdapter(in.Logger, "etcd-client"), zap.IncreaseLevel(zap.WarnLevel)),
+				DialOptions: dialOptions,
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to initialize etcd client")

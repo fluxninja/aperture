@@ -78,14 +78,12 @@ type Engine struct {
 }
 
 // ProcessRequest .
-func (e *Engine) ProcessRequest(
-	ctx context.Context,
-	requestContext iface.RequestContext,
-) (response *flowcontrolv1.CheckResponse) {
+func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.RequestContext) (response *flowcontrolv1.CheckResponse) {
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
 	labelKeys := flowLabels.SortedKeys()
+
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: labelKeys,

@@ -14,12 +14,12 @@ are typically referred to by their fully qualified domain names (FQDN).
 
 ## Service Discovery
 
-Aperture agent maintains a mapping of entities' (Kubernetes pod or VM) IP
+Aperture Agent maintains a mapping of entities' (Kubernetes pod or VM) IP
 addresses to service names. Each agent is responsible for discovering the
 entities in its vicinity and the services that they belong to. The discovery
-database is local to each Aperture agent.
+database is local to each Aperture Agent.
 
-In the case of a Kubernetes DaemonSet installation, each Aperture agent
+In the case of a Kubernetes DaemonSet installation, each Aperture Agent
 maintains a mapping of IP addresses to services for the pods running on its
 worker node. Changes in services and entities are actively watched by the agent
 to ensure that the discovery remains up to date. This allows for accurate and

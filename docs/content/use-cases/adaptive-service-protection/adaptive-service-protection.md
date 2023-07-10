@@ -10,7 +10,7 @@ sidebar_label: Adaptive Service Protection
 
 Adaptive service protection leverages closed-loop feedback of service health
 telemetry to dynamically adjust the rate of requests processed by a service.
-This adjustment is managed by Aperture agents, which provide a virtual request
+This adjustment is managed by Aperture Agents, which provide a virtual request
 queue at the service's entry point.
 
 The queue adjusts the rate of requests in real-time based on the service's

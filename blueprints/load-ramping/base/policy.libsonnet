@@ -1,4 +1,5 @@
 local spec = import '../../spec.libsonnet';
+local utils = import '../../utils/utils.libsonnet';
 local config = import './config.libsonnet';
 
 function(cfg, metadata={}) {
@@ -339,12 +340,17 @@ function(cfg, metadata={}) {
 
   local policyDef =
     spec.v1.Policy.new()
-    + spec.v1.Policy.withResources(spec.v1.Resources.new()
-                                   + spec.v1.Resources.withFlowControl(
-                                     spec.v1.FlowControlResources.new()
-                                     + spec.v1.FlowControlResources.withFluxMeters((if std.objectHas(params.policy.resources.flow_control, 'flux_meters') then params.policy.resources.flow_control.flux_meters else {}) + driverAccumulator.flux_meters)
-                                     + spec.v1.FlowControlResources.withClassifiers(params.policy.resources.flow_control.classifiers)
-                                   ))
+    + spec.v1.Policy.withResources(
+      utils.resources(params.policy.resources).updatedResources +
+      spec.v1.Resources.new()
+      + spec.v1.Resources.withFlowControl(
+        spec.v1.FlowControlResources.new()
+        + spec.v1.FlowControlResources.withFluxMeters((
+          if std.objectHas(params.policy.resources.flow_control, 'flux_meters') then
+            params.policy.resources.flow_control.flux_meters else {}
+        ) + driverAccumulator.flux_meters)
+      )
+    )
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
       + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)

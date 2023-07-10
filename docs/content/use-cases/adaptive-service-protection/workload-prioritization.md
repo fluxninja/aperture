@@ -12,6 +12,14 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+The following policy is based on the
+[Load Scheduling with Average Latency Feedback](/reference/blueprints/load-scheduling/average-latency.md)
+blueprint.
+
+:::
+
 ## Overview
 
 When dealing with services in resource-limited scenarios, it becomes paramount

@@ -13,6 +13,13 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+The following policy is based on the
+[Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint.
+
+:::
+
 ## Overview
 
 This policy is an example of how to implement
@@ -95,7 +102,7 @@ From there on, the Classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
 [`Rate Limiter`](/concepts/rate-limiter.md) component in the policy to limit the
-`createTodo` mutation query to `2` requests per second with a burst capacity of
+`createTodo` mutation query to `2` requests per second, with a burst capacity of
 `40` requests for each `userID`.
 
 ## Policy in Action

@@ -380,9 +380,11 @@ type Decider struct {
 	Operator string `protobuf:"bytes,3,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=gt lt gte lte eq neq"` // @gotags: validate:"oneof=gt lt gte lte eq neq"
 	// Duration of time to wait before changing to true state.
 	// If the duration is zero, the change will happen instantaneously.```
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	TrueFor *durationpb.Duration `protobuf:"bytes,4,opt,name=true_for,json=trueFor,proto3" json:"true_for,omitempty" default:"0s"` // @gotags: default:"0s"
 	// Duration of time to wait before changing to false state.
 	// If the duration is zero, the change will happen instantaneously.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	FalseFor *durationpb.Duration `protobuf:"bytes,5,opt,name=false_for,json=falseFor,proto3" json:"false_for,omitempty" default:"0s"` // @gotags: default:"0s"
 }
 
@@ -1333,6 +1335,7 @@ type Differentiator struct {
 	// Output ports for the Differentiator component.
 	OutPorts *Differentiator_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// The window of time over which differentiator operates.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	Window *durationpb.Duration `protobuf:"bytes,3,opt,name=window,proto3" json:"window,omitempty" default:"5s"` // @gotags: default:"5s"
 }
 
@@ -1398,8 +1401,10 @@ type PulseGenerator struct {
 	// Output ports for the PulseGenerator component.
 	OutPorts *PulseGenerator_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Emitting 1 for the `true_for` duration.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	TrueFor *durationpb.Duration `protobuf:"bytes,2,opt,name=true_for,json=trueFor,proto3" json:"true_for,omitempty" default:"5s"` // @gotags: default:"5s"
 	// Emitting 0 for the `false_for` duration.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	FalseFor *durationpb.Duration `protobuf:"bytes,3,opt,name=false_for,json=falseFor,proto3" json:"false_for,omitempty" default:"5s"` // @gotags: default:"5s"
 }
 
@@ -1468,6 +1473,7 @@ type Holder struct {
 	// Output ports for the Holder component.
 	OutPorts *Holder_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Holding the last valid signal value for the `hold_for` duration.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	HoldFor *durationpb.Duration `protobuf:"bytes,3,opt,name=hold_for,json=holdFor,proto3" json:"hold_for,omitempty" default:"5s"` // @gotags: default:"5s"
 }
 
@@ -2093,10 +2099,12 @@ type EMA_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Duration of EMA sampling window.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	EmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Duration of EMA warming up window.
 	//
 	// The initial value of the EMA is the average of signal readings received during the warm up window.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	WarmupWindow *durationpb.Duration `protobuf:"bytes,2,opt,name=warmup_window,json=warmupWindow,proto3" json:"warmup_window,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Correction factor to apply on the output value if its in violation of the min envelope.
 	CorrectionFactorOnMinEnvelopeViolation float64 `protobuf:"fixed64,3,opt,name=correction_factor_on_min_envelope_violation,json=correctionFactorOnMinEnvelopeViolation,proto3" json:"correction_factor_on_min_envelope_violation,omitempty" validate:"gte=1.0" default:"1.0"` // @gotags: validate:"gte=1.0" default:"1.0"
@@ -2275,6 +2283,7 @@ type SMA_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Window of time over which the moving average is computed.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	SmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=sma_window,json=smaWindow,proto3" json:"sma_window,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Whether the output is valid during the warm-up stage.
 	ValidDuringWarmup bool `protobuf:"varint,2,opt,name=valid_during_warmup,json=validDuringWarmup,proto3" json:"valid_during_warmup,omitempty" default:"false"` // @gotags: default:"false"
@@ -2859,6 +2868,7 @@ type Extrapolator_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Maximum time interval to repeat the last valid value of input signal.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	MaxExtrapolationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=max_extrapolation_interval,json=maxExtrapolationInterval,proto3" json:"max_extrapolation_interval,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
@@ -3604,6 +3614,7 @@ type Alerter_Parameters struct {
 	// Severity of the alert, one of 'info', 'warn' or 'crit'.
 	Severity string `protobuf:"bytes,2,opt,name=severity,proto3" json:"severity,omitempty" default:"info" validate:"oneof=info warn crit"` // @gotags: default:"info" validate:"oneof=info warn crit"
 	// Duration of alert resolver.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	ResolveTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=resolve_timeout,json=resolveTimeout,proto3" json:"resolve_timeout,omitempty" default:"5s"` // @gotags: default:"5s"
 	// A list of alert channel strings.
 	AlertChannels []string `protobuf:"bytes,4,rep,name=alert_channels,json=alertChannels,proto3" json:"alert_channels,omitempty"`
@@ -4390,6 +4401,7 @@ type SignalGenerator_Parameters_Step struct {
 	// The value of the step.
 	TargetOutput *ConstantSignal `protobuf:"bytes,1,opt,name=target_output,json=targetOutput,proto3" json:"target_output,omitempty"`
 	// Duration for which the step is active.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	Duration *durationpb.Duration `protobuf:"bytes,2,opt,name=duration,proto3" json:"duration,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 

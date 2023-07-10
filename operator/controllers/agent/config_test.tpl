@@ -89,6 +89,7 @@ fluxninja:
       use_proxy: false
       write_buffer_size: 0
   disable_local_otel_pipeline: false
+  enable_cloud_controller: false
   endpoint: ""
   heartbeat_interval: 5s
   installation_mode: LINUX_BARE_METAL

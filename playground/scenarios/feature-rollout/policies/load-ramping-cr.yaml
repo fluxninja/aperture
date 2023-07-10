@@ -145,9 +145,9 @@ spec:
     evaluation_interval: 10s
   resources:
     flow_control:
-      classifiers: []
       flux_meters:
         load-ramping/average_latency/0:
           selectors:
           - control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
+    infra_meters: {}

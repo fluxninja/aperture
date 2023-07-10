@@ -25,6 +25,8 @@ import (
 var (
 	Version = info.Version
 	verbose bool
+
+	controller utils.ControllerConn
 )
 
 func init() {
@@ -40,6 +42,7 @@ func init() {
 	RootCmd.AddCommand(agentsCmd)
 	RootCmd.AddCommand(delete.DeleteCmd)
 	RootCmd.AddCommand(decisions.DecisionsCmd)
+	RootCmd.AddCommand(policiesCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

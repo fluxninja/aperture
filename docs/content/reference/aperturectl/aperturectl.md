@@ -8,7 +8,11 @@ keywords:
 
 <!-- markdownlint-disable -->
 
-## aperturectl
+:::info
+
+For installation instructions, see [installing aperturectl](/get-started/installation/aperture-cli/aperture-cli.md).
+
+:::## aperturectl
 
 aperturectl - CLI tool to interact with Aperture
 
@@ -36,4 +40,5 @@ aperturectl is a CLI tool which can be used to interact with Aperture seamlessly
 - [aperturectl discovery](/reference/aperturectl/discovery/discovery.md) - Discovery integrations
 - [aperturectl flow-control](/reference/aperturectl/flow-control/flow-control.md) - Flow Control integrations
 - [aperturectl install](/reference/aperturectl/install/install.md) - Install Aperture components
+- [aperturectl policies](/reference/aperturectl/policies/policies.md) - List applied policies
 - [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) - Uninstall Aperture components

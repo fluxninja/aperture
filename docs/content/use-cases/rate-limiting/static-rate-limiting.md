@@ -12,6 +12,13 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+:::note
+
+The following policy is based on the
+[Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint.
+
+:::
+
 ## Overview
 
 When exposing an API to the public, it is critical to protect it from potential

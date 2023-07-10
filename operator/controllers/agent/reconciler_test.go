@@ -84,6 +84,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -155,6 +156,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			ns1 := &corev1.Namespace{
@@ -265,6 +267,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
+			instance.Spec.Image.Digest = TestDigest
 			encodedString := fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(Test)))
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
@@ -385,6 +388,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -444,6 +448,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 
 			ns1 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -539,6 +544,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.Sidecar.Enabled = false
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			ns1 := &corev1.Namespace{
@@ -648,6 +654,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			ns1 := &corev1.Namespace{
