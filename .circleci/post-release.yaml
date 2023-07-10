@@ -333,27 +333,10 @@ jobs:
       - run:
           name: Add changes to values.yaml file.
           command: |
-            fn release publish_azure_marketplace \
-            --path "azure-marketplace" \
-            --controller_app_version '{"bitnami/etcd": "3.5.8-debian-11-r0","quay.io/prometheus/prometheus":"v2.39.1", "jimmidyson/configmap-reload": "v0.5.0", "bitnami/kubectl": "1.27","linuxserver/yq": "3.1.0"}' \
+            fn release publish-azure-marketplace \
+            --azure-dir-path "azure-marketplace" \
+            --controller-dependency-versions '{"docker.io/bitnami/etcd": "3.5.8-debian-11-r0","quay.io/prometheus/prometheus":"v2.39.1", "docker.io/jimmidyson/configmap-reload": "v0.5.0", "docker.io/bitnami/kubectl": "1.27","docker.io/linuxserver/yq": "3.1.0"}' \
             --tag << parameters.tag >>
-      - run:
-          name: Pushing bundle to azure registery.
-          command: |
-            docker pull mcr.microsoft.com/container-package-app:latest
-            cd ..
-            docker run -e APP_ID=${APP_ID} -e AZURE_PASSWORD=${AZURE_PASSWORD} -e TENANT=${TENANT} -d --name microsoft_container -v /var/run/docker.sock:/var/run/docker.sock -v project:/data mcr.microsoft.com/container-package-app:latest tail -f /dev/null
-            docker exec microsoft_container /bin/bash -xc '
-              export REGISTRY_NAME="fluxninja.azurecr.io"
-              az login --service-principal -u ${APP_ID} --password ${AZURE_PASSWORD} --tenant ${TENANT}
-              az acr login -n $REGISTRY_NAME
-              cd /data/azure-marketplace/controller
-              cpa verify
-              cpa buildbundle
-              cd ../agent/
-              cpa verify
-              cpa buildbundle
-            '
 
 workflows:
   version: 2
