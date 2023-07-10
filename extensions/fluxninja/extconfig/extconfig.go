@@ -2,12 +2,14 @@
 package extconfig
 
 import (
+	"context"
 	"time"
 
-	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/etcd"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
 )
@@ -66,18 +68,35 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 	return &extensionConfig, nil
 }
 
-func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) (*etcd.EtcdConfigOverride, error) {
+func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdclient.ConfigOverride {
 	if extensionConfig.EnableCloudController {
-		return &etcd.EtcdConfigOverride{
+		return &etcdclient.ConfigOverride{
 			EtcdConfig: etcd.EtcdConfig{
 				Namespace: "",
 				Endpoints: []string{extensionConfig.Endpoint},
 				LeaseTTL:  config.MakeDuration(60 * time.Second),
 			},
-			HeaderKey:   "apiKey",
-			HeaderValue: extensionConfig.APIKey,
-		}, nil
+			PerRPCCredentials: perRPCHeaders{
+				headers: map[string]string{
+					"apiKey": extensionConfig.APIKey,
+				},
+			},
+		}
 	} else {
-		return nil, nil
+		return nil
 	}
+}
+
+type perRPCHeaders struct {
+	headers map[string]string
+}
+
+// GetRequestMetadata returns the request headers to be used with the RPC.
+func (p perRPCHeaders) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
+	return p.headers, nil
+}
+
+// RequireTransportSecurity always returns true for this implementation.
+func (p perRPCHeaders) RequireTransportSecurity() bool {
+	return true
 }

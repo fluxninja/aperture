@@ -22,10 +22,3 @@ type EtcdConfig struct {
 	// List of etcd server endpoints
 	Endpoints []string `json:"endpoints" validate:"required,gt=0,dive,hostname_port|url|fqdn"`
 }
-
-// EtcdConfigOverride is provided by FluxNinja plugin if EnableCloudController flag is set.
-type EtcdConfigOverride struct {
-	EtcdConfig
-	HeaderKey   string `json:"header_key"`
-	HeaderValue string `json:"header_value"`
-}

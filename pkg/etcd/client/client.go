@@ -9,6 +9,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
@@ -22,6 +23,12 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(ProvideClient),
 	)
+}
+
+// ConfigOverride can be provided by an extension to provide etcd client config directly.
+type ConfigOverride struct {
+	etcd.EtcdConfig
+	PerRPCCredentials credentials.PerRPCCredentials // optional
 }
 
 const (
@@ -43,7 +50,7 @@ type ClientIn struct {
 	Lifecycle      fx.Lifecycle
 	Shutdowner     fx.Shutdowner
 	Logger         *log.Logger
-	ConfigOverride *etcd.EtcdConfigOverride `optional:"true"`
+	ConfigOverride *ConfigOverride `optional:"true"`
 }
 
 // Client is a wrapper around etcd client v3. It provides interfaces rooted by a namespace in etcd.
@@ -61,6 +68,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 	var etcdConf etcd.EtcdConfig
 
 	if in.ConfigOverride != nil {
+		log.Error().Msg("Skipping etcd config deserialization, etcd config already provided")
 		etcdConf.Namespace = in.ConfigOverride.Namespace
 		etcdConf.Endpoints = in.ConfigOverride.Endpoints
 		etcdConf.LeaseTTL = in.ConfigOverride.LeaseTTL
@@ -86,12 +94,11 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 			var dialOptions []grpc.DialOption
 
-			headers := map[string]string{
-				in.ConfigOverride.HeaderKey: in.ConfigOverride.HeaderValue,
-			}
-
-			if in.ConfigOverride != nil {
-				dialOptions = append(dialOptions, headerInterceptor(headers))
+			if in.ConfigOverride != nil && in.ConfigOverride.PerRPCCredentials != nil {
+				dialOptions = append(
+					dialOptions,
+					grpc.WithPerRPCCredentials(in.ConfigOverride.PerRPCCredentials),
+				)
 			}
 
 			log.Info().Msg("Initializing etcd client")
@@ -159,25 +166,4 @@ func ProvideClient(in ClientIn) (*Client, error) {
 	})
 
 	return etcdClient, nil
-}
-
-func headerInterceptor(headers map[string]string) grpc.DialOption {
-	rpcHeaders := &perRPCHeaders{
-		headers,
-	}
-	return grpc.WithPerRPCCredentials(rpcHeaders)
-}
-
-type perRPCHeaders struct {
-	headers map[string]string
-}
-
-// GetRequestMetadata returns the request headers to be used with the RPC.
-func (p *perRPCHeaders) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
-	return p.headers, nil
-}
-
-// RequireTransportSecurity always returns true for this implementation.
-func (p *perRPCHeaders) RequireTransportSecurity() bool {
-	return true
 }
