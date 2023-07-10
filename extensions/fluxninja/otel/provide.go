@@ -104,10 +104,12 @@ func injectOtelConfig(
 				if !strings.HasPrefix(pipelineName, "metrics/user-defined-") {
 					continue
 				}
-				addFNToPipeline(pipelineName, config, customMetricsPipeline)
 				if disableLocalPipelines {
-					deleteLocalMetricsPipeline(config, pipelineName)
+					// In case of user defined pipelines, we clean-up list of exporters
+					// and then depend on `addFNToPipeline' to add its own exporter.
+					customMetricsPipeline.Exporters = []string{}
 				}
+				addFNToPipeline(pipelineName, config, customMetricsPipeline)
 			}
 		})
 	}))
