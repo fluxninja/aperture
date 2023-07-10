@@ -90,7 +90,7 @@ func injectOtelConfig(
 			}
 			if _, exists := config.Service.Pipeline("metrics/controller-fast"); exists {
 				addMetricsControllerSlowPipeline(config)
-				if extensionConfig.DisableLocalOTelPipeline {
+				if extensionConfig.EnableCloudController || extensionConfig.DisableLocalOTelPipeline {
 					deleteLocalMetricsPipeline(config)
 				}
 			}
