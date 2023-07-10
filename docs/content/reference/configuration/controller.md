@@ -867,6 +867,18 @@ List of etcd server endpoints
 Lease time-to-live
 
 </dd>
+<dt>namespace</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"aperture"`)
+
+<!-- vale on -->
+
+etcd namespace
+
+</dd>
 <dt>password</dt>
 <dd>
 
@@ -924,6 +936,43 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 <!-- vale on -->
 
 API Key for this agent. If this key is not set, the extension won't be enabled.
+
+</dd>
+<dt>controller_id</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Controller ID.
+
+</dd>
+<dt>disable_local_otel_pipeline</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Whether to configure local Prometheus OTel pipeline for metrics. Implied to be
+true by EnableCloudController.
+
+</dd>
+<dt>enable_cloud_controller</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Whether to enable cloud controller. Overrides etcd and TLS configurations.
 
 </dd>
 <dt>endpoint</dt>
@@ -2006,6 +2055,52 @@ PrometheusConfig holds configuration for Prometheus Server.
 <!-- vale on -->
 
 Address of the Prometheus server
+
+</dd>
+<dt>labels</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]PrometheusLabel](#prometheus-label))
+
+<!-- vale on -->
+
+A list of labels to be attached to every query
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PrometheusLabel {#prometheus-label}
+
+<!-- vale on -->
+
+PrometheusLabel holds Name->Value mapping for the label that will be attached to
+every PromQL query executed by the controller.
+
+<dl>
+<dt>name</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+</dd>
+<dt>value</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
 
 </dd>
 </dl>

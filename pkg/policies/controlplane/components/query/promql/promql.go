@@ -49,10 +49,11 @@ func Module() fx.Option {
 	)
 }
 
-func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API) notifiers.FxOptionsFunc {
+func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup, promAPI prometheusv1.API, enforcer *prometheus.PrometheusEnforcer) notifiers.FxOptionsFunc {
 	return func(key notifiers.Key, _ config.Unmarshaller, _ status.Registry) (fx.Option, error) {
 		return fx.Supply(fx.Annotated{Name: promQLJobGroupTag, Target: promQLJobGroup},
 			fx.Annotate(promAPI, fx.As(new(prometheusv1.API))),
+			fx.Annotate(enforcer, fx.As(new(*prometheus.PrometheusEnforcer))),
 		), nil
 	}
 }
@@ -139,6 +140,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer *prometheus.PrometheusEnforcer,
 	timeout time.Duration,
 	cb scalarResultCallback,
 ) {
@@ -152,6 +154,7 @@ func (pje *promJobsExecutor) registerScalarJob(
 			query,
 			endTimestamp,
 			promAPI,
+			enforcer,
 			timeout,
 			scalarResBroker.handleResult,
 			scalarResBroker.handleError,
@@ -165,6 +168,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer *prometheus.PrometheusEnforcer,
 	timeout time.Duration,
 	cb promResultCallback,
 ) {
@@ -178,6 +182,7 @@ func (pje *promJobsExecutor) registerTaggedJob(
 			query,
 			endTimestamp,
 			promAPI,
+			enforcer,
 			timeout,
 			taggedResBroker.handleResult,
 			taggedResBroker.handleError,
@@ -337,6 +342,8 @@ type PromQL struct {
 	tickInfo runtime.TickInfo
 	// Prometheus API
 	promAPI prometheusv1.API
+	// Prometheus Labels Enforcer
+	enforcer *prometheus.PrometheusEnforcer
 	// Policy read API
 	policyReadAPI iface.Policy
 	// Current error
@@ -408,8 +415,9 @@ func NewPromQLAndOptions(
 	return promQL, options, nil
 }
 
-func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) error {
+func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API, enforcer *prometheus.PrometheusEnforcer) error {
 	promQL.promAPI = promAPI
+	promQL.enforcer = enforcer
 	promQL.jobExecutor = pje
 
 	return nil
@@ -452,6 +460,7 @@ func (promQL *PromQL) registerJob(endTimestamp time.Time) {
 		promQL.queryString,
 		endTimestamp,
 		promQL.promAPI,
+		promQL.enforcer,
 		promTimeout,
 		promQL.onScalarResult,
 	)
@@ -551,6 +560,7 @@ func (taggedQuery *TaggedQuery) registerJob(endTimestamp time.Time) {
 		taggedQuery.scalarQuery.promQL.queryString,
 		endTimestamp,
 		taggedQuery.scalarQuery.promQL.promAPI,
+		taggedQuery.scalarQuery.promQL.enforcer,
 		promTimeout,
 		taggedQuery.onTaggedResult,
 	)

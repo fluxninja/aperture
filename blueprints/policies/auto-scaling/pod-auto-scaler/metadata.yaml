@@ -1,4 +1,0 @@
-blueprint:
-  Auto-Scaling Policy for Kubernetes.
-sources:
-  policy: policies/auto-scaling/pod-auto-scaler/policy.libsonnet

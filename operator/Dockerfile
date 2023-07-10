@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.20.4-bullseye AS builder
+FROM golang:1.20.5-bullseye AS builder
 
 WORKDIR /src
 COPY --link . .

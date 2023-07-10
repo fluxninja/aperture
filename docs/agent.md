@@ -638,8 +638,7 @@ empty schema
 | ---------- | ------ | -------- | :------: | ------- | ------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | AgentGroup | string | `string` |          |         | All agents within an agent group receive the same data-plane configuration (for example, Flux Meters, Rate Limiters and so on). |
 
-[Read more about agent groups here](/concepts/flow-control/selector.md#agent-group).
-| |
+[Read more about agent groups here](/concepts/selector.md#agent-group). | |
 
 ### <span id="agent-o-tel-config"></span> AgentOTelConfig
 

@@ -19,7 +19,8 @@ Use this command to delete the Aperture Policies.
 ### Options
 
 ```
-      --controller string      Address of Aperture controller
+      --api-key string         FluxNinja ARC API Key to be used when using Cloud Controller
+      --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for delete
       --insecure               Allow connection to controller running without TLS

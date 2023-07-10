@@ -85,15 +85,29 @@ func injectOtelConfig(
 			if alertsPipeline, exists := config.Service.Pipeline("logs/alerts"); exists {
 				addFNToPipeline("logs/alerts", config, alertsPipeline)
 			}
+
+			disableLocalPipelines := extensionConfig.EnableCloudController || extensionConfig.DisableLocalOTelPipeline
+
 			if _, exists := config.Service.Pipeline("metrics/fast"); exists {
 				addMetricsSlowPipeline(config)
+				if disableLocalPipelines {
+					deleteLocalMetricsPipeline(config, "metrics/fast")
+				}
 			}
 			if _, exists := config.Service.Pipeline("metrics/controller-fast"); exists {
 				addMetricsControllerSlowPipeline(config)
+				if disableLocalPipelines {
+					deleteLocalMetricsPipeline(config, "metrics/controller-fast")
+				}
 			}
 			for pipelineName, customMetricsPipeline := range config.Service.Pipelines {
 				if !strings.HasPrefix(pipelineName, "metrics/user-defined-") {
 					continue
+				}
+				if disableLocalPipelines {
+					// In case of user defined pipelines, we clean-up list of exporters
+					// and then depend on `addFNToPipeline' to add its own exporter.
+					customMetricsPipeline.Exporters = []string{}
 				}
 				addFNToPipeline(pipelineName, config, customMetricsPipeline)
 			}
@@ -188,6 +202,11 @@ func addFluxNinjaPrometheusReceiver(config *otelconfig.Config) {
 		log.Fatal().Err(err).Msg("failed to merge configs")
 	}
 	config.AddReceiver(receiverPrometheus, duplicatedReceiverConfig)
+}
+
+func deleteLocalMetricsPipeline(config *otelconfig.Config, pipeline string) {
+	log.Info().Msg("Cleaning up local prometheus pipeline")
+	config.Service.DeletePipeline(pipeline)
 }
 
 func duplicateMap(in map[string]any) (map[string]any, error) {

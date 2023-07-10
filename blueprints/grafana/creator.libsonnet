@@ -11,14 +11,20 @@ function(policyFile, cfg) {
   local policyJSON =
     if std.isObject(policyFile)
     then policyFile
+    else if std.startsWith(policyFile, '{')
+    then std.parseJson(policyFile)
     else std.parseYaml(policyFile),
+  local componentsJSON =
+    if std.objectHas(policyJSON, 'spec')
+    then policyJSON.spec.circuit.components
+    else policyJSON.node.component.components,
 
   // Flow Control Panels
   local flowControlComponents = std.flattenArrays(std.filter(function(x) x != null, [
     if std.objectHas(component, 'flow_control')
     then
       std.objectFields(component.flow_control)
-    for component in policyJSON.spec.circuit.components
+    for component in componentsJSON
   ])),
 
   local flowControlPanels = std.flattenArrays(std.filter(function(x) x != null, [
@@ -34,7 +40,7 @@ function(policyFile, cfg) {
     if std.objectHas(panelLibrary, std.toString(componentName))
     then
       unwrap(std.toString(componentName), component, config).panel
-    for component in policyJSON.spec.circuit.components
+    for component in componentsJSON
     for componentName in std.objectFields(component)
   ])),
 

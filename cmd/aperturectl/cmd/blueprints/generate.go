@@ -35,7 +35,6 @@ func init() {
 
 type metadata struct {
 	BlueprintsURI string `json:"blueprints_uri"`
-	BlueprintName string `json:"blueprint_name"`
 }
 
 var generateCmd = &cobra.Command{
@@ -44,9 +43,9 @@ var generateCmd = &cobra.Command{
 	Long: `
 Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
-	Example: `aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml
+	Example: `aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml --apply`,
+aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := utils.ReaderLock(blueprintsURIRoot)
 		if err != nil {
@@ -133,7 +132,6 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 		}
 		metadata, err := json.Marshal(metadata{
 			BlueprintsURI: blueprintsURIMetadata,
-			BlueprintName: blueprintName,
 		})
 		if err != nil {
 			return err

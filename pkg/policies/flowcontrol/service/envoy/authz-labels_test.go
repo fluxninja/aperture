@@ -26,7 +26,7 @@ var _ = Describe("Flow labels", func() {
 		}
 
 		flowLabels := AuthzRequestToFlowLabels(req)
-		labels := flowLabels.ToPlainMap()
+		labels := flowLabels.Copy()
 		Expect(labels).To(HaveKeyWithValue("http.method", "GET"))
 		Expect(labels).To(HaveKeyWithValue("http.target", "/foo/bar"))
 		Expect(labels).To(HaveKeyWithValue("http.host", "example.com"))

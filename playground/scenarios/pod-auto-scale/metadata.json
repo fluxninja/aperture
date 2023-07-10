@@ -1,0 +1,27 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/single-service-app",
+  "needs": ["istio"],
+  "aperture_policies": [
+    {
+      "blueprint_name": "auto-scaling/pod-auto-scaler",
+      "policy_name": "pod-auto-scaler",
+      "values_file": "policies/pod-auto-scaler.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    }
+  ]
+}

@@ -16,7 +16,6 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -94,7 +93,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		// Additional base64 encoding step is used, as there's no way to push
 		// binary data through dynamic metadata and envoy's access log
 		// formatter. Overhead of this base64 encoding is small though.
-		marshalledCheckResponse, err := proto.Marshal(checkResponse)
+		marshalledCheckResponse, err := checkResponse.MarshalVT()
 		if err != nil {
 			log.Bug().Err(err).Msg("bug: Failed to marshal check response")
 			return nil
@@ -166,7 +165,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
 	svcs := h.serviceGetter.ServicesFromContext(ctx)
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels, input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -185,19 +184,19 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	// Make the freshly created flow labels available to flowcontrol.
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
-	flowLabels := mergedFlowLabels.ToPlainMap()
 
 	// Ask flow control service for Ok/Deny
-	checkResponse := h.fcHandler.CheckRequest(ctx,
+	checkResponse := h.fcHandler.CheckRequest(
+		ctx,
 		iface.RequestContext{
-			FlowLabels:   flowLabels,
+			FlowLabels:   mergedFlowLabels,
 			ControlPoint: ctrlPt,
 			Services:     svcs,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
-	checkResponse.TelemetryFlowLabels = flowLabels
+	checkResponse.TelemetryFlowLabels = mergedFlowLabels.TelemetryLabels()
 	// add control point type
 	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 

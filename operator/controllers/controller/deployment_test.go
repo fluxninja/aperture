@@ -96,14 +96,14 @@ var _ = Describe("Controller Deployment", func() {
 		It("returns correct deployment for Controller", func() {
 			selectorLabels := map[string]string{
 				"app.kubernetes.io/name":       AppName,
-				"app.kubernetes.io/instance":   AppName,
+				"app.kubernetes.io/instance":   ControllerName,
 				"app.kubernetes.io/managed-by": OperatorName,
 				"app.kubernetes.io/component":  ControllerServiceName,
 			}
 
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -282,7 +282,7 @@ var _ = Describe("Controller Deployment", func() {
 				},
 			}
 
-			result, err := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := deploymentForController(instance.DeepCopy(), true, logr.Logger{}, scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Spec.Template.Spec.Containers).To(Equal(expected.Spec.Template.Spec.Containers))
@@ -293,14 +293,14 @@ var _ = Describe("Controller Deployment", func() {
 		It("returns correct deployment for Controller", func() {
 			selectorLabels := map[string]string{
 				"app.kubernetes.io/name":       AppName,
-				"app.kubernetes.io/instance":   AppName,
+				"app.kubernetes.io/instance":   ControllerName,
 				"app.kubernetes.io/managed-by": OperatorName,
 				"app.kubernetes.io/component":  ControllerServiceName,
 			}
 
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -618,7 +618,7 @@ var _ = Describe("Controller Deployment", func() {
 				},
 			}
 
-			result, err := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := deploymentForController(instance.DeepCopy(), true, logr.Logger{}, scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Spec.Template.Spec.ImagePullSecrets).To(Equal(expected.Spec.Template.Spec.ImagePullSecrets))

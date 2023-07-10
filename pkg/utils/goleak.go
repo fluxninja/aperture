@@ -31,6 +31,7 @@ var ignoreFuncs = []string{
 	"github.com/SAP/go-hdb/driver.(*metrics).collect",
 	"internal/poll.runtime_pollWait",
 	"database/sql.(*DB).connectionOpener",
+	"google.golang.org/grpc/internal/grpcsync.(*CallbackSerializer).run",
 }
 
 // GoLeakDetector holds options for the goleak detector.

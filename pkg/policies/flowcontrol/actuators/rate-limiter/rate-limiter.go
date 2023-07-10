@@ -20,6 +20,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -314,13 +315,13 @@ func (rl *rateLimiter) GetSelectors() []*policylangv1.Selector {
 }
 
 // Decide runs the limiter.
-func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
+func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) iface.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
 	tokens := float64(1)
 	// get tokens from labels
 	if rl.lbProto.Parameters.TokensLabelKey != "" {
-		if val, ok := labels[rl.lbProto.Parameters.TokensLabelKey]; ok {
+		if val, ok := labels.Get(rl.lbProto.Parameters.TokensLabelKey); ok {
 			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
 				tokens = parsedTokens
 			}
@@ -359,7 +360,7 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels map[string]string) ifa
 }
 
 // Revert returns the tokens to the limiter.
-func (rl *rateLimiter) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (rl *rateLimiter) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
 		tokens := rateLimiterDecision.RateLimiterInfo.TokensConsumed
 		if tokens > 0 {
@@ -371,7 +372,7 @@ func (rl *rateLimiter) Revert(ctx context.Context, labels map[string]string, dec
 // TakeIfAvailable takes n tokens from the limiter.
 func (rl *rateLimiter) TakeIfAvailable(
 	ctx context.Context,
-	labels map[string]string,
+	labels labels.Labels,
 	n float64,
 ) (label string, ok bool, waitTime time.Duration, remaining float64, current float64) {
 	if rl.limiter.GetPassThrough() {
@@ -382,7 +383,7 @@ func (rl *rateLimiter) TakeIfAvailable(
 	if labelKey == "" {
 		label = "default"
 	} else {
-		labelValue, found := labels[labelKey]
+		labelValue, found := labels.Get(labelKey)
 		if !found {
 			return "", true, 0, 0, 0
 		}

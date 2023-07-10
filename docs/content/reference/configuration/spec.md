@@ -14,7 +14,7 @@ sidebar_label: Policy Specification
 <!-- vale on -->
 
 Reference for all objects used in
-[the Policy language](/concepts/policy/policy.md).
+[the Policy language](/concepts/advanced/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).
 
@@ -448,7 +448,12 @@ Additional labels to add to alert.
 
 <!-- vale on -->
 
-Duration of alert resolver.
+Duration of alert resolver. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>severity</dt>
@@ -1010,7 +1015,12 @@ Configuration for scale-in Alerter.
 <!-- vale on -->
 
 The amount of time to wait after a scale-in operation for another scale-in
-operation.
+operation. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>scale_out_alerter</dt>
@@ -1035,7 +1045,12 @@ Configuration for scale-out Alerter.
 <!-- vale on -->
 
 The amount of time to wait after a scale-out operation for another scale-out or
-scale-in operation.
+scale-in operation. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1128,7 +1143,7 @@ Circuit is graph of inter-connected signal processing components.
 
 :::info
 
-See also [Circuit overview](/concepts/policy/circuit.md).
+See also [Circuit overview](/concepts/advanced/circuit.md).
 
 :::
 
@@ -1176,7 +1191,12 @@ Defines a signal processing graph as a list of components.
 
 Evaluation interval (tick) is the time between consecutive runs of the policy
 circuit. This interval is typically aligned with how often the corrective action
-(actuation) needs to be taken.
+(actuation) needs to be taken. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1193,7 +1213,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+See also [Classifier overview](/concepts/classifier.md).
 
 ::: Example
 
@@ -1243,9 +1263,9 @@ extractors are recommended.
 
 <!-- vale on -->
 
-A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to rules that define how
-to extract and propagate flow labels with that key.
+A map of {key, value} pairs mapping from [flow label](/concepts/flow-label.md)
+keys to rules that define how to extract and propagate flow labels with that
+key.
 
 </dd>
 <dt>selectors</dt>
@@ -1274,7 +1294,7 @@ Computational block that forms the circuit
 
 :::info
 
-See also [Components overview](/concepts/policy/circuit.md#components).
+See also [Components overview](/concepts/advanced/circuit.md#components).
 
 :::
 
@@ -1350,8 +1370,8 @@ AutoScale components are used to scale the service.
 
 <!-- vale on -->
 
-BoolVariable emits a constant Boolean signal which can be changed at runtime via
-dynamic configuration.
+BoolVariable emits a constant Boolean signal which can be changed at runtime
+through dynamic configuration.
 
 </dd>
 <dt>decider</dt>
@@ -1637,7 +1657,7 @@ Takes an input signal and emits the square root of the input signal.
 
 <!-- vale on -->
 
-Emits a variable signal which can be changed at runtime via dynamic
+Emits a variable signal which can be changed at runtime through dynamic
 configuration.
 
 </dd>
@@ -1710,7 +1730,12 @@ zero then the transitions are instantaneous.
 <!-- vale on -->
 
 Duration of time to wait before changing to false state. If the duration is
-zero, the change will happen instantaneously.
+zero, the change will happen instantaneously. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>in_ports</dt>
@@ -1759,7 +1784,12 @@ Output ports for the Decider component.
 <!-- vale on -->
 
 Duration of time to wait before changing to true state. If the duration is zero,
-the change will happen instantaneously.```
+the change will happen instantaneously.``` This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -1984,7 +2014,12 @@ Output ports for the Differentiator component.
 
 <!-- vale on -->
 
-The window of time over which differentiator operates.
+The window of time over which differentiator operates. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2247,7 +2282,12 @@ envelope.
 
 <!-- vale on -->
 
-Duration of EMA sampling window.
+Duration of EMA sampling window. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -2274,7 +2314,12 @@ Whether the output is valid during the warm-up stage.
 Duration of EMA warming up window.
 
 The initial value of the EMA is the average of signal readings received during
-the warm up window.
+the warm up window. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2534,7 +2579,13 @@ Parameters for the Extrapolator component.
 
 <!-- vale on -->
 
-Maximum time interval to repeat the last valid value of input signal.
+Maximum time interval to repeat the last valid value of input signal. This field
+employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -2666,19 +2717,6 @@ deviation of the signal from setpoint.
 _Load Ramp_ smoothly regulates the flow of requests over specified steps.
 
 </dd>
-<dt>load_ramp_series</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampSeries](#load-ramp-series))
-
-<!-- vale on -->
-
-_Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one
-after another at same or different _Control Points_.
-
-</dd>
 <dt>load_scheduler</dt>
 <dd>
 
@@ -2788,7 +2826,7 @@ histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+See also [Flux Meter overview](/concepts/flux-meter.md).
 
 ::: Example:
 
@@ -3386,7 +3424,13 @@ and invalid new signals until the `hold_for` duration is finished.
 
 <!-- vale on -->
 
-Holding the last valid signal value for the `hold_for` duration.
+Holding the last valid signal value for the `hold_for` duration. This field
+employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>in_ports</dt>
@@ -4159,8 +4203,7 @@ Describes which pods a control or observability component should apply to.
 
 <!-- vale on -->
 
-Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
-selector applies to.
+Which [agent-group](/concepts/selector.md#agent-group) this selector applies to.
 
 </dd>
 <dt>api_version</dt>
@@ -4221,9 +4264,8 @@ Kubernetes namespace that the resource belongs to.
 
 <!-- vale on -->
 
-Allows to define rules whether a map of
-[labels](/concepts/flow-control/flow-label.md) should be considered a match or
-not
+Allows to define rules whether a map of [labels](/concepts/flow-label.md) should
+be considered a match or not
 
 It provides three ways to define requirements:
 
@@ -4513,7 +4555,12 @@ Parameters for the _Sampler_.
 
 <!-- vale on -->
 
-Duration for which the step is active.
+Duration for which the step is active. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>target_accept_percentage</dt>
@@ -4534,147 +4581,6 @@ The value of the step.
 
 <!-- vale off -->
 
-### LoadRampSeries {#load-ramp-series}
-
-<!-- vale on -->
-
-_LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampSeriesIns](#load-ramp-series-ins))
-
-<!-- vale on -->
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampSeriesParameters](#load-ramp-series-parameters))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRampSeriesIns {#load-ramp-series-ins}
-
-<!-- vale on -->
-
-Inputs for the _LoadRampSeries_ component.
-
-<dl>
-<dt>backward</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Whether to progress the load ramp series towards the previous step.
-
-</dd>
-<dt>forward</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Whether to progress the load ramp series towards the next step.
-
-</dd>
-<dt>reset</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-Whether to reset the load ramp series to the first step.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRampSeriesLoadRampInstance {#load-ramp-series-load-ramp-instance}
-
-<!-- vale on -->
-
-<dl>
-<dt>load_ramp</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampParameters](#load-ramp-parameters))
-
-<!-- vale on -->
-
-The load ramp.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([LoadRampOuts](#load-ramp-outs))
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### LoadRampSeriesParameters {#load-ramp-series-parameters}
-
-<!-- vale on -->
-
-Parameters for the _LoadRampSeries_ component.
-
-<dl>
-<dt>load_ramps</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]LoadRampSeriesLoadRampInstance](#load-ramp-series-load-ramp-instance),
-**required**)
-
-<!-- vale on -->
-
-An ordered list of load ramps that get applied in order.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### LoadScheduler {#load-scheduler}
 
 <!-- vale on -->
@@ -4684,8 +4590,7 @@ active service protection
 
 :::info
 
-See also
-[_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
 
 :::
 
@@ -4880,8 +4785,6 @@ in the flow labels.
 ### MatchExpression {#match-expression}
 
 <!-- vale on -->
-
-Defines a `[map<string, string> → bool]` expression to be evaluated on labels
 
 MatchExpression has multiple variants, exactly one should be set.
 
@@ -5601,7 +5504,12 @@ PeriodicDecrease defines a controller for scaling in based on a periodic timer.
 
 <!-- vale on -->
 
-The period of the timer.
+The period of the timer. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>scale_in_percentage</dt>
@@ -5768,7 +5676,7 @@ Policy expresses observability-driven control logic.
 
 :::info
 
-See also [Policy overview](/concepts/policy/policy.md).
+See also [Policy overview](/concepts/advanced/policy.md).
 
 :::
 
@@ -5824,6 +5732,12 @@ output signal
 <!-- vale on -->
 
 Describes the interval between successive evaluations of the Prometheus query.
+This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>out_ports</dt>
@@ -5860,12 +5774,12 @@ single element.
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be
-queries using PromQL. Flux Meter defines histogram type of metrics in
-Prometheus. Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and
-`flux_meter_bucket`. The particular Flux Meter can be identified with the
-`flux_meter_name` label. There are additional labels available on a Flux Meter
-such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
+[Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux
+Meter defines histogram type of metrics in Prometheus. Therefore, one can refer
+to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`. The particular
+Flux Meter can be identified with the `flux_meter_name` label. There are
+additional labels available on a Flux Meter such as `valid`, `flow_status`,
+`http_status_code` and `decision_type`.
 
 :::
 
@@ -5924,7 +5838,12 @@ Generates 0 and 1 in turns.
 
 <!-- vale on -->
 
-Emitting 0 for the `false_for` duration.
+Emitting 0 for the `false_for` duration. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>out_ports</dt>
@@ -5948,7 +5867,12 @@ Output ports for the PulseGenerator component.
 
 <!-- vale on -->
 
-Emitting 1 for the `true_for` duration.
+Emitting 1 for the `true_for` duration. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -6066,8 +5990,7 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also
-[_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/rate-limiter.md).
 
 :::
 
@@ -6194,7 +6117,12 @@ continuously or only on discrete intervals.
 <!-- vale on -->
 
 Interval defines the time interval in which the token bucket will fill tokens
-specified by `fill_amount` signal.
+specified by `fill_amount` signal. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>label_key</dt>
@@ -6209,10 +6137,10 @@ specified by `fill_amount` signal.
 Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/flow-label.md) with given key. For example, to
-give each user a separate limit, assuming you have a _user_ flow label set up,
-set `label_key: "user"`. If no label key is specified, then all requests
-matching the selectors will be rate limited based on the global bucket.
+[label](/concepts/flow-label.md) with given key. For example, to give each user
+a separate limit, assuming you have a _user_ flow label set up, set
+`label_key: "user"`. If no label key is specified, then all requests matching
+the selectors will be rate limited based on the global bucket.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -6237,7 +6165,12 @@ Configuration of lazy-syncing behavior of rate limiter
 <!-- vale on -->
 
 Max idle time before token bucket state for a label is removed. If set to 0, the
-state is never removed.
+state is never removed. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -6303,8 +6236,7 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 
 :::info
 
-You can use the
-[live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests)
+You can use the [live-preview](/concepts/classifier.md#live-previewing-requests)
 feature to first preview the input to the classifier before writing the labeling
 logic.
 
@@ -6340,11 +6272,10 @@ rego:
 
 <!-- vale on -->
 
-A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to queries that define
-how to extract and propagate flow labels with that key. The name of the label
-maps to a variable in the Rego module. It maps to `data.<package>.<label>`
-variable.
+A map of {key, value} pairs mapping from [flow label](/concepts/flow-label.md)
+keys to queries that define how to extract and propagate flow labels with that
+key. The name of the label maps to a variable in the Rego module. It maps to
+`data.<package>.<label>` variable.
 
 </dd>
 <dt>module</dt>
@@ -6386,8 +6317,7 @@ Must include a "package" declaration.
 <!-- vale on -->
 
 Decides if the created flow label should be available as an attribute in OLAP
-telemetry and propagated in
-[baggage](/concepts/flow-control/flow-label.md#baggage)
+telemetry and propagated in [baggage](/concepts/flow-label.md#baggage)
 
 :::note
 
@@ -6419,7 +6349,7 @@ Resources that need to be setup for the policy to function
 
 :::info
 
-See also [Resources overview](/concepts/policy/resources.md).
+See also [Resources overview](/concepts/advanced/policy.md).
 
 :::
 
@@ -6538,8 +6468,7 @@ High-level declarative extractor.
 <!-- vale on -->
 
 Decides if the created flow label should be available as an attribute in OLAP
-telemetry and propagated in
-[baggage](/concepts/flow-control/flow-label.md#baggage)
+telemetry and propagated in [baggage](/concepts/flow-label.md#baggage)
 
 :::note
 
@@ -6673,7 +6602,12 @@ Computed moving average.
 
 <!-- vale on -->
 
-Window of time over which the moving average is computed.
+Window of time over which the moving average is computed. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -6699,12 +6633,12 @@ Whether the output is valid during the warm-up stage.
 <!-- vale on -->
 
 _Sampler_ is a component that regulates the load at a
-[_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing
-only a specified percentage of flows at random or by sticky sessions.
+[_Control Point_](/concepts/selector.md/#control-point) by allowing only a
+specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
+See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
 
 :::
 
@@ -6983,7 +6917,12 @@ based on the [gRPC deadline](https://grpc.io/blog/deadlines) or the
 
 Fail-open logic is use for flow control APIs, so if the gRPC deadline reaches,
 the flow will end up being unconditionally allowed while it is still waiting on
-the scheduler.
+the scheduler. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -7025,9 +6964,9 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-allows for load throttling to be "intelligent" instead of queueing flows in an
-arbitrary order. There are two aspects of this "intelligence":
+Categorizing flows into workloads allows for load throttling to be "intelligent"
+instead of queueing flows in an arbitrary order. There are two aspects of this
+"intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands that
   flows belonging to different classes have different weights (for example,
@@ -7043,7 +6982,7 @@ workloads, the first matching one will be used. If none of workloads match,
 :::info
 
 See also
-[workload definition in the concepts section](/concepts/flow-control/components/load-scheduler.md#workload).
+[workload definition in the concepts section](/concepts/scheduler/scheduler.md#workload).
 
 :::
 
@@ -7072,7 +7011,7 @@ as response latency and desired priority.
 <!-- vale on -->
 
 Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/flow-label.md).
+[flow labels](/concepts/flow-label.md).
 
 </dd>
 <dt>name</dt>
@@ -7136,6 +7075,27 @@ virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\ri
 $$
 
 </dd>
+<dt>queue_timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Timeout for the flow in the workload. If timeout is provided on the Check call
+as well, we pick the minimum of the two. If this override is not provided, the
+timeout provided in the check call is used. 0 timeout value implies that the
+request will not wait in the queue and will be accepted/dropped immediately.
+This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
 <dt>tokens</dt>
 <dd>
 
@@ -7163,13 +7123,11 @@ only if tokens for the flow aren't specified in the flow labels.
 <!-- vale on -->
 
 Selects flows based on control point, flow labels, agent group and the service
-that the
-[flow control component](/concepts/flow-control/flow-control.md#components) will
-operate on.
+that the flow control component will operate on.
 
 :::info
 
-See also [Selector overview](/concepts/flow-control/selector.md).
+See also [Selector overview](/concepts/selector.md).
 
 :::
 
@@ -7202,8 +7160,7 @@ label_matcher:
 
 <!-- vale on -->
 
-[_Agent Group_](/concepts/flow-control/selector.md#agent-group) this selector
-applies to.
+[_Agent Group_](/concepts/selector.md#agent-group) this selector applies to.
 
 :::info
 
@@ -7223,12 +7180,11 @@ configuration and form a peer to peer cluster to constantly share state.
 
 <!-- vale on -->
 
-[Control Point](/concepts/flow-control/selector.md#control-point) identifies
-location within services where policies can act on flows. For an SDK based
-insertion, a _Control Point_ can represent a particular feature or execution
-block within a service. In case of service mesh or middleware insertion, a
-_Control Point_ can identify ingress or egress calls or distinct listeners or
-filter chains.
+[Control Point](/concepts/control-point.md) identifies location within services
+where policies can act on flows. For an SDK based insertion, a _Control Point_
+can represent a particular feature or execution block within a service. In case
+of service mesh or middleware insertion, a _Control Point_ can identify ingress
+or egress calls or distinct listeners or filter chains.
 
 </dd>
 <dt>label_matcher</dt>
@@ -7240,8 +7196,8 @@ filter chains.
 
 <!-- vale on -->
 
-[Label Matcher](/concepts/flow-control/selector.md#label-matcher) can be used to
-match flows based on flow labels.
+[Label Matcher](/concepts/selector.md#label-matcher) can be used to match flows
+based on flow labels.
 
 </dd>
 <dt>service</dt>
@@ -7253,8 +7209,8 @@ match flows based on flow labels.
 
 <!-- vale on -->
 
-The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/selector.md) to select.
+The Fully Qualified Domain Name of the [service](/concepts/selector.md) to
+select.
 
 In Kubernetes, this is the FQDN of the Service object.
 
@@ -7470,7 +7426,12 @@ Parameters for the _Signal Generator_ component.
 
 <!-- vale on -->
 
-Duration for which the step is active.
+Duration for which the step is active. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 <dt>target_output</dt>

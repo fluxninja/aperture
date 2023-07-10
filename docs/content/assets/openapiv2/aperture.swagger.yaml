@@ -173,6 +173,7 @@ definitions:
                 default: 5s
                 description: |+
                     Duration of alert resolver.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -440,6 +441,7 @@ definitions:
                 default: 120s
                 description: |+
                     The amount of time to wait after a scale-in operation for another scale-in operation.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 120s
@@ -453,6 +455,7 @@ definitions:
                 default: 30s
                 description: |+
                     The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 30s
@@ -633,7 +636,7 @@ definitions:
 
             :::info
 
-            See also [Circuit overview](/concepts/policy/circuit.md).
+            See also [Circuit overview](/concepts/advanced/circuit.md).
 
             :::
 
@@ -671,6 +674,7 @@ definitions:
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 10s
@@ -679,7 +683,7 @@ definitions:
         description: |-
             :::info
 
-            See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
+            See also [Classifier overview](/concepts/classifier.md).
 
             :::
             Example
@@ -713,7 +717,7 @@ definitions:
                     $ref: '#/definitions/Rule'
                 description: |+
                     A map of {key, value} pairs mapping from
-                    [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+                    [flow label](/concepts/flow-label.md) keys to rules that define
                     how to extract and propagate flow labels with that key.
 
                 type: object
@@ -780,7 +784,7 @@ definitions:
         description: |-
             :::info
 
-            See also [Components overview](/concepts/policy/circuit.md#components).
+            See also [Components overview](/concepts/advanced/circuit.md#components).
 
             :::
 
@@ -810,7 +814,7 @@ definitions:
                 description: AutoScale components are used to scale the service.
             bool_variable:
                 $ref: '#/definitions/BoolVariable'
-                description: BoolVariable emits a constant Boolean signal which can be changed at runtime via dynamic configuration.
+                description: BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
             decider:
                 $ref: '#/definitions/Decider'
                 description: Decider emits the binary result of comparison operator on two operands.
@@ -881,7 +885,7 @@ definitions:
                 description: Takes an input signal and emits the square root of the input signal.
             variable:
                 $ref: '#/definitions/Variable'
-                description: Emits a variable signal which can be changed at runtime via dynamic configuration.
+                description: Emits a variable signal which can be changed at runtime through dynamic configuration.
         title: Computational block that forms the circuit
         type: object
     ConstantSignal:
@@ -923,6 +927,7 @@ definitions:
                 description: |+
                     Duration of time to wait before changing to false state.
                     If the duration is zero, the change will happen instantaneously.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 0s
@@ -948,9 +953,11 @@ definitions:
                 description: Output ports for the Decider component.
             true_for:
                 default: 0s
-                title: |-
+                description: |+
                     Duration of time to wait before changing to true state.
                     If the duration is zero, the change will happen instantaneously.```
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+
                 type: string
                 x-go-tag-default: 0s
         title: Type of Combinator that computes the comparison operation on LHS and RHS signals
@@ -1046,6 +1053,7 @@ definitions:
                 default: 5s
                 description: |+
                     The window of time over which differentiator operates.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -1161,6 +1169,7 @@ definitions:
             ema_window:
                 description: |+
                     Duration of EMA sampling window.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -1176,6 +1185,7 @@ definitions:
                     Duration of EMA warming up window.
 
                     The initial value of the EMA is the average of signal readings received during the warm up window.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -1325,6 +1335,7 @@ definitions:
             max_extrapolation_interval:
                 description: |+
                     Maximum time interval to repeat the last valid value of input signal.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -1370,9 +1381,6 @@ definitions:
             load_ramp:
                 $ref: '#/definitions/LoadRamp'
                 description: _Load Ramp_ smoothly regulates the flow of requests over specified steps.
-            load_ramp_series:
-                $ref: '#/definitions/LoadRampSeries'
-                description: _Load Ramp Series_ is a series of _Load Ramp_ components that can shape load one after another at same or different _Control Points_.
             load_scheduler:
                 $ref: '#/definitions/LoadScheduler'
                 description: _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
@@ -1434,7 +1442,7 @@ definitions:
 
             :::info
 
-            See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
+            See also [Flux Meter overview](/concepts/flux-meter.md).
 
             :::
             Example:
@@ -1592,6 +1600,14 @@ definitions:
                     type: number
                 type: array
                 x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+        type: object
+    GetDecisionsResponse:
+        description: GetDecisionsResponse is a response containing decisions for a given decision type.
+        properties:
+            decisions:
+                additionalProperties:
+                    type: string
+                type: object
         type: object
     GetPoliciesResponse:
         description: GetPoliciesResponse is a response containing all Policies.
@@ -1795,6 +1811,7 @@ definitions:
                 default: 5s
                 description: |+
                     Holding the last valid signal value for the `hold_for` duration.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -2116,7 +2133,7 @@ definitions:
             agent_group:
                 default: default
                 description: |+
-                    Which [agent-group](/concepts/flow-control/selector.md#agent-group) this
+                    Which [agent-group](/concepts/selector.md#agent-group) this
                     selector applies to.
 
                 type: string
@@ -2182,7 +2199,7 @@ definitions:
                 type: object
         title: |-
             Allows to define rules whether a map of
-            [labels](/concepts/flow-control/flow-label.md)
+            [labels](/concepts/flow-label.md)
             should be considered a match or not
         type: object
     LimiterDecision:
@@ -2386,6 +2403,7 @@ definitions:
             duration:
                 description: |+
                     Duration for which the step is active.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -2401,59 +2419,11 @@ definitions:
         required:
             - duration
         type: object
-    LoadRampSeries:
-        description: _LoadRampSeries_ is a component that applies a series of _Load Ramps_ in order.
-        properties:
-            in_ports:
-                $ref: '#/definitions/LoadRampSeriesIns'
-            parameters:
-                $ref: '#/definitions/LoadRampSeriesParameters'
-                x-go-tag-validate: required
-        type: object
-    LoadRampSeriesIns:
-        description: Inputs for the _LoadRampSeries_ component.
-        properties:
-            backward:
-                $ref: '#/definitions/InPort'
-                description: Whether to progress the load ramp series towards the previous step.
-            forward:
-                $ref: '#/definitions/InPort'
-                description: Whether to progress the load ramp series towards the next step.
-            reset:
-                $ref: '#/definitions/InPort'
-                description: Whether to reset the load ramp series to the first step.
-        type: object
-    LoadRampSeriesLoadRampInstance:
-        properties:
-            load_ramp:
-                $ref: '#/definitions/LoadRampParameters'
-                description: |+
-                    The load ramp.
-
-                x-go-tag-validate: required
-            out_ports:
-                $ref: '#/definitions/LoadRampOuts'
-        type: object
-    LoadRampSeriesParameters:
-        description: Parameters for the _LoadRampSeries_ component.
-        properties:
-            load_ramps:
-                description: |+
-                    An ordered list of load ramps that get applied in order.
-
-                items:
-                    $ref: '#/definitions/LoadRampSeriesLoadRampInstance'
-                    type: object
-                type: array
-                x-go-tag-validate: required,dive
-        required:
-            - load_ramps
-        type: object
     LoadScheduler:
         description: |-
             :::info
 
-            See also [_Load Scheduler_ overview](/concepts/flow-control/components/load-scheduler.md).
+            See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
 
             :::
 
@@ -2573,7 +2543,6 @@ definitions:
             not:
                 $ref: '#/definitions/MatchExpression'
                 description: The expression negates the result of sub expression.
-        title: Defines a `[map<string, string> → bool]` expression to be evaluated on labels
         type: object
     MatchExpressionList:
         description: 'for example, `{any: {of: [expr1, expr2]}}`.'
@@ -2862,6 +2831,7 @@ definitions:
             period:
                 description: |+
                     The period of the timer.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -2934,7 +2904,7 @@ definitions:
 
             :::info
 
-            See also [Policy overview](/concepts/policy/policy.md).
+            See also [Policy overview](/concepts/advanced/policy.md).
 
             :::
 
@@ -2947,15 +2917,6 @@ definitions:
                 $ref: '#/definitions/Resources'
                 description: Resources (such as Flux Meters, Classifiers) to setup.
         type: object
-    PolicyMetadata:
-        properties:
-            blueprint_name:
-                type: string
-            blueprints_uri:
-                type: string
-            values:
-                type: string
-        type: object
     PolicyWrapper:
         properties:
             common_attributes:
@@ -2964,9 +2925,6 @@ definitions:
             policy:
                 $ref: '#/definitions/Policy'
                 title: Policy
-            policy_metadata:
-                $ref: '#/definitions/PolicyMetadata'
-                title: Policy Metadata
         type: object
     PolicyWrappers:
         properties:
@@ -3041,6 +2999,7 @@ definitions:
                 default: 10s
                 description: |+
                     Describes the interval between successive evaluations of the Prometheus query.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 10s
@@ -3059,7 +3018,7 @@ definitions:
 
                     :::info Usage with Flux Meter
 
-                    [Flux Meter](/concepts/flow-control/resources/flux-meter.md) metrics can be queries using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+                    [Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
                     Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
                     The particular Flux Meter can be identified with the `flux_meter_name` label.
                     There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
@@ -3088,6 +3047,7 @@ definitions:
                 default: 5s
                 description: |+
                     Emitting 0 for the `false_for` duration.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -3098,6 +3058,7 @@ definitions:
                 default: 5s
                 description: |+
                     Emitting 1 for the `true_for` duration.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 5s
@@ -3140,7 +3101,7 @@ definitions:
         description: |-
             :::info
 
-            See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
+            See also [_Rate Limiter_ overview](/concepts/rate-limiter.md).
 
             :::
 
@@ -3201,6 +3162,7 @@ definitions:
                 description: |+
                     Interval defines the time interval in which the token bucket
                     will fill tokens specified by `fill_amount` signal.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -3209,7 +3171,7 @@ definitions:
                     Specifies which label the rate limiter should be keyed by.
 
                     Rate limiting is done independently for each value of the
-                    [label](/concepts/flow-control/flow-label.md) with given key.
+                    [label](/concepts/flow-label.md) with given key.
                     For example, to give each user a separate limit, assuming you
                     have a _user_ flow
                     label set up, set `label_key: "user"`.
@@ -3224,6 +3186,7 @@ definitions:
                 description: |+
                     Max idle time before token bucket state for a label is removed.
                     If set to 0, the state is never removed.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 7200s
@@ -3266,7 +3229,7 @@ definitions:
 
             :::info
 
-            You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+            You can use the [live-preview](/concepts/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 
             :::
 
@@ -3294,7 +3257,7 @@ definitions:
                     $ref: '#/definitions/RegoLabelProperties'
                 description: |+
                     A map of {key, value} pairs mapping from
-                    [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
+                    [flow label](/concepts/flow-label.md) keys to queries that define
                     how to extract and propagate flow labels with that key.
                     The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
 
@@ -3338,7 +3301,7 @@ definitions:
 
                 title: |-
                     Decides if the created flow label should be available as an attribute in OLAP telemetry and
-                    propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+                    propagated in [baggage](/concepts/flow-label.md#baggage)
                 type: boolean
                 x-go-tag-default: "true"
         type: object
@@ -3395,7 +3358,7 @@ definitions:
         description: |-
             :::info
 
-            See also [Resources overview](/concepts/policy/resources.md).
+            See also [Resources overview](/concepts/advanced/policy.md).
 
             :::
         properties:
@@ -3494,7 +3457,7 @@ definitions:
 
                 title: |-
                     Decides if the created flow label should be available as an attribute in OLAP telemetry and
-                    propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+                    propagated in [baggage](/concepts/flow-label.md#baggage)
                 type: boolean
                 x-go-tag-default: "true"
         title: Rule describes a single classification Rule
@@ -3532,6 +3495,7 @@ definitions:
             sma_window:
                 description: |+
                     Window of time over which the moving average is computed.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -3548,12 +3512,12 @@ definitions:
     Sampler:
         description: |-
             _Sampler_ is a component that regulates the load at a
-            [_Control Point_](/concepts/flow-control/selector.md/#control-point) by allowing only a specified percentage of
+            [_Control Point_](/concepts/selector.md/#control-point) by allowing only a specified percentage of
             flows at random or by sticky sessions.
 
             :::info
 
-            See also [_Sampler_ overview](/concepts/flow-control/components/sampler.md).
+            See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
 
             :::
         properties:
@@ -3664,6 +3628,7 @@ definitions:
                     Fail-open logic is use for flow control APIs, so if the gRPC deadline
                     reaches, the flow will end up being unconditionally allowed while
                     it is still waiting on the scheduler.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-default: 0.01s
@@ -3683,7 +3648,7 @@ definitions:
                 description: |+
                     List of workloads to be used in scheduler.
 
-                    Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+                    Categorizing flows into workloads
                     allows for load throttling to be "intelligent" instead of queueing flows in an arbitrary order.
                     There are two aspects of this "intelligence":
                     * Scheduler can more precisely calculate concurrency if it understands
@@ -3699,7 +3664,7 @@ definitions:
                     :::info
 
                     See also [workload definition in the concepts
-                    section](/concepts/flow-control/components/load-scheduler.md#workload).
+                    section](/concepts/scheduler/scheduler.md#workload).
 
                     :::
 
@@ -3717,7 +3682,7 @@ definitions:
                 $ref: '#/definitions/LabelMatcher'
                 description: |+
                     Label Matcher to select a Workload based on
-                    [flow labels](/concepts/flow-control/flow-label.md).
+                    [flow labels](/concepts/flow-label.md).
 
                 x-go-tag-validate: required
             name:
@@ -3751,6 +3716,14 @@ definitions:
                 type: string
                 x-go-tag-default: "1"
                 x-go-tag-validate: gt=0
+            queue_timeout:
+                description: |-
+                    Timeout for the flow in the workload.
+                    If timeout is provided on the Check call as well, we pick the minimum of the two.
+                    If this override is not provided, the timeout provided in the check call is used.
+                    0 timeout value implies that the request will not wait in the queue and will be accepted/dropped immediately.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+                type: string
             tokens:
                 description: |-
                     Tokens determines the cost of admitting a single flow in the workload,
@@ -3765,12 +3738,12 @@ definitions:
     Selector:
         description: |-
             Selects flows based on control point, flow labels, agent group and the service
-            that the [flow control component](/concepts/flow-control/flow-control.md#components)
+            that the flow control component
             will operate on.
 
             :::info
 
-            See also [Selector overview](/concepts/flow-control/selector.md).
+            See also [Selector overview](/concepts/selector.md).
 
             :::
 
@@ -3795,7 +3768,7 @@ definitions:
             agent_group:
                 default: default
                 description: |+
-                    [_Agent Group_](/concepts/flow-control/selector.md#agent-group) this
+                    [_Agent Group_](/concepts/selector.md#agent-group) this
                     selector applies to.
 
                     :::info
@@ -3810,7 +3783,7 @@ definitions:
                 x-go-tag-default: default
             control_point:
                 description: |+
-                    [Control Point](/concepts/flow-control/selector.md#control-point)
+                    [Control Point](/concepts/control-point.md)
                     identifies location within services where policies can act on flows.
                     For an SDK based insertion,
                     a _Control Point_ can represent a particular feature or execution
@@ -3823,13 +3796,13 @@ definitions:
             label_matcher:
                 $ref: '#/definitions/LabelMatcher'
                 description: |-
-                    [Label Matcher](/concepts/flow-control/selector.md#label-matcher)
+                    [Label Matcher](/concepts/selector.md#label-matcher)
                     can be used to match flows based on flow labels.
             service:
                 default: any
                 description: |+
                     The Fully Qualified Domain Name of the
-                    [service](/concepts/flow-control/selector.md) to select.
+                    [service](/concepts/selector.md) to select.
 
                     In Kubernetes, this is the FQDN of the Service object.
 
@@ -3958,6 +3931,7 @@ definitions:
             duration:
                 description: |+
                     Duration for which the step is active.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
                 x-go-tag-validate: required
@@ -4456,6 +4430,25 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-agent
+    /v1/decisions/{decision_type}:
+        get:
+            operationId: PolicyService_GetDecisions
+            parameters:
+                - in: path
+                  name: decision_type
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetDecisionsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-controller
     /v1/discovery/entities:
         get:
             operationId: EntitiesService_GetEntities
@@ -4883,8 +4876,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string
@@ -4917,8 +4908,6 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        policy_metadata:
-                            $ref: '#/definitions/PolicyMetadata'
                         update_mask:
                             description: The paths to update.
                             type: string

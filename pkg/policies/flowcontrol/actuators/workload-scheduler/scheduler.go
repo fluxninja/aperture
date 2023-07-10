@@ -17,6 +17,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	multimatcher "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
@@ -355,12 +356,12 @@ func (wsFactory *Factory) NewScheduler(
 // Decide processes a single flow by load scheduler in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) iface.LimiterDecision {
+func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority uint64
 	var matchedWorkloadIndex string
 	// match labels against ws.workloadMultiMatcher
-	mmr := s.workloadMultiMatcher.Match(multimatcher.Labels(labels))
+	mmr := s.workloadMultiMatcher.Match(labels)
 	// if at least one match, return workload with lowest index
 	if len(mmr.matchedWorkloads) > 0 {
 		// select the smallest workloadIndex
@@ -400,8 +401,15 @@ func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) iface.
 		tokens = matchedWorkloadParametersProto.Tokens
 	}
 
+	var matchedWorkloadTimeout time.Duration
+	hasWorkloadTimeout := false
+	if matchedWorkloadParametersProto.QueueTimeout != nil {
+		matchedWorkloadTimeout = matchedWorkloadParametersProto.QueueTimeout.AsDuration()
+		hasWorkloadTimeout = true
+	}
+
 	if s.proto.TokensLabelKey != "" {
-		if val, ok := labels[s.proto.TokensLabelKey]; ok {
+		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
 			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
 				tokens = parsedTokens
 			}
@@ -410,7 +418,8 @@ func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) iface.
 
 	reqCtx := ctx
 
-	if clientDeadline, hasDeadline := ctx.Deadline(); hasDeadline {
+	clientDeadline, hasClientDeadline := ctx.Deadline()
+	if hasClientDeadline {
 		// The clientDeadline is calculated based on client's timeout, passed
 		// as grpc-timeout. Our goal is for the response to be received by the
 		// client before its deadline passes (otherwise we risk fail-open on
@@ -424,7 +433,18 @@ func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) iface.
 			// dropped if it doesn't get the tokens immediately.
 			timeout = 0
 		}
+
+		// find the minimum of matchedWorkloadTimeout and client's timeout
+		if hasWorkloadTimeout && matchedWorkloadTimeout < timeout {
+			timeout = matchedWorkloadTimeout
+		}
+
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		reqCtx = timeoutCtx
+	} else if hasWorkloadTimeout {
+		// If there is no client deadline but there is a workload timeout, we create a new context with the workload timeout.
+		timeoutCtx, cancel := context.WithTimeout(ctx, matchedWorkloadTimeout)
 		defer cancel()
 		reqCtx = timeoutCtx
 	}
@@ -455,7 +475,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels map[string]string) iface.
 }
 
 // Revert reverts the decision made by the limiter.
-func (s *Scheduler) Revert(ctx context.Context, labels map[string]string, decision *flowcontrolv1.LimiterDecision) {
+func (s *Scheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
 		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
 		if tokens > 0 {

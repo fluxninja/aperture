@@ -1018,6 +1018,9 @@ spec:
                       lease_ttl:
                         description: Lease time-to-live
                         type: string
+                      namespace:
+                        description: etcd namespace
+                        type: string
                       password:
                         type: string
                       tls:
@@ -1172,6 +1175,17 @@ spec:
                                 type: integer
                             type: object
                         type: object
+                      controller_id:
+                        description: Controller ID.
+                        type: string
+                      disable_local_otel_pipeline:
+                        description: Whether to configure local Prometheus OTel pipeline
+                          for metrics. Implied to be true by EnableCloudController.
+                        type: boolean
+                      enable_cloud_controller:
+                        description: Whether to enable cloud controller. Overrides
+                          etcd and TLS configurations.
+                        type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in
                           agent service. To use HTTP protocol, the address must start
@@ -1386,6 +1400,19 @@ spec:
                       address:
                         description: Address of the Prometheus server
                         type: string
+                      labels:
+                        description: A list of labels to be attached to every query
+                        items:
+                          description: PrometheusLabel holds Name->Value mapping for
+                            the label that will be attached to every PromQL query
+                            executed by the controller.
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
                     type: object
                   readiness:
                     description: Readiness probe configuration.
@@ -1539,6 +1566,16 @@ spec:
                             description: Server Key file path
                             type: string
                         type: object
+                    type: object
+                  token_source:
+                    description: Google Token Source configuration
+                    properties:
+                      enabled:
+                        type: boolean
+                      scopes:
+                        items:
+                          type: string
+                        type: array
                     type: object
                   watchdog:
                     description: Watchdog configuration.
@@ -3716,6 +3753,9 @@ spec:
               image:
                 description: Image configuration
                 properties:
+                  digest:
+                    description: The digest (sha) of the image
+                    type: string
                   pullPolicy:
                     description: The ImagePullPolicy of the image
                     type: string
@@ -5391,6 +5431,9 @@ spec:
                   create:
                     description: Specifies whether a ServiceAccount should be created
                     type: boolean
+                  name:
+                    description: Existing ServiceAccount name to be used
+                    type: string
                 required:
                 - create
                 type: object
@@ -6711,6 +6754,8 @@ spec:
           status:
             description: ControllerStatus defines the observed state of Controller.
             properties:
+              isMigrationCompleted:
+                type: boolean
               resources:
                 type: string
             type: object

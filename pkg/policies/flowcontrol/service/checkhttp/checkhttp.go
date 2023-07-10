@@ -12,7 +12,6 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -75,10 +74,13 @@ type Handler struct {
 // CheckHTTP is the Check method of Flow Control service returns the allow/deny decisions of
 // whether to accept the traffic after running the algorithms.
 func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTTPRequest) (*flowcontrolhttpv1.CheckHTTPResponse, error) {
+	// Put inner fields back into pool.
+	// Note: Not pooling the whole CheckHTTPRequest, as we don't control the object creation.
+	defer req.ResetVT()
 	// record the start time of the request
 	start := time.Now()
 	createResponse := func(checkResponse *flowcontrolv1.CheckResponse) *flowcontrolhttpv1.CheckHTTPResponse {
-		marshalledCheckResponse, err := proto.Marshal(checkResponse)
+		marshalledCheckResponse, err := checkResponse.MarshalVT()
 		if err != nil {
 			log.Bug().Err(err).Msg("bug: Failed to marshal check response")
 			return nil
@@ -142,7 +144,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, destinationSvcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, destinationSvcs, ctrlPt, mergedFlowLabels, input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -160,7 +162,6 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	// Make the freshly created flow labels available to flowcontrol.
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
-	flowLabels := mergedFlowLabels.ToPlainMap()
 
 	// Ask flow control service for Ok/Deny
 	// checkResponse := h.fcHandler.CheckRequest(ctx, destinationSvcs, ctrlPt, flowLabels)
@@ -168,12 +169,12 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 		iface.RequestContext{
 			Services:     destinationSvcs,
 			ControlPoint: ctrlPt,
-			FlowLabels:   flowLabels,
+			FlowLabels:   mergedFlowLabels,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
-	checkResponse.TelemetryFlowLabels = flowLabels
+	checkResponse.TelemetryFlowLabels = mergedFlowLabels.TelemetryLabels()
 	// add control point type
 	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 	checkResponse.TelemetryFlowLabels[otelconsts.ApertureSourceServiceLabel] = strings.Join(sourceSvcs, ",")
@@ -212,6 +213,9 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 			Status: statusCode,
 		}
 		if checkResponse.WaitTime != nil {
+			if deniedHTTPResponse.Headers == nil {
+				deniedHTTPResponse.Headers = map[string]string{}
+			}
 			deniedHTTPResponse.Headers["retry-after"] = waitTimeToRetryAfter(checkResponse.WaitTime)
 			// Clear to avoid redundancy, as we're translating it into header.
 			// Logs processor doesn't read it and clients aren't supposed to

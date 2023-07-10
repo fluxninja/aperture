@@ -21,7 +21,7 @@ const (
 )
 
 // Allows to define rules whether a map of
-// [labels](/concepts/flow-control/flow-label.md)
+// [labels](/concepts/flow-label.md)
 // should be considered a match or not
 //
 // It provides three ways to define requirements:
@@ -172,8 +172,6 @@ func (x *K8SLabelMatcherRequirement) GetValues() []string {
 	return nil
 }
 
-// Defines a `[map<string, string> → bool]` expression to be evaluated on labels
-//
 // MatchExpression has multiple variants, exactly one should be set.
 //
 // Example:

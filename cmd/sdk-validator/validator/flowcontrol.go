@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/check"
@@ -32,7 +33,7 @@ func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.Check
 
 	start := time.Now()
 	resp := f.CommonHandler.CheckRequest(ctx, iface.RequestContext{
-		FlowLabels:   req.Labels,
+		FlowLabels:   labels.PlainMap(req.Labels),
 		ControlPoint: req.ControlPoint,
 		Services:     services,
 	})

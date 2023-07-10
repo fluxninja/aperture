@@ -42,6 +42,10 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	if (controller.Spec.Image.Digest == "" && controller.Spec.Image.Tag == "") || (controller.Spec.Image.Digest != "" && controller.Spec.Image.Tag != "") {
+		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
+	}
+
 	if controller.Spec.Secrets.FluxNinjaExtension.Create && controller.Spec.Secrets.FluxNinjaExtension.Value == "" {
 		return admission.Denied("The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 	}

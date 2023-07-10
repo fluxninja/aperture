@@ -184,11 +184,13 @@ message EMA {
   // Parameters for the EMA component.
   message Parameters {
     // Duration of EMA sampling window.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration ema_window = 1; // @gotags: validate:"required"
 
     // Duration of EMA warming up window.
     //
     // The initial value of the EMA is the average of signal readings received during the warm up window.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration warmup_window = 2; // @gotags: validate:"required"
 
     // Correction factor to apply on the output value if its in violation of the min envelope.
@@ -223,6 +225,7 @@ message SMA {
   }
   message Parameters {
     // Window of time over which the moving average is computed.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration sma_window = 1; // @gotags: validate:"required"
     // Whether the output is valid during the warm-up stage.
     bool valid_during_warmup = 2; // @gotags: default:"false"
@@ -304,10 +307,12 @@ message Decider {
 
   // Duration of time to wait before changing to true state.
   // If the duration is zero, the change will happen instantaneously.```
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration true_for = 4; // @gotags: default:"0s"
 
   // Duration of time to wait before changing to false state.
   // If the duration is zero, the change will happen instantaneously.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration false_for = 5; // @gotags: default:"0s"
 }
 
@@ -451,6 +456,7 @@ message Extrapolator {
   // Parameters for the Extrapolator component.
   message Parameters {
     // Maximum time interval to repeat the last valid value of input signal.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration max_extrapolation_interval = 1; // @gotags: validate:"required"
   }
 
@@ -640,6 +646,7 @@ message Alerter {
     string severity = 2; // @gotags: default:"info" validate:"oneof=info warn crit"
 
     // Duration of alert resolver.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration resolve_timeout = 3; // @gotags: default:"5s"
 
     // A list of alert channel strings.
@@ -710,6 +717,7 @@ message Differentiator {
   Outs out_ports = 2;
 
   // The window of time over which differentiator operates.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration window = 3; // @gotags: default:"5s"
 }
 
@@ -724,9 +732,11 @@ message PulseGenerator {
   Outs out_ports = 1;
 
   // Emitting 1 for the `true_for` duration.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration true_for = 2; // @gotags: default:"5s"
 
   // Emitting 0 for the `false_for` duration.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration false_for = 3; // @gotags: default:"5s"
 }
 
@@ -753,6 +763,7 @@ message Holder {
   Outs out_ports = 2;
 
   // Holding the last valid signal value for the `hold_for` duration.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration hold_for = 3; // @gotags: default:"5s"
 }
 
@@ -801,6 +812,7 @@ message SignalGenerator {
       // The value of the step.
       ConstantSignal target_output = 1;
       // Duration for which the step is active.
+      // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
     repeated Step steps = 1; // @gotags: validate:"required,gt=0,dive"

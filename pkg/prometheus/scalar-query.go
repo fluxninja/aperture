@@ -29,6 +29,7 @@ func NewScalarQueryJob(
 	query string,
 	endTimestamp time.Time,
 	promAPI prometheusv1.API,
+	enforcer *PrometheusEnforcer,
 	timeout time.Duration,
 	resultCallback ScalarResultCallback,
 	errorCallback PromErrorCallback,
@@ -36,7 +37,7 @@ func NewScalarQueryJob(
 ) jobs.JobCallback {
 	sq := &ScalarQuery{scalarResultCallback: resultCallback, query: query, errorCallback: errorCallback}
 
-	return NewPromQueryJob(query, endTimestamp, promAPI, timeout, sq.execute, errorCallback, cbArgs...)
+	return NewPromQueryJob(query, endTimestamp, promAPI, enforcer, timeout, sq.execute, errorCallback, cbArgs...)
 }
 
 func (sq *ScalarQuery) execute(ctx context.Context, value prometheusmodel.Value, cbArgs ...interface{}) (proto.Message, error) {

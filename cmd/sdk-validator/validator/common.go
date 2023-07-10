@@ -5,8 +5,6 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"golang.org/x/exp/maps"
-
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
@@ -32,7 +30,7 @@ func (c *CommonHandler) CheckRequest(ctx context.Context,
 	services := requestContext.Services
 	var path string
 	var found bool
-	if path, found = labels["http.target"]; !found {
+	if path, found = labels.Get("http.target"); !found {
 		// traffic control points will have this label set
 		log.Trace().Msg("Missing request path label")
 		path = targetLabelMissing
@@ -41,7 +39,7 @@ func (c *CommonHandler) CheckRequest(ctx context.Context,
 
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
-		FlowLabelKeys: maps.Keys(labels),
+		FlowLabelKeys: labels.SortedKeys(),
 		Services:      services,
 		ControlPoint:  controlPoint,
 		RejectReason:  flowcontrolv1.CheckResponse_REJECT_REASON_NONE,

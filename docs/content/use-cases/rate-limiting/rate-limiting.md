@@ -6,6 +6,13 @@ sidebar_position: 3
 sidebar_label: Rate Limiting
 ---
 
+:::note
+
+The following policy is based on the
+[Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint.
+
+:::
+
 ## Overview
 
 Rate limiting is a critical strategy for managing the load on an API. By
@@ -30,7 +37,7 @@ performance and resource allocation.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/rate-limiting.mmd}
+{@include: ./assets/rate-limiting/rate-limiting.mmd}
 ```
 
 </Zoom>

@@ -50,8 +50,7 @@ viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
 [Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
-with a combination of
-[Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
+with a combination of [Rate-Limiting Actuator](/concepts/rate-limiter.md) to
 dynamically rate-limit traffic from unwanted users, which protects the demo
 application against sudden surges in traffic load. You can verify it using the
 following command:
@@ -317,7 +316,7 @@ clicked.
 
 There are other playground scenarios under the `playground/scenarios/`
 directory, and they can be loaded during `Tilt` setup by passing a relative path
-to the scenario, e.g. `tilt up -- --scenario scenarios/feature-rollout`
+to the scenario, e.g. `tilt up -- --scenario scenarios/load-ramping`
 
 > 📍 You can skip building of aperture container images to speed up your work on
 > the scenario, by passing `-- --dockerhub-image` to the `tilt up` command. In

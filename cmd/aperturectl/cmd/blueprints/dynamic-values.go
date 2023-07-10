@@ -23,7 +23,7 @@ var dynamicValuesCmd = &cobra.Command{
 	Long: `
 Provides a dynamic values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
 	SilenceErrors: true,
-	Example:       `aperturectl blueprints dynamic-values --name=policies/rate-limiting --output-file=values.yaml`,
+	Example:       `aperturectl blueprints dynamic-values --name=rate-limiting/base --output-file=values.yaml`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")

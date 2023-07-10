@@ -24,7 +24,9 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/fluxninja/aperture/v2/operator/controllers"
 	. "github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -53,10 +55,11 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			instance.Name = Test
 			instance.Namespace = Test
 			reconciler = &ControllerReconciler{
-				Client:        K8sClient,
-				DynamicClient: K8sDynamicClient,
-				Scheme:        scheme.Scheme,
-				Recorder:      K8sManager.GetEventRecorderFor(AppName),
+				Client:           K8sClient,
+				DynamicClient:    K8sDynamicClient,
+				Scheme:           scheme.Scheme,
+				Recorder:         K8sManager.GetEventRecorderFor(AppName),
+				ResourcesDeleted: map[string]bool{},
 			}
 		})
 
@@ -81,6 +84,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -89,30 +93,29 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 					Namespace: namespace,
 				},
 			})
-
 			createdControllerConfigMap := &corev1.ConfigMap{}
-			controllerConfigKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerConfigKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdControllerService := &corev1.Service{}
-			controllerServiceKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerServiceKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: ControllerServiceName}
+			clusterRoleKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
-			clusterRoleBindingKey := types.NamespacedName{Name: ControllerServiceName}
+			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerServiceAccount := &corev1.ServiceAccount{}
-			controllerServiceAccountKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ServiceAccountName(instance), Namespace: namespace}
 
 			createdControllerDeployment := &appsv1.Deployment{}
-			controllerDeploymentKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerDeploymentKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: ControllerServiceName}
+			vwcKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerSecret := &corev1.Secret{}
-			controllerSecretKey := types.NamespacedName{Name: SecretName(Test, "controller", &instance.Spec.Secrets.FluxNinjaExtension), Namespace: namespace}
+			controllerSecretKey := types.NamespacedName{Name: Test, Namespace: namespace}
 
 			createdControllerCertSecret := &corev1.Secret{}
 			controllerCertSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-cert", instance.GetName()), Namespace: namespace}
@@ -130,6 +133,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 				err7 := K8sClient.Get(Ctx, vwcKey, createdVWC)
 				err8 := K8sClient.Get(Ctx, controllerSecretKey, createdControllerSecret)
 				err9 := K8sClient.Get(Ctx, controllerCertSecretKey, createdControllerCertSecret)
+				log.Error().Msgf("err1: %v, err2: %v, err3: %v, err4: %v, err5: %v, err6: %v, err7: %v, err8: %v, err9: %v", err1, err2, err3, err4, err5, err6, err7, err8, err9)
 				return err1 == nil && err2 == nil && err3 == nil && err4 == nil &&
 					err5 == nil && err6 == nil && err7 == nil && err8 != nil && err9 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
@@ -152,6 +156,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			instance.Namespace = namespace
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -162,28 +167,28 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			})
 
 			createdControllerConfigMap := &corev1.ConfigMap{}
-			controllerConfigKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerConfigKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdControllerService := &corev1.Service{}
-			controllerServiceKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerServiceKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: ControllerServiceName}
+			clusterRoleKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
-			clusterRoleBindingKey := types.NamespacedName{Name: ControllerServiceName}
+			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerServiceAccount := &corev1.ServiceAccount{}
-			controllerServiceAccountKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ServiceAccountName(instance), Namespace: namespace}
 
 			createdControllerDeployment := &appsv1.Deployment{}
-			controllerDeploymentKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
+			controllerDeploymentKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
 
 			createdVWC := &admissionregistrationv1.ValidatingWebhookConfiguration{}
-			vwcKey := types.NamespacedName{Name: ControllerServiceName}
+			vwcKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerSecret := &corev1.Secret{}
-			controllerSecretKey := types.NamespacedName{Name: SecretName(Test, "controller", &instance.Spec.Secrets.FluxNinjaExtension), Namespace: namespace}
+			controllerSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-apikey", instance.GetName()), Namespace: namespace}
 
 			createdControllerCertSecret := &corev1.Secret{}
 			controllerCertSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-cert", instance.GetName()), Namespace: namespace}
@@ -224,6 +229,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -270,8 +276,10 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 
 			instance.Namespace = namespace
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
+			instance.Spec.CommonSpec.ServiceAccountSpec.Name = Test
 			instance.Spec.Secrets.FluxNinjaExtension.Create = true
 			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
+			instance.Spec.Image.Digest = TestDigest
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls6.crt")
@@ -299,7 +307,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
-			clusterRoleBindingKey := types.NamespacedName{Name: ControllerServiceName}
+			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			Eventually(func() bool {
 				return K8sClient.Get(Ctx, clusterRoleBindingKey, createdClusterRoleBinding) == nil
