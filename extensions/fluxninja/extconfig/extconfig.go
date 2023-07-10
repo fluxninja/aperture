@@ -2,6 +2,9 @@
 package extconfig
 
 import (
+	"time"
+
+	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -28,8 +31,10 @@ type FluxNinjaExtensionConfig struct {
 	ClientConfig ClientConfig `json:"client"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
-	// Whether to configure local Prometheus OTel pipeline for metrics
+	// Whether to configure local Prometheus OTel pipeline for metrics. Implied to be true by EnableCloudController.
 	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
+	// Whether to enable cloud controller. Overrides etcd and TLS configurations.
+	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
 	// Controller ID.
 	ControllerID string `json:"controller_id,omitempty"`
 }
@@ -48,6 +53,7 @@ type ClientConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideConfig),
+		fx.Provide(provideEtcdConfigOverride),
 	)
 }
 
@@ -58,4 +64,20 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 		return nil, err
 	}
 	return &extensionConfig, nil
+}
+
+func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) (*etcd.EtcdConfigOverride, error) {
+	if extensionConfig.EnableCloudController {
+		return &etcd.EtcdConfigOverride{
+			EtcdConfig: etcd.EtcdConfig{
+				Namespace: "",
+				Endpoints: []string{extensionConfig.Endpoint},
+				LeaseTTL:  config.MakeDuration(60 * time.Second),
+			},
+			HeaderKey:   "apiKey",
+			HeaderValue: extensionConfig.APIKey,
+		}, nil
+	} else {
+		return nil, nil
+	}
 }

@@ -8,6 +8,7 @@ import (
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
@@ -38,10 +39,11 @@ const (
 type ClientIn struct {
 	fx.In
 
-	Unmarshaller config.Unmarshaller
-	Lifecycle    fx.Lifecycle
-	Shutdowner   fx.Shutdowner
-	Logger       *log.Logger
+	Unmarshaller   config.Unmarshaller
+	Lifecycle      fx.Lifecycle
+	Shutdowner     fx.Shutdowner
+	Logger         *log.Logger
+	ConfigOverride *etcd.EtcdConfigOverride `optional:"true"`
 }
 
 // Client is a wrapper around etcd client v3. It provides interfaces rooted by a namespace in etcd.
@@ -56,11 +58,17 @@ type Client struct {
 
 // ProvideClient creates a new Etcd Client and provides it via Fx.
 func ProvideClient(in ClientIn) (*Client, error) {
-	var config etcd.EtcdConfig
+	var etcdConf etcd.EtcdConfig
 
-	if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
-		log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
-		return nil, err
+	if in.ConfigOverride != nil {
+		etcdConf.Namespace = in.ConfigOverride.Namespace
+		etcdConf.Endpoints = in.ConfigOverride.Endpoints
+		etcdConf.LeaseTTL = in.ConfigOverride.LeaseTTL
+	} else {
+		if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &etcdConf); err != nil {
+			log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
+			return nil, err
+		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -69,20 +77,32 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			tlsConfig, tlsErr := config.ClientTLSConfig.GetTLSConfig()
+			tlsConfig, tlsErr := etcdConf.ClientTLSConfig.GetTLSConfig()
 			if tlsErr != nil {
 				log.Error().Err(tlsErr).Msg("Failed to get TLS config")
 				cancel()
 				return tlsErr
 			}
+
+			var dialOptions []grpc.DialOption
+
+			headers := map[string]string{
+				in.ConfigOverride.HeaderKey: in.ConfigOverride.HeaderValue,
+			}
+
+			if in.ConfigOverride != nil {
+				dialOptions = append(dialOptions, headerInterceptor(headers))
+			}
+
 			log.Info().Msg("Initializing etcd client")
 			cli, err := clientv3.New(clientv3.Config{
-				Endpoints: config.Endpoints,
-				Context:   ctx,
-				TLS:       tlsConfig,
-				Username:  config.Username,
-				Password:  config.Password,
-				Logger:    zap.New(log.NewZapAdapter(in.Logger, "etcd-client"), zap.IncreaseLevel(zap.WarnLevel)),
+				Endpoints:   etcdConf.Endpoints,
+				Context:     ctx,
+				TLS:         tlsConfig,
+				Username:    etcdConf.Username,
+				Password:    etcdConf.Password,
+				Logger:      zap.New(log.NewZapAdapter(in.Logger, "etcd-client"), zap.IncreaseLevel(zap.WarnLevel)),
+				DialOptions: dialOptions,
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to initialize etcd client")
@@ -100,15 +120,15 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			etcdClient.Client = cli
 
 			// namespace the client
-			cli.Lease = namespacev3.NewLease(cli.Lease, config.Namespace)
+			cli.Lease = namespacev3.NewLease(cli.Lease, etcdConf.Namespace)
 			etcdClient.Lease = cli.Lease
-			cli.KV = namespacev3.NewKV(cli.KV, config.Namespace)
+			cli.KV = namespacev3.NewKV(cli.KV, etcdConf.Namespace)
 			etcdClient.KV = cli.KV
-			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, config.Namespace)
+			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, etcdConf.Namespace)
 			etcdClient.Watcher = cli.Watcher
 
 			// Create a new Session
-			session, err := concurrencyv3.NewSession(etcdClient.Client, concurrencyv3.WithTTL((int)(config.LeaseTTL.AsDuration().Seconds())))
+			session, err := concurrencyv3.NewSession(etcdClient.Client, concurrencyv3.WithTTL((int)(etcdConf.LeaseTTL.AsDuration().Seconds())))
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to create a new session")
 				cancel()
@@ -139,4 +159,25 @@ func ProvideClient(in ClientIn) (*Client, error) {
 	})
 
 	return etcdClient, nil
+}
+
+func headerInterceptor(headers map[string]string) grpc.DialOption {
+	rpcHeaders := &perRPCHeaders{
+		headers,
+	}
+	return grpc.WithPerRPCCredentials(rpcHeaders)
+}
+
+type perRPCHeaders struct {
+	headers map[string]string
+}
+
+// GetRequestMetadata returns the request headers to be used with the RPC.
+func (p *perRPCHeaders) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
+	return p.headers, nil
+}
+
+// RequireTransportSecurity always returns true for this implementation.
+func (p *perRPCHeaders) RequireTransportSecurity() bool {
+	return true
 }

@@ -1296,7 +1296,11 @@ spec:
                         type: string
                       disable_local_otel_pipeline:
                         description: Whether to configure local Prometheus OTel pipeline
-                          for metrics
+                          for metrics. Implied to be true by EnableCloudController.
+                        type: boolean
+                      enable_cloud_controller:
+                        description: Whether to enable cloud controller. Overrides
+                          etcd and TLS configurations.
                         type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in
