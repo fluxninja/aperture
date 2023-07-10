@@ -1,4 +1,4 @@
-local kubeletstats_infra_meter(agent_group, filters) = {
+local kubeletstats_infra_meter(agent_group, selectors) = {
   kubeletstats: {
     agent_group: agent_group,
     pipeline: {
@@ -28,7 +28,7 @@ local kubeletstats_infra_meter(agent_group, filters) = {
             'k8s.container.name',
           ],
         },
-        selector: filters,
+        selectors: if std.isArray(selectors) then selectors else [selectors],
         pod_association: [
           {
             sources: [

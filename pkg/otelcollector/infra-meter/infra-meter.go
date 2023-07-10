@@ -14,6 +14,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
 	"go.opentelemetry.io/collector/component"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
@@ -78,16 +80,18 @@ func addInfraMeter(
 			return fmt.Errorf("failed to prepare sha256 for receiver '%s' in infra_meter: '%s' of Policy: '%s': %w", origName, infraMeterName, policyName, err)
 		}
 		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", configSHA.Sum(nil)))
+		strID := id.String()
 
 		// If receiver is already present with given id and per-agent-group = false, skip adding receiver with per-agent-group = true.
-		if _, ok := config.Receivers[id.String()]; ok && infraMeter.PerAgentGroup {
-			receiverIDs[origName] = id.String()
+		if _, ok := config.Receivers[strID]; ok && infraMeter.PerAgentGroup {
+			receiverIDs[origName] = strID
 			continue
 		}
 
 		var cfg any
 		cfg = receiverConfig.AsMap()
 		id, cfg = leaderonlyreceiver.WrapConfigIf(infraMeter.PerAgentGroup, id, cfg)
+		strID = id.String()
 
 		// Remove receiver for per-agent-group infra-meter if a receiver with the same config already exists without per-agent-group.
 		if !infraMeter.PerAgentGroup {
@@ -99,18 +103,77 @@ func addInfraMeter(
 						receiverIDs[key] = id.String()
 					}
 				}
-				continue
+
+				// Update pipelines to use the new receiver id.
+				for key, value := range config.Service.Pipelines {
+					if slices.Contains(value.Receivers, updatedID.String()) {
+						value.Receivers[slices.Index(value.Receivers, updatedID.String())] = id.String()
+						config.Service.Pipelines[key] = value
+					}
+				}
 			}
 		}
-		receiverIDs[origName] = id.String()
-		config.AddReceiver(id.String(), cfg)
+		receiverIDs[origName] = strID
+		config.AddReceiver(strID, cfg)
 	}
 
 	for origName, processorConfig := range infraMeter.Processors {
-		id := normalizeComponentName(pipelineName, origName)
-		processorIDs[origName] = id
-		var cfg any = processorConfig.AsMap()
-		config.AddProcessor(id, cfg)
+		var id component.ID
+		if err := id.UnmarshalText([]byte(origName)); err != nil {
+			return fmt.Errorf("invalid id %q: %w", origName, err)
+		}
+
+		selectorsList := []interface{}{}
+		var selectors *structpb.Value
+		if id.Type() == otelconsts.ProcessorK8sAttributes {
+			var ok bool
+			selectors, ok = processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors]
+			if ok && selectors != nil {
+				selectorsList = selectors.GetListValue().AsSlice()
+				delete(processorConfig.Fields, otelconsts.ProcessorK8sAttributesSelectors)
+			}
+		}
+
+		configSHA := sha256.New()
+		_, err := configSHA.Write([]byte(processorConfig.String()))
+		if err != nil {
+			return fmt.Errorf("failed to prepare sha256 for processor '%s' in infra_meter: '%s' of Policy: '%s': %w", origName, infraMeterName, policyName, err)
+		}
+		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", configSHA.Sum(nil)))
+		strID := id.String()
+		if processor, ok := config.Processors[strID]; ok {
+			if id.Type() == otelconsts.ProcessorK8sAttributes {
+				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
+				processorMap := processor.(map[string]interface{})
+				if processorMap != nil {
+					var existingSelectorsList []interface{}
+					existingSelectors, ok := processorMap[otelconsts.ProcessorK8sAttributesSelectors]
+					if !ok || existingSelectors == nil {
+						existingSelectorsList = []interface{}{}
+					} else {
+						existingSelectorsList = existingSelectors.([]interface{})
+						if existingSelectorsList == nil {
+							existingSelectorsList = []interface{}{}
+						}
+					}
+
+					if len(selectorsList) > 0 {
+						processorMap[otelconsts.ProcessorK8sAttributesSelectors] = append(existingSelectorsList, selectorsList...)
+					}
+				}
+
+				config.Processors[strID] = processorMap
+			}
+			processorIDs[origName] = strID
+			continue
+		} else {
+			if id.Type() == otelconsts.ProcessorK8sAttributes {
+				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
+			}
+			processorIDs[origName] = strID
+			var cfg any = processorConfig.AsMap()
+			config.AddProcessor(strID, cfg)
+		}
 	}
 
 	if infraMeter.Pipeline == nil {
@@ -168,15 +231,4 @@ func mapSlice(mapping map[string]string, xs []string) []string {
 		ys = append(ys, y)
 	}
 	return ys
-}
-
-// normalizeComponentName normalizes user defines component name by adding
-// `user-defined-<pipeline_name>` suffix.
-// This ensures no builtin components are overwritten.
-func normalizeComponentName(pipelineName, componentName string) string {
-	suffix := fmt.Sprintf("user-defined-%s", pipelineName)
-	if componentName == "" {
-		return suffix
-	}
-	return fmt.Sprintf("%s/%s", componentName, suffix)
 }

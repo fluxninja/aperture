@@ -158,7 +158,7 @@ func otelState(otelService *otelcol.Collector) (proto.Message, error) {
 	state := otelService.GetState()
 	var err error
 	if state != otelcol.StateRunning {
-		err = errors.New("otel-collector is not running")
+		err = errors.New("otel-collector is not running. State: " + state.String())
 	}
 	return wrapperspb.String(state.String()), err
 }
