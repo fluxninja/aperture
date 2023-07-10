@@ -68,7 +68,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 	var config etcd.EtcdConfig
 
 	if in.ConfigOverride != nil {
-		log.Error().Msg("Skipping etcd config deserialization, etcd config already provided")
+		log.Info().Msg("Skipping etcd config deserialization, etcd config already provided")
 		config.Namespace = in.ConfigOverride.Namespace
 		config.Endpoints = in.ConfigOverride.Endpoints
 		config.LeaseTTL = in.ConfigOverride.LeaseTTL
