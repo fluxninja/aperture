@@ -353,7 +353,14 @@ func (r *ControllerReconciler) deleteOlderInstances(ctx context.Context, log log
 		}
 	}
 
-	vwc := validatingWebhookConfiguration(singletonInstance.DeepCopy(), controllerClientCert.Bytes())
+	var certBytes []byte
+	if controllerClientCert == nil {
+		certBytes = []byte{}
+	} else {
+		certBytes = controllerClientCert.Bytes()
+	}
+
+	vwc := validatingWebhookConfiguration(singletonInstance.DeepCopy(), certBytes)
 	vwc.Name = controllers.ControllerServiceName
 	if err := r.Delete(ctx, vwc); err != nil && !errors.IsNotFound(err) {
 		log.Error(err, "Failed to delete old ValidatingWebhookConfiguration during Migration")
