@@ -41,12 +41,14 @@ spec:
                   name: guest
                   parameters:
                     priority: "50"
+                    queue_timeout: 1s
                 - label_matcher:
                     match_labels:
                       http.request.header.user_type: subscriber
                   name: subscriber
                   parameters:
                     priority: "200"
+                    queue_timeout: 2s
               selectors:
               - control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local

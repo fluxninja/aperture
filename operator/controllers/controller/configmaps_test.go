@@ -29,6 +29,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/utils/pointer"
 
 	controller "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
 	"github.com/fluxninja/aperture/v2/operator/api/common"
@@ -119,6 +120,15 @@ var _ = Describe("ConfigMap for Controller", func() {
 						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
+					},
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion:         "fluxninja.com/v1alpha1",
+							Name:               instance.GetName(),
+							Kind:               "Controller",
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
+						},
 					},
 				},
 				Data: map[string]string{

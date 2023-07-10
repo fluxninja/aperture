@@ -17,6 +17,10 @@ import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js
 
 Integrating Aperture with Nginx using Lua modules.
 
+![Nginx](./assets/nginx-dark.svg#gh-dark-mode-only)
+
+![Nginx](./assets/nginx-light.svg#gh-light-mode-only)
+
 ## Introduction
 
 Lua's modules are scripts that can be executed within Nginx to extend its

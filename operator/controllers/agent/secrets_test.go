@@ -52,7 +52,7 @@ var _ = Describe("Secret for Agent", func() {
 
 			expected := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("%s-aperture-agent-apikey", AppName),
+					Name:      fmt.Sprintf("%s-agent-apikey", AppName),
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,

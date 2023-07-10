@@ -30,6 +30,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/yaml"
@@ -51,7 +52,7 @@ func configMapForControllerConfig(instance *controllerv1alpha1.Controller, schem
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ConfigMapName(instance),
+			Name:        controllers.ControllerResourcesName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: instance.Spec.Annotations,
@@ -59,6 +60,10 @@ func configMapForControllerConfig(instance *controllerv1alpha1.Controller, schem
 		Data: map[string]string{
 			"aperture-controller.yaml": string(config),
 		},
+	}
+
+	if err := ctrl.SetControllerReference(instance, cm, scheme); err != nil {
+		return nil, err
 	}
 
 	return cm, nil

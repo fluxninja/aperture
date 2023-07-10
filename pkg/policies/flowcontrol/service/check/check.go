@@ -13,6 +13,8 @@ import (
 	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 )
 
+//go:generate mockgen -source=check.go -destination=../../../mocks/mock_check.go -package=mocks
+
 // Handler implements the flowcontrol.v1 Service
 //
 // It also accepts a pointer to an EntityCache for services lookup.
@@ -45,10 +47,7 @@ type HandlerWithValues interface {
 }
 
 // CheckRequest makes decision using collected inferred fields from authz or Handler.
-func (h *Handler) CheckRequest(
-	ctx context.Context,
-	requestContext iface.RequestContext,
-) *flowcontrolv1.CheckResponse {
+func (h *Handler) CheckRequest(ctx context.Context, requestContext iface.RequestContext) *flowcontrolv1.CheckResponse {
 	checkResponse := h.engine.ProcessRequest(ctx, requestContext)
 	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason())
 	return checkResponse

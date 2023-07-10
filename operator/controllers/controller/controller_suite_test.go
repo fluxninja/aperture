@@ -56,6 +56,8 @@ var (
 	cancel  context.CancelFunc
 )
 
+var controllerName = "aperture-controller-aperture"
+
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
@@ -151,6 +153,8 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
+
+	MinimumKubernetesVersionBool = true
 
 	err = config.UnmarshalYAML([]byte{}, &DefaultControllerInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())
