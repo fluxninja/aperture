@@ -94,6 +94,20 @@ Aperture Agent is a binary that can be run on the
 The installation steps are available
 [here](/get-started/installation/agent/bare_metal.md).
 
+### What are the Aperture Agent's performance numbers?
+
+The Aperture Agent is designed to be lightweight and performant.
+
+Comparing Aperture Agent’s CPU usage with the application it protects is unfair
+because the application’s CPU usage depends heavily on its workload type.
+
+With that being said, we have collected performance numbers at high RPS traffic
+constant arrival rate:
+
+- On average, CPU utilization of Aperture Agent stays close to half of Istio
+  Proxy’s
+- On average, memory consumption of Aperture Agent remains around Istio Proxy’s
+
 [Rate Limiter]: /concepts/rate-limiter.md
 [Load Scheduler]: /concepts/scheduler/load-scheduler.md
 [Classifier]: /concepts/classifier.md
