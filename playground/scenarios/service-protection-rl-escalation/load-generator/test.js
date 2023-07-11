@@ -3,22 +3,13 @@ import { check, sleep } from "k6";
 import { vu } from "k6/execution";
 import http from "k6/http";
 
-// export let vuStages = [
-//   { duration: "10s", target: 50 },
-//   { duration: "2m", target: 50 },
-//   { duration: "1m", target: 50 },
-//   { duration: "2m", target: 50 },
-//   { duration: "10s", target: 5 },
-//   { duration: "2m", target: 5 },
-// ];
-
 export let options = {
   discardResponseBodies: true,
   scenarios: {
     guests: {
       executor: "constant-arrival-rate",
       duration: '5m',
-      rate: 2000,
+      rate: 750,
       timeUnit: '1s',
       preAllocatedVUs: 100,
       env: { USER_TYPE: "guest" },
@@ -26,7 +17,7 @@ export let options = {
     subscribers: {
       executor: "constant-arrival-rate",
       duration: '5m',
-      rate: 1000,
+      rate: 250,
       timeUnit: '1s',
       preAllocatedVUs: 100,
       env: { USER_TYPE: "subscriber" },
@@ -34,7 +25,7 @@ export let options = {
     crawlers: {
       executor: "constant-arrival-rate",
       duration: '5m',
-      rate: 2000,
+      rate: 1500,
       timeUnit: '1s',
       preAllocatedVUs: 100,
       env: { USER_TYPE: "crawler" },
@@ -52,36 +43,6 @@ export default function () {
       "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
     "User-Type": userType,
     "User-Id": userId,
-    "One-Header": "one",
-    "Two-Header": "two",
-    "Three-Header": "three",
-    "Four-Header": "four",
-    "Five-Header": "five",
-    "Six-Header": "six",
-    "Seven-Header": "seven",
-    "Eight-Header": "eight",
-    "Nine-Header": "nine",
-    "Ten-Header": "ten",
-    "One-One-Header": "one-one",
-    "One-Two-Header": "one-two",
-    "One-Three-Header": "one-three",
-    "One-Four-Header": "one-four",
-    "One-Five-Header": "one-five",
-    "One-Six-Header": "one-six",
-    "One-Seven-Header": "one-seven",
-    "One-Eight-Header": "one-eight",
-    "One-Nine-Header": "one-nine",
-    "One-Ten-Header": "one-ten",
-    "Two-One-Header": "two-one",
-    "Two-Two-Header": "two-two",
-    "Two-Three-Header": "two-three",
-    "Two-Four-Header": "two-four",
-    "Two-Five-Header": "two-five",
-    "Two-Six-Header": "two-six",
-    "Two-Seven-Header": "two-seven",
-    "Two-Eight-Header": "two-eight",
-    "Two-Nine-Header": "two-nine",
-    "Two-Ten-Header": "two-ten",
   };
   const body = {
     request: [
