@@ -343,6 +343,14 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 			if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
 				log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
+
+			if slices.Contains(instance.Spec.Sidecar.EnableNamespaceByDefault, ns.GetName()) {
+				delete(ns.Labels, controllers.SidecarLabelKey)
+				ns := ns
+				if err := controllers.UpdateResource(r.Client, ctx, &ns); err != nil {
+					log.Error(err, fmt.Sprintf("failed to delete aperture label from namespace %s", ns.GetName()))
+				}
+			}
 		}
 	}
 }

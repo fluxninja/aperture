@@ -11,7 +11,7 @@ function(policyJSON, cfg) {
     dashboard+: {
       title: 'Aperture Signals - %s' % policyName,
     },
-  }),
+  }).dashboard,
 
   mainDashboard: mainDashboard,
   signalsDashboard: signalsDashboard,
