@@ -125,7 +125,6 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-	decoder := admission.NewDecoder(mgr.GetScheme())
 
 	dynamicClient, err := dynamic.NewForConfig(ctrl.GetConfigOrDie())
 	if err != nil {
@@ -191,7 +190,7 @@ func main() {
 
 		apertureInjector := &mutatingwebhook.ApertureInjector{
 			Client:  mgr.GetClient(),
-			Decoder: decoder,
+			Decoder: admission.NewDecoder(mgr.GetScheme()),
 		}
 		reconciler.ApertureInjector = apertureInjector
 
