@@ -83,7 +83,7 @@ function(cfg, params={}, metadata={}) {
       + spec.v1.AdaptiveLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
         overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
-        signal: spec.v1.Port.withSignalName('SIGNAL'),
+        signal: spec.v1.Port.withSignalName('LATENCY'),
         setpoint: spec.v1.Port.withSignalName('SETPOINT'),
       })
       + spec.v1.AdaptiveLoadScheduler.withOutPorts({

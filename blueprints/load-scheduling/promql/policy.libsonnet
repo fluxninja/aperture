@@ -18,7 +18,7 @@ function(cfg, params={}, metadata={}) {
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
             + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
-            + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
+            + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('LATENCY') }),
           ),
         ),
         spec.v1.Component.withVariable(
