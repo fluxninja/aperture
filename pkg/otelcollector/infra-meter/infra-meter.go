@@ -75,8 +75,7 @@ func addInfraMeter(
 		}
 
 		configSHA := sha256.New()
-		_, err := configSHA.Write([]byte(receiverConfig.String()))
-		if err != nil {
+		if _, err := configSHA.Write([]byte(receiverConfig.String())); err != nil {
 			return fmt.Errorf("failed to prepare sha256 for receiver '%s' in infra_meter: '%s' of Policy: '%s': %w", origName, infraMeterName, policyName, err)
 		}
 		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", configSHA.Sum(nil)))
@@ -135,33 +134,15 @@ func addInfraMeter(
 		}
 
 		configSHA := sha256.New()
-		_, err := configSHA.Write([]byte(processorConfig.String()))
-		if err != nil {
-			return fmt.Errorf("failed to prepare sha256 for processor '%s' in infra_meter: '%s' of Policy: '%s': %w", origName, infraMeterName, policyName, err)
+		if _, err := configSHA.Write([]byte(processorConfig.String())); err != nil {
+			return fmt.Errorf("failed to prepare sha256 for receiver '%s' in infra_meter: '%s' of Policy: '%s': %w", origName, infraMeterName, policyName, err)
 		}
 		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", configSHA.Sum(nil)))
 		strID := id.String()
 		if processor, ok := config.Processors[strID]; ok {
 			if id.Type() == otelconsts.ProcessorK8sAttributes {
 				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
-				processorMap := processor.(map[string]interface{})
-				if processorMap != nil {
-					var existingSelectorsList []interface{}
-					existingSelectors, ok := processorMap[otelconsts.ProcessorK8sAttributesSelectors]
-					if !ok || existingSelectors == nil {
-						existingSelectorsList = []interface{}{}
-					} else {
-						existingSelectorsList = existingSelectors.([]interface{})
-						if existingSelectorsList == nil {
-							existingSelectorsList = []interface{}{}
-						}
-					}
-
-					if len(selectorsList) > 0 {
-						processorMap[otelconsts.ProcessorK8sAttributesSelectors] = append(existingSelectorsList, selectorsList...)
-					}
-				}
-
+				processorMap := updateK8sAttributesProcessor(processor, selectorsList)
 				config.Processors[strID] = processorMap
 			}
 			processorIDs[origName] = strID
@@ -231,4 +212,26 @@ func mapSlice(mapping map[string]string, xs []string) []string {
 		ys = append(ys, y)
 	}
 	return ys
+}
+
+func updateK8sAttributesProcessor(processor interface{}, selectorsList []interface{}) map[string]interface{} {
+	processorMap := processor.(map[string]interface{})
+	if processorMap != nil {
+		var existingSelectorsList []interface{}
+		existingSelectors, ok := processorMap[otelconsts.ProcessorK8sAttributesSelectors]
+		if !ok || existingSelectors == nil {
+			existingSelectorsList = []interface{}{}
+		} else {
+			existingSelectorsList = existingSelectors.([]interface{})
+			if existingSelectorsList == nil {
+				existingSelectorsList = []interface{}{}
+			}
+		}
+
+		if len(selectorsList) > 0 {
+			processorMap[otelconsts.ProcessorK8sAttributesSelectors] = append(existingSelectorsList, selectorsList...)
+		}
+	}
+
+	return processorMap
 }
