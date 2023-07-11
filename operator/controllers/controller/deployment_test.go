@@ -282,7 +282,7 @@ var _ = Describe("Controller Deployment", func() {
 				},
 			}
 
-			result, err := deploymentForController(instance.DeepCopy(), true, logr.Logger{}, scheme.Scheme)
+			result, err := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Spec.Template.Spec.Containers).To(Equal(expected.Spec.Template.Spec.Containers))
@@ -618,7 +618,7 @@ var _ = Describe("Controller Deployment", func() {
 				},
 			}
 
-			result, err := deploymentForController(instance.DeepCopy(), true, logr.Logger{}, scheme.Scheme)
+			result, err := deploymentForController(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Spec.Template.Spec.ImagePullSecrets).To(Equal(expected.Spec.Template.Spec.ImagePullSecrets))
